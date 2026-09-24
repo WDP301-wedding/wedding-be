@@ -1,0 +1,35 @@
+{
+  "name": "wedding-be",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Backend service for the single-restaurant wedding management system.",
+  "type": "module",
+  "engines": {
+    "node": ">=24.11 <25",
+    "npm": ">=11 <12"
+  },
+  "packageManager": "npm@11.19.0",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc --project tsconfig.build.json",
+    "start": "node --enable-source-maps dist/server.js",
+    "typecheck": "tsc --project tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0",
+    "dotenv": "18.0.3",
+    "express": "5.2.1",
+    "pg": "8.23.0",
+    "zod": "4.6.5",
+    "zod-openapi": "6.0.2"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.6",
+    "@types/node": "24.13.6",
+    "@types/pg": "8.23.1",
+    "prisma": "7.10.0",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3"
+  }
+}

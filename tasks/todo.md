@@ -21,15 +21,17 @@ Specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)
 
 **Acceptance criteria:**
 
-- [ ] `package.json` pins Node 24, npm, TypeScript 5.9.3, Express 5.2.1, Prisma 7.10.0, and the approved core dependencies without preview tags.
-- [ ] ESM and strict compiler options are configured for development and production output.
-- [ ] A clean install produces exactly one committed npm lockfile.
+- [x] `package.json` pins Node 24, npm, TypeScript 5.9.3, Express 5.2.1, Prisma 7.10.0, and the approved core dependencies without preview tags.
+- [x] ESM and strict compiler options are configured for development and production output.
+- [x] A clean install produces exactly one committed npm lockfile.
 
 **Verification:**
 
-- [ ] `npm ci`
-- [ ] `npm run typecheck`
-- [ ] Inspect `npm ls --depth=0` for unexpected major versions.
+- [x] `npm ci`
+- [x] `npm run typecheck`
+- [x] Inspect `npm ls --depth=0` for unexpected major versions.
+
+**Implementation evidence (2026-09-24):** `npm ci`, typecheck, and production compilation pass; registry signatures verify for all 240 installed packages. A full `npm audit` reports four high advisories below the Prisma 7 CLI (`deepmerge-ts` and `mysql2`). `npm explain` confirms that path enters through the root development dependency and Prisma's optional peer; the application uses PostgreSQL and does not execute either affected code path. npm only offers a forced downgrade to Prisma 6.19.3, which conflicts with the approved Prisma 7 baseline, so no forced fix or unverified override was applied. Recheck by 2026-10-08 or when the next stable Prisma 7 patch is available.
 
 **Dependencies:** None  
 **Files likely touched:** `wedding-be/package.json`, `wedding-be/package-lock.json`, `wedding-be/.node-version`, `wedding-be/tsconfig.json`, `wedding-be/tsconfig.build.json`  
