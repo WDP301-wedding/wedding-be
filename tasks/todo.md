@@ -43,15 +43,17 @@ Specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)
 
 **Acceptance criteria:**
 
-- [ ] ESLint uses flat config and TypeScript-aware rules; Prettier is the only formatter.
-- [ ] Vitest runs in Node mode and enforces the approved core coverage thresholds.
-- [ ] Secrets, dependencies, build output, reports, and local environment files are ignored.
+- [x] ESLint uses flat config and TypeScript-aware rules; Prettier is the only formatter.
+- [x] Vitest runs in Node mode and enforces the approved core coverage thresholds.
+- [x] Secrets, dependencies, build output, reports, and local environment files are ignored.
 
 **Verification:**
 
-- [ ] `npm run lint`
-- [ ] `npm run test:coverage`
-- [ ] `npm run build`
+- [x] `npm run lint`
+- [x] `npm run test:coverage`
+- [x] `npm run build`
+
+**Implementation evidence (2026-09-25):** A script-disabled install and lifecycle review found only the already-approved Prisma and esbuild install hooks; the Windows-only result excludes optional `fsevents`. A normal `npm ci` then installed 375 packages successfully. Prettier check, typed ESLint, TypeScript typecheck, two Node/ESM smoke tests, per-file 80% line/branch coverage enforcement, and the production build all pass. The current empty backend entry point has no executable statements, so coverage reports `0/0` as 100%; the configured `include` and per-file thresholds will begin measuring every non-test TypeScript source file as implementation is added. Registry signatures verify for all 375 packages, and the four known Prisma CLI advisories remain unchanged from CP-01 with no new advisory introduced by the quality toolchain.
 
 **Dependencies:** CP-01  
 **Files likely touched:** `wedding-be/eslint.config.mjs`, `wedding-be/prettier.config.mjs`, `wedding-be/vitest.config.ts`, `wedding-be/src/core/smoke.test.ts`, `wedding-be/.gitignore`  
@@ -59,8 +61,8 @@ Specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)
 
 #### Checkpoint A1 — Backend toolchain
 
-- [ ] Clean install, lint, typecheck, unit test, coverage, and build all pass.
-- [ ] No secrets or build outputs appear in `git status`.
+- [x] Clean install, lint, typecheck, unit test, coverage, and build all pass.
+- [x] No secrets or build outputs appear in `git status`.
 
 ### CP-03: Establish the Public Web Next.js baseline
 

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+coverage/
+test-results/
+playwright-report/
+package-lock.json
+
+# Approved planning documents are formatted manually and must not be rewritten mechanically.
+CAPABILITY-MAP.md
+SPEC-core-platform.md
+tasks/
