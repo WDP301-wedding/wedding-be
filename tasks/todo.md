@@ -119,15 +119,17 @@ Specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)
 
 **Acceptance criteria:**
 
-- [ ] The repository is an independent App Router application for Manager/Staff surfaces.
-- [ ] It does not import the Public Web repository or backend source.
-- [ ] Public environment parsing permits only the API base URL and other explicitly public values.
+- [x] The repository is an independent App Router application for Manager/Staff surfaces.
+- [x] It does not import the Public Web repository or backend source.
+- [x] Public environment parsing permits only the API base URL and other explicitly public values.
 
 **Verification:**
 
-- [ ] `npm ci`
-- [ ] `npm run typecheck`
-- [ ] `npm ls next react react-dom typescript`
+- [x] `npm ci`
+- [x] `npm run typecheck`
+- [x] `npm ls next react react-dom typescript`
+
+**Implementation evidence (2026-09-25):** `wedding-manage-web` commit `fec1d73` establishes the independent App Router baseline and pins Next.js 16.3.6, React/React DOM 19.2.3, TypeScript 5.9.3, Zod 4.6.5, `openapi-fetch` 0.17.0, and `openapi-typescript` 7.13.0. A clean `npm ci` installs 248 packages with dependency lifecycle scripts disabled and no audit findings; route type generation, strict typecheck, ESLint 10, Prettier, and five public-environment boundary tests pass. The environment parser allowlists only `NEXT_PUBLIC_API_BASE_URL`, requires HTTPS in production, permits cleartext only for loopback development URLs, and has no source import from the Public Web or backend repositories.
 
 **Dependencies:** None; may run in parallel with CP-01, CP-03, and CP-07.  
 **Files likely touched:** framework-generated Next.js configuration set plus `wedding-manage-web/src/lib/env.ts`  
