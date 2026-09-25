@@ -70,15 +70,17 @@ Specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)
 
 **Acceptance criteria:**
 
-- [ ] The repository uses App Router and contains no backend/database dependency.
-- [ ] Node, TypeScript, Next.js, React, lint/test, and API-client packages are pinned to approved stable lines.
-- [ ] Public environment parsing recognizes only non-secret public configuration.
+- [x] The repository uses App Router and contains no backend/database dependency.
+- [x] Node, TypeScript, Next.js, React, lint/test, and API-client packages are pinned to approved stable lines.
+- [x] Public environment parsing recognizes only non-secret public configuration.
 
 **Verification:**
 
-- [ ] `npm ci`
-- [ ] `npm run typecheck`
-- [ ] `npm ls next react react-dom typescript`
+- [x] `npm ci`
+- [x] `npm run typecheck`
+- [x] `npm ls next react react-dom typescript`
+
+**Implementation evidence (2026-09-25):** `wedding-web` commit `8942770` establishes the App Router directory and pins Node 24.21.0, Next.js 16.3.6, React/React DOM 19.2.3, TypeScript 5.9.3, Vitest 5.0.1, Zod 4.6.5, `openapi-fetch` 0.17.0, and `openapi-typescript` 7.13.0. A normal `npm ci` installs 248 packages with no audit findings; route type generation, strict typecheck, ESLint 10, Prettier, and five public-environment boundary tests pass. The environment parser allowlists only `NEXT_PUBLIC_API_BASE_URL`, requires HTTPS in production, and permits cleartext only for loopback development URLs. The official direct `@next/eslint-plugin-next` integration is used because the transitive React plugins bundled by `eslint-config-next` 16.3.6 do not yet execute under the spec-mandated ESLint 10 runtime.
 
 **Dependencies:** None; may run in parallel with CP-01, CP-05, and CP-07.  
 **Files likely touched:** framework-generated Next.js configuration set plus `wedding-web/src/lib/env.ts`  
