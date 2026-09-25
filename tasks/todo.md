@@ -92,15 +92,17 @@ Specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)
 
 **Acceptance criteria:**
 
-- [ ] The root route renders a neutral foundation page and route groups exist without business screens.
-- [ ] Vitest/Testing Library has one rendering smoke test.
-- [ ] ESLint, formatting, test, and build scripts match the shared command contract.
+- [x] The root route renders a neutral foundation page and route groups exist without business screens.
+- [x] Vitest/Testing Library has one rendering smoke test.
+- [x] ESLint, formatting, test, and build scripts match the shared command contract.
 
 **Verification:**
 
-- [ ] `npm run lint`
-- [ ] `npm run test:coverage`
-- [ ] `npm run build`
+- [x] `npm run lint`
+- [x] `npm run test:coverage`
+- [x] `npm run build`
+
+**Implementation evidence (2026-09-25):** `wedding-web` commit `66df8bd` adds the neutral App Router root shell and tracked `(public)`, `(guest)`, and `(couple)` route-group placeholders without business screens. Vitest 5 runs in jsdom with Testing Library React 16.3.3, a shared cleanup setup, one semantic rendering smoke test, and per-file 80% line/branch coverage gates; the complete six-test suite reports 88.88% line and 100% branch coverage. Exact dev dependencies preserve the existing Node engine contract, lifecycle review found no new install script, and `npm audit` reports no vulnerabilities. A clean `npm ci`, formatting check, typed ESLint, route type generation, strict TypeScript check, unit tests, coverage, and the Next.js production build all pass. Browser verification confirms the prerendered `/` route has the expected main/heading structure and no console warning or error.
 
 **Dependencies:** CP-03  
 **Files likely touched:** `wedding-web/app/layout.tsx`, `wedding-web/app/page.tsx`, `wedding-web/eslint.config.mjs`, `wedding-web/vitest.config.ts`, `wedding-web/src/test/app-smoke.test.tsx`  
@@ -108,8 +110,8 @@ Specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)
 
 #### Checkpoint A2 — Public Web toolchain
 
-- [ ] Clean install, lint, typecheck, unit test, coverage, and build all pass.
-- [ ] No API secret or backend package exists in the browser bundle configuration.
+- [x] Clean install, lint, typecheck, unit test, coverage, and build all pass.
+- [x] No API secret or backend package exists in the browser bundle configuration.
 
 ### CP-05: Establish the Management Web Next.js baseline
 
