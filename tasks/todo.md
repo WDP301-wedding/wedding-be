@@ -141,15 +141,17 @@ Specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)
 
 **Acceptance criteria:**
 
-- [ ] Auth, Manager, and Staff route groups exist as structure only.
-- [ ] Vitest/Testing Library has one rendering smoke test.
-- [ ] Lint, typecheck, test, coverage, and build use the same command names as Public Web.
+- [x] Auth, Manager, and Staff route groups exist as structure only.
+- [x] Vitest/Testing Library has one rendering smoke test.
+- [x] Lint, typecheck, test, coverage, and build use the same command names as Public Web.
 
 **Verification:**
 
-- [ ] `npm run lint`
-- [ ] `npm run test:coverage`
-- [ ] `npm run build`
+- [x] `npm run lint`
+- [x] `npm run test:coverage`
+- [x] `npm run build`
+
+**Implementation evidence (2026-09-26):** `wedding-manage-web` commit `1331061` adds the neutral App Router root shell, tracked `(auth)`, `(manager)`, and `(staff)` route-group placeholders, and a static application icon without introducing RBAC or domain screens. Vitest 5 runs in jsdom with Testing Library React 16.3.3, shared cleanup, one semantic rendering smoke test, and per-file 80% line/branch coverage gates; the complete six-test suite reports 88.88% line and 100% branch coverage. Management Web now exposes the same lint, formatting, typecheck, test, coverage, watch, and build command names as Public Web. A clean `npm ci`, ESLint, strict TypeScript checking, unit tests, coverage, formatting check, and the Next.js production build all pass with no audit findings. Browser verification confirms the `/` route renders the expected `main` and level-one heading at 320, 768, 1024, and 1440 pixel widths with no console errors or warnings.
 
 **Dependencies:** CP-05  
 **Files likely touched:** `wedding-manage-web/app/layout.tsx`, `wedding-manage-web/app/page.tsx`, `wedding-manage-web/eslint.config.mjs`, `wedding-manage-web/vitest.config.ts`, `wedding-manage-web/src/test/app-smoke.test.tsx`  
@@ -157,8 +159,8 @@ Specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)
 
 #### Checkpoint A3 — Management Web toolchain
 
-- [ ] Clean install, lint, typecheck, unit test, coverage, and build all pass.
-- [ ] Manager and Staff are only route partitions; no client-side authorization is treated as authoritative.
+- [x] Clean install, lint, typecheck, unit test, coverage, and build all pass.
+- [x] Manager and Staff are only route partitions; no client-side authorization is treated as authoritative.
 
 ### CP-07: Establish the Expo SDK 57 baseline
 
