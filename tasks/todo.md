@@ -226,15 +226,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] Required, optional, conditional, URL, origin-list, boolean, and numeric settings follow the approved spec.
-- [ ] Enabling a provider without its required configuration fails before server start.
-- [ ] Tests cover valid development/test values and every required production failure branch.
+- [x] Required, optional, conditional, URL, origin-list, boolean, and numeric settings follow the approved spec.
+- [x] Enabling a provider without its required configuration fails before server start.
+- [x] Tests cover valid development/test values and every required production failure branch.
 
 **Verification:**
 
-- [ ] `npm run test:unit -- env`
-- [ ] `npm run typecheck`
-- [ ] Manually start with one required variable absent and confirm a redacted startup failure.
+- [x] `npm run test:unit -- env`
+- [x] `npm run typecheck`
+- [x] Manually start with one required variable absent and confirm a redacted startup failure.
+
+**Implementation evidence (2026-09-28):** The backend now allowlists and parses all 18 approved environment variables once through Zod, exposes a deeply frozen typed configuration, applies safe development/test defaults, and enforces deployed CORS, PostgreSQL TLS, database, Supabase Storage, and Resend requirements. Storage and email configuration is all-or-none; Gemini credentials are required only when its provider is selected; metrics require a token only when enabled; optional OTLP configuration remains disabled when blank. The focused environment suite passes 47 tests covering every required staging/production omission, numeric/boolean/URL/origin failures, conditional provider branches, immutability, and secret-safe errors. Typecheck, ESLint, Prettier, production build, and the complete coverage suite pass with 100% statement, branch, function, and line coverage. A production module startup with only `RESEND_API_KEY` absent exited before application composition with `EnvironmentConfigurationError: Invalid environment configuration: RESEND_API_KEY.` and did not print any configured secret value.
 
 **Dependencies:** CP-01, CP-02  
 **Files likely touched:** `wedding-be/.env.example`, `wedding-be/src/config/env.ts`, `wedding-be/src/config/config.ts`, `wedding-be/src/config/env.test.ts`  
