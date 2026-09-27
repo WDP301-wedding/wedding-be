@@ -3,7 +3,8 @@
 Status: Approved by project owner on 2026-09-24  
 Capability: `core-platform`  
 Capability Map: [`CAPABILITY-MAP.md`](./CAPABILITY-MAP.md)  
-Last updated: 2026-09-24
+Cross-module product requirements: [`PRODUCT-REQUIREMENTS.md`](./PRODUCT-REQUIREMENTS.md)<br>
+Last updated: 2026-09-26
 
 ## 1. Objective
 

@@ -1,8 +1,11 @@
-# Task List: `core-platform`
+# Task List: Wedding Management System
 
-Status: Approved by project owner on 2026-09-24  
-Plan: [`plan.md`](./plan.md)  
-Specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)
+Core-platform task list status: Approved by project owner on 2026-09-24<br>
+Post-core specification sequence status: Approved by project owner on 2026-09-27<br>
+Plan: [`plan.md`](./plan.md)<br>
+Platform specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)<br>
+Product requirements: [`../PRODUCT-REQUIREMENTS.md`](../PRODUCT-REQUIREMENTS.md)<br>
+Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 ## Working Rules
 
@@ -12,6 +15,9 @@ Specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)
 - Update the approved spec before changing a locked architecture decision.
 - Do not use live Supabase, Resend, Gemini, or EAS credentials in automated tests.
 - Commit each verified task or tightly coupled task pair as an atomic save point in its owning repository.
+- Preserve completed CP checkboxes and evidence as implementation history; extending the plan must not reopen or rewrite completed work without a documented reason.
+- Do not implement a post-core module until its `SPEC-<module-id>.md`, detailed vertical tasks, and human approval gate exist.
+- Every post-core module spec and task slice must trace its owned identifiers from `PRODUCT-REQUIREMENTS.md`.
 
 ## Phase A — Reproducible Repository Foundations
 
@@ -168,15 +174,17 @@ Specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)
 
 **Acceptance criteria:**
 
-- [ ] Expo SDK 57, React Native 0.86, and React 19.2.3 are resolved compatibly.
-- [ ] `src/app` is the router root and secrets are not exposed through `EXPO_PUBLIC_*`.
-- [ ] The repository declares Android as the required platform without deleting framework-required iOS metadata prematurely.
+- [x] Expo SDK 57, React Native 0.86, and React 19.2.3 are resolved compatibly.
+- [x] `src/app` is the router root and secrets are not exposed through `EXPO_PUBLIC_*`.
+- [x] The repository declares Android as the required platform without deleting framework-required iOS metadata prematurely.
 
 **Verification:**
 
-- [ ] `npm ci`
-- [ ] `npx expo-doctor`
-- [ ] `npm run typecheck`
+- [x] `npm ci`
+- [x] `npx expo-doctor`
+- [x] `npm run typecheck`
+
+**Implementation evidence (2026-09-27):** `wedding-app` commit `d0b911a` establishes the Android-first managed/CNG baseline from Expo's official SDK 57 template. The resolved root versions are Expo 57.0.25, React Native 0.86.3, React 19.2.3, and the approved cross-repository TypeScript 5.9.3 pin; Expo's documented dependency-validation exclusion records that deliberate TypeScript exception while all other managed packages pass `npx expo install --check`. `src/app` is the tracked router root without introducing the CP-08 shell, `app.config.ts` explicitly supports Android while preserving generated iOS icon metadata, and the Zod environment boundary allowlists only the public API URL plus optional EAS project ID with production HTTPS enforcement. A script-disabled `npm ci` installs 584 packages, strict typecheck passes, Expo Doctor passes all 21 checks, and registry verification confirms signatures for all 584 packages plus attestations for 159. `npm audit --omit=dev --audit-level=high` reports no high or critical finding; 14 moderate advisories remain in Expo Router/CLI transitive packages, and npm's only forced remediation would install SDK-incompatible package lines, so no forced fix was applied. Recheck by 2026-10-11 or when a compatible Expo SDK 57 patch is available.
 
 **Dependencies:** None; may run in parallel with CP-01, CP-03, and CP-05.  
 **Files likely touched:** framework-generated Expo configuration set plus `wedding-app/src/lib/env.ts`  
@@ -760,3 +768,279 @@ Specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)
 - [ ] All 32 tasks and all checkpoints are complete.
 - [ ] Project owner reviews the evidence and approves `core-platform` implementation.
 - [ ] No work on `identity-access` starts before that approval.
+
+## Phase H — Post-Core Module Specification and Planning Gates
+
+The tasks below are documentation and planning gates, not authorization to implement the named module. Completing a gate adds the module's detailed vertical implementation tasks to this file. Those new tasks must be completed and the module implementation approved before the next provider-dependent specification gate begins.
+
+### SPEC-01: Specify `identity-access`
+
+**Description:** Convert the approved access requirements into the module specification, fix the prospect/Couple entitlement model and provider contracts, and expand this rolling plan with small implementation slices.
+
+**Acceptance criteria:**
+
+- [ ] `SPEC-identity-access.md` covers ACC-002 through ACC-007, authentication/session behavior, restricted prospect entitlements, access promotion, privacy/retention, and failure states.
+- [ ] Invitation bootstrap, revocation, authorization, and post-deposit promotion contracts have explicit state transitions and concurrency/security tests.
+- [ ] Detailed implementation tasks and checkpoints are inserted into `plan.md` and `todo.md`, then approved by the project owner before code starts.
+
+**Verification:**
+
+- [ ] Trace ACC-002 through ACC-007 to spec acceptance criteria and planned automated tests.
+- [ ] Review the provider boundary needed by `booking-lifecycle` without introducing a reverse dependency.
+- [ ] Run Prettier and `git diff --check` on the affected documentation.
+
+**Dependencies:** CP-32 and project-owner approval of the `core-platform` implementation.
+
+**Files likely touched:** `wedding-be/SPEC-identity-access.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
+
+**Estimated scope:** Medium
+
+#### Checkpoint H1 — Identity specification ready
+
+- [ ] Project owner approves the identity-access spec and detailed implementation slice.
+- [ ] No identity implementation begins from product requirements alone.
+
+### SPEC-02: Specify `venue-catalog`
+
+**Description:** Specify the restaurant catalog together with versioned timeline templates and immutable fixed-layout templates, then add its vertical implementation tasks.
+
+**Acceptance criteria:**
+
+- [ ] `SPEC-venue-catalog.md` covers the existing restaurant/hall/menu scope plus SEA-001 and SEA-002.
+- [ ] Template versioning, capacity ranges, stable table identities, retirement behavior, Manager permissions, and historical-reference preservation are explicit.
+- [ ] Detailed backend and Management Web slices with migration, API, seed, and verification tasks are approved before implementation.
+
+**Verification:**
+
+- [ ] Trace SEA-001 and SEA-002 to acceptance criteria and tests.
+- [ ] Confirm layout geometry remains restaurant-owned and cannot be mutated through Couple contracts.
+- [ ] Run Prettier and `git diff --check` on the affected documentation.
+
+**Dependencies:** Approved and completed `identity-access` implementation.
+
+**Files likely touched:** `wedding-be/SPEC-venue-catalog.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
+
+**Estimated scope:** Medium
+
+### SPEC-03: Specify `booking-lifecycle`
+
+**Description:** Specify consultation workspaces, versioned timeline collaboration, dual approval, deposit eligibility, and post-deposit change requests before adding implementation slices.
+
+**Acceptance criteria:**
+
+- [ ] `SPEC-booking-lifecycle.md` covers ACC-001 and TML-001 through TML-008 together with availability, holds, booking states, change, and cancellation rules.
+- [ ] Timeline revision/approval transitions and the authoritative deposit-eligibility contract handle stale clients and edit/approval races.
+- [ ] Detailed backend, Public Web, and Management Web vertical slices are approved with migration, API, concurrency, audit, and UI verification.
+
+**Verification:**
+
+- [ ] Trace ACC-001 and TML-001 through TML-008 to acceptance criteria and tests.
+- [ ] Review the identity, catalog, and future payment interfaces for acyclic ownership.
+- [ ] Run Prettier and `git diff --check` on the affected documentation.
+
+**Dependencies:** Approved and completed `venue-catalog` implementation.
+
+**Files likely touched:** `wedding-be/SPEC-booking-lifecycle.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
+
+**Estimated scope:** Medium
+
+#### Checkpoint H2 — Consultation and catalog planning ready
+
+- [ ] Venue and booking specifications have approved provider contracts and detailed task slices.
+- [ ] Deposit remains impossible to plan as a client-only or stale-state decision.
+
+### SPEC-04: Specify `payments-billing`
+
+**Description:** Specify deposit, manual/VNPay payment, balance, invoice, refund, and accepted print-charge accounting with idempotent money transitions.
+
+**Acceptance criteria:**
+
+- [ ] `SPEC-payments-billing.md` covers the existing payment scope and PRN-006.
+- [ ] Deposit eligibility recheck, print-charge registration, receivable inclusion, idempotency, reconciliation, and refund boundaries are explicit.
+- [ ] Detailed implementation tasks cover database constraints, provider callbacks, audit evidence, API contracts, and Manager/Couple billing views.
+
+**Verification:**
+
+- [ ] Trace PRN-006 and all payment state transitions to automated tests, including concurrency and callback replay.
+- [ ] Confirm `invitation-studio` can register an accepted charge without owning billing state.
+- [ ] Run Prettier and `git diff --check` on the affected documentation.
+
+**Dependencies:** Approved and completed `booking-lifecycle` implementation.
+
+**Files likely touched:** `wedding-be/SPEC-payments-billing.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
+
+**Estimated scope:** Medium
+
+### SPEC-05: Specify `invitation-studio`
+
+**Description:** Specify invitation designs, private wedding media, the generic public QR, immutable printable revisions, quotation approval, and print fulfillment before adding vertical slices.
+
+**Acceptance criteria:**
+
+- [ ] `SPEC-invitation-studio.md` covers MED-001 through MED-006, PRN-001 through PRN-005, PRN-007 through PRN-009, and QRC-001 through QRC-004.
+- [ ] Media authorization/retention, printable/commercial snapshotting, print state transitions, billing calls, and public/private asset separation are explicit.
+- [ ] Detailed backend, Public Web, Couple App, and Management Web tasks are approved with storage, security, contract, and print-race tests.
+
+**Verification:**
+
+- [ ] Trace every owned MED, PRN, and QRC requirement to acceptance criteria and automated tests.
+- [ ] Prove the generic QR cannot reveal private media, personalized guest data, RSVP identity, or a check-in mutation.
+- [ ] Run Prettier and `git diff --check` on the affected documentation.
+
+**Dependencies:** Approved and completed `payments-billing` implementation.
+
+**Files likely touched:** `wedding-be/SPEC-invitation-studio.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
+
+**Estimated scope:** Medium
+
+#### Checkpoint H3 — Commercial and invitation planning ready
+
+- [ ] Payment and invitation specs preserve one-way billing ownership and immutable approved print content.
+- [ ] Private media and public invitation assets have separate authorization and storage purposes.
+
+### SPEC-06: Specify `guest-rsvp`
+
+**Description:** Specify invitation households, default/custom guest groups, personalized electronic invitations, delivery, RSVP, and expected headcount.
+
+**Acceptance criteria:**
+
+- [ ] `SPEC-guest-rsvp.md` covers GST-001 through GST-008 and QRC-005.
+- [ ] Household identity, optional disambiguating contact, companion counts, group lifecycle, token privacy, and personalized-link behavior are explicit.
+- [ ] Detailed backend and Guest/Couple Web tasks are approved with import, normalization, authorization, delivery, and RSVP tests.
+
+**Verification:**
+
+- [ ] Trace GST-001 through GST-008 and QRC-005 to acceptance criteria and tests.
+- [ ] Confirm guest-group identifiers are stable provider-owned contracts for seating, staff operations, and analytics.
+- [ ] Run Prettier and `git diff --check` on the affected documentation.
+
+**Dependencies:** Approved and completed `invitation-studio` implementation.
+
+**Files likely touched:** `wedding-be/SPEC-guest-rsvp.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
+
+**Estimated scope:** Medium
+
+### SPEC-07: Specify `seating-plan`
+
+**Description:** Specify capacity-compatible fixed-layout selection and table-level guest-group labeling without per-guest seating or editable geometry.
+
+**Acceptance criteria:**
+
+- [ ] `SPEC-seating-plan.md` covers SEA-003 through SEA-008.
+- [ ] Layout selection, label mapping, headcount invalidation, Manager exception, remapping, confirmation, and audit transitions are explicit.
+- [ ] Detailed backend and Couple/Manager client slices are approved with compatibility, stale-template, authorization, and remapping tests.
+
+**Verification:**
+
+- [ ] Trace SEA-003 through SEA-008 to acceptance criteria and tests.
+- [ ] Search the planned contracts for prohibited individual `SeatAssignment` or Couple geometry mutations.
+- [ ] Run Prettier and `git diff --check` on the affected documentation.
+
+**Dependencies:** Approved and completed `guest-rsvp` implementation.
+
+**Files likely touched:** `wedding-be/SPEC-seating-plan.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
+
+**Estimated scope:** Medium
+
+### SPEC-08: Specify `staff-operations`
+
+**Description:** Specify event assignments, household lookup, multi-arrival check-in, over-expected warnings, group guidance, and audited corrections.
+
+**Acceptance criteria:**
+
+- [ ] `SPEC-staff-operations.md` covers CHK-001 through CHK-008 and staff assignment/authorization.
+- [ ] Arrival, correction, cumulative attendance, duplicate-name handling, concurrency, and audit state are explicit.
+- [ ] Detailed backend and Staff Web slices are approved with simultaneous-arrival, warning, correction, privacy, and authorization tests.
+
+**Verification:**
+
+- [ ] Trace CHK-001 through CHK-008 to acceptance criteria and tests.
+- [ ] Confirm actual attendance derives from auditable arrivals/corrections and never from QR or per-seat occupancy.
+- [ ] Run Prettier and `git diff --check` on the affected documentation.
+
+**Dependencies:** Approved and completed `seating-plan` implementation.
+
+**Files likely touched:** `wedding-be/SPEC-staff-operations.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
+
+**Estimated scope:** Medium
+
+#### Checkpoint H4 — Guest planning and event operations ready
+
+- [ ] Guest, seating, and staff specs use one stable guest-group identity with acyclic dependencies.
+- [ ] End-to-end test plans cover group creation through table labeling and multi-arrival guidance.
+
+### SPEC-09: Specify `notifications-automation`
+
+**Description:** Specify safe delivery of workspace, timeline, payment, print, RSVP, reminder, and completion events plus bounded background-job behavior.
+
+**Acceptance criteria:**
+
+- [ ] `SPEC-notifications-automation.md` covers OPS-001 and OPS-002 with the existing notification/job scope.
+- [ ] Event ownership, deduplication, retries, deadlines, quiet failure behavior, redaction, and recipient preferences are explicit.
+- [ ] Detailed backend and client notification tasks are approved with fake-provider, replay, scheduling, and PII-leak tests.
+
+**Verification:**
+
+- [ ] Trace OPS-001 and OPS-002 to acceptance criteria and tests.
+- [ ] Confirm notifications consume provider events without becoming the source of booking, payment, print, or RSVP truth.
+- [ ] Run Prettier and `git diff --check` on the affected documentation.
+
+**Dependencies:** Approved and completed `staff-operations` implementation.
+
+**Files likely touched:** `wedding-be/SPEC-notifications-automation.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
+
+**Estimated scope:** Medium
+
+### SPEC-10: Specify `analytics-dashboard`
+
+**Description:** Specify restaurant KPIs, receivables, booking/hall/menu reporting, print fulfillment, and grouped expected-versus-actual attendance.
+
+**Acceptance criteria:**
+
+- [ ] `SPEC-analytics-dashboard.md` covers OPS-003 and OPS-004 with the existing dashboard scope.
+- [ ] Metric definitions, filters, time zone, source-of-truth fields, draft/accepted print treatment, privacy, and refresh behavior are explicit.
+- [ ] Detailed backend and Management Web slices are approved with fixture-based query, aggregation, authorization, and display tests.
+
+**Verification:**
+
+- [ ] Trace OPS-003 and OPS-004 to acceptance criteria and tests.
+- [ ] Confirm reports do not infer per-seat occupancy and exclude draft print quotations from receivables.
+- [ ] Run Prettier and `git diff --check` on the affected documentation.
+
+**Dependencies:** Approved and completed `notifications-automation` implementation.
+
+**Files likely touched:** `wedding-be/SPEC-analytics-dashboard.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
+
+**Estimated scope:** Medium
+
+### SPEC-11: Specify `release-demo`
+
+**Description:** Specify the production-minded demo release, seeded end-to-end journey, deployment, Android preview artifact, observability, rollback, and evidence package.
+
+**Acceptance criteria:**
+
+- [ ] `SPEC-release-demo.md` covers the complete approved capability map and cross-module scenarios from `PRODUCT-REQUIREMENTS.md`.
+- [ ] Deployment ownership, environment configuration, seed data, migration order, rollback, monitoring, security review, and demo script are explicit.
+- [ ] Detailed release tasks and go/no-go checkpoints are approved without weakening any module's Definition of Done.
+
+**Verification:**
+
+- [ ] Map every capability and cross-module acceptance scenario to a release check or evidence artifact.
+- [ ] Review deployment and rollback dependencies across all four repositories.
+- [ ] Run Prettier and `git diff --check` on the affected documentation.
+
+**Dependencies:** Approved and completed `analytics-dashboard` implementation.
+
+**Files likely touched:** `wedding-be/SPEC-release-demo.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
+
+**Estimated scope:** Medium
+
+#### Checkpoint H5 — Program specification sequence complete
+
+- [ ] All module specs, detailed task slices, implementations, and evidence approvals are complete in dependency order.
+- [ ] Release planning covers the restricted-workspace-to-event-check-in journey and all four repositories.
+- [ ] No deferred or out-of-scope feature was silently promoted into the required release.
+
+## Rolling-Plan Rule
+
+When a SPEC task is approved, insert that module's implementation tasks immediately after its specification gate and before the next dependent SPEC task. Update the dependent SPEC task to reference the final implementation/evidence task IDs. Never mark a SPEC task complete merely because a draft exists; approval and detailed task insertion are required.
