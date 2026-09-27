@@ -188,16 +188,18 @@ Specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)
 
 **Acceptance criteria:**
 
-- [ ] `src/app` contains route files only; screen UI lives under `src/screens`.
-- [ ] A smoke test renders the initial screen with `jest-expo`.
-- [ ] Android JS export/build script succeeds without requiring a cloud build.
+- [x] `src/app` contains route files only; screen UI lives under `src/screens`.
+- [x] A smoke test renders the initial screen with `jest-expo`.
+- [x] Android JS export/build script succeeds without requiring a cloud build.
 
 **Verification:**
 
-- [ ] `npm run lint`
-- [ ] `npm run test:coverage`
-- [ ] `npm run build`
-- [ ] `npx expo-doctor`
+- [x] `npm run lint`
+- [x] `npm run test:coverage`
+- [x] `npm run build`
+- [x] `npx expo-doctor`
+
+**Implementation evidence (2026-09-27):** `wedding-app` commit `50bb656` adds a thin Expo Router root stack, tracked `(auth)` and `(couple)` route-group placeholders, and a neutral initial screen whose UI body lives under `src/screens`. The SDK-compatible harness pins `jest-expo` 57.0.5, Jest 29.7.0, React Native Testing Library 14.0.1, and `test-renderer` 1.2.0 for React 19.2.3; the smoke test reports 100% statement, branch, function, and line coverage for the screen. A script-disabled clean install resolves 1,074 packages, Expo dependency validation passes with only the approved TypeScript exclusion, lint, formatting, strict typecheck, and coverage pass, the Android production JS export bundles 1,191 modules without EAS or cloud credentials, and Expo Doctor passes all 21 checks. The high-severity audit gate reports no high or critical finding; the remaining moderate advisories are in the existing Expo/Expo Router transitive graph and currently have no compatible non-breaking remediation.
 
 **Dependencies:** CP-07  
 **Files likely touched:** `wedding-app/src/app/_layout.tsx`, `wedding-app/src/app/index.tsx`, `wedding-app/src/screens/home.tsx`, `wedding-app/jest.config.js`, `wedding-app/src/screens/home.test.tsx`  
@@ -205,8 +207,8 @@ Specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)
 
 #### Checkpoint A4 — Expo toolchain
 
-- [ ] Clean install, lint, typecheck, test, coverage, Android export, and Expo Doctor pass.
-- [ ] No product feature, iOS acceptance work, or privileged Supabase client is introduced.
+- [x] Clean install, lint, typecheck, test, coverage, Android export, and Expo Doctor pass.
+- [x] No product feature, iOS acceptance work, or privileged Supabase client is introduced.
 
 ## Phase B — Backend Process and HTTP Contract
 
