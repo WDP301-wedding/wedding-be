@@ -248,15 +248,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] `createApp` returns a testable Express app without opening a port.
-- [ ] `server.ts` owns listen, SIGINT/SIGTERM, readiness state, and bounded cleanup.
-- [ ] Startup and shutdown behavior is covered without orphaning handles.
+- [x] `createApp` returns a testable Express app without opening a port.
+- [x] `server.ts` owns listen, SIGINT/SIGTERM, readiness state, and bounded cleanup.
+- [x] Startup and shutdown behavior is covered without orphaning handles.
 
 **Verification:**
 
-- [ ] `npm run test:unit -- lifecycle`
-- [ ] `npm run build`
-- [ ] Start and terminate locally; process exits cleanly within the configured deadline.
+- [x] `npm run test:unit -- lifecycle`
+- [x] `npm run build`
+- [x] Start and terminate locally; process exits cleanly within the configured deadline.
+
+**Implementation evidence (2026-09-28):** `createApp` now composes Express without opening a socket, while the import-safe `server.ts` bootstrap loads and validates configuration before application or HTTP-server construction. The server owns listening, readiness transitions, SIGINT/SIGTERM registration, deterministic process exit codes, and idempotent shutdown. The lifecycle drains HTTP before closing registered resources, aggregates cleanup failures, enforces a 10-second default deadline, and force-closes connections/resources on failure or timeout. The focused lifecycle suite passes 15 tests covering side-effect-free composition, config-before-listen behavior, bind failure cleanup, readiness, both process outcomes, duplicate shutdown calls, cleanup errors, and deadline enforcement without leaked listeners or servers. The complete 64-test coverage suite, strict typecheck, ESLint, Prettier, and production build pass. A production-build harness opened a listener and handled SIGTERM with exit code 0 in 5 ms; a production start with invalid configuration exited 1 without opening port 3001.
 
 **Dependencies:** CP-09  
 **Files likely touched:** `wedding-be/src/app.ts`, `wedding-be/src/server.ts`, `wedding-be/src/core/http/lifecycle.ts`, `wedding-be/src/core/http/lifecycle.test.ts`  
@@ -264,8 +266,8 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 #### Checkpoint B1 — Process lifecycle
 
-- [ ] Invalid configuration never opens a listening port.
-- [ ] App construction and process startup are independently testable.
+- [x] Invalid configuration never opens a listening port.
+- [x] App construction and process startup are independently testable.
 
 ### CP-11: Implement request context, standard errors, and validation
 
