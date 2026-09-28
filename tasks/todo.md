@@ -375,15 +375,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] `(namespace, idempotencyKey)` uniqueness atomically selects one winner.
-- [ ] Canonical hashing is deterministic and detects same-key/different-payload use.
+- [x] `(namespace, idempotencyKey)` uniqueness atomically selects one winner.
+- [x] Canonical hashing is deterministic and detects same-key/different-payload use.
 - [ ] Real concurrent PostgreSQL tests show exactly one successful claim.
 
 **Verification:**
 
-- [ ] `npm run test:unit -- idempotency-hash`
+- [x] `npm run test:unit -- idempotency-hash`
 - [ ] `npm run test:integration -- idempotency-repository`
 - [ ] Repeat the concurrency test enough times to detect a check-then-insert race.
+
+**Implementation evidence (2026-09-29):** Canonical request hashing now recursively sorts object keys, preserves array order and JSON scalar types, produces lowercase SHA-256 digests, and rejects cyclic, sparse, non-finite, symbol-bearing, or otherwise non-JSON payloads. The typed idempotency service validates printable 1–128 byte keys, calculates injectable 30-day default and explicit 180-day payment retention timestamps, distinguishes `CLAIMED`, `IN_PROGRESS`, `MISMATCH`, `SUCCEEDED`, and `FAILED`, and permits only one terminal transition. The Prisma repository attempts `create` without a preceding read, lets the existing compound unique constraint choose the winner, resolves `P2002` to that winning row, and guards terminal updates with `id + IN_PROGRESS`; focused unit tests cover Prisma error propagation and terminal-state immutability. The idempotency-only unit suite passes 45 tests and scoped coverage is 100% statements, branches, functions, and lines; the exact hash verification command passes 10 tests. The PostgreSQL integration suite is committed with 20 rounds of 12 simultaneous claims plus a concurrent terminal-transition race, but its two cases remain skipped because this environment has no `DATABASE_URL`; the Docker daemon is stopped and its Windows service could not be started from this session, so the two PostgreSQL verification items above remain open. The complete available suite passes 159 tests with six database cases skipped and 98.03% line / 96.40% branch coverage; strict typecheck, ESLint, Prettier, and the production build pass. `npm audit` still reports the pre-existing Prisma CLI/configuration findings in `deepmerge-ts` and unused MySQL support (one moderate and four high findings); this slice adds no dependency or lockfile change, so the existing 2026-10-12/CP-32 review gate remains applicable.
 
 **Dependencies:** CP-13  
 **Files likely touched:** `wedding-be/src/core/idempotency/request-hash.ts`, `wedding-be/src/core/idempotency/idempotency.repository.ts`, `wedding-be/src/core/idempotency/idempotency.service.ts`, `wedding-be/src/core/idempotency/request-hash.test.ts`, `wedding-be/tests/integration/idempotency-repository.test.ts`  
