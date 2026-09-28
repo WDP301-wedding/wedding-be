@@ -17,13 +17,7 @@ export class CanonicalRequestError extends Error {
 }
 
 function serializePrimitive(value: boolean | number | string): string {
-  const serialized = JSON.stringify(value);
-
-  if (serialized === undefined) {
-    throw new CanonicalRequestError();
-  }
-
-  return serialized;
+  return JSON.stringify(value);
 }
 
 function serializeCanonical(value: unknown, ancestors: Set<object>): string {
@@ -51,12 +45,12 @@ function serializeCanonical(value: unknown, ancestors: Set<object>): string {
 
   try {
     if (Array.isArray(value)) {
-      const entries = value.map((entry, index) => {
+      const entries = Array.from({ length: value.length }, (_, index) => {
         if (!Object.hasOwn(value, index)) {
           throw new CanonicalRequestError();
         }
 
-        return serializeCanonical(entry, ancestors);
+        return serializeCanonical(value[index], ancestors);
       });
 
       return `[${entries.join(',')}]`;

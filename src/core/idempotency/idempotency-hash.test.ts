@@ -35,6 +35,18 @@ describe('idempotency request hashing', () => {
     );
   });
 
+  it('canonicalizes every JSON scalar and null-prototype objects', () => {
+    const nullPrototype = Object.create(null) as Record<string, unknown>;
+    nullPrototype.enabled = true;
+    nullPrototype.note = null;
+
+    expect(canonicalizeRequest(null)).toBe('null');
+    expect(canonicalizeRequest('intent')).toBe('"intent"');
+    expect(canonicalizeRequest(true)).toBe('true');
+    expect(canonicalizeRequest(-0)).toBe('0');
+    expect(canonicalizeRequest(nullPrototype)).toBe('{"enabled":true,"note":null}');
+  });
+
   it.each([
     ['undefined', undefined],
     ['a non-finite number', Number.POSITIVE_INFINITY],
@@ -50,5 +62,14 @@ describe('idempotency request hashing', () => {
     payload.self = payload;
 
     expect(() => canonicalizeRequest(payload)).toThrow(CanonicalRequestError);
+  });
+
+  it('rejects sparse arrays and symbol properties instead of omitting them', () => {
+    const sparse = new Array<unknown>(1);
+    const symbolProperty = { amount: 1 };
+    Object.assign(symbolProperty, { [Symbol('hidden')]: 'not-json' });
+
+    expect(() => canonicalizeRequest(sparse)).toThrow(CanonicalRequestError);
+    expect(() => canonicalizeRequest(symbolProperty)).toThrow(CanonicalRequestError);
   });
 });
