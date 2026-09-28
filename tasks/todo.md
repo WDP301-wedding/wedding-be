@@ -326,15 +326,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] Prisma uses `DATABASE_URL` at runtime and `MIGRATION_DATABASE_URL` for migration commands.
-- [ ] The initial migration creates only `AuditLog`, `IdempotencyRecord`, required enums/indexes, and Prisma metadata.
-- [ ] A PostgreSQL-backed integration test proves connect, transaction, and clean migration deployment.
+- [x] Prisma uses `DATABASE_URL` at runtime and `MIGRATION_DATABASE_URL` for migration commands.
+- [x] The initial migration creates only `AuditLog`, `IdempotencyRecord`, required enums/indexes, and Prisma metadata.
+- [x] A PostgreSQL-backed integration test proves connect, transaction, and clean migration deployment.
 
 **Verification:**
 
-- [ ] `npm run db:generate`
-- [ ] `npm run db:migrate:deploy` against an empty disposable PostgreSQL database.
-- [ ] `npm run test:integration -- database`
+- [x] `npm run db:generate`
+- [x] `npm run db:migrate:deploy` against an empty disposable PostgreSQL database.
+- [x] `npm run test:integration -- database`
+
+**Implementation evidence (2026-09-28):** Prisma 7.10 now generates an ESM client from the PostgreSQL-only infrastructure schema and uses the `@prisma/adapter-pg` runtime factory with `DATABASE_URL`; CLI scripts explicitly load `prisma.config.ts`, which reads only `MIGRATION_DATABASE_URL`. The immutable initial migration creates `AuditLog`, `IdempotencyRecord`, their two enums, uniqueness constraint, operational indexes, and Prisma's deployment metadata. On an empty disposable local PostgreSQL instance, `db:migrate:deploy` applied the single migration, the database integration suite passed all 20 tests (including connection, migration metadata, commit, and rollback), and Prisma reported no migration/schema drift. The complete 105-test suite passes with 97.34% line and 94.87% branch coverage; strict typecheck, ESLint, Prettier, and the production build pass. The existing npm audit findings remain confined to Prisma's CLI/configuration graph and unused MySQL support; this change adds no dependency or lockfile delta.
 
 **Dependencies:** CP-09, CP-10  
 **Files likely touched:** `wedding-be/prisma/schema.prisma`, `wedding-be/prisma.config.ts`, `wedding-be/prisma/migrations/<timestamp>_core_platform/migration.sql`, `wedding-be/src/core/database/prisma.ts`, `wedding-be/tests/integration/database.test.ts`  

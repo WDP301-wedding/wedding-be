@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum AuditActorType {
+  SYSTEM
+  USER
+  GUEST_LINK
+}
+
+enum IdempotencyStatus {
+  IN_PROGRESS
+  SUCCEEDED
+  FAILED
+}
+
+model AuditLog {
+  id         String         @id @default(uuid()) @db.Uuid
+  occurredAt DateTime       @default(now()) @db.Timestamptz(6)
+  requestId  String         @db.Uuid
+  actorType  AuditActorType
+  actorId    String?        @db.Uuid
+  action     String
+  entityType String
+  entityId   String?        @db.Uuid
+  metadata   Json           @db.JsonB
+
+  @@index([occurredAt(sort: Desc)])
+  @@index([requestId])
+  @@index([actorType, actorId])
+  @@index([entityType, entityId])
+}
+
+model IdempotencyRecord {
+  id             String            @id @default(uuid()) @db.Uuid
+  namespace      String
+  idempotencyKey String
+  requestHash    String
+  status         IdempotencyStatus
+  responseStatus Int?              @db.SmallInt
+  responseBody   Json?             @db.JsonB
+  resourceType   String?
+  resourceId     String?           @db.Uuid
+  lockedAt       DateTime          @default(now()) @db.Timestamptz(6)
+  expiresAt      DateTime          @db.Timestamptz(6)
+  createdAt      DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime          @updatedAt @db.Timestamptz(6)
+
+  @@unique([namespace, idempotencyKey])
+  @@index([status, lockedAt])
+  @@index([expiresAt])
+  @@index([resourceType, resourceId])
+}

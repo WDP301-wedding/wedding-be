@@ -21,7 +21,11 @@
     "test:unit": "vitest run --exclude tests/**/*.test.ts",
     "test:integration": "vitest run tests/integration",
     "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "db:generate": "prisma generate --config prisma.config.ts",
+    "db:migrate": "prisma migrate dev --config prisma.config.ts",
+    "db:migrate:deploy": "prisma migrate deploy --config prisma.config.ts",
+    "db:studio": "prisma studio --config prisma.config.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "7.10.0",
