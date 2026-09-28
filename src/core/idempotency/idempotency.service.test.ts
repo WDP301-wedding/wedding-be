@@ -188,6 +188,16 @@ describe('idempotency service', () => {
     expect(repository.records).toHaveLength(0);
   });
 
+  it('rejects an empty namespace before persistence', async () => {
+    const repository = new InMemoryIdempotencyRepository();
+    const service = createIdempotencyService(repository);
+
+    await expect(
+      service.claim({ namespace: '   ', idempotencyKey: 'booking-intent-1', payload: {} }),
+    ).rejects.toBeInstanceOf(IdempotencyInputError);
+    expect(repository.records).toHaveLength(0);
+  });
+
   it.each([0, -1, 1.5, Number.POSITIVE_INFINITY])(
     'rejects an invalid retention duration of %s',
     async (retentionMs) => {
@@ -280,7 +290,49 @@ describe('idempotency service', () => {
     ).rejects.toBeInstanceOf(IdempotencyTransitionError);
   });
 
-  it('rejects invalid terminal response data before persistence', async () => {
+  it.each([
+    ['an invalid claim ID', { claimId: 'not-a-uuid', responseStatus: 201 }],
+    ['a non-integer response status', { claimId: randomUUID(), responseStatus: 201.5 }],
+    ['a response status below 100', { claimId: randomUUID(), responseStatus: 99 }],
+    ['a response status above 599', { claimId: randomUUID(), responseStatus: 600 }],
+    [
+      'a non-JSON response body',
+      { claimId: randomUUID(), responseStatus: 201, responseBody: { data: undefined } as never },
+    ],
+    [
+      'an empty resource type',
+      {
+        claimId: randomUUID(),
+        responseStatus: 201,
+        resource: { type: ' ', id: randomUUID() },
+      },
+    ],
+    [
+      'an invalid resource ID',
+      {
+        claimId: randomUUID(),
+        responseStatus: 201,
+        resource: { type: 'booking', id: 'not-a-uuid' },
+      },
+    ],
+  ])('rejects %s before a terminal transition', async (_label, invalidInput) => {
+    const repository = new InMemoryIdempotencyRepository();
+    const service = createIdempotencyService(repository);
+    await service.claim({
+      namespace: 'booking:create:v1',
+      idempotencyKey: 'booking-intent-1',
+      payload: {},
+    });
+
+    await expect(
+      service.markSucceeded({
+        ...invalidInput,
+      }),
+    ).rejects.toBeInstanceOf(IdempotencyInputError);
+    expect(repository.records.values().next().value).toMatchObject({ status: 'IN_PROGRESS' });
+  });
+
+  it('stores an omitted response body as null', async () => {
     const repository = new InMemoryIdempotencyRepository();
     const service = createIdempotencyService(repository);
     const claim = await service.claim({
@@ -290,12 +342,25 @@ describe('idempotency service', () => {
     });
 
     await expect(
-      service.markSucceeded({
-        claimId: claim.record.id,
-        responseStatus: 700,
-        responseBody: { data: undefined } as never,
+      service.markSucceeded({ claimId: claim.record.id, responseStatus: 204 }),
+    ).resolves.toMatchObject({ responseBody: null });
+  });
+
+  it.each([
+    ['an invalid clock value', () => new Date(Number.NaN), DEFAULT_IDEMPOTENCY_RETENTION_MS],
+    ['an overflowing expiry date', () => new Date(0), Number.MAX_SAFE_INTEGER],
+  ])('rejects %s before persistence', async (_label, now, retentionMs) => {
+    const repository = new InMemoryIdempotencyRepository();
+    const service = createIdempotencyService(repository, now);
+
+    await expect(
+      service.claim({
+        namespace: 'booking:create:v1',
+        idempotencyKey: 'booking-intent-1',
+        payload: {},
+        retentionMs,
       }),
     ).rejects.toBeInstanceOf(IdempotencyInputError);
-    expect(repository.records.values().next().value).toMatchObject({ status: 'IN_PROGRESS' });
+    expect(repository.records).toHaveLength(0);
   });
 });
