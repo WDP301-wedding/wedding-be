@@ -6,6 +6,7 @@ import { z } from 'zod';
 import type { AuditLogRecord, NewAuditLogRecord } from './audit.types.js';
 import type { AuditRepository } from './audit.repository.js';
 import {
+  AuditAttributionValidationError,
   AuditMetadataValidationError,
   createAuditService,
   defineAuditEvent,
@@ -71,8 +72,7 @@ describe('audit service', () => {
 
   it('records system activity without inventing an actor or entity ID', async () => {
     const repository = new InMemoryAuditRepository();
-    const occurredAt = new Date('2026-09-28T10:00:00.000Z');
-    const service = createAuditService(repository, () => occurredAt);
+    const service = createAuditService(repository);
 
     const result = await service.record(bookingStatusChanged, {
       context: { requestId: randomUUID(), actor: { type: 'SYSTEM' } },
@@ -82,6 +82,7 @@ describe('audit service', () => {
     expect(result.actorType).toBe('SYSTEM');
     expect(result.actorId).toBeNull();
     expect(result.entityId).toBeNull();
+    expect(result.occurredAt).toBeInstanceOf(Date);
   });
 
   it.each([
@@ -122,6 +123,37 @@ describe('audit service', () => {
         },
       }),
     ).rejects.toBeInstanceOf(AuditMetadataValidationError);
+    expect(repository.records).toEqual([]);
+  });
+
+  it('rejects metadata that is allowlisted but cannot be stored as JSON', async () => {
+    const repository = new InMemoryAuditRepository();
+    const service = createAuditService(repository);
+    const eventWithNonJsonMetadata = defineAuditEvent({
+      action: 'booking.processed',
+      entityType: 'booking',
+      metadata: { processedAt: z.date() },
+    });
+
+    await expect(
+      service.record(eventWithNonJsonMetadata, {
+        context: { requestId: randomUUID(), actor: { type: 'SYSTEM' } },
+        metadata: { processedAt: new Date() },
+      }),
+    ).rejects.toBeInstanceOf(AuditMetadataValidationError);
+    expect(repository.records).toEqual([]);
+  });
+
+  it('rejects malformed request attribution before persistence', async () => {
+    const repository = new InMemoryAuditRepository();
+    const service = createAuditService(repository);
+
+    await expect(
+      service.record(bookingStatusChanged, {
+        context: { requestId: 'not-a-uuid', actor: { type: 'SYSTEM' } },
+        metadata: { fromStatus: 'DRAFT', toStatus: 'CONFIRMED' },
+      }),
+    ).rejects.toBeInstanceOf(AuditAttributionValidationError);
     expect(repository.records).toEqual([]);
   });
 });

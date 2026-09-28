@@ -348,15 +348,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] The service records actor, action, entity, request ID, timestamp, and redacted metadata.
-- [ ] No update/delete operation exists in the application repository contract.
-- [ ] Tests prove secret/PII fields are rejected or redacted before persistence.
+- [x] The service records actor, action, entity, request ID, timestamp, and redacted metadata.
+- [x] No update/delete operation exists in the application repository contract.
+- [x] Tests prove secret/PII fields are rejected or redacted before persistence.
 
 **Verification:**
 
-- [ ] `npm run test:unit -- audit`
+- [x] `npm run test:unit -- audit`
 - [ ] `npm run test:integration -- audit`
 - [ ] Query the test table and confirm stored metadata matches the allowlist.
+
+**Implementation evidence (2026-09-28):** Typed audit-event definitions now construct strict Zod metadata allowlists, and the audit service validates UUID request/actor/entity attribution, rejects unknown or non-JSON metadata before persistence, assigns an injectable timestamp, and delegates only an immutable append record. The application-facing repository contract exposes only `append`; its Prisma adapter creates `AuditLog` rows without update/delete methods. Nine focused unit tests pass, including password, email, refresh-token, invalid-value, invalid-attribution, non-JSON, append-only-contract, and deterministic timestamp cases. A PostgreSQL integration suite is committed to query the stored JSONB keys and prove rejected secret/PII payloads create no row, but its two database cases remain skipped because this environment has no `DATABASE_URL`; Docker Desktop also failed to bring its WSL-backed daemon online, so the two PostgreSQL verification items above remain open. The complete non-database suite passes 114 tests with 97.51% line and 95.14% branch coverage; the audit-only coverage run is 100% statements, branches, functions, and lines. Strict typecheck, ESLint, Prettier, and the production build pass. `npm audit` still reports the pre-existing Prisma CLI/configuration findings in `deepmerge-ts` and unused MySQL support; this slice adds no dependency or lockfile change.
 
 **Dependencies:** CP-11, CP-13  
 **Files likely touched:** `wedding-be/src/core/audit/audit.types.ts`, `wedding-be/src/core/audit/audit.repository.ts`, `wedding-be/src/core/audit/audit.service.ts`, `wedding-be/src/core/audit/audit.service.test.ts`, `wedding-be/tests/integration/audit.test.ts`  
