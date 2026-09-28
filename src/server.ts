@@ -4,7 +4,7 @@ import { pathToFileURL } from 'node:url';
 
 import type { Express } from 'express';
 
-import { createApp } from './app.js';
+import { createApp, type CreateAppOptions } from './app.js';
 import type { Config } from './config/config.js';
 import {
   createHttpLifecycle,
@@ -12,6 +12,7 @@ import {
   type ReadinessState,
   type ShutdownResource,
 } from './core/http/lifecycle.js';
+import type { ReadinessProbe } from './core/http/readiness.js';
 
 type ProcessExitCode = NodeJS.Process['exitCode'];
 type ProcessSignal = 'SIGINT' | 'SIGTERM';
@@ -35,8 +36,10 @@ export interface StartServerOptions {
   readonly host?: string;
   readonly resources?: readonly ShutdownResource[];
   readonly shutdownTimeoutMs?: number;
+  readonly readinessProbe?: ReadinessProbe;
+  readonly readinessTimeoutMs?: number;
   readonly signalTarget?: SignalTarget;
-  readonly createApplication?: () => Express;
+  readonly createApplication?: (options: CreateAppOptions) => Express;
   readonly createHttpServer?: (requestListener: RequestListener) => Server;
   readonly reportShutdownError?: (error: unknown) => void;
 }
@@ -47,9 +50,14 @@ export interface BootstrapDependencies {
 }
 
 export async function startServer(options: StartServerOptions): Promise<RunningServer> {
-  const app = (options.createApplication ?? createApp)();
-  const httpServer = (options.createHttpServer ?? createServer)(app as RequestListener);
   const readiness = createReadinessState();
+  const app = (options.createApplication ?? createApp)({
+    readinessProbe: createServerReadinessProbe(readiness, options.readinessProbe),
+    ...(options.readinessTimeoutMs === undefined
+      ? {}
+      : { readinessTimeoutMs: options.readinessTimeoutMs }),
+  });
+  const httpServer = (options.createHttpServer ?? createServer)(app as RequestListener);
   const lifecycle = createHttpLifecycle({
     httpServer,
     readiness,
@@ -127,6 +135,19 @@ export async function runMain(
 
 export function isMainModule(moduleUrl: string, entryPath = process.argv[1]): boolean {
   return entryPath !== undefined && moduleUrl === pathToFileURL(resolve(entryPath)).href;
+}
+
+function createServerReadinessProbe(
+  readiness: ReadinessState,
+  dependencyProbe: ReadinessProbe | undefined,
+): ReadinessProbe {
+  return async (signal) => {
+    if (!readiness.isReady()) {
+      throw new Error('The HTTP server lifecycle is not ready.');
+    }
+
+    await dependencyProbe?.(signal);
+  };
 }
 
 function installSignalHandlers(options: {

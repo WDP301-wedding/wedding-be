@@ -8,6 +8,7 @@ import {
   healthUnavailableResponseSchema,
 } from '../../src/core/http/health.schemas.js';
 import type { ReadinessProbe } from '../../src/core/http/readiness.js';
+import { startServer } from '../../src/server.js';
 
 const trustedRequestId = '24dcfaac-4408-4d42-8d66-456ed6ee7ea4';
 
@@ -104,5 +105,31 @@ describe('health endpoints', () => {
     expect(liveResponse.status).toBe(200);
     expect(healthLiveResponseSchema.safeParse(liveResponse.body).success).toBe(true);
     expect(readinessProbe).toHaveBeenCalledOnce();
+  });
+
+  it('combines server lifecycle readiness with the injected dependency probe', async () => {
+    const readinessProbe = vi.fn<ReadinessProbe>().mockResolvedValue(undefined);
+    const running = await startServer({
+      host: '127.0.0.1',
+      port: 0,
+      readinessProbe,
+    });
+
+    try {
+      const readyResponse = await request(running.app).get('/health/ready');
+
+      expect(readyResponse.status).toBe(200);
+      expect(readinessProbe).toHaveBeenCalledOnce();
+
+      running.readiness.markNotReady();
+      const unavailableResponse = await request(running.app).get('/health/ready');
+      const liveResponse = await request(running.app).get('/health/live');
+
+      expect(unavailableResponse.status).toBe(503);
+      expect(readinessProbe).toHaveBeenCalledOnce();
+      expect(liveResponse.status).toBe(200);
+    } finally {
+      await running.shutdown();
+    }
   });
 });
