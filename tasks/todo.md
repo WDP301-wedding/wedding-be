@@ -297,15 +297,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] `/health/live` returns success without calling dependencies.
-- [ ] `/health/ready` returns success/failure from the probe and uses `503` when unavailable.
-- [ ] Both responses carry request IDs and use stable schemas suitable for OpenAPI generation.
+- [x] `/health/live` returns success without calling dependencies.
+- [x] `/health/ready` returns success/failure from the probe and uses `503` when unavailable.
+- [x] Both responses carry request IDs and use stable schemas suitable for OpenAPI generation.
 
 **Verification:**
 
-- [ ] `npm run test:integration -- health`
-- [ ] `npm run build`
-- [ ] Force the readiness probe to fail and confirm liveness remains healthy.
+- [x] `npm run test:integration -- health`
+- [x] `npm run build`
+- [x] Force the readiness probe to fail and confirm liveness remains healthy.
+
+**Implementation evidence (2026-09-28):** The Express composition root now exposes schema-backed `GET /health/live` and `GET /health/ready` endpoints with correlated request IDs in both the response header and body. Liveness never invokes the dependency probe. Readiness composes the server lifecycle state with an injected abort-aware dependency probe, enforces a one-second default timeout, short-circuits dependencies while the process is not ready, and normalizes rejection or timeout to the standard non-leaking `503 SERVICE_UNAVAILABLE` envelope. Exported strict Zod response schemas carry stable OpenAPI metadata for later contract generation. The focused health integration command passes 16 tests across the integration suite, including forced rejection, timeout, and lifecycle-not-ready scenarios where liveness remains `200`; the readiness unit suite passes 2 timeout-validation tests. The complete 103-test suite passes, coverage passes with 97.28% line and 94.73% branch coverage, and strict typecheck, ESLint, Prettier, and the production build pass.
 
 **Dependencies:** CP-09, CP-10, CP-11  
 **Files likely touched:** `wedding-be/src/core/http/health.router.ts`, `wedding-be/src/core/http/readiness.ts`, `wedding-be/src/core/http/health.schemas.ts`, `wedding-be/src/app.ts`, `wedding-be/tests/integration/health.test.ts`  
@@ -313,8 +315,8 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 #### Checkpoint B2 — HTTP foundation
 
-- [ ] All backend static and unit/integration gates pass.
-- [ ] Health, 404, validation, and unexpected-error responses match the spec exactly.
+- [x] All backend static and unit/integration gates pass.
+- [x] Health, 404, validation, and unexpected-error responses match the spec exactly.
 
 ## Phase C — PostgreSQL and Reliability Primitives
 
