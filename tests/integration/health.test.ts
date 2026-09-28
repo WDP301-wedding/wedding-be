@@ -50,6 +50,15 @@ describe('health endpoints', () => {
     expect(readinessProbe).toHaveBeenCalledWith(expect.any(AbortSignal));
   });
 
+  it('uses a healthy no-dependency probe by default', async () => {
+    const response = await request(createApp())
+      .get('/health/ready')
+      .set('x-request-id', trustedRequestId);
+
+    expect(response.status).toBe(200);
+    expect(healthReadyResponseSchema.safeParse(response.body).success).toBe(true);
+  });
+
   it('returns the standard 503 contract without leaking probe failures', async () => {
     const readinessProbe = vi
       .fn<ReadinessProbe>()
@@ -113,17 +122,18 @@ describe('health endpoints', () => {
       host: '127.0.0.1',
       port: 0,
       readinessProbe,
+      readinessTimeoutMs: 100,
     });
 
     try {
-      const readyResponse = await request(running.app).get('/health/ready');
+      const readyResponse = await request(running.httpServer).get('/health/ready');
 
       expect(readyResponse.status).toBe(200);
       expect(readinessProbe).toHaveBeenCalledOnce();
 
       running.readiness.markNotReady();
-      const unavailableResponse = await request(running.app).get('/health/ready');
-      const liveResponse = await request(running.app).get('/health/live');
+      const unavailableResponse = await request(running.httpServer).get('/health/ready');
+      const liveResponse = await request(running.httpServer).get('/health/live');
 
       expect(unavailableResponse.status).toBe(503);
       expect(readinessProbe).toHaveBeenCalledOnce();
