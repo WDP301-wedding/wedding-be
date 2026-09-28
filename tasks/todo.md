@@ -275,15 +275,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] Valid trusted request IDs are propagated; otherwise UUIDs are generated and returned.
-- [ ] Validation, not-found, conflict, rate-limit, provider, and unexpected errors map consistently without stack leakage.
-- [ ] Write schemas reject unknown fields unless explicitly documented.
+- [x] Valid trusted request IDs are propagated; otherwise UUIDs are generated and returned.
+- [x] Validation, not-found, conflict, rate-limit, provider, and unexpected errors map consistently without stack leakage.
+- [x] Write schemas reject unknown fields unless explicitly documented.
 
 **Verification:**
 
-- [ ] `npm run test:unit -- http-contract`
-- [ ] `npm run test:integration -- common-errors`
-- [ ] Inspect test responses for `error.code`, `error.message`, and `error.requestId`.
+- [x] `npm run test:unit -- http-contract`
+- [x] `npm run test:integration -- common-errors`
+- [x] Inspect test responses for `error.code`, `error.message`, and `error.requestId`.
+
+**Implementation evidence (2026-09-28):** The Express composition root now installs request correlation before JSON parsing, accepts upstream IDs only through an injected trust policy plus UUID validation, generates safe fallback UUIDs, and returns `x-request-id` on success and failure. Typed application errors and the terminal error middleware provide one non-leaking envelope for malformed JSON, validation, 404, conflict, rate-limit (including `Retry-After`), provider `502`/`503`/`504`, and unexpected failures. Reusable async Zod boundary validation covers params, query, headers, and bodies; `strictWriteSchema` rejects undocumented fields and exposes typed parsed inputs. The focused unit suite passes 21 tests, the common-error integration suite passes 10 tests, the complete 95-test coverage suite passes with 96.57% line and 94.18% branch coverage, and error mapping has 100% branch coverage. Strict typecheck, ESLint, Prettier, and the production build pass. A clean `npm ci --ignore-scripts` also succeeds. The dependency audit's four existing high findings remain isolated to the Prisma CLI/configuration graph (`deepmerge-ts` and unused MySQL support); they are not introduced by the test-only Supertest dependency, are not reachable from this PostgreSQL HTTP runtime, and npm offers only a spec-incompatible Prisma 6 downgrade. Recheck by 2026-10-12 or during CP-32, whichever comes first.
 
 **Dependencies:** CP-10  
 **Files likely touched:** `wedding-be/src/core/http/request-context.ts`, `wedding-be/src/core/errors/app-error.ts`, `wedding-be/src/core/errors/error-handler.ts`, `wedding-be/src/core/http/validate.ts`, `wedding-be/tests/integration/common-errors.test.ts`  
