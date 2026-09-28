@@ -107,6 +107,16 @@ export class ProviderError extends AppError {
   }
 }
 
+export class ServiceUnavailableError extends AppError {
+  constructor() {
+    super({
+      status: 503,
+      code: 'SERVICE_UNAVAILABLE',
+      message: 'The service is not ready.',
+    });
+  }
+}
+
 export class InternalError extends AppError {
   constructor() {
     super({
