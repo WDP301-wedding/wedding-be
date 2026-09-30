@@ -40,6 +40,7 @@ describe('parseEnvironment', () => {
       email: { enabled: false },
       aiImage: { provider: null },
       metrics: { enabled: false },
+      openApi: { enabledInProduction: false },
       telemetry: { otlpEndpoint: undefined },
     });
   });
@@ -62,6 +63,7 @@ describe('parseEnvironment', () => {
       GEMINI_IMAGE_MODEL: 'gemini-image-model',
       METRICS_ENABLED: 'true',
       METRICS_TOKEN: 'metrics-secret',
+      OPENAPI_ENABLED: 'true',
       OTEL_EXPORTER_OTLP_ENDPOINT: 'http://localhost:4318',
     });
 
@@ -93,6 +95,7 @@ describe('parseEnvironment', () => {
       model: 'gemini-image-model',
     });
     expect(parsed.metrics).toEqual({ enabled: true, token: 'metrics-secret' });
+    expect(parsed.openApi).toEqual({ enabledInProduction: true });
     expect(parsed.telemetry).toEqual({ otlpEndpoint: 'http://localhost:4318' });
 
     expect(
@@ -280,7 +283,14 @@ describe('parseEnvironment', () => {
     expect(Object.isFrozen(parsed.email)).toBe(true);
     expect(Object.isFrozen(parsed.aiImage)).toBe(true);
     expect(Object.isFrozen(parsed.metrics)).toBe(true);
+    expect(Object.isFrozen(parsed.openApi)).toBe(true);
     expect(Object.isFrozen(parsed.telemetry)).toBe(true);
+  });
+
+  it('rejects invalid OpenAPI serving flags', () => {
+    expect(() => parseEnvironment({ OPENAPI_ENABLED: 'yes' })).toThrow(
+      EnvironmentConfigurationError,
+    );
   });
 
   it('reports only variable names and never secret values', () => {

@@ -70,6 +70,47 @@ export class ConflictError extends AppError {
   }
 }
 
+export class IdempotencyKeyRequiredError extends AppError {
+  constructor() {
+    super({
+      status: 400,
+      code: 'IDEMPOTENCY_KEY_REQUIRED',
+      message: 'An Idempotency-Key header is required.',
+    });
+  }
+}
+
+export class InvalidIdempotencyKeyError extends AppError {
+  constructor() {
+    super({
+      status: 422,
+      code: 'INVALID_IDEMPOTENCY_KEY',
+      message: 'The Idempotency-Key header is invalid.',
+    });
+  }
+}
+
+export class IdempotencyKeyReusedError extends AppError {
+  constructor() {
+    super({
+      status: 422,
+      code: 'IDEMPOTENCY_KEY_REUSED',
+      message: 'The Idempotency-Key was already used for a different request.',
+    });
+  }
+}
+
+export class RequestInProgressError extends AppError {
+  constructor(retryAfterSeconds: number) {
+    super({
+      status: 409,
+      code: 'REQUEST_IN_PROGRESS',
+      message: 'A request with this Idempotency-Key is still in progress.',
+      headers: retryAfterHeader(retryAfterSeconds),
+    });
+  }
+}
+
 export class RateLimitError extends AppError {
   constructor(retryAfterSeconds: number) {
     super(rateLimitOptions(retryAfterSeconds));
@@ -128,14 +169,18 @@ export class InternalError extends AppError {
 }
 
 function rateLimitOptions(retryAfterSeconds: number): AppErrorOptions {
-  if (!Number.isInteger(retryAfterSeconds) || retryAfterSeconds <= 0) {
-    throw new RangeError('Retry-After must be a positive integer number of seconds.');
-  }
-
   return {
     status: 429,
     code: 'RATE_LIMITED',
     message: 'Too many requests.',
-    headers: { 'Retry-After': String(retryAfterSeconds) },
+    headers: retryAfterHeader(retryAfterSeconds),
   };
+}
+
+function retryAfterHeader(retryAfterSeconds: number): Readonly<Record<string, string>> {
+  if (!Number.isInteger(retryAfterSeconds) || retryAfterSeconds <= 0) {
+    throw new RangeError('Retry-After must be a positive integer number of seconds.');
+  }
+
+  return { 'Retry-After': String(retryAfterSeconds) };
 }

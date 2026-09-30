@@ -1,5 +1,6 @@
 import type { ErrorRequestHandler, Request, RequestHandler } from 'express';
 
+import { errorResponseSchema } from '../http/common.schemas.js';
 import { AppError, InternalError, MalformedJsonError, NotFoundError } from './app-error.js';
 
 export type UnexpectedErrorReporter = (error: unknown, request: Request) => void;
@@ -26,7 +27,7 @@ export function createErrorHandler(
       response.set(applicationError.headers);
     }
 
-    response.status(applicationError.status).json({
+    const body = errorResponseSchema.parse({
       error: {
         code: applicationError.code,
         message: applicationError.message,
@@ -34,6 +35,7 @@ export function createErrorHandler(
         requestId: request.requestId,
       },
     });
+    response.status(applicationError.status).json(body);
   };
 }
 

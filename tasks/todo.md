@@ -355,10 +355,10 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 **Verification:**
 
 - [x] `npm run test:unit -- audit`
-- [ ] `npm run test:integration -- audit`
-- [ ] Query the test table and confirm stored metadata matches the allowlist.
+- [x] `npx vitest run tests/integration/audit.test.ts`
+- [x] Query the test table and confirm stored metadata matches the allowlist.
 
-**Implementation evidence (2026-09-28):** Typed audit-event definitions now construct strict Zod metadata allowlists, and the audit service validates UUID request/actor/entity attribution, rejects unknown or non-JSON metadata before persistence, assigns an injectable timestamp, and delegates only an immutable append record. The application-facing repository contract exposes only `append`; its Prisma adapter creates `AuditLog` rows without update/delete methods. Nine focused unit tests pass, including password, email, refresh-token, invalid-value, invalid-attribution, non-JSON, append-only-contract, and deterministic timestamp cases. A PostgreSQL integration suite is committed to query the stored JSONB keys and prove rejected secret/PII payloads create no row, but its two database cases remain skipped because this environment has no `DATABASE_URL`; Docker Desktop also failed to bring its WSL-backed daemon online, so the two PostgreSQL verification items above remain open. The complete non-database suite passes 114 tests with 97.51% line and 95.14% branch coverage; the audit-only coverage run is 100% statements, branches, functions, and lines. Strict typecheck, ESLint, Prettier, and the production build pass. `npm audit` still reports the pre-existing Prisma CLI/configuration findings in `deepmerge-ts` and unused MySQL support; this slice adds no dependency or lockfile change.
+**Implementation evidence (2026-09-29):** Typed audit-event definitions construct strict Zod metadata allowlists, and the audit service validates UUID request/actor/entity attribution, rejects unknown or non-JSON metadata before persistence, assigns an injectable timestamp, and delegates only an immutable append record. The application-facing repository contract exposes only `append`; its Prisma adapter creates `AuditLog` rows without update/delete methods. All nine focused unit tests pass, including password, email, refresh-token, invalid-value, invalid-attribution, non-JSON, append-only-contract, and deterministic timestamp cases. Against the configured Supabase PostgreSQL database through its TLS session pooler, both focused integration tests pass: the persisted JSONB row is queried back with exactly `fromStatus`, `reasonCode`, and `toStatus`, while a payload containing password/email fields is rejected before persistence and leaves no row. The integration command is the exact file path because appending `audit` to the directory-based npm script also selects unrelated integration files. The previous complete non-database suite passed 114 tests with 97.51% line and 95.14% branch coverage; the audit-only coverage run was 100% statements, branches, functions, and lines. Strict typecheck, ESLint, Prettier, and the production build passed. `npm audit` still reports the pre-existing Prisma CLI/configuration findings in `deepmerge-ts` and unused MySQL support; this slice adds no dependency or lockfile change.
 
 **Dependencies:** CP-11, CP-13  
 **Files likely touched:** `wedding-be/src/core/audit/audit.types.ts`, `wedding-be/src/core/audit/audit.repository.ts`, `wedding-be/src/core/audit/audit.service.ts`, `wedding-be/src/core/audit/audit.service.test.ts`, `wedding-be/tests/integration/audit.test.ts`  
@@ -367,7 +367,7 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 #### Checkpoint C1 — Persistence and audit
 
 - [ ] Fresh migration and rollback-by-new-forward-migration policy are documented and verified.
-- [ ] Audit tests prove append-only application behavior and redaction.
+- [x] Audit tests prove append-only application behavior and redaction.
 
 ### CP-15: Implement atomic idempotency persistence
 
@@ -377,15 +377,15 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 - [x] `(namespace, idempotencyKey)` uniqueness atomically selects one winner.
 - [x] Canonical hashing is deterministic and detects same-key/different-payload use.
-- [ ] Real concurrent PostgreSQL tests show exactly one successful claim.
+- [x] Real concurrent PostgreSQL tests show exactly one successful claim.
 
 **Verification:**
 
 - [x] `npm run test:unit -- idempotency-hash`
-- [ ] `npm run test:integration -- idempotency-repository`
-- [ ] Repeat the concurrency test enough times to detect a check-then-insert race.
+- [x] `npm run test:integration -- idempotency-repository`
+- [x] Repeat the concurrency test enough times to detect a check-then-insert race.
 
-**Implementation evidence (2026-09-29):** Canonical request hashing now recursively sorts object keys, preserves array order and JSON scalar types, produces lowercase SHA-256 digests, and rejects cyclic, sparse, non-finite, symbol-bearing, or otherwise non-JSON payloads. The typed idempotency service validates printable 1–128 byte keys, calculates injectable 30-day default and explicit 180-day payment retention timestamps, distinguishes `CLAIMED`, `IN_PROGRESS`, `MISMATCH`, `SUCCEEDED`, and `FAILED`, and permits only one terminal transition. The Prisma repository attempts `create` without a preceding read, lets the existing compound unique constraint choose the winner, resolves `P2002` to that winning row, and guards terminal updates with `id + IN_PROGRESS`; focused unit tests cover Prisma error propagation and terminal-state immutability. The idempotency-only unit suite passes 45 tests and scoped coverage is 100% statements, branches, functions, and lines; the exact hash verification command passes 10 tests. The PostgreSQL integration suite is committed with 20 rounds of 12 simultaneous claims plus a concurrent terminal-transition race, but its two cases remain skipped because this environment has no `DATABASE_URL`; the Docker daemon is stopped and its Windows service could not be started from this session, so the two PostgreSQL verification items above remain open. The complete available suite passes 159 tests with six database cases skipped and 98.03% line / 96.40% branch coverage; strict typecheck, ESLint, Prettier, and the production build pass. `npm audit` still reports the pre-existing Prisma CLI/configuration findings in `deepmerge-ts` and unused MySQL support (one moderate and four high findings); this slice adds no dependency or lockfile change, so the existing 2026-10-12/CP-32 review gate remains applicable.
+**Implementation evidence (2026-09-29):** Canonical request hashing now recursively sorts object keys, preserves array order and JSON scalar types, produces lowercase SHA-256 digests, and rejects cyclic, sparse, non-finite, symbol-bearing, or otherwise non-JSON payloads. The typed idempotency service validates printable 1–128 byte keys, calculates injectable 30-day default and explicit 180-day payment retention timestamps, distinguishes `CLAIMED`, `IN_PROGRESS`, `MISMATCH`, `SUCCEEDED`, and `FAILED`, and permits only one terminal transition. The Prisma repository attempts `create` without a preceding read, lets the existing compound unique constraint choose the winner, resolves `P2002` to that winning row, and guards terminal updates with `id + IN_PROGRESS`; focused unit tests cover Prisma error propagation and terminal-state immutability. The idempotency-only unit suite passes 45 tests and scoped coverage is 100% statements, branches, functions, and lines; the exact hash verification command passes 10 tests. The initial Prisma migration was deployed to Supabase and its migration status is current. Against that real PostgreSQL database, the integration suite passes all 22 tests, including 20 rounds of 12 simultaneous claims that each produce exactly one winner and one stored row, plus a concurrent terminal-transition race that preserves retention timestamps. The stress rounds run in batches of four and retain all 240 claim attempts; the complete 165-test suite passes through the Supabase session pooler in about 69 seconds. Timed-out diagnostic rows were removed and no test namespaces remain. Strict typecheck, ESLint, Prettier, and the production build pass. `npm audit` still reports the pre-existing Prisma CLI/configuration findings in `deepmerge-ts` and unused MySQL support (one moderate and four high findings); this slice adds no dependency or lockfile change, so the existing 2026-10-12/CP-32 review gate remains applicable.
 
 **Dependencies:** CP-13  
 **Files likely touched:** `wedding-be/src/core/idempotency/request-hash.ts`, `wedding-be/src/core/idempotency/idempotency.repository.ts`, `wedding-be/src/core/idempotency/idempotency.service.ts`, `wedding-be/src/core/idempotency/request-hash.test.ts`, `wedding-be/tests/integration/idempotency-repository.test.ts`  
@@ -397,15 +397,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] Missing/invalid keys, in-flight duplicates, payload mismatch, and completed replay use documented status/error semantics.
-- [ ] Two concurrent HTTP requests execute the protected handler once.
-- [ ] Unknown external outcomes remain reconcilable and are never silently re-executed.
+- [x] Missing/invalid keys, in-flight duplicates, payload mismatch, and completed replay use documented status/error semantics.
+- [x] Two concurrent HTTP requests execute the protected handler once.
+- [x] Unknown external outcomes remain reconcilable and are never silently re-executed.
 
 **Verification:**
 
-- [ ] `npm run test:integration -- idempotency-http`
-- [ ] `npm run test:coverage -- idempotency`
-- [ ] Inspect database state after forced success, deterministic failure, and simulated timeout.
+- [x] `npm run test:integration -- idempotency-http`
+- [x] `npm run test:coverage -- idempotency`
+- [x] Inspect database state after forced success, deterministic failure, and simulated timeout.
+
+**Implementation evidence (2026-09-30):** Explicit route-level middleware now reads and validates exactly one `Idempotency-Key`, derives a collision-safe namespace from trusted actor scope, HTTP method, normalized route, and operation version, and claims only after the route's request validator has succeeded. The documented contract returns `400 IDEMPOTENCY_KEY_REQUIRED`, `422 INVALID_IDEMPOTENCY_KEY`, `422 IDEMPOTENCY_KEY_REUSED`, or `409 REQUEST_IN_PROGRESS` with `Retry-After` as appropriate. Successful `2xx` and deterministic `4xx` JSON/no-content responses are persisted before transmission and replayed without re-running the handler; replayed standard error envelopes receive the current request ID, while successful domain payloads are left unchanged. `3xx` and `5xx` responses remain `IN_PROGRESS`, so a simulated provider timeout returns `504` once and a retry returns `409` without repeating the external effect. Against the configured Supabase PostgreSQL database through its TLS pooler and existing CA, `npm run test:integration -- idempotency-http` passes six integration files and 28 tests; the CP-16 file directly queries `SUCCEEDED`, `FAILED`, and retained `IN_PROGRESS` rows and proves two concurrent requests execute the handler exactly once. The idempotency coverage run passes 95 tests with 100% statements, branches, functions, and lines; the scope include is supplied because the task's test-name filter otherwise applies per-file thresholds to unrelated source modules. The complete non-database suite passes 188 tests, and strict typecheck, ESLint, Prettier, and the production build pass. One stale CP-16 test row left by an earlier DNS interruption was identified by its exact test namespace and removed. `npm audit` still reports the pre-existing Prisma CLI/configuration findings in `deepmerge-ts` and unused MySQL support (one moderate and four high findings); this slice adds no dependency or lockfile change.
 
 **Dependencies:** CP-11, CP-15  
 **Files likely touched:** `wedding-be/src/core/idempotency/idempotency.middleware.ts`, `wedding-be/src/core/idempotency/response-codec.ts`, `wedding-be/src/core/idempotency/idempotency.policy.ts`, `wedding-be/src/app.ts`, `wedding-be/tests/integration/idempotency-http.test.ts`  
@@ -413,8 +415,8 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 #### Checkpoint C2 — Idempotency
 
-- [ ] Atomic winner, replay, mismatch, in-flight, and unknown-outcome scenarios pass.
-- [ ] No test uses an in-memory substitute for the database concurrency proof.
+- [x] Atomic winner, replay, mismatch, in-flight, and unknown-outcome scenarios pass.
+- [x] No test uses an in-memory substitute for the database concurrency proof.
 
 ## Phase D — Contract, Observability, and Security
 
@@ -424,15 +426,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] `openapi/openapi.json` is generated from the same Zod schemas used at runtime.
-- [ ] Regeneration is byte-stable and `api:check` fails on drift.
-- [ ] Health, common errors, pagination, request ID, and idempotency components are documented.
+- [x] `openapi/openapi.json` is generated from the same Zod schemas used at runtime.
+- [x] Regeneration is byte-stable and `api:check` fails on drift.
+- [x] Health, common errors, pagination, request ID, and idempotency components are documented.
 
 **Verification:**
 
-- [ ] `npm run api:generate`
-- [ ] `npm run api:check`
-- [ ] `npm run test:contract`
+- [x] `npm run api:generate`
+- [x] `npm run api:check`
+- [x] `npm run test:contract`
+
+**Implementation evidence (2026-09-30):** The backend now generates a canonical OpenAPI 3.1 artifact from the same strict Zod schemas used at runtime for request IDs, common error envelopes, health responses, and idempotency keys. The registry documents liveness/readiness operations plus reusable pagination, request-ID, retry, common-error, and idempotency parameter/response components with schema-valid examples. Generation recursively orders object keys, writes a stable two-space JSON artifact with a final newline, and `api:check` regenerates into an isolated temporary directory before comparing bytes; the contract suite also proves intentional drift is rejected. `/api/v1/openapi.json` serves the exact committed bytes in development, test, and staging, remains disabled by default in production, and is enabled there only with validated `OPENAPI_ENABLED=true`; missing artifacts return the standard non-leaking error envelope. `npm run api:generate`, `npm run api:check`, and all six contract tests pass. Focused CP-17 coverage passes 134 tests at 99.10% lines and 97.64% branches; the complete suite passes all 223 tests, including the PostgreSQL/Supabase persistence and concurrency cases. Strict typecheck, ESLint, Prettier, and the production build pass. `npm audit` still reports the pre-existing Prisma CLI/configuration findings in `deepmerge-ts` and unused MySQL support (one moderate and four high findings); CP-17 adds no dependency or lockfile change.
 
 **Dependencies:** CP-11, CP-12, CP-16  
 **Files likely touched:** `wedding-be/src/core/openapi/registry.ts`, `wedding-be/src/core/openapi/generate.ts`, `wedding-be/src/core/openapi/openapi.router.ts`, `wedding-be/openapi/openapi.json`, `wedding-be/tests/contract/openapi.test.ts`  
@@ -460,7 +464,7 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 #### Checkpoint D1 — Contract and logs
 
-- [ ] OpenAPI generation is deterministic and contract tests pass.
+- [x] OpenAPI generation is deterministic and contract tests pass.
 - [ ] Induced failures are diagnosable by request ID with no secret/PII leakage.
 
 ### CP-19: Add RED metrics and optional OpenTelemetry startup

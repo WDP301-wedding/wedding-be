@@ -6,6 +6,7 @@ import type {
   IdempotencyRepository,
   IdempotencyStatus,
 } from './idempotency.repository.js';
+import { idempotencyKeySchema } from './idempotency.schemas.js';
 import { canonicalizeRequest, hashCanonicalRequest } from './request-hash.js';
 
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1_000;
@@ -54,8 +55,11 @@ export class IdempotencyTransitionError extends Error {
   }
 }
 
-const idempotencyKeyPattern = /^[\x20-\x7e]{1,128}$/;
 const uuidSchema = z.uuid();
+
+export function isValidIdempotencyKey(value: string): boolean {
+  return idempotencyKeySchema.safeParse(value).success;
+}
 
 function validateRetention(retentionMs: number): void {
   if (!Number.isSafeInteger(retentionMs) || retentionMs <= 0) {
@@ -64,7 +68,7 @@ function validateRetention(retentionMs: number): void {
 }
 
 function validateClaimInput(input: ClaimIdempotencyInput, retentionMs: number): void {
-  if (input.namespace.trim() === '' || !idempotencyKeyPattern.test(input.idempotencyKey)) {
+  if (input.namespace.trim() === '' || !isValidIdempotencyKey(input.idempotencyKey)) {
     throw new IdempotencyInputError();
   }
 

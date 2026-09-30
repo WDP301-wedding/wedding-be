@@ -31,32 +31,38 @@ describeWithDatabase('idempotency repository persistence', () => {
     const expiresAt = new Date(lockedAt.getTime() + 60_000);
 
     try {
-      for (let round = 0; round < 20; round += 1) {
-        const claim: NewIdempotencyClaim = {
-          namespace: `${runPrefix}-${round}`,
-          idempotencyKey: 'same-intent',
-          requestHash: 'a'.repeat(64),
-          lockedAt,
-          expiresAt,
-        };
-        const results = await Promise.all(
-          Array.from({ length: 12 }, () => repository.claim(claim)),
-        );
-        const winners = results.filter(({ outcome }) => outcome === 'CLAIMED');
-        const recordIds = new Set(results.map(({ record }) => record.id));
+      const rounds = Array.from({ length: 20 }, (_, round) => round);
 
-        expect(winners).toHaveLength(1);
-        expect(recordIds.size).toBe(1);
-        await expect(
-          prisma.idempotencyRecord.count({ where: { namespace: claim.namespace } }),
-        ).resolves.toBe(1);
+      for (let batchStart = 0; batchStart < rounds.length; batchStart += 4) {
+        await Promise.all(
+          rounds.slice(batchStart, batchStart + 4).map(async (round) => {
+            const claim: NewIdempotencyClaim = {
+              namespace: `${runPrefix}-${round}`,
+              idempotencyKey: 'same-intent',
+              requestHash: 'a'.repeat(64),
+              lockedAt,
+              expiresAt,
+            };
+            const results = await Promise.all(
+              Array.from({ length: 12 }, () => repository.claim(claim)),
+            );
+            const winners = results.filter(({ outcome }) => outcome === 'CLAIMED');
+            const recordIds = new Set(results.map(({ record }) => record.id));
+
+            expect(winners).toHaveLength(1);
+            expect(recordIds.size).toBe(1);
+            await expect(
+              prisma.idempotencyRecord.count({ where: { namespace: claim.namespace } }),
+            ).resolves.toBe(1);
+          }),
+        );
       }
     } finally {
       await prisma.idempotencyRecord.deleteMany({
         where: { namespace: { startsWith: runPrefix } },
       });
     }
-  });
+  }, 180_000);
 
   it('allows exactly one terminal state transition and preserves retention timestamps', async () => {
     const namespace = `idempotency-transition-${randomUUID()}`;

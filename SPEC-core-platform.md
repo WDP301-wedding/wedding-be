@@ -336,6 +336,7 @@ GEMINI_API_KEY
 GEMINI_IMAGE_MODEL
 METRICS_ENABLED
 METRICS_TOKEN
+OPENAPI_ENABLED=false
 OTEL_EXPORTER_OTLP_ENDPOINT
 ```
 
@@ -345,6 +346,7 @@ Rules:
 - `SUPABASE_SERVICE_ROLE_KEY`, Resend, database, metrics, and Gemini secrets exist only in backend environments.
 - `GEMINI_API_KEY` and model are optional while AI is disabled; enabling the Gemini adapter without them is a startup error.
 - `CORS_ALLOWED_ORIGINS` is an explicit comma-separated allowlist for the two web deployments. Wildcard origins are forbidden when credentials are accepted.
+- The committed OpenAPI artifact is served outside production. Production serving requires `OPENAPI_ENABLED=true`.
 - Frontend variables prefixed `NEXT_PUBLIC_` or `EXPO_PUBLIC_` are public by definition and must never contain a secret.
 
 ### 8.2 Client configuration
@@ -487,10 +489,13 @@ Later module specs mark which state-changing routes require `Idempotency-Key`. A
 
 - Key length is 1–128 printable ASCII characters and identifies one user intent, not one retry attempt.
 - Namespace includes actor scope, HTTP method, normalized route, and operation version.
+- Actor scope comes only from authenticated or otherwise trusted request context, never from a client-controlled header, query, or body field.
+- A missing required header returns `400 IDEMPOTENCY_KEY_REQUIRED`; a malformed key returns `422 INVALID_IDEMPOTENCY_KEY`.
 - Before the side effect, atomically insert an `IN_PROGRESS` record; the database unique constraint chooses the winner.
 - Store a SHA-256 hash of the canonical request payload. Reusing a key with a different payload returns `422 IDEMPOTENCY_KEY_REUSED`.
 - A concurrent duplicate receives `409 REQUEST_IN_PROGRESS` with `Retry-After`; it never executes the side effect.
 - A completed duplicate receives the stored status/body or the canonical resource reference.
+- Successful `2xx` responses become `SUCCEEDED`; deterministic `4xx` responses become `FAILED` and are replayable. `3xx` and `5xx` responses remain `IN_PROGRESS` because their side-effect outcome is not proven.
 - Default retention is 30 days. Payment operations retain records for at least 180 days or longer if the provider's retry/dispute path requires it.
 - A timeout after calling an external provider is an unknown outcome, not an automatic failure. Keep enough state for reconciliation before any retry.
 

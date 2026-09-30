@@ -32,8 +32,10 @@ export interface RunningServer {
 }
 
 export interface StartServerOptions {
+  readonly enableOpenApiInProduction?: boolean;
   readonly port: number;
   readonly host?: string;
+  readonly runtimeEnvironment?: Config['runtime']['environment'];
   readonly resources?: readonly ShutdownResource[];
   readonly shutdownTimeoutMs?: number;
   readonly readinessProbe?: ReadinessProbe;
@@ -52,10 +54,16 @@ export interface BootstrapDependencies {
 export async function startServer(options: StartServerOptions): Promise<RunningServer> {
   const readiness = createReadinessState();
   const app = (options.createApplication ?? createApp)({
+    ...(options.enableOpenApiInProduction === undefined
+      ? {}
+      : { enableOpenApiInProduction: options.enableOpenApiInProduction }),
     readinessProbe: createServerReadinessProbe(readiness, options.readinessProbe),
     ...(options.readinessTimeoutMs === undefined
       ? {}
       : { readinessTimeoutMs: options.readinessTimeoutMs }),
+    ...(options.runtimeEnvironment === undefined
+      ? {}
+      : { runtimeEnvironment: options.runtimeEnvironment }),
   });
   const httpServer = (options.createHttpServer ?? createServer)(app as RequestListener);
   const lifecycle = createHttpLifecycle({
@@ -234,7 +242,11 @@ async function loadEnvironmentConfig(): Promise<Config> {
 }
 
 function startFromConfig(config: Config): Promise<RunningServer> {
-  return startServer({ port: config.runtime.port });
+  return startServer({
+    enableOpenApiInProduction: config.openApi.enabledInProduction,
+    port: config.runtime.port,
+    runtimeEnvironment: config.runtime.environment,
+  });
 }
 
 function defaultStartupErrorReporter(error: unknown): void {

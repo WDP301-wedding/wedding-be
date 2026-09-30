@@ -1,7 +1,12 @@
 import { Router } from 'express';
 
 import { ServiceUnavailableError } from '../errors/app-error.js';
-import { type HealthLiveResponse, type HealthReadyResponse } from './health.schemas.js';
+import {
+  healthLiveResponseSchema,
+  healthReadyResponseSchema,
+  type HealthLiveResponse,
+  type HealthReadyResponse,
+} from './health.schemas.js';
 import {
   createReadinessCheck,
   DEFAULT_READINESS_TIMEOUT_MS,
@@ -26,7 +31,7 @@ export function createHealthRouter(options: HealthRouterOptions = {}): Router {
     const body: HealthLiveResponse = {
       data: { status: 'live', requestId: request.requestId },
     };
-    response.json(body);
+    response.json(healthLiveResponseSchema.parse(body));
   });
 
   router.get('/ready', async (request, response, next) => {
@@ -38,7 +43,7 @@ export function createHealthRouter(options: HealthRouterOptions = {}): Router {
     const body: HealthReadyResponse = {
       data: { status: 'ready', requestId: request.requestId },
     };
-    response.json(body);
+    response.json(healthReadyResponseSchema.parse(body));
   });
 
   return router;

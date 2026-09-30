@@ -6,9 +6,13 @@ import { z } from 'zod';
 import { createApp } from '../../app.js';
 import {
   ConflictError,
+  IdempotencyKeyRequiredError,
+  IdempotencyKeyReusedError,
+  InvalidIdempotencyKeyError,
   NotFoundError,
   ProviderError,
   RateLimitError,
+  RequestInProgressError,
   ValidationError,
 } from '../errors/app-error.js';
 import { createErrorHandler } from '../errors/error-handler.js';
@@ -97,6 +101,23 @@ describe('application errors', () => {
       code: 'RATE_LIMITED',
       headers: { 'Retry-After': '12' },
     });
+    expect(new IdempotencyKeyRequiredError()).toMatchObject({
+      status: 400,
+      code: 'IDEMPOTENCY_KEY_REQUIRED',
+    });
+    expect(new InvalidIdempotencyKeyError()).toMatchObject({
+      status: 422,
+      code: 'INVALID_IDEMPOTENCY_KEY',
+    });
+    expect(new IdempotencyKeyReusedError()).toMatchObject({
+      status: 422,
+      code: 'IDEMPOTENCY_KEY_REUSED',
+    });
+    expect(new RequestInProgressError(4)).toMatchObject({
+      status: 409,
+      code: 'REQUEST_IN_PROGRESS',
+      headers: { 'Retry-After': '4' },
+    });
   });
 
   it.each([
@@ -120,6 +141,13 @@ describe('application errors', () => {
     'rejects an invalid Retry-After value of %s',
     (retryAfterSeconds) => {
       expect(() => new RateLimitError(retryAfterSeconds)).toThrow(RangeError);
+    },
+  );
+
+  it.each([0, 1.5, Number.POSITIVE_INFINITY])(
+    'rejects an invalid idempotency Retry-After value of %s',
+    (retryAfterSeconds) => {
+      expect(() => new RequestInProgressError(retryAfterSeconds)).toThrow(RangeError);
     },
   );
 });

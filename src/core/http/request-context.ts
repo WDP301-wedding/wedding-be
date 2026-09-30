@@ -1,9 +1,8 @@
 import { randomUUID } from 'node:crypto';
 
 import type { Request, RequestHandler } from 'express';
-import { z } from 'zod';
 
-const requestIdSchema = z.uuid();
+import { requestIdSchema } from './common.schemas.js';
 
 declare module 'express-serve-static-core' {
   interface Request {

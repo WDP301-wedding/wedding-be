@@ -91,6 +91,10 @@ const rawEnvironmentSchema = z
       .default('false')
       .transform((value) => value === 'true'),
     METRICS_TOKEN: optionalString,
+    OPENAPI_ENABLED: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((value) => value === 'true'),
     OTEL_EXPORTER_OTLP_ENDPOINT: optionalString.pipe(httpUrl.optional()),
   })
   .superRefine((environment, context) => {
@@ -213,6 +217,7 @@ export type BackendConfig = Readonly<{
   email: EmailConfig;
   aiImage: AiImageConfig;
   metrics: MetricsConfig;
+  openApi: Readonly<{ enabledInProduction: boolean }>;
   telemetry: Readonly<{ otlpEndpoint: string | undefined }>;
 }>;
 
@@ -258,6 +263,7 @@ function pickEnvironment(source: EnvironmentSource): EnvironmentSource {
     GEMINI_IMAGE_MODEL: source.GEMINI_IMAGE_MODEL,
     METRICS_ENABLED: source.METRICS_ENABLED,
     METRICS_TOKEN: source.METRICS_TOKEN,
+    OPENAPI_ENABLED: source.OPENAPI_ENABLED,
     OTEL_EXPORTER_OTLP_ENDPOINT: source.OTEL_EXPORTER_OTLP_ENDPOINT,
   };
 }
@@ -361,6 +367,9 @@ function createConfig(environment: RawEnvironment): BackendConfig {
     email,
     aiImage,
     metrics,
+    openApi: Object.freeze({
+      enabledInProduction: environment.OPENAPI_ENABLED,
+    }),
     telemetry: Object.freeze({
       otlpEndpoint: environment.OTEL_EXPORTER_OTLP_ENDPOINT,
     }),

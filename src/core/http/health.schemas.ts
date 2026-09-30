@@ -1,15 +1,13 @@
 import { z } from 'zod';
 
-const healthRequestIdSchema = z
-  .uuid()
-  .meta({ description: 'Request correlation identifier for this health check.' });
+import { requestIdSchema } from './common.schemas.js';
 
 export const healthLiveResponseSchema = z
   .object({
     data: z
       .object({
         status: z.literal('live'),
-        requestId: healthRequestIdSchema,
+        requestId: requestIdSchema,
       })
       .strict(),
   })
@@ -21,7 +19,7 @@ export const healthReadyResponseSchema = z
     data: z
       .object({
         status: z.literal('ready'),
-        requestId: healthRequestIdSchema,
+        requestId: requestIdSchema,
       })
       .strict(),
   })
@@ -34,7 +32,7 @@ export const healthUnavailableResponseSchema = z
       .object({
         code: z.literal('SERVICE_UNAVAILABLE'),
         message: z.literal('The service is not ready.'),
-        requestId: healthRequestIdSchema,
+        requestId: requestIdSchema,
       })
       .strict(),
   })
