@@ -366,8 +366,10 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 #### Checkpoint C1 — Persistence and audit
 
-- [ ] Fresh migration and rollback-by-new-forward-migration policy are documented and verified.
+- [x] Fresh migration and rollback-by-new-forward-migration policy are documented and verified.
 - [x] Audit tests prove append-only application behavior and redaction.
+
+**Checkpoint evidence (2026-10-01):** `docs/database-migrations.md` now documents the runtime/migration connection boundary, immutable applied migrations, fresh-database verification, failed-migration recovery boundary, and the required forward-compensation workflow for released schema changes. `tests/integration/migration-policy.test.ts` creates a unique disposable PostgreSQL schema, deploys the complete committed migration history from empty, applies a probe migration, and then compensates it with a later migration. The rehearsal verifies the original probe SQL remains unchanged, both migration history rows remain successfully applied rather than marked rolled back, and the final schema no longer contains the probe column. The focused rehearsal passes against a disposable PostgreSQL 17 database; the bounded full suite passes all 335 tests with 97.54% line and 93.83% branch coverage. Strict typecheck, ESLint, Prettier, production build, and deterministic OpenAPI verification also pass.
 
 ### CP-15: Implement atomic idempotency persistence
 
