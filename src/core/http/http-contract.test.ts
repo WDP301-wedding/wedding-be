@@ -1,3 +1,5 @@
+import { Writable } from 'node:stream';
+
 import express, { type Request, type Response } from 'express';
 import request from 'supertest';
 import { describe, expect, it, vi } from 'vitest';
@@ -16,6 +18,7 @@ import {
   ValidationError,
 } from '../errors/app-error.js';
 import { createErrorHandler } from '../errors/error-handler.js';
+import { createLogger } from '../logging/logger.js';
 import { strictWriteSchema, validateRequest, validatedRequest } from './validate.js';
 
 describe('request context', () => {
@@ -76,6 +79,30 @@ describe('request context', () => {
     expect(response.status).toBe(500);
     expect(z.uuid().safeParse(requestId).success).toBe(true);
     expect(response.body as unknown).toMatchObject({ error: { requestId } });
+  });
+
+  it('keeps the error contract when trust evaluation fails before request logging is attached', async () => {
+    const app = createApp({
+      isTrustedRequestId: () => {
+        throw new Error('trust policy unavailable');
+      },
+    });
+
+    const firstResponse = await request(app)
+      .get('/context')
+      .set('x-request-id', '24dcfaac-4408-4d42-8d66-456ed6ee7ea4');
+    const secondResponse = await request(app)
+      .get('/context')
+      .set('x-request-id', 'f61e102b-35e2-4502-b0a5-f0ae802cc653');
+
+    expect(firstResponse.status).toBe(500);
+    expect(secondResponse.status).toBe(500);
+    expect(firstResponse.body as unknown).toMatchObject({
+      error: { code: 'INTERNAL_ERROR', requestId: firstResponse.headers['x-request-id'] },
+    });
+    expect(secondResponse.body as unknown).toMatchObject({
+      error: { code: 'INTERNAL_ERROR', requestId: secondResponse.headers['x-request-id'] },
+    });
   });
 });
 
@@ -257,8 +284,19 @@ describe('error handler safeguards', () => {
     [new Error('password=must-not-be-logged'), 'Error'],
     ['token=must-not-be-logged', 'NonErrorThrownValue'],
   ])('reports only the safe %s classification by default', async (thrownValue, errorName) => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const logLines: string[] = [];
+    const logger = createLogger({
+      destination: new Writable({
+        write(chunk, _encoding, callback) {
+          logLines.push(String(chunk));
+          callback();
+        },
+      }),
+      level: 'info',
+      runtimeEnvironment: 'test',
+    });
     const app = createApp({
+      logger,
       registerRoutes: (router) => {
         router.get('/unexpected', (_request, _response, next) => {
           next(thrownValue);
@@ -266,18 +304,12 @@ describe('error handler safeguards', () => {
       },
     });
 
-    try {
-      const response = await request(app).get('/unexpected');
+    const response = await request(app).get('/unexpected');
 
-      expect(response.status).toBe(500);
-      expect(consoleError).toHaveBeenCalledWith('Unexpected request error.', {
-        requestId: response.headers['x-request-id'],
-        errorName,
-      });
-      expect(JSON.stringify(consoleError.mock.calls)).not.toContain('must-not-be-logged');
-    } finally {
-      consoleError.mockRestore();
-    }
+    expect(response.status).toBe(500);
+    expect(logLines.join('')).toContain(`"errorName":"${errorName}"`);
+    expect(logLines.join('')).toContain(`"requestId":"${response.headers['x-request-id']}"`);
+    expect(logLines.join('')).not.toContain('must-not-be-logged');
   });
 
   it('preserves the error contract when an unexpected-error reporter fails', async () => {

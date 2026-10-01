@@ -1,7 +1,15 @@
 import type { ErrorRequestHandler, Request, RequestHandler } from 'express';
+import type { Logger } from 'pino';
 
 import { errorResponseSchema } from '../http/common.schemas.js';
-import { AppError, InternalError, MalformedJsonError, NotFoundError } from './app-error.js';
+import { createLogger } from '../logging/logger.js';
+import {
+  AppError,
+  InternalError,
+  MalformedJsonError,
+  NotFoundError,
+  PayloadTooLargeError,
+} from './app-error.js';
 
 export type UnexpectedErrorReporter = (error: unknown, request: Request) => void;
 
@@ -19,7 +27,8 @@ export function createErrorHandler(
     }
 
     const applicationError = normalizeError(error);
-    if (!(error instanceof AppError) && !isMalformedJsonError(error)) {
+    response.locals.errorCode = applicationError.code;
+    if (!(error instanceof AppError) && !isBodyParserError(error)) {
       safelyReportUnexpectedError(reportUnexpectedError, error, request);
     }
 
@@ -48,7 +57,15 @@ function normalizeError(error: unknown): AppError {
     return new MalformedJsonError();
   }
 
+  if (isPayloadTooLargeError(error)) {
+    return new PayloadTooLargeError();
+  }
+
   return new InternalError();
+}
+
+function isBodyParserError(error: unknown): boolean {
+  return isMalformedJsonError(error) || isPayloadTooLargeError(error);
 }
 
 function isMalformedJsonError(error: unknown): boolean {
@@ -60,11 +77,42 @@ function isMalformedJsonError(error: unknown): boolean {
   return parserError.status === 400 && parserError.type === 'entity.parse.failed';
 }
 
+function isPayloadTooLargeError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  const parserError = error as Error & { status?: unknown; type?: unknown };
+  return parserError.status === 413 && parserError.type === 'entity.too.large';
+}
+
 function defaultUnexpectedErrorReporter(error: unknown, request: Request): void {
-  console.error('Unexpected request error.', {
-    requestId: request.requestId,
-    errorName: error instanceof Error ? error.name : 'NonErrorThrownValue',
+  const requestLogger = (request as Request & { readonly log?: Logger }).log;
+  const logger = requestLogger ?? fallbackErrorLogger();
+  logger.error(
+    {
+      errorName: error instanceof Error ? error.name : 'NonErrorThrownValue',
+      event: 'http_request_error',
+      module: 'http',
+      ...(requestLogger === undefined ? { entryPoint: 'http', requestId: request.requestId } : {}),
+    },
+    'unexpected request error',
+  );
+}
+
+let emergencyLogger: Logger | undefined;
+
+function fallbackErrorLogger(): Logger {
+  emergencyLogger ??= createLogger({
+    level: 'error',
+    runtimeEnvironment: runtimeEnvironment(),
   });
+  return emergencyLogger;
+}
+
+function runtimeEnvironment(): 'development' | 'test' | 'staging' | 'production' {
+  const value = process.env.NODE_ENV;
+  return value === 'test' || value === 'staging' || value === 'production' ? value : 'development';
 }
 
 function safelyReportUnexpectedError(

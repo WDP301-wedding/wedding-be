@@ -10,9 +10,9 @@
   },
   "packageManager": "npm@11.19.0",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "tsx watch --import ./src/instrumentation.ts src/server.ts",
     "build": "tsc --project tsconfig.build.json",
-    "start": "node --enable-source-maps dist/server.js",
+    "start": "node --enable-source-maps --import ./dist/instrumentation.js dist/server.js",
     "typecheck": "tsc --project tsconfig.json --noEmit",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",

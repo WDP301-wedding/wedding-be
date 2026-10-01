@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import type { Express } from 'express';
+import type { Logger } from 'pino';
 
 import { createApp, type CreateAppOptions } from './app.js';
 import type { Config } from './config/config.js';
@@ -13,6 +14,8 @@ import {
   type ShutdownResource,
 } from './core/http/lifecycle.js';
 import type { ReadinessProbe } from './core/http/readiness.js';
+import { createLogger } from './core/logging/logger.js';
+import { getActiveTracingResource } from './core/observability/tracing.js';
 
 type ProcessExitCode = NodeJS.Process['exitCode'];
 type ProcessSignal = 'SIGINT' | 'SIGTERM';
@@ -32,10 +35,14 @@ export interface RunningServer {
 }
 
 export interface StartServerOptions {
+  readonly corsConfig?: Config['cors'];
   readonly enableOpenApiInProduction?: boolean;
   readonly port: number;
   readonly host?: string;
+  readonly logger?: Logger;
+  readonly metricsConfig?: Config['metrics'];
   readonly runtimeEnvironment?: Config['runtime']['environment'];
+  readonly securityConfig?: Config['security'];
   readonly resources?: readonly ShutdownResource[];
   readonly shutdownTimeoutMs?: number;
   readonly readinessProbe?: ReadinessProbe;
@@ -54,6 +61,7 @@ export interface BootstrapDependencies {
 export async function startServer(options: StartServerOptions): Promise<RunningServer> {
   const readiness = createReadinessState();
   const app = (options.createApplication ?? createApp)({
+    ...(options.corsConfig === undefined ? {} : { corsConfig: options.corsConfig }),
     ...(options.enableOpenApiInProduction === undefined
       ? {}
       : { enableOpenApiInProduction: options.enableOpenApiInProduction }),
@@ -64,6 +72,9 @@ export async function startServer(options: StartServerOptions): Promise<RunningS
     ...(options.runtimeEnvironment === undefined
       ? {}
       : { runtimeEnvironment: options.runtimeEnvironment }),
+    ...(options.securityConfig === undefined ? {} : { securityConfig: options.securityConfig }),
+    ...(options.logger === undefined ? {} : { logger: options.logger }),
+    ...(options.metricsConfig === undefined ? {} : { metricsConfig: options.metricsConfig }),
   });
   const httpServer = (options.createHttpServer ?? createServer)(app as RequestListener);
   const lifecycle = createHttpLifecycle({
@@ -107,7 +118,7 @@ export async function startServer(options: StartServerOptions): Promise<RunningS
     reportError:
       options.reportShutdownError ??
       ((error) => {
-        console.error('Graceful shutdown failed.', error);
+        reportOperationalError(options.logger, 'server_shutdown_failed', error);
       }),
   });
 
@@ -127,6 +138,7 @@ export async function bootstrap(
 export async function runMain(
   options: {
     readonly bootstrapDependencies?: Partial<BootstrapDependencies>;
+    readonly logger?: Logger;
     readonly processRef?: Pick<SignalTarget, 'exit' | 'exitCode'>;
     readonly reportError?: (error: unknown) => void;
   } = {},
@@ -134,7 +146,12 @@ export async function runMain(
   try {
     await bootstrap(options.bootstrapDependencies);
   } catch (error: unknown) {
-    (options.reportError ?? defaultStartupErrorReporter)(error);
+    (
+      options.reportError ??
+      ((startupError: unknown) => {
+        reportOperationalError(options.logger, 'server_startup_failed', startupError);
+      })
+    )(error);
     const processRef = options.processRef ?? process;
     processRef.exitCode = 1;
     processRef.exit(1);
@@ -242,15 +259,50 @@ async function loadEnvironmentConfig(): Promise<Config> {
 }
 
 function startFromConfig(config: Config): Promise<RunningServer> {
-  return startServer({
-    enableOpenApiInProduction: config.openApi.enabledInProduction,
-    port: config.runtime.port,
+  const logger = createLogger({
+    level: config.runtime.logLevel,
     runtimeEnvironment: config.runtime.environment,
+  });
+
+  const tracingResource = getActiveTracingResource();
+
+  return startServer({
+    corsConfig: config.cors,
+    enableOpenApiInProduction: config.openApi.enabledInProduction,
+    logger,
+    metricsConfig: config.metrics,
+    port: config.runtime.port,
+    ...(tracingResource === undefined ? {} : { resources: [tracingResource] }),
+    runtimeEnvironment: config.runtime.environment,
+    securityConfig: config.security,
   });
 }
 
-function defaultStartupErrorReporter(error: unknown): void {
-  console.error('Server startup failed.', error);
+function reportOperationalError(
+  logger: Logger | undefined,
+  event: 'server_shutdown_failed' | 'server_startup_failed',
+  error: unknown,
+): void {
+  const operationalLogger =
+    logger ??
+    createLogger({
+      level: 'error',
+      runtimeEnvironment: runtimeEnvironment(),
+    });
+  operationalLogger.error(
+    {
+      entryPoint: 'cli',
+      errorName: error instanceof Error ? error.name : 'NonErrorThrownValue',
+      event,
+      module: 'core',
+    },
+    event === 'server_startup_failed' ? 'server startup failed' : 'server shutdown failed',
+  );
+}
+
+function runtimeEnvironment(): Config['runtime']['environment'] {
+  const value = process.env.NODE_ENV;
+  return value === 'test' || value === 'staging' || value === 'production' ? value : 'development';
 }
 
 if (isMainModule(import.meta.url)) {

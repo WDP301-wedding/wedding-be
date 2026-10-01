@@ -18,6 +18,19 @@ const optionalString = z.preprocess(
   z.string().trim().min(1).optional(),
 );
 
+function integerEnvironmentVariable(options: {
+  readonly defaultValue: number;
+  readonly maximum: number;
+  readonly minimum: number;
+}): z.ZodDefault<z.ZodPipe<z.ZodPipe<z.ZodString, z.ZodTransform<number, string>>, z.ZodNumber>> {
+  return z
+    .string()
+    .regex(/^\d+$/u)
+    .transform(Number)
+    .pipe(z.number().int().min(options.minimum).max(options.maximum))
+    .default(options.defaultValue);
+}
+
 const databaseUrl = z.url({ protocol: /^postgres(?:ql)?$/ });
 const httpsUrl = z.url({ protocol: /^https$/ });
 const httpUrl = z.url({ protocol: /^https?$/ });
@@ -76,6 +89,30 @@ const rawEnvironmentSchema = z
       .default('info'),
     RESTAURANT_TIME_ZONE: z.literal('Asia/Ho_Chi_Minh').default('Asia/Ho_Chi_Minh'),
     CORS_ALLOWED_ORIGINS: corsAllowedOrigins,
+    HTTP_BODY_LIMIT_BYTES: integerEnvironmentVariable({
+      defaultValue: 1_048_576,
+      minimum: 1_024,
+      maximum: 10_485_760,
+    }),
+    HTTP_REQUEST_TIMEOUT_MS: integerEnvironmentVariable({
+      defaultValue: 30_000,
+      minimum: 1_000,
+      maximum: 120_000,
+    }),
+    RATE_LIMIT_MAX_REQUESTS: integerEnvironmentVariable({
+      defaultValue: 100,
+      minimum: 1,
+      maximum: 100_000,
+    }),
+    RATE_LIMIT_WINDOW_MS: integerEnvironmentVariable({
+      defaultValue: 60_000,
+      minimum: 1_000,
+      maximum: 3_600_000,
+    }),
+    BACKEND_REPLICA_COUNT: z
+      .literal('1')
+      .transform(() => 1 as const)
+      .default(1),
     DATABASE_URL: optionalString.pipe(databaseUrl.optional()),
     MIGRATION_DATABASE_URL: optionalString.pipe(databaseUrl.optional()),
     SUPABASE_URL: optionalString.pipe(httpsUrl.optional()),
@@ -212,6 +249,12 @@ export type BackendConfig = Readonly<{
     restaurantTimeZone: 'Asia/Ho_Chi_Minh';
   }>;
   cors: Readonly<{ allowedOrigins: readonly string[] }>;
+  security: Readonly<{
+    bodyLimitBytes: number;
+    requestTimeoutMs: number;
+    rateLimit: Readonly<{ maxRequests: number; windowMs: number }>;
+    replicaCount: 1;
+  }>;
   database: Readonly<{ url: string | undefined; migrationUrl: string | undefined }>;
   storage: StorageConfig;
   email: EmailConfig;
@@ -251,6 +294,11 @@ function pickEnvironment(source: EnvironmentSource): EnvironmentSource {
     LOG_LEVEL: source.LOG_LEVEL,
     RESTAURANT_TIME_ZONE: source.RESTAURANT_TIME_ZONE,
     CORS_ALLOWED_ORIGINS: source.CORS_ALLOWED_ORIGINS,
+    HTTP_BODY_LIMIT_BYTES: source.HTTP_BODY_LIMIT_BYTES,
+    HTTP_REQUEST_TIMEOUT_MS: source.HTTP_REQUEST_TIMEOUT_MS,
+    RATE_LIMIT_MAX_REQUESTS: source.RATE_LIMIT_MAX_REQUESTS,
+    RATE_LIMIT_WINDOW_MS: source.RATE_LIMIT_WINDOW_MS,
+    BACKEND_REPLICA_COUNT: source.BACKEND_REPLICA_COUNT,
     DATABASE_URL: source.DATABASE_URL,
     MIGRATION_DATABASE_URL: source.MIGRATION_DATABASE_URL,
     SUPABASE_URL: source.SUPABASE_URL,
@@ -358,6 +406,15 @@ function createConfig(environment: RawEnvironment): BackendConfig {
     }),
     cors: Object.freeze({
       allowedOrigins: Object.freeze([...environment.CORS_ALLOWED_ORIGINS]),
+    }),
+    security: Object.freeze({
+      bodyLimitBytes: environment.HTTP_BODY_LIMIT_BYTES,
+      requestTimeoutMs: environment.HTTP_REQUEST_TIMEOUT_MS,
+      rateLimit: Object.freeze({
+        maxRequests: environment.RATE_LIMIT_MAX_REQUESTS,
+        windowMs: environment.RATE_LIMIT_WINDOW_MS,
+      }),
+      replicaCount: environment.BACKEND_REPLICA_COUNT,
     }),
     database: Object.freeze({
       url: environment.DATABASE_URL,

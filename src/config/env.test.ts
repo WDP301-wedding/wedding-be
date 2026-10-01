@@ -35,6 +35,12 @@ describe('parseEnvironment', () => {
         restaurantTimeZone: 'Asia/Ho_Chi_Minh',
       },
       cors: { allowedOrigins: [] },
+      security: {
+        bodyLimitBytes: 1_048_576,
+        requestTimeoutMs: 30_000,
+        rateLimit: { maxRequests: 100, windowMs: 60_000 },
+        replicaCount: 1,
+      },
       database: { url: undefined, migrationUrl: undefined },
       storage: { enabled: false },
       email: { enabled: false },
@@ -65,6 +71,11 @@ describe('parseEnvironment', () => {
       METRICS_TOKEN: 'metrics-secret',
       OPENAPI_ENABLED: 'true',
       OTEL_EXPORTER_OTLP_ENDPOINT: 'http://localhost:4318',
+      HTTP_BODY_LIMIT_BYTES: '2048',
+      HTTP_REQUEST_TIMEOUT_MS: '5000',
+      RATE_LIMIT_MAX_REQUESTS: '25',
+      RATE_LIMIT_WINDOW_MS: '30000',
+      BACKEND_REPLICA_COUNT: '1',
     });
 
     expect(parsed.runtime).toEqual({
@@ -74,6 +85,12 @@ describe('parseEnvironment', () => {
       restaurantTimeZone: 'Asia/Ho_Chi_Minh',
     });
     expect(parsed.cors.allowedOrigins).toEqual(['http://localhost:3000', 'http://127.0.0.1:3002']);
+    expect(parsed.security).toEqual({
+      bodyLimitBytes: 2048,
+      requestTimeoutMs: 5000,
+      rateLimit: { maxRequests: 25, windowMs: 30000 },
+      replicaCount: 1,
+    });
     expect(parsed.database).toEqual({
       url: 'postgresql://test:test@localhost:5432/wedding',
       migrationUrl: 'postgres://test:test@localhost:5432/wedding',
@@ -156,6 +173,11 @@ describe('parseEnvironment', () => {
     ['RESTAURANT_TIME_ZONE', 'UTC'],
     ['METRICS_ENABLED', 'yes'],
     ['AI_IMAGE_PROVIDER', 'openai'],
+    ['HTTP_BODY_LIMIT_BYTES', '0'],
+    ['HTTP_REQUEST_TIMEOUT_MS', '0'],
+    ['RATE_LIMIT_MAX_REQUESTS', '0'],
+    ['RATE_LIMIT_WINDOW_MS', '0'],
+    ['BACKEND_REPLICA_COUNT', '2'],
   ])('rejects invalid %s values', (variableName, value) => {
     expect(() => parseEnvironment({ [variableName]: value })).toThrow(
       EnvironmentConfigurationError,
@@ -278,6 +300,8 @@ describe('parseEnvironment', () => {
     expect(Object.isFrozen(parsed.runtime)).toBe(true);
     expect(Object.isFrozen(parsed.cors)).toBe(true);
     expect(Object.isFrozen(parsed.cors.allowedOrigins)).toBe(true);
+    expect(Object.isFrozen(parsed.security)).toBe(true);
+    expect(Object.isFrozen(parsed.security.rateLimit)).toBe(true);
     expect(Object.isFrozen(parsed.database)).toBe(true);
     expect(Object.isFrozen(parsed.storage)).toBe(true);
     expect(Object.isFrozen(parsed.email)).toBe(true);

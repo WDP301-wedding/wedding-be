@@ -1,6 +1,7 @@
 import { createServer, Server } from 'node:http';
 import { EventEmitter, once } from 'node:events';
 import { resolve } from 'node:path';
+import { Writable } from 'node:stream';
 import { pathToFileURL } from 'node:url';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -8,6 +9,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createApp } from '../../app.js';
 import { parseEnvironment } from '../../config/env.js';
 import { bootstrap, isMainModule, runMain, startServer, type RunningServer } from '../../server.js';
+import { createLogger } from '../logging/logger.js';
 import {
   createHttpLifecycle,
   createReadinessState,
@@ -290,6 +292,64 @@ describe('server startup and process signals', () => {
 
     expect(reportError).toHaveBeenCalledWith(startupError);
     expect(signalTarget.exitCode).toBe(1);
+    expect(signalTarget.exitedWith).toBe(1);
+  });
+
+  it('writes a structured startup failure through the supplied operational logger', async () => {
+    const signalTarget = new TestSignalTarget();
+    const logLines: string[] = [];
+    const logger = createLogger({
+      destination: new Writable({
+        write(chunk, _encoding, callback) {
+          logLines.push(String(chunk));
+          callback();
+        },
+      }),
+      level: 'error',
+      runtimeEnvironment: 'test',
+    });
+
+    await runMain({
+      bootstrapDependencies: {
+        loadConfig: vi.fn().mockRejectedValue('configuration unavailable'),
+      },
+      logger,
+      processRef: signalTarget,
+    });
+
+    expect(logLines.join('')).toContain('"event":"server_startup_failed"');
+    expect(logLines.join('')).toContain('"errorName":"NonErrorThrownValue"');
+    expect(signalTarget.exitedWith).toBe(1);
+  });
+
+  it('writes a structured shutdown failure through the server logger', async () => {
+    const signalTarget = new TestSignalTarget();
+    const logLines: string[] = [];
+    const logger = createLogger({
+      destination: new Writable({
+        write(chunk, _encoding, callback) {
+          logLines.push(String(chunk));
+          callback();
+        },
+      }),
+      level: 'error',
+      runtimeEnvironment: 'test',
+    });
+    const neverCloses = new Promise<void>(() => undefined);
+    const running = await startServer({
+      logger,
+      port: 0,
+      resources: [{ name: 'stalled-resource', close: () => neverCloses }],
+      shutdownTimeoutMs: 10,
+      signalTarget,
+    });
+    runningServers.push(running);
+
+    signalTarget.emit('SIGTERM');
+    await expect(running.shutdown()).rejects.toBeInstanceOf(ShutdownTimeoutError);
+    await vi.waitFor(() => expect(logLines.join('')).toContain('"event":"server_shutdown_failed"'));
+
+    expect(logLines.join('')).toContain('"errorName":"ShutdownTimeoutError"');
     expect(signalTarget.exitedWith).toBe(1);
   });
 

@@ -39,6 +39,36 @@ export class MalformedJsonError extends AppError {
   }
 }
 
+export class PayloadTooLargeError extends AppError {
+  constructor() {
+    super({
+      status: 413,
+      code: 'PAYLOAD_TOO_LARGE',
+      message: 'The request body is too large.',
+    });
+  }
+}
+
+export class RequestTimeoutError extends AppError {
+  constructor() {
+    super({
+      status: 408,
+      code: 'REQUEST_TIMEOUT',
+      message: 'The request exceeded its allowed duration.',
+    });
+  }
+}
+
+export class CorsOriginDeniedError extends AppError {
+  constructor() {
+    super({
+      status: 403,
+      code: 'CORS_ORIGIN_DENIED',
+      message: 'The request origin is not allowed.',
+    });
+  }
+}
+
 export class ValidationError extends AppError {
   constructor(details?: readonly ErrorDetail[]) {
     super({
