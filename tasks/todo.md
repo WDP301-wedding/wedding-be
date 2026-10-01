@@ -448,15 +448,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] Production output is structured JSON; local output may use a readable transport.
-- [ ] Request ID and entry point are present on every request log and provider child logger.
-- [ ] Redaction tests cover authorization, cookies, tokens, contact data, payment fields, and request bodies.
+- [x] Production output is structured JSON; local output may use a readable transport.
+- [x] Request ID and entry point are present on every request log and provider child logger.
+- [x] Redaction tests cover authorization, cookies, tokens, contact data, payment fields, and request bodies.
 
 **Verification:**
 
-- [ ] `npm run test:unit -- logging`
-- [ ] `npm run test:integration -- request-logging`
-- [ ] Capture an induced error and locate all related events by request ID.
+- [x] `npm run test:unit -- logging`
+- [x] `npm run test:integration -- request-logging`
+- [x] Capture an induced error and locate all related events by request ID.
+
+**Implementation evidence (2026-09-30):** The backend now uses pinned Pino 10.3.1 and pino-http 11.0.0 dependencies: production emits newline-delimited JSON with stable event fields, while local development uses the pinned pino-pretty 13.1.3 transport. Request middleware reuses a trusted UUID request ID or generates one, binds `requestId` and the `http` entry point, captures mounted normalized routes before completion, and records bounded method, status class, duration, and error-code fields. Provider child loggers preserve the same correlation context without duplicate JSON keys. An allowlisted request serializer and recursive fail-closed sanitizer exclude request/response bodies and redact authorization, cookies, credentials, tokens, contact data, payment fields, nested errors, circular structures, and unsafe getters. The induced-error integration test locates both the error and completion events by one request ID while proving that the embedded database password is absent. The exact verification commands pass 8 unit tests and 30 integration tests; the complete coverage run passes 236 tests at 98.28% lines and 95.17% branches. Typecheck, ESLint, Prettier, the production build, and `api:check` pass. Registry signature verification covered 425 signatures and 112 attestations, and the new logging packages have MIT licenses and no install scripts. `npm audit` still reports four high-severity findings in the pre-existing Prisma CLI/configuration dependency chain; none is introduced by the Pino packages.
 
 **Dependencies:** CP-09, CP-11  
 **Files likely touched:** `wedding-be/src/core/logging/logger.ts`, `wedding-be/src/core/logging/request-logger.ts`, `wedding-be/src/core/logging/redaction.ts`, `wedding-be/src/app.ts`, `wedding-be/src/core/logging/logging.test.ts`  
@@ -465,7 +467,7 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 #### Checkpoint D1 — Contract and logs
 
 - [x] OpenAPI generation is deterministic and contract tests pass.
-- [ ] Induced failures are diagnosable by request ID with no secret/PII leakage.
+- [x] Induced failures are diagnosable by request ID with no secret/PII leakage.
 
 ### CP-19: Add RED metrics and optional OpenTelemetry startup
 
@@ -473,15 +475,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] Histograms support p50/p95/p99 analysis and labels never include raw URLs, IDs, or messages.
-- [ ] `/internal/metrics` is disabled by default and protected when enabled.
-- [ ] The process runs normally with no OTLP endpoint and initializes tracing before application imports when configured.
+- [x] Histograms support p50/p95/p99 analysis and labels never include raw URLs, IDs, or messages.
+- [x] `/internal/metrics` is disabled by default and protected when enabled.
+- [x] The process runs normally with no OTLP endpoint and initializes tracing before application imports when configured.
 
 **Verification:**
 
-- [ ] `npm run test:unit -- observability`
-- [ ] `npm run test:integration -- metrics`
-- [ ] Inspect metric series after successful and failed test requests for bounded labels.
+- [x] `npm run test:unit -- observability`
+- [x] `npm run test:integration -- metrics`
+- [x] Inspect metric series after successful and failed test requests for bounded labels.
+
+**Implementation evidence (2026-09-30):** Per-application `prom-client` registries now record HTTP and external-provider request counts, error counts, and duration histograms with buckets suitable for `histogram_quantile` p50/p95/p99 queries. HTTP labels are limited to normalized route templates, an allowlisted method (arbitrary values collapse to `OTHER`), and bounded status classes; provider labels use closed module, provider, outcome, and error-kind unions. Success/error integration traffic proves that raw paths, identifiers, query PII, messages, request IDs, and bearer secrets never enter exported series. `/internal/metrics` is absent by default; enabling it requires the validated dedicated bearer token, compares token digests with `timingSafeEqual`, returns the standard error envelope on rejection, disables caching, and remains outside OpenAPI. OpenTelemetry 0.222.0 uses the OTLP HTTP trace exporter plus scoped HTTP/Express auto-instrumentation; the preload registers Node's ESM hook and starts the SDK before `server.ts`, while an absent endpoint loads no hook or SDK. The SDK participates in graceful lifecycle cleanup. Both disabled and configured runtime starts served `/health/live` successfully, and invalid configuration still followed the structured startup-error path. The focused suites pass 9 unit and 3 integration tests; the complete suite passes 248 tests at 98.23% line and 94.56% branch coverage. Typecheck, ESLint, Prettier, production build, and `api:check` pass. All seven new direct telemetry packages are Apache-2.0 and have no dependency lifecycle scripts; registry verification covered 496 signatures and 147 attestations. `npm audit` reports only the four previously documented high findings in the Prisma CLI/configuration chain. npm now marks the spec-mandated `prom-client` 15.1.3 as deprecated in favor of `@prometheus-io/client`; changing that locked architecture requires an approved spec amendment, so no silent migration was made. Re-evaluate that amendment before production launch or by 2026-10-14.
 
 **Dependencies:** CP-10, CP-18  
 **Files likely touched:** `wedding-be/src/core/observability/metrics.ts`, `wedding-be/src/core/observability/tracing.ts`, `wedding-be/src/core/observability/metrics.router.ts`, `wedding-be/src/server.ts`, `wedding-be/tests/integration/metrics.test.ts`  
@@ -493,15 +497,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] Helmet and CORS settings match environment configuration; wildcard credentialed CORS is impossible.
-- [ ] JSON/body size, timeout, and general rate-limit failures use the common error envelope.
-- [ ] Configuration makes the one-process rate-limit limitation explicit and blocks accidental multi-replica claims.
+- [x] Helmet and CORS settings match environment configuration; wildcard credentialed CORS is impossible.
+- [x] JSON/body size, timeout, and general rate-limit failures use the common error envelope.
+- [x] Configuration makes the one-process rate-limit limitation explicit and blocks accidental multi-replica claims.
 
 **Verification:**
 
-- [ ] `npm run test:integration -- security`
-- [ ] Inspect response headers and blocked-origin behavior.
-- [ ] Trigger body-size, timeout, and rate-limit paths and confirm status plus `Retry-After` where applicable.
+- [x] `npm run test:integration -- security`
+- [x] Inspect response headers and blocked-origin behavior.
+- [x] Trigger body-size, timeout, and rate-limit paths and confirm status plus `Retry-After` where applicable.
+
+**Implementation evidence (2026-10-01):** Helmet 8.3.0 now applies its API-safe header baseline on every response, with HSTS enabled only in staging/production. CORS 2.8.6 accepts credentialed browser requests only from the validated exact-origin allowlist, permits origin-less non-browser clients, exposes request/retry correlation headers, and maps rejected origins to the standard `403 CORS_ORIGIN_DENIED` envelope. The bounded JSON parser returns `413 PAYLOAD_TOO_LARGE`, the application deadline returns `408 REQUEST_TIMEOUT`, and express-rate-limit 8.7.0 returns `429 RATE_LIMITED` with `Retry-After`, draft-8 `RateLimit`, and no legacy rate-limit headers. Defaults are 1 MiB, 30 seconds, and 100 requests per 60 seconds; all are bounded startup configuration. `BACKEND_REPLICA_COUNT` accepts only `1`, `.env.example` explains the in-process store, and startup forwards the validated CORS/security settings into the running server. The focused integration command passes 47 tests, the complete suite passes 267 tests, and coverage remains at 98.32% lines and 94.69% branches. Typecheck, ESLint, production build, and `api:check` pass. Registry verification covered 502 signatures and 149 attestations; `npm audit` reports only the four previously documented high findings in the Prisma CLI/configuration chain, whose proposed forced remediation is a breaking Prisma downgrade.
 
 **Dependencies:** CP-09, CP-11, CP-18  
 **Files likely touched:** `wedding-be/src/core/http/security.ts`, `wedding-be/src/core/http/rate-limit.ts`, `wedding-be/src/app.ts`, `wedding-be/.env.example`, `wedding-be/tests/integration/security.test.ts`  
@@ -509,8 +515,8 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 #### Checkpoint D2 — Operable and hardened API
 
-- [ ] Contract, logging, metrics, tracing-disabled, and security suites pass together.
-- [ ] No public response leaks stack traces, SQL details, provider payloads, or secrets.
+- [x] Contract, logging, metrics, tracing-disabled, and security suites pass together.
+- [x] No public response leaks stack traces, SQL details, provider payloads, or secrets.
 
 ## Phase E — External Provider Boundaries
 
@@ -520,15 +526,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] Callers provide a purpose/resource identity, never an arbitrary bucket/path.
-- [ ] The adapter persists object keys rather than signed URLs and defaults reads to 15-minute URLs.
-- [ ] Tests cover success, invalid MIME/content metadata, timeout, missing object, and unsafe key attempts without network calls.
+- [x] Callers provide a purpose/resource identity, never an arbitrary bucket/path.
+- [x] The adapter persists object keys rather than signed URLs and defaults reads to 15-minute URLs.
+- [x] Tests cover success, invalid MIME/content metadata, timeout, missing object, and unsafe key attempts without network calls.
 
 **Verification:**
 
-- [ ] `npm run test:unit -- storage-provider`
-- [ ] `npm run typecheck`
-- [ ] Search outside `src/integrations/storage` and confirm no Supabase Storage SDK type escapes.
+- [x] `npm run test:unit -- storage-provider`
+- [x] `npm run typecheck`
+- [x] Search outside `src/integrations/storage` and confirm no Supabase Storage SDK type escapes.
+
+**Implementation evidence (2026-10-01):** The storage boundary now accepts only the closed `PRIVATE_WEDDING_MEDIA` purpose plus a canonical UUID resource identity, generates content-addressed keys under the allowlisted `private-wedding-media/<resourceId>/` prefix, and never accepts a caller-selected bucket or raw provider path. Upload validation allowlists JPEG/PNG/WebP, enforces the 25 MiB platform cap, checks magic bytes, and records SHA-256, MIME, size, purpose, and resource metadata. The offline fake and the pinned `@supabase/storage-js` 2.116.0 adapter share the same interface; the adapter uses the configured private bucket, disables upsert, verifies provider metadata after upload, makes delete idempotent while rejecting mismatched provider identities, normalizes not-found/timeout/unavailable failures, and validates signed URL origin, exact path, token, and bounded lifetime. Only object keys are returned for persistence; read URLs default to 900 seconds. The focused suite passes 24 tests entirely offline with 97.05% statements, 94.33% branches, and 96.96% lines across the selected storage boundary coverage target; the complete suite passes 291 tests. Typecheck, ESLint, Prettier, the production build, `api:check`, and `git diff --check` pass, and the SDK/type escape search has no matches outside `src/integrations/storage`. Registry verification covered 505 signatures and 151 attestations. `npm audit --omit=dev` still reports the four previously documented high findings in the pre-existing Prisma CLI/configuration chain; the new storage dependency chain contains only `iceberg-js` and `tslib` and does not introduce those findings.
 
 **Dependencies:** CP-09, CP-11, CP-18, CP-20  
 **Files likely touched:** `wedding-be/src/integrations/storage/storage-provider.ts`, `wedding-be/src/integrations/storage/storage.schemas.ts`, `wedding-be/src/integrations/storage/fake-storage-provider.ts`, `wedding-be/src/integrations/storage/supabase-storage-provider.ts`, `wedding-be/src/integrations/storage/storage-provider.test.ts`  
@@ -540,15 +548,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] Every send command requires a deterministic intent idempotency key.
-- [ ] The adapter validates provider responses and never exposes raw SDK errors to application callers.
-- [ ] Tests cover success, same-intent retry, mismatched payload, provider conflict, timeout, and transient failure offline.
+- [x] Every send command requires a deterministic intent idempotency key.
+- [x] The adapter validates provider responses and never exposes raw SDK errors to application callers.
+- [x] Tests cover success, same-intent retry, mismatched payload, provider conflict, timeout, and transient failure offline.
 
 **Verification:**
 
-- [ ] `npm run test:unit -- email-provider`
-- [ ] `npm run typecheck`
-- [ ] Search outside `src/integrations/email` and confirm no Resend SDK type escapes.
+- [x] `npm run test:unit -- email-provider`
+- [x] `npm run typecheck`
+- [x] Search outside `src/integrations/email` and confirm no Resend SDK type escapes.
+
+**Implementation evidence (2026-10-01):** The email boundary now requires a branded `<event-type>/<persisted-UUID>` intent key, accepts only bounded transactional recipient/subject/text/optional-HTML fields, sources the sender exclusively from validated configuration, and rejects unknown fields plus CR/LF header-injection attempts. The offline fake hashes payloads, replays the original result for same-intent retries, and rejects key reuse with a different payload without retaining recipient addresses or message bodies. The pinned Resend 6.31.0 adapter passes the key through the SDK's documented request options, validates every returned shape and provider message UUID, applies a bounded timeout, maps payload mismatch and concurrent requests to stable idempotency errors, and normalizes timeout, rate-limit, transient, malformed, permanent, and thrown failures without exposing raw SDK details. The focused suite passes 18 tests offline with 98.94% statements, 97.26% branches, 100% functions, and 98.93% lines across the selected email boundary coverage target; the complete suite passes 309 tests. Typecheck, ESLint, Prettier, the production build, `api:check`, `git diff --check`, a clean `npm ci --ignore-scripts`, and the SDK-import escape search pass. Registry verification covered 510 signatures and 154 attestations. `npm audit --omit=dev` still reports the four previously documented high findings in the pre-existing Prisma CLI/configuration chain; the new Resend dependency chain contains only `postal-mime` and `standardwebhooks` and does not introduce those findings. No live or billable Resend request was made.
 
 **Dependencies:** CP-09, CP-11, CP-18, CP-20  
 **Files likely touched:** `wedding-be/src/integrations/email/email-provider.ts`, `wedding-be/src/integrations/email/email.schemas.ts`, `wedding-be/src/integrations/email/fake-email-provider.ts`, `wedding-be/src/integrations/email/resend-email-provider.ts`, `wedding-be/src/integrations/email/email-provider.test.ts`  
