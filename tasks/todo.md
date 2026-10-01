@@ -570,15 +570,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] No caller sends guest, payment, authentication, or unrelated PII through the contract.
-- [ ] Returned images are validated for schema, MIME, dimensions, and byte size before acceptance.
-- [ ] Tests cover success, safety refusal, invalid output, timeout, quota/transient failure, and disabled provider offline.
+- [x] No caller sends guest, payment, authentication, or unrelated PII through the contract.
+- [x] Returned images are validated for schema, MIME, dimensions, and byte size before acceptance.
+- [x] Tests cover success, safety refusal, invalid output, timeout, quota/transient failure, and disabled provider offline.
 
 **Verification:**
 
-- [ ] `npm run test:unit -- ai-image-provider`
-- [ ] `npm run typecheck`
-- [ ] Search outside `src/integrations/ai-image` and confirm no Gemini SDK type escapes.
+- [x] `npm run test:unit -- ai-image-provider`
+- [x] `npm run typecheck`
+- [x] Search outside `src/integrations/ai-image` and confirm no Gemini SDK type escapes.
+
+**Implementation evidence (2026-10-01):** The AI image boundary now accepts only a bounded creative prompt and allowlisted aspect ratio, rejects unknown fields plus recognizable contact, payment, auth-token, and entity-identifier patterns, and exposes no guest, booking, payment, authentication, storage-path, or tool-call fields. The offline fake returns a deterministic validated PNG, while the disabled provider fails closed without constructing an SDK client or issuing network traffic. The pinned `@google/genai` 2.24.0 adapter keeps the configured model and all SDK types local, requests exactly one image with no tools, disables automatic retries for the potentially billable operation, applies SDK and outer abort timeouts, and validates the complete response path before decoding strict base64. Accepted output is restricted to PNG signature/IHDR data, 10 MiB, 4096 pixels per dimension, and 16,777,216 total pixels; safety refusals, invalid output, timeout, quota/transient, and permanent failures map to stable errors without raw SDK details. The focused suite passes 25 tests offline with 92.24% statements, 86.95% branches, 96.66% functions, and 92.06% lines across the selected AI image boundary target; all three provider suites pass 67 tests and the complete suite passes 334 tests at 97.54% line and 93.83% branch coverage. Typecheck, ESLint, Prettier, the production build, `api:check`, `git diff --check`, a clean `npm ci --ignore-scripts`, and the SDK-import escape search pass. Registry verification covered 536 signatures and 155 attestations. `npm audit --omit=dev` still reports only the four previously documented high findings in the pre-existing Prisma CLI/configuration chain; the new Gemini dependency chain introduces none of those findings. No live, billable, or externally mutating Gemini request was made.
 
 **Dependencies:** CP-09, CP-11, CP-18, CP-20  
 **Files likely touched:** `wedding-be/src/integrations/ai-image/ai-image-provider.ts`, `wedding-be/src/integrations/ai-image/ai-image.schemas.ts`, `wedding-be/src/integrations/ai-image/fake-ai-image-provider.ts`, `wedding-be/src/integrations/ai-image/gemini-ai-image-provider.ts`, `wedding-be/src/integrations/ai-image/ai-image-provider.test.ts`  
@@ -586,9 +588,9 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 #### Checkpoint E — Provider isolation
 
-- [ ] All provider tests pass with network disabled.
-- [ ] SDK imports/types remain adapter-local and provider logs pass redaction checks.
-- [ ] No billable call or external mutation occurred.
+- [x] All provider tests pass with network disabled.
+- [x] SDK imports/types remain adapter-local and provider logs pass redaction checks.
+- [x] No billable call or external mutation occurred.
 
 ## Phase F — Typed API Clients
 
