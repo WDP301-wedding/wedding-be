@@ -624,15 +624,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] The digest matches Public Web for the same backend contract.
-- [ ] No Manager/Staff authorization decision is implemented in the wrapper.
-- [ ] Success, structured errors, malformed responses, and timeout are tested.
+- [x] The digest matches Public Web for the same backend contract.
+- [x] No Manager/Staff authorization decision is implemented in the wrapper.
+- [x] Success, structured errors, malformed responses, and timeout are tested.
 
 **Verification:**
 
-- [ ] `npm run api:generate`
-- [ ] `npm run api:check`
-- [ ] `npm run test:unit -- api-client`
+- [x] `npm run api:generate`
+- [x] `npm run api:check`
+- [x] `npm run test:unit -- api-client`
+
+**Implementation evidence (2026-10-02):** Management Web now locks the same canonical backend OpenAPI artifact and SHA-256 digest as Public Web (`eaf954a667801edcf94ba1db7c11a442d88a55b99de8c9020d6ac2675be76d8f`). Its deterministic generator rejects an intentional declaration drift and restores the committed schema through regeneration. The repo-local `openapi-fetch` wrapper applies the validated public base URL, per-request UUID correlation, bounded timeout and caller-abort propagation, and normalized structured API, malformed-response, network, abort, and timeout errors without making Manager/Staff authorization decisions. The focused acceptance suite passes 10 tests; the complete 16-test coverage suite passes with `client.ts` at 94.91% line and 89.74% branch coverage. Strict typecheck, ESLint, Prettier, deterministic API verification, and the Next.js production build pass. The implementation is recorded in Management Web commits `962a80f` and `fbd7368`.
 
 **Dependencies:** CP-05, CP-06, CP-17  
 **Files likely touched:** `wedding-manage-web/scripts/generate-api.mjs`, `wedding-manage-web/api-contract.lock.json`, `wedding-manage-web/src/lib/api/generated/schema.d.ts`, `wedding-manage-web/src/lib/api/client.ts`, `wedding-manage-web/src/lib/api/client.test.ts`  
