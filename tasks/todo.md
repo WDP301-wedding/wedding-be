@@ -646,15 +646,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] Contract digest matches both web clients.
-- [ ] The client handles offline/network timeout separately from structured API errors and contains no auth storage policy yet.
-- [ ] `eas.json` contains a valid Android preview profile and no credential material.
+- [x] Contract digest matches both web clients.
+- [x] The client handles offline/network timeout separately from structured API errors and contains no auth storage policy yet.
+- [x] `eas.json` contains a valid Android preview profile and no credential material.
 
 **Verification:**
 
-- [ ] `npm run api:generate && npm run api:check`
-- [ ] `npm run test -- api-client`
-- [ ] `npx expo-doctor`
+- [x] `npm run api:generate && npm run api:check`
+- [x] `npm run test -- api-client`
+- [x] `npx expo-doctor`
+
+**Implementation evidence (2026-10-02):** Expo now locks and deterministically generates from the same canonical backend OpenAPI artifact and SHA-256 digest as both web clients (`eaf954a667801edcf94ba1db7c11a442d88a55b99de8c9020d6ac2675be76d8f`). Its repo-local `openapi-fetch` wrapper uses `expo/fetch`, Expo-native UUID generation, validated public configuration, request correlation, bounded timeout, caller-abort propagation, and distinct structured API, malformed-response, offline/network, abort, and timeout errors without introducing token storage or authorization policy. The Android-only EAS `preview` profile is pinned to EAS CLI 23.2.0 and produces an internally distributed APK without committed credential material; no cloud build was run. The focused suite passes 10 tests, the complete 11-test coverage suite passes with `client.ts` at 94.82% line and 89.74% branch coverage, Expo Doctor passes all 21 checks, and strict typecheck, ESLint, Prettier, deterministic API verification, high/critical production audit, and Android production export pass. The implementation is recorded in Expo commits `a234b3d` and `01aa813`.
 
 **Dependencies:** CP-07, CP-08, CP-17  
 **Files likely touched:** `wedding-app/scripts/generate-api.mjs`, `wedding-app/api-contract.lock.json`, `wedding-app/src/lib/api/generated/schema.d.ts`, `wedding-app/src/lib/api/client.ts`, `wedding-app/eas.json`  
@@ -662,9 +664,9 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 #### Checkpoint F — Cross-repository contract
 
-- [ ] All three generated schema files identify the same backend artifact digest.
-- [ ] Every client `api:check`, test, typecheck, and build passes.
-- [ ] No client imports backend source or contains provider service secrets.
+- [x] All three generated schema files identify the same backend artifact digest.
+- [x] Every client `api:check`, test, typecheck, and build passes.
+- [x] No client imports backend source or contains provider service secrets.
 
 ## Phase G — CI, Documentation, and Acceptance
 
