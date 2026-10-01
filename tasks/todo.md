@@ -602,15 +602,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] Generated declarations include source digest metadata and are never hand-edited.
-- [ ] `api:check` fails on intentional drift and accepts the canonical artifact.
-- [ ] Wrapper tests cover successful data, structured API errors, malformed responses, and timeout.
+- [x] Generated declarations include source digest metadata and are never hand-edited.
+- [x] `api:check` fails on intentional drift and accepts the canonical artifact.
+- [x] Wrapper tests cover successful data, structured API errors, malformed responses, and timeout.
 
 **Verification:**
 
-- [ ] `npm run api:generate`
-- [ ] `npm run api:check`
-- [ ] `npm run test:unit -- api-client`
+- [x] `npm run api:generate`
+- [x] `npm run api:check`
+- [x] `npm run test:unit -- api-client`
+
+**Implementation evidence (2026-10-01):** Public Web now locks the canonical backend OpenAPI artifact from commit `2726eaa2b316da00890a73066610186a12967a36` at SHA-256 `eaf954a667801edcf94ba1db7c11a442d88a55b99de8c9020d6ac2675be76d8f`. Its deterministic generator validates that digest before producing the committed, immutable, Prettier-stable declaration header and body; an intentional one-line declaration drift made `api:check` fail before regeneration restored a clean check. The single `openapi-fetch` wrapper applies the validated public base URL, per-request UUID correlation, bounded timeout and caller-abort propagation, and normalized structured API, malformed-response, network, abort, and timeout errors without exposing raw transport messages. The focused acceptance suite passes 10 tests. The complete 16-test coverage suite passes with `client.ts` at 94.91% line and 89.74% branch coverage. Strict typecheck, ESLint, Prettier, deterministic API verification, and the Next.js production build pass.
 
 **Dependencies:** CP-03, CP-04, CP-17  
 **Files likely touched:** `wedding-web/scripts/generate-api.mjs`, `wedding-web/api-contract.lock.json`, `wedding-web/src/lib/api/generated/schema.d.ts`, `wedding-web/src/lib/api/client.ts`, `wedding-web/src/lib/api/client.test.ts`  
