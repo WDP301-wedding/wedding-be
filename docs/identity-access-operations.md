@@ -51,3 +51,12 @@ The IA-04 bootstrap command must enforce this sequence:
 Routine Manager or Staff lifecycle changes must use explicit privileged workflows with audit
 events. Customer invitation acceptance may add only the `COUPLE` role scoped through consultation
 access and can never grant `MANAGER` or `STAFF`.
+
+## Scrypt benchmark evidence
+
+On 2026-10-03, the approved parameters were measured on the Windows development host under Node
+24 with three sequential hashes: 388 ms, 346 ms, and 317 ms (350 ms mean). The configured `maxmem`
+ceiling is 256 MiB and the scrypt working-set estimate is approximately 128 MiB per concurrent
+hash. Deployment sizing must therefore bound concurrent password work and repeat this benchmark on
+the production compute class before launch; changing the cost requires a reviewed policy revision
+and causes successful verification of older records to request rehash.
