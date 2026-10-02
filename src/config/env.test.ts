@@ -3,6 +3,38 @@ import { describe, expect, it } from 'vitest';
 import { config } from './config.js';
 import { EnvironmentConfigurationError, parseEnvironment } from './env.js';
 
+const approvedIdentityEnvironment = {
+  AUTH_TRUST_PROXY_HOPS: '1',
+  AUTH_ACCESS_TOKEN_TTL_SECONDS: '600',
+  AUTH_REFRESH_IDLE_TTL_SECONDS: '2592000',
+  AUTH_REFRESH_ABSOLUTE_TTL_SECONDS: '7776000',
+  AUTH_PASSWORD_RESET_TTL_SECONDS: '1800',
+  AUTH_INVITATION_TTL_SECONDS: '259200',
+  AUTH_INVITATION_REISSUE_LIMIT: '3',
+  AUTH_INVITATION_REISSUE_WINDOW_SECONDS: '86400',
+  AUTH_PASSWORD_MIN_CHARACTERS: '12',
+  AUTH_PASSWORD_MAX_CHARACTERS: '128',
+  AUTH_PASSWORD_MAX_BYTES: '512',
+  AUTH_SCRYPT_COST: '131072',
+  AUTH_SCRYPT_BLOCK_SIZE: '8',
+  AUTH_SCRYPT_PARALLELIZATION: '1',
+  AUTH_SCRYPT_KEY_LENGTH_BYTES: '64',
+  AUTH_SCRYPT_MAX_MEMORY_BYTES: '268435456',
+  AUTH_TOKEN_ENTROPY_BYTES: '32',
+  AUTH_LOGIN_RATE_LIMIT_MAX: '10',
+  AUTH_LOGIN_RATE_LIMIT_WINDOW_SECONDS: '900',
+  AUTH_TOKEN_CONSUME_RATE_LIMIT_MAX: '10',
+  AUTH_TOKEN_CONSUME_RATE_LIMIT_WINDOW_SECONDS: '900',
+  AUTH_RESET_REQUEST_RATE_LIMIT_MAX: '3',
+  AUTH_RESET_REQUEST_RATE_LIMIT_WINDOW_SECONDS: '3600',
+  AUTH_REFRESH_RATE_LIMIT_MAX: '60',
+  AUTH_REFRESH_RATE_LIMIT_WINDOW_SECONDS: '900',
+  AUTH_INVITATION_RETENTION_DAYS: '180',
+  AUTH_PASSWORD_RESET_RETENTION_DAYS: '30',
+  AUTH_SESSION_RETENTION_DAYS: '90',
+  AUTH_DISABLED_ACCOUNT_PII_RETENTION_DAYS: '365',
+} as const;
+
 const validProductionEnvironment = {
   NODE_ENV: 'production',
   PORT: '3001',
@@ -16,6 +48,7 @@ const validProductionEnvironment = {
   SUPABASE_STORAGE_BUCKET: 'wedding-media',
   RESEND_API_KEY: 'resend-secret',
   RESEND_FROM_EMAIL: 'Wedding Restaurant <notifications@example.com>',
+  ...approvedIdentityEnvironment,
 } as const;
 
 describe('parseEnvironment', () => {
@@ -40,6 +73,52 @@ describe('parseEnvironment', () => {
         requestTimeoutMs: 30_000,
         rateLimit: { maxRequests: 100, windowMs: 60_000 },
         replicaCount: 1,
+      },
+      identityAccess: {
+        trustedProxyHops: 0,
+        refreshCookie: {
+          name: '__Host-wedding-refresh',
+          path: '/',
+          httpOnly: true,
+          secure: true,
+          sameSite: 'lax',
+        },
+        lifetimesSeconds: {
+          accessToken: 600,
+          refreshIdle: 2_592_000,
+          refreshAbsolute: 7_776_000,
+          passwordReset: 1_800,
+        },
+        invitation: {
+          lifetimeSeconds: 259_200,
+          reissueLimit: 3,
+          reissueWindowSeconds: 86_400,
+        },
+        password: {
+          minimumCharacters: 12,
+          maximumCharacters: 128,
+          maximumBytes: 512,
+          scrypt: {
+            cost: 131_072,
+            blockSize: 8,
+            parallelization: 1,
+            keyLengthBytes: 64,
+            maxMemoryBytes: 268_435_456,
+          },
+        },
+        tokenEntropyBytes: 32,
+        rateLimits: {
+          login: { maxAttempts: 10, windowSeconds: 900 },
+          tokenConsume: { maxAttempts: 10, windowSeconds: 900 },
+          resetRequest: { maxAttempts: 3, windowSeconds: 3_600 },
+          refresh: { maxAttempts: 60, windowSeconds: 900 },
+        },
+        retentionDays: {
+          invitation: 180,
+          passwordReset: 30,
+          session: 90,
+          disabledAccountPii: 365,
+        },
       },
       database: { url: undefined, migrationUrl: undefined },
       storage: { enabled: false },
@@ -140,6 +219,8 @@ describe('parseEnvironment', () => {
     ]);
     expect(parsed.storage.enabled).toBe(true);
     expect(parsed.email.enabled).toBe(true);
+    expect(parsed.identityAccess.trustedProxyHops).toBe(1);
+    expect(parsed.identityAccess.refreshCookie.name).toBe('__Host-wedding-refresh');
   });
 
   it.each([
@@ -151,12 +232,39 @@ describe('parseEnvironment', () => {
     'SUPABASE_STORAGE_BUCKET',
     'RESEND_API_KEY',
     'RESEND_FROM_EMAIL',
+    ...Object.keys(approvedIdentityEnvironment),
   ] as const)('rejects production when %s is absent', (variableName) => {
     const source: Record<string, string | undefined> = { ...validProductionEnvironment };
     delete source[variableName];
 
     expect(() => parseEnvironment(source)).toThrow(EnvironmentConfigurationError);
     expect(() => parseEnvironment(source)).toThrow(variableName);
+  });
+
+  it.each([
+    ['AUTH_TRUST_PROXY_HOPS', '2'],
+    ['AUTH_ACCESS_TOKEN_TTL_SECONDS', '601'],
+    ['AUTH_REFRESH_IDLE_TTL_SECONDS', '2591999'],
+    ['AUTH_REFRESH_ABSOLUTE_TTL_SECONDS', '7776001'],
+    ['AUTH_PASSWORD_RESET_TTL_SECONDS', '3600'],
+    ['AUTH_INVITATION_TTL_SECONDS', '86400'],
+    ['AUTH_INVITATION_REISSUE_LIMIT', '4'],
+    ['AUTH_PASSWORD_MIN_CHARACTERS', '8'],
+    ['AUTH_PASSWORD_MAX_CHARACTERS', '256'],
+    ['AUTH_SCRYPT_COST', '16384'],
+    ['AUTH_SCRYPT_MAX_MEMORY_BYTES', '33554432'],
+    ['AUTH_TOKEN_ENTROPY_BYTES', '16'],
+    ['AUTH_LOGIN_RATE_LIMIT_MAX', '100'],
+    ['AUTH_RESET_REQUEST_RATE_LIMIT_WINDOW_SECONDS', '60'],
+    ['AUTH_INVITATION_RETENTION_DAYS', '30'],
+    ['AUTH_DISABLED_ACCOUNT_PII_RETENTION_DAYS', '0'],
+  ])('rejects an unapproved identity policy value for %s', (variableName, value) => {
+    expect(() =>
+      parseEnvironment({
+        ...approvedIdentityEnvironment,
+        [variableName]: value,
+      }),
+    ).toThrow(EnvironmentConfigurationError);
   });
 
   it('applies production requirements to staging', () => {
@@ -302,6 +410,11 @@ describe('parseEnvironment', () => {
     expect(Object.isFrozen(parsed.cors.allowedOrigins)).toBe(true);
     expect(Object.isFrozen(parsed.security)).toBe(true);
     expect(Object.isFrozen(parsed.security.rateLimit)).toBe(true);
+    expect(Object.isFrozen(parsed.identityAccess)).toBe(true);
+    expect(Object.isFrozen(parsed.identityAccess.refreshCookie)).toBe(true);
+    expect(Object.isFrozen(parsed.identityAccess.password.scrypt)).toBe(true);
+    expect(Object.isFrozen(parsed.identityAccess.rateLimits.login)).toBe(true);
+    expect(Object.isFrozen(parsed.identityAccess.retentionDays)).toBe(true);
     expect(Object.isFrozen(parsed.database)).toBe(true);
     expect(Object.isFrozen(parsed.storage)).toBe(true);
     expect(Object.isFrozen(parsed.email)).toBe(true);

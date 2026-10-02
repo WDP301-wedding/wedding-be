@@ -1,0 +1,53 @@
+# Identity and access operations
+
+This document is the operator contract for the approved identity and access boundary. Runtime
+implementation must consume the typed values from `src/config/env.ts`; it must not duplicate or
+silently override them.
+
+## Security policy
+
+- The web refresh credential uses the exact cookie name `__Host-wedding-refresh` with
+  `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, and no `Domain` attribute.
+- Access credentials live for 10 minutes. Refresh sessions expire after 30 idle days or 90 days
+  absolutely, whichever comes first. Password-reset credentials live for 30 minutes.
+- Workspace invitations live for 72 hours. At most three issues or reissues are allowed for one
+  consultation/email pair in 24 hours.
+- Passwords contain 12–128 Unicode characters and at most 512 UTF-8 bytes. The approved scrypt
+  parameters are `N=131072`, `r=8`, `p=1`, a 64-byte derived key, and 256 MiB `maxmem`.
+- Opaque access, refresh, invitation, and reset credentials use 32 random bytes before base64url
+  encoding. Only purpose-separated deterministic hashes may cross the credential boundary into
+  persistence, logs, errors, or snapshots.
+- Login and one-time-token consumption allow 10 attempts per 15 minutes. Reset requests allow
+  three per hour. Refresh allows 60 per 15 minutes. These are separate fail-closed buckets; no
+  permanent account lockout is allowed.
+- Invitation, password-reset, and expired/revoked session records are retained for 180, 30, and
+  90 days. Disabled-account PII becomes eligible for deletion after 365 days only when terminal
+  linked-record facts permit it. Legal and financial holds take precedence.
+
+Staging and production must explicitly set every `AUTH_*` value shown in `.env.example`. The
+parser accepts only the approved values. Development and test receive the same policy defaults;
+only trusted-proxy hops default to zero. Set `AUTH_TRUST_PROXY_HOPS=1` only when exactly one
+controlled reverse proxy sits between the application and every client. Any other topology needs
+a reviewed configuration change before deployment.
+
+## Initial Manager bootstrap
+
+Manager creation is an operator-only deployment operation. There is no public registration route
+and no generic role-assignment endpoint.
+
+The IA-04 bootstrap command must enforce this sequence:
+
+1. An authorized operator opens an audited shell in the target deployment and confirms the exact
+   database and environment.
+2. The operator supplies the normalized Manager email and display data as command options. The
+   password is read from an interactive hidden prompt or an approved secret-file descriptor—never
+   from command-line arguments, logs, shell history, or a checked-in environment file.
+3. The command starts one database transaction, refuses to run if any Manager role already exists,
+   creates the account/password verifier/Manager role, and emits an audit record identifying the
+   operator and deployment request.
+4. The operator verifies a successful audit event, removes any one-time secret material, and closes
+   the audited shell. Re-running the command must fail closed.
+
+Routine Manager or Staff lifecycle changes must use explicit privileged workflows with audit
+events. Customer invitation acceptance may add only the `COUPLE` role scoped through consultation
+access and can never grant `MANAGER` or `STAFF`.

@@ -2,6 +2,37 @@ import { z } from 'zod';
 
 const deployedEnvironments = new Set(['staging', 'production']);
 const loopbackHosts = new Set(['localhost', '127.0.0.1', '[::1]']);
+const identityRequiredVariables = [
+  'AUTH_TRUST_PROXY_HOPS',
+  'AUTH_ACCESS_TOKEN_TTL_SECONDS',
+  'AUTH_REFRESH_IDLE_TTL_SECONDS',
+  'AUTH_REFRESH_ABSOLUTE_TTL_SECONDS',
+  'AUTH_PASSWORD_RESET_TTL_SECONDS',
+  'AUTH_INVITATION_TTL_SECONDS',
+  'AUTH_INVITATION_REISSUE_LIMIT',
+  'AUTH_INVITATION_REISSUE_WINDOW_SECONDS',
+  'AUTH_PASSWORD_MIN_CHARACTERS',
+  'AUTH_PASSWORD_MAX_CHARACTERS',
+  'AUTH_PASSWORD_MAX_BYTES',
+  'AUTH_SCRYPT_COST',
+  'AUTH_SCRYPT_BLOCK_SIZE',
+  'AUTH_SCRYPT_PARALLELIZATION',
+  'AUTH_SCRYPT_KEY_LENGTH_BYTES',
+  'AUTH_SCRYPT_MAX_MEMORY_BYTES',
+  'AUTH_TOKEN_ENTROPY_BYTES',
+  'AUTH_LOGIN_RATE_LIMIT_MAX',
+  'AUTH_LOGIN_RATE_LIMIT_WINDOW_SECONDS',
+  'AUTH_TOKEN_CONSUME_RATE_LIMIT_MAX',
+  'AUTH_TOKEN_CONSUME_RATE_LIMIT_WINDOW_SECONDS',
+  'AUTH_RESET_REQUEST_RATE_LIMIT_MAX',
+  'AUTH_RESET_REQUEST_RATE_LIMIT_WINDOW_SECONDS',
+  'AUTH_REFRESH_RATE_LIMIT_MAX',
+  'AUTH_REFRESH_RATE_LIMIT_WINDOW_SECONDS',
+  'AUTH_INVITATION_RETENTION_DAYS',
+  'AUTH_PASSWORD_RESET_RETENTION_DAYS',
+  'AUTH_SESSION_RETENTION_DAYS',
+  'AUTH_DISABLED_ACCOUNT_PII_RETENTION_DAYS',
+] as const;
 const productionRequiredVariables = [
   'CORS_ALLOWED_ORIGINS',
   'DATABASE_URL',
@@ -11,7 +42,39 @@ const productionRequiredVariables = [
   'SUPABASE_STORAGE_BUCKET',
   'RESEND_API_KEY',
   'RESEND_FROM_EMAIL',
+  ...identityRequiredVariables,
 ] as const;
+
+const approvedIdentityPolicy = Object.freeze({
+  accessTokenTtlSeconds: 600,
+  refreshIdleTtlSeconds: 2_592_000,
+  refreshAbsoluteTtlSeconds: 7_776_000,
+  passwordResetTtlSeconds: 1_800,
+  invitationTtlSeconds: 259_200,
+  invitationReissueLimit: 3,
+  invitationReissueWindowSeconds: 86_400,
+  passwordMinimumCharacters: 12,
+  passwordMaximumCharacters: 128,
+  passwordMaximumBytes: 512,
+  scryptCost: 131_072,
+  scryptBlockSize: 8,
+  scryptParallelization: 1,
+  scryptKeyLengthBytes: 64,
+  scryptMaxMemoryBytes: 268_435_456,
+  tokenEntropyBytes: 32,
+  loginRateLimitMax: 10,
+  loginRateLimitWindowSeconds: 900,
+  tokenConsumeRateLimitMax: 10,
+  tokenConsumeRateLimitWindowSeconds: 900,
+  resetRequestRateLimitMax: 3,
+  resetRequestRateLimitWindowSeconds: 3_600,
+  refreshRateLimitMax: 60,
+  refreshRateLimitWindowSeconds: 900,
+  invitationRetentionDays: 180,
+  passwordResetRetentionDays: 30,
+  sessionRetentionDays: 90,
+  disabledAccountPiiRetentionDays: 365,
+});
 
 const optionalString = z.preprocess(
   (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
@@ -29,6 +92,13 @@ function integerEnvironmentVariable(options: {
     .transform(Number)
     .pipe(z.number().int().min(options.minimum).max(options.maximum))
     .default(options.defaultValue);
+}
+
+function approvedInteger(value: number) {
+  return z
+    .literal(String(value))
+    .transform(() => value)
+    .optional();
 }
 
 const databaseUrl = z.url({ protocol: /^postgres(?:ql)?$/ });
@@ -113,6 +183,61 @@ const rawEnvironmentSchema = z
       .literal('1')
       .transform(() => 1 as const)
       .default(1),
+    AUTH_TRUST_PROXY_HOPS: z
+      .enum(['0', '1'])
+      .transform(Number)
+      .pipe(z.union([z.literal(0), z.literal(1)]))
+      .optional(),
+    AUTH_ACCESS_TOKEN_TTL_SECONDS: approvedInteger(approvedIdentityPolicy.accessTokenTtlSeconds),
+    AUTH_REFRESH_IDLE_TTL_SECONDS: approvedInteger(approvedIdentityPolicy.refreshIdleTtlSeconds),
+    AUTH_REFRESH_ABSOLUTE_TTL_SECONDS: approvedInteger(
+      approvedIdentityPolicy.refreshAbsoluteTtlSeconds,
+    ),
+    AUTH_PASSWORD_RESET_TTL_SECONDS: approvedInteger(
+      approvedIdentityPolicy.passwordResetTtlSeconds,
+    ),
+    AUTH_INVITATION_TTL_SECONDS: approvedInteger(approvedIdentityPolicy.invitationTtlSeconds),
+    AUTH_INVITATION_REISSUE_LIMIT: approvedInteger(approvedIdentityPolicy.invitationReissueLimit),
+    AUTH_INVITATION_REISSUE_WINDOW_SECONDS: approvedInteger(
+      approvedIdentityPolicy.invitationReissueWindowSeconds,
+    ),
+    AUTH_PASSWORD_MIN_CHARACTERS: approvedInteger(approvedIdentityPolicy.passwordMinimumCharacters),
+    AUTH_PASSWORD_MAX_CHARACTERS: approvedInteger(approvedIdentityPolicy.passwordMaximumCharacters),
+    AUTH_PASSWORD_MAX_BYTES: approvedInteger(approvedIdentityPolicy.passwordMaximumBytes),
+    AUTH_SCRYPT_COST: approvedInteger(approvedIdentityPolicy.scryptCost),
+    AUTH_SCRYPT_BLOCK_SIZE: approvedInteger(approvedIdentityPolicy.scryptBlockSize),
+    AUTH_SCRYPT_PARALLELIZATION: approvedInteger(approvedIdentityPolicy.scryptParallelization),
+    AUTH_SCRYPT_KEY_LENGTH_BYTES: approvedInteger(approvedIdentityPolicy.scryptKeyLengthBytes),
+    AUTH_SCRYPT_MAX_MEMORY_BYTES: approvedInteger(approvedIdentityPolicy.scryptMaxMemoryBytes),
+    AUTH_TOKEN_ENTROPY_BYTES: approvedInteger(approvedIdentityPolicy.tokenEntropyBytes),
+    AUTH_LOGIN_RATE_LIMIT_MAX: approvedInteger(approvedIdentityPolicy.loginRateLimitMax),
+    AUTH_LOGIN_RATE_LIMIT_WINDOW_SECONDS: approvedInteger(
+      approvedIdentityPolicy.loginRateLimitWindowSeconds,
+    ),
+    AUTH_TOKEN_CONSUME_RATE_LIMIT_MAX: approvedInteger(
+      approvedIdentityPolicy.tokenConsumeRateLimitMax,
+    ),
+    AUTH_TOKEN_CONSUME_RATE_LIMIT_WINDOW_SECONDS: approvedInteger(
+      approvedIdentityPolicy.tokenConsumeRateLimitWindowSeconds,
+    ),
+    AUTH_RESET_REQUEST_RATE_LIMIT_MAX: approvedInteger(
+      approvedIdentityPolicy.resetRequestRateLimitMax,
+    ),
+    AUTH_RESET_REQUEST_RATE_LIMIT_WINDOW_SECONDS: approvedInteger(
+      approvedIdentityPolicy.resetRequestRateLimitWindowSeconds,
+    ),
+    AUTH_REFRESH_RATE_LIMIT_MAX: approvedInteger(approvedIdentityPolicy.refreshRateLimitMax),
+    AUTH_REFRESH_RATE_LIMIT_WINDOW_SECONDS: approvedInteger(
+      approvedIdentityPolicy.refreshRateLimitWindowSeconds,
+    ),
+    AUTH_INVITATION_RETENTION_DAYS: approvedInteger(approvedIdentityPolicy.invitationRetentionDays),
+    AUTH_PASSWORD_RESET_RETENTION_DAYS: approvedInteger(
+      approvedIdentityPolicy.passwordResetRetentionDays,
+    ),
+    AUTH_SESSION_RETENTION_DAYS: approvedInteger(approvedIdentityPolicy.sessionRetentionDays),
+    AUTH_DISABLED_ACCOUNT_PII_RETENTION_DAYS: approvedInteger(
+      approvedIdentityPolicy.disabledAccountPiiRetentionDays,
+    ),
     DATABASE_URL: optionalString.pipe(databaseUrl.optional()),
     MIGRATION_DATABASE_URL: optionalString.pipe(databaseUrl.optional()),
     SUPABASE_URL: optionalString.pipe(httpsUrl.optional()),
@@ -255,6 +380,52 @@ export type BackendConfig = Readonly<{
     rateLimit: Readonly<{ maxRequests: number; windowMs: number }>;
     replicaCount: 1;
   }>;
+  identityAccess: Readonly<{
+    trustedProxyHops: 0 | 1;
+    refreshCookie: Readonly<{
+      name: '__Host-wedding-refresh';
+      path: '/';
+      httpOnly: true;
+      secure: true;
+      sameSite: 'lax';
+    }>;
+    lifetimesSeconds: Readonly<{
+      accessToken: number;
+      refreshIdle: number;
+      refreshAbsolute: number;
+      passwordReset: number;
+    }>;
+    invitation: Readonly<{
+      lifetimeSeconds: number;
+      reissueLimit: number;
+      reissueWindowSeconds: number;
+    }>;
+    password: Readonly<{
+      minimumCharacters: number;
+      maximumCharacters: number;
+      maximumBytes: number;
+      scrypt: Readonly<{
+        cost: number;
+        blockSize: number;
+        parallelization: number;
+        keyLengthBytes: number;
+        maxMemoryBytes: number;
+      }>;
+    }>;
+    tokenEntropyBytes: number;
+    rateLimits: Readonly<{
+      login: Readonly<{ maxAttempts: number; windowSeconds: number }>;
+      tokenConsume: Readonly<{ maxAttempts: number; windowSeconds: number }>;
+      resetRequest: Readonly<{ maxAttempts: number; windowSeconds: number }>;
+      refresh: Readonly<{ maxAttempts: number; windowSeconds: number }>;
+    }>;
+    retentionDays: Readonly<{
+      invitation: number;
+      passwordReset: number;
+      session: number;
+      disabledAccountPii: number;
+    }>;
+  }>;
   database: Readonly<{ url: string | undefined; migrationUrl: string | undefined }>;
   storage: StorageConfig;
   email: EmailConfig;
@@ -299,6 +470,37 @@ function pickEnvironment(source: EnvironmentSource): EnvironmentSource {
     RATE_LIMIT_MAX_REQUESTS: source.RATE_LIMIT_MAX_REQUESTS,
     RATE_LIMIT_WINDOW_MS: source.RATE_LIMIT_WINDOW_MS,
     BACKEND_REPLICA_COUNT: source.BACKEND_REPLICA_COUNT,
+    AUTH_TRUST_PROXY_HOPS: source.AUTH_TRUST_PROXY_HOPS,
+    AUTH_ACCESS_TOKEN_TTL_SECONDS: source.AUTH_ACCESS_TOKEN_TTL_SECONDS,
+    AUTH_REFRESH_IDLE_TTL_SECONDS: source.AUTH_REFRESH_IDLE_TTL_SECONDS,
+    AUTH_REFRESH_ABSOLUTE_TTL_SECONDS: source.AUTH_REFRESH_ABSOLUTE_TTL_SECONDS,
+    AUTH_PASSWORD_RESET_TTL_SECONDS: source.AUTH_PASSWORD_RESET_TTL_SECONDS,
+    AUTH_INVITATION_TTL_SECONDS: source.AUTH_INVITATION_TTL_SECONDS,
+    AUTH_INVITATION_REISSUE_LIMIT: source.AUTH_INVITATION_REISSUE_LIMIT,
+    AUTH_INVITATION_REISSUE_WINDOW_SECONDS: source.AUTH_INVITATION_REISSUE_WINDOW_SECONDS,
+    AUTH_PASSWORD_MIN_CHARACTERS: source.AUTH_PASSWORD_MIN_CHARACTERS,
+    AUTH_PASSWORD_MAX_CHARACTERS: source.AUTH_PASSWORD_MAX_CHARACTERS,
+    AUTH_PASSWORD_MAX_BYTES: source.AUTH_PASSWORD_MAX_BYTES,
+    AUTH_SCRYPT_COST: source.AUTH_SCRYPT_COST,
+    AUTH_SCRYPT_BLOCK_SIZE: source.AUTH_SCRYPT_BLOCK_SIZE,
+    AUTH_SCRYPT_PARALLELIZATION: source.AUTH_SCRYPT_PARALLELIZATION,
+    AUTH_SCRYPT_KEY_LENGTH_BYTES: source.AUTH_SCRYPT_KEY_LENGTH_BYTES,
+    AUTH_SCRYPT_MAX_MEMORY_BYTES: source.AUTH_SCRYPT_MAX_MEMORY_BYTES,
+    AUTH_TOKEN_ENTROPY_BYTES: source.AUTH_TOKEN_ENTROPY_BYTES,
+    AUTH_LOGIN_RATE_LIMIT_MAX: source.AUTH_LOGIN_RATE_LIMIT_MAX,
+    AUTH_LOGIN_RATE_LIMIT_WINDOW_SECONDS: source.AUTH_LOGIN_RATE_LIMIT_WINDOW_SECONDS,
+    AUTH_TOKEN_CONSUME_RATE_LIMIT_MAX: source.AUTH_TOKEN_CONSUME_RATE_LIMIT_MAX,
+    AUTH_TOKEN_CONSUME_RATE_LIMIT_WINDOW_SECONDS:
+      source.AUTH_TOKEN_CONSUME_RATE_LIMIT_WINDOW_SECONDS,
+    AUTH_RESET_REQUEST_RATE_LIMIT_MAX: source.AUTH_RESET_REQUEST_RATE_LIMIT_MAX,
+    AUTH_RESET_REQUEST_RATE_LIMIT_WINDOW_SECONDS:
+      source.AUTH_RESET_REQUEST_RATE_LIMIT_WINDOW_SECONDS,
+    AUTH_REFRESH_RATE_LIMIT_MAX: source.AUTH_REFRESH_RATE_LIMIT_MAX,
+    AUTH_REFRESH_RATE_LIMIT_WINDOW_SECONDS: source.AUTH_REFRESH_RATE_LIMIT_WINDOW_SECONDS,
+    AUTH_INVITATION_RETENTION_DAYS: source.AUTH_INVITATION_RETENTION_DAYS,
+    AUTH_PASSWORD_RESET_RETENTION_DAYS: source.AUTH_PASSWORD_RESET_RETENTION_DAYS,
+    AUTH_SESSION_RETENTION_DAYS: source.AUTH_SESSION_RETENTION_DAYS,
+    AUTH_DISABLED_ACCOUNT_PII_RETENTION_DAYS: source.AUTH_DISABLED_ACCOUNT_PII_RETENTION_DAYS,
     DATABASE_URL: source.DATABASE_URL,
     MIGRATION_DATABASE_URL: source.MIGRATION_DATABASE_URL,
     SUPABASE_URL: source.SUPABASE_URL,
@@ -415,6 +617,105 @@ function createConfig(environment: RawEnvironment): BackendConfig {
         windowMs: environment.RATE_LIMIT_WINDOW_MS,
       }),
       replicaCount: environment.BACKEND_REPLICA_COUNT,
+    }),
+    identityAccess: Object.freeze({
+      trustedProxyHops: environment.AUTH_TRUST_PROXY_HOPS ?? 0,
+      refreshCookie: Object.freeze({
+        name: '__Host-wedding-refresh' as const,
+        path: '/' as const,
+        httpOnly: true as const,
+        secure: true as const,
+        sameSite: 'lax' as const,
+      }),
+      lifetimesSeconds: Object.freeze({
+        accessToken:
+          environment.AUTH_ACCESS_TOKEN_TTL_SECONDS ?? approvedIdentityPolicy.accessTokenTtlSeconds,
+        refreshIdle:
+          environment.AUTH_REFRESH_IDLE_TTL_SECONDS ?? approvedIdentityPolicy.refreshIdleTtlSeconds,
+        refreshAbsolute:
+          environment.AUTH_REFRESH_ABSOLUTE_TTL_SECONDS ??
+          approvedIdentityPolicy.refreshAbsoluteTtlSeconds,
+        passwordReset:
+          environment.AUTH_PASSWORD_RESET_TTL_SECONDS ??
+          approvedIdentityPolicy.passwordResetTtlSeconds,
+      }),
+      invitation: Object.freeze({
+        lifetimeSeconds:
+          environment.AUTH_INVITATION_TTL_SECONDS ?? approvedIdentityPolicy.invitationTtlSeconds,
+        reissueLimit:
+          environment.AUTH_INVITATION_REISSUE_LIMIT ??
+          approvedIdentityPolicy.invitationReissueLimit,
+        reissueWindowSeconds:
+          environment.AUTH_INVITATION_REISSUE_WINDOW_SECONDS ??
+          approvedIdentityPolicy.invitationReissueWindowSeconds,
+      }),
+      password: Object.freeze({
+        minimumCharacters:
+          environment.AUTH_PASSWORD_MIN_CHARACTERS ??
+          approvedIdentityPolicy.passwordMinimumCharacters,
+        maximumCharacters:
+          environment.AUTH_PASSWORD_MAX_CHARACTERS ??
+          approvedIdentityPolicy.passwordMaximumCharacters,
+        maximumBytes:
+          environment.AUTH_PASSWORD_MAX_BYTES ?? approvedIdentityPolicy.passwordMaximumBytes,
+        scrypt: Object.freeze({
+          cost: environment.AUTH_SCRYPT_COST ?? approvedIdentityPolicy.scryptCost,
+          blockSize: environment.AUTH_SCRYPT_BLOCK_SIZE ?? approvedIdentityPolicy.scryptBlockSize,
+          parallelization:
+            environment.AUTH_SCRYPT_PARALLELIZATION ?? approvedIdentityPolicy.scryptParallelization,
+          keyLengthBytes:
+            environment.AUTH_SCRYPT_KEY_LENGTH_BYTES ?? approvedIdentityPolicy.scryptKeyLengthBytes,
+          maxMemoryBytes:
+            environment.AUTH_SCRYPT_MAX_MEMORY_BYTES ?? approvedIdentityPolicy.scryptMaxMemoryBytes,
+        }),
+      }),
+      tokenEntropyBytes:
+        environment.AUTH_TOKEN_ENTROPY_BYTES ?? approvedIdentityPolicy.tokenEntropyBytes,
+      rateLimits: Object.freeze({
+        login: Object.freeze({
+          maxAttempts:
+            environment.AUTH_LOGIN_RATE_LIMIT_MAX ?? approvedIdentityPolicy.loginRateLimitMax,
+          windowSeconds:
+            environment.AUTH_LOGIN_RATE_LIMIT_WINDOW_SECONDS ??
+            approvedIdentityPolicy.loginRateLimitWindowSeconds,
+        }),
+        tokenConsume: Object.freeze({
+          maxAttempts:
+            environment.AUTH_TOKEN_CONSUME_RATE_LIMIT_MAX ??
+            approvedIdentityPolicy.tokenConsumeRateLimitMax,
+          windowSeconds:
+            environment.AUTH_TOKEN_CONSUME_RATE_LIMIT_WINDOW_SECONDS ??
+            approvedIdentityPolicy.tokenConsumeRateLimitWindowSeconds,
+        }),
+        resetRequest: Object.freeze({
+          maxAttempts:
+            environment.AUTH_RESET_REQUEST_RATE_LIMIT_MAX ??
+            approvedIdentityPolicy.resetRequestRateLimitMax,
+          windowSeconds:
+            environment.AUTH_RESET_REQUEST_RATE_LIMIT_WINDOW_SECONDS ??
+            approvedIdentityPolicy.resetRequestRateLimitWindowSeconds,
+        }),
+        refresh: Object.freeze({
+          maxAttempts:
+            environment.AUTH_REFRESH_RATE_LIMIT_MAX ?? approvedIdentityPolicy.refreshRateLimitMax,
+          windowSeconds:
+            environment.AUTH_REFRESH_RATE_LIMIT_WINDOW_SECONDS ??
+            approvedIdentityPolicy.refreshRateLimitWindowSeconds,
+        }),
+      }),
+      retentionDays: Object.freeze({
+        invitation:
+          environment.AUTH_INVITATION_RETENTION_DAYS ??
+          approvedIdentityPolicy.invitationRetentionDays,
+        passwordReset:
+          environment.AUTH_PASSWORD_RESET_RETENTION_DAYS ??
+          approvedIdentityPolicy.passwordResetRetentionDays,
+        session:
+          environment.AUTH_SESSION_RETENTION_DAYS ?? approvedIdentityPolicy.sessionRetentionDays,
+        disabledAccountPii:
+          environment.AUTH_DISABLED_ACCOUNT_PII_RETENTION_DAYS ??
+          approvedIdentityPolicy.disabledAccountPiiRetentionDays,
+      }),
     }),
     database: Object.freeze({
       url: environment.DATABASE_URL,
