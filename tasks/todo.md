@@ -825,15 +825,22 @@ The tasks below are documentation and planning gates, not authorization to imple
 
 **Acceptance criteria:**
 
-- [ ] `SPEC-identity-access.md` covers ACC-002 through ACC-007, authentication/session behavior, restricted prospect entitlements, access promotion, privacy/retention, and failure states.
-- [ ] Invitation bootstrap, revocation, authorization, and post-deposit promotion contracts have explicit state transitions and concurrency/security tests.
-- [ ] Detailed implementation tasks and checkpoints are inserted into `plan.md` and `todo.md`, then approved by the project owner before code starts.
+- [x] `SPEC-identity-access.md` covers ACC-002 through ACC-007, authentication/session behavior, restricted prospect entitlements, access promotion, privacy/retention, and failure states.
+- [x] Invitation bootstrap, revocation, authorization, and post-deposit promotion contracts have explicit state transitions and concurrency/security tests.
+- [x] Detailed implementation tasks and checkpoints are inserted into `plan.md` and `todo.md`, then approved by the project owner before code starts.
 
 **Verification:**
 
-- [ ] Trace ACC-002 through ACC-007 to spec acceptance criteria and planned automated tests.
-- [ ] Review the provider boundary needed by `booking-lifecycle` without introducing a reverse dependency.
-- [ ] Run Prettier and `git diff --check` on the affected documentation.
+- [x] Trace ACC-002 through ACC-007 to spec acceptance criteria and planned automated tests.
+- [x] Review the provider boundary needed by `booking-lifecycle` without introducing a reverse dependency.
+- [x] Run Prettier and `git diff --check` on the affected documentation.
+
+**Completion evidence (2026-10-03):** `SPEC-identity-access.md` maps ACC-002 through
+ACC-007 to explicit state transitions, API/provider boundaries, privacy/retention rules,
+security and concurrency tests. `tasks/plan.md` and this task list contain the ordered
+IA-01 through IA-17 slices and checkpoints I1 through I3. Prettier and
+`git diff --check` pass. The project owner explicitly approved the spec, decisions D1
+through D7, and the detailed plan in the project conversation.
 
 **Dependencies:** CP-32 and project-owner approval of the `core-platform` implementation.
 
@@ -843,8 +850,493 @@ The tasks below are documentation and planning gates, not authorization to imple
 
 #### Checkpoint H1 — Identity specification ready
 
-- [ ] Project owner approves the identity-access spec and detailed implementation slice.
-- [ ] No identity implementation begins from product requirements alone.
+- [x] Project owner approves the identity-access spec and detailed implementation slice.
+- [x] No identity implementation begins from product requirements alone.
+
+**Approval evidence (2026-10-03):** The project owner explicitly stated, “Tôi duyệt
+SPEC-01 và H1.” This approves D1 through D7 and authorizes the ordered IA-01 through
+IA-17 implementation tasks, subject to their dependencies and stop conditions.
+
+## Phase I — Identity-Access Implementation (Approved at H1)
+
+Checkpoint H1 authorizes this phase. The approved values for decisions D1 through D7
+in `SPEC-identity-access.md` control these tasks; an implementation that needs different
+authentication, transport, password, role, retention, or rate-limit behavior must stop
+for project-owner review.
+
+### IA-01: Freeze approved identity configuration and operator boundary
+
+**Description:** Translate approved D1–D7 values into named configuration inputs,
+safe examples, and an explicit first-Manager bootstrap procedure before runtime code.
+
+**Acceptance criteria:**
+
+- [ ] Credential lifetimes, exact `__Host-` cookie flags/name/path, password cost, auth
+      throttles, trusted-proxy policy, invitation limits, and retention values have one
+      documented source of truth.
+- [ ] Development/test defaults are safe; staging/production fail fast on missing
+      security inputs and never accept placeholder secrets.
+- [ ] Manager bootstrap is an operator-only procedure with no public registration or
+      generic role-assignment endpoint.
+
+**Verification:**
+
+- [ ] Configuration tests reject malformed, unsafe, and missing production values,
+      including proxy configurations that would trust attacker-supplied forwarded IPs.
+- [ ] Secret-pattern scan and Prettier pass on the focused files.
+
+**Dependencies:** Checkpoint H1
+
+**Files likely touched:** `src/config.ts`, `.env.example`,
+`src/config.test.ts`, `docs/cross-repo-development.md`
+
+**Estimated scope:** Small
+
+### IA-02: Add password and opaque-token cryptographic primitives
+
+**Description:** Implement versioned scrypt password verification plus high-entropy
+opaque credential generation/hashing without persistence or HTTP concerns.
+
+**Acceptance criteria:**
+
+- [ ] Password verifiers record algorithm/version/parameters and support safe future
+      rehash decisions; passwords outside the approved byte/character limits fail.
+- [ ] Access, refresh, invitation, and reset credentials use purpose-separated random
+      values and only deterministic hashes leave the primitive boundary.
+- [ ] Secret values never appear in error text, structured logs, or test snapshots.
+
+**Verification:**
+
+- [ ] Unit tests cover correct/incorrect/malformed passwords, constant-time hash
+      comparison, token uniqueness, purpose separation, and exact expiry boundaries.
+- [ ] Benchmark the proposed scrypt parameters on the deployment runtime and record
+      memory/latency evidence before accepting the credential primitive.
+- [ ] Run focused unit tests, lint, typecheck, and the redaction test suite.
+
+**Dependencies:** IA-01
+
+**Files likely touched:** `src/modules/identity-access/crypto/password.ts`,
+`src/modules/identity-access/crypto/token.ts`, two focused test files
+
+**Estimated scope:** Small
+
+### IA-03: Add identity persistence and forward-only migration
+
+**Description:** Add the approved account, credential, role, consultation-access,
+invitation, session/token, and password-reset records with database-enforced winners.
+
+**Acceptance criteria:**
+
+- [ ] Normalized email, role, consultation access, invitation activity, refresh
+      rotation, and promotion source invariants are represented by constraints/indexes.
+- [ ] Raw credentials cannot be represented in a persistence column.
+- [ ] The migration is forward-only and deploys cleanly to an empty PostgreSQL database.
+
+**Verification:**
+
+- [ ] Constraint-focused integration tests cover duplicate normalized email, active
+      invitation, refresh successor, and payment-source conflicts.
+- [ ] Run Prisma validation/generation and clean `db:migrate:deploy`.
+
+**Dependencies:** IA-01
+
+**Files likely touched:** `prisma/schema.prisma`, one migration directory,
+`tests/integration/identity-access/identity-schema.test.ts`
+
+**Estimated scope:** Medium
+
+### IA-04: Add account and password service behavior
+
+**Description:** Implement account lookup, password enrollment/verification, account
+status checks, roles, the operator-only initial Manager bootstrap service, and the
+identity-owned retention-eligibility boundary.
+
+**Acceptance criteria:**
+
+- [ ] Email normalization produces one account identity and preserves a separate safe
+      display value.
+- [ ] Unknown, disabled, and incorrect-password paths are externally
+      indistinguishable while internal outcomes remain safely observable.
+- [ ] Public input cannot create a Manager/Staff role, alter account status, or mark an
+      account retention-eligible; internal eligibility facts are audited and legal or
+      financial holds fail closed.
+
+**Verification:**
+
+- [ ] Unit/integration tests cover normalization collisions, all statuses, duplicate
+      bootstrap, password replacement, role allowlisting, retention due dates, and
+      active holds.
+- [ ] Audit assertions contain no email or password material.
+
+**Dependencies:** IA-02, IA-03
+
+**Files likely touched:** account repository/service plus two focused test files
+
+**Estimated scope:** Medium
+
+### IA-05: Create login and session issuance services
+
+**Description:** Create Web/Android session families and short-lived access plus
+rotating refresh credentials after password authentication.
+
+**Acceptance criteria:**
+
+- [ ] Only hashes persist; each credential is bound to an active account/session,
+      client kind, idle expiry, and absolute expiry.
+- [ ] Login throttling applies to the approved IP plus normalized-email key without a
+      permanent attacker-triggered account lockout; reset, token-consumption, and
+      refresh limits use their separately approved buckets.
+- [ ] Raw credentials are returned only once through typed service results.
+
+**Verification:**
+
+- [ ] Focused tests cover successful/failed/throttled login, expiry edges, disabled
+      accounts, token non-persistence, and audit/redaction behavior.
+- [ ] Run unit, PostgreSQL integration, lint, typecheck, and coverage checks.
+
+**Dependencies:** IA-04
+
+**Files likely touched:** session repository/service, throttle adapter, two test files
+
+**Estimated scope:** Medium
+
+### IA-06: Add atomic refresh rotation and session revocation
+
+**Description:** Implement refresh rotation, replay containment, logout, session
+inventory, and caller-owned session revocation.
+
+**Acceptance criteria:**
+
+- [ ] A refresh credential has at most one successor and cannot extend the absolute
+      session lifetime.
+- [ ] Reuse of a consumed refresh credential atomically marks the family compromised
+      and revokes every successor.
+- [ ] Callers can list/revoke only their own sessions; password/account events can
+      revoke all sessions through an internal port.
+
+**Verification:**
+
+- [ ] Real PostgreSQL concurrency tests prove one rotation winner and replay-family
+      revocation; logout/revoke operations are idempotent.
+- [ ] Session output contains no credential hash or sensitive device metadata.
+
+**Dependencies:** IA-05
+
+**Files likely touched:** refresh/session service and repository extensions plus two
+focused test files
+
+**Estimated scope:** Medium
+
+### IA-07: Add authenticated actor and deny-by-default access policy
+
+**Description:** Resolve immutable actors from current database state and expose role
+and consultation-scoped access checks for later modules.
+
+**Acceptance criteria:**
+
+- [ ] Middleware ignores request-supplied account, role, session, and access-level
+      claims and fails closed on stale/revoked/expired state.
+- [ ] `RESTRICTED` grants only proposal-read/timeline-collaboration capabilities;
+      ACC-004 capabilities require `FULL` plus owning-module resource checks.
+- [ ] Wrong-consultation and concealed-resource paths use the approved 403/404 policy.
+
+**Verification:**
+
+- [ ] Exhaustive policy-table tests cover Manager, Staff, restricted, full, disabled,
+      forged-role, stale-session, and cross-consultation cases.
+- [ ] Mutation-sensitive tests fail if any deny condition is removed or inverted.
+
+**Dependencies:** IA-06, IA-03
+
+**Files likely touched:** actor middleware, access reader/policy, two focused test files
+
+**Estimated scope:** Medium
+
+#### Checkpoint I1 — Authentication core verified
+
+- [ ] IA-01 through IA-07 pass focused unit, PostgreSQL concurrency, audit, redaction,
+      lint, typecheck, coverage, and migration checks.
+- [ ] Security review confirms no raw credential persistence/logging and no
+      client-asserted authorization state.
+
+### IA-08: Publish session and current-user HTTP contracts
+
+**Description:** Add strict Web/Android login, refresh, logout, current-user, session
+list, and session revoke routes using the existing error/OpenAPI infrastructure.
+
+**Acceptance criteria:**
+
+- [ ] Web refresh uses only the approved host cookie and allowed Origin; Android
+      refresh uses the request body; access credentials use the authorization header.
+- [ ] Auth responses set `Cache-Control: no-store`, stable enumeration-safe errors,
+      and exact cookie clear/set semantics.
+- [ ] Route handlers only map validated transport values to IA-05–IA-07 services;
+      session inventory is cursor-bounded and every state-changing route documents
+      idempotent, retryable, or unsafe-to-retry behavior.
+
+**Verification:**
+
+- [ ] Contract tests cover success, invalid input, auth failure, forbidden ownership,
+      throttling, Origin rejection, cookie flags, no-store, and secret non-echo.
+- [ ] OpenAPI generation is deterministic after repeated runs.
+
+**Dependencies:** Checkpoint I1
+
+**Files likely touched:** identity schemas/router, app route registration, two contract
+test files
+
+**Estimated scope:** Medium
+
+### IA-09: Add enumeration-safe password reset
+
+**Description:** Add reset request/completion services and notification intent using
+single-use hashed credentials.
+
+**Acceptance criteria:**
+
+- [ ] Request responses are identical for unknown, disabled, and eligible accounts
+      where practical; issuance and completion are separately throttled.
+- [ ] Completion atomically consumes an unexpired token, replaces the password, and
+      revokes every account session.
+- [ ] The notification port receives the raw token only at the final provider boundary.
+
+**Verification:**
+
+- [ ] Tests cover enumeration, expiry, replay, concurrent completion, provider failure,
+      all-session revocation, audit allowlists, and token redaction.
+- [ ] Focused unit/integration and EmailProvider fake tests pass.
+
+**Dependencies:** IA-04, IA-06
+
+**Files likely touched:** reset service/repository, notification port adapter, two test
+files
+
+**Estimated scope:** Medium
+
+### IA-10: Add workspace invitation issue, reissue, and revoke lifecycle
+
+**Description:** Implement the provider service used later by `booking-lifecycle`,
+including approved expiry/reissue limits and delivery intent.
+
+**Acceptance criteria:**
+
+- [ ] One active invitation exists per consultation/normalized email; reissue
+      atomically supersedes it and revocation preserves consultation/audit references.
+- [ ] The provider contract exposes issue, reissue, and revoke as explicit operations;
+      consumers cannot emulate reissue with a non-atomic revoke-plus-issue sequence.
+- [ ] Reissue limits, idempotency, issuer identity, sequence, and terminal reasons are
+      enforced from current database state; raw tokens exist only in the one-time
+      return/notification command.
+
+**Verification:**
+
+- [ ] Tests cover issue, duplicate issue, reissue limit, revoke, expiry, provider
+      failure, concurrent issue/reissue, audit data, and token non-persistence.
+- [ ] Provider interface imports no booking implementation.
+
+**Dependencies:** IA-03, IA-04
+
+**Files likely touched:** invitation repository/service, notification command, two test
+files
+
+**Estimated scope:** Medium
+
+### IA-11: Add atomic workspace invitation acceptance
+
+**Description:** Convert one valid invitation into the same/new matching account,
+restricted consultation access, and a real Web session.
+
+**Acceptance criteria:**
+
+- [ ] New accounts set a password; existing matching accounts verify their current
+      password and never have it silently replaced.
+- [ ] Account/access/session creation and invitation consumption form one atomic
+      transition; expired/revoked/superseded/consumed tokens fail generically.
+- [ ] Reaccept cannot create a second account, consultation access, or session.
+
+**Verification:**
+
+- [ ] PostgreSQL tests cover new/existing accounts, mismatch, expiry boundaries,
+      replay, accept/accept concurrency, and accept/reissue races.
+- [ ] Audit and errors contain no email, password, raw token, or token hash.
+
+**Dependencies:** IA-05, IA-10
+
+**Files likely touched:** acceptance service/transaction plus three focused test files
+
+**Estimated scope:** Medium
+
+### IA-12: Add restricted-access provider and Couple promotion port
+
+**Description:** Finalize the identity-owned ports consumed by later booking, payment,
+and capability modules.
+
+**Acceptance criteria:**
+
+- [ ] Access reads require account plus consultation and return only current
+      `RESTRICTED`/`FULL` state.
+- [ ] Promotion accepts evidence identifiers, not a caller-selected level; it is
+      monotonic, idempotent, preserves account/consultation-access identity, and
+      atomically upserts `COUPLE`; restricted acceptance alone never grants that role.
+- [ ] Reusing one payment source for a different account/consultation fails with a
+      conflict and a safe audit event.
+
+**Verification:**
+
+- [ ] Concurrency tests prove one promotion winner and safe exact replay.
+- [ ] Contract fixtures trace ACC-003–ACC-007 and verify no reverse dependency on
+      `booking-lifecycle` or `payments-billing`.
+
+**Dependencies:** IA-07, IA-11
+
+**Files likely touched:** provider interfaces/service plus two focused test files
+
+**Estimated scope:** Medium
+
+#### Checkpoint I2 — Identity state and provider contracts verified
+
+- [ ] IA-08 through IA-12 pass contract, state-transition, expiry, replay,
+      concurrency, audit, and ACC-002–ACC-007 trace reviews.
+- [ ] Provider/API boundaries are frozen before client implementation begins.
+
+### IA-13: Complete identity routes and publish the immutable OpenAPI contract
+
+**Description:** Expose password-reset and invitation-acceptance routes, register every
+identity schema, and publish the generated contract/digest for all clients.
+
+**Acceptance criteria:**
+
+- [ ] Every public identity route documents success, validation, authentication,
+      authorization, throttling, and generic token/error responses.
+- [ ] Invitation and password-reset credentials are accepted only in POST bodies; no
+      contract puts a raw credential in a query/path/header intended for logging.
+- [ ] The committed OpenAPI artifact is deterministic and lockable by exact digest.
+
+**Verification:**
+
+- [ ] Run contract tests, `api:check`, migration/integration suites, coverage, lint,
+      typecheck, build, audit policy, and `git diff --check`.
+- [ ] Inspect the artifact and generated examples for secret/PII leakage.
+
+**Dependencies:** Checkpoint I2
+
+**Files likely touched:** identity schemas/router, OpenAPI registry/artifact, focused
+contract test
+
+**Estimated scope:** Medium
+
+### IA-14: Implement Public Web identity flows
+
+**Description:** Add login, invitation acceptance, reset, session restore/logout, and
+restricted/full presentation using memory-only access credentials.
+
+**Acceptance criteria:**
+
+- [ ] The invitation page reads the fragment, removes it from visible URL/history,
+      submits it once, and never places it in Web Storage or telemetry.
+- [ ] Refresh relies on the HttpOnly cookie; access state is memory-only and clears on
+      logout/auth failure.
+- [ ] Restricted/full UI is presentation only and handles backend denial/stale state.
+
+**Verification:**
+
+- [ ] Browser/component tests cover fragment removal, new/existing-account acceptance,
+      reset, restore, rotation, logout, denied capabilities, and storage inspection.
+- [ ] Run immutable API check, lint, typecheck, coverage, build, and audit.
+
+**Dependencies:** IA-13
+
+**Files likely touched:** one auth route group, identity feature store/client, focused
+browser/component tests; split before work if over five human-authored files
+
+**Estimated scope:** Medium
+
+### IA-15: Implement Management Web identity flows
+
+**Description:** Add Manager/Staff login, reset, restore/logout, and presentation
+guards while leaving every authorization decision to the backend.
+
+**Acceptance criteria:**
+
+- [ ] Access credentials remain memory-only and refresh uses the approved HttpOnly
+      cookie/Origin flow.
+- [ ] Manager/Staff navigation derives from `/auth/me` and cannot manufacture roles or
+      override a backend denial.
+- [ ] Logout and revoked/expired sessions clear local presentation state.
+
+**Verification:**
+
+- [ ] Browser/component tests cover restore, role-specific presentation, forged local
+      state, backend 403/404, reset, and logout.
+- [ ] Run immutable API check, lint, typecheck, coverage, build, and audit.
+
+**Dependencies:** IA-13
+
+**Files likely touched:** auth route group, identity feature store/client, focused tests;
+split before work if over five human-authored files
+
+**Estimated scope:** Medium
+
+### IA-16: Implement Android secure session flows
+
+**Description:** Add Couple login/reset, process restoration, refresh rotation, and
+logout using Expo SecureStore for refresh credentials only.
+
+**Acceptance criteria:**
+
+- [ ] Refresh credentials use SecureStore and rotated values replace prior values
+      atomically; access credentials stay in memory.
+- [ ] AsyncStorage, route params, logs, analytics, and error reports never receive an
+      auth credential.
+- [ ] Restore failure, expiry, replay response, and logout remove secure state.
+
+**Verification:**
+
+- [ ] Tests cover secure persistence, process restore, rotation replacement, failure
+      cleanup, reset, logout, and an explicit no-AsyncStorage assertion.
+- [ ] Run `expo-doctor`, immutable API check, lint, typecheck, coverage, Android export,
+      and audit policy.
+
+**Dependencies:** IA-13
+
+**Files likely touched:** auth routes, identity store/client, SecureStore adapter,
+focused tests; split before work if over five human-authored files
+
+**Estimated scope:** Medium
+
+### IA-17: Run and record identity-access acceptance audit
+
+**Description:** Execute all repository gates and collect evidence for the approved
+spec before opening the next module gate.
+
+**Acceptance criteria:**
+
+- [ ] ACC-002 through ACC-007 each have passing automated evidence and exact file/test
+      references.
+- [ ] D1–D7, I1, and I2 decisions match runtime behavior; all four working trees contain
+      only intended artifacts and no credentials/unauthorized PII.
+- [ ] Identity-access is ready for project-owner review; SPEC-02 remains blocked until
+      implementation approval.
+
+**Verification:**
+
+- [ ] Run clean installs and every owning repository quality/contract/build/audit gate,
+      backend clean migration plus PostgreSQL concurrency suites, and Expo Doctor.
+- [ ] Review cross-repository diffs, generated contract digests, dependency audits,
+      secret scan, logs/audit samples, and retention jobs/queries.
+- [ ] Save `tasks/evidence/identity-access.md` and run Prettier plus `git diff --check`.
+
+**Dependencies:** IA-14, IA-15, IA-16
+
+**Files likely touched:** `tasks/evidence/identity-access.md`, `tasks/todo.md`
+
+**Estimated scope:** Medium
+
+#### Checkpoint I3 — Identity implementation approved
+
+- [ ] Project owner approves the completed identity-access implementation and evidence.
+- [ ] SPEC-02 may begin only after this checkpoint; no venue-catalog implementation is
+      authorized by identity approval alone.
 
 ### SPEC-02: Specify `venue-catalog`
 

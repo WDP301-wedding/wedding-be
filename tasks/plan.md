@@ -423,3 +423,134 @@ These are planning boundaries, not yet-authorized implementation tasks. The owni
 ## 15. Post-Core Extension Approval Gate
 
 The project owner approved this extension and the SPEC-01 through SPEC-11 sequence on 2026-09-27. The approval authorizes staged specification and planning only. Each module still requires explicit spec/plan approval before its implementation starts.
+
+## 16. Identity-Access Implementation Plan
+
+Status: **Approved by project owner on 2026-10-03**
+
+Specification: [`../SPEC-identity-access.md`](../SPEC-identity-access.md)
+
+Requirement ownership: ACC-002 through ACC-007
+
+This section defines the approved implementation sequence for `identity-access`.
+Checkpoint H1 approved decisions D1 through D7 and authorizes IA-01 through IA-17 in
+their recorded dependency order. Changes covered by the stop conditions still require
+project-owner review.
+
+### 16.1 Decision and dependency graph
+
+```text
+D1-D7 owner approval at H1
+            |
+            v
+IA-01 decision/config lock
+      |                 \
+      v                  v
+IA-02 crypto/config   IA-03 schema/migration
+      \                  /
+       v                v
+       IA-04 accounts/passwords
+                |
+                v
+       IA-05 login/session
+                |
+                v
+       IA-06 rotation/revocation
+                |
+                v
+       IA-07 actor/access ---- Checkpoint I1
+                    |
+          +---------+---------+
+          v         v         v
+     IA-08 HTTP  IA-09 reset  IA-10 invitation lifecycle
+                                  |
+                                  v
+                           IA-11 invitation acceptance
+                                  |
+                                  v
+                           IA-12 promotion/provider ports ---- Checkpoint I2
+                                  |
+            IA-08 + IA-09 -------+
+                                  v
+                           IA-13 publish contract
+                         /          |          \
+                        v           v           v
+                 IA-14 Public   IA-15 Manage   IA-16 Android
+                        \           |           /
+                         v          v          v
+                      IA-17 cross-repository acceptance ---- Checkpoint I3
+```
+
+Backend security and persistence precede every client. After IA-13 fixes the generated
+contract, the three client tasks may proceed in parallel. No client task may implement
+an authorization rule; clients only transport credentials and present the current
+backend result.
+
+### 16.2 Ordered slices
+
+| Task | Deliverable | Repository | Depends on | Focused proof |
+| --- | --- | --- | --- | --- |
+| IA-01 | Record approved D1-D7 values, environment names, cookie/deep-link policy, and operator bootstrap boundary. | `wedding-be` docs/config examples | H1 | Decision table has no unresolved implementation input; secret scan and formatting pass. |
+| IA-02 | Add versioned password/token crypto and auth configuration parsing without an HTTP surface. | `wedding-be` | IA-01 | Unit tests cover scrypt verification, constant-time token comparison, entropy, expiry edges, redaction, and a recorded deployment-runtime cost benchmark. |
+| IA-03 | Add forward-only identity schema/migration and database constraint tests. | `wedding-be` | IA-01 | Empty deploy succeeds; normalized-email and single-winner constraints fail safely under PostgreSQL. |
+| IA-04 | Add account/password repository and service behavior, including bootstrap-only Manager creation and retention eligibility. | `wedding-be` | IA-02, IA-03 | Known/unknown verification is externally indistinguishable; disabled accounts and retention holds fail closed. |
+| IA-05 | Add access/refresh issuance and email/password session creation. | `wedding-be` | IA-04 | Only token hashes persist; account/session state is checked; throttling and audit assertions pass. |
+| IA-06 | Add atomic refresh rotation, replay-family revocation, logout, inventory, and owned-session revocation. | `wedding-be` | IA-05 | Concurrent refresh has one winner and replay revokes the family. |
+| IA-07 | Add authenticated actor middleware plus role and consultation-access readers. | `wedding-be` | IA-06 | Forged roles, stale credentials, disabled accounts, cross-consultation access, and ACC-004 capabilities are denied. |
+| IA-08 | Publish session, current-user, and logout routes through strict Zod/OpenAPI schemas. | `wedding-be` | IA-07 | Contract tests cover Web/Android transport, bounded session pagination, explicit retry semantics, allowed Origin, no-store, stable errors, and no secret echo. |
+| IA-09 | Add enumeration-safe password-reset request/completion and notification intent. | `wedding-be` | IA-04, IA-06 | Reset is single-use, expires, revokes all sessions, and emits no email/token in logs or audit data. |
+| IA-10 | Add explicit invitation issue/reissue/revoke lifecycle and notification intent. | `wedding-be` | IA-03, IA-04 | Exactly one active invitation survives; expiry, reissue limit, idempotency, and audit tests pass. |
+| IA-11 | Add atomic invitation acceptance and restricted Web-session creation. | `wedding-be` | IA-05, IA-10 | Accept/reissue races have one valid outcome; existing/new account paths obey D7; consumed tokens cannot replay. |
+| IA-12 | Add consultation-access provider and idempotent Couple promotion port. | `wedding-be` | IA-07, IA-11 | Concurrent promotion is monotonic, preserves identity, atomically upserts the `COUPLE` role, rejects mismatched payment reuse, and traces ACC-003–007. |
+| IA-13 | Complete reset/invitation routes, generate OpenAPI, and publish the immutable contract artifact. | `wedding-be` | IA-08, IA-09, IA-11, IA-12 | Reset/invitation tokens are POST-body-only; contract, deterministic generation, digest, backend quality, migration, and integration gates pass. |
+| IA-14 | Implement Public Web login, invitation acceptance, reset, memory-only access state, cookie refresh, and restricted/full presentation. | `wedding-web` | IA-13 | Browser tests prove fragment removal, no Web Storage token, session restore/logout, and backend-denial handling. |
+| IA-15 | Implement Management Web login/reset, memory-only access state, cookie refresh, and Manager/Staff presentation guards. | `wedding-manage-web` | IA-13 | Browser tests prove forged UI state grants nothing and session restore/logout behave correctly. |
+| IA-16 | Implement Android login/reset, SecureStore refresh persistence, process restore, rotation, and logout cleanup. | `wedding-app` | IA-13 | Tests prove no AsyncStorage token, secure restore, rotated token replacement, and logout deletion. |
+| IA-17 | Run and record the cross-repository identity-access acceptance audit. | all four | IA-14, IA-15, IA-16 | ACC-002–007 trace, clean installs, repository gates, secret/PII scan, concurrency suite, and owner review evidence are complete. |
+
+Each implementation task is further constrained in `todo.md` to a small file group,
+normally no more than five human-authored files. A task that exceeds that boundary must
+be split before implementation instead of silently growing.
+
+### 16.3 Verification checkpoints
+
+**Checkpoint I1 — Authentication core:** IA-02 through IA-07 must pass unit,
+PostgreSQL integration, concurrency, audit, redaction, lint, typecheck, and coverage
+checks. No HTTP or client work proceeds with a failing credential/session primitive.
+
+**Checkpoint I2 — Identity contracts:** IA-08 through IA-12 must prove every state
+transition, denial, replay, and provider contract before the OpenAPI artifact is fixed.
+The review specifically checks that `booking-lifecycle` and `payments-billing` depend on
+identity-owned ports without a reverse import.
+
+**Checkpoint I3 — Identity implementation approval:** IA-17 records all backend and
+client evidence. The project owner must approve the completed module before SPEC-02 or
+any `venue-catalog` implementation begins.
+
+### 16.4 Risks and controls
+
+| Risk | Control fixed by the draft |
+| --- | --- |
+| Stolen/replayed refresh credential | Opaque hashes, atomic rotation, absolute expiry, immediate family revocation on reuse. |
+| Invitation used as permanent login | Single-use bootstrap, password verification/set, real revocable session, raw token removed from the URL fragment. |
+| Duplicate identity during deposit promotion | Unique normalized account/access records and an idempotent monotonic provider port. |
+| Full access without Couple role | Promotion atomically upserts `COUPLE`; restricted invitation acceptance never does. |
+| Client-side role or access forgery | Actor and scoped access are rebuilt from current PostgreSQL state on every protected request. |
+| Enumeration and credential stuffing | Generic outcomes, bounded per-IP/email throttling, no permanent attacker-triggered lockout. |
+| PII or credential leakage | Allowlisted audit/metrics, core redaction tests, no browser durable storage, hash-only persistence. |
+| Cross-repository contract drift | Backend-first OpenAPI generation plus immutable digest checks in all three clients. |
+| Overlarge identity change | Small ordered slices and mandatory I1/I2/I3 review points. |
+
+### 16.5 Parallelization and stop conditions
+
+- IA-02 and IA-03 may run in parallel after IA-01 because neither consumes the other's
+  implementation.
+- IA-09 may begin after account and session revocation contracts are fixed; it does not
+  need invitation code.
+- IA-14, IA-15, and IA-16 may run in parallel only after IA-13 publishes the exact
+  immutable OpenAPI artifact.
+- Stop and return to H1 if a task needs a different auth provider, token transport,
+  password policy, role model, cookie/CORS policy, retention period, external store, or
+  new PII field.
+- Stop and split a task if its reviewed human-authored file group exceeds the stated
+  small-slice boundary or combines schema, HTTP, and multi-client behavior in one step.
