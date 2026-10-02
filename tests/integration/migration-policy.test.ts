@@ -11,7 +11,7 @@ import { Client } from 'pg';
 import { describe, expect, it } from 'vitest';
 
 const execFileAsync = promisify(execFile);
-const migrationDatabaseUrl = process.env.MIGRATION_DATABASE_URL?.trim();
+const migrationDatabaseUrl = process.env.TEST_MIGRATION_DATABASE_URL?.trim();
 const describeWithMigrationDatabase =
   migrationDatabaseUrl === undefined || migrationDatabaseUrl === '' ? describe.skip : describe;
 

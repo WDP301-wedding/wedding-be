@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["partialIndexes"]
 }
 
 datasource db {
@@ -17,6 +18,50 @@ enum IdempotencyStatus {
   IN_PROGRESS
   SUCCEEDED
   FAILED
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  DISABLED
+}
+
+enum AccountRoleType {
+  MANAGER
+  STAFF
+  COUPLE
+}
+
+enum ConsultationAccessLevel {
+  RESTRICTED
+  FULL
+}
+
+enum WorkspaceInvitationStatus {
+  ACTIVE
+  ACCEPTED
+  REVOKED
+  SUPERSEDED
+  EXPIRED
+}
+
+enum SessionClientKind {
+  WEB
+  ANDROID
+}
+
+enum SessionStatus {
+  ACTIVE
+  REVOKED
+  EXPIRED
+  COMPROMISED
+}
+
+enum CredentialStatus {
+  ACTIVE
+  CONSUMED
+  REVOKED
+  EXPIRED
 }
 
 model AuditLog {
@@ -55,4 +100,179 @@ model IdempotencyRecord {
   @@index([status, lockedAt])
   @@index([expiresAt])
   @@index([resourceType, resourceId])
+}
+
+model Account {
+  id                     String                            @id @default(uuid()) @db.Uuid
+  emailNormalized        String                            @unique
+  displayEmail           String
+  status                 AccountStatus                     @default(ACTIVE)
+  disabledAt             DateTime?                         @db.Timestamptz(6)
+  piiRetentionEligibleAt DateTime?                         @db.Timestamptz(6)
+  piiAnonymizedAt        DateTime?                         @db.Timestamptz(6)
+  legalHoldUntil         DateTime?                         @db.Timestamptz(6)
+  createdAt              DateTime                          @default(now()) @db.Timestamptz(6)
+  updatedAt              DateTime                          @updatedAt @db.Timestamptz(6)
+  passwordCredential     PasswordCredential?
+  roles                  AccountRole[]
+  consultationAccesses   ConsultationAccess[]
+  invitations            WorkspaceInvitation[]             @relation("InvitationAccount")
+  issuedInvitations      WorkspaceInvitation[]             @relation("InvitationIssuer")
+  sessions               Session[]
+  passwordResets         PasswordResetCredential[]
+  retentionFacts         AccountRetentionEligibilityFact[]
+
+  @@index([status])
+  @@index([piiRetentionEligibleAt])
+}
+
+model PasswordCredential {
+  accountId         String   @id @db.Uuid
+  algorithm         String
+  version           Int      @db.SmallInt
+  cost              Int
+  blockSize         Int
+  parallelization   Int
+  keyLengthBytes    Int      @db.SmallInt
+  maxMemoryBytes    Int
+  saltEncoded       String
+  derivedKeyEncoded String
+  createdAt         DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime @updatedAt @db.Timestamptz(6)
+  account           Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+}
+
+model AccountRole {
+  id        String          @id @default(uuid()) @db.Uuid
+  accountId String          @db.Uuid
+  role      AccountRoleType
+  grantedAt DateTime        @default(now()) @db.Timestamptz(6)
+  account   Account         @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, role])
+  @@index([role])
+}
+
+model ConsultationAccess {
+  id              String                  @id @default(uuid()) @db.Uuid
+  accountId       String                  @db.Uuid
+  consultationId  String                  @db.Uuid
+  bookingId       String?                 @unique @db.Uuid
+  level           ConsultationAccessLevel @default(RESTRICTED)
+  promotedAt      DateTime?               @db.Timestamptz(6)
+  sourcePaymentId String?                 @unique @db.Uuid
+  createdAt       DateTime                @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime                @updatedAt @db.Timestamptz(6)
+  account         Account                 @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, consultationId])
+  @@index([consultationId, level])
+}
+
+model WorkspaceInvitation {
+  id                       String                    @id @default(uuid()) @db.Uuid
+  consultationId           String                    @db.Uuid
+  recipientEmailNormalized String
+  resolvedAccountId        String?                   @db.Uuid
+  issuedByAccountId        String                    @db.Uuid
+  sequence                 Int
+  tokenHash                String                    @unique
+  status                   WorkspaceInvitationStatus @default(ACTIVE)
+  expiresAt                DateTime                  @db.Timestamptz(6)
+  acceptedAt               DateTime?                 @db.Timestamptz(6)
+  revokedAt                DateTime?                 @db.Timestamptz(6)
+  supersededAt             DateTime?                 @db.Timestamptz(6)
+  expiredAt                DateTime?                 @db.Timestamptz(6)
+  createdAt                DateTime                  @default(now()) @db.Timestamptz(6)
+  updatedAt                DateTime                  @updatedAt @db.Timestamptz(6)
+  resolvedAccount          Account?                  @relation("InvitationAccount", fields: [resolvedAccountId], references: [id], onDelete: SetNull)
+  issuedByAccount          Account                   @relation("InvitationIssuer", fields: [issuedByAccountId], references: [id], onDelete: Restrict)
+
+  @@unique([consultationId, recipientEmailNormalized, sequence])
+  @@unique([consultationId, recipientEmailNormalized], map: "WorkspaceInvitation_active_consultation_email_key", where: raw("\"status\" = 'ACTIVE'"))
+  @@index([recipientEmailNormalized, createdAt(sort: Desc)])
+  @@index([status, expiresAt])
+}
+
+model Session {
+  id                 String              @id @default(uuid()) @db.Uuid
+  accountId          String              @db.Uuid
+  clientKind         SessionClientKind
+  status             SessionStatus       @default(ACTIVE)
+  refreshFamilyId    String              @unique @db.Uuid
+  idleExpiresAt      DateTime            @db.Timestamptz(6)
+  absoluteExpiresAt  DateTime            @db.Timestamptz(6)
+  lastSeenAt         DateTime            @default(now()) @db.Timestamptz(6)
+  revokedAt          DateTime?           @db.Timestamptz(6)
+  revocationReason   String?
+  createdAt          DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime            @updatedAt @db.Timestamptz(6)
+  account            Account             @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accessCredentials  AccessCredential[]
+  refreshCredentials RefreshCredential[]
+
+  @@index([accountId, status])
+  @@index([status, idleExpiresAt])
+  @@index([status, absoluteExpiresAt])
+}
+
+model AccessCredential {
+  id        String           @id @default(uuid()) @db.Uuid
+  sessionId String           @db.Uuid
+  tokenHash String           @unique
+  status    CredentialStatus @default(ACTIVE)
+  expiresAt DateTime         @db.Timestamptz(6)
+  revokedAt DateTime?        @db.Timestamptz(6)
+  createdAt DateTime         @default(now()) @db.Timestamptz(6)
+  session   Session          @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, status])
+  @@index([status, expiresAt])
+}
+
+model RefreshCredential {
+  id            String             @id @default(uuid()) @db.Uuid
+  sessionId     String             @db.Uuid
+  predecessorId String?            @unique @db.Uuid
+  tokenHash     String             @unique
+  status        CredentialStatus   @default(ACTIVE)
+  expiresAt     DateTime           @db.Timestamptz(6)
+  consumedAt    DateTime?          @db.Timestamptz(6)
+  revokedAt     DateTime?          @db.Timestamptz(6)
+  createdAt     DateTime           @default(now()) @db.Timestamptz(6)
+  session       Session            @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  predecessor   RefreshCredential? @relation("RefreshRotation", fields: [predecessorId], references: [id], onDelete: Restrict)
+  successor     RefreshCredential? @relation("RefreshRotation")
+
+  @@index([sessionId, status])
+  @@index([status, expiresAt])
+}
+
+model PasswordResetCredential {
+  id         String           @id @default(uuid()) @db.Uuid
+  accountId  String           @db.Uuid
+  tokenHash  String           @unique
+  status     CredentialStatus @default(ACTIVE)
+  expiresAt  DateTime         @db.Timestamptz(6)
+  consumedAt DateTime?        @db.Timestamptz(6)
+  revokedAt  DateTime?        @db.Timestamptz(6)
+  expiredAt  DateTime?        @db.Timestamptz(6)
+  createdAt  DateTime         @default(now()) @db.Timestamptz(6)
+  account    Account          @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, status])
+  @@index([status, expiresAt])
+}
+
+model AccountRetentionEligibilityFact {
+  id                     String   @id @default(uuid()) @db.Uuid
+  accountId              String   @db.Uuid
+  consultationId         String   @db.Uuid
+  sourceBusinessRecordId String   @unique @db.Uuid
+  eligibleAfter          DateTime @db.Timestamptz(6)
+  recordedAt             DateTime @default(now()) @db.Timestamptz(6)
+  account                Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, consultationId])
+  @@index([accountId, eligibleAfter])
 }
