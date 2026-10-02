@@ -28,7 +28,8 @@
     "db:migrate:deploy": "prisma migrate deploy --config prisma.config.ts",
     "db:studio": "prisma studio --config prisma.config.ts",
     "api:generate": "tsx scripts/openapi.ts",
-    "api:check": "tsx scripts/openapi.ts --check"
+    "api:check": "tsx scripts/openapi.ts --check",
+    "audit:ci": "tsx scripts/dependency-audit.ts"
   },
   "dependencies": {
     "@google/genai": "2.24.0",
