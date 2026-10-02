@@ -676,15 +676,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] Pull requests and pushes to `main` run Node 24 with `npm ci`.
-- [ ] A disposable PostgreSQL service runs migration and integration suites with test-only credentials.
-- [ ] Failures block the job; no test, audit, or migration gate is marked continue-on-error.
+- [x] Pull requests and pushes to `main` run Node 24 with `npm ci`.
+- [x] A disposable PostgreSQL service runs migration and integration suites with test-only credentials.
+- [x] Failures block the job; no test, audit, or migration gate is marked continue-on-error.
 
 **Verification:**
 
-- [ ] Validate workflow syntax.
-- [ ] Run all workflow commands locally or in an equivalent clean environment.
-- [ ] Confirm artifacts/logs contain no secrets.
+- [x] Validate workflow syntax.
+- [x] Run all workflow commands locally or in an equivalent clean environment.
+- [x] Confirm artifacts/logs contain no secrets.
+
+**Implementation evidence (2026-10-02):** Backend CI now runs two independent, ten-minute GitHub Actions jobs for every pull request and push to `main`, using the committed Node 24 version, `npm ci`, npm caching, read-only repository permissions, and SHA-pinned official checkout/setup actions. The quality job gates formatting, lint, strict typecheck, unit and contract suites, deterministic OpenAPI verification, bounded-worker coverage, production build, and a fail-closed high/critical dependency audit. The audit policy accepts only the two current Prisma 7.10 transitive advisories after exact identity matching and documented reachability, mitigation, owner, and a mandatory 2026-10-16 review date; malformed reports, new advisories, mismatches, and expired exceptions fail the job. The PostgreSQL job uses an isolated PostgreSQL 17 service with test-only credentials, health checks, a clean migration deploy, and the complete integration suite; no production secret or `continue-on-error` is present. Dependabot separately tracks npm and GitHub Actions weekly. Prettier parsed both YAML files, the CI contract suite passes 13 tests, a clean `npm ci` and Prisma generation succeed, and format, ESLint, typecheck, OpenAPI, build, and the real audit gate pass. Unit tests pass 286/286; a clean no-`.env` coverage run passes 329 tests with 13 database tests intentionally skipped at 97.54% line and 93.83% branch coverage. Against a disposable local PostgreSQL 17 container, the initial migration applies from empty and all 43 integration tests pass; the container was then stopped and removed. No artifact upload is configured, and the inspected output contains no credential value beyond the explicitly non-secret disposable test account.
 
 **Dependencies:** CP-13 through CP-23  
 **Files likely touched:** `wedding-be/.github/workflows/ci.yml`, `wedding-be/.github/dependabot.yml`, `wedding-be/package.json`  
