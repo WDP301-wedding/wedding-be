@@ -941,21 +941,21 @@ invitation, session/token, and password-reset records with database-enforced win
 - [x] Normalized email, role, consultation access, invitation activity, refresh
       rotation, and promotion source invariants are represented by constraints/indexes.
 - [x] Raw credentials cannot be represented in a persistence column.
-- [ ] The migration is forward-only and deploys cleanly to an empty PostgreSQL database.
+- [x] The migration is forward-only and deploys cleanly to an empty PostgreSQL database.
 
 **Verification:**
 
 - [x] Constraint-focused integration tests cover duplicate normalized email, active
       invitation, refresh successor, and payment-source conflicts.
-- [ ] Run Prisma validation/generation and clean `db:migrate:deploy`.
+- [x] Run Prisma validation/generation and clean `db:migrate:deploy`.
 
 **Implementation evidence (2026-10-03):** Commit `706a567` adds the Prisma models,
 transactional forward migration, and conflict-focused disposable-database integration
-test. Prisma validate/generate, typecheck, lint, build, formatting, and a clean migration
-application under PostgreSQL-compatible PGlite pass. The exact PostgreSQL
-`db:migrate:deploy` gate remains open because this host has no disposable PostgreSQL and
-the configured shared Supabase database was deliberately not mutated; CI must provide
-`TEST_MIGRATION_DATABASE_URL` to complete it.
+test. Prisma validate/generate, typecheck, lint, build, and formatting pass. The exact
+`npm run db:migrate:deploy` command applied both committed migrations to an empty,
+loopback-only disposable PostgreSQL 17 database, and all 44 integration tests passed,
+including the migration-policy and identity constraint suites. The configured shared
+Supabase database was not changed.
 
 **Dependencies:** IA-01
 
