@@ -1,6 +1,7 @@
 # Task List: Wedding Management System
 
 Core-platform task list status: Approved by project owner on 2026-09-24<br>
+Core-platform implementation status: Approved by project owner on 2026-10-03<br>
 Post-core specification sequence status: Approved by project owner on 2026-09-27<br>
 Plan: [`plan.md`](./plan.md)<br>
 Platform specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)<br>
@@ -716,8 +717,10 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 #### Checkpoint G1 — Backend and Public Web CI
 
-- [ ] Both workflows contain every required gate and use no production secrets.
-- [ ] Expected runtime is under 10 minutes or an optimization note is recorded.
+- [x] Both workflows contain every required gate and use no production secrets.
+- [x] Expected runtime is under 10 minutes or an optimization note is recorded.
+
+**Checkpoint evidence (2026-10-02):** Backend CI gates formatting, lint, strict typecheck, unit tests, contract tests, deterministic OpenAPI verification, coverage, production build, dependency audit, clean PostgreSQL migration deployment, and the integration suite across two independent fail-closed jobs. Public Web CI gates formatting, lint, strict typecheck, immutable contract download and digest/schema verification, coverage, production build, and high-severity dependency audit in one fail-closed job. Neither workflow uses a production credential; backend CI uses only disposable PostgreSQL service values, while Public Web's sole secret reference is the optional fine-grained read-only `BACKEND_CONTRACT_READ_TOKEN` used to fetch the exact locked private artifact. Both workflows use npm caching, cancellation of superseded runs, bounded coverage workers, and a hard ten-minute timeout per job. Fresh local verification completed the backend post-install quality chain in approximately 2 minutes 47 seconds and the Public Web chain in approximately 2 minutes 10 seconds. Backend's CI-equivalent coverage run passed 329 tests with 13 database tests intentionally delegated to the PostgreSQL job at 97.54% line and 93.83% branch coverage; Public Web passed all 16 tests at 95.58% line and 90.9% branch coverage. Both production builds and dependency-audit gates passed.
 
 ### CP-29: Add Management Web CI and immutable contract verification
 
@@ -765,9 +768,11 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 #### Checkpoint G2 — All repository CI
 
-- [ ] Four independent CI workflows pass from clean installs.
-- [ ] No gate is skipped or configured as non-blocking.
-- [ ] Dependency update automation is weekly and bounded.
+- [x] Four independent CI workflows pass from clean installs.
+- [x] No gate is skipped or configured as non-blocking.
+- [x] Dependency update automation is weekly and bounded.
+
+**CP-32 re-audit update (2026-10-03):** The npm registry now propagates the same reviewed `GHSA-86w9-cpqp-85rv` root through 28 Expo audit package nodes instead of the four nodes recorded above. The Expo policy was hardened to resolve every high-severity path to its root advisory and separately bind the exception to exactly one `node-forge@1.4.0` lockfile entry and its two reviewed direct dependents. It rejects malformed or cyclic-only graphs, new advisory roots, direct app use, new dependents, range/version drift, every critical finding, and the existing 2026-10-16 expiry. Thirteen policy tests and the real audit pass; the review date and no-EAS/no-runtime reachability decision are unchanged.
 
 ### CP-31: Document the four-repository developer workflow
 
@@ -775,15 +780,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] A new developer can identify which repository owns each responsibility and start each project without tribal knowledge.
-- [ ] Documentation distinguishes runtime versus migration database URLs and immutable OpenAPI artifact flow.
-- [ ] Secret handling, fake-provider testing, Android/EAS boundary, and common troubleshooting are explicit.
+- [x] A new developer can identify which repository owns each responsibility and start each project without tribal knowledge.
+- [x] Documentation distinguishes runtime versus migration database URLs and immutable OpenAPI artifact flow.
+- [x] Secret handling, fake-provider testing, Android/EAS boundary, and common troubleshooting are explicit.
 
 **Verification:**
 
-- [ ] Follow each README from a clean checkout using placeholder/test configuration.
-- [ ] Check every documented command against `package.json`.
-- [ ] Confirm no example contains a real credential or usable production identifier.
+- [x] Follow each README from a clean checkout using placeholder/test configuration.
+- [x] Check every documented command against `package.json`.
+- [x] Confirm no example contains a real credential or usable production identifier.
+
+**Implementation evidence (2026-10-02):** Each repository now has a repository-specific README, while `wedding-be/docs/cross-repo-development.md` is the shared onboarding source for ownership, sibling checkout layout, startup order, public versus backend-only configuration, the runtime/migration PostgreSQL split, forward-only migrations, exact-commit and SHA-256-pinned OpenAPI distribution, offline fake-provider tests, quality gates, Android emulator networking, the local-export/EAS-cloud boundary, and common failures. All four lockfile installs completed with `npm ci`. With only local placeholder/offline configuration, backend liveness and readiness returned HTTP 200, both Next.js home pages returned HTTP 200 on their documented ports, and Expo Metro reached its ready state on port 8081 without EAS credentials. An automated comparison found every documented `npm run` target in an owning `package.json`; a credential-pattern and URL inventory found only localhost/emulator and repository documentation URLs, with no credential-like literal. Formatting passes in all repositories. Backend lint, typecheck, deterministic OpenAPI check, 286 unit tests, 13 contract tests, build, and dependency-audit policy pass; PostgreSQL integration tests remain explicitly dependent on usable runtime and migration URLs. Public and management web each pass lint, typecheck, locked-contract verification, all 16 tests, production build, and high-severity audit. Expo passes `expo-doctor` 21/21, lint, typecheck, locked-contract verification, all 11 tests, and Android JavaScript export. The live Expo dependency audit currently fails closed because the registry now reports the existing `node-forge` advisory through additional package paths not covered by CP-30's exact exception; CP-31 does not broaden that security exception.
 
 **Dependencies:** CP-24 through CP-30  
 **Files likely touched:** `wedding-be/README.md`, `wedding-be/docs/cross-repo-development.md`, `wedding-web/README.md`, `wedding-manage-web/README.md`, `wedding-app/README.md`  
@@ -795,15 +802,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] Every success criterion in `SPEC-core-platform.md` has command/test/file evidence or an owner-approved external-input deferral.
-- [ ] All four working trees contain only intended source/config/generated artifacts and no secrets/build outputs.
-- [ ] The capability is ready for project-owner review before beginning `identity-access`.
+- [x] Every success criterion in `SPEC-core-platform.md` has command/test/file evidence or an owner-approved external-input deferral.
+- [x] All four working trees contain only intended source/config/generated artifacts and no secrets/build outputs.
+- [x] The capability is ready for project-owner review before beginning `identity-access`.
 
 **Verification:**
 
-- [ ] Run every command in the plan's Verification Model in its owning repository.
-- [ ] Review dependency-audit findings for reachability and document any time-bounded exception.
-- [ ] Review cross-repository diffs and contract digests, then save the evidence report.
+- [x] Run every command in the plan's Verification Model in its owning repository.
+- [x] Review dependency-audit findings for reachability and document any time-bounded exception.
+- [x] Review cross-repository diffs and contract digests, then save the evidence report.
+
+**Implementation evidence (2026-10-03):** [`evidence/core-platform.md`](./evidence/core-platform.md) maps all 12 success criteria, records four clean installs and every repository gate, reviews the bounded backend and Expo dependency exceptions, verifies the shared OpenAPI digest, and inventories the intended working-tree artifacts. The exact `npm run db:migrate:deploy` command applied the committed migration successfully to an empty disposable local PostgreSQL 17 database; the `wedding-cp32-postgres` container was removed afterward, and the configured shared Supabase database was not changed. All other format, lint, typecheck, test, coverage, build/export, contract, integration, audit-policy, and Expo Doctor gates pass. CP-32 completed the technical acceptance audit; the subsequent project-owner approval is recorded in Checkpoint G3 below.
 
 **Dependencies:** CP-27, CP-28, CP-29, CP-30, CP-31  
 **Files likely touched:** `wedding-be/tasks/evidence/core-platform.md`, `wedding-be/tasks/todo.md`  
@@ -811,9 +820,11 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 #### Checkpoint G3 — Capability complete
 
-- [ ] All 32 tasks and all checkpoints are complete.
-- [ ] Project owner reviews the evidence and approves `core-platform` implementation.
-- [ ] No work on `identity-access` starts before that approval.
+- [x] All 32 tasks and all checkpoints are complete.
+- [x] Project owner reviews the evidence and approves `core-platform` implementation.
+- [x] No work on `identity-access` starts before that approval.
+
+**Approval evidence (2026-10-03):** The project owner reviewed the CP-32 acceptance result and explicitly approved `core-platform` implementation in the project conversation. Checkpoint G3 is complete. The approval opens the Phase H `identity-access` specification and detailed-planning gate; it does not approve `identity-access` implementation before that module's own spec, task plan, and human approval are complete.
 
 ## Phase H — Post-Core Module Specification and Planning Gates
 
