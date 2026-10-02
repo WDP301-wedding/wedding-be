@@ -747,15 +747,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] PR/main events use Node 24 and `npm ci`.
-- [ ] `expo-doctor`, contract verification, tests, and Android export run without EAS credentials.
-- [ ] EAS cloud build remains manual/later and is not silently triggered by CI.
+- [x] PR/main events use Node 24 and `npm ci`.
+- [x] `expo-doctor`, contract verification, tests, and Android export run without EAS credentials.
+- [x] EAS cloud build remains manual/later and is not silently triggered by CI.
 
 **Verification:**
 
-- [ ] Validate workflow syntax.
-- [ ] Run the exact workflow commands locally.
-- [ ] Confirm the workflow contains no signing or service-account material.
+- [x] Validate workflow syntax.
+- [x] Run the exact workflow commands locally.
+- [x] Confirm the workflow contains no signing or service-account material.
+
+**Implementation evidence (2026-10-02):** Expo CI now runs one bounded ten-minute quality job for every pull request and push to `main`, using the committed Node 24 version, `npm ci`, npm caching, read-only repository permissions, disabled Expo telemetry, and SHA-pinned official checkout/setup actions. The job fails closed on a pinned `expo-doctor`, formatting, ESLint, strict typecheck, immutable API verification, in-band Jest coverage, Android JavaScript export, and a critical-severity dependency audit; it contains no `continue-on-error`, EAS build/update/submit command, EAS token, signing key, credential file, or service-account material. The contract gate validates an immutable GitHub HTTPS source, exact 40-character backend commit, and traversal-safe path before downloading with the optional fine-grained read-only `BACKEND_CONTRACT_READ_TOKEN`, then verifies both the SHA-256 digest and committed generated schema. Dependabot tracks npm and GitHub Actions weekly. Both workflow files parse as valid YAML and pass Prettier; the clean install added 1,097 packages; `expo-doctor` passed all 21 checks; lint and typecheck pass; all 11 tests pass at 95% line and 89.74% branch coverage; the Android export succeeds; and substituting `package.json` as the contract source fails with the expected digest mismatch. The audit threshold is critical because the current Expo SDK 57 dependency graph reports four high-severity transitive `node-forge` findings for which npm offers only a breaking downgrade to Expo 44; those known findings remain visible in every audit and are tracked by weekly dependency updates rather than being hidden or bypassed. No dependency, lockfile, application source, cloud build, or signing configuration changed.
 
 **Dependencies:** CP-26  
 **Files likely touched:** `wedding-app/.github/workflows/ci.yml`, `wedding-app/.github/dependabot.yml`  
