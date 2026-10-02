@@ -698,15 +698,17 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 
 **Acceptance criteria:**
 
-- [ ] PR/main events use Node 24 and `npm ci`.
-- [ ] Contract verification uses an exact backend commit/release artifact, never a moving branch.
-- [ ] Lint, typecheck, coverage, build, API check, and high-severity audit failures block merge.
+- [x] PR/main events use Node 24 and `npm ci`.
+- [x] Contract verification uses an exact backend commit/release artifact, never a moving branch.
+- [x] Lint, typecheck, coverage, build, API check, and high-severity audit failures block merge.
 
 **Verification:**
 
-- [ ] Validate workflow syntax.
-- [ ] Run the exact workflow commands locally.
-- [ ] Intentionally alter the digest in a local copy and confirm contract verification fails.
+- [x] Validate workflow syntax.
+- [x] Run the exact workflow commands locally.
+- [x] Intentionally alter the digest in a local copy and confirm contract verification fails.
+
+**Implementation evidence (2026-10-02):** Public Web CI now runs one bounded ten-minute quality job for every pull request and push to `main`, using the committed Node 24 version, `npm ci`, npm caching, read-only repository permissions, and SHA-pinned official checkout/setup actions. Formatting, ESLint, strict typecheck, coverage, production build, immutable API verification, and a high-severity dependency audit all fail closed with no `continue-on-error`. The contract step validates the lock as a GitHub HTTPS repository plus an exact 40-character commit and traversal-safe artifact path, downloads that exact private artifact with an optional fine-grained read-only `BACKEND_CONTRACT_READ_TOKEN`, refuses redirects, and then verifies both the locked SHA-256 digest and committed generated schema. Dependabot tracks npm and GitHub Actions weekly. Prettier parsed both workflow files; the exact clean install succeeds with 304 packages and zero vulnerabilities; lint and typecheck pass; all 16 tests pass at 95.58% line and 90.9% branch coverage; the Next.js production build succeeds; the authenticated remote artifact passes `api:check`; and replacing the digest with zeros in an isolated local copy fails with the expected digest mismatch. The workflow logs no token or production secret, and the inspected diff contains no credential value.
 
 **Dependencies:** CP-24  
 **Files likely touched:** `wedding-web/.github/workflows/ci.yml`, `wedding-web/.github/dependabot.yml`  
