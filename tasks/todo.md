@@ -871,19 +871,24 @@ safe examples, and an explicit first-Manager bootstrap procedure before runtime 
 
 **Acceptance criteria:**
 
-- [ ] Credential lifetimes, exact `__Host-` cookie flags/name/path, password cost, auth
+- [x] Credential lifetimes, exact `__Host-` cookie flags/name/path, password cost, auth
       throttles, trusted-proxy policy, invitation limits, and retention values have one
       documented source of truth.
-- [ ] Development/test defaults are safe; staging/production fail fast on missing
+- [x] Development/test defaults are safe; staging/production fail fast on missing
       security inputs and never accept placeholder secrets.
-- [ ] Manager bootstrap is an operator-only procedure with no public registration or
+- [x] Manager bootstrap is an operator-only procedure with no public registration or
       generic role-assignment endpoint.
 
 **Verification:**
 
-- [ ] Configuration tests reject malformed, unsafe, and missing production values,
+- [x] Configuration tests reject malformed, unsafe, and missing production values,
       including proxy configurations that would trust attacker-supplied forwarded IPs.
-- [ ] Secret-pattern scan and Prettier pass on the focused files.
+- [x] Secret-pattern scan and Prettier pass on the focused files.
+
+**Implementation evidence (2026-10-03):** Commit `115fe86` adds the immutable typed
+policy, exact cookie contract, allowlisted production inputs, proxy policy tests, safe
+examples, and the operator-only Manager bootstrap procedure. The focused 98-test suite,
+typecheck, lint, Prettier, diff check, and secret-pattern scan pass.
 
 **Dependencies:** Checkpoint H1
 
@@ -899,19 +904,25 @@ opaque credential generation/hashing without persistence or HTTP concerns.
 
 **Acceptance criteria:**
 
-- [ ] Password verifiers record algorithm/version/parameters and support safe future
+- [x] Password verifiers record algorithm/version/parameters and support safe future
       rehash decisions; passwords outside the approved byte/character limits fail.
-- [ ] Access, refresh, invitation, and reset credentials use purpose-separated random
+- [x] Access, refresh, invitation, and reset credentials use purpose-separated random
       values and only deterministic hashes leave the primitive boundary.
-- [ ] Secret values never appear in error text, structured logs, or test snapshots.
+- [x] Secret values never appear in error text, structured logs, or test snapshots.
 
 **Verification:**
 
-- [ ] Unit tests cover correct/incorrect/malformed passwords, constant-time hash
+- [x] Unit tests cover correct/incorrect/malformed passwords, constant-time hash
       comparison, token uniqueness, purpose separation, and exact expiry boundaries.
-- [ ] Benchmark the proposed scrypt parameters on the deployment runtime and record
+- [x] Benchmark the proposed scrypt parameters on the deployment runtime and record
       memory/latency evidence before accepting the credential primitive.
-- [ ] Run focused unit tests, lint, typecheck, and the redaction test suite.
+- [x] Run focused unit tests, lint, typecheck, and the redaction test suite.
+
+**Implementation evidence (2026-10-03):** Commit `02355fa` adds Node scrypt verifier
+versioning/rehash decisions and purpose-separated opaque-token primitives. All 26 focused
+tests pass. A boundary-condition mutation is caught. The approved production parameters
+measured 388/346/317 ms (350 ms mean) on this Node 24 development host; memory and
+deployment sizing evidence is recorded in `docs/identity-access-operations.md`.
 
 **Dependencies:** IA-01
 
@@ -927,16 +938,24 @@ invitation, session/token, and password-reset records with database-enforced win
 
 **Acceptance criteria:**
 
-- [ ] Normalized email, role, consultation access, invitation activity, refresh
+- [x] Normalized email, role, consultation access, invitation activity, refresh
       rotation, and promotion source invariants are represented by constraints/indexes.
-- [ ] Raw credentials cannot be represented in a persistence column.
+- [x] Raw credentials cannot be represented in a persistence column.
 - [ ] The migration is forward-only and deploys cleanly to an empty PostgreSQL database.
 
 **Verification:**
 
-- [ ] Constraint-focused integration tests cover duplicate normalized email, active
+- [x] Constraint-focused integration tests cover duplicate normalized email, active
       invitation, refresh successor, and payment-source conflicts.
 - [ ] Run Prisma validation/generation and clean `db:migrate:deploy`.
+
+**Implementation evidence (2026-10-03):** Commit `706a567` adds the Prisma models,
+transactional forward migration, and conflict-focused disposable-database integration
+test. Prisma validate/generate, typecheck, lint, build, formatting, and a clean migration
+application under PostgreSQL-compatible PGlite pass. The exact PostgreSQL
+`db:migrate:deploy` gate remains open because this host has no disposable PostgreSQL and
+the configured shared Supabase database was deliberately not mutated; CI must provide
+`TEST_MIGRATION_DATABASE_URL` to complete it.
 
 **Dependencies:** IA-01
 
