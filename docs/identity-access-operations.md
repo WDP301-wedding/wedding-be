@@ -52,6 +52,32 @@ Routine Manager or Staff lifecycle changes must use explicit privileged workflow
 events. Customer invitation acceptance may add only the `COUPLE` role scoped through consultation
 access and can never grant `MANAGER` or `STAFF`.
 
+## Identity retention execution
+
+The identity retention command is operator-only and has no HTTP route. It processes one bounded
+batch, rechecks D6 eligibility in PostgreSQL, anonymizes due disabled-account PII, revokes remaining
+authentication material, and deletes terminal invitation, password-reset, and session metadata
+after 180, 30, and 90 days respectively.
+
+Before every run, confirm `DATABASE_URL` names the intended database and, when applicable, schema.
+Then run:
+
+```powershell
+npm run retention:identity -- --confirm-retention --batch-size=100
+```
+
+The command refuses to run without `--confirm-retention`, accepts only batch sizes from 1 to 1,000,
+and emits counts without account identifiers, email addresses, or credentials. Re-run until all
+counts are zero. The operation is idempotent and concurrent workers use PostgreSQL row locks with
+`SKIP LOCKED`, so one account is anonymized at most once. Never point a development retention run
+at the shared Supabase `public` schema.
+
+An anonymized account retains its UUID only as a pseudonymous business/audit reference. Its login
+and display emails move to the reserved `identity.invalid` domain, its password verifier is deleted,
+active sessions and one-time credentials are revoked, invitation recipient email is scrubbed, and
+`piiAnonymizedAt` records completion. Legal/financial holds and missing terminality facts fail
+closed.
+
 ## Scrypt benchmark evidence
 
 On 2026-10-03, the approved parameters were measured on the Windows development host under Node

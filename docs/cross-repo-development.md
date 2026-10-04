@@ -125,3 +125,40 @@ Run commands from the owning repository.
 | Prisma migration cannot connect               | Ensure `MIGRATION_DATABASE_URL` is direct/session mode with migration privileges; transaction-pooler URLs are unsupported for Prisma Migrate                     |
 | Web ports collide                             | Start explicitly with `npm run dev -- --port 3000` and `npm run dev -- --port 3002`, then keep backend CORS origins synchronized                                 |
 | EAS prompts for credentials or a project link | Stop unless intentionally performing the manual release-stage cloud build; local development and CI do not need EAS                                              |
+
+## Repeatable local PostgreSQL acceptance database
+
+Identity-access migration and concurrency tests must use a disposable PostgreSQL database, never
+the shared Supabase `public` schema. On Windows, start Docker Desktop and create the same PostgreSQL
+17 class used by CI:
+
+```powershell
+docker run --name wedding-ia17-postgres --rm -d `
+  -e POSTGRES_DB=wedding_ia17 `
+  -e POSTGRES_USER=wedding_ia17 `
+  -e POSTGRES_PASSWORD=wedding_ia17_only `
+  -p 127.0.0.1:55432:5432 `
+  postgres:17
+
+docker exec wedding-ia17-postgres pg_isready -U wedding_ia17 -d wedding_ia17
+
+$env:DATABASE_URL = 'postgresql://wedding_ia17:wedding_ia17_only@127.0.0.1:55432/wedding_ia17'
+$env:MIGRATION_DATABASE_URL = $env:DATABASE_URL
+$env:TEST_MIGRATION_DATABASE_URL = $env:DATABASE_URL
+```
+
+Run migration/integration/coverage gates in that same PowerShell session. Stop the container after
+the audit; `--rm` removes it automatically:
+
+```powershell
+docker stop wedding-ia17-postgres
+```
+
+## Windows Next.js SWC file locks
+
+`npm ci` deletes `node_modules` before reinstalling. If a `next dev` process is active, Windows can
+hold `next-swc.win32-x64-msvc.node` open and cause `npm ci` to fail with `EPERM`. Stop the exact
+Public Web or Management Web dev terminal with `Ctrl+C`, then rerun `npm ci`. If the owner is not
+obvious, use Process Explorer's **Find Handle** search for the SWC filename and stop only the process
+whose command line points at the affected repository. Never use a blanket `taskkill /IM node.exe`
+because it can terminate unrelated Node.js work.
