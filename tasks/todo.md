@@ -1308,7 +1308,7 @@ restricted/full presentation using memory-only access credentials.
 
 - [x] Browser/component tests cover fragment removal, new/existing-account acceptance,
       reset, restore, rotation, logout, denied capabilities, and storage inspection.
-- [ ] Run immutable API check, lint, typecheck, coverage, build, and audit.
+- [x] Run immutable API check, lint, typecheck, coverage, build, and audit.
 
 **Dependencies:** IA-13
 
@@ -1334,7 +1334,7 @@ guards while leaving every authorization decision to the backend.
 
 - [x] Browser/component tests cover restore, role-specific presentation, forged local
       state, backend 403/404, reset, and logout.
-- [ ] Run immutable API check, lint, typecheck, coverage, build, and audit.
+- [x] Run immutable API check, lint, typecheck, coverage, build, and audit.
 
 **Dependencies:** IA-13
 
@@ -1360,7 +1360,7 @@ logout using Expo SecureStore for refresh credentials only.
 
 - [x] Tests cover secure persistence, process restore, rotation replacement, failure
       cleanup, reset, logout, and an explicit no-AsyncStorage assertion.
-- [ ] Run `expo-doctor`, immutable API check, lint, typecheck, coverage, Android export,
+- [x] Run `expo-doctor`, immutable API check, lint, typecheck, coverage, Android export,
       and audit policy.
 
 **Dependencies:** IA-13
