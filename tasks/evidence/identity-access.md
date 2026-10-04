@@ -4,13 +4,15 @@ Audit date: 2026-10-04 (Asia/Saigon)
 
 Scope: `wedding-be`, `wedding-web`, `wedding-manage-web`, and `wedding-app`
 
-Status: **Passed; ready for Checkpoint I3 project-owner review**
+Status: **Passed and approved at Checkpoint I3**
 
 IA-17 was completed without opening SPEC-02. ACC-002 through ACC-007 have current
 automated evidence, D1-D7 match runtime behavior, all repository gates pass, and the
-previous D6, PostgreSQL, and Windows SWC blockers are resolved. Checkpoint I3 remains
-unapproved until the project owner explicitly reviews this evidence; SPEC-02 therefore
-remains blocked.
+previous D6, PostgreSQL, and Windows SWC blockers are resolved. On 2026-10-05 the
+project owner explicitly instructed, “hãy hoàn tất Checkpoint I3,” approving the
+completed implementation and this evidence. SPEC-02 specification/planning may now
+begin; venue-catalog implementation still requires its own approved specification and
+implementation plan.
 
 ## Audit environment and resolved blockers
 
@@ -39,7 +41,7 @@ remains blocked.
 | `npm run format:check` | Pass | Pass | Pass | Pass |
 | `npm run lint` | Pass | Pass | Pass | Pass |
 | `npm run typecheck` | Pass | Pass | Pass | Pass |
-| Full coverage | 566/566 tests; 96.91% lines / 92.55% branches | 23/23; 95.58% / 90.90% | 23/23; 95.58% / 90.90% | 20/20; 97.14% / 92.52% |
+| Full coverage | 566/566 tests; 96.92% lines / 92.50% branches | 23/23; 95.58% / 90.90% | 23/23; 95.58% / 90.90% | 20/20; 97.14% / 92.52% |
 | Production build | Pass | Pass | Pass | Pass, Android export |
 | `npm run audit:ci` | Pass, two documented exceptions | Pass, bounded dev-only advisory | Pass, bounded dev-only advisory | Pass, bounded Expo/build-tool advisories |
 
@@ -87,9 +89,10 @@ Additional results:
   as a pseudonymous business/audit reference, and deletes terminal identity metadata
   after its approved window.
 - D6 workers use PostgreSQL `FOR UPDATE SKIP LOCKED`; the PostgreSQL race test proves
-  one account produces one anonymization and one audit row. Re-runs are idempotent.
+  one account produces one anonymization and one audit row. Account and terminal
+  metadata cleanup are both bounded by `batchSize`; re-runs are idempotent.
 - I1 and I2 concurrency claims were freshly revalidated in the full PostgreSQL run.
-  I3 remains open solely for explicit project-owner approval.
+  The project owner approved I3 on 2026-10-05.
 
 ## Contract, diff, secret, PII, log, and retention review
 
@@ -118,6 +121,7 @@ The three previously recorded blockers are closed:
 3. The exact Next.js processes holding the SWC binaries were stopped and both clean
    installs plus complete frontend gates pass.
 
-IA-17 passes and identity-access is ready for project-owner review. This evidence does
-not self-approve Checkpoint I3: the owner approval checkbox remains open, and SPEC-02
-must not begin until that explicit approval is recorded.
+IA-17 passes and the project owner has approved Checkpoint I3. SPEC-02
+specification/planning may begin. This approval does not authorize venue-catalog
+implementation before SPEC-02 and its detailed implementation plan receive their own
+explicit approval.

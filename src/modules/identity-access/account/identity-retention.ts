@@ -76,6 +76,9 @@ export function createPrismaIdentityRetentionRepository(
   const accountTable = Prisma.raw(`"${schema}"."Account"`);
   const accessTable = Prisma.raw(`"${schema}"."ConsultationAccess"`);
   const retentionFactTable = Prisma.raw(`"${schema}"."AccountRetentionEligibilityFact"`);
+  const invitationTable = Prisma.raw(`"${schema}"."WorkspaceInvitation"`);
+  const passwordResetTable = Prisma.raw(`"${schema}"."PasswordResetCredential"`);
+  const sessionTable = Prisma.raw(`"${schema}"."Session"`);
 
   return {
     runBatch(input) {
@@ -119,45 +122,45 @@ export function createPrismaIdentityRetentionRepository(
           }
         }
 
-        const deletedInvitations = await transaction.workspaceInvitation.deleteMany({
-          where: {
-            OR: [
-              { status: 'ACCEPTED', acceptedAt: { lte: invitationCutoff } },
-              { status: 'REVOKED', revokedAt: { lte: invitationCutoff } },
-              { status: 'SUPERSEDED', supersededAt: { lte: invitationCutoff } },
-              { status: 'EXPIRED', expiredAt: { lte: invitationCutoff } },
-            ],
-          },
-        });
-        const deletedPasswordResets = await transaction.passwordResetCredential.deleteMany({
-          where: {
-            OR: [
-              { status: 'CONSUMED', consumedAt: { lte: passwordResetCutoff } },
-              { status: 'REVOKED', revokedAt: { lte: passwordResetCutoff } },
-              { status: 'EXPIRED', expiredAt: { lte: passwordResetCutoff } },
-            ],
-          },
-        });
-        const deletedSessions = await transaction.session.deleteMany({
-          where: {
-            OR: [
-              { status: { in: ['REVOKED', 'COMPROMISED'] }, revokedAt: { lte: sessionCutoff } },
-              {
-                status: 'EXPIRED',
-                OR: [
-                  { idleExpiresAt: { lte: sessionCutoff } },
-                  { absoluteExpiresAt: { lte: sessionCutoff } },
-                ],
-              },
-            ],
-          },
-        });
+        const deletedInvitations = await deleteTerminalMetadataBatch(
+          transaction,
+          invitationTable,
+          Prisma.sql`
+            ("status" = 'ACCEPTED' AND "acceptedAt" <= ${invitationCutoff})
+            OR ("status" = 'REVOKED' AND "revokedAt" <= ${invitationCutoff})
+            OR ("status" = 'SUPERSEDED' AND "supersededAt" <= ${invitationCutoff})
+            OR ("status" = 'EXPIRED' AND "expiredAt" <= ${invitationCutoff})
+          `,
+          input.batchSize,
+        );
+        const deletedPasswordResets = await deleteTerminalMetadataBatch(
+          transaction,
+          passwordResetTable,
+          Prisma.sql`
+            ("status" = 'CONSUMED' AND "consumedAt" <= ${passwordResetCutoff})
+            OR ("status" = 'REVOKED' AND "revokedAt" <= ${passwordResetCutoff})
+            OR ("status" = 'EXPIRED' AND "expiredAt" <= ${passwordResetCutoff})
+          `,
+          input.batchSize,
+        );
+        const deletedSessions = await deleteTerminalMetadataBatch(
+          transaction,
+          sessionTable,
+          Prisma.sql`
+            ("status" IN ('REVOKED', 'COMPROMISED') AND "revokedAt" <= ${sessionCutoff})
+            OR (
+              "status" = 'EXPIRED'
+              AND ("idleExpiresAt" <= ${sessionCutoff} OR "absoluteExpiresAt" <= ${sessionCutoff})
+            )
+          `,
+          input.batchSize,
+        );
 
         const result = Object.freeze({
           anonymizedAccounts,
-          deletedInvitations: deletedInvitations.count,
-          deletedPasswordResets: deletedPasswordResets.count,
-          deletedSessions: deletedSessions.count,
+          deletedInvitations,
+          deletedPasswordResets,
+          deletedSessions,
         });
         if (
           result.deletedInvitations > 0 ||
@@ -184,6 +187,31 @@ export function createPrismaIdentityRetentionRepository(
       });
     },
   };
+}
+
+async function deleteTerminalMetadataBatch(
+  transaction: Prisma.TransactionClient,
+  table: Prisma.Sql,
+  where: Prisma.Sql,
+  batchSize: number,
+): Promise<number> {
+  const [result] = await transaction.$queryRaw<readonly Readonly<{ count: number }>[]>(Prisma.sql`
+    WITH candidates AS (
+      SELECT "id"
+      FROM ${table}
+      WHERE ${where}
+      ORDER BY "id"
+      FOR UPDATE SKIP LOCKED
+      LIMIT ${batchSize}
+    ), deleted AS (
+      DELETE FROM ${table}
+      WHERE "id" IN (SELECT "id" FROM candidates)
+      RETURNING "id"
+    )
+    SELECT COUNT(*)::integer AS "count"
+    FROM deleted
+  `);
+  return result?.count ?? 0;
 }
 
 async function anonymizeAccount(
