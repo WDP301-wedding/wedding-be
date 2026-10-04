@@ -1377,20 +1377,29 @@ spec before opening the next module gate.
 
 **Acceptance criteria:**
 
-- [ ] ACC-002 through ACC-007 each have passing automated evidence and exact file/test
+- [x] ACC-002 through ACC-007 each have passing automated evidence and exact file/test
       references.
-- [ ] D1–D7, I1, and I2 decisions match runtime behavior; all four working trees contain
+- [x] D1–D7, I1, and I2 decisions match runtime behavior; all four working trees contain
       only intended artifacts and no credentials/unauthorized PII.
-- [ ] Identity-access is ready for project-owner review; SPEC-02 remains blocked until
+- [x] Identity-access is ready for project-owner review; SPEC-02 remains blocked until
       implementation approval.
 
 **Verification:**
 
-- [ ] Run clean installs and every owning repository quality/contract/build/audit gate,
+- [x] Run clean installs and every owning repository quality/contract/build/audit gate,
       backend clean migration plus PostgreSQL concurrency suites, and Expo Doctor.
-- [ ] Review cross-repository diffs, generated contract digests, dependency audits,
+- [x] Review cross-repository diffs, generated contract digests, dependency audits,
       secret scan, logs/audit samples, and retention jobs/queries.
-- [ ] Save `tasks/evidence/identity-access.md` and run Prettier plus `git diff --check`.
+- [x] Save `tasks/evidence/identity-access.md` and run Prettier plus `git diff --check`.
+
+**Audit evidence (2026-10-04):** `tasks/evidence/identity-access.md` records the
+passing cross-repository IA-17 run. A disposable PostgreSQL 17 Docker database proves
+clean migrations, all integration/concurrency cases, and the new idempotent D6
+anonymization executor. Exact Next.js processes holding the Windows SWC binaries were
+stopped; clean installs and every client gate then passed. All four API digests match,
+coverage/build/audit/format gates pass, and the final secret/PII review found only safe
+examples and test fixtures. Identity-access is ready for owner review; Checkpoint I3
+and SPEC-02 remain closed until explicit project-owner approval.
 
 **Dependencies:** IA-14, IA-15, IA-16
 
