@@ -16,6 +16,7 @@ import {
 import type { ReadinessProbe } from './core/http/readiness.js';
 import { createLogger } from './core/logging/logger.js';
 import { getActiveTracingResource } from './core/observability/tracing.js';
+import { createIdentityRuntime } from './modules/identity-access/identity.runtime.js';
 
 type ProcessExitCode = NodeJS.Process['exitCode'];
 type ProcessSignal = 'SIGINT' | 'SIGTERM';
@@ -51,6 +52,8 @@ export interface StartServerOptions {
   readonly createApplication?: (options: CreateAppOptions) => Express;
   readonly createHttpServer?: (requestListener: RequestListener) => Server;
   readonly reportShutdownError?: (error: unknown) => void;
+  readonly registerRoutes?: CreateAppOptions['registerRoutes'];
+  readonly trustedProxyHops?: 0 | 1;
 }
 
 export interface BootstrapDependencies {
@@ -75,6 +78,10 @@ export async function startServer(options: StartServerOptions): Promise<RunningS
     ...(options.securityConfig === undefined ? {} : { securityConfig: options.securityConfig }),
     ...(options.logger === undefined ? {} : { logger: options.logger }),
     ...(options.metricsConfig === undefined ? {} : { metricsConfig: options.metricsConfig }),
+    ...(options.registerRoutes === undefined ? {} : { registerRoutes: options.registerRoutes }),
+    ...(options.trustedProxyHops === undefined
+      ? {}
+      : { trustedProxyHops: options.trustedProxyHops }),
   });
   const httpServer = (options.createHttpServer ?? createServer)(app as RequestListener);
   const lifecycle = createHttpLifecycle({
@@ -258,13 +265,14 @@ async function loadEnvironmentConfig(): Promise<Config> {
   return environmentModule.config;
 }
 
-function startFromConfig(config: Config): Promise<RunningServer> {
+async function startFromConfig(config: Config): Promise<RunningServer> {
   const logger = createLogger({
     level: config.runtime.logLevel,
     runtimeEnvironment: config.runtime.environment,
   });
 
   const tracingResource = getActiveTracingResource();
+  const identityRuntime = await createIdentityRuntime(config);
 
   return startServer({
     corsConfig: config.cors,
@@ -272,9 +280,16 @@ function startFromConfig(config: Config): Promise<RunningServer> {
     logger,
     metricsConfig: config.metrics,
     port: config.runtime.port,
-    ...(tracingResource === undefined ? {} : { resources: [tracingResource] }),
+    resources:
+      tracingResource === undefined
+        ? [identityRuntime.resource]
+        : [tracingResource, identityRuntime.resource],
+    registerRoutes: (app) => {
+      app.use('/api/v1', identityRuntime.router);
+    },
     runtimeEnvironment: config.runtime.environment,
     securityConfig: config.security,
+    trustedProxyHops: config.identityAccess.trustedProxyHops,
   });
 }
 

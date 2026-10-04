@@ -12,11 +12,12 @@ import {
   healthLiveResponseSchema,
   healthReadyResponseSchema,
 } from '../../src/core/http/health.schemas.js';
-import { OPENAPI_ARTIFACT_PATH } from '../../src/core/openapi/artifact.js';
+import { OPENAPI_ARTIFACT_PATH, OPENAPI_DIGEST_PATH } from '../../src/core/openapi/artifact.js';
 import {
   createOpenApiDocument,
   checkOpenApiArtifact,
   serializeOpenApiDocument,
+  sha256,
 } from '../../src/core/openapi/generate.js';
 
 describe('OpenAPI contract', () => {
@@ -72,14 +73,84 @@ describe('OpenAPI contract', () => {
     );
   });
 
+  it('documents the IA-08 Web and Android session transports and retry semantics', () => {
+    const document = createOpenApiDocument();
+    const paths = document.paths ?? {};
+
+    expect(paths).toHaveProperty('/auth/web-sessions.post.responses.201');
+    expect(paths).toHaveProperty('/auth/android-sessions.post.responses.201');
+    expect(paths).toHaveProperty('/auth/web-session-refreshes.post.responses.200');
+    expect(paths).toHaveProperty('/auth/android-session-refreshes.post.responses.200');
+    expect(paths).toHaveProperty('/auth/sessions/current.delete.responses.204');
+    expect(paths).toHaveProperty('/auth/me.get.responses.200');
+    expect(paths).toHaveProperty('/auth/sessions.get.responses.200');
+    expect(paths).toHaveProperty('/auth/sessions/{sessionId}.delete.responses.204');
+    expect(document.components?.parameters?.WebRefreshCookie).toMatchObject({
+      in: 'cookie',
+      name: '__Host-wedding-refresh',
+      required: true,
+    });
+    expect(document.components?.securitySchemes?.bearerAuth).toMatchObject({
+      type: 'http',
+      scheme: 'bearer',
+    });
+    expect(paths['/auth/sessions/current']?.delete?.description).toContain('Idempotent');
+    expect(paths['/auth/web-session-refreshes']?.post?.description).toContain('Unsafe to replay');
+  });
+
+  it('documents IA-13 reset and invitation credentials only in POST request bodies', () => {
+    const document = createOpenApiDocument();
+    const paths = document.paths ?? {};
+
+    expect(paths).toHaveProperty('/auth/password-reset-requests.post.responses.202');
+    expect(paths).toHaveProperty('/auth/password-reset-completions.post.responses.200');
+    expect(paths).toHaveProperty('/workspace-invitation-acceptances.post.responses.201');
+    expect(paths['/auth/password-reset-completions']?.post?.requestBody).toBeDefined();
+    expect(paths['/workspace-invitation-acceptances']?.post?.requestBody).toBeDefined();
+    expect(JSON.stringify(paths)).not.toMatch(
+      /"in":"(?:query|path|header)"[^}]*"name":"(?:resetToken|invitationToken)"/u,
+    );
+  });
+
+  it('publishes the exact SHA-256 digest of the committed immutable artifact', async () => {
+    const [artifact, digest] = await Promise.all([
+      readFile(resolve(OPENAPI_ARTIFACT_PATH), 'utf8'),
+      readFile(resolve(OPENAPI_DIGEST_PATH), 'utf8'),
+    ]);
+
+    expect(digest).toBe(`${sha256(artifact)}\n`);
+  });
+
   it('rejects a committed artifact that has drifted from the registered schemas', async () => {
     const temporaryDirectory = await mkdtemp(join(tmpdir(), 'wedding-openapi-test-'));
     const driftedArtifact = join(temporaryDirectory, 'openapi.json');
 
     try {
-      await writeFile(driftedArtifact, '{}\n', 'utf8');
+      await Promise.all([
+        writeFile(driftedArtifact, '{}\n', 'utf8'),
+        writeFile(`${driftedArtifact}.sha256`, `${'0'.repeat(64)}\n`, 'utf8'),
+      ]);
 
       await expect(checkOpenApiArtifact(driftedArtifact)).rejects.toThrow(
+        'The committed OpenAPI artifact has drifted.',
+      );
+    } finally {
+      await rm(temporaryDirectory, { recursive: true, force: true });
+    }
+  });
+
+  it('rejects a stale digest even when the custom artifact bytes are current', async () => {
+    const temporaryDirectory = await mkdtemp(join(tmpdir(), 'wedding-openapi-digest-test-'));
+    const artifact = join(temporaryDirectory, 'openapi.json');
+    const serialized = serializeOpenApiDocument(createOpenApiDocument());
+
+    try {
+      await Promise.all([
+        writeFile(artifact, serialized, 'utf8'),
+        writeFile(`${artifact}.sha256`, `${'0'.repeat(64)}\n`, 'utf8'),
+      ]);
+
+      await expect(checkOpenApiArtifact(artifact)).rejects.toThrow(
         'The committed OpenAPI artifact has drifted.',
       );
     } finally {

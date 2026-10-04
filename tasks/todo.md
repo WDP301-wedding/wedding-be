@@ -983,20 +983,20 @@ identity-owned retention-eligibility boundary.
 
 **Acceptance criteria:**
 
-- [ ] Email normalization produces one account identity and preserves a separate safe
+- [x] Email normalization produces one account identity and preserves a separate safe
       display value.
-- [ ] Unknown, disabled, and incorrect-password paths are externally
+- [x] Unknown, disabled, and incorrect-password paths are externally
       indistinguishable while internal outcomes remain safely observable.
-- [ ] Public input cannot create a Manager/Staff role, alter account status, or mark an
+- [x] Public input cannot create a Manager/Staff role, alter account status, or mark an
       account retention-eligible; internal eligibility facts are audited and legal or
       financial holds fail closed.
 
 **Verification:**
 
-- [ ] Unit/integration tests cover normalization collisions, all statuses, duplicate
+- [x] Unit/integration tests cover normalization collisions, all statuses, duplicate
       bootstrap, password replacement, role allowlisting, retention due dates, and
       active holds.
-- [ ] Audit assertions contain no email or password material.
+- [x] Audit assertions contain no email or password material.
 
 **Dependencies:** IA-02, IA-03
 
@@ -1011,18 +1011,18 @@ rotating refresh credentials after password authentication.
 
 **Acceptance criteria:**
 
-- [ ] Only hashes persist; each credential is bound to an active account/session,
+- [x] Only hashes persist; each credential is bound to an active account/session,
       client kind, idle expiry, and absolute expiry.
-- [ ] Login throttling applies to the approved IP plus normalized-email key without a
+- [x] Login throttling applies to the approved IP plus normalized-email key without a
       permanent attacker-triggered account lockout; reset, token-consumption, and
       refresh limits use their separately approved buckets.
-- [ ] Raw credentials are returned only once through typed service results.
+- [x] Raw credentials are returned only once through typed service results.
 
 **Verification:**
 
-- [ ] Focused tests cover successful/failed/throttled login, expiry edges, disabled
+- [x] Focused tests cover successful/failed/throttled login, expiry edges, disabled
       accounts, token non-persistence, and audit/redaction behavior.
-- [ ] Run unit, PostgreSQL integration, lint, typecheck, and coverage checks.
+- [x] Run unit, PostgreSQL integration, lint, typecheck, and coverage checks.
 
 **Dependencies:** IA-04
 
@@ -1037,18 +1037,18 @@ inventory, and caller-owned session revocation.
 
 **Acceptance criteria:**
 
-- [ ] A refresh credential has at most one successor and cannot extend the absolute
+- [x] A refresh credential has at most one successor and cannot extend the absolute
       session lifetime.
-- [ ] Reuse of a consumed refresh credential atomically marks the family compromised
+- [x] Reuse of a consumed refresh credential atomically marks the family compromised
       and revokes every successor.
-- [ ] Callers can list/revoke only their own sessions; password/account events can
+- [x] Callers can list/revoke only their own sessions; password/account events can
       revoke all sessions through an internal port.
 
 **Verification:**
 
-- [ ] Real PostgreSQL concurrency tests prove one rotation winner and replay-family
+- [x] Real PostgreSQL concurrency tests prove one rotation winner and replay-family
       revocation; logout/revoke operations are idempotent.
-- [ ] Session output contains no credential hash or sensitive device metadata.
+- [x] Session output contains no credential hash or sensitive device metadata.
 
 **Dependencies:** IA-05
 
@@ -1064,17 +1064,17 @@ and consultation-scoped access checks for later modules.
 
 **Acceptance criteria:**
 
-- [ ] Middleware ignores request-supplied account, role, session, and access-level
+- [x] Middleware ignores request-supplied account, role, session, and access-level
       claims and fails closed on stale/revoked/expired state.
-- [ ] `RESTRICTED` grants only proposal-read/timeline-collaboration capabilities;
+- [x] `RESTRICTED` grants only proposal-read/timeline-collaboration capabilities;
       ACC-004 capabilities require `FULL` plus owning-module resource checks.
-- [ ] Wrong-consultation and concealed-resource paths use the approved 403/404 policy.
+- [x] Wrong-consultation and concealed-resource paths use the approved 403/404 policy.
 
 **Verification:**
 
-- [ ] Exhaustive policy-table tests cover Manager, Staff, restricted, full, disabled,
+- [x] Exhaustive policy-table tests cover Manager, Staff, restricted, full, disabled,
       forged-role, stale-session, and cross-consultation cases.
-- [ ] Mutation-sensitive tests fail if any deny condition is removed or inverted.
+- [x] Mutation-sensitive tests fail if any deny condition is removed or inverted.
 
 **Dependencies:** IA-06, IA-03
 
@@ -1084,9 +1084,23 @@ and consultation-scoped access checks for later modules.
 
 #### Checkpoint I1 — Authentication core verified
 
-- [ ] IA-01 through IA-07 pass focused unit, PostgreSQL concurrency, audit, redaction,
+**Implementation evidence (2026-10-03):** IA-04 through IA-07 services, repositories,
+and focused tests are implemented. A disposable local PostgreSQL 17 container received
+both committed migrations; four schema-isolated migration/account/session suites pass
+8 tests, and the complete PostgreSQL integration suite passes 50 tests in 13 files.
+The 106 focused identity unit tests, lint, typecheck, build, 13 contract tests,
+immutable OpenAPI check, dependency-audit policy, and focused identity coverage pass
+(96.31% lines / 94.60% branches). The full coverage run passes 498 tests and reports
+97.24% lines / 94.33% branches; the two idempotency repository concurrency tests pass
+separately with Vitest's thread pool because the default fork worker exits natively on
+Windows with `0xC0000409`. A manual mutation that inverted the `RESTRICTED`/`FULL`
+policy caused 10 authorization tests to fail and was then reverted. CI now supplies
+`TEST_MIGRATION_DATABASE_URL` from its PostgreSQL 17 service so these suites cannot
+silently skip. No shared Supabase schema was used or changed.
+
+- [x] IA-01 through IA-07 pass focused unit, PostgreSQL concurrency, audit, redaction,
       lint, typecheck, coverage, and migration checks.
-- [ ] Security review confirms no raw credential persistence/logging and no
+- [x] Security review confirms no raw credential persistence/logging and no
       client-asserted authorization state.
 
 ### IA-08: Publish session and current-user HTTP contracts
@@ -1096,19 +1110,19 @@ list, and session revoke routes using the existing error/OpenAPI infrastructure.
 
 **Acceptance criteria:**
 
-- [ ] Web refresh uses only the approved host cookie and allowed Origin; Android
+- [x] Web refresh uses only the approved host cookie and allowed Origin; Android
       refresh uses the request body; access credentials use the authorization header.
-- [ ] Auth responses set `Cache-Control: no-store`, stable enumeration-safe errors,
+- [x] Auth responses set `Cache-Control: no-store`, stable enumeration-safe errors,
       and exact cookie clear/set semantics.
-- [ ] Route handlers only map validated transport values to IA-05–IA-07 services;
+- [x] Route handlers only map validated transport values to IA-05–IA-07 services;
       session inventory is cursor-bounded and every state-changing route documents
       idempotent, retryable, or unsafe-to-retry behavior.
 
 **Verification:**
 
-- [ ] Contract tests cover success, invalid input, auth failure, forbidden ownership,
+- [x] Contract tests cover success, invalid input, auth failure, forbidden ownership,
       throttling, Origin rejection, cookie flags, no-store, and secret non-echo.
-- [ ] OpenAPI generation is deterministic after repeated runs.
+- [x] OpenAPI generation is deterministic after repeated runs.
 
 **Dependencies:** Checkpoint I1
 
@@ -1124,17 +1138,17 @@ single-use hashed credentials.
 
 **Acceptance criteria:**
 
-- [ ] Request responses are identical for unknown, disabled, and eligible accounts
+- [x] Request responses are identical for unknown, disabled, and eligible accounts
       where practical; issuance and completion are separately throttled.
-- [ ] Completion atomically consumes an unexpired token, replaces the password, and
+- [x] Completion atomically consumes an unexpired token, replaces the password, and
       revokes every account session.
-- [ ] The notification port receives the raw token only at the final provider boundary.
+- [x] The notification port receives the raw token only at the final provider boundary.
 
 **Verification:**
 
-- [ ] Tests cover enumeration, expiry, replay, concurrent completion, provider failure,
+- [x] Tests cover enumeration, expiry, replay, concurrent completion, provider failure,
       all-session revocation, audit allowlists, and token redaction.
-- [ ] Focused unit/integration and EmailProvider fake tests pass.
+- [x] Focused unit/integration and EmailProvider fake tests pass.
 
 **Dependencies:** IA-04, IA-06
 
@@ -1150,19 +1164,28 @@ including approved expiry/reissue limits and delivery intent.
 
 **Acceptance criteria:**
 
-- [ ] One active invitation exists per consultation/normalized email; reissue
+- [x] One active invitation exists per consultation/normalized email; reissue
       atomically supersedes it and revocation preserves consultation/audit references.
-- [ ] The provider contract exposes issue, reissue, and revoke as explicit operations;
+- [x] The provider contract exposes issue, reissue, and revoke as explicit operations;
       consumers cannot emulate reissue with a non-atomic revoke-plus-issue sequence.
-- [ ] Reissue limits, idempotency, issuer identity, sequence, and terminal reasons are
+- [x] Reissue limits, idempotency, issuer identity, sequence, and terminal reasons are
       enforced from current database state; raw tokens exist only in the one-time
       return/notification command.
 
 **Verification:**
 
-- [ ] Tests cover issue, duplicate issue, reissue limit, revoke, expiry, provider
+- [x] Tests cover issue, duplicate issue, reissue limit, revoke, expiry, provider
       failure, concurrent issue/reissue, audit data, and token non-persistence.
-- [ ] Provider interface imports no booking implementation.
+- [x] Provider interface imports no booking implementation.
+
+**Implementation evidence (2026-10-03):** IA-08 through IA-10 are implemented with
+strict transport schemas, runtime route composition, deterministic OpenAPI output,
+single-use reset completion, and transactional invitation lifecycle operations. The
+PostgreSQL suites prove reset completion has one concurrent winner, all sessions are
+revoked, invitation issue/reissue preserves exactly one active row, rolling reissue
+limits hold, and audit rows contain no email or credential material. The full suite
+passes 536 tests in 51 files with 97.08% line and 93.54% branch coverage; lint,
+formatting, typecheck, build, OpenAPI drift, dependency-audit, and mutation checks pass.
 
 **Dependencies:** IA-03, IA-04
 
@@ -1178,17 +1201,17 @@ restricted consultation access, and a real Web session.
 
 **Acceptance criteria:**
 
-- [ ] New accounts set a password; existing matching accounts verify their current
+- [x] New accounts set a password; existing matching accounts verify their current
       password and never have it silently replaced.
-- [ ] Account/access/session creation and invitation consumption form one atomic
+- [x] Account/access/session creation and invitation consumption form one atomic
       transition; expired/revoked/superseded/consumed tokens fail generically.
-- [ ] Reaccept cannot create a second account, consultation access, or session.
+- [x] Reaccept cannot create a second account, consultation access, or session.
 
 **Verification:**
 
-- [ ] PostgreSQL tests cover new/existing accounts, mismatch, expiry boundaries,
+- [x] PostgreSQL tests cover new/existing accounts, mismatch, expiry boundaries,
       replay, accept/accept concurrency, and accept/reissue races.
-- [ ] Audit and errors contain no email, password, raw token, or token hash.
+- [x] Audit and errors contain no email, password, raw token, or token hash.
 
 **Dependencies:** IA-05, IA-10
 
@@ -1203,18 +1226,18 @@ and capability modules.
 
 **Acceptance criteria:**
 
-- [ ] Access reads require account plus consultation and return only current
+- [x] Access reads require account plus consultation and return only current
       `RESTRICTED`/`FULL` state.
-- [ ] Promotion accepts evidence identifiers, not a caller-selected level; it is
+- [x] Promotion accepts evidence identifiers, not a caller-selected level; it is
       monotonic, idempotent, preserves account/consultation-access identity, and
       atomically upserts `COUPLE`; restricted acceptance alone never grants that role.
-- [ ] Reusing one payment source for a different account/consultation fails with a
+- [x] Reusing one payment source for a different account/consultation fails with a
       conflict and a safe audit event.
 
 **Verification:**
 
-- [ ] Concurrency tests prove one promotion winner and safe exact replay.
-- [ ] Contract fixtures trace ACC-003–ACC-007 and verify no reverse dependency on
+- [x] Concurrency tests prove one promotion winner and safe exact replay.
+- [x] Contract fixtures trace ACC-003–ACC-007 and verify no reverse dependency on
       `booking-lifecycle` or `payments-billing`.
 
 **Dependencies:** IA-07, IA-11
@@ -1225,9 +1248,9 @@ and capability modules.
 
 #### Checkpoint I2 — Identity state and provider contracts verified
 
-- [ ] IA-08 through IA-12 pass contract, state-transition, expiry, replay,
+- [x] IA-08 through IA-12 pass contract, state-transition, expiry, replay,
       concurrency, audit, and ACC-002–ACC-007 trace reviews.
-- [ ] Provider/API boundaries are frozen before client implementation begins.
+- [x] Provider/API boundaries are frozen before client implementation begins.
 
 ### IA-13: Complete identity routes and publish the immutable OpenAPI contract
 
@@ -1236,17 +1259,30 @@ identity schema, and publish the generated contract/digest for all clients.
 
 **Acceptance criteria:**
 
-- [ ] Every public identity route documents success, validation, authentication,
+- [x] Every public identity route documents success, validation, authentication,
       authorization, throttling, and generic token/error responses.
-- [ ] Invitation and password-reset credentials are accepted only in POST bodies; no
+- [x] Invitation and password-reset credentials are accepted only in POST bodies; no
       contract puts a raw credential in a query/path/header intended for logging.
-- [ ] The committed OpenAPI artifact is deterministic and lockable by exact digest.
+- [x] The committed OpenAPI artifact is deterministic and lockable by exact digest.
 
 **Verification:**
 
-- [ ] Run contract tests, `api:check`, migration/integration suites, coverage, lint,
+- [x] Run contract tests, `api:check`, migration/integration suites, coverage, lint,
       typecheck, build, audit policy, and `git diff --check`.
-- [ ] Inspect the artifact and generated examples for secret/PII leakage.
+- [x] Inspect the artifact and generated examples for secret/PII leakage.
+
+**Implementation evidence (2026-10-03):** IA-11 through IA-13 add atomic invitation
+acceptance for new and existing accounts, consultation-scoped restricted access, real
+Web sessions, monotonic evidence-driven Couple promotion, strict reset/invitation POST
+routes, and a deterministic OpenAPI artifact locked by SHA-256 digest
+`84b109a0d6b0adc0e164a5ca798b76ee7fe1942feda8d106743d8e3a74c80be6`. Disposable
+PostgreSQL 17 tests prove accept/accept and accept/reissue races, exact promotion replay,
+payment-source conflict handling, stable identities, password-verifier preservation,
+and safe audit metadata. The complete 55-file suite passes 555 tests at 96.87% line and
+92.66% branch coverage with every file above 80%; the invitation acceptance mutation
+check fails when password-match logic is inverted. Formatting, ESLint, strict
+typecheck, contract and integration suites, OpenAPI drift, build, dependency-audit
+policy, artifact secret/PII inspection, and `git diff --check` pass.
 
 **Dependencies:** Checkpoint I2
 
@@ -1262,15 +1298,15 @@ restricted/full presentation using memory-only access credentials.
 
 **Acceptance criteria:**
 
-- [ ] The invitation page reads the fragment, removes it from visible URL/history,
+- [x] The invitation page reads the fragment, removes it from visible URL/history,
       submits it once, and never places it in Web Storage or telemetry.
-- [ ] Refresh relies on the HttpOnly cookie; access state is memory-only and clears on
+- [x] Refresh relies on the HttpOnly cookie; access state is memory-only and clears on
       logout/auth failure.
-- [ ] Restricted/full UI is presentation only and handles backend denial/stale state.
+- [x] Restricted/full UI is presentation only and handles backend denial/stale state.
 
 **Verification:**
 
-- [ ] Browser/component tests cover fragment removal, new/existing-account acceptance,
+- [x] Browser/component tests cover fragment removal, new/existing-account acceptance,
       reset, restore, rotation, logout, denied capabilities, and storage inspection.
 - [ ] Run immutable API check, lint, typecheck, coverage, build, and audit.
 
@@ -1288,15 +1324,15 @@ guards while leaving every authorization decision to the backend.
 
 **Acceptance criteria:**
 
-- [ ] Access credentials remain memory-only and refresh uses the approved HttpOnly
+- [x] Access credentials remain memory-only and refresh uses the approved HttpOnly
       cookie/Origin flow.
-- [ ] Manager/Staff navigation derives from `/auth/me` and cannot manufacture roles or
+- [x] Manager/Staff navigation derives from `/auth/me` and cannot manufacture roles or
       override a backend denial.
-- [ ] Logout and revoked/expired sessions clear local presentation state.
+- [x] Logout and revoked/expired sessions clear local presentation state.
 
 **Verification:**
 
-- [ ] Browser/component tests cover restore, role-specific presentation, forged local
+- [x] Browser/component tests cover restore, role-specific presentation, forged local
       state, backend 403/404, reset, and logout.
 - [ ] Run immutable API check, lint, typecheck, coverage, build, and audit.
 
@@ -1314,15 +1350,15 @@ logout using Expo SecureStore for refresh credentials only.
 
 **Acceptance criteria:**
 
-- [ ] Refresh credentials use SecureStore and rotated values replace prior values
+- [x] Refresh credentials use SecureStore and rotated values replace prior values
       atomically; access credentials stay in memory.
-- [ ] AsyncStorage, route params, logs, analytics, and error reports never receive an
+- [x] AsyncStorage, route params, logs, analytics, and error reports never receive an
       auth credential.
-- [ ] Restore failure, expiry, replay response, and logout remove secure state.
+- [x] Restore failure, expiry, replay response, and logout remove secure state.
 
 **Verification:**
 
-- [ ] Tests cover secure persistence, process restore, rotation replacement, failure
+- [x] Tests cover secure persistence, process restore, rotation replacement, failure
       cleanup, reset, logout, and an explicit no-AsyncStorage assertion.
 - [ ] Run `expo-doctor`, immutable API check, lint, typecheck, coverage, Android export,
       and audit policy.

@@ -18,7 +18,11 @@ export function createPrismaClient(databaseUrl = config.database.url): PrismaCli
     throw new DatabaseConfigurationError();
   }
 
-  const adapter = new PrismaPg({ connectionString });
+  const schema = new URL(connectionString).searchParams.get('schema')?.trim();
+  const adapter = new PrismaPg(
+    { connectionString },
+    schema === undefined || schema === '' ? undefined : { schema },
+  );
 
   return new PrismaClient({ adapter });
 }

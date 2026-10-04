@@ -41,6 +41,7 @@ export interface CreateAppOptions {
   readonly reportUnexpectedError?: UnexpectedErrorReporter;
   readonly runtimeEnvironment?: RuntimeEnvironment;
   readonly securityConfig?: BackendConfig['security'];
+  readonly trustedProxyHops?: 0 | 1;
 }
 
 export function createApp(options: CreateAppOptions = {}): Express {
@@ -50,10 +51,18 @@ export function createApp(options: CreateAppOptions = {}): Express {
   const runtimeEnvironment = options.runtimeEnvironment ?? 'development';
   const securityConfig = options.securityConfig ?? defaultHttpSecurityConfig;
 
+  app.set('trust proxy', options.trustedProxyHops ?? 0);
+
   app.use(createRequestContext(options.isTrustedRequestId));
   app.use(createRequestLogger(logger));
   app.use(createHttpMetricsMiddleware(metrics));
   app.use(createSecurityHeaders(runtimeEnvironment));
+  app.use((request, response, next) => {
+    if (request.path.startsWith('/api/v1/auth/')) {
+      response.set('Cache-Control', 'no-store');
+    }
+    next();
+  });
   app.use(createCorsMiddleware(options.corsConfig ?? { allowedOrigins: [] }));
   app.use(createRequestDeadline(securityConfig.requestTimeoutMs));
   app.use(createGeneralRateLimit(securityConfig.rateLimit));

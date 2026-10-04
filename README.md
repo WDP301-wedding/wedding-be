@@ -48,13 +48,13 @@ The values in `.env.example` are placeholders. For offline development, clear bo
 | `npm run db:migrate -- --name <name>` | Create and apply a development migration                |
 | `npm run db:migrate:deploy`           | Apply committed migrations without creating new ones    |
 | `npm run db:studio`                   | Open Prisma Studio                                      |
-| `npm run api:generate`                | Regenerate `openapi/openapi.json`                       |
-| `npm run api:check`                   | Fail if the committed OpenAPI artifact is stale         |
+| `npm run api:generate`                | Regenerate the OpenAPI artifact and SHA-256 digest      |
+| `npm run api:check`                   | Fail if the committed artifact or digest is stale       |
 | `npm run audit:ci`                    | Enforce the reviewed dependency-audit policy            |
 
 ## Database and API ownership
 
-Only this repository changes `prisma/schema.prisma`, migration history, Zod API schemas, or `openapi/openapi.json`. Applied migrations are immutable; corrections are new forward migrations. Client repositories consume an OpenAPI artifact pinned to an exact backend commit and SHA-256 digest, then generate their own `schema.d.ts` files. Do not hand-edit generated artifacts.
+Only this repository changes `prisma/schema.prisma`, migration history, Zod API schemas, `openapi/openapi.json`, or its generated `openapi/openapi.sha256` digest. Applied migrations are immutable; corrections are new forward migrations. Client repositories consume the OpenAPI artifact pinned to an exact backend commit and the published digest, then generate their own `schema.d.ts` files. Do not hand-edit generated artifacts.
 
 ## Offline provider tests
 

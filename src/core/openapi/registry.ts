@@ -1,4 +1,5 @@
 import type { ZodOpenApiObject, ZodOpenApiResponseObject } from 'zod-openapi';
+import type { z } from 'zod';
 
 import {
   errorDetailSchema,
@@ -12,6 +13,22 @@ import {
   healthUnavailableResponseSchema,
 } from '../http/health.schemas.js';
 import { idempotencyKeySchema } from '../idempotency/idempotency.schemas.js';
+import {
+  accountSummarySchema,
+  androidRefreshBodySchema,
+  currentUserResponseSchema,
+  emptyWriteBodySchema,
+  identityLoginBodySchema,
+  invitationAcceptanceBodySchema,
+  issuedSessionResponseSchema,
+  passwordResetCompletionBodySchema,
+  passwordResetCompletionResponseSchema,
+  passwordResetRequestBodySchema,
+  passwordResetRequestResponseSchema,
+  refreshedSessionResponseSchema,
+  sessionInventoryResponseSchema,
+  sessionSummarySchema,
+} from '../../modules/identity-access/identity.schemas.js';
 
 function errorResponse(
   description: string,
@@ -124,7 +141,10 @@ export const openApiRegistry = {
     version: '0.1.0',
     description: 'Canonical HTTP contract for the wedding management backend.',
   },
-  tags: [{ name: 'Health', description: 'Process liveness and dependency readiness.' }],
+  tags: [
+    { name: 'Health', description: 'Process liveness and dependency readiness.' },
+    { name: 'Identity', description: 'Authentication and caller-owned session lifecycle.' },
+  ],
   paths: {
     '/health/live': {
       get: {
@@ -192,6 +212,256 @@ export const openApiRegistry = {
         },
       },
     },
+    '/auth/web-sessions': {
+      post: {
+        operationId: 'createWebSession',
+        summary: 'Create a Web session',
+        description:
+          'Unsafe to retry automatically because a successful response issues new credentials.',
+        tags: ['Identity'],
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: identityLoginBodySchema } },
+        },
+        responses: {
+          '201': identitySuccessResponse(
+            'A Web session was created and the refresh credential was set only as a secure host cookie.',
+            issuedSessionResponseSchema,
+          ),
+          '401': { $ref: '#/components/responses/Unauthorized' },
+          '422': { $ref: '#/components/responses/UnprocessableEntity' },
+          '429': { $ref: '#/components/responses/TooManyRequests' },
+          '500': { $ref: '#/components/responses/InternalServerError' },
+        },
+      },
+    },
+    '/auth/password-reset-requests': {
+      post: {
+        operationId: 'requestPasswordReset',
+        summary: 'Request a password reset',
+        description:
+          'Enumeration-safe and unsafe to retry automatically; every eligible request creates a new single-use credential.',
+        tags: ['Identity'],
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: passwordResetRequestBodySchema } },
+        },
+        responses: {
+          '202': identitySuccessResponse(
+            'The request was accepted regardless of account eligibility.',
+            passwordResetRequestResponseSchema,
+          ),
+          '422': { $ref: '#/components/responses/UnprocessableEntity' },
+          '429': { $ref: '#/components/responses/TooManyRequests' },
+          '500': { $ref: '#/components/responses/InternalServerError' },
+          '502': { $ref: '#/components/responses/BadGateway' },
+          '503': { $ref: '#/components/responses/ServiceUnavailable' },
+          '504': { $ref: '#/components/responses/GatewayTimeout' },
+        },
+      },
+    },
+    '/auth/password-reset-completions': {
+      post: {
+        operationId: 'completePasswordReset',
+        summary: 'Complete a password reset',
+        description:
+          'Unsafe to replay after an unknown outcome; a consumed credential directs the user to normal login.',
+        tags: ['Identity'],
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: passwordResetCompletionBodySchema } },
+        },
+        responses: {
+          '200': identitySuccessResponse(
+            'The password was changed and all existing sessions were revoked.',
+            passwordResetCompletionResponseSchema,
+          ),
+          '401': { $ref: '#/components/responses/Unauthorized' },
+          '422': { $ref: '#/components/responses/UnprocessableEntity' },
+          '429': { $ref: '#/components/responses/TooManyRequests' },
+          '500': { $ref: '#/components/responses/InternalServerError' },
+        },
+      },
+    },
+    '/workspace-invitation-acceptances': {
+      post: {
+        operationId: 'acceptWorkspaceInvitation',
+        summary: 'Accept a workspace invitation',
+        description:
+          'Unsafe to replay after an unknown outcome; success consumes the invitation and creates one restricted Web session.',
+        tags: ['Identity'],
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: invitationAcceptanceBodySchema } },
+        },
+        responses: {
+          '201': identitySuccessResponse(
+            'The invitation was consumed and a restricted Web session was created.',
+            issuedSessionResponseSchema,
+          ),
+          '401': { $ref: '#/components/responses/Unauthorized' },
+          '422': { $ref: '#/components/responses/UnprocessableEntity' },
+          '429': { $ref: '#/components/responses/TooManyRequests' },
+          '500': { $ref: '#/components/responses/InternalServerError' },
+        },
+      },
+    },
+    '/auth/android-sessions': {
+      post: {
+        operationId: 'createAndroidSession',
+        summary: 'Create an Android session',
+        description:
+          'Unsafe to retry automatically because a successful response issues new credentials.',
+        tags: ['Identity'],
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: identityLoginBodySchema } },
+        },
+        responses: {
+          '201': identitySuccessResponse(
+            'An Android session was created and both credentials are returned once.',
+            issuedSessionResponseSchema,
+          ),
+          '401': { $ref: '#/components/responses/Unauthorized' },
+          '422': { $ref: '#/components/responses/UnprocessableEntity' },
+          '429': { $ref: '#/components/responses/TooManyRequests' },
+          '500': { $ref: '#/components/responses/InternalServerError' },
+        },
+      },
+    },
+    '/auth/web-session-refreshes': {
+      post: {
+        operationId: 'refreshWebSession',
+        summary: 'Rotate a Web refresh credential',
+        description: 'Unsafe to replay after an unknown outcome; clients must fall back to login.',
+        tags: ['Identity'],
+        parameters: [{ $ref: '#/components/parameters/WebRefreshCookie' }],
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: emptyWriteBodySchema } },
+        },
+        responses: {
+          '200': identitySuccessResponse(
+            'The Web refresh credential was rotated in the host cookie.',
+            refreshedSessionResponseSchema,
+          ),
+          '401': { $ref: '#/components/responses/Unauthorized' },
+          '403': { $ref: '#/components/responses/Forbidden' },
+          '422': { $ref: '#/components/responses/UnprocessableEntity' },
+          '429': { $ref: '#/components/responses/TooManyRequests' },
+          '500': { $ref: '#/components/responses/InternalServerError' },
+        },
+      },
+    },
+    '/auth/android-session-refreshes': {
+      post: {
+        operationId: 'refreshAndroidSession',
+        summary: 'Rotate an Android refresh credential',
+        description: 'Unsafe to replay after an unknown outcome; clients must fall back to login.',
+        tags: ['Identity'],
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: androidRefreshBodySchema } },
+        },
+        responses: {
+          '200': identitySuccessResponse(
+            'The Android credentials were rotated and returned once.',
+            refreshedSessionResponseSchema,
+          ),
+          '401': { $ref: '#/components/responses/Unauthorized' },
+          '422': { $ref: '#/components/responses/UnprocessableEntity' },
+          '429': { $ref: '#/components/responses/TooManyRequests' },
+          '500': { $ref: '#/components/responses/InternalServerError' },
+        },
+      },
+    },
+    '/auth/sessions/current': {
+      delete: {
+        operationId: 'deleteCurrentSession',
+        summary: 'Log out the current session',
+        description:
+          'Idempotent; retries keep the session revoked and clear any Web refresh cookie.',
+        tags: ['Identity'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          '204': identityNoContentResponse('The current session is revoked.'),
+          '401': { $ref: '#/components/responses/Unauthorized' },
+          '500': { $ref: '#/components/responses/InternalServerError' },
+        },
+      },
+    },
+    '/auth/me': {
+      get: {
+        operationId: 'getCurrentUser',
+        summary: 'Read the current authenticated user',
+        tags: ['Identity'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          '200': identitySuccessResponse(
+            'The current account and session summary.',
+            currentUserResponseSchema,
+          ),
+          '401': { $ref: '#/components/responses/Unauthorized' },
+          '500': { $ref: '#/components/responses/InternalServerError' },
+        },
+      },
+    },
+    '/auth/sessions': {
+      get: {
+        operationId: 'listSessions',
+        summary: 'List caller-owned sessions',
+        tags: ['Identity'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: 'limit',
+            in: 'query',
+            required: false,
+            schema: { type: 'integer', minimum: 1, maximum: 100, default: 20 },
+          },
+          {
+            name: 'cursor',
+            in: 'query',
+            required: false,
+            schema: { type: 'string', format: 'uuid' },
+          },
+        ],
+        responses: {
+          '200': identitySuccessResponse(
+            'A bounded cursor page of safe session summaries.',
+            sessionInventoryResponseSchema,
+          ),
+          '401': { $ref: '#/components/responses/Unauthorized' },
+          '422': { $ref: '#/components/responses/UnprocessableEntity' },
+          '500': { $ref: '#/components/responses/InternalServerError' },
+        },
+      },
+    },
+    '/auth/sessions/{sessionId}': {
+      delete: {
+        operationId: 'deleteOwnedSession',
+        summary: 'Revoke a caller-owned session',
+        description:
+          'Idempotent for an owned session; a foreign or absent session is concealed as not found.',
+        tags: ['Identity'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: 'sessionId',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', format: 'uuid' },
+          },
+        ],
+        responses: {
+          '204': identityNoContentResponse('The owned session is revoked.'),
+          '401': { $ref: '#/components/responses/Unauthorized' },
+          '404': { $ref: '#/components/responses/NotFound' },
+          '422': { $ref: '#/components/responses/UnprocessableEntity' },
+          '500': { $ref: '#/components/responses/InternalServerError' },
+        },
+      },
+    },
   },
   components: {
     schemas: {
@@ -201,8 +471,21 @@ export const openApiRegistry = {
       HealthReadyResponse: healthReadyResponseSchema,
       HealthUnavailableResponse: healthUnavailableResponseSchema,
       IdempotencyKey: idempotencyKeySchema,
+      AccountSummary: accountSummarySchema,
+      AndroidRefreshBody: androidRefreshBodySchema,
+      CurrentUserResponse: currentUserResponseSchema,
+      IdentityLoginBody: identityLoginBodySchema,
+      InvitationAcceptanceBody: invitationAcceptanceBodySchema,
+      IssuedSessionResponse: issuedSessionResponseSchema,
+      PasswordResetCompletionBody: passwordResetCompletionBodySchema,
+      PasswordResetCompletionResponse: passwordResetCompletionResponseSchema,
+      PasswordResetRequestBody: passwordResetRequestBodySchema,
+      PasswordResetRequestResponse: passwordResetRequestResponseSchema,
       PaginationMetadata: paginationMetadataSchema,
+      RefreshedSessionResponse: refreshedSessionResponseSchema,
       RequestId: requestIdSchema,
+      SessionInventoryResponse: sessionInventoryResponseSchema,
+      SessionSummary: sessionSummarySchema,
     },
     parameters: {
       IdempotencyKey: {
@@ -220,6 +503,14 @@ export const openApiRegistry = {
           'Trusted callers may supply a UUID request ID; otherwise the service generates one.',
         schema: { $ref: '#/components/schemas/RequestId' },
       },
+      WebRefreshCookie: {
+        name: '__Host-wedding-refresh',
+        in: 'cookie',
+        required: true,
+        description:
+          'HttpOnly, Secure, SameSite=Lax refresh credential. An allowed Origin header is also required.',
+        schema: { type: 'string', pattern: '^wir_[A-Za-z0-9_-]{43}$' },
+      },
     },
     headers: {
       RequestId: {
@@ -232,5 +523,29 @@ export const openApiRegistry = {
       },
     },
     responses: { ...commonResponses, ...idempotencyResponses },
+    securitySchemes: {
+      bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'opaque' },
+    },
   },
 } satisfies ZodOpenApiObject;
+
+function identitySuccessResponse(description: string, schema: z.ZodType): ZodOpenApiResponseObject {
+  return {
+    description,
+    content: { 'application/json': { schema } },
+    headers: {
+      'Cache-Control': { schema: { type: 'string' as const, const: 'no-store' } },
+      'x-request-id': { $ref: '#/components/headers/RequestId' },
+    },
+  };
+}
+
+function identityNoContentResponse(description: string): ZodOpenApiResponseObject {
+  return {
+    description,
+    headers: {
+      'Cache-Control': { schema: { type: 'string' as const, const: 'no-store' } },
+      'x-request-id': { $ref: '#/components/headers/RequestId' },
+    },
+  };
+}
