@@ -179,6 +179,19 @@ describeWithDatabase('identity retention execution', () => {
         expiresAt: new Date('2026-07-05T00:00:00.000Z'),
       },
     });
+    await prisma.workspaceInvitation.create({
+      data: {
+        consultationId: randomUUID(),
+        recipientEmailNormalized: 'cleanup-second@example.com',
+        issuedByAccountId: issuer.id,
+        sequence: 1,
+        tokenHash: 'g'.repeat(43),
+        status: 'REVOKED',
+        createdAt: new Date('2026-07-01T00:00:00.000Z'),
+        revokedAt: new Date('2026-07-04T00:00:00.000Z'),
+        expiresAt: new Date('2026-07-05T00:00:00.000Z'),
+      },
+    });
     await prisma.passwordResetCredential.create({
       data: {
         accountId: account.id,
@@ -186,6 +199,16 @@ describeWithDatabase('identity retention execution', () => {
         status: 'CONSUMED',
         createdAt: new Date('2026-12-01T00:00:00.000Z'),
         consumedAt: new Date('2026-12-02T00:00:00.000Z'),
+        expiresAt: new Date('2026-12-03T00:00:00.000Z'),
+      },
+    });
+    await prisma.passwordResetCredential.create({
+      data: {
+        accountId: account.id,
+        tokenHash: 'h'.repeat(43),
+        status: 'REVOKED',
+        createdAt: new Date('2026-12-01T00:00:00.000Z'),
+        revokedAt: new Date('2026-12-02T00:00:00.000Z'),
         expiresAt: new Date('2026-12-03T00:00:00.000Z'),
       },
     });
@@ -201,8 +224,25 @@ describeWithDatabase('identity retention execution', () => {
         revokedAt: new Date('2026-10-03T00:00:00.000Z'),
       },
     });
+    await prisma.session.create({
+      data: {
+        accountId: account.id,
+        clientKind: 'WEB',
+        status: 'COMPROMISED',
+        refreshFamilyId: randomUUID(),
+        createdAt: new Date('2026-09-01T00:00:00.000Z'),
+        idleExpiresAt: new Date('2026-10-04T00:00:00.000Z'),
+        absoluteExpiresAt: new Date('2026-10-04T00:00:00.000Z'),
+        revokedAt: new Date('2026-10-03T00:00:00.000Z'),
+      },
+    });
 
-    await expect(service().run({ batchSize: 10 })).resolves.toMatchObject({
+    await expect(service().run({ batchSize: 1 })).resolves.toMatchObject({
+      deletedInvitations: 1,
+      deletedPasswordResets: 1,
+      deletedSessions: 1,
+    });
+    await expect(service().run({ batchSize: 1 })).resolves.toMatchObject({
       deletedInvitations: 1,
       deletedPasswordResets: 1,
       deletedSessions: 1,

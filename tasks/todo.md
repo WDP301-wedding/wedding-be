@@ -1398,8 +1398,9 @@ clean migrations, all integration/concurrency cases, and the new idempotent D6
 anonymization executor. Exact Next.js processes holding the Windows SWC binaries were
 stopped; clean installs and every client gate then passed. All four API digests match,
 coverage/build/audit/format gates pass, and the final secret/PII review found only safe
-examples and test fixtures. Identity-access is ready for owner review; Checkpoint I3
-and SPEC-02 remain closed until explicit project-owner approval.
+examples and test fixtures. The project owner approved Checkpoint I3 on 2026-10-05;
+SPEC-02 specification/planning may begin, while venue-catalog implementation still
+requires its own approved specification and detailed plan.
 
 **Dependencies:** IA-14, IA-15, IA-16
 
@@ -1409,9 +1410,14 @@ and SPEC-02 remain closed until explicit project-owner approval.
 
 #### Checkpoint I3 — Identity implementation approved
 
-- [ ] Project owner approves the completed identity-access implementation and evidence.
-- [ ] SPEC-02 may begin only after this checkpoint; no venue-catalog implementation is
+- [x] Project owner approves the completed identity-access implementation and evidence.
+- [x] SPEC-02 may begin only after this checkpoint; no venue-catalog implementation is
       authorized by identity approval alone.
+
+**Approval evidence (2026-10-05):** The project owner explicitly instructed, “hãy
+hoàn tất Checkpoint I3,” approving the completed identity-access implementation and
+IA-17 evidence. This opens SPEC-02 specification/planning only; venue-catalog
+implementation remains subject to its own approval gate.
 
 ### SPEC-02: Specify `venue-catalog`
 
