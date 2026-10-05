@@ -1767,24 +1767,33 @@ normalized fixed geometry, supported ranges, publication, and historical resolut
 
 **Acceptance criteria:**
 
-- [ ] SEA-001 ranges are recomputed against current hall maximum and summed table seat
+- [x] SEA-001 ranges are recomputed against current hall maximum and summed table seat
       capacity in every publish transaction.
-- [ ] SEA-002 table UUIDs remain template-owned across versions, retired IDs cannot be
+- [x] SEA-002 table UUIDs remain template-owned across versions, retired IDs cannot be
       reused, and published geometry/ranges/membership cannot change in place.
-- [ ] No service input accepts a Couple/public actor, caller-supplied total, hall move,
+- [x] No service input accepts a Couple/public actor, caller-supplied total, hall move,
       or aggregate/version/table ownership override.
 
 **Verification:**
 
-- [ ] Mutation-sensitive unit and PostgreSQL race tests cover range edges, bounds,
+- [x] Mutation-sensitive unit and PostgreSQL race tests cover range edges, bounds,
       table creation/change/retirement, stable IDs, hall conflicts, and exact history.
-- [ ] Search service contracts for prohibited per-guest seating or geometry mutation.
+- [x] Search service contracts for prohibited per-guest seating or geometry mutation.
 
 **Dependencies:** Checkpoint V1, VC-05
 
 **Files likely touched:** layout repository/service plus two focused test files
 
 **Estimated scope:** Medium
+
+**Implementation evidence (2026-10-05):** `LayoutService` now creates hall-bound
+drafts and stable table registries atomically, replaces geometry through revision CAS,
+recomputes SEA-001 hall/table capacity inside publication, preserves exact immutable
+history, retains table UUIDs across versions, and permanently retires identities from
+future drafts. Ten unit cases and two disposable-PostgreSQL
+tests cover bounds, ownership, table retirement/non-reuse, publish races, supersession,
+current selection, and exact history. A contract search found no Couple/public actor,
+guest seating, hall-move, or caller-supplied total input.
 
 ### VC-09: Add private catalog media lifecycle
 
@@ -1793,18 +1802,18 @@ read, and failure cleanup using the approved Storage provider purpose.
 
 **Acceptance criteria:**
 
-- [ ] Only Manager-authorized allowlisted resource types receive validated JPEG/PNG/WebP
+- [x] Only Manager-authorized allowlisted resource types receive validated JPEG/PNG/WebP
       assets with generated purpose/resource-bound keys.
-- [ ] Replacement commits the new reference before detaching/deleting the old object;
+- [x] Replacement commits the new reference before detaching/deleting the old object;
       shared or still-referenced objects cannot be deleted.
-- [ ] API/service outputs expose short-lived signed URLs and safe metadata, never object
+- [x] API/service outputs expose short-lived signed URLs and safe metadata, never object
       keys, checksums, bucket names, or provider payloads.
 
 **Verification:**
 
-- [ ] Fake-provider tests cover magic bytes, MIME/size/count limits, ownership, order,
+- [x] Fake-provider tests cover magic bytes, MIME/size/count limits, ownership, order,
       signed expiry, provider failure, rollback, and orphan cleanup.
-- [ ] Run focused tests, redaction/secret scan, coverage, lint, typecheck, and build.
+- [x] Run focused tests, redaction/secret scan, coverage, lint, typecheck, and build.
 
 **Dependencies:** VC-05, VC-06, VC-07, VC-08
 
@@ -1813,6 +1822,15 @@ and two focused test files
 
 **Estimated scope:** Medium
 
+**Implementation evidence (2026-10-05):** `CatalogMediaService` verifies all six
+allowlisted resource types, reuses the private `VENUE_CATALOG_MEDIA` Storage purpose,
+enforces the 20-asset cap, signs 15-minute reads, and returns only safe presentation
+metadata. Replacement persists the new reference before detaching the prior asset;
+deletion checks live references after commit, while failed attachment rolls back and
+cleans an unreferenced upload. Eight unit tests and two disposable-PostgreSQL tests
+cover magic bytes/MIME, provider failure, ownership, ordering, replacement, rollback,
+orphan cleanup, signed expiry, and output redaction.
+
 ### VC-10: Publish catalog provider and authorization boundaries
 
 **Description:** Publish `VenueCatalogReader`, distinguish current selection from
@@ -1820,18 +1838,18 @@ historical resolution, and enforce current Manager authorization for every mutat
 
 **Acceptance criteria:**
 
-- [ ] Current reads reject retired/inactive dependencies; exact stored version reads
+- [x] Current reads reject retired/inactive dependencies; exact stored version reads
       preserve history without making it newly selectable.
-- [ ] Provider inputs/outputs are immutable typed snapshots and create no reverse import
+- [x] Provider inputs/outputs are immutable typed snapshots and create no reverse import
       from catalog to booking, seating, guest, payment, or analytics modules.
-- [ ] Staff, Couple, restricted prospect, public, stale session, and forged-role writes
+- [x] Staff, Couple, restricted prospect, public, stale session, and forged-role writes
       fail closed.
 
 **Verification:**
 
-- [ ] Policy/provider tests cover every actor, lifecycle, wrong ID/version, history,
+- [x] Policy/provider tests cover every actor, lifecycle, wrong ID/version, history,
       snapshot, and dependency-direction case.
-- [ ] Mutation-sensitive tests fail when a Manager or lifecycle check is removed.
+- [x] Mutation-sensitive tests fail when a Manager or lifecycle check is removed.
 
 **Dependencies:** VC-05 through VC-09
 
@@ -1840,12 +1858,33 @@ focused test files
 
 **Estimated scope:** Medium
 
+**Implementation evidence (2026-10-05):** `VenueCatalogReader` now exposes separate
+current-selection and exact-history methods over immutable detached snapshots, with no
+reverse import to a downstream business module. Catalog mutation context creation
+requires a freshly resolved current `MANAGER`; Staff, Couple, restricted/no-role,
+stale-session, and forged-body-role cases fail closed. Eleven provider/authorization
+tests pass, and a deliberate mutation that admitted `STAFF` made three denial tests
+fail before the Manager-only guard was restored.
+
 #### Checkpoint V2 — Catalog services and provider contracts verified
 
 - [ ] VC-05 through VC-10 pass state, history, SEA-001/002, role-denial, Storage,
       concurrency, audit, coverage, lint, typecheck, and build checks.
-- [ ] Provider boundaries are frozen; HTTP schemas may not add a mutation, bypass, or
+- [x] Provider boundaries are frozen; HTTP schemas may not add a mutation, bypass, or
       current/history ambiguity absent from the service contract.
+
+**Gate evidence (2026-10-05):** All 569 backend unit tests pass. The five VC-05–VC-09
+behavior suites pass seven disposable-PostgreSQL tests sequentially, and the FT-V2
+unit/integration coverage gate passes its per-file 80% thresholds (media 82.05%,
+layout 84.21%, and provider 85.71% branch coverage after hardening, with each above
+90% statement/line coverage). ESLint,
+Prettier, strict typecheck, production build, dependency audit, secret/redaction scan,
+and `git diff --check` pass. Checkpoint V2 remains open because the complete integration
+gate and isolated `catalog-persistence` suite currently stop before assertions when
+Prisma `migrate deploy` returns an opaque `Schema engine error`; the same infrastructure
+failure occurs in pre-existing identity migration suites, while direct PostgreSQL
+catalog migrations and behavior tests succeed. Per the fast-track stop condition, do
+not begin FT-V3 until this migration gate is green.
 
 ### VC-11: Add restaurant, shift, and hall HTTP contracts
 
