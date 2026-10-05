@@ -1868,23 +1868,22 @@ fail before the Manager-only guard was restored.
 
 #### Checkpoint V2 — Catalog services and provider contracts verified
 
-- [ ] VC-05 through VC-10 pass state, history, SEA-001/002, role-denial, Storage,
+- [x] VC-05 through VC-10 pass state, history, SEA-001/002, role-denial, Storage,
       concurrency, audit, coverage, lint, typecheck, and build checks.
 - [x] Provider boundaries are frozen; HTTP schemas may not add a mutation, bypass, or
       current/history ambiguity absent from the service contract.
 
-**Gate evidence (2026-10-05):** All 569 backend unit tests pass. The five VC-05–VC-09
-behavior suites pass seven disposable-PostgreSQL tests sequentially, and the FT-V2
-unit/integration coverage gate passes its per-file 80% thresholds (media 82.05%,
-layout 84.21%, and provider 85.71% branch coverage after hardening, with each above
-90% statement/line coverage). ESLint,
-Prettier, strict typecheck, production build, dependency audit, secret/redaction scan,
-and `git diff --check` pass. Checkpoint V2 remains open because the complete integration
-gate and isolated `catalog-persistence` suite currently stop before assertions when
-Prisma `migrate deploy` returns an opaque `Schema engine error`; the same infrastructure
-failure occurs in pre-existing identity migration suites, while direct PostgreSQL
-catalog migrations and behavior tests succeed. Per the fast-track stop condition, do
-not begin FT-V3 until this migration gate is green.
+**Gate evidence (2026-10-05):** Prisma deploys all three migrations from an empty,
+disposable PostgreSQL 17 database, including the catalog persistence constraints. The
+complete integration gate passes 24 files and 80 tests sequentially. The complete
+backend coverage gate passes 71 files and 667 tests with every per-file 80% threshold
+enforced; aggregate coverage is 96.03% statements, 91.97% branches, 98.66% functions,
+and 96.79% lines. On Windows the coverage workload was collected in isolated Vitest
+blob shards and merged before threshold evaluation to avoid the native worker resource
+abort seen in a single-process run. ESLint, Prettier, strict typecheck, production build,
+Prisma Client generation, OpenAPI drift, dependency audit (with documented unexpired
+exceptions 1145093 and 1153173), secret/redaction scan, and `git diff --check` pass.
+Checkpoint V2 is green and authorizes FT-V3.
 
 ### VC-11: Add restaurant, shift, and hall HTTP contracts
 
