@@ -64,6 +64,36 @@ enum CredentialStatus {
   EXPIRED
 }
 
+enum CatalogLifecycle {
+  ACTIVE
+  RETIRED
+}
+
+enum CatalogVersionState {
+  DRAFT
+  PUBLISHED
+  SUPERSEDED
+}
+
+enum RestaurantShiftCode {
+  LUNCH
+  DINNER
+}
+
+enum LayoutTableShape {
+  ROUND
+  RECTANGLE
+}
+
+enum CatalogMediaResourceType {
+  RESTAURANT_PROFILE
+  HALL
+  DISH_VERSION
+  MENU_PACKAGE_VERSION
+  TIMELINE_TEMPLATE_VERSION
+  LAYOUT_TEMPLATE_VERSION
+}
+
 model AuditLog {
   id         String         @id @default(uuid()) @db.Uuid
   occurredAt DateTime       @default(now()) @db.Timestamptz(6)
@@ -275,4 +305,315 @@ model AccountRetentionEligibilityFact {
 
   @@unique([accountId, consultationId])
   @@index([accountId, eligibleAfter])
+}
+
+model RestaurantProfile {
+  id                 String   @id @default(uuid()) @db.Uuid
+  singletonKey       String   @unique @default("RESTAURANT")
+  displayName        String
+  description        String
+  address            String
+  publicPhone        String?
+  publicEmail        String?
+  revision           Int      @default(1)
+  updatedByAccountId String   @db.Uuid
+  createdAt          DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime @updatedAt @db.Timestamptz(6)
+}
+
+model RestaurantShift {
+  code               RestaurantShiftCode @id
+  startTime          DateTime            @db.Time(0)
+  endTime            DateTime            @db.Time(0)
+  isActive           Boolean             @default(true)
+  revision           Int                 @default(1)
+  updatedByAccountId String              @db.Uuid
+  createdAt          DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime            @updatedAt @db.Timestamptz(6)
+}
+
+model Hall {
+  id                 String           @id @default(uuid()) @db.Uuid
+  name               String
+  nameNormalized     String
+  description        String
+  maxGuests          Int
+  displayOrder       Int
+  lifecycle          CatalogLifecycle @default(ACTIVE)
+  revision           Int              @default(1)
+  retiredAt          DateTime?        @db.Timestamptz(6)
+  updatedByAccountId String           @db.Uuid
+  createdAt          DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime         @updatedAt @db.Timestamptz(6)
+  layoutTemplates    LayoutTemplate[]
+
+  @@unique([nameNormalized], map: "Hall_active_name_key", where: raw("\"lifecycle\" = 'ACTIVE'"))
+  @@index([lifecycle, displayOrder, id])
+}
+
+model Dish {
+  id                        String           @id @default(uuid()) @db.Uuid
+  lifecycle                 CatalogLifecycle @default(ACTIVE)
+  displayOrder              Int
+  revision                  Int              @default(1)
+  currentPublishedVersionId String?          @db.Uuid
+  draftVersionId            String?          @db.Uuid
+  retiredAt                 DateTime?        @db.Timestamptz(6)
+  createdByAccountId        String           @db.Uuid
+  updatedByAccountId        String           @db.Uuid
+  createdAt                 DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt                 DateTime         @updatedAt @db.Timestamptz(6)
+  versions                  DishVersion[]    @relation("DishVersions")
+  currentPublishedVersion   DishVersion?     @relation("DishCurrentVersion", fields: [currentPublishedVersionId, id], references: [id, dishId], onDelete: Restrict, onUpdate: NoAction)
+  draftVersion              DishVersion?     @relation("DishDraftVersion", fields: [draftVersionId, id], references: [id, dishId], onDelete: Restrict, onUpdate: NoAction)
+
+  @@unique([currentPublishedVersionId, id])
+  @@unique([draftVersionId, id])
+  @@index([lifecycle, displayOrder, id])
+}
+
+model DishVersion {
+  id                 String              @id @default(uuid()) @db.Uuid
+  dishId             String              @db.Uuid
+  versionNumber      Int?
+  revision           Int                 @default(1)
+  state              CatalogVersionState @default(DRAFT)
+  name               String
+  description        String
+  categoryLabel      String
+  priceVnd           Decimal?            @db.Decimal(18, 0)
+  createdByAccountId String              @db.Uuid
+  publishedAt        DateTime?           @db.Timestamptz(6)
+  createdAt          DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime            @updatedAt @db.Timestamptz(6)
+  dish               Dish                @relation("DishVersions", fields: [dishId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  currentFor         Dish?               @relation("DishCurrentVersion")
+  draftFor           Dish?               @relation("DishDraftVersion")
+  menuItems          MenuPackageItem[]
+
+  @@unique([id, dishId])
+  @@unique([dishId, versionNumber])
+  @@unique([dishId], map: "DishVersion_one_draft_key", where: raw("\"state\" = 'DRAFT'"))
+  @@unique([dishId], map: "DishVersion_one_current_key", where: raw("\"state\" = 'PUBLISHED'"))
+  @@index([dishId, state])
+}
+
+model MenuPackage {
+  id                        String               @id @default(uuid()) @db.Uuid
+  lifecycle                 CatalogLifecycle     @default(ACTIVE)
+  displayOrder              Int
+  revision                  Int                  @default(1)
+  currentPublishedVersionId String?              @db.Uuid
+  draftVersionId            String?              @db.Uuid
+  retiredAt                 DateTime?            @db.Timestamptz(6)
+  createdByAccountId        String               @db.Uuid
+  updatedByAccountId        String               @db.Uuid
+  createdAt                 DateTime             @default(now()) @db.Timestamptz(6)
+  updatedAt                 DateTime             @updatedAt @db.Timestamptz(6)
+  versions                  MenuPackageVersion[] @relation("MenuPackageVersions")
+  currentPublishedVersion   MenuPackageVersion?  @relation("MenuPackageCurrentVersion", fields: [currentPublishedVersionId, id], references: [id, menuPackageId], onDelete: Restrict, onUpdate: NoAction)
+  draftVersion              MenuPackageVersion?  @relation("MenuPackageDraftVersion", fields: [draftVersionId, id], references: [id, menuPackageId], onDelete: Restrict, onUpdate: NoAction)
+
+  @@unique([currentPublishedVersionId, id])
+  @@unique([draftVersionId, id])
+  @@index([lifecycle, displayOrder, id])
+}
+
+model MenuPackageVersion {
+  id                 String              @id @default(uuid()) @db.Uuid
+  menuPackageId      String              @db.Uuid
+  versionNumber      Int?
+  revision           Int                 @default(1)
+  state              CatalogVersionState @default(DRAFT)
+  name               String
+  description        String
+  priceVndPerTable   Decimal             @db.Decimal(18, 0)
+  createdByAccountId String              @db.Uuid
+  publishedAt        DateTime?           @db.Timestamptz(6)
+  createdAt          DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime            @updatedAt @db.Timestamptz(6)
+  menuPackage        MenuPackage         @relation("MenuPackageVersions", fields: [menuPackageId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  currentFor         MenuPackage?        @relation("MenuPackageCurrentVersion")
+  draftFor           MenuPackage?        @relation("MenuPackageDraftVersion")
+  items              MenuPackageItem[]
+
+  @@unique([id, menuPackageId])
+  @@unique([menuPackageId, versionNumber])
+  @@unique([menuPackageId], map: "MenuPackageVersion_one_draft_key", where: raw("\"state\" = 'DRAFT'"))
+  @@unique([menuPackageId], map: "MenuPackageVersion_one_current_key", where: raw("\"state\" = 'PUBLISHED'"))
+  @@index([menuPackageId, state])
+}
+
+model MenuPackageItem {
+  id                   String             @id @default(uuid()) @db.Uuid
+  menuPackageVersionId String             @db.Uuid
+  dishVersionId        String             @db.Uuid
+  displayOrder         Int
+  menuPackageVersion   MenuPackageVersion @relation(fields: [menuPackageVersionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  dishVersion          DishVersion        @relation(fields: [dishVersionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([menuPackageVersionId, dishVersionId])
+  @@unique([menuPackageVersionId, displayOrder])
+}
+
+model TimelineTemplate {
+  id                        String                    @id @default(uuid()) @db.Uuid
+  lifecycle                 CatalogLifecycle          @default(ACTIVE)
+  displayOrder              Int
+  revision                  Int                       @default(1)
+  currentPublishedVersionId String?                   @db.Uuid
+  draftVersionId            String?                   @db.Uuid
+  retiredAt                 DateTime?                 @db.Timestamptz(6)
+  createdByAccountId        String                    @db.Uuid
+  updatedByAccountId        String                    @db.Uuid
+  createdAt                 DateTime                  @default(now()) @db.Timestamptz(6)
+  updatedAt                 DateTime                  @updatedAt @db.Timestamptz(6)
+  versions                  TimelineTemplateVersion[] @relation("TimelineTemplateVersions")
+  currentPublishedVersion   TimelineTemplateVersion?  @relation("TimelineTemplateCurrentVersion", fields: [currentPublishedVersionId, id], references: [id, timelineTemplateId], onDelete: Restrict, onUpdate: NoAction)
+  draftVersion              TimelineTemplateVersion?  @relation("TimelineTemplateDraftVersion", fields: [draftVersionId, id], references: [id, timelineTemplateId], onDelete: Restrict, onUpdate: NoAction)
+
+  @@unique([currentPublishedVersionId, id])
+  @@unique([draftVersionId, id])
+  @@index([lifecycle, displayOrder, id])
+}
+
+model TimelineTemplateVersion {
+  id                 String                 @id @default(uuid()) @db.Uuid
+  timelineTemplateId String                 @db.Uuid
+  versionNumber      Int?
+  revision           Int                    @default(1)
+  state              CatalogVersionState    @default(DRAFT)
+  name               String
+  description        String
+  createdByAccountId String                 @db.Uuid
+  publishedAt        DateTime?              @db.Timestamptz(6)
+  createdAt          DateTime               @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime               @updatedAt @db.Timestamptz(6)
+  timelineTemplate   TimelineTemplate       @relation("TimelineTemplateVersions", fields: [timelineTemplateId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  currentFor         TimelineTemplate?      @relation("TimelineTemplateCurrentVersion")
+  draftFor           TimelineTemplate?      @relation("TimelineTemplateDraftVersion")
+  items              TimelineTemplateItem[]
+
+  @@unique([id, timelineTemplateId])
+  @@unique([timelineTemplateId, versionNumber])
+  @@unique([timelineTemplateId], map: "TimelineTemplateVersion_one_draft_key", where: raw("\"state\" = 'DRAFT'"))
+  @@unique([timelineTemplateId], map: "TimelineTemplateVersion_one_current_key", where: raw("\"state\" = 'PUBLISHED'"))
+  @@index([timelineTemplateId, state])
+}
+
+model TimelineTemplateItem {
+  id                        String                  @id @db.Uuid
+  timelineTemplateVersionId String                  @db.Uuid
+  title                     String
+  description               String?
+  offsetMinutes             Int
+  durationMinutes           Int?
+  displayOrder              Int
+  timelineTemplateVersion   TimelineTemplateVersion @relation(fields: [timelineTemplateVersionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([timelineTemplateVersionId, id])
+  @@unique([timelineTemplateVersionId, displayOrder])
+}
+
+model LayoutTemplate {
+  id                        String                  @id @default(uuid()) @db.Uuid
+  hallId                    String                  @db.Uuid
+  lifecycle                 CatalogLifecycle        @default(ACTIVE)
+  displayOrder              Int
+  revision                  Int                     @default(1)
+  currentPublishedVersionId String?                 @db.Uuid
+  draftVersionId            String?                 @db.Uuid
+  retiredAt                 DateTime?               @db.Timestamptz(6)
+  createdByAccountId        String                  @db.Uuid
+  updatedByAccountId        String                  @db.Uuid
+  createdAt                 DateTime                @default(now()) @db.Timestamptz(6)
+  updatedAt                 DateTime                @updatedAt @db.Timestamptz(6)
+  hall                      Hall                    @relation(fields: [hallId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  versions                  LayoutTemplateVersion[] @relation("LayoutTemplateVersions")
+  tableIdentities           LayoutTableIdentity[]
+  currentPublishedVersion   LayoutTemplateVersion?  @relation("LayoutTemplateCurrentVersion", fields: [currentPublishedVersionId, id], references: [id, layoutTemplateId], onDelete: Restrict, onUpdate: NoAction)
+  draftVersion              LayoutTemplateVersion?  @relation("LayoutTemplateDraftVersion", fields: [draftVersionId, id], references: [id, layoutTemplateId], onDelete: Restrict, onUpdate: NoAction)
+
+  @@unique([currentPublishedVersionId, id])
+  @@unique([draftVersionId, id])
+  @@index([hallId, lifecycle, displayOrder, id])
+}
+
+model LayoutTemplateVersion {
+  id                 String                @id @default(uuid()) @db.Uuid
+  layoutTemplateId   String                @db.Uuid
+  versionNumber      Int?
+  revision           Int                   @default(1)
+  state              CatalogVersionState   @default(DRAFT)
+  name               String
+  description        String
+  minGuests          Int
+  maxGuests          Int
+  createdByAccountId String                @db.Uuid
+  publishedAt        DateTime?             @db.Timestamptz(6)
+  createdAt          DateTime              @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime              @updatedAt @db.Timestamptz(6)
+  layoutTemplate     LayoutTemplate        @relation("LayoutTemplateVersions", fields: [layoutTemplateId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  currentFor         LayoutTemplate?       @relation("LayoutTemplateCurrentVersion")
+  draftFor           LayoutTemplate?       @relation("LayoutTemplateDraftVersion")
+  geometry           LayoutTableGeometry[]
+
+  @@unique([id, layoutTemplateId])
+  @@unique([layoutTemplateId, versionNumber])
+  @@unique([layoutTemplateId], map: "LayoutTemplateVersion_one_draft_key", where: raw("\"state\" = 'DRAFT'"))
+  @@unique([layoutTemplateId], map: "LayoutTemplateVersion_one_current_key", where: raw("\"state\" = 'PUBLISHED'"))
+  @@index([layoutTemplateId, state])
+}
+
+model LayoutTableIdentity {
+  id                 String                @id @db.Uuid
+  layoutTemplateId   String                @db.Uuid
+  createdByAccountId String                @db.Uuid
+  createdAt          DateTime              @default(now()) @db.Timestamptz(6)
+  retiredAt          DateTime?             @db.Timestamptz(6)
+  layoutTemplate     LayoutTemplate        @relation(fields: [layoutTemplateId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  geometry           LayoutTableGeometry[]
+
+  @@unique([id, layoutTemplateId])
+  @@index([layoutTemplateId, retiredAt])
+}
+
+model LayoutTableGeometry {
+  id                      String                @id @default(uuid()) @db.Uuid
+  layoutTemplateVersionId String                @db.Uuid
+  layoutTemplateId        String                @db.Uuid
+  tableId                 String                @db.Uuid
+  label                   String
+  shape                   LayoutTableShape
+  seatCapacity            Int
+  x                       Int
+  y                       Int
+  width                   Int
+  height                  Int
+  rotationDegrees         Int
+  displayOrder            Int
+  layoutTemplateVersion   LayoutTemplateVersion @relation(fields: [layoutTemplateVersionId, layoutTemplateId], references: [id, layoutTemplateId], onDelete: Restrict, onUpdate: Cascade)
+  tableIdentity           LayoutTableIdentity   @relation(fields: [tableId, layoutTemplateId], references: [id, layoutTemplateId], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([layoutTemplateVersionId, tableId])
+  @@unique([layoutTemplateVersionId, displayOrder])
+  @@index([layoutTemplateId, tableId])
+}
+
+model CatalogMediaAsset {
+  id                 String                   @id @default(uuid()) @db.Uuid
+  resourceType       CatalogMediaResourceType
+  resourceId         String                   @db.Uuid
+  objectKey          String                   @unique
+  checksumSha256     String
+  contentType        String
+  sizeBytes          Int
+  alternativeText    String
+  displayOrder       Int
+  createdByAccountId String                   @db.Uuid
+  createdAt          DateTime                 @default(now()) @db.Timestamptz(6)
+  detachedAt         DateTime?                @db.Timestamptz(6)
+
+  @@unique([resourceType, resourceId, displayOrder], map: "CatalogMediaAsset_attached_order_key", where: raw("\"detachedAt\" IS NULL"))
+  @@index([resourceType, resourceId, detachedAt])
 }

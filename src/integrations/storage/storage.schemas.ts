@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { ValidationError } from '../../core/errors/app-error.js';
 
 export const MAX_STORAGE_OBJECT_BYTES = 25 * 1024 * 1024;
-export const storagePurposeSchema = z.enum(['PRIVATE_WEDDING_MEDIA']);
+export const storagePurposeSchema = z.enum(['PRIVATE_WEDDING_MEDIA', 'VENUE_CATALOG_MEDIA']);
 export const storageContentTypeSchema = z.enum(['image/jpeg', 'image/png', 'image/webp']);
 const resourceIdSchema = z.uuid().transform((resourceId) => resourceId.toLowerCase());
 
@@ -33,7 +33,7 @@ export const putObjectCommandSchema = z
   });
 
 const objectKeyPattern =
-  /^private-wedding-media\/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/[a-f\d]{64}\.(?:jpg|png|webp)$/u;
+  /^(?:private-wedding-media|venue-catalog-media)\/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/[a-f\d]{64}\.(?:jpg|png|webp)$/u;
 
 export const storageObjectKeySchema = z
   .string()
@@ -120,10 +120,14 @@ export function extensionForContentType(contentType: StorageContentType): 'jpg' 
   }
 }
 
-export function purposePrefix(purpose: StoragePurpose): 'private-wedding-media' {
+export function purposePrefix(
+  purpose: StoragePurpose,
+): 'private-wedding-media' | 'venue-catalog-media' {
   switch (purpose) {
     case 'PRIVATE_WEDDING_MEDIA':
       return 'private-wedding-media';
+    case 'VENUE_CATALOG_MEDIA':
+      return 'venue-catalog-media';
   }
 }
 

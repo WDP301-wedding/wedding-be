@@ -117,6 +117,24 @@ describe('FakeStorageProvider', () => {
     expect(stored.objectKey).toContain(`/${uppercaseResourceId.toLowerCase()}/`);
   });
 
+  it('isolates venue catalog media under its generated purpose/resource prefix', async () => {
+    const provider = new FakeStorageProvider();
+
+    const stored = await provider.put({
+      ...validPutCommand(),
+      purpose: 'VENUE_CATALOG_MEDIA',
+    });
+
+    expect(stored.objectKey).toBe(`venue-catalog-media/${resourceId}/${stored.checksumSha256}.png`);
+    expect(stored.purpose).toBe('VENUE_CATALOG_MEDIA');
+    expect(() =>
+      createStorageObjectReference({
+        ...stored,
+        purpose: 'PRIVATE_WEDDING_MEDIA',
+      }),
+    ).toThrow(ValidationError);
+  });
+
   it('rejects unsupported MIME declarations and mismatched magic bytes', async () => {
     const provider = new FakeStorageProvider();
     const unsupported = {
