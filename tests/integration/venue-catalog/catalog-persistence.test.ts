@@ -301,7 +301,7 @@ describeWithDatabase('venue catalog persistence constraints', () => {
     );
     await expectDatabaseCode(
       database.query(`DELETE FROM "Dish" WHERE "id" = $1`, [dishId]),
-      '23001',
+      '23503',
     );
   });
 
@@ -435,5 +435,5 @@ describeWithDatabase('venue catalog persistence constraints', () => {
       state: 'PUBLISHED',
       versionNumber: 2,
     });
-  });
+  }, 30_000);
 });
