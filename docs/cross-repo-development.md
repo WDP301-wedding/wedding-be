@@ -21,6 +21,30 @@ workspace/
 
 Client validation exists for user experience. The backend remains authoritative for state changes, authorization, booking, payment, refund, invitation delivery, seating, and check-in.
 
+## Shared Codex design skill
+
+The canonical Wedding UI skill is committed at
+`.codex/skills/wedding-design-system/` in `wedding-be`. It applies to UI work in
+`wedding-web`, `wedding-manage-web`, and `wedding-app`; it does not apply to
+backend-only work.
+
+From `wedding-be`, install or refresh the user-scoped copy so Codex can discover
+the same skill while working from any of the four sibling repositories:
+
+```powershell
+.\scripts\install-codex-skills.ps1
+```
+
+Use `$wedding-design-system` explicitly when assigning a Wedding UI task. Commit
+changes to the canonical repository copy first, then rerun the installer to refresh
+the local copy. Do not maintain independent edited copies in the client repositories.
+
+The files in `assets/approved-samples/` are visual references only. They establish
+hierarchy, density, shape, color, and tone, but they contain known copy and
+typography defects. Never copy visible wording, spelling, line breaks, or glyph
+rendering from those screenshots; product requirements and reviewed Vietnamese
+copy are authoritative.
+
 ## First local start
 
 All repositories require Node.js 24.21.0 (the version pinned in `.node-version`) and npm 11.x. From each repository, use `npm ci`; do not use `npm install` to reproduce the committed lockfile.

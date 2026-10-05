@@ -6,6 +6,9 @@ playwright-report/
 package-lock.json
 openapi/openapi.json
 
+# Shared Codex skills preserve their own authored Markdown and YAML formatting.
+.codex/skills/
+
 # Approved planning documents are formatted manually and must not be rewritten mechanically.
 CAPABILITY-MAP.md
 SPEC-core-platform.md
