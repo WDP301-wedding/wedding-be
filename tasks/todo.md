@@ -1425,21 +1425,813 @@ implementation remains subject to its own approval gate.
 
 **Acceptance criteria:**
 
-- [ ] `SPEC-venue-catalog.md` covers the existing restaurant/hall/menu scope plus SEA-001 and SEA-002.
-- [ ] Template versioning, capacity ranges, stable table identities, retirement behavior, Manager permissions, and historical-reference preservation are explicit.
-- [ ] Detailed backend and Management Web slices with migration, API, seed, and verification tasks are approved before implementation.
+- [x] `SPEC-venue-catalog.md` covers the existing restaurant/hall/menu scope plus SEA-001 and SEA-002.
+- [x] Template versioning, capacity ranges, stable table identities, retirement behavior, Manager permissions, and historical-reference preservation are explicit.
+- [x] Detailed backend and Management Web slices with migration, API, seed, and verification tasks are approved before implementation.
 
 **Verification:**
 
-- [ ] Trace SEA-001 and SEA-002 to acceptance criteria and tests.
-- [ ] Confirm layout geometry remains restaurant-owned and cannot be mutated through Couple contracts.
-- [ ] Run Prettier and `git diff --check` on the affected documentation.
+- [x] Trace SEA-001 and SEA-002 to acceptance criteria and tests.
+- [x] Confirm layout geometry remains restaurant-owned and cannot be mutated through Couple contracts.
+- [x] Run Prettier and `git diff --check` on the affected documentation.
+
+**Specification and plan approval evidence (2026-10-05):** The project owner first
+replied, “tôi phê duyệt,” approving VC-D1 through VC-D9 in
+`SPEC-venue-catalog.md`. After reviewing the generated plan, the owner explicitly
+approved “kế hoạch `VC-01`–`VC-23` và các hằng số tại mục 17.1.” This fixes the
+catalog/version/layout decisions, bounded constants, dependency order, and V1–V4
+checkpoints. SPEC-02 and Checkpoint V0 are complete; implementation is authorized in
+the recorded order but has not started in this specification task.
 
 **Dependencies:** Approved and completed `identity-access` implementation.
 
 **Files likely touched:** `wedding-be/SPEC-venue-catalog.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
 
 **Estimated scope:** Medium
+
+#### Checkpoint V0 — Venue-catalog implementation plan approved
+
+- [x] Project owner approves VC-01 through VC-23, their dependency order, and V1–V4
+      checkpoints as written in `tasks/plan.md` and this task list.
+- [x] No `venue-catalog` implementation begins before this checkpoint is approved.
+
+**Approval evidence (2026-10-05):** The project owner explicitly approved VC-01
+through VC-23 and the bounded constants in `tasks/plan.md` Section 17.1. VC-01 is now
+the first authorized implementation task; V1–V4 and every recorded stop condition
+remain mandatory.
+
+### VC-01: Freeze approved catalog policies and validation constants
+
+**Description:** Convert VC-D1 through VC-D9 into committed validation constants,
+storage-purpose rules, retry semantics, and implementation boundaries before schema or
+service work begins.
+
+**Acceptance criteria:**
+
+- [x] Price units, text/item/table/media bounds, shift rules, geometry coordinates,
+      lifecycle transitions, and signed-read policy have one typed source of truth.
+- [x] Storage recognizes `VENUE_CATALOG_MEDIA` with a generated purpose/resource prefix
+      while preserving the existing private-wedding-media behavior.
+- [x] No new secret, provider, public bucket, environment-dependent business rule, or
+      unresolved VC-D1–D9 input is introduced.
+
+**Verification:**
+
+- [x] Focused tests cover every bound, purpose prefix, object-key ownership, retry
+      classification, and redaction case.
+- [x] Run focused unit tests, lint, typecheck, Prettier, and secret-pattern review.
+
+**Dependencies:** Checkpoint V0
+
+**Files likely touched:** catalog constants/policy file, Storage schemas/provider, and
+two focused test files
+
+**Estimated scope:** Medium
+
+**Implementation evidence (2026-10-05):** Approved catalog constants now have one
+immutable typed policy source, including VND, text, shift, timeline, layout, media,
+pagination, private signed-read, and retry semantics. Storage accepts the additional
+`VENUE_CATALOG_MEDIA` purpose only under generated
+`venue-catalog-media/<resourceId>/...` keys while retaining the existing private
+wedding-media behavior and object ownership checks. Focused policy, repository, and
+Storage coverage passes 57 tests at 98.04% statements, 95.94% branches, 100% functions,
+and 97.98% lines. The complete unit suite passes 514 tests; lint, strict typecheck,
+Prettier, Prisma validation/generation, the production build, diff checks, and the
+VC-specific secret-pattern scan pass.
+
+### VC-02: Add pure catalog version, lifecycle, timeline, and layout policies
+
+**Description:** Implement framework-free domain rules for shifts, integer VND,
+version transitions, timeline items, fixed geometry, capacity ranges, and stable table
+identity.
+
+**Acceptance criteria:**
+
+- [x] Published/superseded versions are immutable; drafts alone accept CAS-governed
+      edits and only approved lifecycle transitions are representable.
+- [x] Layout policy recomputes seat totals and enforces hall/range/canvas/table
+      invariants without trusting client totals or state.
+- [x] Timeline/menu ordering and price rules produce deterministic immutable outputs.
+
+**Verification:**
+
+- [x] Mutation-sensitive unit tests cover every valid transition and boundary failure,
+      including table-ID reuse and changed published content.
+- [x] Run focused unit tests, coverage, lint, typecheck, and build.
+
+**Dependencies:** VC-01
+
+**Files likely touched:** version/lifecycle policy, timeline policy, layout policy, and
+two focused test files; split before work if over five human-authored files
+
+**Estimated scope:** Medium
+
+**Implementation evidence (2026-10-05):** Framework-free domain policy now validates
+integer VND, same-day minute shifts, version/lifecycle transitions, deterministic menu
+and timeline ordering, stable table ownership, retired-ID non-reuse, normalized canvas
+geometry, recomputed seats, and the approved hall/range relationship. Returned menu,
+timeline, and layout values are deeply immutable. A review mutation that deliberately
+removed the table-seat range limit made the focused test fail and was then restored,
+proving the regression guard is effective. The focused and complete gates recorded in
+VC-01 evidence pass.
+
+### VC-03: Add catalog persistence and forward-only migration
+
+**Description:** Add restaurant, shift, hall, dish/menu version, timeline/layout
+version, stable table, and catalog-media records with database-enforced invariants.
+
+**Acceptance criteria:**
+
+- [x] Stable aggregate/version/table ownership, one draft/current version, unique
+      version number, active-name, and exact-reference invariants have constraints.
+- [x] Published history cannot cascade-delete and no column represents client-authored
+      totals, signed URLs, raw provider responses, or arbitrary HTML.
+- [x] The forward migration deploys from an empty database and the approved identity
+      baseline without rewriting applied history.
+
+**Verification:**
+
+- [x] Disposable PostgreSQL tests prove every unique/foreign-key/check constraint and
+      safe deletion/retirement behavior.
+- [x] Run Prisma format/validate/generate plus clean and identity-baseline migration
+      deploys.
+
+**Dependencies:** VC-01
+
+**Files likely touched:** `prisma/schema.prisma`, one migration directory, one focused
+schema integration test
+
+**Estimated scope:** Medium
+
+**Implementation evidence (2026-10-05):** The additive Prisma schema and forward-only
+`20261005000000_venue_catalog_core` migration model restaurant, fixed shifts, halls,
+dish/menu versions, timeline/layout versions, stable table identities, fixed geometry,
+and private catalog media. Composite foreign keys, partial unique indexes, CHECK
+constraints, and deferred constraint triggers enforce ownership, one draft/current
+version, pointer/state consistency, immutable published history, stable table IDs, and
+non-cascading history. Prisma format, validate, and client generation pass. On
+2026-10-05, a disposable PostgreSQL 18 cluster deployed all three migrations from an
+empty database, including the identity baseline and
+`20261005000000_venue_catalog_core`. The focused schema test passed all unique, FK,
+CHECK, deferred-trigger, ownership, immutability, deletion, and retirement cases.
+
+### VC-04: Implement transactional catalog version repositories
+
+**Description:** Add repositories for draft compare-and-swap, atomic publication,
+supersession, retirement/restoration, stable table registration, and exact-version
+resolution.
+
+**Acceptance criteria:**
+
+- [x] One transaction validates dependencies, assigns the next version, supersedes the
+      old current version, updates the aggregate pointer, and records audit evidence.
+- [x] Stale drafts, duplicate publishes, conflicting restores, and table-ID reuse fail
+      with stable domain conflicts and no partial writes.
+- [x] Current-selection queries exclude retired content while exact historical queries
+      continue to resolve immutable versions.
+
+**Verification:**
+
+- [x] Real PostgreSQL concurrency tests prove one publish/CAS/retirement winner and
+      intact prior history.
+- [x] Run focused integration tests, lint, typecheck, coverage, and build.
+
+**Dependencies:** VC-02, VC-03
+
+**Files likely touched:** shared catalog repository/types and two focused unit or
+integration test files
+
+**Estimated scope:** Medium
+
+**Implementation evidence (2026-10-05):** The shared Prisma repository exposes typed
+draft CAS, publication, lifecycle, stable-table registration, current selection, and
+exact historical resolution. Non-dish publication requires an in-transaction dependency
+validator; serializable transactions use aggregate advisory locks, retry only `P2034`,
+atomically supersede/update pointers, and append allowlisted audit metadata. Unit tests
+cover winners, stale/duplicate/restore conflicts, serialization retries, rollback paths,
+redacted audit metadata, current-selection exclusion, and exact superseded resolution.
+The focused PostgreSQL 18 suite passes 5/5 tests and proves one publish, CAS, and
+retirement winner with intact version history. The complete integration suite passes
+19/19 files and 72/72 tests with one Windows worker; unit tests pass 514/514, focused
+coverage remains 98.04% statements/95.94% branches/100% functions/97.98% lines, and
+lint, strict typecheck, build, Prettier, Prisma validation/generation, and diff checks
+pass.
+
+#### Checkpoint V1 — Catalog persistence and version core verified
+
+- [x] VC-01 through VC-04 pass domain, migration, constraint, concurrency, audit,
+      redaction, coverage, lint, typecheck, and build checks.
+- [x] No service or HTTP task proceeds with mutable published versions, reusable table
+      IDs, ambiguous capacity rules, or failing PostgreSQL constraints.
+
+### VC-05: Implement restaurant, shift, and hall catalog behavior
+
+**Description:** Implement the singleton restaurant profile, fixed shift records,
+halls, hall snapshots, lifecycle, ordering, and capacity-lowering guard.
+
+**Acceptance criteria:**
+
+- [x] Only `LUNCH` and `DINNER` exist; valid local windows, public business fields,
+      active hall-name uniqueness, ordering, and optimistic revisions are enforced.
+- [x] Lowering a hall below a current published layout fails until compatible layout
+      versions exist; retirement hides new selection without losing history.
+- [x] Snapshot outputs contain the exact mutable hall/shift fields later booking
+      records must preserve.
+
+**Verification:**
+
+- [x] Unit/integration tests cover time boundaries, name normalization, stale writes,
+      capacity conflicts, retirement/restoration, and current/history reads.
+- [x] Audit assertions expose no contact values or request bodies.
+
+**Dependencies:** Checkpoint V1
+
+**Files likely touched:** restaurant/hall repository and service plus two focused test
+files
+
+**Estimated scope:** Medium
+
+**Implementation evidence (2026-10-05):** `VenueService` now owns singleton profile
+CAS updates, the two fixed local-time shifts, normalized active hall names, deterministic
+ordering, hall lifecycle, active selection snapshots, Manager history reads, and a
+serializable capacity-lowering guard against current published layouts. Focused unit and
+isolated PostgreSQL tests cover time and capacity boundaries, stale revisions,
+normalization collisions, retirement/restoration, snapshot separation, and redacted
+audit metadata.
+
+### VC-06: Implement dishes and versioned menu packages
+
+**Description:** Implement stable dish identities, immutable dish/package versions,
+ordered exact dish references, lifecycle, and per-table pricing.
+
+**Acceptance criteria:**
+
+- [x] Package publication accepts only current published versions of active dishes,
+      positive integer per-table prices, and deterministic unique ordering.
+- [x] Dish rename/reprice/retirement never mutates an existing package version or
+      historical package snapshot.
+- [x] New selection and exact historical resolution follow VC-D3 and VC-D6.
+
+**Verification:**
+
+- [x] Unit/PostgreSQL tests cover price limits, duplicate/order errors, stale publish,
+      supersession, retirement, exact references, and concurrent publication.
+- [x] Run focused tests, coverage, lint, typecheck, and build.
+
+**Dependencies:** Checkpoint V1
+
+**Files likely touched:** dish/menu repository and service plus two focused test files
+
+**Estimated scope:** Medium
+
+**Implementation evidence (2026-10-05):** `MenuService` creates and clones dish and
+menu-package drafts, applies shared draft CAS/publication/lifecycle semantics, persists
+ordered exact dish-version IDs, and revalidates active current dish dependencies inside
+the publication transaction. Current selection excludes retired aggregates while exact
+published/superseded snapshots retain their original names and VND prices. A real
+PostgreSQL publish race has one winner and preserves the first package snapshot after a
+dish rename/reprice and package retirement.
+
+### VC-07: Implement versioned timeline templates
+
+**Description:** Implement timeline-template drafts, ordered relative schedule items,
+publication, cloning, supersession, lifecycle, and exact-version resolution.
+
+**Acceptance criteria:**
+
+- [x] Item IDs/order, offsets, durations, text bounds, and at-most-one-draft/current
+      rules are server-enforced.
+- [x] Publishing freezes items; cloning a published/superseded version creates a new
+      draft identity without rewriting its source.
+- [x] Direct Couple/prospect/public template access is not introduced.
+
+**Verification:**
+
+- [x] Unit/PostgreSQL tests cover all bounds, reordering, clone independence,
+      concurrent publish, supersession, retirement, and historical resolution.
+- [x] Run focused tests, coverage, lint, typecheck, and build.
+
+**Dependencies:** Checkpoint V1
+
+**Files likely touched:** timeline-template repository/service plus two focused test
+files
+
+**Estimated scope:** Medium
+
+**Implementation evidence (2026-10-05):** `TimelineService` creates bounded ordered
+drafts, replaces/reorders items through revision CAS, clones published or superseded
+versions with fresh version-local item UUIDs, publishes through the shared serializable
+repository, and separates active current selection from exact history. Focused unit and
+PostgreSQL tests cover invalid bounds/order, clone independence, a one-winner publish
+race, supersession, retirement, and immutable historical resolution; no public or
+Couple-facing route was added.
+
+**Combined VC-05–VC-07 verification (2026-10-05):** 26 focused unit tests and three
+isolated PostgreSQL behavior tests pass. Focused service coverage is 92.16% statements,
+84.29% branches, 100% functions, and 94.75% lines. The complete unit suite passes
+540/540 tests, and lint, strict typecheck, build, and Prettier checks pass. The checked-in
+`TEST_MIGRATION_DATABASE_URL` currently returns PostgreSQL `28P01`; verification used
+the valid migration credential only as a process-local override against disposable
+test databases, which were removed after each suite.
+
+#### Fast-track amendment — VC-08 through VC-23
+
+**Approval evidence (2026-10-05):** The project owner approved continuous-wave
+execution beginning at VC-08. VC-05 through VC-07 are already in progress and remain
+unchanged. Existing requirements, task IDs, dependencies, acceptance criteria, and
+V2–V4 safety gates remain authoritative; only execution cadence and repeated-gate
+frequency change.
+
+- **FT-V2:** Continue through VC-08, VC-09, and VC-10 as dependencies become green,
+  without pausing for owner confirmation between tasks. Run focused tests per task and
+  the complete backend service/provider gate once at V2.
+- **FT-V3:** After V2, VC-11 through VC-14 may proceed independently with coordinated
+  OpenAPI ownership; VC-16 may proceed alongside them, VC-15 integrates their shared
+  media/lifecycle surface, and VC-17 runs the complete backend/contract gate at V3.
+- **FT-V4:** After VC-17 freezes the digest, VC-18 through VC-21 may proceed
+  independently; VC-22 integrates shared UI and VC-23 runs the final acceptance audit.
+- Per-task verification uses the task's focused unit/integration/contract/browser tests,
+  formatting for changed files, and `git diff --check`. Full unit/integration/coverage,
+  lint, typecheck, build, migration, generation, audit, and drift suites run at the owning
+  checkpoint unless a focused failure requires them earlier.
+- A green V2 or V3 gate authorizes automatic continuation to the next wave. Stop only
+  for a failed gate, an unresolved approved stop condition, unsafe overlapping edits, or
+  a new product decision. V4 still requires explicit project-owner approval.
+- On this Windows host, complete backend integration verification uses
+  `npm run test:integration -- --maxWorkers=1`; focused database tests may run directly.
+
+### VC-08: Implement immutable fixed-layout templates
+
+**Description:** Implement hall-bound layout drafts/versions, the stable table registry,
+normalized fixed geometry, supported ranges, publication, and historical resolution.
+
+**Acceptance criteria:**
+
+- [ ] SEA-001 ranges are recomputed against current hall maximum and summed table seat
+      capacity in every publish transaction.
+- [ ] SEA-002 table UUIDs remain template-owned across versions, retired IDs cannot be
+      reused, and published geometry/ranges/membership cannot change in place.
+- [ ] No service input accepts a Couple/public actor, caller-supplied total, hall move,
+      or aggregate/version/table ownership override.
+
+**Verification:**
+
+- [ ] Mutation-sensitive unit and PostgreSQL race tests cover range edges, bounds,
+      table creation/change/retirement, stable IDs, hall conflicts, and exact history.
+- [ ] Search service contracts for prohibited per-guest seating or geometry mutation.
+
+**Dependencies:** Checkpoint V1, VC-05
+
+**Files likely touched:** layout repository/service plus two focused test files
+
+**Estimated scope:** Medium
+
+### VC-09: Add private catalog media lifecycle
+
+**Description:** Add catalog-media upload, attachment, ordering, replacement, signed
+read, and failure cleanup using the approved Storage provider purpose.
+
+**Acceptance criteria:**
+
+- [ ] Only Manager-authorized allowlisted resource types receive validated JPEG/PNG/WebP
+      assets with generated purpose/resource-bound keys.
+- [ ] Replacement commits the new reference before detaching/deleting the old object;
+      shared or still-referenced objects cannot be deleted.
+- [ ] API/service outputs expose short-lived signed URLs and safe metadata, never object
+      keys, checksums, bucket names, or provider payloads.
+
+**Verification:**
+
+- [ ] Fake-provider tests cover magic bytes, MIME/size/count limits, ownership, order,
+      signed expiry, provider failure, rollback, and orphan cleanup.
+- [ ] Run focused tests, redaction/secret scan, coverage, lint, typecheck, and build.
+
+**Dependencies:** VC-05, VC-06, VC-07, VC-08
+
+**Files likely touched:** catalog-media repository/service, Storage adapter extension,
+and two focused test files
+
+**Estimated scope:** Medium
+
+### VC-10: Publish catalog provider and authorization boundaries
+
+**Description:** Publish `VenueCatalogReader`, distinguish current selection from
+historical resolution, and enforce current Manager authorization for every mutation.
+
+**Acceptance criteria:**
+
+- [ ] Current reads reject retired/inactive dependencies; exact stored version reads
+      preserve history without making it newly selectable.
+- [ ] Provider inputs/outputs are immutable typed snapshots and create no reverse import
+      from catalog to booking, seating, guest, payment, or analytics modules.
+- [ ] Staff, Couple, restricted prospect, public, stale session, and forged-role writes
+      fail closed.
+
+**Verification:**
+
+- [ ] Policy/provider tests cover every actor, lifecycle, wrong ID/version, history,
+      snapshot, and dependency-direction case.
+- [ ] Mutation-sensitive tests fail when a Manager or lifecycle check is removed.
+
+**Dependencies:** VC-05 through VC-09
+
+**Files likely touched:** provider/authorization interfaces and services plus two
+focused test files
+
+**Estimated scope:** Medium
+
+#### Checkpoint V2 — Catalog services and provider contracts verified
+
+- [ ] VC-05 through VC-10 pass state, history, SEA-001/002, role-denial, Storage,
+      concurrency, audit, coverage, lint, typecheck, and build checks.
+- [ ] Provider boundaries are frozen; HTTP schemas may not add a mutation, bypass, or
+      current/history ambiguity absent from the service contract.
+
+### VC-11: Add restaurant, shift, and hall HTTP contracts
+
+**Description:** Add public/current restaurant/hall reads and Manager profile, shift,
+hall, capacity, and lifecycle routes through strict Zod/OpenAPI schemas.
+
+**Acceptance criteria:**
+
+- [ ] Public responses contain only active safe fields, cursor metadata, and signed
+      media; Manager responses carry revisions and lifecycle data without internals.
+- [ ] Writes require current Manager identity, expected revision or idempotency as
+      specified, and stable validation/conflict errors.
+- [ ] Unknown fields, forged roles/states/totals, stale writes, and concealed-resource
+      probes are rejected consistently.
+
+**Verification:**
+
+- [ ] HTTP/contract tests cover success, pagination, ETag/CAS, validation,
+      authentication, authorization, idempotency, retirement, and conflicts.
+- [ ] Run focused route tests and OpenAPI generation/check.
+
+**Dependencies:** Checkpoint V2
+
+**Files likely touched:** venue schemas/router and two focused HTTP/contract test files
+
+**Estimated scope:** Medium
+
+### VC-12: Add dish and menu-package HTTP contracts
+
+**Description:** Add public/current dish/menu reads and Manager version, publication,
+ordering, pricing, history, and lifecycle routes.
+
+**Acceptance criteria:**
+
+- [ ] Public/current responses hide drafts, superseded history, actor data, revisions,
+      and storage internals while returning integer VND values.
+- [ ] Manager routes expose explicit version operations and reject stale, retired,
+      duplicate, cross-aggregate, or invalid-price requests.
+- [ ] Publication and lifecycle operations honor atomic idempotency and stable errors.
+
+**Verification:**
+
+- [ ] HTTP/contract tests cover pagination/filtering, exact references, publish/history,
+      non-Manager denials, retry semantics, and conflict payloads.
+- [ ] Run focused route tests and OpenAPI generation/check.
+
+**Dependencies:** Checkpoint V2
+
+**Files likely touched:** dish/menu schemas/router and two focused HTTP/contract test
+files
+
+**Estimated scope:** Medium
+
+### VC-13: Add timeline-template HTTP contracts
+
+**Description:** Add Manager-only timeline-template list, draft, clone, publish,
+history, retirement, and restoration routes.
+
+**Acceptance criteria:**
+
+- [ ] Strict schemas preserve ordered bounded items and distinguish draft mutation from
+      immutable version resolution.
+- [ ] No public, restricted prospect, Couple, or Staff catalog operation can browse
+      Manager template history or mutate timeline templates.
+- [ ] Idempotency, CAS, pagination, lifecycle, and error contracts are explicit.
+
+**Verification:**
+
+- [ ] HTTP/contract tests cover every operation, role denial, stale edit, publish
+      replay, invalid transition, and exact history.
+- [ ] Inspect generated OpenAPI for unintended non-Manager timeline operations.
+
+**Dependencies:** Checkpoint V2
+
+**Files likely touched:** timeline schemas/router and two focused HTTP/contract test
+files
+
+**Estimated scope:** Medium
+
+### VC-14: Add fixed-layout HTTP contracts
+
+**Description:** Add Manager-only layout list, draft, table/geometry, publish, history,
+retirement, and restoration routes.
+
+**Acceptance criteria:**
+
+- [ ] Requests cannot supply computed totals, reuse table IDs, change a template hall,
+      or mutate a published/superseded version.
+- [ ] SEA-001 hall/range/capacity and SEA-002 immutable geometry/stable ID errors are
+      documented with exact version/table response identities.
+- [ ] No Couple/public operation can create, move, resize, rotate, add, remove, or
+      reidentify a table or alter the range.
+
+**Verification:**
+
+- [ ] Direct HTTP tests cover range/geometry/table boundaries, races, history, every
+      actor denial, and concealed mismatched IDs.
+- [ ] Inspect OpenAPI operation IDs and schemas for prohibited seating assignments or
+      Couple geometry writes.
+
+**Dependencies:** Checkpoint V2
+
+**Files likely touched:** layout schemas/router and two focused HTTP/contract test files
+
+**Estimated scope:** Medium
+
+### VC-15: Add media and explicit lifecycle HTTP contracts
+
+**Description:** Expose Manager catalog-media upload/order plus explicit retire/restore
+routes for each versioned aggregate.
+
+**Acceptance criteria:**
+
+- [ ] Multipart/file fields, allowlisted target types, purpose/resource ownership, and
+      response metadata are strict and bounded.
+- [ ] Each lifecycle endpoint names its resource type explicitly and applies current
+      dependency/conflict checks rather than a generic state setter.
+- [ ] State-changing operations honor VC-D9 and never serialize Storage internals.
+
+**Verification:**
+
+- [ ] HTTP/fake-provider tests cover success, malformed files, wrong target, stale
+      order, retry/in-flight conflict, provider failure, retirement, and restoration.
+- [ ] Run focused route/contract tests, redaction review, and OpenAPI generation/check.
+
+**Dependencies:** VC-11 through VC-14
+
+**Files likely touched:** media/lifecycle schemas/router and two focused HTTP/provider
+test files
+
+**Estimated scope:** Medium
+
+### VC-16: Add deterministic catalog seed data
+
+**Description:** Add an explicit idempotent seed entry for the approved restaurant,
+shift, hall, menu, timeline, layout, stable-table, and retired-history fixtures.
+
+**Acceptance criteria:**
+
+- [ ] Seed output satisfies the spec's required published/retired fixture set and uses
+      deterministic stable seed keys without assuming production credentials.
+- [ ] Repeated runs neither duplicate nor overwrite Manager-edited records with the
+      same stable IDs.
+- [ ] The seed is an explicit development/demo command and never runs at production
+      startup or migration deploy.
+
+**Verification:**
+
+- [ ] Disposable PostgreSQL tests run the seed twice, verify counts/references/history,
+      and prove edited-record conflict handling.
+- [ ] Run seed-focused integration, lint, typecheck, and build checks.
+
+**Dependencies:** VC-05 through VC-10
+
+**Files likely touched:** one catalog seed script, package script entry, one focused
+integration test
+
+**Estimated scope:** Medium
+
+### VC-17: Publish the immutable venue-catalog OpenAPI contract
+
+**Description:** Register all catalog schemas/routes, generate the OpenAPI artifact,
+and publish the exact digest consumed by Management Web.
+
+**Acceptance criteria:**
+
+- [ ] Contract documents pagination, ETags/CAS, idempotency, lifecycle, integer VND,
+      immutable versions, capacity, geometry, stable IDs, uploads, and stable errors.
+- [ ] Generated operations contain no Couple/public layout mutation, per-guest seating,
+      object key, audit metadata, or Manager identity leakage.
+- [ ] The artifact and digest are deterministic and lockable by the Management Web.
+
+**Verification:**
+
+- [ ] Run complete contract, migration, integration/concurrency, seed, coverage, lint,
+      typecheck, build, audit, `api:generate`, `api:check`, and `git diff --check` gates.
+- [ ] Inspect the artifact/examples for secret, contact, object-key, draft, history, and
+      prohibited geometry-operation leakage.
+
+**Dependencies:** VC-11 through VC-16
+
+**Files likely touched:** catalog router/schema registry, app composition, focused
+contract test, and generated OpenAPI artifact/digest
+
+**Estimated scope:** Medium
+
+#### Checkpoint V3 — Immutable catalog API verified
+
+- [ ] VC-11 through VC-17 pass all backend HTTP, contract, migration, seed,
+      authorization, concurrency, coverage, quality, audit, and drift gates.
+- [ ] Management Web begins only after its contract lock references this exact backend
+      commit/digest.
+
+### VC-18: Implement Management Web restaurant, shift, and hall administration
+
+**Description:** Add the Manager catalog shell and responsive restaurant, shift, hall,
+capacity, ordering, and lifecycle views using generated types.
+
+**Acceptance criteria:**
+
+- [ ] Forms display server validation, stale revision, capacity conflict, loading,
+      empty, success, and denial states without manufacturing authorization.
+- [ ] Lists/forms are keyboard accessible, label controls, preserve focus, and work at
+      mobile and desktop widths.
+- [ ] Staff/forged local role state cannot expose a working mutation path or bypass a
+      backend 403/404.
+
+**Verification:**
+
+- [ ] Component/browser tests cover CRUD-equivalent lifecycle, CAS conflicts, active
+      filtering, capacity errors, responsive layout, a11y, and backend denial.
+- [ ] Run immutable API check, lint, typecheck, coverage, build, and audit.
+
+**Dependencies:** Checkpoint V3
+
+**Files likely touched:** Manager catalog route, feature page/forms, generated-client
+adapter, and two focused test files
+
+**Estimated scope:** Medium
+
+### VC-19: Implement Management Web dish and menu administration
+
+**Description:** Add dish/package lists, drafts, ordered dish selection, per-table
+pricing, publication, history, retirement, and restoration UX.
+
+**Acceptance criteria:**
+
+- [ ] Integer VND editing/display is locale-safe and never uses floating-point totals
+      or a client-authoritative price calculation.
+- [ ] Version/current/history distinctions and retired dependencies are explicit; the
+      UI never edits published content in place.
+- [ ] All conflict, validation, loading, empty, retry, and denial states remain usable
+      with keyboard and responsive layouts.
+
+**Verification:**
+
+- [ ] Component/browser tests cover ordering, exact dish versions, price bounds,
+      publish/history, stale conflicts, lifecycle, a11y, and backend denial.
+- [ ] Run immutable API check, lint, typecheck, coverage, build, and audit.
+
+**Dependencies:** Checkpoint V3
+
+**Files likely touched:** dish/menu route, feature components/client adapter, and two
+focused test files
+
+**Estimated scope:** Medium
+
+### VC-20: Implement Management Web timeline-template editor
+
+**Description:** Add timeline-template list, draft item editor, reorder, clone,
+publication, immutable history, retirement, and restoration UX.
+
+**Acceptance criteria:**
+
+- [ ] Add/edit/remove/reorder supports keyboard controls and explicit numeric/text
+      validation without drag-only interaction.
+- [ ] Published/superseded content is read-only and clone creates a separate draft;
+      stale edits and publish races show recoverable conflict guidance.
+- [ ] Timeline template pages remain Manager-only presentation over backend authority.
+
+**Verification:**
+
+- [ ] Component/browser tests cover all editor operations, boundaries, keyboard order,
+      clone independence, publish/history, stale conflict, lifecycle, and denial.
+- [ ] Run immutable API check, lint, typecheck, coverage, build, and audit.
+
+**Dependencies:** Checkpoint V3
+
+**Files likely touched:** timeline route, feature editor/client adapter, and two focused
+test files
+
+**Estimated scope:** Medium
+
+### VC-21: Implement Management Web fixed-layout editor
+
+**Description:** Add hall-bound layout drafts, stable table management, numeric and
+visual fixed-geometry editing, capacity ranges, publication, preview, history, and
+lifecycle UX.
+
+**Acceptance criteria:**
+
+- [ ] Every pointer/drag control has labeled keyboard/numeric alternatives; UI feedback
+      shows canvas bounds, seat totals, hall maximum, and valid range.
+- [ ] Existing table UUIDs survive draft geometry changes, removal retires an ID, and
+      the UI cannot reuse IDs, change the hall, or edit a published version.
+- [ ] Published preview is read-only and responsive; no copy or action implies movable
+      Couple geometry or individual guest seating.
+
+**Verification:**
+
+- [ ] Component/browser tests cover range/seat/canvas boundaries, stable IDs, keyboard
+      editing, responsive preview, publication/history, conflicts, lifecycle, and denial.
+- [ ] Inspect generated client usage and DOM actions for prohibited Couple geometry or
+      per-guest seating behavior; run all Management Web quality gates.
+
+**Dependencies:** Checkpoint V3
+
+**Files likely touched:** layout route, editor, geometry adapter, client adapter, and
+focused test; split before work if over five human-authored files
+
+**Estimated scope:** Medium
+
+### VC-22: Add shared Manager catalog media and history presentation
+
+**Description:** Add reusable upload/order, signed preview, version history, retirement,
+and restoration presentation across the catalog features.
+
+**Acceptance criteria:**
+
+- [ ] Upload UI enforces advisory type/size feedback but treats backend validation as
+      authoritative and never displays/persists object keys or signed URLs as state.
+- [ ] Media ordering, provider errors, expiry refresh, history, retirement, and
+      restoration expose clear accessible states without overwriting current content.
+- [ ] Shared components do not collapse distinct resource/version IDs or bypass each
+      feature's generated operation.
+
+**Verification:**
+
+- [ ] Component/browser tests cover valid/invalid uploads, order, replacement failure,
+      URL refresh, history/lifecycle, keyboard/a11y, and backend conflicts/denials.
+- [ ] Run immutable API check, lint, typecheck, coverage, build, audit, and browser
+      console/network review.
+
+**Dependencies:** VC-18 through VC-21
+
+**Files likely touched:** shared media uploader, history/lifecycle panel, feature
+integration adapter, and two focused test files
+
+**Estimated scope:** Medium
+
+### VC-23: Run and record venue-catalog acceptance audit
+
+**Description:** Execute every owning repository gate and collect exact evidence for
+the approved spec, decisions, checkpoints, and SEA-001/002 before opening SPEC-03.
+
+**Acceptance criteria:**
+
+- [ ] SEA-001 and SEA-002 each have passing automated evidence with exact files/tests;
+      VC-D1–D9 and V1–V3 match runtime behavior.
+- [ ] Clean/upgrade migrations, idempotent seed, immutable history, concurrency,
+      Manager denials, Storage privacy, and no-Couple-geometry contracts are verified.
+- [ ] Backend and Management Web contain only intended artifacts, no secret/object-key
+      leakage, and are ready for project-owner implementation review.
+
+**Verification:**
+
+- [ ] Run clean installs and all migration, seed, unit/integration/concurrency,
+      contract/API, coverage, lint, typecheck, build, audit, and browser/a11y gates.
+- [ ] Save `tasks/evidence/venue-catalog.md`; review diffs, generated digests, dependency
+      audits, logs/audit samples, media cleanup, and run Prettier plus `git diff --check`.
+
+**Dependencies:** VC-17, VC-22
+
+**Files likely touched:** `tasks/evidence/venue-catalog.md`, `tasks/todo.md`
+
+**Estimated scope:** Medium
+
+#### Checkpoint V4 — Venue-catalog implementation approved
+
+- [ ] Project owner approves the completed venue-catalog implementation and VC-23
+      evidence.
+- [ ] SPEC-03 may begin only after this checkpoint; no booking-lifecycle implementation
+      is authorized by venue-catalog planning or implementation alone.
+
+## Fast-track protocol — SPEC-03 through SPEC-11
+
+**Approval evidence (2026-10-05):** The project owner approved compact module planning
+and continuous-wave implementation for every module beginning with SPEC-03. Module
+dependency order and final owner approval remain unchanged.
+
+- Each module uses a delta specification: reference the approved core-platform,
+  identity, audit, idempotency, error, pagination, migration, Storage, and security
+  contracts instead of restating them.
+- `booking-lifecycle`, `payments-billing`, and `invitation-studio` may use at most eight
+  implementation waves because their state, money, and media risks are high. Later
+  modules use four to six waves unless a documented dependency requires one more.
+- Microtasks remain explicit as acceptance checklists inside their owning wave, but do
+  not require separate owner approval or a separate full-suite run.
+- Each wave runs focused proof while it is active. The complete repository gates run
+  once at the module contract/checkpoint, and clean migration/seed/E2E/security evidence
+  runs once at final module acceptance.
+- Independent backend aggregates and client surfaces may proceed in parallel only after
+  their provider/OpenAPI contract is stable and their files/worktrees do not overlap.
+- Continue automatically between green waves. Stop for a new business decision,
+  dependency-direction change, schema/history/money/auth safety exception, failed module
+  gate, or final owner approval.
 
 ### SPEC-03: Specify `booking-lifecycle`
 
@@ -1449,7 +2241,8 @@ implementation remains subject to its own approval gate.
 
 - [ ] `SPEC-booking-lifecycle.md` covers ACC-001 and TML-001 through TML-008 together with availability, holds, booking states, change, and cancellation rules.
 - [ ] Timeline revision/approval transitions and the authoritative deposit-eligibility contract handle stale clients and edit/approval races.
-- [ ] Detailed backend, Public Web, and Management Web vertical slices are approved with migration, API, concurrency, audit, and UI verification.
+- [ ] A compact plan of at most eight continuous implementation waves covers backend,
+      Public Web, and Management Web migration, API, concurrency, audit, and UI proof.
 
 **Verification:**
 
@@ -1465,7 +2258,8 @@ implementation remains subject to its own approval gate.
 
 #### Checkpoint H2 — Consultation and catalog planning ready
 
-- [ ] Venue and booking specifications have approved provider contracts and detailed task slices.
+- [ ] Venue and booking specifications have approved provider contracts and compact
+      implementation waves with nested acceptance checklists.
 - [ ] Deposit remains impossible to plan as a client-only or stale-state decision.
 
 ### SPEC-04: Specify `payments-billing`
@@ -1476,7 +2270,8 @@ implementation remains subject to its own approval gate.
 
 - [ ] `SPEC-payments-billing.md` covers the existing payment scope and PRN-006.
 - [ ] Deposit eligibility recheck, print-charge registration, receivable inclusion, idempotency, reconciliation, and refund boundaries are explicit.
-- [ ] Detailed implementation tasks cover database constraints, provider callbacks, audit evidence, API contracts, and Manager/Couple billing views.
+- [ ] A compact plan of at most eight continuous implementation waves covers database
+      constraints, provider callbacks, audit evidence, API contracts, and billing views.
 
 **Verification:**
 
@@ -1498,7 +2293,8 @@ implementation remains subject to its own approval gate.
 
 - [ ] `SPEC-invitation-studio.md` covers MED-001 through MED-006, PRN-001 through PRN-005, PRN-007 through PRN-009, and QRC-001 through QRC-004.
 - [ ] Media authorization/retention, printable/commercial snapshotting, print state transitions, billing calls, and public/private asset separation are explicit.
-- [ ] Detailed backend, Public Web, Couple App, and Management Web tasks are approved with storage, security, contract, and print-race tests.
+- [ ] A compact plan of at most eight continuous implementation waves covers backend,
+      Public Web, Couple App, Management Web, storage, security, contract, and race proof.
 
 **Verification:**
 
@@ -1525,7 +2321,8 @@ implementation remains subject to its own approval gate.
 
 - [ ] `SPEC-guest-rsvp.md` covers GST-001 through GST-008 and QRC-005.
 - [ ] Household identity, optional disambiguating contact, companion counts, group lifecycle, token privacy, and personalized-link behavior are explicit.
-- [ ] Detailed backend and Guest/Couple Web tasks are approved with import, normalization, authorization, delivery, and RSVP tests.
+- [ ] A compact plan of four to six continuous implementation waves covers backend and
+      Guest/Couple Web import, normalization, authorization, delivery, and RSVP proof.
 
 **Verification:**
 
@@ -1547,7 +2344,8 @@ implementation remains subject to its own approval gate.
 
 - [ ] `SPEC-seating-plan.md` covers SEA-003 through SEA-008.
 - [ ] Layout selection, label mapping, headcount invalidation, Manager exception, remapping, confirmation, and audit transitions are explicit.
-- [ ] Detailed backend and Couple/Manager client slices are approved with compatibility, stale-template, authorization, and remapping tests.
+- [ ] A compact plan of four to six continuous implementation waves covers backend and
+      Couple/Manager compatibility, stale-template, authorization, and remapping proof.
 
 **Verification:**
 
@@ -1569,7 +2367,8 @@ implementation remains subject to its own approval gate.
 
 - [ ] `SPEC-staff-operations.md` covers CHK-001 through CHK-008 and staff assignment/authorization.
 - [ ] Arrival, correction, cumulative attendance, duplicate-name handling, concurrency, and audit state are explicit.
-- [ ] Detailed backend and Staff Web slices are approved with simultaneous-arrival, warning, correction, privacy, and authorization tests.
+- [ ] A compact plan of four to six continuous implementation waves covers backend and
+      Staff Web concurrency, warning, correction, privacy, and authorization proof.
 
 **Verification:**
 
@@ -1596,7 +2395,8 @@ implementation remains subject to its own approval gate.
 
 - [ ] `SPEC-notifications-automation.md` covers OPS-001 and OPS-002 with the existing notification/job scope.
 - [ ] Event ownership, deduplication, retries, deadlines, quiet failure behavior, redaction, and recipient preferences are explicit.
-- [ ] Detailed backend and client notification tasks are approved with fake-provider, replay, scheduling, and PII-leak tests.
+- [ ] A compact plan of four to six continuous implementation waves covers backend and
+      client fake-provider, replay, scheduling, and PII-leak proof.
 
 **Verification:**
 
@@ -1618,7 +2418,8 @@ implementation remains subject to its own approval gate.
 
 - [ ] `SPEC-analytics-dashboard.md` covers OPS-003 and OPS-004 with the existing dashboard scope.
 - [ ] Metric definitions, filters, time zone, source-of-truth fields, draft/accepted print treatment, privacy, and refresh behavior are explicit.
-- [ ] Detailed backend and Management Web slices are approved with fixture-based query, aggregation, authorization, and display tests.
+- [ ] A compact plan of four to six continuous implementation waves covers backend and
+      Management Web query, aggregation, authorization, and display proof.
 
 **Verification:**
 
@@ -1640,7 +2441,8 @@ implementation remains subject to its own approval gate.
 
 - [ ] `SPEC-release-demo.md` covers the complete approved capability map and cross-module scenarios from `PRODUCT-REQUIREMENTS.md`.
 - [ ] Deployment ownership, environment configuration, seed data, migration order, rollback, monitoring, security review, and demo script are explicit.
-- [ ] Detailed release tasks and go/no-go checkpoints are approved without weakening any module's Definition of Done.
+- [ ] A compact plan of four to six continuous release waves and explicit go/no-go
+      checkpoints is approved without weakening any module's Definition of Done.
 
 **Verification:**
 
@@ -1656,10 +2458,16 @@ implementation remains subject to its own approval gate.
 
 #### Checkpoint H5 — Program specification sequence complete
 
-- [ ] All module specs, detailed task slices, implementations, and evidence approvals are complete in dependency order.
+- [ ] All module specs, compact implementation waves, implementations, and evidence
+      approvals are complete in dependency order.
 - [ ] Release planning covers the restricted-workspace-to-event-check-in journey and all four repositories.
 - [ ] No deferred or out-of-scope feature was silently promoted into the required release.
 
 ## Rolling-Plan Rule
 
-When a SPEC task is approved, insert that module's implementation tasks immediately after its specification gate and before the next dependent SPEC task. Update the dependent SPEC task to reference the final implementation/evidence task IDs. Never mark a SPEC task complete merely because a draft exists; approval and detailed task insertion are required.
+When a SPEC task is approved, insert that module's compact implementation waves
+immediately after its specification gate and before the next dependent SPEC task.
+Record microtasks as acceptance checklists inside those waves rather than expanding them
+into separately approved execution tasks. Update the dependent SPEC task to reference
+the final implementation/evidence wave IDs. Never mark a SPEC task complete merely
+because a draft exists; decision approval and wave insertion are required.
