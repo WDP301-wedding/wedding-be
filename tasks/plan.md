@@ -554,3 +554,237 @@ any `venue-catalog` implementation begins.
   new PII field.
 - Stop and split a task if its reviewed human-authored file group exceeds the stated
   small-slice boundary or combines schema, HTTP, and multi-client behavior in one step.
+
+## 17. Venue-Catalog Implementation Plan
+
+Status: **Approved by project owner on 2026-10-05**
+
+Specification: [`../SPEC-venue-catalog.md`](../SPEC-venue-catalog.md)
+
+Requirement ownership: SEA-001 and SEA-002
+
+The project owner approved VC-D1 through VC-D9 and then approved this exact VC-01
+through VC-23 plan, its bounded Section 17.1 constants, dependency order, and V1–V4
+checkpoints on 2026-10-05. Checkpoint V0 therefore authorizes implementation in the
+recorded order; approval does not mean any implementation task has already started.
+
+### 17.1 Implementation constants and dependency graph
+
+Checkpoint V0 also approves these bounded constants for VC-01. Changing one later is a
+catalog contract/policy change, not an environment override:
+
+| Concern | Planned constant |
+| --- | --- |
+| Names and titles | 1–120 trimmed characters |
+| Descriptions | 0–2,000 characters |
+| Media alternative text | 1–250 characters |
+| Table display label | 1–50 characters |
+| Dish display price | Optional integer VND from 0 through 1,000,000,000 |
+| Menu-package per-table price | Integer VND from 1 through 1,000,000,000 |
+| Hall maximum guests | Integer from 1 through 10,000 |
+| Layout table count | 1–500 tables per published version |
+| Table seat capacity | Integer from 1 through 100 |
+| Timeline item count | 1–100 items per published version |
+| Timeline offset/duration | Offset 0–1,440 minutes; optional duration 1–1,440 minutes |
+| Canvas | Fixed normalized `10000 × 10000`; integer positions 0–10,000 and positive in-bounds dimensions |
+| Catalog media | At most 20 attached assets per resource; JPEG/PNG/WebP, each at most the existing 25 MiB object limit |
+| Cursor page size | Default 20, maximum 100 |
+| Shift windows | Minute precision, same restaurant-local day, `startTime < endTime` |
+
+```text
+VC-D1 through VC-D9 approved
+              |
+              v
+       VC-01 policy/config lock
+          /                 \
+         v                   v
+ VC-02 domain rules    VC-03 schema/migration
+          \                 /
+           v               v
+        VC-04 version repository/concurrency ---- Checkpoint V1
+          |       |        |        |
+          v       v        v        v
+       VC-05   VC-06    VC-07    VC-08
+       venue   menu    timeline  layout
+          \       |        |        /
+           +------+---VC-09 media-+
+                         |
+                         v
+              VC-10 provider/auth/history ---- Checkpoint V2
+                  /       |       |       \
+                 v        v       v        v
+              VC-11    VC-12   VC-13    VC-14
+              venue     menu   timeline  layout HTTP
+                  \       |       |       /
+                   +------+-VC-15 media/lifecycle HTTP
+                                  |
+                           VC-16 deterministic seed
+                                  |
+                           VC-17 contract freeze ---- Checkpoint V3
+                          /       |        |       \
+                         v        v        v        v
+                      VC-18    VC-19    VC-20    VC-21
+                      venue     menu    timeline  layout UI
+                         \        |        |        /
+                          +-------+-VC-22 media/history UI
+                                      |
+                                  VC-23 acceptance audit ---- Checkpoint V4
+```
+
+VC-02 and VC-03 may proceed independently after VC-01. The four service slices may be
+implemented independently after the shared repository contract is stable, but their
+schema/repository files must not overlap without coordination. HTTP work begins only
+after V2. Management Web begins only after VC-17 fixes and publishes the generated
+contract.
+
+### 17.2 Ordered slices
+
+| Task | Deliverable | Repository | Depends on | Focused proof |
+| --- | --- | --- | --- | --- |
+| VC-01 | Record approved constants, validation bounds, storage purpose, retry semantics, and operator boundaries. | `wedding-be` | V0 | No implementation input from VC-D1–D9 remains ambiguous; config/format/secret checks pass. |
+| VC-02 | Add pure catalog lifecycle, version, shift, VND, timeline, capacity, and geometry policies. | `wedding-be` | VC-01 | Mutation-sensitive unit tests cover all valid/invalid boundaries without Prisma or HTTP. |
+| VC-03 | Add forward-only catalog schema and migration with aggregate/version/table constraints. | `wedding-be` | VC-01 | Empty and identity-baseline deploys pass; PostgreSQL rejects duplicate/current/draft/table conflicts. |
+| VC-04 | Add transactional repositories for draft CAS, publish, supersede, retire/restore, and exact-version resolution. | `wedding-be` | VC-02, VC-03 | Real PostgreSQL races have one winner and preserve immutable history. |
+| VC-05 | Implement restaurant profile, fixed shifts, halls, hall snapshots, and capacity-lowering guards. | `wedding-be` | VC-04 | Service/integration tests cover active/retired reads, name collisions, snapshots, and layout-dependent capacity conflicts. |
+| VC-06 | Implement dish versions and menu-package versions with ordered exact dish references and per-table price. | `wedding-be` | VC-04 | Repricing/retirement cannot mutate a published package or its historical resolution. |
+| VC-07 | Implement timeline-template drafts, publication, cloning, ordering, and immutable version resolution. | `wedding-be` | VC-04 | Item bounds/order, concurrent publish, clone, supersede, and retired-history tests pass. |
+| VC-08 | Implement hall-bound layout versions, stable table registry, fixed geometry, and capacity validation. | `wedding-be` | VC-04, VC-05 | SEA-001/002 unit and PostgreSQL tests prove range validation, immutable geometry, stable IDs, and non-reuse. |
+| VC-09 | Extend private Storage for catalog media and add transactional attach/reorder/replacement cleanup. | `wedding-be` | VC-05, VC-06, VC-07, VC-08 | MIME/magic-byte/size/key tests and failure cleanup preserve prior assets and expose no object key. |
+| VC-10 | Publish `VenueCatalogReader`, Manager authorization, current-selection reads, and exact historical resolution. | `wedding-be` | VC-05 through VC-09 | Provider tests deny retired content for new selection, resolve stored versions, and prove dependency direction. |
+| VC-11 | Add public/current plus Manager restaurant, shift, and hall HTTP contracts. | `wedding-be` | V2 | Strict schema, pagination, ETag/CAS, idempotency, role denial, and public-field contract tests pass. |
+| VC-12 | Add public/current plus Manager dish and menu-package HTTP contracts. | `wedding-be` | V2 | Version/price/dish-reference routes hide drafts/history and reject stale or non-Manager writes. |
+| VC-13 | Add Manager timeline-template HTTP contracts without a direct Couple/prospect template route. | `wedding-be` | V2 | Draft/publish/history tests and OpenAPI inspection prove bounded immutable timeline versions. |
+| VC-14 | Add Manager layout-template HTTP contracts without a Couple/public geometry mutation. | `wedding-be` | V2 | SEA-001/002 route tests cover hall/range/table invariants, stable errors, auth denials, and history. |
+| VC-15 | Add catalog media upload/order and explicit lifecycle HTTP contracts. | `wedding-be` | VC-11 through VC-14 | Upload and retire/restore routes honor idempotency/CAS; signed outputs omit storage internals. |
+| VC-16 | Add an explicit idempotent development/demo catalog seed. | `wedding-be` | VC-05 through VC-10 | Reruns do not duplicate/overwrite; published and retired fixtures satisfy the spec and seed never auto-runs in production. |
+| VC-17 | Register all schemas, generate OpenAPI, and publish the immutable backend contract/digest. | `wedding-be` | VC-11 through VC-16 | Contract generation/check, migration, complete backend gates, and secret/object-key inspection pass. |
+| VC-18 | Add Management Web catalog shell plus restaurant, shift, and hall administration. | `wedding-manage-web` | VC-17 | Component/browser tests cover responsive lists/forms, Manager guards, CAS conflicts, denials, and lifecycle feedback. |
+| VC-19 | Add accessible dish and menu-package version/pricing administration. | `wedding-manage-web` | VC-17 | Tests cover integer VND input/display, ordered dishes, publish/history, retirement, stale data, and API errors. |
+| VC-20 | Add timeline-template version editor and history. | `wedding-manage-web` | VC-17 | Keyboard-accessible add/edit/remove/reorder, publish, clone, and immutable-history tests pass. |
+| VC-21 | Add fixed-layout editor and read-only published preview. | `wedding-manage-web` | VC-17 | Tests cover bounded geometry, stable table IDs, range/seat feedback, keyboard alternatives, responsive preview, and no Couple contract. |
+| VC-22 | Add shared catalog media, history, retirement, and restoration presentation to Manager features. | `wedding-manage-web` | VC-18 through VC-21 | Upload/order/error/a11y tests pass; UI exposes no object key and cannot override backend conflicts. |
+| VC-23 | Run and record the cross-repository venue-catalog acceptance audit. | backend + Management Web | VC-17, VC-22 | SEA-001/002 trace, clean migrations/seeds, concurrency, immutable contract, quality gates, secret/data review, and owner-ready evidence complete. |
+
+Each task is constrained in `todo.md` to no more than five human-authored files. If a
+slice crosses that boundary, it must be split before implementation rather than
+silently expanding its file group.
+
+### 17.3 Verification checkpoints
+
+**Checkpoint V0 — Venue-catalog plan approval:** Approved on 2026-10-05 for VC-01
+through VC-23, their Section 17.1 constants, dependency order, and V1–V4 checkpoints.
+Implementation may now begin with VC-01; later checkpoints and stop conditions remain
+mandatory.
+
+**Checkpoint V1 — Catalog persistence and version core:** VC-01 through VC-04 must pass
+pure-domain tests, empty/upgrade PostgreSQL migrations, constraint tests, and concurrent
+publish/CAS/retirement tests. No service or HTTP slice proceeds with an ambiguous or
+mutable published-version primitive.
+
+**Checkpoint V2 — Catalog services and provider boundary:** VC-05 through VC-10 must
+prove current-selection versus historical-resolution behavior, Manager-only mutation,
+private media handling, and SEA-001/002 invariants. HTTP schemas may not weaken these
+service contracts.
+
+**Checkpoint V3 — Immutable catalog contract:** VC-11 through VC-17 must pass contract,
+authorization, idempotency, migration, seed, coverage, lint, typecheck, build, audit,
+and OpenAPI drift gates. Management Web starts only from the committed digest.
+
+**Checkpoint V4 — Venue-catalog implementation approval:** VC-23 records all backend
+and Management Web evidence. The project owner must approve the completed module before
+SPEC-03 or any `booking-lifecycle` implementation begins.
+
+### 17.4 Risks and controls
+
+| Risk | Control fixed by the plan |
+| --- | --- |
+| Published price or template changes retroactively | Immutable exact versions, consumer snapshots, and historical-resolution tests. |
+| Two Manager tabs publish conflicting versions | Draft CAS, transactional next-version assignment, idempotency, and PostgreSQL race tests. |
+| Hall/layout capacity mismatch | Server recomputation, database ownership constraints, and capacity-lowering conflict tests. |
+| Table labels point to a different physical table | Template-owned UUID registry, no ID recycling, exact layout version references. |
+| Couple or forged UI mutates geometry | No Couple mutation operation in OpenAPI and direct backend role-denial tests. |
+| Retiring catalog content breaks bookings or reports | New-selection exclusion separated from exact historical resolution; no hard deletion. |
+| Catalog upload weakens private storage | Purpose-scoped generated keys, existing validation baseline, signed reads, failure cleanup. |
+| Client drifts from backend rules | Backend-first immutable OpenAPI digest and generated Management Web types. |
+| Layout editor is inaccessible or mobile-unusable | Keyboard controls, numeric field alternative, semantic forms, and responsive preview tests. |
+| Oversized catalog change becomes unreviewable | Small vertical slices, five-file boundary, and V1/V2/V3/V4 review points. |
+
+### 17.5 Parallelization and stop conditions
+
+- VC-02 and VC-03 may run in parallel after VC-01.
+- VC-05, VC-06, and VC-07 may run in parallel after VC-04 when they do not edit the
+  same shared repository/schema file. VC-08 also requires VC-05's hall contract.
+- VC-11 through VC-14 may run in parallel after V2 if OpenAPI registry ownership is
+  coordinated; VC-15 waits for their lifecycle/media surfaces.
+- VC-18 through VC-21 may run in parallel only after VC-17 publishes the exact digest.
+- Stop and return to the project owner if a task needs a new price unit, shift code,
+  capacity exception, editable published version, reusable table ID, public Storage
+  bucket, new provider, Couple mutation, hard deletion, or different retention policy.
+- Stop and split a task before work if it exceeds five human-authored files, combines
+  unrelated catalog aggregates, or changes backend and Management Web in one slice.
+
+### 17.6 Fast-track amendment from VC-08
+
+The project owner approved this amendment on 2026-10-05. VC-05 through VC-07 were
+already in progress and are not replanned. VC-08 through VC-23 retain their identifiers,
+requirements, dependency order, focused proof, and safety constraints, but execute as
+continuous waves:
+
+| Wave | Scope | Execution rule | Full gate |
+| --- | --- | --- | --- |
+| FT-V2 | VC-08 → VC-09 → VC-10 | Continue automatically when each dependency and focused proof is green. | V2 backend service/provider gate |
+| FT-V3 | VC-11–VC-14 plus VC-16 where non-overlapping → VC-15 → VC-17 | Coordinate shared OpenAPI ownership; do not pause between green tasks. | V3 backend/contract/digest gate |
+| FT-V4 | VC-18–VC-21 where non-overlapping → VC-22 → VC-23 | Begin only from the frozen VC-17 digest. | V4 cross-repository acceptance and owner approval |
+
+During a wave, each task runs only its focused behavioral proof, changed-file formatting,
+and diff checks. Full unit/integration/coverage, lint, typecheck, build, migration,
+generation, dependency audit, and drift commands run once at the owning checkpoint,
+unless a focused failure makes an earlier complete run necessary. On this Windows host,
+the stable complete integration command is
+`npm run test:integration -- --maxWorkers=1`.
+
+A green V2 or V3 gate authorizes immediate continuation. Return to the project owner
+only for a failed checkpoint, an existing Section 17.5 stop condition, unsafe overlap,
+or a new product decision. V4 keeps its explicit owner-approval requirement.
+
+## 18. Fast-track planning protocol for SPEC-03 through SPEC-11
+
+Beginning with `booking-lifecycle`, specifications are compact delta specs over the
+already approved platform contracts. They must not repeat established environment,
+HTTP/error, RBAC, audit, idempotency, pagination, migration, Storage, observability, or
+secret-handling rules unless the module intentionally tightens one.
+
+### 18.1 Wave budgets
+
+| Module class | Modules | Planned waves |
+| --- | --- | --- |
+| High-risk state/money/media | `booking-lifecycle`, `payments-billing`, `invitation-studio` | At most 8 |
+| Product workflow | `guest-rsvp`, `seating-plan`, `staff-operations` | 4–6 |
+| Operations/reporting/release | `notifications-automation`, `analytics-dashboard`, `release-demo` | 4–6 |
+
+Every wave owns a coherent vertical outcome and keeps its detailed microtasks as
+acceptance checklists. Microtasks do not become separate approval gates or trigger a
+complete repository suite. A module normally uses these outcomes: decision/contract
+lock, persistence/domain, services/authorization, HTTP/OpenAPI, independent clients,
+and final acceptance; high-risk modules may split persistence, external providers, or
+concurrency into additional waves within the budget.
+
+### 18.2 Verification and continuation
+
+- Focused tests and changed-file format/diff checks run inside each wave.
+- Full repository gates run once at the module contract checkpoint.
+- Clean migrations, deterministic seed, critical E2E, security/redaction, and evidence
+  run once at final module acceptance.
+- Independent aggregates or clients may proceed concurrently only after their provider
+  or OpenAPI surface is stable and their worktrees/files do not overlap.
+- Green waves continue without another owner round-trip. Stop only for a new business
+  decision, dependency reversal, money/auth/history/schema safety exception, failed
+  checkpoint, or final owner approval.
+
+### 18.3 Rolling-plan rule
+
+After a SPEC decision gate is approved, insert its compact implementation waves before
+the next dependent SPEC entry in `tasks/todo.md`. Reference existing platform decisions
+instead of duplicating them, and record microtasks beneath their owning wave. Update the
+next SPEC dependency to the completed evidence wave. Module order from
+`CAPABILITY-MAP.md` remains unchanged.
