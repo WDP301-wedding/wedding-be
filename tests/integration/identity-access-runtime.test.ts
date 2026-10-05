@@ -24,16 +24,25 @@ const execFileAsync = promisify(execFile);
 const migrationDatabaseUrl = process.env.TEST_MIGRATION_DATABASE_URL?.trim();
 const describeWithDatabase = migrationDatabaseUrl ? describe : describe.skip;
 const baseUrl = migrationDatabaseUrl ?? 'postgresql://unused:unused@127.0.0.1:1/unused';
+const testScrypt = {
+  cost: 2,
+  blockSize: 1,
+  parallelization: 1,
+  keyLengthBytes: 16,
+  maxMemoryBytes: 4096,
+} as const;
 
 describeWithDatabase('IA-08 identity runtime composition', () => {
   const schemaName = `identity_runtime_${randomUUID().replaceAll('-', '')}`;
   const scopedUrl = withSchema(baseUrl, schemaName);
   const admin = new Client({ connectionString: baseUrl });
-  const runtimeConfig = parseEnvironment({
-    NODE_ENV: 'test',
-    DATABASE_URL: scopedUrl,
-    CORS_ALLOWED_ORIGINS: 'https://couple.example.com',
-  });
+  const runtimeConfig = withTestScrypt(
+    parseEnvironment({
+      NODE_ENV: 'test',
+      DATABASE_URL: scopedUrl,
+      CORS_ALLOWED_ORIGINS: 'https://couple.example.com',
+    }),
+  );
   let runtime: IdentityRuntime;
 
   beforeAll(async () => {
@@ -46,13 +55,7 @@ describeWithDatabase('IA-08 identity runtime composition', () => {
       minimumCharacters: 12,
       maximumCharacters: 128,
       maximumBytes: 512,
-      scrypt: {
-        cost: 2,
-        blockSize: 1,
-        parallelization: 1,
-        keyLengthBytes: 16,
-        maxMemoryBytes: 4096,
-      },
+      scrypt: testScrypt,
     });
     await seed.account.create({
       data: {
@@ -125,7 +128,39 @@ describeWithDatabase('IA-08 identity runtime composition', () => {
       name: 'PasswordConfigurationError',
     });
   });
+
+  it('composes the email provider with the local notification origin fallback', async () => {
+    const emailRuntime = await createIdentityRuntime(
+      withTestScrypt(
+        parseEnvironment({
+          NODE_ENV: 'test',
+          DATABASE_URL: scopedUrl,
+          RESEND_API_KEY: 're_test_only',
+          RESEND_FROM_EMAIL: 'Wedding Test <notifications@example.com>',
+        }),
+      ),
+    );
+
+    try {
+      expect(emailRuntime.router).toBeTypeOf('function');
+    } finally {
+      await emailRuntime.resource.close();
+    }
+  });
 });
+
+function withTestScrypt(config: BackendConfig): BackendConfig {
+  return {
+    ...config,
+    identityAccess: {
+      ...config.identityAccess,
+      password: {
+        ...config.identityAccess.password,
+        scrypt: testScrypt,
+      },
+    },
+  };
+}
 
 function quoteIdentifier(value: string): string {
   return `"${value.replaceAll('"', '""')}"`;

@@ -1,9 +1,20 @@
 import request from 'supertest';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { createApp } from '../../src/app.js';
 import { parseEnvironment } from '../../src/config/env.js';
 import { bootstrap } from '../../src/server.js';
+
+vi.mock('../../src/modules/identity-access/identity.runtime.js', async () => {
+  const { Router } = await import('express');
+
+  return {
+    createIdentityRuntime: vi.fn(() => ({
+      router: Router(),
+      resource: { name: 'identity-database', close: vi.fn() },
+    })),
+  };
+});
 
 const trustedRequestId = '24dcfaac-4408-4d42-8d66-456ed6ee7ea4';
 const allowedOrigin = 'https://wedding.example.com';

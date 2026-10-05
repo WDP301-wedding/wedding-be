@@ -17,6 +17,17 @@ import {
   type ShutdownResource,
 } from './lifecycle.js';
 
+vi.mock('../../modules/identity-access/identity.runtime.js', async () => {
+  const { Router } = await import('express');
+
+  return {
+    createIdentityRuntime: vi.fn(() => ({
+      router: Router(),
+      resource: { name: 'identity-database', close: vi.fn() },
+    })),
+  };
+});
+
 class TestSignalTarget extends EventEmitter {
   exitCode: NodeJS.Process['exitCode'];
   exitedWith: number | undefined;
