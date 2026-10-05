@@ -2,6 +2,10 @@
 
 - Approved cross-module requirements: [`PRODUCT-REQUIREMENTS.md`](./PRODUCT-REQUIREMENTS.md)
 - Decision rationale: [`ADR-001`](./docs/decisions/0001-model-revised-wedding-operations-with-existing-capabilities.md)
+- Locked contract baseline:
+  [`WEDDING-CONTRACT-1@1.0.0`](./CONTRACT-BASELINE.md)
+- Parallel-specification decision:
+  [`ADR-002`](./docs/decisions/0002-freeze-program-contracts-before-parallel-specification.md)
 
 ## Initiative
 
@@ -28,7 +32,7 @@ Business rules are authoritative in the Express API. Web and App clients consume
 | `seating-plan` | Capacity-compatible fixed-layout selection, guest-group colors, table-level group labeling, layout confirmation, and compatibility warnings when expected headcount changes | `venue-catalog`, `booking-lifecycle`, `guest-rsvp` |
 | `staff-operations` | Staff accounts, event assignments, invitation-household search, multi-arrival manual check-in, actual companion counts, guest-group guidance, and audited attendance corrections | `identity-access`, `booking-lifecycle`, `guest-rsvp`, `seating-plan` |
 | `notifications-automation` | Android push notifications, operational email, workspace invitations, timeline approval and change events, payment and print-order events, RSVP deadlines, D-3 reminders, and booking completion jobs | `identity-access`, `booking-lifecycle`, `payments-billing`, `invitation-studio`, `guest-rsvp` |
-| `analytics-dashboard` | KPIs, revenue, receivables, booking status, hall utilization, menu popularity, print-order status, and expected-versus-actual attendance by invitation household and guest group | `venue-catalog`, `booking-lifecycle`, `payments-billing`, `invitation-studio`, `guest-rsvp`, `staff-operations` |
+| `analytics-dashboard` | KPIs, revenue, receivables, booking status, hall utilization, menu popularity, print-order status, and expected-versus-actual attendance by invitation household and guest group | `venue-catalog`, `booking-lifecycle`, `payments-billing`, `invitation-studio`, `guest-rsvp`, `seating-plan`, `staff-operations` |
 | `release-demo` | End-to-end verification, demo seed data, Web/API deployment, Android EAS build, logging, and the demo checklist | All preceding modules |
 
 Module IDs are stable and must not be renamed after approval. Each module receives its own `SPEC-<module-id>.md` before planning or implementation begins for that module. Those module specs must trace applicable requirements from `PRODUCT-REQUIREMENTS.md`.
@@ -49,19 +53,32 @@ payments-billing
 invitation-studio
     |
 guest-rsvp
-    |
-seating-plan
-    |
-staff-operations
-    |
-notifications-automation
-    |
-analytics-dashboard
-    |
-release-demo
+    |\
+    | +---------------------> notifications-automation --------+
+    v                                                        |
+seating-plan                                                 |
+    |                                                        |
+    v                                                        |
+staff-operations                                             |
+    |                                                        |
+    v                                                        |
+analytics-dashboard -----------------------------------------+
+                                                             |
+                                                             v
+                                                        release-demo
 ```
 
-The diagram shows the governing build order. Some internal tasks may still run in parallel once their provider contracts are stable, but a dependent module cannot be approved before its providers. Dependencies must remain acyclic; cross-module communication uses provider-owned contracts or domain events defined by the providing module.
+The diagram shows the governing provider spine and the first approved branch in the
+program. Final contract approval remains provider-first. After `guest-rsvp` is stable,
+the `seating-plan → staff-operations → analytics-dashboard` chain and
+`notifications-automation` are the principal parallel branches. `release-demo` waits
+for both. Dependencies must remain acyclic; cross-module communication uses
+provider-owned contracts or domain events defined by the providing module.
+
+Drafting may overlap earlier than implementation under `WEDDING-CONTRACT-1@1.0.0`,
+but a draft does not satisfy its contract, plan, implementation, or integration gate.
+`SPEC-02` continues under its existing V1–V4 sequence, and `SPEC-03` implementation
+remains blocked until venue-catalog reaches V4.
 
 `guest-rsvp` owns guest-group definitions because the same group identifies an invitation household before it labels any table. `seating-plan` consumes those stable group identifiers and the fixed layout templates owned by `venue-catalog`; this direction avoids a dependency cycle between the guest list and seating plan.
 
@@ -94,7 +111,7 @@ The following do not receive required modules or acceptance criteria. They may b
 - Per-recipient physical-invitation QR codes and QR-based event check-in.
 - Printed recipient names, in-system image editing, and public wedding-photo albums.
 
-## Approved Build Order
+## Approved Dependency and Execution Order
 
 1. `core-platform`
 2. `identity-access`
@@ -103,12 +120,20 @@ The following do not receive required modules or acceptance criteria. They may b
 5. `payments-billing`
 6. `invitation-studio`
 7. `guest-rsvp`
-8. `seating-plan`
-9. `staff-operations`
-10. `notifications-automation`
-11. `analytics-dashboard`
-12. `release-demo`
+8. Branch A starts with `seating-plan`; Branch B starts with
+   `notifications-automation` and may proceed independently where producer contracts
+   are already stable.
+9. `staff-operations` follows `seating-plan` on Branch A.
+10. `analytics-dashboard` follows `staff-operations` and may overlap the remaining
+    notification work.
+11. `release-demo` starts only after both `notifications-automation` and
+    `analytics-dashboard` satisfy their acceptance gates.
 
 The initial capability map was approved by the project owner on 2026-09-24.
 
 The revised responsibilities, dependency direction, and build order were approved by the project owner on 2026-09-26. The revision adds pre-deposit timeline collaboration, post-deposit wedding media, fixed-layout guest-group seating, invitation-household check-in, and physical-invitation print fulfillment while preserving the approved module IDs.
+
+The contract-first coordination model and branched execution order for `SPEC-03`
+through `SPEC-11` were approved by the project owner through
+`WEDDING-CONTRACT-1@1.0.0` on 2026-10-06. This approval does not reopen or replan
+`SPEC-02`.

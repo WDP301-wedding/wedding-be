@@ -2,6 +2,8 @@
 
 Core-platform plan status: Approved by project owner on 2026-09-24<br>
 Post-core program extension status: Approved by project owner on 2026-09-27<br>
+Cross-module contract baseline: Locked as
+[`WEDDING-CONTRACT-1@1.0.0`](../CONTRACT-BASELINE.md) on 2026-10-06<br>
 Approved platform specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)<br>
 Approved product requirements: [`../PRODUCT-REQUIREMENTS.md`](../PRODUCT-REQUIREMENTS.md)<br>
 Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)<br>
@@ -13,7 +15,12 @@ Extended: 2026-09-27
 
 Implement the approved wedding-management capabilities across four independent repositories in the dependency order recorded by `CAPABILITY-MAP.md`. The currently detailed CP-01 through CP-32 work establishes `core-platform`: reproducible TypeScript toolchains, a production-minded Express/Prisma foundation, a generated OpenAPI contract, three typed API clients, provider boundaries, security/observability primitives, and independent CI quality gates.
 
-The post-core extension adds rolling specification and planning gates for every later module. A module receives detailed implementation tasks only after its own `SPEC-<module-id>.md` is approved. This preserves the completed and in-progress core-platform history while preventing unapproved API, state-machine, security, or data-retention assumptions from entering implementation tasks.
+The post-core extension adds rolling specification and planning gates for every later
+module. `WEDDING-CONTRACT-1@1.0.0` now permits controlled overlap while `SPEC-03`
+through `SPEC-11` are drafted, but a module receives detailed implementation tasks
+only after its own `SPEC-<module-id>.md` is approved. This preserves completed and
+in-progress history while preventing unapproved API, state-machine, security, or
+data-retention assumptions from entering implementation tasks.
 
 The plan remains front-loaded with the highest-risk foundations: PostgreSQL migration behavior, HTTP/error conventions, idempotency concurrency, deterministic API generation, prospect-to-Couple authorization, revision-bound approvals, private media, attendance concurrency, and immutable print snapshots.
 
@@ -28,6 +35,12 @@ The plan remains front-loaded with the highest-risk foundations: PostgreSQL migr
 - Phase estimates are sequencing guidance, not delivery promises; verification evidence determines completion.
 - `PRODUCT-REQUIREMENTS.md` and the revised capability map are approved, but no later module is authorized for implementation until its module specification and detailed task slice pass their own human review gate.
 - The task list is a rolling plan: completed CP tasks are immutable history, unchecked CP tasks remain active, and later module tasks are inserted only by the corresponding specification gate.
+- `SPEC-02` remains governed by its approved venue-catalog plan through V4. The
+  baseline does not reopen it, and no `booking-lifecycle` implementation starts before
+  V4 acceptance.
+- Every SPEC from `SPEC-03` onward declares
+  `contractBaseline: WEDDING-CONTRACT-1@1.0.0` and lists its produced and consumed
+  provider contracts and events.
 
 ## 3. Architecture Decisions Carried into Implementation
 
@@ -45,6 +58,9 @@ The plan remains front-loaded with the highest-risk foundations: PostgreSQL migr
 12. Guest groups belong to `guest-rsvp`; fixed layout geometry belongs to `venue-catalog`; table labeling belongs to `seating-plan`.
 13. Event check-in records invitation-household arrivals and corrections rather than per-seat occupancy or physical-invitation QR credentials.
 14. `payments-billing` precedes `invitation-studio` because accepted print charges become booking receivables.
+15. Cross-module ownership, identifiers, events, snapshot semantics, compatibility,
+    and change control are fixed by `WEDDING-CONTRACT-1@1.0.0`; conflicting module
+    choices require a baseline change proposal first.
 
 ## 4. Dependency Graph
 
@@ -336,7 +352,7 @@ Fake adapters and placeholder `.env.example` values keep these inputs from block
 
 The original approval authorizes work on `core-platform` only. CP-01 through CP-32 and their checkpoints remain unchanged in meaning; later capabilities still require their own approved specs, detailed vertical slices, and human approval.
 
-## 11. Post-Core Dependency Graph
+## 11. Post-Core Contract and Dependency Graph
 
 ```text
 CP-32 + core-platform implementation approval
@@ -349,30 +365,34 @@ SPEC-02 venue-catalog spec and detailed plan
         |
 venue-catalog implementation + evidence approval
         |
-SPEC-03 booking-lifecycle spec and detailed plan
+SPEC-03 booking-lifecycle final approval
         |
-booking-lifecycle implementation + evidence approval
+SPEC-04 payments-billing final approval
         |
-SPEC-04 payments-billing spec and detailed plan
+SPEC-05 invitation-studio final approval
         |
-payments-billing implementation + evidence approval
-        |
-SPEC-05 invitation-studio spec and detailed plan
-        |
-SPEC-06 guest-rsvp spec and detailed plan
-        |
-SPEC-07 seating-plan spec and detailed plan
-        |
-SPEC-08 staff-operations spec and detailed plan
-        |
-SPEC-09 notifications-automation spec and detailed plan
-        |
-SPEC-10 analytics-dashboard spec and detailed plan
-        |
-SPEC-11 release-demo spec and detailed plan
+SPEC-06 guest-rsvp final approval
+        |\
+        | +--> SPEC-09 notifications-automation final approval --------+
+        v                                                              |
+SPEC-07 seating-plan final approval                                     |
+        |                                                              |
+        v                                                              |
+SPEC-08 staff-operations final approval                                 |
+        |                                                              |
+        v                                                              |
+SPEC-10 analytics-dashboard final approval -----------------------------+
+                                                                       |
+                                                                       v
+                                                        SPEC-11 release-demo
 ```
 
-A `SPEC-*` gate writes and approves the owning module spec, resolves that module's deferred configuration values, fixes provider contracts and state transitions, and then expands `todo.md` with small vertical implementation tasks. Completion of a specification gate does not itself authorize the next provider-dependent module; the current module must be implemented, verified, and approved first.
+A `SPEC-*` draft may begin against the locked baseline before its upstream
+implementation is complete. Final contract approval remains provider-first according
+to the graph. After a module SPEC is approved, its plan and small vertical task slices
+may be prepared; implementation uses the readiness waves in the baseline and final
+integration requires real providers. A completed draft never authorizes implementation
+by itself.
 
 ## 12. Anticipated Module Slices
 
@@ -422,7 +442,12 @@ These are planning boundaries, not yet-authorized implementation tasks. The owni
 
 ## 15. Post-Core Extension Approval Gate
 
-The project owner approved this extension and the SPEC-01 through SPEC-11 sequence on 2026-09-27. The approval authorizes staged specification and planning only. Each module still requires explicit spec/plan approval before its implementation starts.
+The project owner approved this extension and the SPEC-01 through SPEC-11 sequence on
+2026-09-27, then approved and locked `WEDDING-CONTRACT-1@1.0.0` on 2026-10-06. The
+later approval authorizes controlled overlap in drafting, final contract review, and
+planning for separately approved SPECs. Each module still requires explicit SPEC and
+plan approval before implementation, and each real integration waits for its provider
+readiness gate.
 
 ## 16. Identity-Access Implementation Plan
 
@@ -750,9 +775,15 @@ or a new product decision. V4 keeps its explicit owner-approval requirement.
 ## 18. Fast-track planning protocol for SPEC-03 through SPEC-11
 
 Beginning with `booking-lifecycle`, specifications are compact delta specs over the
-already approved platform contracts. They must not repeat established environment,
+already approved platform contracts and `WEDDING-CONTRACT-1@1.0.0`. They must declare
+that baseline version, list produced/consumed contracts and events, and must not repeat established environment,
 HTTP/error, RBAC, audit, idempotency, pagination, migration, Storage, observability, or
 secret-handling rules unless the module intentionally tightens one.
+
+Drafting may overlap, but final approval follows `03 → 04 → 05 → 06`, then
+`07 → 08 → 10` in parallel with `09`; `11` waits for both branches. Parallelism is
+optional, not a target that overrides review capacity, file ownership, migration
+ordering, or integration safety.
 
 ### 18.1 Wave budgets
 
@@ -783,8 +814,10 @@ concurrency into additional waves within the budget.
 
 ### 18.3 Rolling-plan rule
 
-After a SPEC decision gate is approved, insert its compact implementation waves before
-the next dependent SPEC entry in `tasks/todo.md`. Reference existing platform decisions
-instead of duplicating them, and record microtasks beneath their owning wave. Update the
-next SPEC dependency to the completed evidence wave. Module order from
-`CAPABILITY-MAP.md` remains unchanged.
+After a SPEC decision gate is approved, record its compact implementation waves in
+`tasks/todo.md`; plans for separate approved SPECs may be prepared concurrently.
+Reference the baseline and existing platform decisions instead of duplicating them,
+and record microtasks beneath their owning wave. Execution order follows provider
+readiness, not the physical order of checklist entries. Prisma migrations remain in
+one serialized backend lane, and money, access promotion, immutable snapshots, and
+end-to-end acceptance cannot be closed using fakes alone.

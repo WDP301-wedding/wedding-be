@@ -3,6 +3,8 @@
 Core-platform task list status: Approved by project owner on 2026-09-24<br>
 Core-platform implementation status: Approved by project owner on 2026-10-03<br>
 Post-core specification sequence status: Approved by project owner on 2026-09-27<br>
+Cross-module contract baseline: Locked as
+[`WEDDING-CONTRACT-1@1.0.0`](../CONTRACT-BASELINE.md) on 2026-10-06<br>
 Plan: [`plan.md`](./plan.md)<br>
 Platform specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)<br>
 Product requirements: [`../PRODUCT-REQUIREMENTS.md`](../PRODUCT-REQUIREMENTS.md)<br>
@@ -19,6 +21,13 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 - Preserve completed CP checkboxes and evidence as implementation history; extending the plan must not reopen or rewrite completed work without a documented reason.
 - Do not implement a post-core module until its `SPEC-<module-id>.md`, detailed vertical tasks, and human approval gate exist.
 - Every post-core module spec and task slice must trace its owned identifiers from `PRODUCT-REQUIREMENTS.md`.
+- Every SPEC from `SPEC-03` onward must declare
+  `contractBaseline: WEDDING-CONTRACT-1@1.0.0`, list its produced and consumed
+  contracts/events, and use the baseline change procedure instead of silently forking
+  a provider contract.
+- SPEC drafts may overlap where the baseline permits. Final contract approvals,
+  implementation, real-provider integration, Prisma migrations, and acceptance still
+  follow their recorded dependency gates.
 
 ## Phase A — Reproducible Repository Foundations
 
@@ -2254,6 +2263,11 @@ the approved spec, decisions, checkpoints, and SEA-001/002 before opening SPEC-0
 and continuous-wave implementation for every module beginning with SPEC-03. Module
 dependency order and final owner approval remain unchanged.
 
+**Contract lock evidence (2026-10-06):** The project owner approved and locked
+`WEDDING-CONTRACT-1@1.0.0`. It applies to SPEC-03 through SPEC-11, leaves SPEC-02
+unchanged through V4, and replaces the former fully sequential later-SPEC drafting
+rule with the controlled gates below.
+
 - Each module uses a delta specification: reference the approved core-platform,
   identity, audit, idempotency, error, pagination, migration, Storage, and security
   contracts instead of restating them.
@@ -2270,6 +2284,17 @@ dependency order and final owner approval remain unchanged.
 - Continue automatically between green waves. Stop for a new business decision,
   dependency-direction change, schema/history/money/auth safety exception, failed module
   gate, or final owner approval.
+
+#### Checkpoint CB1 — Cross-module contract baseline locked
+
+- [x] `WEDDING-CONTRACT-1@1.0.0` records ownership, provider ports, events, snapshots,
+      compatibility, and change control.
+- [x] ADR-002 is accepted and `CAPABILITY-MAP.md` records the branched dependency
+      graph.
+- [x] SPEC-02 retains its existing VC/V checkpoints; SPEC-03 implementation remains
+      blocked until V4.
+- [x] The final SPEC approval graph is `03 → 04 → 05 → 06`, followed by
+      `07 → 08 → 10` in parallel with `09`; `11` waits for both branches.
 
 ### SPEC-03: Specify `booking-lifecycle`
 
@@ -2288,7 +2313,8 @@ dependency order and final owner approval remain unchanged.
 - [ ] Review the identity, catalog, and future payment interfaces for acyclic ownership.
 - [ ] Run Prettier and `git diff --check` on the affected documentation.
 
-**Dependencies:** Approved and completed `venue-catalog` implementation.
+**Dependencies:** The locked baseline authorizes drafting. Final SPEC/plan approval and
+all implementation remain blocked on venue-catalog V4 acceptance.
 
 **Files likely touched:** `wedding-be/SPEC-booking-lifecycle.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
 
@@ -2317,7 +2343,9 @@ dependency order and final owner approval remain unchanged.
 - [ ] Confirm `invitation-studio` can register an accepted charge without owning billing state.
 - [ ] Run Prettier and `git diff --check` on the affected documentation.
 
-**Dependencies:** Approved and completed `booking-lifecycle` implementation.
+**Dependencies:** Drafting may overlap SPEC-03. Final approval requires the approved
+SPEC-03 provider contract; real payment integration requires the implemented booking
+provider.
 
 **Files likely touched:** `wedding-be/SPEC-payments-billing.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
 
@@ -2340,7 +2368,9 @@ dependency order and final owner approval remain unchanged.
 - [ ] Prove the generic QR cannot reveal private media, personalized guest data, RSVP identity, or a check-in mutation.
 - [ ] Run Prettier and `git diff --check` on the affected documentation.
 
-**Dependencies:** Approved and completed `payments-billing` implementation.
+**Dependencies:** Drafting may overlap earlier work. Final approval requires the
+approved SPEC-04 billing contract; print acceptance requires the real charge registrar
+and settlement reader.
 
 **Files likely touched:** `wedding-be/SPEC-invitation-studio.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
 
@@ -2368,7 +2398,9 @@ dependency order and final owner approval remain unchanged.
 - [ ] Confirm guest-group identifiers are stable provider-owned contracts for seating, staff operations, and analytics.
 - [ ] Run Prettier and `git diff --check` on the affected documentation.
 
-**Dependencies:** Approved and completed `invitation-studio` implementation.
+**Dependencies:** Drafting may overlap earlier work. Final approval requires the
+approved SPEC-05 publication contract; personalized-link acceptance requires the real
+invitation provider.
 
 **Files likely touched:** `wedding-be/SPEC-guest-rsvp.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
 
@@ -2391,7 +2423,9 @@ dependency order and final owner approval remain unchanged.
 - [ ] Search the planned contracts for prohibited individual `SeatAssignment` or Couple geometry mutations.
 - [ ] Run Prettier and `git diff --check` on the affected documentation.
 
-**Dependencies:** Approved and completed `guest-rsvp` implementation.
+**Dependencies:** Drafting may overlap earlier work. Final approval requires the
+approved SPEC-06 guest/group contract; seating integration requires real guest and
+venue providers.
 
 **Files likely touched:** `wedding-be/SPEC-seating-plan.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
 
@@ -2414,7 +2448,9 @@ dependency order and final owner approval remain unchanged.
 - [ ] Confirm actual attendance derives from auditable arrivals/corrections and never from QR or per-seat occupancy.
 - [ ] Run Prettier and `git diff --check` on the affected documentation.
 
-**Dependencies:** Approved and completed `seating-plan` implementation.
+**Dependencies:** Drafting may overlap seating work. Final approval requires the
+approved SPEC-07 seating contract; staff integration requires real booking, guest, and
+seating providers.
 
 **Files likely touched:** `wedding-be/SPEC-staff-operations.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
 
@@ -2442,7 +2478,9 @@ dependency order and final owner approval remain unchanged.
 - [ ] Confirm notifications consume provider events without becoming the source of booking, payment, print, or RSVP truth.
 - [ ] Run Prettier and `git diff --check` on the affected documentation.
 
-**Dependencies:** Approved and completed `staff-operations` implementation.
+**Dependencies:** The locked baseline authorizes channel/provider drafting. Final
+approval requires all notification producer contracts through SPEC-06; individual
+handlers and acceptance wait for their real producer events.
 
 **Files likely touched:** `wedding-be/SPEC-notifications-automation.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
 
@@ -2465,7 +2503,9 @@ dependency order and final owner approval remain unchanged.
 - [ ] Confirm reports do not infer per-seat occupancy and exclude draft print quotations from receivables.
 - [ ] Run Prettier and `git diff --check` on the affected documentation.
 
-**Dependencies:** Approved and completed `notifications-automation` implementation.
+**Dependencies:** Metric drafting may start early. Final approval requires the
+approved payment, invitation, guest, seating, and staff contracts through SPEC-08;
+analytics does not wait for notification delivery and may overlap SPEC-09.
 
 **Files likely touched:** `wedding-be/SPEC-analytics-dashboard.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
 
@@ -2488,7 +2528,9 @@ dependency order and final owner approval remain unchanged.
 - [ ] Review deployment and rollback dependencies across all four repositories.
 - [ ] Run Prettier and `git diff --check` on the affected documentation.
 
-**Dependencies:** Approved and completed `analytics-dashboard` implementation.
+**Dependencies:** Scaffolding/checklist drafting may start early. Final SPEC and
+release-plan approval wait for approved SPEC-09 and SPEC-10 contracts; release
+execution and acceptance wait for every preceding real implementation.
 
 **Files likely touched:** `wedding-be/SPEC-release-demo.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
 
@@ -2504,8 +2546,10 @@ dependency order and final owner approval remain unchanged.
 ## Rolling-Plan Rule
 
 When a SPEC task is approved, insert that module's compact implementation waves
-immediately after its specification gate and before the next dependent SPEC task.
-Record microtasks as acceptance checklists inside those waves rather than expanding them
-into separately approved execution tasks. Update the dependent SPEC task to reference
-the final implementation/evidence wave IDs. Never mark a SPEC task complete merely
-because a draft exists; decision approval and wave insertion are required.
+after its specification gate; plans for separate approved SPECs may be prepared
+concurrently. Record microtasks as acceptance checklists inside their owning wave
+rather than expanding them into separately approved execution tasks. Link each
+consumer integration wave to the real provider evidence it requires. Checklist order
+does not override the dependency graph, serialized Prisma migration lane, or provider
+acceptance gates. Never mark a SPEC task complete merely because a draft exists;
+decision approval and wave insertion are required.
