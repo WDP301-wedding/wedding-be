@@ -174,7 +174,7 @@ export function createCatalogMediaService(
               resourceType: validated.resourceType,
             },
           });
-          detached = oldAsset as MediaRow;
+          detached = oldAsset;
           return attached;
         });
         if (detached !== undefined) {

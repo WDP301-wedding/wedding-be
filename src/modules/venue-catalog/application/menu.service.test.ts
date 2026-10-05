@@ -260,7 +260,7 @@ describe('menu service', () => {
     const service = createMenuService(
       prisma,
       versionRepository({
-        publish: publish as CatalogVersionRepository['publish'],
+        publish,
         changeLifecycle,
       }),
     );

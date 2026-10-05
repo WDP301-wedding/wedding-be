@@ -405,12 +405,13 @@ function validateLayoutContent(
     readonly description: string;
     readonly minGuests: number;
     readonly maxGuests: number;
-    readonly tables?: readonly LayoutTableInput[];
-    readonly geometry?: readonly LayoutTableInput[];
-  },
+  } & (
+    | Readonly<{ tables: readonly LayoutTableInput[] }>
+    | Readonly<{ geometry: readonly LayoutTableInput[] }>
+  ),
   template: LayoutValidationState,
 ) {
-  const tables = input.tables ?? input.geometry ?? [];
+  const tables = 'tables' in input ? input.tables : input.geometry;
   return Object.freeze({
     name: validateCatalogName(input.name),
     description: validateCatalogDescription(input.description),

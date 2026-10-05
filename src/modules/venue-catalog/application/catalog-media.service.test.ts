@@ -55,10 +55,10 @@ function uploadPrisma(input: ReturnType<typeof uploadInput>, provider: FakeStora
               ).length,
         ),
       ),
-      create: vi.fn(async ({ data }: { data: Omit<ReturnType<typeof mediaRow>, 'createdAt'> }) => {
+      create: vi.fn(({ data }: { data: Omit<ReturnType<typeof mediaRow>, 'createdAt'> }) => {
         const row = { ...data, createdAt: new Date() } as ReturnType<typeof mediaRow>;
         rows.push(row);
-        return row;
+        return Promise.resolve(row);
       }),
       findMany: vi.fn(() => Promise.resolve(rows.filter(({ detachedAt }) => detachedAt === null))),
     },
@@ -120,6 +120,34 @@ describe('catalog media service', () => {
     expect(fixture.rows).toHaveLength(0);
   });
 
+  it('allowlists and verifies every approved catalog resource type', async () => {
+    const resourceId = randomUUID();
+    const count = vi.fn(() => Promise.resolve(1));
+    const prisma = {
+      restaurantProfile: { count },
+      hall: { count },
+      dishVersion: { count },
+      menuPackageVersion: { count },
+      timelineTemplateVersion: { count },
+      layoutTemplateVersion: { count },
+      catalogMediaAsset: { findMany: vi.fn(() => Promise.resolve([])) },
+    } as unknown as PrismaClient;
+    const service = createCatalogMediaService(prisma, new FakeStorageProvider());
+    const resourceTypes = [
+      'RESTAURANT_PROFILE',
+      'HALL',
+      'DISH_VERSION',
+      'MENU_PACKAGE_VERSION',
+      'TIMELINE_TEMPLATE_VERSION',
+      'LAYOUT_TEMPLATE_VERSION',
+    ] as const;
+
+    for (const resourceType of resourceTypes) {
+      await expect(service.listSigned(resourceType, resourceId)).resolves.toEqual([]);
+    }
+    expect(count).toHaveBeenCalledTimes(resourceTypes.length);
+  });
+
   it('does not touch the database when Storage fails', async () => {
     const input = uploadInput();
     const provider: StorageProvider = {
@@ -138,7 +166,7 @@ describe('catalog media service', () => {
     const input = uploadInput();
     const provider = new FakeStorageProvider();
     const fixture = uploadPrisma(input, provider);
-    fixture.prisma.$transaction = vi.fn(() => Promise.reject(new Error('rollback'))) as never;
+    fixture.prisma.$transaction = vi.fn(() => Promise.reject(new Error('rollback')));
     const service = createCatalogMediaService(fixture.prisma, provider);
 
     await expect(service.upload(input)).rejects.toThrow('rollback');
@@ -223,7 +251,7 @@ describe('catalog media service', () => {
     await expect(provider.createSignedReadUrl(oldStored)).rejects.toBeInstanceOf(NotFoundError);
 
     const rollbackInput = uploadInput({ resourceId, bytes: Uint8Array.from([...pngBytes, 3]) });
-    prisma.$transaction = vi.fn(() => Promise.reject(new Error('rollback'))) as never;
+    prisma.$transaction = vi.fn(() => Promise.reject(new Error('rollback')));
     await expect(
       service.replace({ oldAssetId: newInput.assetId, ...rollbackInput }),
     ).rejects.toThrow('rollback');

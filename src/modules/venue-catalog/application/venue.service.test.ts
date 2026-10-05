@@ -229,7 +229,15 @@ describe('venue service', () => {
     ).resolves.toEqual(profile);
     expect(updateMany).toHaveBeenCalledWith({
       where: { singletonKey: 'RESTAURANT', revision: 1 },
-      data: expect.objectContaining({ publicPhone: null, publicEmail: null }),
+      data: {
+        displayName: 'Estate',
+        description: '',
+        address: '1 Road',
+        publicPhone: null,
+        publicEmail: null,
+        revision: { increment: 1 },
+        updatedByAccountId: context.actorId,
+      },
     });
   });
 

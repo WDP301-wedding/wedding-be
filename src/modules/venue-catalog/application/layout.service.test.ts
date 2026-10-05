@@ -106,7 +106,13 @@ describe('layout service', () => {
     ).resolves.toEqual({ versionId, revision: 1 });
 
     expect(transaction.layoutTemplate.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({ id: templateId, hallId }),
+      data: {
+        id: templateId,
+        hallId,
+        displayOrder: 0,
+        createdByAccountId: context.actorId,
+        updatedByAccountId: context.actorId,
+      },
     });
     expect(transaction.layoutTableIdentity.createMany).toHaveBeenCalledWith({
       data: [
@@ -161,12 +167,10 @@ describe('layout service', () => {
       },
     } as unknown as Prisma.TransactionClient);
 
-    expect(compareAndSwapDraft).toHaveBeenCalledWith(
-      expect.not.objectContaining({
-        hallId: expect.anything(),
-        totalSeatCapacity: expect.anything(),
-      }),
-    );
+    const compareAndSwapInput = compareAndSwapDraft.mock.calls[0]?.[0];
+    expect(compareAndSwapInput).toBeDefined();
+    expect(compareAndSwapInput).not.toHaveProperty('hallId');
+    expect(compareAndSwapInput).not.toHaveProperty('totalSeatCapacity');
     expect(createMany).toHaveBeenCalledWith({
       data: [expect.objectContaining({ tableId: geometry.tableId, layoutTemplateId: templateId })],
     });
@@ -307,47 +311,134 @@ describe('layout service', () => {
     ).rejects.toMatchObject({ code: 'CATALOG_TABLE_IDENTITY_CONFLICT' });
   });
 
-  it('rejects a missing/inactive hall and maps duplicate draft identities', async () => {
-    const missingHall = createLayoutService({
-      $transaction: vi.fn(async (operation: (value: object) => Promise<unknown>) =>
-        operation({ hall: { findFirst: vi.fn(() => Promise.resolve(null)) } }),
-      ),
-    } as unknown as PrismaClient);
-    await expect(
-      missingHall.createTemplate({
-        templateId: randomUUID(),
-        versionId: randomUUID(),
-        hallId: randomUUID(),
-        displayOrder: 0,
-        name: 'Layout',
-        description: '',
-        minGuests: 1,
-        maxGuests: 10,
-        tables: [table()],
-        context,
-      }),
-    ).rejects.toMatchObject({ code: 'NOT_FOUND' });
+  it('delegates lifecycle changes and lists only current hall layouts', async () => {
+    const geometry = table();
+    const changeLifecycle = vi.fn(() =>
+      Promise.resolve({ lifecycle: 'RETIRED' as const, revision: 3 }),
+    );
+    const findMany = vi.fn(() =>
+      Promise.resolve([
+        {
+          id: randomUUID(),
+          layoutTemplateId: randomUUID(),
+          versionNumber: 1,
+          revision: 2,
+          state: 'PUBLISHED' as const,
+          name: 'Current layout',
+          description: '',
+          minGuests: 1,
+          maxGuests: 10,
+          layoutTemplate: { hallId: randomUUID() },
+          geometry: [geometry],
+        },
+      ]),
+    );
+    const service = createLayoutService(
+      { layoutTemplateVersion: { findMany } } as unknown as PrismaClient,
+      versionRepository({ changeLifecycle }),
+    );
 
-    const duplicate = new Prisma.PrismaClientKnownRequestError('duplicate', {
-      code: 'P2002',
-      clientVersion: 'test',
+    await service.changeLifecycle({
+      aggregateId: randomUUID(),
+      expectedRevision: 2,
+      transition: 'RETIRE',
+      context,
     });
-    const conflict = createLayoutService({
-      $transaction: vi.fn(() => Promise.reject(duplicate)),
-    } as unknown as PrismaClient);
+    await expect(service.listCurrentVersionsForHall(randomUUID())).resolves.toMatchObject([
+      { state: 'PUBLISHED', totalSeatCapacity: 10 },
+    ]);
+    expect(changeLifecycle).toHaveBeenCalledOnce();
+    expect(findMany).toHaveBeenCalledOnce();
+  });
+
+  it('conceals an invalid historical row and rejects invalid template ordering', async () => {
+    const geometry = table();
+    const service = createLayoutService(
+      {
+        layoutTemplateVersion: {
+          findFirst: vi.fn(() =>
+            Promise.resolve({
+              id: randomUUID(),
+              layoutTemplateId: randomUUID(),
+              versionNumber: null,
+              revision: 1,
+              state: 'DRAFT',
+              name: 'Draft',
+              description: '',
+              minGuests: 1,
+              maxGuests: 10,
+              layoutTemplate: { hallId: randomUUID() },
+              geometry: [geometry],
+            }),
+          ),
+        },
+      } as unknown as PrismaClient,
+      versionRepository(),
+    );
+
+    await expect(service.resolveVersion(randomUUID())).rejects.toMatchObject({
+      code: 'NOT_FOUND',
+    });
     await expect(
-      conflict.createTemplate({
+      service.createTemplate({
         templateId: randomUUID(),
         versionId: randomUUID(),
         hallId: randomUUID(),
-        displayOrder: 0,
-        name: 'Layout',
+        displayOrder: -1,
+        name: 'Invalid',
         description: '',
         minGuests: 1,
         maxGuests: 10,
-        tables: [table()],
+        tables: [geometry],
         context,
       }),
-    ).rejects.toMatchObject({ code: 'CATALOG_DRAFT_CONFLICT' });
+    ).rejects.toBeInstanceOf(TypeError);
   });
+
+  it.each(['P2002', 'P2003', 'P2014'])(
+    'rejects a missing/inactive hall and maps database conflict %s',
+    async (conflictCode) => {
+      const missingHall = createLayoutService({
+        $transaction: vi.fn(async (operation: (value: object) => Promise<unknown>) =>
+          operation({ hall: { findFirst: vi.fn(() => Promise.resolve(null)) } }),
+        ),
+      } as unknown as PrismaClient);
+      await expect(
+        missingHall.createTemplate({
+          templateId: randomUUID(),
+          versionId: randomUUID(),
+          hallId: randomUUID(),
+          displayOrder: 0,
+          name: 'Layout',
+          description: '',
+          minGuests: 1,
+          maxGuests: 10,
+          tables: [table()],
+          context,
+        }),
+      ).rejects.toMatchObject({ code: 'NOT_FOUND' });
+
+      const duplicate = new Prisma.PrismaClientKnownRequestError('duplicate', {
+        code: conflictCode,
+        clientVersion: 'test',
+      });
+      const conflict = createLayoutService({
+        $transaction: vi.fn(() => Promise.reject(duplicate)),
+      } as unknown as PrismaClient);
+      await expect(
+        conflict.createTemplate({
+          templateId: randomUUID(),
+          versionId: randomUUID(),
+          hallId: randomUUID(),
+          displayOrder: 0,
+          name: 'Layout',
+          description: '',
+          minGuests: 1,
+          maxGuests: 10,
+          tables: [table()],
+          context,
+        }),
+      ).rejects.toMatchObject({ code: 'CATALOG_DRAFT_CONFLICT' });
+    },
+  );
 });

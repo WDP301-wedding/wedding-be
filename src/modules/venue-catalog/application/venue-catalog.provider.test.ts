@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 
 import { describe, expect, it, vi } from 'vitest';
 
+import { NotFoundError } from '../../../core/errors/app-error.js';
 import type {
   AuthenticatedActor,
   AuthenticatedActorResolver,
@@ -72,29 +73,43 @@ const layoutSnapshot: LayoutVersionSnapshot = {
 };
 
 function services() {
+  const requireActiveHallSnapshot = vi.fn(() => Promise.resolve(hallSnapshot));
+  const requireActiveShiftSnapshot = vi.fn(() => Promise.resolve(shiftSnapshot));
+  const requireCurrentMenuPackageVersion = vi.fn(() => Promise.resolve(menuSnapshot));
+  const resolveMenuPackageVersion = vi.fn(() =>
+    Promise.resolve({ ...menuSnapshot, state: 'SUPERSEDED' as const }),
+  );
+  const requireCurrentTimelineVersion = vi.fn(() => Promise.resolve(timelineSnapshot));
+  const resolveTimelineVersion = vi.fn(() =>
+    Promise.resolve({ ...timelineSnapshot, state: 'SUPERSEDED' as const }),
+  );
+  const listCurrentLayoutVersionsForHall = vi.fn(() => Promise.resolve([layoutSnapshot]));
+  const resolveLayoutVersion = vi.fn(() =>
+    Promise.resolve({ ...layoutSnapshot, state: 'SUPERSEDED' as const }),
+  );
   const venue = {
-    requireActiveHallSnapshot: vi.fn(() => Promise.resolve(hallSnapshot)),
-    requireActiveShiftSnapshot: vi.fn(() => Promise.resolve(shiftSnapshot)),
+    requireActiveHallSnapshot,
+    requireActiveShiftSnapshot,
   } as unknown as VenueService;
   const menu = {
-    requireCurrentMenuPackageVersion: vi.fn(() => Promise.resolve(menuSnapshot)),
-    resolveMenuPackageVersion: vi.fn(() =>
-      Promise.resolve({ ...menuSnapshot, state: 'SUPERSEDED' as const }),
-    ),
+    requireCurrentMenuPackageVersion,
+    resolveMenuPackageVersion,
   } as unknown as MenuService;
   const timeline = {
-    requireCurrentVersion: vi.fn(() => Promise.resolve(timelineSnapshot)),
-    resolveVersion: vi.fn(() =>
-      Promise.resolve({ ...timelineSnapshot, state: 'SUPERSEDED' as const }),
-    ),
+    requireCurrentVersion: requireCurrentTimelineVersion,
+    resolveVersion: resolveTimelineVersion,
   } as unknown as TimelineService;
   const layout = {
-    listCurrentVersionsForHall: vi.fn(() => Promise.resolve([layoutSnapshot])),
-    resolveVersion: vi.fn(() =>
-      Promise.resolve({ ...layoutSnapshot, state: 'SUPERSEDED' as const }),
-    ),
+    listCurrentVersionsForHall: listCurrentLayoutVersionsForHall,
+    resolveVersion: resolveLayoutVersion,
   } as unknown as LayoutService;
-  return { venue, menu, timeline, layout };
+  return {
+    venue,
+    menu,
+    timeline,
+    layout,
+    mocks: { requireCurrentMenuPackageVersion, resolveMenuPackageVersion },
+  };
 }
 
 describe('VenueCatalogReader', () => {
@@ -123,10 +138,10 @@ describe('VenueCatalogReader', () => {
     await expect(reader.resolveLayoutTemplateVersion(layoutSnapshot.id)).resolves.toMatchObject({
       state: 'SUPERSEDED',
     });
-    expect(dependencies.menu.requireCurrentMenuPackageVersion).toHaveBeenCalledWith(
+    expect(dependencies.mocks.requireCurrentMenuPackageVersion).toHaveBeenCalledWith(
       menuSnapshot.menuPackageId,
     );
-    expect(dependencies.menu.resolveMenuPackageVersion).toHaveBeenCalledWith(menuSnapshot.id);
+    expect(dependencies.mocks.resolveMenuPackageVersion).toHaveBeenCalledWith(menuSnapshot.id);
   });
 
   it('returns detached deeply immutable snapshots', async () => {
@@ -146,11 +161,9 @@ describe('VenueCatalogReader', () => {
 
   it('preserves concealed wrong-ID and retired dependency failures', async () => {
     const dependencies = services();
-    dependencies.venue.requireActiveHallSnapshot = vi.fn(() =>
-      Promise.reject({ code: 'NOT_FOUND' }),
-    );
+    dependencies.venue.requireActiveHallSnapshot = vi.fn(() => Promise.reject(new NotFoundError()));
     dependencies.menu.requireCurrentMenuPackageVersion = vi.fn(() =>
-      Promise.reject({ code: 'NOT_FOUND' }),
+      Promise.reject(new NotFoundError()),
     );
     const reader = createVenueCatalogReader(dependencies);
 
