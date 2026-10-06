@@ -5,7 +5,7 @@ Audit date: 2026-10-06 (Asia/Saigon)
 Scope: `wedding-be` FT-V1 through FT-V3 and `wedding-manage-web` FT-V4, VC-01
 through VC-23
 
-Status: **VC-23 passed; Checkpoint V4 awaits project-owner approval**
+Status: **Passed at Checkpoint V4**
 
 ## Delivered contract and implementation
 
@@ -143,6 +143,7 @@ existing `GHSA-vfj7-8cjw-p6xm` dev-only exception, graph-locked and expiring on
   (VC-20), `564999d` (VC-21), and `a0dd230` (VC-22).
 
 VC-01 through VC-23 are implemented and verified. The backend contract and Management
-Web worktrees contain only intended committed artifacts. Checkpoint V4 remains open
-only for the project owner's implementation approval; SPEC-03 is not authorized by
-this evidence alone.
+Web worktrees contain only intended committed artifacts. On 2026-10-06, the project
+owner explicitly approved the implementation with “tôi phê duyệt implementation.”
+Checkpoint V4 is green; SPEC-03 may begin under the approved fast-track protocol and
+`WEDDING-CONTRACT-1@1.0.0`.

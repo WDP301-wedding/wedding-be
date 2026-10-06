@@ -2272,15 +2272,19 @@ Management Web clean install, 8-file/40-test coverage, API drift, lint, formatti
 strict typecheck, production build, dependency audit, browser/a11y, diff, secret, and
 artifact-cleanup gates pass. Exact cross-repository evidence, SEA-001/002 trace, V1–V3
 inheritance, and the reviewed dev-only audit exception are recorded in
-`tasks/evidence/venue-catalog.md`. VC-23 is complete; Checkpoint V4 still requires the
-project owner's explicit implementation approval.
+`tasks/evidence/venue-catalog.md`. VC-23 is complete.
 
 #### Checkpoint V4 — Venue-catalog implementation approved
 
-- [ ] Project owner approves the completed venue-catalog implementation and VC-23
+- [x] Project owner approves the completed venue-catalog implementation and VC-23
       evidence.
-- [ ] SPEC-03 may begin only after this checkpoint; no booking-lifecycle implementation
+- [x] SPEC-03 may begin only after this checkpoint; no booking-lifecycle implementation
       is authorized by venue-catalog planning or implementation alone.
+
+**Implementation approval evidence (2026-10-06):** After reviewing the completed
+FT-V4 implementation and VC-23 evidence, the project owner explicitly replied,
+“tôi phê duyệt implementation.” Checkpoint V4 is green and authorizes SPEC-03 to
+begin under the approved fast-track protocol and `WEDDING-CONTRACT-1@1.0.0`.
 
 ## Fast-track protocol — SPEC-03 through SPEC-11
 
