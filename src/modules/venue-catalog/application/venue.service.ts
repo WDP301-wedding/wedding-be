@@ -51,12 +51,14 @@ export interface HallView extends HallSnapshot {
 export interface VenueService {
   getRestaurantProfile(): Promise<RestaurantProfileView>;
   updateRestaurantProfile(input: UpdateRestaurantProfileInput): Promise<RestaurantProfileView>;
+  listShifts(): Promise<readonly ShiftView[]>;
   listActiveShifts(): Promise<readonly ShiftView[]>;
   updateShift(input: UpdateShiftInput): Promise<ShiftView>;
   requireActiveShiftSnapshot(code: RestaurantShiftCode): Promise<ShiftSnapshot>;
   createHall(input: CreateHallInput): Promise<HallView & { readonly nameNormalized: string }>;
   updateHall(input: UpdateHallInput): Promise<HallView>;
   changeHallLifecycle(input: ChangeHallLifecycleInput): Promise<HallView>;
+  listHalls(): Promise<readonly HallView[]>;
   listActiveHalls(): Promise<readonly HallView[]>;
   getHall(id: string): Promise<HallView>;
   requireActiveHallSnapshot(id: string): Promise<HallSnapshot>;
@@ -164,6 +166,11 @@ export function createVenueService(prisma: PrismaClient): VenueService {
         });
         return toRestaurantView(profile);
       });
+    },
+
+    async listShifts() {
+      const shifts = await prisma.restaurantShift.findMany({ orderBy: { code: 'asc' } });
+      return Object.freeze(shifts.map(toShiftView));
     },
 
     async listActiveShifts() {
@@ -363,6 +370,13 @@ export function createVenueService(prisma: PrismaClient): VenueService {
       } catch (error: unknown) {
         throw mapHallUniqueConflict(error);
       }
+    },
+
+    async listHalls() {
+      const halls = await prisma.hall.findMany({
+        orderBy: [{ displayOrder: 'asc' }, { id: 'asc' }],
+      });
+      return Object.freeze(halls.map(toHallView));
     },
 
     async listActiveHalls() {

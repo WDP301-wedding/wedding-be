@@ -53,6 +53,24 @@ function services(): VenueCatalogHttpServices {
           },
         ]),
       ),
+      listShifts: vi.fn(() =>
+        Promise.resolve([
+          {
+            code: 'LUNCH' as const,
+            startTime: '10:00',
+            endTime: '14:00',
+            isActive: true,
+            revision: 2,
+          },
+          {
+            code: 'DINNER' as const,
+            startTime: '17:00',
+            endTime: '22:00',
+            isActive: false,
+            revision: 5,
+          },
+        ]),
+      ),
       listActiveHalls: vi.fn(() =>
         Promise.resolve([
           {
@@ -64,6 +82,30 @@ function services(): VenueCatalogHttpServices {
             lifecycle: 'ACTIVE' as const,
             revision: 3,
             retiredAt: null,
+          },
+        ]),
+      ),
+      listHalls: vi.fn(() =>
+        Promise.resolve([
+          {
+            id: hallId,
+            name: 'Lotus',
+            description: 'Main hall',
+            maxGuests: 300,
+            displayOrder: 1,
+            lifecycle: 'ACTIVE' as const,
+            revision: 3,
+            retiredAt: null,
+          },
+          {
+            id: '00000000-0000-4000-8000-000000000099',
+            name: 'Rose',
+            description: 'Retired hall',
+            maxGuests: 120,
+            displayOrder: 2,
+            lifecycle: 'RETIRED' as const,
+            revision: 7,
+            retiredAt: new Date('2026-10-01T00:00:00.000Z'),
           },
         ]),
       ),
@@ -190,6 +232,44 @@ describe('FT-V3 venue catalog HTTP contract', () => {
             maxGuests: 300,
             media: [],
           },
+        ],
+        nextCursor: null,
+      },
+    });
+  });
+
+  it('returns manager venue state with revisions, inactive shifts, and retired halls', async () => {
+    const { app } = appWith();
+
+    const unauthorized = await request(app).get('/api/v1/management/catalog/restaurant');
+    const restaurant = await request(app)
+      .get('/api/v1/management/catalog/restaurant')
+      .set('Authorization', 'Bearer manager-token');
+    const shifts = await request(app)
+      .get('/api/v1/management/catalog/shifts')
+      .set('Authorization', 'Bearer manager-token');
+    const halls = await request(app)
+      .get('/api/v1/management/catalog/halls?limit=20')
+      .set('Authorization', 'Bearer manager-token');
+
+    expect(unauthorized.status).toBe(401);
+    expect(restaurant.status).toBe(200);
+    expect(restaurant.body).toMatchObject({
+      data: { displayName: 'Wedding Estate', revision: 4 },
+    });
+    expect(shifts.body).toMatchObject({
+      data: {
+        items: [
+          { code: 'LUNCH', isActive: true, revision: 2 },
+          { code: 'DINNER', isActive: false, revision: 5 },
+        ],
+      },
+    });
+    expect(halls.body).toMatchObject({
+      data: {
+        items: [
+          { id: hallId, lifecycle: 'ACTIVE', revision: 3 },
+          { lifecycle: 'RETIRED', revision: 7 },
         ],
         nextCursor: null,
       },

@@ -197,6 +197,46 @@ export function createVenueCatalogRouter(options: CreateVenueCatalogRouterOption
     }),
   );
 
+  router.get(
+    '/management/catalog/restaurant',
+    manager,
+    asyncHandler(async (_request, response) => {
+      const profile = await options.services.venue.getRestaurantProfile();
+      sendRevision(response, profile, profile.revision);
+    }),
+  );
+  router.get(
+    '/management/catalog/shifts',
+    manager,
+    asyncHandler(async (_request, response) => {
+      response.json({ data: { items: await options.services.venue.listShifts() } });
+    }),
+  );
+  router.get(
+    '/management/catalog/halls',
+    manager,
+    validateRequest({ query: cursorQuerySchema }),
+    asyncHandler(async (_request, response) => {
+      const { query } = validatedRequest(response, { query: cursorQuerySchema });
+      const halls = await options.services.venue.listHalls();
+      const cursorIndex =
+        query.cursor === undefined ? -1 : halls.findIndex(({ id }) => id === query.cursor);
+      if (query.cursor !== undefined && cursorIndex < 0) {
+        throw new ValidationError([
+          { path: 'cursor', code: 'invalid_value', message: 'The catalog cursor is invalid.' },
+        ]);
+      }
+      const page = halls.slice(cursorIndex + 1, cursorIndex + query.limit + 2);
+      const items = page.slice(0, query.limit);
+      response.json({
+        data: {
+          items,
+          nextCursor: page.length > query.limit ? (items.at(-1)?.id ?? null) : null,
+        },
+      });
+    }),
+  );
+
   router.patch(
     '/management/catalog/restaurant',
     manager,

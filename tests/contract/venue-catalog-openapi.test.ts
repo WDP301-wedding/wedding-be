@@ -16,6 +16,12 @@ describe('FT-V3 immutable venue catalog contract', () => {
     );
     expect(paths).toHaveProperty('/management/catalog/dishes.post.operationId', 'createDishDraft');
     expect(paths).toHaveProperty(
+      '/management/catalog/restaurant.get.operationId',
+      'getManagerRestaurant',
+    );
+    expect(paths).toHaveProperty('/management/catalog/shifts.get.operationId', 'listManagerShifts');
+    expect(paths).toHaveProperty('/management/catalog/halls.get.operationId', 'listManagerHalls');
+    expect(paths).toHaveProperty(
       '/management/catalog/timeline-template-versions/{versionId}/publication.post.operationId',
       'publishTimelineTemplateVersion',
     );

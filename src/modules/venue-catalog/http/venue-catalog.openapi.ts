@@ -337,12 +337,31 @@ const basePaths: Paths = {
     },
   },
   '/management/catalog/restaurant': {
+    get: {
+      operationId: 'getManagerRestaurant',
+      summary: 'Get the Manager restaurant profile with its current revision',
+      tags: ['Venue Catalog'],
+      security: bearerSecurity,
+      responses: { '200': catalogSuccess(restaurantProfileSchema), ...managerErrors },
+    },
     patch: managerMutation(
       'updateRestaurantProfile',
       'Update the restaurant profile using its expected revision',
       updateRestaurantBodySchema,
       { responseSchema: restaurantProfileSchema },
     ),
+  },
+  '/management/catalog/shifts': {
+    get: {
+      operationId: 'listManagerShifts',
+      summary: 'List fixed restaurant shifts with lifecycle state and revisions',
+      tags: ['Venue Catalog'],
+      security: bearerSecurity,
+      responses: {
+        '200': catalogSuccess(z.strictObject({ items: z.array(shiftViewSchema) })),
+        ...managerErrors,
+      },
+    },
   },
   '/management/catalog/shifts/{shiftCode}': {
     patch: {
@@ -363,6 +382,14 @@ const basePaths: Paths = {
     },
   },
   '/management/catalog/halls': {
+    get: {
+      operationId: 'listManagerHalls',
+      summary: 'List halls including retired records and current revisions',
+      tags: ['Venue Catalog'],
+      security: bearerSecurity,
+      parameters: cursorParameters(),
+      responses: { '200': catalogSuccess(pageSchema(hallViewSchema)), ...managerErrors },
+    },
     post: managerMutation('createHall', 'Create a hall', createHallBodySchema, {
       created: true,
       idempotent: true,
