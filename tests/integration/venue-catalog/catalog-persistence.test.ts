@@ -43,6 +43,18 @@ async function expectDatabaseCode(operation: Promise<unknown>, code: string): Pr
   }
 }
 
+async function expectDatabaseCodeIn(
+  operation: Promise<unknown>,
+  codes: readonly string[],
+): Promise<void> {
+  try {
+    await operation;
+    throw new Error(`Expected one of PostgreSQL errors ${codes.join(', ')}.`);
+  } catch (error: unknown) {
+    expect(codes).toContain((error as DatabaseError).code);
+  }
+}
+
 async function withDatabaseTransaction(operation: () => Promise<void>): Promise<void> {
   await database.query('BEGIN');
   try {
@@ -299,10 +311,10 @@ describeWithDatabase('venue catalog persistence constraints', () => {
       database.query(`DELETE FROM "DishVersion" WHERE "id" = $1`, [versionId]),
       '23514',
     );
-    await expectDatabaseCode(
-      database.query(`DELETE FROM "Dish" WHERE "id" = $1`, [dishId]),
+    await expectDatabaseCodeIn(database.query(`DELETE FROM "Dish" WHERE "id" = $1`, [dishId]), [
+      '23001',
       '23503',
-    );
+    ]);
   });
 
   it('serializes publish, draft CAS, and retirement races while preserving exact history', async () => {

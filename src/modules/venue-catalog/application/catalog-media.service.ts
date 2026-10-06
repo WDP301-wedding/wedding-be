@@ -55,6 +55,7 @@ export interface CatalogMediaService {
     readonly resourceType: CatalogMediaResourceType;
     readonly resourceId: string;
     readonly assetIds: readonly string[];
+    readonly expectedRevision?: number;
     readonly context: CatalogMutationContext;
   }): Promise<void>;
   listSigned(
@@ -64,14 +65,21 @@ export interface CatalogMediaService {
 }
 
 export class CatalogMediaConflictError extends AppError {
-  constructor(code: 'CATALOG_MEDIA_LIMIT_REACHED' | 'CATALOG_MEDIA_OWNERSHIP_CONFLICT') {
+  constructor(
+    code:
+      | 'CATALOG_MEDIA_LIMIT_REACHED'
+      | 'CATALOG_MEDIA_OWNERSHIP_CONFLICT'
+      | 'CATALOG_REVISION_CONFLICT',
+  ) {
     super({
       status: 409,
       code,
       message:
         code === 'CATALOG_MEDIA_LIMIT_REACHED'
           ? 'The catalog resource already has the maximum number of media assets.'
-          : 'The catalog media asset does not belong to the supplied resource or order.',
+          : code === 'CATALOG_REVISION_CONFLICT'
+            ? 'The catalog resource changed after it was loaded.'
+            : 'The catalog media asset does not belong to the supplied resource or order.',
     });
   }
 }
@@ -194,6 +202,15 @@ export function createCatalogMediaService(
       }
       await prisma.$transaction(
         async (transaction) => {
+          if (input.expectedRevision !== undefined) {
+            await claimResourceRevision(
+              transaction,
+              resourceType,
+              input.resourceId,
+              input.expectedRevision,
+              input.context.actorId,
+            );
+          }
           await requireResource(transaction, resourceType, input.resourceId);
           const attached = await transaction.catalogMediaAsset.findMany({
             where: { resourceType, resourceId: input.resourceId, detachedAt: null },
@@ -253,6 +270,68 @@ export function createCatalogMediaService(
     },
   };
   return Object.freeze(service);
+}
+
+async function claimResourceRevision(
+  transaction: Transaction,
+  resourceType: CatalogMediaResourceType,
+  resourceId: string,
+  expectedRevision: number,
+  actorId: string,
+): Promise<void> {
+  const data = { revision: { increment: 1 }, updatedByAccountId: actorId } as const;
+  let count: number;
+  switch (resourceType) {
+    case 'RESTAURANT_PROFILE':
+      count = (
+        await transaction.restaurantProfile.updateMany({
+          where: { id: resourceId, revision: expectedRevision },
+          data,
+        })
+      ).count;
+      break;
+    case 'HALL':
+      count = (
+        await transaction.hall.updateMany({
+          where: { id: resourceId, revision: expectedRevision },
+          data,
+        })
+      ).count;
+      break;
+    case 'DISH_VERSION':
+      count = (
+        await transaction.dishVersion.updateMany({
+          where: { id: resourceId, revision: expectedRevision, state: 'DRAFT' },
+          data: { revision: { increment: 1 } },
+        })
+      ).count;
+      break;
+    case 'MENU_PACKAGE_VERSION':
+      count = (
+        await transaction.menuPackageVersion.updateMany({
+          where: { id: resourceId, revision: expectedRevision, state: 'DRAFT' },
+          data: { revision: { increment: 1 } },
+        })
+      ).count;
+      break;
+    case 'TIMELINE_TEMPLATE_VERSION':
+      count = (
+        await transaction.timelineTemplateVersion.updateMany({
+          where: { id: resourceId, revision: expectedRevision, state: 'DRAFT' },
+          data: { revision: { increment: 1 } },
+        })
+      ).count;
+      break;
+    case 'LAYOUT_TEMPLATE_VERSION':
+      count = (
+        await transaction.layoutTemplateVersion.updateMany({
+          where: { id: resourceId, revision: expectedRevision, state: 'DRAFT' },
+          data: { revision: { increment: 1 } },
+        })
+      ).count;
+      break;
+  }
+  if (count !== 1) throw new CatalogMediaConflictError('CATALOG_REVISION_CONFLICT');
 }
 
 function validateUploadInput(input: UploadCatalogMediaInput): UploadCatalogMediaInput {

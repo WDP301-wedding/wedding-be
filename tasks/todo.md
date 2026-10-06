@@ -1901,18 +1901,18 @@ hall, capacity, and lifecycle routes through strict Zod/OpenAPI schemas.
 
 **Acceptance criteria:**
 
-- [ ] Public responses contain only active safe fields, cursor metadata, and signed
+- [x] Public responses contain only active safe fields, cursor metadata, and signed
       media; Manager responses carry revisions and lifecycle data without internals.
-- [ ] Writes require current Manager identity, expected revision or idempotency as
+- [x] Writes require current Manager identity, expected revision or idempotency as
       specified, and stable validation/conflict errors.
-- [ ] Unknown fields, forged roles/states/totals, stale writes, and concealed-resource
+- [x] Unknown fields, forged roles/states/totals, stale writes, and concealed-resource
       probes are rejected consistently.
 
 **Verification:**
 
-- [ ] HTTP/contract tests cover success, pagination, ETag/CAS, validation,
+- [x] HTTP/contract tests cover success, pagination, ETag/CAS, validation,
       authentication, authorization, idempotency, retirement, and conflicts.
-- [ ] Run focused route tests and OpenAPI generation/check.
+- [x] Run focused route tests and OpenAPI generation/check.
 
 **Dependencies:** Checkpoint V2
 
@@ -1927,17 +1927,17 @@ ordering, pricing, history, and lifecycle routes.
 
 **Acceptance criteria:**
 
-- [ ] Public/current responses hide drafts, superseded history, actor data, revisions,
+- [x] Public/current responses hide drafts, superseded history, actor data, revisions,
       and storage internals while returning integer VND values.
-- [ ] Manager routes expose explicit version operations and reject stale, retired,
+- [x] Manager routes expose explicit version operations and reject stale, retired,
       duplicate, cross-aggregate, or invalid-price requests.
-- [ ] Publication and lifecycle operations honor atomic idempotency and stable errors.
+- [x] Publication and lifecycle operations honor atomic idempotency and stable errors.
 
 **Verification:**
 
-- [ ] HTTP/contract tests cover pagination/filtering, exact references, publish/history,
+- [x] HTTP/contract tests cover pagination/filtering, exact references, publish/history,
       non-Manager denials, retry semantics, and conflict payloads.
-- [ ] Run focused route tests and OpenAPI generation/check.
+- [x] Run focused route tests and OpenAPI generation/check.
 
 **Dependencies:** Checkpoint V2
 
@@ -1953,17 +1953,17 @@ history, retirement, and restoration routes.
 
 **Acceptance criteria:**
 
-- [ ] Strict schemas preserve ordered bounded items and distinguish draft mutation from
+- [x] Strict schemas preserve ordered bounded items and distinguish draft mutation from
       immutable version resolution.
-- [ ] No public, restricted prospect, Couple, or Staff catalog operation can browse
+- [x] No public, restricted prospect, Couple, or Staff catalog operation can browse
       Manager template history or mutate timeline templates.
-- [ ] Idempotency, CAS, pagination, lifecycle, and error contracts are explicit.
+- [x] Idempotency, CAS, pagination, lifecycle, and error contracts are explicit.
 
 **Verification:**
 
-- [ ] HTTP/contract tests cover every operation, role denial, stale edit, publish
+- [x] HTTP/contract tests cover every operation, role denial, stale edit, publish
       replay, invalid transition, and exact history.
-- [ ] Inspect generated OpenAPI for unintended non-Manager timeline operations.
+- [x] Inspect generated OpenAPI for unintended non-Manager timeline operations.
 
 **Dependencies:** Checkpoint V2
 
@@ -1979,18 +1979,18 @@ retirement, and restoration routes.
 
 **Acceptance criteria:**
 
-- [ ] Requests cannot supply computed totals, reuse table IDs, change a template hall,
+- [x] Requests cannot supply computed totals, reuse table IDs, change a template hall,
       or mutate a published/superseded version.
-- [ ] SEA-001 hall/range/capacity and SEA-002 immutable geometry/stable ID errors are
+- [x] SEA-001 hall/range/capacity and SEA-002 immutable geometry/stable ID errors are
       documented with exact version/table response identities.
-- [ ] No Couple/public operation can create, move, resize, rotate, add, remove, or
+- [x] No Couple/public operation can create, move, resize, rotate, add, remove, or
       reidentify a table or alter the range.
 
 **Verification:**
 
-- [ ] Direct HTTP tests cover range/geometry/table boundaries, races, history, every
+- [x] Direct HTTP tests cover range/geometry/table boundaries, races, history, every
       actor denial, and concealed mismatched IDs.
-- [ ] Inspect OpenAPI operation IDs and schemas for prohibited seating assignments or
+- [x] Inspect OpenAPI operation IDs and schemas for prohibited seating assignments or
       Couple geometry writes.
 
 **Dependencies:** Checkpoint V2
@@ -2006,17 +2006,17 @@ routes for each versioned aggregate.
 
 **Acceptance criteria:**
 
-- [ ] Multipart/file fields, allowlisted target types, purpose/resource ownership, and
+- [x] Multipart/file fields, allowlisted target types, purpose/resource ownership, and
       response metadata are strict and bounded.
-- [ ] Each lifecycle endpoint names its resource type explicitly and applies current
+- [x] Each lifecycle endpoint names its resource type explicitly and applies current
       dependency/conflict checks rather than a generic state setter.
-- [ ] State-changing operations honor VC-D9 and never serialize Storage internals.
+- [x] State-changing operations honor VC-D9 and never serialize Storage internals.
 
 **Verification:**
 
-- [ ] HTTP/fake-provider tests cover success, malformed files, wrong target, stale
+- [x] HTTP/fake-provider tests cover success, malformed files, wrong target, stale
       order, retry/in-flight conflict, provider failure, retirement, and restoration.
-- [ ] Run focused route/contract tests, redaction review, and OpenAPI generation/check.
+- [x] Run focused route/contract tests, redaction review, and OpenAPI generation/check.
 
 **Dependencies:** VC-11 through VC-14
 
@@ -2032,18 +2032,18 @@ shift, hall, menu, timeline, layout, stable-table, and retired-history fixtures.
 
 **Acceptance criteria:**
 
-- [ ] Seed output satisfies the spec's required published/retired fixture set and uses
+- [x] Seed output satisfies the spec's required published/retired fixture set and uses
       deterministic stable seed keys without assuming production credentials.
-- [ ] Repeated runs neither duplicate nor overwrite Manager-edited records with the
+- [x] Repeated runs neither duplicate nor overwrite Manager-edited records with the
       same stable IDs.
-- [ ] The seed is an explicit development/demo command and never runs at production
+- [x] The seed is an explicit development/demo command and never runs at production
       startup or migration deploy.
 
 **Verification:**
 
-- [ ] Disposable PostgreSQL tests run the seed twice, verify counts/references/history,
+- [x] Disposable PostgreSQL tests run the seed twice, verify counts/references/history,
       and prove edited-record conflict handling.
-- [ ] Run seed-focused integration, lint, typecheck, and build checks.
+- [x] Run seed-focused integration, lint, typecheck, and build checks.
 
 **Dependencies:** VC-05 through VC-10
 
@@ -2059,17 +2059,17 @@ and publish the exact digest consumed by Management Web.
 
 **Acceptance criteria:**
 
-- [ ] Contract documents pagination, ETags/CAS, idempotency, lifecycle, integer VND,
+- [x] Contract documents pagination, ETags/CAS, idempotency, lifecycle, integer VND,
       immutable versions, capacity, geometry, stable IDs, uploads, and stable errors.
-- [ ] Generated operations contain no Couple/public layout mutation, per-guest seating,
+- [x] Generated operations contain no Couple/public layout mutation, per-guest seating,
       object key, audit metadata, or Manager identity leakage.
-- [ ] The artifact and digest are deterministic and lockable by the Management Web.
+- [x] The artifact and digest are deterministic and lockable by the Management Web.
 
 **Verification:**
 
-- [ ] Run complete contract, migration, integration/concurrency, seed, coverage, lint,
+- [x] Run complete contract, migration, integration/concurrency, seed, coverage, lint,
       typecheck, build, audit, `api:generate`, `api:check`, and `git diff --check` gates.
-- [ ] Inspect the artifact/examples for secret, contact, object-key, draft, history, and
+- [x] Inspect the artifact/examples for secret, contact, object-key, draft, history, and
       prohibited geometry-operation leakage.
 
 **Dependencies:** VC-11 through VC-16
@@ -2081,10 +2081,23 @@ contract test, and generated OpenAPI artifact/digest
 
 #### Checkpoint V3 — Immutable catalog API verified
 
-- [ ] VC-11 through VC-17 pass all backend HTTP, contract, migration, seed,
+- [x] VC-11 through VC-17 pass all backend HTTP, contract, migration, seed,
       authorization, concurrency, coverage, quality, audit, and drift gates.
-- [ ] Management Web begins only after its contract lock references this exact backend
+- [x] Management Web begins only after its contract lock references this exact backend
       commit/digest.
+
+**Gate evidence (2026-10-06):** The complete backend suite passes 76 files and 688
+tests sequentially against disposable PostgreSQL, including HTTP, authorization,
+idempotency, concurrency, persistence, and deterministic seed coverage. The complete
+per-file coverage gate passes at 96.37% statements, 92.21% branches, 98.66% functions,
+and 97.05% lines. All three migrations deploy from an empty PostgreSQL 18 database;
+the persistence test accepts the PostgreSQL 17/18 SQLSTATE variants for the same
+`ON DELETE RESTRICT` guarantee. ESLint, Prettier, strict typecheck, production build,
+Prisma Client generation, OpenAPI generation/drift, dependency audit, redaction/secret
+scans, and `git diff --check` pass. The immutable backend OpenAPI digest is
+`8aa21388cacb5d2ffa1cfd2cfb6ef5fa23b4964058a72143453bdc2b47215db8`.
+Detailed evidence is recorded in `tasks/evidence/venue-catalog.md`. Checkpoint V3 is
+green; downstream clients must lock this digest before FT-V4 implementation begins.
 
 ### VC-18: Implement Management Web restaurant, shift, and hall administration
 

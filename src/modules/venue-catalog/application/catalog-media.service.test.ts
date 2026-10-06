@@ -321,4 +321,70 @@ describe('catalog media service', () => {
       }),
     ).rejects.toMatchObject({ code: 'CATALOG_MEDIA_OWNERSHIP_CONFLICT' });
   });
+
+  it('claims the owning resource revision before an ordered media write', async () => {
+    const resourceId = randomUUID();
+    const revisionModel = () => ({
+      count: vi.fn(() => Promise.resolve(1)),
+      updateMany: vi.fn(() => Promise.resolve({ count: 1 })),
+    });
+    const transaction = {
+      restaurantProfile: revisionModel(),
+      hall: revisionModel(),
+      dishVersion: revisionModel(),
+      menuPackageVersion: revisionModel(),
+      timelineTemplateVersion: revisionModel(),
+      layoutTemplateVersion: revisionModel(),
+      catalogMediaAsset: {
+        findMany: vi.fn(() => Promise.resolve([])),
+        updateMany: vi.fn(() => Promise.resolve({ count: 0 })),
+        update: vi.fn(),
+      },
+      auditLog: { create: vi.fn(() => Promise.resolve({})) },
+    };
+    const prisma = {
+      $transaction: vi.fn(async (operation: (value: object) => Promise<unknown>) =>
+        operation(transaction),
+      ),
+    } as unknown as PrismaClient;
+    const service = createCatalogMediaService(prisma, new FakeStorageProvider());
+    const resourceTypes = [
+      'RESTAURANT_PROFILE',
+      'HALL',
+      'DISH_VERSION',
+      'MENU_PACKAGE_VERSION',
+      'TIMELINE_TEMPLATE_VERSION',
+      'LAYOUT_TEMPLATE_VERSION',
+    ] as const;
+
+    for (const resourceType of resourceTypes) {
+      await service.reorder({
+        resourceType,
+        resourceId,
+        assetIds: [],
+        expectedRevision: 4,
+        context,
+      });
+    }
+
+    expect(transaction.restaurantProfile.updateMany).toHaveBeenCalledWith({
+      where: { id: resourceId, revision: 4 },
+      data: { revision: { increment: 1 }, updatedByAccountId: context.actorId },
+    });
+    expect(transaction.layoutTemplateVersion.updateMany).toHaveBeenCalledWith({
+      where: { id: resourceId, revision: 4, state: 'DRAFT' },
+      data: { revision: { increment: 1 } },
+    });
+
+    transaction.hall.updateMany.mockResolvedValueOnce({ count: 0 });
+    await expect(
+      service.reorder({
+        resourceType: 'HALL',
+        resourceId,
+        assetIds: [],
+        expectedRevision: 4,
+        context,
+      }),
+    ).rejects.toMatchObject({ code: 'CATALOG_REVISION_CONFLICT' });
+  });
 });

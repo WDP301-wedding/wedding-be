@@ -17,6 +17,7 @@ import type { ReadinessProbe } from './core/http/readiness.js';
 import { createLogger } from './core/logging/logger.js';
 import { getActiveTracingResource } from './core/observability/tracing.js';
 import { createIdentityRuntime } from './modules/identity-access/identity.runtime.js';
+import { createVenueCatalogRuntime } from './modules/venue-catalog/venue-catalog.runtime.js';
 
 type ProcessExitCode = NodeJS.Process['exitCode'];
 type ProcessSignal = 'SIGINT' | 'SIGTERM';
@@ -273,6 +274,13 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
 
   const tracingResource = getActiveTracingResource();
   const identityRuntime = await createIdentityRuntime(config);
+  let venueCatalogRuntime: Awaited<ReturnType<typeof createVenueCatalogRuntime>>;
+  try {
+    venueCatalogRuntime = await createVenueCatalogRuntime(config);
+  } catch (error: unknown) {
+    await identityRuntime.resource.close();
+    throw error;
+  }
 
   return startServer({
     corsConfig: config.cors,
@@ -282,10 +290,11 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     port: config.runtime.port,
     resources:
       tracingResource === undefined
-        ? [identityRuntime.resource]
-        : [tracingResource, identityRuntime.resource],
+        ? [identityRuntime.resource, venueCatalogRuntime.resource]
+        : [tracingResource, identityRuntime.resource, venueCatalogRuntime.resource],
     registerRoutes: (app) => {
       app.use('/api/v1', identityRuntime.router);
+      app.use('/api/v1', venueCatalogRuntime.router);
     },
     runtimeEnvironment: config.runtime.environment,
     securityConfig: config.security,

@@ -29,6 +29,10 @@ import {
   sessionInventoryResponseSchema,
   sessionSummarySchema,
 } from '../../modules/identity-access/identity.schemas.js';
+import {
+  venueCatalogOpenApiPaths,
+  venueCatalogOpenApiSchemas,
+} from '../../modules/venue-catalog/http/venue-catalog.openapi.js';
 
 function errorResponse(
   description: string,
@@ -144,8 +148,14 @@ export const openApiRegistry = {
   tags: [
     { name: 'Health', description: 'Process liveness and dependency readiness.' },
     { name: 'Identity', description: 'Authentication and caller-owned session lifecycle.' },
+    {
+      name: 'Venue Catalog',
+      description:
+        'Public current catalog reads and Manager-owned immutable catalog administration.',
+    },
   ],
   paths: {
+    ...venueCatalogOpenApiPaths,
     '/health/live': {
       get: {
         operationId: 'getHealthLive',
@@ -486,6 +496,7 @@ export const openApiRegistry = {
       RequestId: requestIdSchema,
       SessionInventoryResponse: sessionInventoryResponseSchema,
       SessionSummary: sessionSummarySchema,
+      ...venueCatalogOpenApiSchemas,
     },
     parameters: {
       IdempotencyKey: {
