@@ -295,9 +295,7 @@ describe('FT-V3 venue catalog HTTP contract', () => {
     ]);
     const { app } = appWith(catalogServices);
 
-    const unauthorized = await request(app).get(
-      `/api/v1/management/catalog/halls/${hallId}/media`,
-    );
+    const unauthorized = await request(app).get(`/api/v1/management/catalog/halls/${hallId}/media`);
     const response = await request(app)
       .get(`/api/v1/management/catalog/halls/${hallId}/media`)
       .set('Authorization', 'Bearer manager-token');
