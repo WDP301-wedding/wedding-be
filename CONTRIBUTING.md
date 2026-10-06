@@ -49,6 +49,23 @@ to the final merged artifact before publishing their changes.
 After merging, update local `main` with `git pull --ff-only` and start the next
 change on a new branch.
 
+## Dependency pull requests
+
+Routine dependency updates run monthly, with at most two npm version-update PRs
+and one GitHub Actions version-update PR open per repository. Related React,
+Next.js, Prisma, and Vitest packages are grouped where applicable so their
+versions are reviewed together. Security updates are not subject to the routine
+PR limit; do not close a security update solely to reduce notifications.
+
+The mobile repository limits automated version updates to the committed
+manifest ranges. Expo SDK, React, native modules, and Jest upgrades that need
+different ranges require a coordinated SDK compatibility review.
+
+An optional version-update PR may be closed or deferred when it does not fix a
+current issue, mismatches the approved runtime or SDK, or is superseded by a
+reviewed replacement. Closing a PR does not uninstall the existing dependency or
+remove project features. Record the reason in the PR when closing it.
+
 ## Branch protection availability
 
 The repositories are private. GitHub currently rejects both rulesets and classic

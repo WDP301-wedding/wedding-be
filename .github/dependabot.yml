@@ -3,11 +3,24 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
+      interval: monthly
+    # Limit routine version PRs; security update PRs have a separate limit.
+    open-pull-requests-limit: 2
+    groups:
+      prisma-stack:
+        patterns: ['prisma', '@prisma/*']
+      vitest-stack:
+        patterns: ['vitest', '@vitest/*']
+    ignore:
+      # Runtime and CI are pinned to Node.js 24.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
+      interval: monthly
+    open-pull-requests-limit: 1
+    groups:
+      github-actions:
+        patterns: ['*']
