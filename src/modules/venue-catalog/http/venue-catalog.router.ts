@@ -869,6 +869,22 @@ function registerMediaRoutes(
   options: CreateVenueCatalogRouterOptions,
   manager: RequestHandler,
 ): void {
+  router.get(
+    '/management/catalog/:resource/:resourceId/media',
+    manager,
+    validateRequest({ params: mediaOrderParamsSchema }),
+    asyncHandler(async (_request, response) => {
+      const { params } = validatedRequest(response, { params: mediaOrderParamsSchema });
+      response.json({
+        data: {
+          items: await options.services.media.listSigned(
+            resourceTypeForPath(params.resource),
+            params.resourceId,
+          ),
+        },
+      });
+    }),
+  );
   router.post(
     '/management/catalog/media-assets',
     manager,

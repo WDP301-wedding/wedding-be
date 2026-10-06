@@ -498,6 +498,37 @@ const basePaths: Paths = {
       ],
     },
   },
+  '/management/catalog/{resource}/{resourceId}/media': {
+    get: {
+      operationId: 'listCatalogMedia',
+      summary: 'List attached catalog media with fresh signed read URLs',
+      tags: ['Venue Catalog'],
+      security: bearerSecurity,
+      parameters: [
+        {
+          name: 'resource',
+          in: 'path',
+          required: true,
+          schema: {
+            type: 'string',
+            enum: [
+              'restaurant-profile',
+              'halls',
+              'dish-versions',
+              'menu-package-versions',
+              'timeline-template-versions',
+              'layout-template-versions',
+            ],
+          },
+        },
+        pathParameter('resourceId'),
+      ],
+      responses: {
+        '200': catalogSuccess(z.strictObject({ items: z.array(mediaViewSchema) })),
+        ...managerErrors,
+      },
+    },
+  },
   '/management/catalog/media-assets': {
     post: {
       ...managerMutation(

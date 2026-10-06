@@ -32,6 +32,10 @@ describe('FT-V3 immutable venue catalog contract', () => {
     expect(paths).toHaveProperty(
       '/management/catalog/media-assets.post.requestBody.content.multipart/form-data',
     );
+    expect(paths).toHaveProperty(
+      '/management/catalog/{resource}/{resourceId}/media.get.operationId',
+      'listCatalogMedia',
+    );
   });
 
   it('contains no public/Couple geometry mutation or storage and actor internals', () => {

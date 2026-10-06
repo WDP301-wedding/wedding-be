@@ -9138,6 +9138,110 @@
         ]
       }
     },
+    "/management/catalog/{resource}/{resourceId}/media": {
+      "get": {
+        "operationId": "listCatalogMedia",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "resource",
+            "required": true,
+            "schema": {
+              "enum": [
+                "restaurant-profile",
+                "halls",
+                "dish-versions",
+                "menu-package-versions",
+                "timeline-template-versions",
+                "layout-template-versions"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "resourceId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "items": {
+                          "items": {
+                            "$ref": "#/components/schemas/CatalogMediaView"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "items"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The catalog operation completed successfully.",
+            "headers": {
+              "ETag": {
+                "description": "Quoted optimistic-concurrency revision when the resource is mutable.",
+                "schema": {
+                  "pattern": "^\"[1-9][0-9]*\"$",
+                  "type": "string"
+                }
+              },
+              "x-request-id": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List attached catalog media with fresh signed read URLs",
+        "tags": [
+          "Venue Catalog"
+        ]
+      }
+    },
     "/management/catalog/{resource}/{resourceId}/media-order": {
       "patch": {
         "operationId": "reorderCatalogMedia",

@@ -276,6 +276,49 @@ describe('FT-V3 venue catalog HTTP contract', () => {
     });
   });
 
+  it('returns freshly signed media to Managers for an allowlisted catalog resource', async () => {
+    const catalogServices = services();
+    const media = mockedService(catalogServices.media);
+    const assetId = randomUUID();
+    media.listSigned.mockResolvedValueOnce([
+      {
+        id: assetId,
+        resourceType: 'HALL',
+        resourceId: hallId,
+        contentType: 'image/webp',
+        sizeBytes: 2048,
+        alternativeText: 'Sảnh chính',
+        displayOrder: 1,
+        signedUrl: 'https://storage.example.test/signed',
+        signedUrlExpiresInSeconds: 300,
+      },
+    ]);
+    const { app } = appWith(catalogServices);
+
+    const unauthorized = await request(app).get(
+      `/api/v1/management/catalog/halls/${hallId}/media`,
+    );
+    const response = await request(app)
+      .get(`/api/v1/management/catalog/halls/${hallId}/media`)
+      .set('Authorization', 'Bearer manager-token');
+
+    expect(unauthorized.status).toBe(401);
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      data: {
+        items: [
+          expect.objectContaining({
+            id: assetId,
+            signedUrl: 'https://storage.example.test/signed',
+            signedUrlExpiresInSeconds: 300,
+          }),
+        ],
+      },
+    });
+    expect(media.listSigned).toHaveBeenCalledWith('HALL', hallId);
+    expect(JSON.stringify(response.body)).not.toMatch(/objectKey|checksumSha256/u);
+  });
+
   it('requires a current manager and idempotency key for hall creation', async () => {
     const { app, catalogServices } = appWith();
     const venue = mockedService(catalogServices.venue);
