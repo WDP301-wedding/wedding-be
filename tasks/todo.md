@@ -2106,18 +2106,18 @@ capacity, ordering, and lifecycle views using generated types.
 
 **Acceptance criteria:**
 
-- [ ] Forms display server validation, stale revision, capacity conflict, loading,
+- [x] Forms display server validation, stale revision, capacity conflict, loading,
       empty, success, and denial states without manufacturing authorization.
-- [ ] Lists/forms are keyboard accessible, label controls, preserve focus, and work at
+- [x] Lists/forms are keyboard accessible, label controls, preserve focus, and work at
       mobile and desktop widths.
-- [ ] Staff/forged local role state cannot expose a working mutation path or bypass a
+- [x] Staff/forged local role state cannot expose a working mutation path or bypass a
       backend 403/404.
 
 **Verification:**
 
-- [ ] Component/browser tests cover CRUD-equivalent lifecycle, CAS conflicts, active
+- [x] Component/browser tests cover CRUD-equivalent lifecycle, CAS conflicts, active
       filtering, capacity errors, responsive layout, a11y, and backend denial.
-- [ ] Run immutable API check, lint, typecheck, coverage, build, and audit.
+- [x] Run immutable API check, lint, typecheck, coverage, build, and audit.
 
 **Dependencies:** Checkpoint V3
 
@@ -2133,18 +2133,18 @@ pricing, publication, history, retirement, and restoration UX.
 
 **Acceptance criteria:**
 
-- [ ] Integer VND editing/display is locale-safe and never uses floating-point totals
+- [x] Integer VND editing/display is locale-safe and never uses floating-point totals
       or a client-authoritative price calculation.
-- [ ] Version/current/history distinctions and retired dependencies are explicit; the
+- [x] Version/current/history distinctions and retired dependencies are explicit; the
       UI never edits published content in place.
-- [ ] All conflict, validation, loading, empty, retry, and denial states remain usable
+- [x] All conflict, validation, loading, empty, retry, and denial states remain usable
       with keyboard and responsive layouts.
 
 **Verification:**
 
-- [ ] Component/browser tests cover ordering, exact dish versions, price bounds,
+- [x] Component/browser tests cover ordering, exact dish versions, price bounds,
       publish/history, stale conflicts, lifecycle, a11y, and backend denial.
-- [ ] Run immutable API check, lint, typecheck, coverage, build, and audit.
+- [x] Run immutable API check, lint, typecheck, coverage, build, and audit.
 
 **Dependencies:** Checkpoint V3
 
@@ -2160,17 +2160,17 @@ publication, immutable history, retirement, and restoration UX.
 
 **Acceptance criteria:**
 
-- [ ] Add/edit/remove/reorder supports keyboard controls and explicit numeric/text
+- [x] Add/edit/remove/reorder supports keyboard controls and explicit numeric/text
       validation without drag-only interaction.
-- [ ] Published/superseded content is read-only and clone creates a separate draft;
+- [x] Published/superseded content is read-only and clone creates a separate draft;
       stale edits and publish races show recoverable conflict guidance.
-- [ ] Timeline template pages remain Manager-only presentation over backend authority.
+- [x] Timeline template pages remain Manager-only presentation over backend authority.
 
 **Verification:**
 
-- [ ] Component/browser tests cover all editor operations, boundaries, keyboard order,
+- [x] Component/browser tests cover all editor operations, boundaries, keyboard order,
       clone independence, publish/history, stale conflict, lifecycle, and denial.
-- [ ] Run immutable API check, lint, typecheck, coverage, build, and audit.
+- [x] Run immutable API check, lint, typecheck, coverage, build, and audit.
 
 **Dependencies:** Checkpoint V3
 
@@ -2187,18 +2187,18 @@ lifecycle UX.
 
 **Acceptance criteria:**
 
-- [ ] Every pointer/drag control has labeled keyboard/numeric alternatives; UI feedback
+- [x] Every pointer/drag control has labeled keyboard/numeric alternatives; UI feedback
       shows canvas bounds, seat totals, hall maximum, and valid range.
-- [ ] Existing table UUIDs survive draft geometry changes, removal retires an ID, and
+- [x] Existing table UUIDs survive draft geometry changes, removal retires an ID, and
       the UI cannot reuse IDs, change the hall, or edit a published version.
-- [ ] Published preview is read-only and responsive; no copy or action implies movable
+- [x] Published preview is read-only and responsive; no copy or action implies movable
       Couple geometry or individual guest seating.
 
 **Verification:**
 
-- [ ] Component/browser tests cover range/seat/canvas boundaries, stable IDs, keyboard
+- [x] Component/browser tests cover range/seat/canvas boundaries, stable IDs, keyboard
       editing, responsive preview, publication/history, conflicts, lifecycle, and denial.
-- [ ] Inspect generated client usage and DOM actions for prohibited Couple geometry or
+- [x] Inspect generated client usage and DOM actions for prohibited Couple geometry or
       per-guest seating behavior; run all Management Web quality gates.
 
 **Dependencies:** Checkpoint V3
@@ -2215,18 +2215,18 @@ and restoration presentation across the catalog features.
 
 **Acceptance criteria:**
 
-- [ ] Upload UI enforces advisory type/size feedback but treats backend validation as
+- [x] Upload UI enforces advisory type/size feedback but treats backend validation as
       authoritative and never displays/persists object keys or signed URLs as state.
-- [ ] Media ordering, provider errors, expiry refresh, history, retirement, and
+- [x] Media ordering, provider errors, expiry refresh, history, retirement, and
       restoration expose clear accessible states without overwriting current content.
-- [ ] Shared components do not collapse distinct resource/version IDs or bypass each
+- [x] Shared components do not collapse distinct resource/version IDs or bypass each
       feature's generated operation.
 
 **Verification:**
 
-- [ ] Component/browser tests cover valid/invalid uploads, order, replacement failure,
+- [x] Component/browser tests cover valid/invalid uploads, order, replacement failure,
       URL refresh, history/lifecycle, keyboard/a11y, and backend conflicts/denials.
-- [ ] Run immutable API check, lint, typecheck, coverage, build, audit, and browser
+- [x] Run immutable API check, lint, typecheck, coverage, build, audit, and browser
       console/network review.
 
 **Dependencies:** VC-18 through VC-21
@@ -2243,18 +2243,18 @@ the approved spec, decisions, checkpoints, and SEA-001/002 before opening SPEC-0
 
 **Acceptance criteria:**
 
-- [ ] SEA-001 and SEA-002 each have passing automated evidence with exact files/tests;
+- [x] SEA-001 and SEA-002 each have passing automated evidence with exact files/tests;
       VC-D1–D9 and V1–V3 match runtime behavior.
-- [ ] Clean/upgrade migrations, idempotent seed, immutable history, concurrency,
+- [x] Clean/upgrade migrations, idempotent seed, immutable history, concurrency,
       Manager denials, Storage privacy, and no-Couple-geometry contracts are verified.
-- [ ] Backend and Management Web contain only intended artifacts, no secret/object-key
+- [x] Backend and Management Web contain only intended artifacts, no secret/object-key
       leakage, and are ready for project-owner implementation review.
 
 **Verification:**
 
-- [ ] Run clean installs and all migration, seed, unit/integration/concurrency,
+- [x] Run clean installs and all migration, seed, unit/integration/concurrency,
       contract/API, coverage, lint, typecheck, build, audit, and browser/a11y gates.
-- [ ] Save `tasks/evidence/venue-catalog.md`; review diffs, generated digests, dependency
+- [x] Save `tasks/evidence/venue-catalog.md`; review diffs, generated digests, dependency
       audits, logs/audit samples, media cleanup, and run Prettier plus `git diff --check`.
 
 **Dependencies:** VC-17, VC-22
@@ -2262,6 +2262,18 @@ the approved spec, decisions, checkpoints, and SEA-001/002 before opening SPEC-0
 **Files likely touched:** `tasks/evidence/venue-catalog.md`, `tasks/todo.md`
 
 **Estimated scope:** Medium
+
+**Implementation evidence (2026-10-06):** VC-18 through VC-22 are committed in
+`wedding-manage-web`; final acceptance hardening is commit
+`f54851c11a4e273561af9427ce5504d93c7bd28b`. The generated client is locked to backend
+commit `7b01f0b13c828a0caac719ae4a739c8d4e2a73b0` and OpenAPI digest
+`caad010d6008cbfc8fc0748f49abad0c651e85ccda5cf008b60ac3f4e6fa3dc5`.
+Management Web clean install, 8-file/40-test coverage, API drift, lint, formatting,
+strict typecheck, production build, dependency audit, browser/a11y, diff, secret, and
+artifact-cleanup gates pass. Exact cross-repository evidence, SEA-001/002 trace, V1–V3
+inheritance, and the reviewed dev-only audit exception are recorded in
+`tasks/evidence/venue-catalog.md`. VC-23 is complete; Checkpoint V4 still requires the
+project owner's explicit implementation approval.
 
 #### Checkpoint V4 — Venue-catalog implementation approved
 
