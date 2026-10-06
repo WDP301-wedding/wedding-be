@@ -4,7 +4,7 @@
 
 Inspect the target repository, existing routes/components/theme, nearby tests, and any task acceptance criteria. Identify the primary user, primary action, essential states, and target breakpoints before composing the screen.
 
-Use the approved system without requesting routine visual approval. When the task leaves minor copy or layout choices open, make a coherent product decision and document only material assumptions.
+Use the approved system without requesting routine visual approval. The current visual authority is `foundation.md` plus the relevant product pattern; legacy screenshots are behavior/information-architecture anchors only. When the task leaves minor copy or layout choices open, make a coherent product decision and document only material assumptions.
 
 ## 2. Calibrate and audit the direction
 

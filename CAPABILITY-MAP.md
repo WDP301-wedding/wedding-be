@@ -3,9 +3,11 @@
 - Approved cross-module requirements: [`PRODUCT-REQUIREMENTS.md`](./PRODUCT-REQUIREMENTS.md)
 - Decision rationale: [`ADR-001`](./docs/decisions/0001-model-revised-wedding-operations-with-existing-capabilities.md)
 - Locked contract baseline:
-  [`WEDDING-CONTRACT-1@1.0.0`](./CONTRACT-BASELINE.md)
+  [`WEDDING-CONTRACT-1@1.1.0`](./CONTRACT-BASELINE.md) (active; 1.0.0 history retained)
 - Parallel-specification decision:
   [`ADR-002`](./docs/decisions/0002-freeze-program-contracts-before-parallel-specification.md)
+- Accepted implementation hand-off decision:
+  [`ADR-003`](./docs/decisions/0003-publish-provider-hand-offs-for-overlapping-implementation.md)
 
 ## Initiative
 
@@ -27,15 +29,45 @@ Business rules are authoritative in the Express API. Web and App clients consume
 | `venue-catalog` | Restaurant settings, `LUNCH`/`DINNER` shifts, halls, dishes, menu packages, pricing, media, reusable wedding-timeline templates, and fixed seating-layout templates with supported capacity ranges | `core-platform`, `identity-access` |
 | `booking-lifecycle` | Consultation records, restricted pre-deposit workspaces, availability, temporary slot holds, online/counter bookings, versioned timeline proposals and mutual approval, deposit eligibility, policy snapshots, post-deposit change requests, cancellation, audit history, and booking states | `identity-access`, `venue-catalog` |
 | `payments-billing` | VNPay sandbox, manual payments, idempotent callbacks, deposit and remaining-balance accounting, physical-invitation print charges, invoices, and manual refunds | `booking-lifecycle` |
-| `invitation-studio` | Template library, Gemini-generated assets, post-deposit wedding-media library, full Web editor, quick App edits, generic public invitation QR, printable revision snapshots, multi-variant print orders, and print fulfillment status | `core-platform`, `identity-access`, `booking-lifecycle`, `payments-billing` |
+| `invitation-studio` | Template library, Gemini-generated assets, post-deposit wedding-media library, full Web editor, quick App edits, generic public invitation QR, printable revision snapshots, multi-variant print orders, and print fulfillment status | `core-platform`, `identity-access`, `venue-catalog` (1.1.0 eligibility), `booking-lifecycle`, `payments-billing` |
 | `guest-rsvp` | Invitation-household list/import, default and custom guest groups, personalized electronic invitation links, invitation delivery, RSVP, optional companion counts, and expected headcount | `booking-lifecycle`, `invitation-studio` |
-| `seating-plan` | Capacity-compatible fixed-layout selection, guest-group colors, table-level group labeling, layout confirmation, and compatibility warnings when expected headcount changes | `venue-catalog`, `booking-lifecycle`, `guest-rsvp` |
+| `seating-plan` | Capacity-compatible fixed-layout selection, guest-group colors, table-level group labeling, layout confirmation, and compatibility warnings when expected headcount changes | `venue-catalog`, `booking-lifecycle`, `guest-rsvp`, `invitation-studio` (printable registry) |
 | `staff-operations` | Staff accounts, event assignments, invitation-household search, multi-arrival manual check-in, actual companion counts, guest-group guidance, and audited attendance corrections | `identity-access`, `booking-lifecycle`, `guest-rsvp`, `seating-plan` |
 | `notifications-automation` | Android push notifications, operational email, workspace invitations, timeline approval and change events, payment and print-order events, RSVP deadlines, D-3 reminders, and booking completion jobs | `identity-access`, `booking-lifecycle`, `payments-billing`, `invitation-studio`, `guest-rsvp` |
 | `analytics-dashboard` | KPIs, revenue, receivables, booking status, hall utilization, menu popularity, print-order status, and expected-versus-actual attendance by invitation household and guest group | `venue-catalog`, `booking-lifecycle`, `payments-billing`, `invitation-studio`, `guest-rsvp`, `seating-plan`, `staff-operations` |
 | `release-demo` | End-to-end verification, demo seed data, Web/API deployment, Android EAS build, logging, and the demo checklist | All preceding modules |
 
 Module IDs are stable and must not be renamed after approval. Each module receives its own `SPEC-<module-id>.md` before planning or implementation begins for that module. Those module specs must trace applicable requirements from `PRODUCT-REQUIREMENTS.md`.
+
+## Specification Register
+
+Implementation hand-off: [team implementation contract](./docs/team-implementation.md).
+SPEC-03 through SPEC-11 are approved against active additive 1.1.0 in baseline
+Section 21, retaining inherited 1.0.0 history. After their bounded plan/artifact gates,
+slices can be coded concurrently using conforming provider fakes; real integration/
+acceptance remain provider-ordered. Every module/file/migration need not run simultaneously.
+The accepted invitation dependency includes an upstream venue eligibility read.
+Initial ownership is A: 03–04, B: 05–06, C: 07–08; 09–11 remain unassigned.
+
+All later-module documents below are **approved specifications**, not approved module
+execution plans or accepted implementations. The owner approved the assembled contract
+package on 2026-10-06 with “vậy tôi duyệt draft trên”. Provider meanings were reviewed
+in dependency order; real-provider and module acceptance gates remain unchanged.
+
+| Module | Specification | Contract status |
+| --- | --- | --- |
+| `core-platform` | [`SPEC-core-platform.md`](./SPEC-core-platform.md) | Approved |
+| `identity-access` | [`SPEC-identity-access.md`](./SPEC-identity-access.md) | Approved |
+| `venue-catalog` | [`SPEC-venue-catalog.md`](./SPEC-venue-catalog.md) | Approved; implementation remains subject to V4 |
+| `booking-lifecycle` | [`SPEC-booking-lifecycle.md`](./SPEC-booking-lifecycle.md) | Approved SPEC; plan/implementation pending |
+| `payments-billing` | [`SPEC-payments-billing.md`](./SPEC-payments-billing.md) | Approved SPEC; plan/implementation pending |
+| `invitation-studio` | [`SPEC-invitation-studio.md`](./SPEC-invitation-studio.md) | Approved SPEC; plan/implementation pending |
+| `guest-rsvp` | [`SPEC-guest-rsvp.md`](./SPEC-guest-rsvp.md) | Approved SPEC; plan/implementation pending |
+| `seating-plan` | [`SPEC-seating-plan.md`](./SPEC-seating-plan.md) | Approved SPEC; plan/implementation pending |
+| `staff-operations` | [`SPEC-staff-operations.md`](./SPEC-staff-operations.md) | Approved SPEC; plan/implementation pending |
+| `notifications-automation` | [`SPEC-notifications-automation.md`](./SPEC-notifications-automation.md) | Approved SPEC; owner/plan/implementation pending |
+| `analytics-dashboard` | [`SPEC-analytics-dashboard.md`](./SPEC-analytics-dashboard.md) | Approved SPEC; owner/plan/implementation pending |
+| `release-demo` | [`SPEC-release-demo.md`](./SPEC-release-demo.md) | Approved SPEC; owner/plan/implementation pending |
 
 ## Dependency Direction
 
@@ -77,8 +109,8 @@ provider-owned contracts or domain events defined by the providing module.
 
 Drafting may overlap earlier than implementation under `WEDDING-CONTRACT-1@1.0.0`,
 but a draft does not satisfy its contract, plan, implementation, or integration gate.
-`SPEC-02` continues under its existing V1–V4 sequence, and `SPEC-03` implementation
-remains blocked until venue-catalog reaches V4.
+`SPEC-02` retains its V1–V4 acceptance history. V4 was accepted on 2026-10-06;
+`SPEC-03` still requires its own bounded implementation-plan approval.
 
 `guest-rsvp` owns guest-group definitions because the same group identifies an invitation household before it labels any table. `seating-plan` consumes those stable group identifiers and the fixed layout templates owned by `venue-catalog`; this direction avoids a dependency cycle between the guest list and seating plan.
 
@@ -113,6 +145,11 @@ The following do not receive required modules or acceptance criteria. They may b
 
 ## Approved Dependency and Execution Order
 
+This order governs provider integration and acceptance. Approved isolated implementation
+and release scaffolding may overlap after their own SPEC/plan/provider-contract approvals;
+each SPEC lists precise gates and [team implementation](./docs/team-implementation.md)
+defines file/migration ownership.
+
 1. `core-platform`
 2. `identity-access`
 3. `venue-catalog`
@@ -126,8 +163,9 @@ The following do not receive required modules or acceptance criteria. They may b
 9. `staff-operations` follows `seating-plan` on Branch A.
 10. `analytics-dashboard` follows `staff-operations` and may overlap the remaining
     notification work.
-11. `release-demo` starts only after both `notifications-automation` and
-    `analytics-dashboard` satisfy their acceptance gates.
+11. `release-demo` final journey/deployment starts only after both
+    `notifications-automation` and `analytics-dashboard` satisfy their acceptance gates;
+    approved isolated scaffolding may be implemented earlier after its own plan gate.
 
 The initial capability map was approved by the project owner on 2026-09-24.
 
@@ -137,3 +175,7 @@ The contract-first coordination model and branched execution order for `SPEC-03`
 through `SPEC-11` were approved by the project owner through
 `WEDDING-CONTRACT-1@1.0.0` on 2026-10-06. This approval does not reopen or replan
 `SPEC-02`.
+
+The owner accepted amendment `WEDDING-CONTRACT-1@1.1.0`, ADR-003, SPEC-03 through
+SPEC-11 and the three-person initial ownership split on 2026-10-06. Module task/wave
+plans, published provider artifacts, implementation and acceptance remain separate gates.

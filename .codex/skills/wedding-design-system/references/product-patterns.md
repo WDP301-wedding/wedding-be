@@ -1,6 +1,6 @@
 # Product patterns
 
-Read only the section for the product being changed. The screenshots in `../assets/approved-samples/` document the approved baseline.
+Read only the section for the product being changed. The prior screenshots in `../assets/approved-samples/` may be used to understand established information architecture and product behavior; they are not visual templates for this updated system.
 
 ## `wedding-web`
 
@@ -10,14 +10,13 @@ Taste baseline: **variance 6, motion 3–4, density 3**. Routine forms may lower
 
 Preferred composition:
 
-- A slim brown announcement strip for high-value context.
-- A centered estate-style wordmark/header with one clear action.
-- A navy script ribbon or quiet transition band when it supports the page story.
-- Full-bleed or split-layout photography occupying substantial visual space.
-- Serif uppercase page titles with short burgundy script accents.
-- Gold-outline summaries for date, venue, time, package, or RSVP facts.
-- Powder-blue section headings and warm paper form areas.
-- Editorial whitespace and a single dominant action per section.
+- A slim muted or champagne-dust announcement strip only when it carries meaningful context.
+- A calm editorial header: Latin wordmark may use Lora; Vietnamese navigation and actions use Be Vietnam Pro.
+- A full-bleed or split hero with warm photography, restrained ivory/forest overlay only where copy needs it, and a concise Be Vietnam Pro statement.
+- Pressed-ivory canvas, asymmetrical but balanced editorial sections, measured photo mattes, and hairline rules instead of decorative color bands.
+- Short labels used selectively; serif section titles; Be Vietnam Pro body copy at a comfortable reading width. Do not force Vietnamese labels or headings to uppercase.
+- Alabaster fact or RSVP groups with sage borders; champagne is reserved for framing and small emphasis.
+- One dominant action per section. Vary page rhythm to match the story rather than repeating a card grid.
 
 On mobile, stack image before content, keep primary facts visible, reduce display type, and turn multi-column fact/form groups into one column. Do not reproduce desktop navigation at reduced scale.
 
@@ -31,11 +30,12 @@ Taste baseline: **variance 3, motion 2, density 7**. Operational consistency tak
 
 Preferred composition:
 
-- Deep navy sidebar or structural navigation with a thin gold accent.
-- Serif uppercase page titles paired with compact operational metadata.
-- A featured venue/event strip combining navy copy and one image.
-- Square metric cells with gold borders rather than floating rounded cards.
-- Powder-blue table/panel headings, clear row separators, and restrained status pills.
+- Deep evergreen or estate-forest sidebar/navigation with a restrained champagne active rule; avoid bright-blue application chrome.
+- Be Vietnam Pro page titles paired with compact operational metadata and controls; reserve Lora for a Latin-only wordmark.
+- Pressed-ivory canvas with alabaster work surfaces, champagne-dust table/panel headers, sage row separators, and clear alignment.
+- Square or barely rounded metric cells with thin sage/champagne rules instead of floating card stacks.
+- A featured venue/event strip may combine forest copy with one framed image, only when it surfaces relevant work.
+- Compact rectangular status tags that pair color with text/icon; no decorative pills or vague synthetic metrics.
 - Dense but readable tables on desktop; deliberate column prioritization on narrow screens.
 - Timelines and attention queues use alignment, time, and small color markers instead of large decorative cards.
 
@@ -51,11 +51,11 @@ Taste baseline: **variance 4, motion 3, density 5**. Branded moments may be expr
 
 Preferred composition:
 
-- Compact estate wordmark followed by a full-width hero image.
-- Navy date/venue band immediately attached to the hero.
-- Centered welcome block with a short script accent, serif title, and gold divider.
-- Powder-blue countdown/progress panel with a thin gold border.
-- Task lists built from separators and ordered indices, not a stack of rounded cards.
+- A compact Latin Lora wordmark or a Be Vietnam Pro screen title, followed by a warm hero or a content-led first action—not a mandatory marketing layout.
+- Pressed-ivory canvas, estate-forest date/venue or progress anchors, and champagne hairlines for important grouping.
+- A centered welcome/milestone block with a short Be Vietnam Pro title, calm body copy, and a thin divider; no default script accent.
+- Champagne-dust planning or appointment panels with thin sage/champagne borders.
+- Task lists built from separators, order, and clear completion affordances rather than a stack of rounded cards.
 - Appointment or milestone sections in powder blue.
 - Native controls and platform behavior; use the existing Expo theme, `expo-image`, and native-capable UI components already present in the project.
 

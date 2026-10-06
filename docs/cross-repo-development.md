@@ -12,6 +12,10 @@ workspace/
 
 ## Ownership boundaries
 
+For module file lanes, conforming fakes, provider readiness and which SPEC slices can
+implement concurrently, use the [team implementation contract](team-implementation.md).
+Concurrent coding does not make shared migrations or final integrations concurrent.
+
 | Repository                                                                   | Owns                                                                                                                                                        | Does not own                                                  |
 | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
 | [`wedding-be`](https://github.com/WDP301-wedding/wedding-be)                 | Express API, authoritative business validation, PostgreSQL/Prisma, migrations, audit records, external-provider adapters, Zod schemas, and OpenAPI artifact | Browser/native presentation or client-side business authority |

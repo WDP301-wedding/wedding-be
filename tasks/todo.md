@@ -1,10 +1,17 @@
 # Task List: Wedding Management System
 
+SPEC-03 through SPEC-11, active baseline 1.1.0 and the initial three-person hand-off
+are approved: see [team implementation](../docs/team-implementation.md) and Checkpoint
+CB2 below. Bounded module plans, executable waves, provider artifacts, integration and
+implementation acceptance remain pending. Existing mixed SPEC/plan tasks are not
+automatically completed; SPEC wave outlines remain planning input. CP/IA/VC history
+and runtime checkpoints are unchanged.
+
 Core-platform task list status: Approved by project owner on 2026-09-24<br>
 Core-platform implementation status: Approved by project owner on 2026-10-03<br>
 Post-core specification sequence status: Approved by project owner on 2026-09-27<br>
 Cross-module contract baseline: Locked as
-[`WEDDING-CONTRACT-1@1.0.0`](../CONTRACT-BASELINE.md) on 2026-10-06<br>
+[`WEDDING-CONTRACT-1@1.1.0`](../CONTRACT-BASELINE.md) on 2026-10-06 (1.0.0 history retained)<br>
 Plan: [`plan.md`](./plan.md)<br>
 Platform specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)<br>
 Product requirements: [`../PRODUCT-REQUIREMENTS.md`](../PRODUCT-REQUIREMENTS.md)<br>
@@ -2324,6 +2331,26 @@ rule with the controlled gates below.
       blocked until V4.
 - [x] The final SPEC approval graph is `03 → 04 → 05 → 06`, followed by
       `07 → 08 → 10` in parallel with `09`; `11` waits for both branches.
+
+#### Checkpoint CB2 — SPEC contracts and initial three-person allocation approved
+
+- [x] Project owner approves revised SPEC-03 through SPEC-11 and their documented
+      numeric defaults as specifications, not completed implementations.
+- [x] Amendment `WEDDING-CONTRACT-1@1.1.0`, ADR-003 and the team hand-off contract
+      are accepted; active version declarations are updated together.
+- [x] Initial owner roles are A: SPEC-03/04, B: SPEC-05/06, C: SPEC-07/08.
+- [ ] Prepare bounded module task/wave plans and obtain their normal approvals.
+- [ ] Assign named A/B/C members and one integration steward before shared-file work.
+- [ ] Publish provider contract artifacts/conformance packages before consumer wiring;
+      prove real-provider readiness and integration before module acceptance.
+- [ ] Assign SPEC-09/10/11 in the next ownership round.
+
+**Approval evidence (2026-10-06):** Following the revised nine-SPEC review and the
+three-person dependency discussion, the project owner replied, “vậy tôi duyệt draft trên”.
+This accepts the specification/contract package and initial allocation. Existing module
+planning/verification tasks remain pending until their specific evidence and wave
+insertion exist; this record does not authorize runtime implementation without a plan,
+mark any provider ready, complete CP/IA/VC work again, or approve a release.
 
 ### SPEC-03: Specify `booking-lifecycle`
 

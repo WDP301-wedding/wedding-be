@@ -4,9 +4,12 @@
 
 - Status: **Locked and accepted**
 - Baseline identifier: `WEDDING-CONTRACT-1`
-- Baseline version: `1.0.0`
+- Baseline version: `1.1.0`
+- Previous accepted version: `1.0.0` (historical approval retained)
 - Prepared: 2026-10-06
 - Approved and locked: 2026-10-06
+- Amendment approval: project owner approved SPEC-03 through SPEC-11 and Section 21
+  on 2026-10-06; module implementation plans and acceptance remain separate gates.
 - Capability index: [`CAPABILITY-MAP.md`](./CAPABILITY-MAP.md)
 - Product requirements: [`PRODUCT-REQUIREMENTS.md`](./PRODUCT-REQUIREMENTS.md)
 - Platform contract: [`SPEC-core-platform.md`](./SPEC-core-platform.md)
@@ -14,8 +17,10 @@
   [`ADR-002`](./docs/decisions/0002-freeze-program-contracts-before-parallel-specification.md)
 
 This document is the accepted cross-module contract freeze for `SPEC-03` through
-`SPEC-11`. Version `1.0.0` permits controlled overlap while module specifications are
-drafted and reviewed. A module plan starts only after that module's SPEC is approved;
+`SPEC-11`. Version `1.1.0` includes the accepted implementation hand-offs in Section 21;
+Sections 2–20 retain the inherited 1.0.0 contract and historical approval evidence;
+the accepted Section 21 governs the active version and additive hand-off changes.
+A module plan starts only after that module's SPEC is approved;
 plans for already approved SPECs may then overlap.
 Provider-first review and approval order remain mandatory where one module defines
 another module's meaning.
@@ -1005,3 +1010,743 @@ receives a new baseline version; it must not be edited into `1.0.0` silently.
 - final notification channels, templates, user preferences, and scheduling cadence;
 - analytics query shape, refresh interval, and chart presentation;
 - deployment hosts, Android artifact details, and release rollback timing.
+
+## 21. Accepted Amendment 1.1.0: Implementation Hand-off Contracts
+
+Status: **Accepted by the project owner on 2026-10-06**. Prepared in response to the
+request to make SPEC-03 through SPEC-11 implementable by different team members.
+Approval evidence: the owner replied, “vậy tôi duyệt draft trên”, after reviewing the
+revised nine SPECs, the hand-off rules and the three-person ownership split.
+Version 1.1.0 is now active; 1.0.0 remains inherited historical contract evidence.
+This is specification/contract approval, not module-plan approval, provider readiness,
+implementation acceptance or deployment authority.
+
+This amendment adds ports and clarifies execution readiness. It preserves the existing
+method signatures, identifiers, enums, ownership, event names, and error envelope.
+Owners publish these declarations under their existing application boundary; the
+declarations below are documentation, not already implemented services. Provider-first
+review and each module's SPEC/plan approval still precede implementation. After those
+gates, isolated implementation may overlap an unfinished upstream implementation using
+a conforming fake. Production wiring and integrated acceptance require real providers.
+
+### 21.1 Common command and reporting types
+
+```typescript
+type ContractContext = Readonly<{
+  requestId: string;
+  causationId: string;
+  actorAccountId: string | null;
+  authority: 'AUTHENTICATED' | 'SYSTEM';
+  transactionScopeId?: string;
+}>;
+
+type SourceQuery = Readonly<{
+  afterSequence: number;
+  throughSequence?: number;
+  cursor?: string;
+  limit: number;
+}>;
+
+type SourceRow<T> = Readonly<{
+  recordId: string;
+  sequence: number;
+  changedAt: string;
+  value: T;
+}>;
+
+type SourcePage<T> = Readonly<{
+  throughSequence: number;
+  nextCursor: string | null;
+  rows: readonly SourceRow<T>[];
+}>;
+```
+
+Context is constructed by the backend after authentication or by an allowlisted worker.
+It is never accepted as authority from an HTTP body. An authenticated context requires
+a non-null active account; system context requires an allowlisted command purpose.
+Consumers authorize their own actor/resource boundary before invoking a port. Provider
+commands validate ownership, state, and supplied evidence again. Failures use the
+existing error envelope at HTTP boundaries, with stable codes specified in owning SPECs.
+
+For source pages, callers supply limit (standard page size 100, maximum 500). Sequence is a monotonically
+increasing safe integer allocated transactionally by the owner for every committed
+reportable change. The first page fixes `throughSequence`; all later pages use that
+same fence. Providers return historical row values as of that fence, ordered by sequence
+then record ID. Cursors bind query/fence and cannot skip records under concurrent writes.
+Rows are absolute snapshots, not add/subtract instructions. A projection upserts by
+record ID and rejects a lower sequence. An archived/cancelled resource remains as a row
+with its terminal state; it is never silently omitted. Rebuild uses afterSequence zero,
+then catches up after the fence. Each provider has its own sequence; numbers from
+different owners are never compared.
+
+### 21.2 Ordered headcount and approved timeline reads
+
+The original `BookingPlanningHeadcountUpdater` remains unchanged and is usable only
+in a serialized owner-controlled path. Concurrent guest-plan synchronization uses the
+new port:
+
+```typescript
+interface BookingPlanningHeadcountSynchronizer {
+  synchronize(
+    input: Readonly<{
+      bookingId: string;
+      sourceRsvpRevisionId: string;
+      sourceSequence: number;
+      expectedAttendees: number;
+    }>,
+    context: ContractContext,
+  ): Promise<
+    Readonly<{
+      bookingRevision: number;
+      appliedSourceSequence: number;
+      outcome: 'APPLIED' | 'REPLAYED' | 'IGNORED_STALE';
+    }>
+  >;
+}
+
+interface GuestAttendancePlanReader {
+  getPlan(
+    bookingId: string,
+    context: ContractContext,
+  ): Promise<
+    Readonly<{
+      sourceRsvpRevisionId: string;
+      sourceSequence: number;
+      expectedAttendees: number;
+      rsvpDeadlineAt: string;
+    }>
+  >;
+}
+
+interface BookingTimelineSnapshotReader {
+  resolveApprovedRevision(
+    input: Readonly<{
+      bookingId: string;
+      timelineRevisionId: string;
+    }>,
+    context: ContractContext,
+  ): Promise<
+    Readonly<{
+      bookingId: string;
+      timelineRevisionId: string;
+      revisionNumber: number;
+      eventDate: string;
+      hallName: string;
+      shiftCode: 'LUNCH' | 'DINNER';
+      shiftStartTime: string;
+      shiftEndTime: string;
+      items: readonly Readonly<{
+        itemId: string;
+        order: number;
+        startTime: string;
+        title: string;
+        description: string | null;
+      }>[];
+      approvedByManagerAt: string;
+      approvedByCoupleAt: string;
+      isEffective: boolean;
+    }>
+  >;
+}
+```
+
+Guest owns a per-booking attendance-plan sequence and immutable aggregate plan revision.
+Every household create/update/archive and RSVP change that changes the planning total
+creates a new aggregate revision; the field name `sourceRsvpRevisionId` retains
+baseline compatibility. It is not the UUID of one arbitrary household's latest response.
+Higher source sequence applies by CAS; same sequence/ID/count replays; same sequence with
+different ID/count is `HEADCOUNT_SOURCE_CONFLICT`; lower sequence is a successful
+`IGNORED_STALE` acknowledgement. Integrated guest-plan activation and booking
+synchronization share the booking unit-of-work. The atomic outbox carries the same
+source revision for replay/reconciliation, not a second independently activated plan.
+
+`guest.expected-attendance-changed` v1 gains optional `sourceSequence` and new
+publishers always include it. A legacy event without it causes an authoritative
+`getPlan` read rather than comparison of UUIDs or timestamps. Booking's existing
+headcount event retains `bookingRevision` for seating ordering.
+
+Timeline reads resolve a stored exact revision, never current catalog content. Historical
+approved revisions remain readable; print approval requires `isEffective: true`.
+Changing the effective revision and capturing a printable snapshot use a serialized
+booking/print boundary so the snapshot cannot mix two revisions.
+
+### 21.3 Deposit reservation and automation command ports
+
+```typescript
+interface BookingDepositIntentCoordinator {
+  reserve(
+    input: Readonly<{
+      bookingId: string;
+      timelineRevisionId: string;
+      paymentAttemptId: string;
+      expectedBookingRevision: number;
+      amountVnd: number;
+      expiresAt: string;
+    }>,
+    context: ContractContext,
+  ): Promise<
+    Readonly<{
+      paymentAttemptId: string;
+      bookingRevision: number;
+      replayed: boolean;
+    }>
+  >;
+  recordUnknown(
+    input: Readonly<{
+      bookingId: string;
+      paymentAttemptId: string;
+    }>,
+    context: ContractContext,
+  ): Promise<void>;
+  releaseVerifiedFailure(
+    input: Readonly<{
+      bookingId: string;
+      paymentAttemptId: string;
+      providerEvidenceId: string;
+    }>,
+    context: ContractContext,
+  ): Promise<void>;
+}
+
+interface BookingAutomationPort {
+  listDue(
+    input: Readonly<{
+      kind: 'D3_REMINDER' | 'COMPLETION';
+      dueBefore: string;
+      cursor?: string;
+      limit: number;
+    }>,
+    context: ContractContext,
+  ): Promise<
+    Readonly<{
+      nextCursor: string | null;
+      items: readonly Readonly<{
+        bookingId: string;
+        bookingRevision: number;
+        dueAt: string;
+        coupleAccountId: string;
+      }>[];
+    }>
+  >;
+  completeDue(
+    input: Readonly<{
+      bookingId: string;
+      expectedBookingRevision: number;
+      commandId: string;
+      now: string;
+    }>,
+    context: ContractContext,
+  ): Promise<
+    Readonly<{
+      outcome: 'COMPLETED' | 'REPLAYED' | 'NOT_DUE' | 'SKIPPED_TERMINAL';
+    }>
+  >;
+}
+```
+
+Booking owns slot reservation and rechecks current timeline/amount/revision on reserve.
+There is one unresolved deposit intent per booking, enforced in PostgreSQL. Edits,
+approval withdrawal, slot release, and cancellation that invalidate that reservation
+return `DEPOSIT_INTENT_ACTIVE` until proven failure or resolved settlement. Timeout
+alone never releases an unknown intent. Payments owns the evidence and reconciliation;
+booking does not query payment repositories. The same attempt ID replays only matching
+intent data. Settlement uses the existing deposit recorder and the reserved attempt's
+persisted evidence. A late verified success remains recorded by payments even if it
+requires Manager reconciliation; it is never silently discarded or automatically charged
+again. The exact same settled payment replays before current-state eligibility checks.
+
+Completion is booking-owned: only a confirmed event past its snapshotted end instant
+plus 12 hours is due. Notifications invokes `completeDue`; the command compares the
+current booking revision, records audit/retention evidence, and emits `booking.completed`.
+A cancelled/completed booking is an idempotent skip/replay. No payment/refund is implied.
+
+### 21.4 Operational guest search and identity additions
+
+```typescript
+interface GuestOperationsSearchReader {
+  search(
+    input: Readonly<{
+      bookingId: string;
+      name?: string;
+      phone?: string;
+      cursor?: string;
+      limit: number;
+    }>,
+    context: ContractContext,
+  ): Promise<
+    Readonly<{
+      nextCursor: string | null;
+      households: readonly Readonly<{
+        invitationHouseholdId: string;
+        guestGroupId: string;
+        representativeName: string;
+        phoneLast4: string | null;
+        expectedAttendees: number;
+        operationalNote: string | null;
+        groupName: string;
+        groupColor: string;
+      }>[];
+    }>
+  >;
+}
+
+interface StaffAccountProvisioner {
+  provision(
+    input: Readonly<{
+      email: string;
+      commandId: string;
+    }>,
+    context: ContractContext,
+  ): Promise<
+    Readonly<{
+      accountId: string;
+      credentialSetupRequired: boolean;
+      replayed: boolean;
+    }>
+  >;
+  setOperationalAccess(
+    input: Readonly<{
+      accountId: string;
+      enabled: boolean;
+      commandId: string;
+    }>,
+    context: ContractContext,
+  ): Promise<void>;
+}
+
+interface NotificationRecipientReader {
+  resolve(
+    input: Readonly<{
+      accountId: string;
+      purpose: 'BOOKING' | 'PAYMENT' | 'PRINT' | 'RSVP' | 'MEDIA';
+    }>,
+    context: ContractContext,
+  ): Promise<
+    Readonly<{
+      accountId: string;
+      active: boolean;
+      email: string | null;
+    }>
+  >;
+}
+```
+
+Guest search is called only by an authorized operational facade after Staff assignment
+or explicit Manager override checks. Guest returns only records in that booking. Query
+phone is a matching input, never an instruction to expose the full phone. Search has
+limit 1–50, deterministic normalized matching, and privacy-safe telemetry.
+
+Identity owns provisioning/revocation, password setup/reset, and account state. Staff
+operations owns the Manager workflow and assignments. These additions require separate
+identity-owned contract/adapter work; they do not reopen completed identity acceptance
+or permit a generic role setter. Disabling operational access removes Staff authority
+and revokes applicable sessions without disabling a separate Couple identity.
+
+The existing `IdentityNotificationPort` remains the credential-delivery boundary.
+Its explicit outbound command may contain the token at the last possible moment;
+integration events, ordinary notification payloads, logs, and audit never do. Implementing
+an asynchronous adapter must provide encrypted, short-lived credential handling or keep
+credential delivery synchronous through that port. Recipient resolution is private
+server-to-server only and requires an allowlisted purpose, not arbitrary account lookup.
+
+### 21.5 Reporting provider ports
+
+Each interface exposes `readPage(query: SourceQuery, context: ContractContext)` and
+returns the indicated `SourcePage`. These reads are available only to an authorized
+Manager projection/rebuild operation; consumers never join provider repositories.
+
+| Interface / owner                        | Row value contract                                                                                                                                                                                                                                  |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `BookingReportingReader` / booking       | `{ bookingId, phase, eventDate, hallId, hallNameSnapshot, shiftCode, menuPackageId: string \| null, menuNameSnapshot: string \| null, tableCount: number, baseChargeVnd, confirmedAt: string \| null, cancelledAt: string \| null }`                |
+| `BillingReportingReader` / payments      | `{ bookingId, acceptedChargesVnd, paidVnd, refundedVnd, outstandingVnd, creditVnd, ledger: readonly { ledgerEntryId, kind: 'CHARGE' \| 'PAYMENT' \| 'REFUND' \| 'CREDIT_ADJUSTMENT', amountVnd, occurredAt, sourceRevisionId: string \| null }[] }` |
+| `InvitationReportingReader` / invitation | `{ bookingId, printOrderId, status, commercialRevisionId: string \| null, receivableChargeId: string \| null, acceptedAmountVnd, approvedAt: string \| null, updatedAt }`                                                                           |
+| `GuestReportingReader` / guest           | `{ bookingId, invitationHouseholdId, guestGroupId, groupNameSnapshot, groupColorSnapshot, expectedAttendees, planningContribution, archived: boolean }`                                                                                             |
+| `AttendanceReportingReader` / staff      | `{ bookingId, invitationHouseholdId, guestGroupId, actualAttendees, ledgerRevision: number }`                                                                                                                                                       |
+
+All IDs and instants in the table are strings; amounts/counts are numbers; states use
+the owning SPEC's enums. Each owner must publish a readonly TypeScript DTO and strict
+runtime schema with these exact field names before consumer fake implementation.
+Booking/base-charge and print-charge facts remain separate. Billing defines its ledger
+and totals; analytics selects/aggregates those values rather than constructing new
+payment truth. The ledger array is bounded to one booking; large ledgers are streamed
+through an owner-defined paged extension before the bound is reached.
+
+### 21.6 Printable invalidation, charge adjustment, and due content
+
+Invalidation is terminal for a given seating revision. At equal revision number,
+`markRequiresReview` wins over `registerConfirmed` regardless of delivery order.
+An immutable reconfirmation requires a greater revision. A registration with an older
+number is acknowledged without lowering the high-water mark. Same ID/different digest
+conflicts. Seating's state change, eligibility change in the invitation-owned registry,
+and print approval are serialized on the booking boundary in the shared database.
+Owners expose an application unit-of-work adapter for this purpose; consumers do not
+import repositories or Prisma transaction types. Durable retry records remain for
+event delivery, but a failed required registry write rolls back confirmation/invalidation
+rather than leaving a known-ineligible snapshot available for new print approval.
+
+```typescript
+interface BookingChargeAdjustmentRegistrar {
+  registerCredit(
+    input: Readonly<{
+      bookingId: string;
+      receivableChargeId: string;
+      sourceAdjustmentId: string;
+      amountVnd: number;
+      reason: 'PRINT_CANCELLED' | 'PRINT_REPLACED';
+      acceptedAt: string;
+    }>,
+    context: ContractContext,
+  ): Promise<
+    Readonly<{
+      adjustmentId: string;
+      replayed: boolean;
+    }>
+  >;
+}
+
+interface InvitationAutomationReader {
+  listMediaCutoffs(
+    input: Readonly<{
+      dueBefore: string;
+      cursor?: string;
+      limit: number;
+    }>,
+    context: ContractContext,
+  ): Promise<
+    Readonly<{
+      nextCursor: string | null;
+      items: readonly Readonly<{
+        bookingId: string;
+        cutoffAt: string;
+        policyRevision: number;
+        coupleAccountId: string;
+      }>[];
+    }>
+  >;
+}
+
+interface GuestAutomationReader {
+  listRsvpDeadlines(
+    input: Readonly<{
+      dueBefore: string;
+      cursor?: string;
+      limit: number;
+    }>,
+    context: ContractContext,
+  ): Promise<
+    Readonly<{
+      nextCursor: string | null;
+      items: readonly Readonly<{
+        bookingId: string;
+        deadlineAt: string;
+        deadlineRevision: number;
+        coupleAccountId: string;
+      }>[];
+    }>
+  >;
+}
+```
+
+A credit adjustment is a new immutable billing fact against one charge, not deletion of
+that charge or automatic refund. Credit cannot exceed the uncredited source charge.
+Print cancellation/replacement registers a deterministic adjustment before completion;
+any paid excess becomes visible credit for Manager reconciliation/manual refund. A
+replacement registers the new full commercial charge and credits the prior charge
+once, rather than accumulating both full amounts. Existing charge/payment/refund event
+meanings remain unchanged; new publishers emit optional additive adjustment facts only
+after their event schema is reviewed.
+
+### 21.7 Compatibility and implementation readiness
+
+| Change                                                 | Classification                                             | Provider/consumer hand-off                                                            |
+| ------------------------------------------------------ | ---------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| New ordered headcount port and optional event sequence | Additive                                                   | Booking/guest review jointly; replace legacy concurrent use before integration.       |
+| Timeline/search/reporting/automation/deposit ports     | Additive                                                   | Owner publishes declarations plus provider tests before consumer relies on them.      |
+| Print credit adjustment port                           | Additive                                                   | Payments defines ledger result; invitation consumes without changing original charge. |
+| Equal-revision invalidation precedence                 | Clarification of existing invalidation promise             | Invitation/seating tests cover both orders and shared transaction rollback.           |
+| Restricted deposit permission                          | Correction to draft SPEC-04                                | Matches approved baseline authorization matrix.                                       |
+| Overlapping implementation on fakes                    | Clarification within approved isolated implementation gate | SPEC and plan still approved; real integration/acceptance remains dependency-ordered. |
+
+`docs/team-implementation.md` and every module SPEC's parallel-work matrix describe
+file lanes, fake readiness, real-provider readiness, integration evidence, and acceptance.
+No implementation task or prior approval is marked complete by this documentation.
+
+### 21.8 Remaining additive owner DTOs
+
+```typescript
+interface BookingBoundaryUnitOfWork {
+  run<T>(
+    input: Readonly<{
+      bookingId: string;
+      context: ContractContext;
+    }>,
+    work: (scopedContext: ContractContext) => Promise<T>,
+  ): Promise<T>;
+}
+
+interface BookingCommercialSnapshotReader {
+  getAccepted(
+    input: Readonly<{
+      bookingId: string;
+      timelineRevisionId: string;
+    }>,
+    context: ContractContext,
+  ): Promise<
+    Readonly<{
+      bookingId: string;
+      commercialRevisionId: string;
+      bookingRevision: number;
+      baseChargeVnd: number;
+      depositAmountVnd: number;
+      menuPackageVersionId: string;
+      tableCount: number;
+      acceptedAt: string;
+    }>
+  >;
+}
+
+interface VenueSelectionEligibilityReader {
+  getLayoutEligibility(
+    layoutTemplateVersionId: string,
+    context: ContractContext,
+  ): Promise<
+    Readonly<{
+      layoutTemplateVersionId: string;
+      hallId: string;
+      templateActive: boolean;
+      hallActive: boolean;
+      currentForNewSelection: boolean;
+      hallMaxGuests: number;
+      totalSeatCapacity: number;
+    }>
+  >;
+}
+
+interface VenueReportingReader {
+  readPage(
+    query: SourceQuery,
+    context: ContractContext,
+  ): Promise<
+    SourcePage<
+      Readonly<{
+        hallId: string;
+        eventDate: string;
+        shiftCode: 'LUNCH' | 'DINNER';
+        hallNameSnapshot: string;
+        available: boolean;
+      }>
+    >
+  >;
+}
+
+interface SeatingGuidanceReader {
+  getGuidance(
+    bookingId: string,
+    context: ContractContext,
+  ): Promise<
+    Readonly<{
+      seatingPlanRevisionId: string | null;
+      status: 'DRAFT' | 'CONFIRMED' | 'REQUIRES_REVIEW' | 'ABSENT';
+      groups: readonly Readonly<{
+        guestGroupId: string;
+        groupName: string;
+        color: string;
+        tableLabels: readonly string[];
+      }>[];
+    }>
+  >;
+}
+
+interface PersonalizedInvitationDeliveryPort {
+  send(
+    input: Readonly<{
+      invitationId: string;
+      bookingId: string;
+      intentId: string;
+      recipientEmail: string;
+      invitationToken: string;
+      expiresAt: string;
+    }>,
+    context: ContractContext,
+  ): Promise<
+    Readonly<{
+      notificationIntentId: string;
+      outcome: 'QUEUED' | 'DELIVERED' | 'UNKNOWN';
+      replayed: boolean;
+    }>
+  >;
+}
+```
+
+Core owns the unit-of-work infrastructure; the interface denotes one database transaction
+and a booking serialization lock. transactionScopeId is opaque, internal, unforgeable
+outside that operation, and invalid after callback completion. Owner infrastructure
+adapters enlist in the same scope; no consumer imports Prisma transaction types.
+Unit-of-work tests prove an exception rolls back all enlisted owner writes. A provider
+that cannot enlist is not ready for settlement/print integration.
+
+Venue additions are owner-maintained separate prerequisite slices. Existing
+VenueCatalogReader/current versus exact-version behavior stays unchanged. Eligibility
+does not equate a superseded version with a retired aggregate. Historical slot reporting
+uses owner-maintained effective-dated hall/shift activity; dates before captured history
+are explicitly SOURCE_NOT_READY. Each active hall/date has at most LUNCH and DINNER,
+with unavailable rows for retired/inactive windows. The venue owner publishes activity
+history/denominator evidence without consumers querying catalog tables.
+
+Personalized delivery is a guest-owned credential boundary implemented by Notifications,
+not an integration event carrying a token. Guest may keep an optional normalized recipient
+email for explicit delivery. Its authorized share link remains separate. Queue handling
+follows SPEC-09 encrypted short-lived rules; idempotency binds intent ID and the exact
+credential revision. No private token is exposed in ordinary notification status.
+
+### 21.9 Amendment approval record
+
+- Status: accepted; active contract revision `WEDDING-CONTRACT-1@1.1.0`.
+- Reviewer/authority: project owner in the current project conversation, 2026-10-06.
+- Approval evidence: “vậy tôi duyệt draft trên”, following the nine-SPEC review and
+  the A: 03–04, B: 05–06, C: 07–08 team allocation discussion.
+- Scope: SPEC-03 through SPEC-11, their documented numeric defaults, Section 21,
+  ADR-003 and the team hand-off/ownership model. No runtime completion is claimed.
+- Active declarations are updated together; Section 19 and ADR-002 retain the
+  historical 1.0.0 approval. Module wave/task plans still need their own approval;
+  published provider artifacts, conformance suites and real integrations remain pending.
+- A required-field change to an existing implemented port is breaking and cannot be
+  slipped into this additive amendment. The new ordered port exists for that reason.
+
+### 21.10 Concrete reporting DTOs and print validity proof
+
+```typescript
+type BookingReportRow = Readonly<{
+  bookingId: string;
+  phase: 'DRAFT' | 'AWAITING_DEPOSIT' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+  eventDate: string;
+  hallId: string;
+  hallNameSnapshot: string;
+  shiftCode: 'LUNCH' | 'DINNER';
+  menuPackageId: string | null;
+  menuNameSnapshot: string | null;
+  tableCount: number;
+  baseChargeVnd: number;
+  confirmedAt: string | null;
+  cancelledAt: string | null;
+}>;
+type BillingReportRow = Readonly<{
+  bookingId: string;
+  acceptedChargesVnd: number;
+  paidVnd: number;
+  refundedVnd: number;
+  outstandingVnd: number;
+  creditVnd: number;
+  ledger: readonly Readonly<{
+    ledgerEntryId: string;
+    kind: 'CHARGE' | 'PAYMENT' | 'REFUND' | 'CREDIT_ADJUSTMENT';
+    amountVnd: number;
+    occurredAt: string;
+    sourceRevisionId: string | null;
+  }>[];
+}>;
+type InvitationReportRow = Readonly<{
+  bookingId: string;
+  printOrderId: string;
+  status:
+    | 'REQUESTED'
+    | 'QUOTED'
+    | 'APPROVED'
+    | 'IN_PRODUCTION'
+    | 'READY_FOR_HANDOVER'
+    | 'HANDED_OVER'
+    | 'CANCELLED';
+  commercialRevisionId: string | null;
+  receivableChargeId: string | null;
+  acceptedAmountVnd: number;
+  approvedAt: string | null;
+  updatedAt: string;
+}>;
+type GuestReportRow = Readonly<{
+  bookingId: string;
+  invitationHouseholdId: string;
+  guestGroupId: string;
+  groupNameSnapshot: string;
+  groupColorSnapshot: string;
+  expectedAttendees: number;
+  planningContribution: number;
+  archived: boolean;
+}>;
+type AttendanceReportRow = Readonly<{
+  bookingId: string;
+  invitationHouseholdId: string;
+  guestGroupId: string;
+  actualAttendees: number;
+  ledgerRevision: number;
+}>;
+interface BookingReportingReader {
+  readPage(query: SourceQuery, context: ContractContext): Promise<SourcePage<BookingReportRow>>;
+}
+interface BillingReportingReader {
+  readPage(query: SourceQuery, context: ContractContext): Promise<SourcePage<BillingReportRow>>;
+}
+interface InvitationReportingReader {
+  readPage(query: SourceQuery, context: ContractContext): Promise<SourcePage<InvitationReportRow>>;
+}
+interface GuestReportingReader {
+  readPage(query: SourceQuery, context: ContractContext): Promise<SourcePage<GuestReportRow>>;
+}
+interface AttendanceReportingReader {
+  readPage(query: SourceQuery, context: ContractContext): Promise<SourcePage<AttendanceReportRow>>;
+}
+interface BookingPlanningSnapshotReader {
+  getCurrent(
+    bookingId: string,
+    context: ContractContext,
+  ): Promise<
+    Readonly<{
+      bookingId: string;
+      bookingRevision: number;
+      planningHeadcount: number;
+    }>
+  >;
+}
+type PrintableSeatingValidityProof = Readonly<{
+  bookingRevision: number;
+  expectedAttendees: number;
+  minGuests: number;
+  maxGuests: number;
+  totalSeatCapacity: number;
+  managerException: Readonly<{
+    approvalId: string;
+    approvedBookingRevision: number;
+    approvedHeadcount: number;
+  }> | null;
+}>;
+```
+
+Amendment 1.1.0 `PrintableSeatingContentRegistry.registerConfirmed` adds optional
+`validityProof?: PrintableSeatingValidityProof` to its input. All new integrated
+seating publishers must include it; an old stored snapshot without proof is historical
+render content only and cannot authorize a new print approval. Existing signature
+callers remain source-compatible; no valid existing 1.0.0 production workflow is claimed
+for these unfinished modules.
+
+Before print approval, invitation obtains `BookingPlanningSnapshotReader.getCurrent`
+and `VenueSelectionEligibilityReader.getLayoutEligibility` within the booking-bound
+unit-of-work. It compares current headcount to stored min/max and the live active hall/
+template check. A Manager exception requires both the approved headcount and booking
+revision to match current values and cannot exceed physical/hall capacity. An out-of-range
+count blocks even if the asynchronous invalidation event has not been delivered.
+This is an additive upstream venue read dependency for invitation, not a reverse
+invitation-to-seating query. The registry/print application service owns these checks;
+it never queries seating tables or reinterprets geometry.
+
+The same booking lock protects headcount synchronization, timeline activation, seating
+validity, and print capture. Full guest-plan integration must activate guest plan and
+booking headcount in the shared unit-of-work. When the real synchronizer is unavailable,
+a durable recovery intent may stage a proposed change, but cannot activate the new plan
+or claim successful completion; return `503 HEADCOUNT_SYNC_PENDING`. Replay activates
+both owner changes atomically. Fake-only or pending-only paths cannot close integration.
+
+Within this unit-of-work, the venue eligibility adapter holds a shared lock on the
+hall/template lifecycle rows until commit. Retirement takes the corresponding exclusive
+lock. Therefore retirement either precedes and blocks approval or follows a valid
+captured snapshot; a read followed by an unlocked retirement race is not conformant.
+Venue retirement never waits on booking locks while holding venue locks; dependent
+invalidation is emitted through its outbox after the venue change.

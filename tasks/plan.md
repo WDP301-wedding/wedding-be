@@ -3,7 +3,9 @@
 Core-platform plan status: Approved by project owner on 2026-09-24<br>
 Post-core program extension status: Approved by project owner on 2026-09-27<br>
 Cross-module contract baseline: Locked as
-[`WEDDING-CONTRACT-1@1.0.0`](../CONTRACT-BASELINE.md) on 2026-10-06<br>
+[`WEDDING-CONTRACT-1@1.1.0`](../CONTRACT-BASELINE.md) on 2026-10-06 (1.0.0 history retained)<br>
+SPEC-03 through SPEC-11 and three-person ownership: Approved on 2026-10-06;<br>
+bounded module task/wave plans and implementation acceptance remain pending.<br>
 Approved platform specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)<br>
 Approved product requirements: [`../PRODUCT-REQUIREMENTS.md`](../PRODUCT-REQUIREMENTS.md)<br>
 Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)<br>
@@ -16,9 +18,9 @@ Extended: 2026-09-27
 Implement the approved wedding-management capabilities across four independent repositories in the dependency order recorded by `CAPABILITY-MAP.md`. The currently detailed CP-01 through CP-32 work establishes `core-platform`: reproducible TypeScript toolchains, a production-minded Express/Prisma foundation, a generated OpenAPI contract, three typed API clients, provider boundaries, security/observability primitives, and independent CI quality gates.
 
 The post-core extension adds rolling specification and planning gates for every later
-module. `WEDDING-CONTRACT-1@1.0.0` now permits controlled overlap while `SPEC-03`
-through `SPEC-11` are drafted, but a module receives detailed implementation tasks
-only after its own `SPEC-<module-id>.md` is approved. This preserves completed and
+module. `WEDDING-CONTRACT-1@1.1.0` permits controlled overlap after contract approval.
+SPEC-03 through SPEC-11 are now approved, but a module receives executable implementation
+tasks only after its bounded plan is prepared and approved. This preserves completed and
 in-progress history while preventing unapproved API, state-machine, security, or
 data-retention assumptions from entering implementation tasks.
 
@@ -39,7 +41,7 @@ The plan remains front-loaded with the highest-risk foundations: PostgreSQL migr
   baseline does not reopen it, and no `booking-lifecycle` implementation starts before
   V4 acceptance.
 - Every SPEC from `SPEC-03` onward declares
-  `contractBaseline: WEDDING-CONTRACT-1@1.0.0` and lists its produced and consumed
+  `contractBaseline: WEDDING-CONTRACT-1@1.1.0`, retains inherited 1.0.0 history and lists its produced and consumed
   provider contracts and events.
 
 ## 3. Architecture Decisions Carried into Implementation
@@ -59,7 +61,7 @@ The plan remains front-loaded with the highest-risk foundations: PostgreSQL migr
 13. Event check-in records invitation-household arrivals and corrections rather than per-seat occupancy or physical-invitation QR credentials.
 14. `payments-billing` precedes `invitation-studio` because accepted print charges become booking receivables.
 15. Cross-module ownership, identifiers, events, snapshot semantics, compatibility,
-    and change control are fixed by `WEDDING-CONTRACT-1@1.0.0`; conflicting module
+    and change control are fixed by active `WEDDING-CONTRACT-1@1.1.0`; conflicting module
     choices require a baseline change proposal first.
 
 ## 4. Dependency Graph
@@ -775,7 +777,7 @@ or a new product decision. V4 keeps its explicit owner-approval requirement.
 ## 18. Fast-track planning protocol for SPEC-03 through SPEC-11
 
 Beginning with `booking-lifecycle`, specifications are compact delta specs over the
-already approved platform contracts and `WEDDING-CONTRACT-1@1.0.0`. They must declare
+already approved platform contracts and active `WEDDING-CONTRACT-1@1.1.0`. They must declare
 that baseline version, list produced/consumed contracts and events, and must not repeat established environment,
 HTTP/error, RBAC, audit, idempotency, pagination, migration, Storage, observability, or
 secret-handling rules unless the module intentionally tightens one.
@@ -821,3 +823,39 @@ and record microtasks beneath their owning wave. Execution order follows provide
 readiness, not the physical order of checklist entries. Prisma migrations remain in
 one serialized backend lane, and money, access promotion, immutable snapshots, and
 end-to-end acceptance cannot be closed using fakes alone.
+
+## 19. Approved implementation hand-off amendment and initial ownership
+
+The owner requested clearer team implementation contracts on 2026-10-06.
+[Team implementation](../docs/team-implementation.md) defines CONTRACT_READY,
+ISOLATED_READY, PROVIDER_READY, INTEGRATION_READY, and ACCEPTED. The nine module
+specifications and additive baseline 1.1.0 Section 21 are approved; existing
+1.0.0/CP/IA/VC records remain historical acceptance evidence.
+
+Independent implementation permits approved non-overlapping module slices to be coded
+concurrently using conforming provider fakes. Specific verified real provider methods
+can unblock consumer integration before the provider's clients are all finished.
+SPEC/plan approval and real-provider integration/acceptance remain distinct gates.
+
+Each SPEC contains a parallel matrix, proposed bounded waves, DTO/request semantics,
+local defaults, stable failures and requirement proof. Proposed waves are planning input;
+insert execution tasks through Section 18.3 only after module SPEC/plan approvals.
+No implementation task is completed by this documentation.
+
+One shared lane owns core outbox/unit-of-work, additive identity/venue prerequisites,
+Prisma migrations, OpenAPI/digest and composition-root wiring. Module owners stay within
+their assigned files/branches and import only owner application ports.
+
+Approval evidence (2026-10-06): the project owner replied, “vậy tôi duyệt draft trên”,
+after reviewing the revised contract package and the three-person allocation. Active
+revision is `WEDDING-CONTRACT-1@1.1.0`; documented numeric defaults are now locked.
+This approval is not retroactive reopening of CP/IA/VC and does not approve unprepared
+module implementation plans, complete runtime tasks, or authorize deployment.
+
+Initial owner roles: A owns SPEC-03 then SPEC-04; B owns SPEC-05 then SPEC-06;
+C owns SPEC-07 then SPEC-08. Their bounded plans may be prepared concurrently.
+After individual plan and contract-artifact approval, isolated slices may overlap;
+real integration waits for specific provider readiness, not every upstream client screen.
+Names and one integration steward must be selected before shared-file concurrency;
+SPEC-09 through SPEC-11 ownership is deferred to the next allocation round.
+See the team guide Section 8 and task Checkpoint CB2 for the recorded approval scope.
