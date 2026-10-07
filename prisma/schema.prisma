@@ -138,6 +138,18 @@ enum BookingTimelineDecisionType {
   WITHDRAWN
 }
 
+enum BookingDepositIntentStatus {
+  ACTIVE
+  UNKNOWN
+  RELEASED
+  SETTLED
+}
+
+enum BookingPromotionStatus {
+  PENDING
+  SUCCEEDED
+}
+
 model AuditLog {
   id         String         @id @default(uuid()) @db.Uuid
   occurredAt DateTime       @default(now()) @db.Timestamptz(6)
@@ -387,6 +399,8 @@ model Booking {
   timelineRevisions           BookingTimelineRevision[] @relation("BookingTimelineRevisions")
   currentTimelineRevision     BookingTimelineRevision?  @relation("BookingCurrentTimeline", fields: [currentTimelineRevisionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
   effectiveTimelineRevision   BookingTimelineRevision?  @relation("BookingEffectiveTimeline", fields: [effectiveTimelineRevisionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  depositIntents              BookingDepositIntent[]
+  depositSettlement           BookingDepositSettlement?
 
   @@index([hallId, eventDate, shiftCode])
   @@index([phase, eventDate])
@@ -410,10 +424,48 @@ model BookingTimelineRevision {
   successors            BookingTimelineRevision[]    @relation("BookingTimelinePredecessor")
   items                 BookingTimelineItem[]
   decisions             BookingTimelineDecision[]
+  depositIntents        BookingDepositIntent[]
 
   @@unique([bookingId, revisionNumber])
   @@unique([bookingId], map: "BookingTimelineRevision_one_current_key", where: raw("\"state\" = 'CURRENT'"))
   @@index([bookingId, createdAt(sort: Desc)])
+}
+
+model BookingDepositIntent {
+  id                      String                     @id @db.Uuid
+  bookingId               String                     @db.Uuid
+  timelineRevisionId      String                     @db.Uuid
+  amountVnd               Decimal                    @db.Decimal(18, 0)
+  status                  BookingDepositIntentStatus @default(ACTIVE)
+  bookingRevisionReserved Int
+  coupleAccountId         String                     @db.Uuid
+  requestId               String                     @db.Uuid
+  expiresAt               DateTime                   @db.Timestamptz(6)
+  providerEvidenceId      String?
+  releasedAt              DateTime?                  @db.Timestamptz(6)
+  settledAt               DateTime?                  @db.Timestamptz(6)
+  createdAt               DateTime                   @default(now()) @db.Timestamptz(6)
+  updatedAt               DateTime                   @updatedAt @db.Timestamptz(6)
+  booking                 Booking                    @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  timelineRevision        BookingTimelineRevision    @relation(fields: [timelineRevisionId], references: [id], onDelete: Restrict)
+
+  @@unique([bookingId], map: "BookingDepositIntent_one_unresolved_key", where: raw("\"status\" IN ('ACTIVE', 'UNKNOWN')"))
+  @@index([status, expiresAt])
+  @@index([timelineRevisionId])
+}
+
+model BookingDepositSettlement {
+  paymentId          String                 @id @db.Uuid
+  bookingId          String                 @unique @db.Uuid
+  timelineRevisionId String                 @db.Uuid
+  amountVnd          Decimal                @db.Decimal(18, 0)
+  settledAt          DateTime               @db.Timestamptz(6)
+  promotionStatus    BookingPromotionStatus @default(PENDING)
+  promotedAt         DateTime?              @db.Timestamptz(6)
+  createdAt          DateTime               @default(now()) @db.Timestamptz(6)
+  booking            Booking                @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+
+  @@index([promotionStatus, createdAt])
 }
 
 model BookingTimelineItem {
