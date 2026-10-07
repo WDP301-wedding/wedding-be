@@ -130,6 +130,70 @@ describe('PrismaTimelineRepository', () => {
     });
     expect('updateMany' in transaction.bookingTimelineItem).toBe(false);
   });
+
+  it('keeps the confirmed effective predecessor while a replacement is under review', async () => {
+    const transaction = fixture();
+    transaction.booking.findUnique.mockResolvedValue({
+      id: revision.bookingId,
+      revision: 1,
+      phase: 'CONFIRMED',
+      currentTimelineRevisionId: revision.predecessorRevisionId,
+      effectiveTimelineRevisionId: revision.predecessorRevisionId,
+    });
+
+    await createPrismaTimelineRepository(client(transaction), ids()).save({
+      revision,
+      expectedBookingRevision: 1,
+      actorAccountId: '00000000-0000-4000-8000-000000000005',
+      party: 'COUPLE',
+      requestId: '00000000-0000-4000-8000-000000000006',
+    });
+
+    expect(transaction.bookingTimelineRevision.updateMany).not.toHaveBeenCalled();
+  });
+
+  it('switches the effective pointer only when the replacement becomes mutually approved', async () => {
+    const transaction = fixture();
+    transaction.booking.findUnique.mockResolvedValue({
+      id: revision.bookingId,
+      revision: 1,
+      phase: 'CONFIRMED',
+      currentTimelineRevisionId: revision.revisionId,
+      effectiveTimelineRevisionId: revision.predecessorRevisionId,
+    });
+    const approvedAt = new Date('2026-10-07T10:05:00.000Z');
+    await createPrismaTimelineRepository(client(transaction), ids()).approve({
+      bookingId: revision.bookingId,
+      timelineRevisionId: revision.revisionId,
+      expectedBookingRevision: 1,
+      approvedRevision: {
+        ...revision,
+        managerApprovedAt: approvedAt,
+        coupleApprovedAt: approvedAt,
+        mutuallyApproved: true,
+      },
+      decisionAt: approvedAt,
+      actorAccountId: '00000000-0000-4000-8000-000000000005',
+      party: 'COUPLE',
+      requestId: '00000000-0000-4000-8000-000000000006',
+    });
+
+    expect(transaction.booking.updateMany).toHaveBeenCalledWith({
+      where: { id: revision.bookingId, revision: 1 },
+      data: {
+        effectiveTimelineRevisionId: revision.revisionId,
+        revision: { increment: 1 },
+      },
+    });
+    expect(transaction.bookingTimelineRevision.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: revision.predecessorRevisionId,
+        bookingId: revision.bookingId,
+        state: 'EFFECTIVE',
+      },
+      data: { state: 'SUPERSEDED' },
+    });
+  });
 });
 
 function fixture() {
@@ -138,7 +202,9 @@ function fixture() {
       findUnique: vi.fn().mockResolvedValue({
         id: revision.bookingId,
         revision: 1,
+        phase: 'DRAFT',
         currentTimelineRevisionId: revision.predecessorRevisionId,
+        effectiveTimelineRevisionId: null,
       }),
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
     },

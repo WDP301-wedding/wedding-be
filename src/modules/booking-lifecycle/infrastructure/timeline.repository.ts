@@ -55,7 +55,10 @@ export function createPrismaTimelineRepository(
           if (booking.currentTimelineRevisionId !== input.revision.predecessorRevisionId) {
             throw new TimelineConflictError('TIMELINE_REVISION_SUPERSEDED');
           }
-          if (input.revision.predecessorRevisionId !== null) {
+          const keepsEffectivePredecessor =
+            booking.phase === 'CONFIRMED' &&
+            booking.effectiveTimelineRevisionId === input.revision.predecessorRevisionId;
+          if (input.revision.predecessorRevisionId !== null && !keepsEffectivePredecessor) {
             const superseded = await transaction.bookingTimelineRevision.updateMany({
               where: {
                 id: input.revision.predecessorRevisionId,
@@ -152,14 +155,33 @@ async function persistDecision(
         decision === 'APPROVED'
           ? (input as Parameters<TimelineRepository['approve']>[0]).approvedRevision
           : (input as Parameters<TimelineRepository['withdraw']>[0]).withdrawnRevision;
+      const activatesReplacement =
+        decision === 'APPROVED' &&
+        nextRevision.mutuallyApproved &&
+        booking.phase === 'CONFIRMED' &&
+        booking.effectiveTimelineRevisionId !== input.timelineRevisionId;
       const updated = await transaction.bookingTimelineRevision.updateMany({
         where: { id: input.timelineRevisionId, bookingId: input.bookingId, state: 'CURRENT' },
         data: {
           managerApprovedAt: nextRevision.managerApprovedAt,
           coupleApprovedAt: nextRevision.coupleApprovedAt,
+          ...(activatesReplacement ? { state: 'EFFECTIVE' as const } : {}),
         },
       });
       if (updated.count !== 1) throw new TimelineConflictError('TIMELINE_REVISION_SUPERSEDED');
+      if (activatesReplacement && booking.effectiveTimelineRevisionId !== null) {
+        const superseded = await transaction.bookingTimelineRevision.updateMany({
+          where: {
+            id: booking.effectiveTimelineRevisionId,
+            bookingId: input.bookingId,
+            state: 'EFFECTIVE',
+          },
+          data: { state: 'SUPERSEDED' },
+        });
+        if (superseded.count !== 1) {
+          throw new TimelineConflictError('TIMELINE_REVISION_SUPERSEDED');
+        }
+      }
       const sequence =
         (await transaction.bookingTimelineDecision.count({
           where: { timelineRevisionId: input.timelineRevisionId, party: input.party },
@@ -185,15 +207,16 @@ async function persistDecision(
         transaction,
         input.bookingId,
         input.expectedBookingRevision,
-        {},
+        activatesReplacement ? { effectiveTimelineRevisionId: input.timelineRevisionId } : {},
       );
       await appendEvidence(transaction, createId, {
         action:
           decision === 'APPROVED'
             ? 'booking.timeline-approved'
             : 'booking.timeline-approval-withdrawn',
-        eventType:
-          decision === 'APPROVED'
+        eventType: activatesReplacement
+          ? 'booking.timeline-superseded'
+          : decision === 'APPROVED'
             ? 'booking.timeline-approved'
             : 'booking.timeline-approval-withdrawn',
         bookingId: input.bookingId,
@@ -217,7 +240,13 @@ async function requireBookingState(
 ) {
   const booking = await transaction.booking.findUnique({
     where: { id: bookingId },
-    select: { id: true, revision: true, currentTimelineRevisionId: true },
+    select: {
+      id: true,
+      revision: true,
+      phase: true,
+      currentTimelineRevisionId: true,
+      effectiveTimelineRevisionId: true,
+    },
   });
   if (booking === null) throw new BookingLifecycleNotFoundError();
   if (booking.revision !== expectedRevision) {
@@ -230,7 +259,10 @@ async function advanceBooking(
   transaction: Prisma.TransactionClient,
   bookingId: string,
   expectedRevision: number,
-  data: Readonly<{ currentTimelineRevisionId?: string }>,
+  data: Readonly<{
+    currentTimelineRevisionId?: string;
+    effectiveTimelineRevisionId?: string;
+  }>,
 ): Promise<number> {
   const updated = await transaction.booking.updateMany({
     where: { id: bookingId, revision: expectedRevision },
