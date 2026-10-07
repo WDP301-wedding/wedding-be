@@ -505,6 +505,33 @@
                 "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                 "type": "string"
               },
+              "cancellationRequests": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "reason": {
+                      "type": "string"
+                    },
+                    "requestId": {
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                      "type": "string"
+                    },
+                    "requestedAt": {
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "requestId",
+                    "reason",
+                    "requestedAt"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
               "capabilities": {
                 "additionalProperties": false,
                 "properties": {
@@ -934,6 +961,11 @@
                 "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                 "type": "string"
               },
+              "consultationRevision": {
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991,
+                "type": "integer"
+              },
               "revision": {
                 "exclusiveMinimum": 0,
                 "maximum": 9007199254740991,
@@ -942,7 +974,8 @@
             },
             "required": [
               "bookingId",
-              "revision"
+              "revision",
+              "consultationRevision"
             ],
             "type": "object"
           }
@@ -6056,6 +6089,150 @@
           }
         ],
         "summary": "Cancel a booking as its Manager",
+        "tags": [
+          "Booking Lifecycle"
+        ]
+      }
+    },
+    "/management/bookings/{bookingId}/cancellation-requests/{requestId}/decision": {
+      "post": {
+        "operationId": "decideBookingCancellation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookingId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "requestId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "decision": {
+                    "enum": [
+                      "APPROVE",
+                      "REJECT"
+                    ],
+                    "type": "string"
+                  },
+                  "expectedRevision": {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  },
+                  "reason": {
+                    "maxLength": 500,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "expectedRevision",
+                  "decision",
+                  "reason"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "bookingRevision": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "phase": {
+                          "enum": [
+                            "DRAFT",
+                            "AWAITING_DEPOSIT",
+                            "CONFIRMED",
+                            "CANCELLED",
+                            "COMPLETED"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "phase",
+                        "bookingRevision"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The booking lifecycle command completed.",
+            "headers": {
+              "x-request-id": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/IdempotencyKeyRequired"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Approve or reject a pending cancellation request",
         "tags": [
           "Booking Lifecycle"
         ]
