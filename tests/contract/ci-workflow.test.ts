@@ -21,6 +21,10 @@ describe('backend CI contract', () => {
     expect(workflow).toContain('run: npm run test:unit');
     expect(workflow).toContain('run: npm run test:contract');
     expect(workflow).toContain('run: npm run test:coverage -- --maxWorkers=2');
+    expect(workflow.match(/run: npm run test:coverage -- --maxWorkers=2/gu)).toHaveLength(1);
+    expect(workflow).toMatch(
+      /postgresql-integration:[\s\S]*run: npm run test:coverage -- --maxWorkers=2/u,
+    );
     expect(workflow).toContain('run: npm run api:check');
     expect(workflow).toContain('run: npm run build');
     expect(workflow).toContain('run: npm run audit:ci');
@@ -35,11 +39,18 @@ describe('backend CI contract', () => {
     expect(workflow).not.toContain('pull_request_target');
   });
 
-  it('keeps npm and GitHub Actions dependencies updated independently', async () => {
+  it('keeps monthly npm and GitHub Actions updates independent with bounded PR counts', async () => {
     const dependabot = await readFile(dependabotPath, 'utf8');
 
     expect(dependabot).toContain('package-ecosystem: npm');
     expect(dependabot).toContain('package-ecosystem: github-actions');
-    expect(dependabot.match(/interval: weekly/gu)).toHaveLength(2);
+    expect(dependabot.match(/interval: monthly/gu)).toHaveLength(2);
+    expect(dependabot).toMatch(/package-ecosystem: npm[\s\S]*?open-pull-requests-limit: 2/u);
+    expect(dependabot).toMatch(
+      /package-ecosystem: github-actions[\s\S]*?open-pull-requests-limit: 1/u,
+    );
+    expect(dependabot).toContain('prisma-stack:');
+    expect(dependabot).toContain('vitest-stack:');
+    expect(dependabot).toContain("dependency-name: '@types/node'");
   });
 });
