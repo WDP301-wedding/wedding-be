@@ -35,11 +35,18 @@ describe('backend CI contract', () => {
     expect(workflow).not.toContain('pull_request_target');
   });
 
-  it('keeps npm and GitHub Actions dependencies updated independently', async () => {
+  it('keeps monthly npm and GitHub Actions updates independent with bounded PR counts', async () => {
     const dependabot = await readFile(dependabotPath, 'utf8');
 
     expect(dependabot).toContain('package-ecosystem: npm');
     expect(dependabot).toContain('package-ecosystem: github-actions');
-    expect(dependabot.match(/interval: weekly/gu)).toHaveLength(2);
+    expect(dependabot.match(/interval: monthly/gu)).toHaveLength(2);
+    expect(dependabot).toMatch(/package-ecosystem: npm[\s\S]*?open-pull-requests-limit: 2/u);
+    expect(dependabot).toMatch(
+      /package-ecosystem: github-actions[\s\S]*?open-pull-requests-limit: 1/u,
+    );
+    expect(dependabot).toContain('prisma-stack:');
+    expect(dependabot).toContain('vitest-stack:');
+    expect(dependabot).toContain("dependency-name: '@types/node'");
   });
 });

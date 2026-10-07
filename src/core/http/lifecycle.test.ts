@@ -9,6 +9,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createApp } from '../../app.js';
 import { parseEnvironment } from '../../config/env.js';
 import { bootstrap, isMainModule, runMain, startServer, type RunningServer } from '../../server.js';
+import { createVenueCatalogRuntime } from '../../modules/venue-catalog/venue-catalog.runtime.js';
 import { createLogger } from '../logging/logger.js';
 import {
   createHttpLifecycle,
@@ -24,6 +25,17 @@ vi.mock('../../modules/identity-access/identity.runtime.js', async () => {
     createIdentityRuntime: vi.fn(() => ({
       router: Router(),
       resource: { name: 'identity-database', close: vi.fn() },
+    })),
+  };
+});
+
+vi.mock('../../modules/venue-catalog/venue-catalog.runtime.js', async () => {
+  const { Router } = await import('express');
+
+  return {
+    createVenueCatalogRuntime: vi.fn(() => ({
+      router: Router(),
+      resource: { name: 'venue-catalog-database', close: vi.fn() },
     })),
   };
 });
@@ -263,6 +275,7 @@ describe('server startup and process signals', () => {
     });
     runningServers.push(running);
 
+    expect(createVenueCatalogRuntime).toHaveBeenCalledWith(config);
     expect(running.httpServer.listening).toBe(true);
     expect(running.readiness.isReady()).toBe(true);
   });

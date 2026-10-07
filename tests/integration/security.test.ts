@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { createApp } from '../../src/app.js';
 import { parseEnvironment } from '../../src/config/env.js';
 import { bootstrap } from '../../src/server.js';
+import { createVenueCatalogRuntime } from '../../src/modules/venue-catalog/venue-catalog.runtime.js';
 
 vi.mock('../../src/modules/identity-access/identity.runtime.js', async () => {
   const { Router } = await import('express');
@@ -12,6 +13,17 @@ vi.mock('../../src/modules/identity-access/identity.runtime.js', async () => {
     createIdentityRuntime: vi.fn(() => ({
       router: Router(),
       resource: { name: 'identity-database', close: vi.fn() },
+    })),
+  };
+});
+
+vi.mock('../../src/modules/venue-catalog/venue-catalog.runtime.js', async () => {
+  const { Router } = await import('express');
+
+  return {
+    createVenueCatalogRuntime: vi.fn(() => ({
+      router: Router(),
+      resource: { name: 'venue-catalog-database', close: vi.fn() },
     })),
   };
 });
@@ -217,6 +229,7 @@ describe('HTTP security baseline', () => {
     });
 
     try {
+      expect(createVenueCatalogRuntime).toHaveBeenCalledWith(config);
       const firstResponse = await request(running.httpServer)
         .get('/health/live')
         .set('origin', allowedOrigin);
