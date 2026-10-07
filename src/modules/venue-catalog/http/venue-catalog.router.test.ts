@@ -276,6 +276,40 @@ describe('FT-V3 venue catalog HTTP contract', () => {
     });
   });
 
+  it('continues manager hall pages and rejects an unknown cursor', async () => {
+    const { app } = appWith();
+    const firstPage = await request(app)
+      .get('/api/v1/management/catalog/halls?limit=1')
+      .set('Authorization', 'Bearer manager-token');
+    const secondPage = await request(app)
+      .get('/api/v1/management/catalog/halls')
+      .query({ limit: 1, cursor: hallId })
+      .set('Authorization', 'Bearer manager-token');
+    const invalidCursor = await request(app)
+      .get('/api/v1/management/catalog/halls')
+      .query({ limit: 1, cursor: randomUUID() })
+      .set('Authorization', 'Bearer manager-token');
+
+    expect(firstPage.status).toBe(200);
+    expect(firstPage.body).toMatchObject({
+      data: { items: [{ id: hallId }], nextCursor: hallId },
+    });
+    expect(secondPage.status).toBe(200);
+    expect(secondPage.body).toMatchObject({
+      data: {
+        items: [{ id: '00000000-0000-4000-8000-000000000099', lifecycle: 'RETIRED' }],
+        nextCursor: null,
+      },
+    });
+    expect(invalidCursor.status).toBe(422);
+    expect(invalidCursor.body).toMatchObject({
+      error: {
+        code: 'VALIDATION_ERROR',
+        details: [{ path: 'cursor', code: 'invalid_value' }],
+      },
+    });
+  });
+
   it('returns freshly signed media to Managers for an allowlisted catalog resource', async () => {
     const catalogServices = services();
     const media = mockedService(catalogServices.media);
