@@ -1,6 +1,7 @@
 import { AppError } from '../../../core/errors/app-error.js';
 import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
 import { normalizeEmail } from '../../identity-access/account/account.service.js';
+import type { ConsultationWorkspaceRepository } from '../application/consultation-workspace.service.js';
 import type {
   ConsultationRecord,
   ConsultationRepository,
@@ -202,8 +203,120 @@ export function createPrismaConsultationRepository(
   });
 }
 
+export function createPrismaConsultationWorkspaceRepository(
+  prisma: PrismaClient,
+  now: () => Date = () => new Date(),
+): ConsultationWorkspaceRepository {
+  return Object.freeze({
+    async createConsultation(
+      record: Parameters<ConsultationWorkspaceRepository['createConsultation']>[0],
+    ) {
+      const email = normalizeEmail(record.intendedEmail);
+      try {
+        await prisma.$transaction(async (transaction) => {
+          await transaction.consultation.create({
+            data: {
+              id: record.consultationId,
+              managerAccountId: record.managerAccountId,
+              intendedEmailNormalized: email.normalized,
+              intendedEmail: email.display,
+              displayName: record.displayName,
+              note: record.note,
+              revision: record.revision,
+            },
+          });
+          await transaction.auditLog.create({
+            data: {
+              occurredAt: now(),
+              requestId: record.requestId,
+              actorType: 'USER',
+              actorId: record.managerAccountId,
+              action: 'booking.consultation-created',
+              entityType: 'consultation',
+              entityId: record.consultationId,
+              metadata: {},
+            },
+          });
+        });
+      } catch (error: unknown) {
+        if (isKnownRequestError(error, 'P2002')) {
+          throw new BookingLifecycleConflictError('CONSULTATION_ALREADY_EXISTS');
+        }
+        throw error;
+      }
+      return immutable({ ...record, intendedEmail: email.display });
+    },
+
+    async createBooking(record: Parameters<ConsultationWorkspaceRepository['createBooking']>[0]) {
+      return prisma.$transaction(
+        async (transaction) => {
+          const consultation = await transaction.consultation.findUnique({
+            where: { id: record.consultationId },
+            select: {
+              id: true,
+              revision: true,
+              managerAccountId: true,
+              booking: { select: { id: true } },
+            },
+          });
+          if (consultation === null || consultation.managerAccountId !== record.managerAccountId) {
+            throw new BookingLifecycleNotFoundError();
+          }
+          if (
+            consultation.revision !== record.expectedConsultationRevision ||
+            consultation.booking !== null
+          ) {
+            throw new BookingLifecycleConflictError('STALE_BOOKING_REVISION');
+          }
+          await transaction.booking.create({
+            data: {
+              id: record.bookingId,
+              consultationId: record.consultationId,
+              hallId: record.proposal.hall.id,
+              eventDate: localDate(record.proposal.eventDate),
+              shiftCode: record.proposal.shift.code,
+              phase: 'DRAFT',
+              revision: 1,
+              planningHeadcount: record.proposal.planningHeadcount,
+              proposalSnapshot: { create: proposalSnapshotData(record.proposal) },
+            },
+          });
+          const updated = await transaction.consultation.updateMany({
+            where: { id: record.consultationId, revision: record.expectedConsultationRevision },
+            data: { revision: { increment: 1 } },
+          });
+          if (updated.count !== 1) {
+            throw new BookingLifecycleConflictError('STALE_BOOKING_REVISION');
+          }
+          await transaction.auditLog.create({
+            data: {
+              occurredAt: now(),
+              requestId: record.requestId,
+              actorType: 'USER',
+              actorId: record.managerAccountId,
+              action: 'booking.proposal-created',
+              entityType: 'booking',
+              entityId: record.bookingId,
+              metadata: {
+                consultationId: record.consultationId,
+                hallId: record.proposal.hall.id,
+                menuPackageVersionId: record.proposal.menu.versionId,
+              },
+            },
+          });
+          return immutable({ ...record, bookingRevision: 1 });
+        },
+        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+      );
+    },
+  });
+}
+
 function proposalData(record: ConsultationRecord) {
-  const proposal = record.proposal;
+  return proposalSnapshotData(record.proposal);
+}
+
+function proposalSnapshotData(proposal: ConsultationRecord['proposal']) {
   return {
     hallId: proposal.hall.id,
     hallName: proposal.hall.name,
