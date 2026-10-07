@@ -65,14 +65,18 @@ export interface TimelineRepository {
 }
 
 export class TimelineConflictError extends AppError {
-  constructor(code: 'STALE_BOOKING_REVISION' | 'TIMELINE_REVISION_SUPERSEDED') {
+  constructor(
+    code: 'STALE_BOOKING_REVISION' | 'TIMELINE_REVISION_SUPERSEDED' | 'DEPOSIT_INTENT_ACTIVE',
+  ) {
     super({
       status: 409,
       code,
       message:
         code === 'STALE_BOOKING_REVISION'
           ? 'The booking changed after it was loaded.'
-          : 'The timeline revision is no longer current.',
+          : code === 'DEPOSIT_INTENT_ACTIVE'
+            ? 'An unresolved deposit attempt blocks this operation.'
+            : 'The timeline revision is no longer current.',
     });
   }
 }

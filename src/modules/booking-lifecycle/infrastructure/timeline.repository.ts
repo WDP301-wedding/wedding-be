@@ -52,6 +52,7 @@ export function createPrismaTimelineRepository(
             input.revision.bookingId,
             input.expectedBookingRevision,
           );
+          await requireNoDepositIntent(transaction, input.revision.bookingId);
           if (booking.currentTimelineRevisionId !== input.revision.predecessorRevisionId) {
             throw new TimelineConflictError('TIMELINE_REVISION_SUPERSEDED');
           }
@@ -148,6 +149,9 @@ async function persistDecision(
         input.bookingId,
         input.expectedBookingRevision,
       );
+      if (decision === 'WITHDRAWN') {
+        await requireNoDepositIntent(transaction, input.bookingId);
+      }
       if (booking.currentTimelineRevisionId !== input.timelineRevisionId) {
         throw new TimelineConflictError('TIMELINE_REVISION_SUPERSEDED');
       }
@@ -253,6 +257,17 @@ async function requireBookingState(
     throw new TimelineConflictError('STALE_BOOKING_REVISION');
   }
   return booking;
+}
+
+async function requireNoDepositIntent(
+  transaction: Prisma.TransactionClient,
+  bookingId: string,
+): Promise<void> {
+  const unresolved = await transaction.bookingDepositIntent.findFirst({
+    where: { bookingId, status: { in: ['ACTIVE', 'UNKNOWN'] } },
+    select: { id: true },
+  });
+  if (unresolved !== null) throw new TimelineConflictError('DEPOSIT_INTENT_ACTIVE');
 }
 
 async function advanceBooking(

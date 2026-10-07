@@ -216,6 +216,7 @@ function fixture() {
       count: vi.fn().mockResolvedValue(0),
       create: vi.fn().mockResolvedValue({}),
     },
+    bookingDepositIntent: { findFirst: vi.fn().mockResolvedValue(null) },
     bookingTimelineItem: {},
     auditLog: { create: vi.fn().mockResolvedValue({}) },
     bookingOutboxEvent: { create: vi.fn().mockResolvedValue({}) },
