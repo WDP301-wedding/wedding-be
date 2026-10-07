@@ -18,6 +18,24 @@ export function createBookingLifecycleService(
 ) {
   const createId = options.createId ?? randomUUID;
   return Object.freeze({
+    async cancel(
+      input: Readonly<{
+        bookingId: string;
+        expectedBookingRevision: number;
+        reason: string;
+        actor: LifecycleActor;
+        requestId: string;
+      }>,
+    ) {
+      await requireOwningManager(options.repository, input.bookingId, input.actor);
+      return options.repository.cancel({
+        bookingId: input.bookingId,
+        expectedBookingRevision: input.expectedBookingRevision,
+        reason: input.reason,
+        context: { requestId: input.requestId, actorAccountId: input.actor.accountId },
+      });
+    },
+
     async requestCancellation(
       input: Readonly<{
         bookingId: string;

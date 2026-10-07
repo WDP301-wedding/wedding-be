@@ -42,6 +42,14 @@ export interface BookingLifecycleRepository extends BookingPlanningHeadcountSync
       managerAccountId: string;
     }>
   >;
+  cancel(
+    input: Readonly<{
+      bookingId: string;
+      expectedBookingRevision: number;
+      reason: string;
+      context: BookingLifecycleMutationContext;
+    }>,
+  ): Promise<Readonly<{ phase: 'CANCELLED'; bookingRevision: number }>>;
   requestCancellation(
     input: Readonly<{
       bookingId: string;
@@ -102,6 +110,44 @@ export function createPrismaBookingLifecycleRepository(
         consultationId: booking.consultation.id,
         managerAccountId: booking.consultation.managerAccountId,
       });
+    },
+
+    cancel(input: Parameters<BookingLifecycleRepository['cancel']>[0]) {
+      return prisma.$transaction(
+        async (transaction) => {
+          const booking = await requireLifecycleBooking(transaction, input.bookingId);
+          if (booking.revision !== input.expectedBookingRevision) {
+            throw new BookingLifecycleStateError('STALE_BOOKING_REVISION');
+          }
+          const cancelledAt = now();
+          requireCancellationAllowed(
+            booking.phase,
+            isoDate(booking.eventDate),
+            timeText(booking.proposalSnapshot!.shiftStartTime),
+            cancelledAt,
+          );
+          await requireNoDepositIntent(transaction, input.bookingId);
+          const bookingRevision = await incrementBooking(
+            transaction,
+            input.bookingId,
+            input.expectedBookingRevision,
+            { phase: 'CANCELLED', cancelledAt },
+            booking.phase,
+          );
+          await appendLifecycleEvidence(transaction, createId, {
+            action: 'booking.cancelled',
+            eventType: 'booking.cancelled',
+            bookingId: input.bookingId,
+            bookingRevision,
+            requestId: input.context.requestId,
+            actorAccountId: input.context.actorAccountId,
+            occurredAt: cancelledAt,
+            metadata: { reason: normalizedReason(input.reason) },
+          });
+          return Object.freeze({ phase: 'CANCELLED' as const, bookingRevision });
+        },
+        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+      );
     },
 
     synchronizeHeadcount(

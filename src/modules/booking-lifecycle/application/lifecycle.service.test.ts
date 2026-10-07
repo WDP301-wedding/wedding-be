@@ -67,6 +67,7 @@ function repositoryFixture(): BookingLifecycleRepository {
       managerAccountId: 'manager',
     }),
     synchronizeHeadcount: vi.fn(),
+    cancel: vi.fn().mockResolvedValue({ phase: 'CANCELLED', bookingRevision: 5 }),
     requestCancellation: vi
       .fn()
       .mockResolvedValue({ cancellationRequestId: 'cancel', bookingRevision: 5 }),
