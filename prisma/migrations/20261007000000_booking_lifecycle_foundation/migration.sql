@@ -88,6 +88,7 @@ CREATE TABLE "BookingInvitationIntent" (
   "consultationId" UUID NOT NULL,
   "intendedEmail" TEXT NOT NULL,
   "managerAccountId" UUID NOT NULL,
+  "expectedRevision" INTEGER NOT NULL,
   "requestId" UUID NOT NULL,
   "status" "BookingInvitationIntentStatus" NOT NULL DEFAULT 'PENDING',
   "invitationId" UUID,
@@ -97,7 +98,7 @@ CREATE TABLE "BookingInvitationIntent" (
   "updatedAt" TIMESTAMPTZ(6) NOT NULL,
   CONSTRAINT "BookingInvitationIntent_pkey" PRIMARY KEY ("id"),
   CONSTRAINT "BookingInvitationIntent_state_check" CHECK (
-    "failureCount" >= 0
+    "failureCount" >= 0 AND "expectedRevision" > 0
     AND (("status" = 'PENDING' AND "invitationId" IS NULL AND "issuedAt" IS NULL)
       OR ("status" = 'ISSUED' AND "invitationId" IS NOT NULL AND "issuedAt" IS NOT NULL))
   )

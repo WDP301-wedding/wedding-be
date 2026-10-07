@@ -389,6 +389,7 @@ model BookingInvitationIntent {
   consultationId   String                        @unique @db.Uuid
   intendedEmail    String
   managerAccountId String                        @db.Uuid
+  expectedRevision Int
   requestId        String                        @db.Uuid
   status           BookingInvitationIntentStatus @default(PENDING)
   invitationId     String?                       @unique @db.Uuid
