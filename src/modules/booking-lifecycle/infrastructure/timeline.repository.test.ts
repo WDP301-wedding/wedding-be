@@ -26,6 +26,26 @@ const revision: TimelineRevision = Object.freeze({
 });
 
 describe('PrismaTimelineRepository', () => {
+  it.each(['CANCELLED', 'COMPLETED'])('rejects timeline changes to a %s booking', async (phase) => {
+    const transaction = fixture();
+    transaction.booking.findUnique.mockResolvedValue({
+      id: revision.bookingId,
+      revision: 1,
+      phase,
+      currentTimelineRevisionId: revision.predecessorRevisionId,
+      effectiveTimelineRevisionId: null,
+    });
+    await expect(
+      createPrismaTimelineRepository(client(transaction), ids()).save({
+        revision,
+        expectedBookingRevision: 1,
+        actorAccountId: 'manager',
+        party: 'MANAGER',
+        requestId: 'request',
+      }),
+    ).rejects.toMatchObject({ code: 'INVALID_BOOKING_TRANSITION' });
+    expect(transaction.bookingTimelineRevision.create).not.toHaveBeenCalled();
+  });
   it('atomically supersedes the predecessor and stores an immutable successor', async () => {
     const transaction = fixture();
     transaction.booking.findUnique.mockResolvedValue({

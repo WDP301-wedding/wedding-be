@@ -6,6 +6,13 @@ import type {
 } from 'zod-openapi';
 
 import {
+  proposalResponseSchema,
+  holdResponseSchema,
+  timelineResultResponseSchema,
+  cancellationRequestResponseSchema,
+} from './booking-lifecycle.responses.js';
+
+import {
   approvalBodySchema,
   bookingResponseSchema,
   cancellationBodySchema,
@@ -23,7 +30,6 @@ type Paths = NonNullable<ZodOpenApiObject['paths']>;
 
 const uuid = z.uuid();
 const revision = z.int().positive();
-const genericEnvelope = z.strictObject({ data: z.unknown() });
 const invitationResponse = z.strictObject({
   data: z.strictObject({
     consultationId: uuid,
@@ -79,7 +85,7 @@ function mutation(
   operationId: string,
   summary: string,
   body: z.ZodType,
-  responseSchema: z.ZodType = genericEnvelope,
+  responseSchema: z.ZodType,
   options: Readonly<{
     created?: boolean;
     accepted?: boolean;
@@ -165,7 +171,7 @@ export const bookingLifecycleOpenApiPaths: Paths = {
       'acquireBookingSlotHold',
       'Acquire a 15 minute slot hold',
       expectedRevisionBodySchema,
-      genericEnvelope,
+      holdResponseSchema,
       { created: true, parameters: [path('bookingId')] },
     ),
   },
@@ -177,7 +183,7 @@ export const bookingLifecycleOpenApiPaths: Paths = {
       security: bearer,
       parameters: [path('bookingId')],
       responses: {
-        '200': success('The authorized proposal workspace.', genericEnvelope),
+        '200': success('The authorized proposal workspace.', proposalResponseSchema),
         ...errors,
       },
     },
@@ -187,7 +193,7 @@ export const bookingLifecycleOpenApiPaths: Paths = {
       'createBookingTimelineRevision',
       'Create an immutable timeline revision',
       timelineRevisionBodySchema,
-      genericEnvelope,
+      timelineResultResponseSchema,
       { created: true, parameters: [path('bookingId')] },
     ),
   },
@@ -196,7 +202,7 @@ export const bookingLifecycleOpenApiPaths: Paths = {
       'approveBookingTimelineRevision',
       'Approve the exact current timeline',
       approvalBodySchema,
-      genericEnvelope,
+      timelineResultResponseSchema,
       {
         parameters: [path('bookingId'), path('revisionId')],
       },
@@ -207,7 +213,7 @@ export const bookingLifecycleOpenApiPaths: Paths = {
       'withdrawBookingTimelineApproval',
       'Withdraw the actor approval',
       withdrawalBodySchema,
-      genericEnvelope,
+      timelineResultResponseSchema,
       {
         parameters: [path('bookingId'), path('revisionId')],
       },
@@ -218,7 +224,7 @@ export const bookingLifecycleOpenApiPaths: Paths = {
       'requestBookingTimelineChange',
       'Propose a post deposit timeline replacement',
       changeRequestBodySchema,
-      genericEnvelope,
+      timelineResultResponseSchema,
       {
         created: true,
         parameters: [path('bookingId')],
@@ -230,7 +236,7 @@ export const bookingLifecycleOpenApiPaths: Paths = {
       'requestBookingCancellation',
       'Request booking cancellation',
       cancellationBodySchema,
-      genericEnvelope,
+      cancellationRequestResponseSchema,
       {
         accepted: true,
         parameters: [path('bookingId')],
@@ -267,4 +273,5 @@ export const bookingLifecycleOpenApiSchemas = {
   ConsultationCreateBody: createConsultationBodySchema,
   ConsultationResponse: consultationResponseSchema,
   TimelineRevisionBody: timelineRevisionBodySchema,
+  BookingProposalResponse: proposalResponseSchema,
 };

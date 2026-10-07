@@ -54,30 +54,17 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
           baseChargeVnd: decimalNumber(snapshot.baseChargeVnd),
           depositAmountVnd: decimalNumber(snapshot.depositAmountVnd),
         },
-        timeline:
-          booking.currentTimelineRevision === null
-            ? null
-            : {
-                revisionId: booking.currentTimelineRevision.id,
-                revisionNumber: booking.currentTimelineRevision.revisionNumber,
-                predecessorRevisionId: booking.currentTimelineRevision.predecessorRevisionId,
-                managerApprovedAt:
-                  booking.currentTimelineRevision.managerApprovedAt?.toISOString() ?? null,
-                coupleApprovedAt:
-                  booking.currentTimelineRevision.coupleApprovedAt?.toISOString() ?? null,
-                items: booking.currentTimelineRevision.items.map((item) => ({
-                  itemId: item.itemId,
-                  order: item.displayOrder,
-                  startTime: timeText(item.startTime),
-                  title: item.title,
-                  description: item.description,
-                })),
-              },
+        timeline: timelineView(booking.currentTimelineRevision),
+        effectiveTimeline: timelineView(booking.effectiveTimelineRevision),
         capabilities: {
           accessLevel: grant.level,
-          canEditTimeline: booking.phase === 'DRAFT' || booking.phase === 'CONFIRMED',
-          canApproveTimeline: booking.phase === 'DRAFT' || booking.phase === 'CONFIRMED',
-          canRequestCancellation: grant.level === 'FULL' && booking.phase === 'CONFIRMED',
+          canEditTimeline: ['DRAFT', 'AWAITING_DEPOSIT', 'CONFIRMED'].includes(booking.phase),
+          canApproveTimeline:
+            ['DRAFT', 'AWAITING_DEPOSIT', 'CONFIRMED'].includes(booking.phase) &&
+            booking.currentTimelineRevision?.state === 'CURRENT',
+          canWithdrawApproval: ['DRAFT', 'AWAITING_DEPOSIT'].includes(booking.phase),
+          canRequestCancellation:
+            !manager && grant.level === 'FULL' && booking.phase === 'CONFIRMED',
         },
       });
     },
@@ -131,6 +118,18 @@ async function requireProposal(prisma: PrismaClient, bookingId: string) {
       currentTimelineRevision: {
         select: {
           id: true,
+          state: true,
+          revisionNumber: true,
+          predecessorRevisionId: true,
+          managerApprovedAt: true,
+          coupleApprovedAt: true,
+          items: { orderBy: { displayOrder: 'asc' } },
+        },
+      },
+      effectiveTimelineRevision: {
+        select: {
+          id: true,
+          state: true,
           revisionNumber: true,
           predecessorRevisionId: true,
           managerApprovedAt: true,
@@ -142,6 +141,26 @@ async function requireProposal(prisma: PrismaClient, bookingId: string) {
   });
   if (booking === null) throw new BookingLifecycleNotFoundError();
   return booking;
+}
+
+function timelineView(
+  stored: Awaited<ReturnType<typeof requireProposal>>['currentTimelineRevision'],
+) {
+  if (stored === null) return null;
+  return {
+    revisionId: stored.id,
+    revisionNumber: stored.revisionNumber,
+    predecessorRevisionId: stored.predecessorRevisionId,
+    managerApprovedAt: stored.managerApprovedAt?.toISOString() ?? null,
+    coupleApprovedAt: stored.coupleApprovedAt?.toISOString() ?? null,
+    items: stored.items.map((item) => ({
+      itemId: item.itemId,
+      order: item.displayOrder,
+      startTime: timeText(item.startTime),
+      title: item.title,
+      description: item.description,
+    })),
+  };
 }
 
 function immutable<T>(value: T): T {

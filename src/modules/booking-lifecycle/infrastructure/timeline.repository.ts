@@ -5,6 +5,7 @@ import type { TimelineContext, TimelineRepository } from '../application/timelin
 import { TimelineConflictError } from '../application/timeline.service.js';
 import type { TimelineParty, TimelineRevision } from '../domain/timeline.policy.js';
 import { BookingLifecycleNotFoundError } from './consultation.repository.js';
+import { BookingPolicyError } from '../domain/booking-policy.js';
 
 export function createPrismaTimelineRepository(
   prisma: PrismaClient,
@@ -255,6 +256,12 @@ async function requireBookingState(
   if (booking === null) throw new BookingLifecycleNotFoundError();
   if (booking.revision !== expectedRevision) {
     throw new TimelineConflictError('STALE_BOOKING_REVISION');
+  }
+  if (booking.phase === 'CANCELLED' || booking.phase === 'COMPLETED') {
+    throw new BookingPolicyError(
+      'INVALID_BOOKING_TRANSITION',
+      'Terminal bookings cannot change timeline decisions.',
+    );
   }
   return booking;
 }
