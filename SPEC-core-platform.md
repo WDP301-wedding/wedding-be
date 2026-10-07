@@ -331,6 +331,8 @@ SUPABASE_SERVICE_ROLE_KEY
 SUPABASE_STORAGE_BUCKET
 RESEND_API_KEY
 RESEND_FROM_EMAIL
+BREVO_API_KEY
+BREVO_FROM_EMAIL
 AI_IMAGE_PROVIDER=gemini
 GEMINI_API_KEY
 GEMINI_IMAGE_MODEL
@@ -343,7 +345,8 @@ OTEL_EXPORTER_OTLP_ENDPOINT
 Rules:
 
 - Zod validates environment variables once at process startup. Invalid or missing required production configuration terminates the process before the HTTP port opens.
-- `SUPABASE_SERVICE_ROLE_KEY`, Resend, database, metrics, and Gemini secrets exist only in backend environments.
+- `SUPABASE_SERVICE_ROLE_KEY`, Brevo, Resend, database, metrics, and Gemini secrets exist only in backend environments.
+- Configure one complete email credential group (`BREVO_*` or legacy `RESEND_*`); staging/production requires email, and simultaneous providers are rejected.
 - `GEMINI_API_KEY` and model are optional while AI is disabled; enabling the Gemini adapter without them is a startup error.
 - `CORS_ALLOWED_ORIGINS` is an explicit comma-separated allowlist for the two web deployments. Wildcard origins are forbidden when credentials are accepted.
 - The committed OpenAPI artifact is served outside production. Production serving requires `OPENAPI_ENABLED=true`.
@@ -551,12 +554,12 @@ Conventions demonstrated by the snippet:
 - A successful upload is not trusted until the backend finalizes and validates it.
 - Deletion requires the caller's resource authorization and an allowlisted key prefix; never accept an arbitrary bucket or path from the client.
 
-### 12.2 Resend
+### 12.2 Transactional email
 
-- `EmailProvider` has one initial `ResendEmailProvider` adapter.
-- Production/staging uses a verified sending domain and configured `RESEND_FROM_EMAIL`.
+- `EmailProvider` supports `BrevoEmailProvider`, the retained `ResendEmailProvider`, and an offline fake. Brevo is the recommended project configuration; setup is documented in `docs/brevo-email.md`.
+- Brevo requires an API key and a verified sender configured through `BREVO_FROM_EMAIL`. Brevo temporarily rewrites free sender addresses; an authenticated domain is recommended for long-term delivery. Legacy Resend production/staging uses a verified sending domain and configured `RESEND_FROM_EMAIL`.
 - Every retryable email intent uses a deterministic provider idempotency key derived from event type and persisted event/entity ID.
-- Resend's provider key retention does not replace the application's durable delivery/audit state.
+- Provider key retention does not replace the application's durable delivery/audit state. Brevo uses a deterministic UUID v5 and documents a 30-minute deduplication window; duplicate rejections are not successful response replays, and the adapter does not automatically retry.
 - Provider timeouts and returned shapes are validated and normalized; raw provider errors remain in redacted server logs.
 
 ### 12.3 AI image generation

@@ -79,7 +79,7 @@ Only the client API base URLs are public configuration. Values prefixed `NEXT_PU
 
 The committed `.env.example` files contain placeholders, not usable secrets. Real `.env*` files are ignored by Git.
 
-For backend work that does not require PostgreSQL or external services, clear `DATABASE_URL`, `MIGRATION_DATABASE_URL`, all three `SUPABASE_*` variables, both `RESEND_*` variables, `AI_IMAGE_PROVIDER`, both `GEMINI_*` variables, `METRICS_TOKEN`, and `OTEL_EXPORTER_OTLP_ENDPOINT`. Keep `METRICS_ENABLED=false`. Optional configuration is normalized from blank strings to disabled features.
+For backend work that does not require PostgreSQL or external services, clear `DATABASE_URL`, `MIGRATION_DATABASE_URL`, all three `SUPABASE_*` variables, both `BREVO_*` variables, both `RESEND_*` variables, `AI_IMAGE_PROVIDER`, both `GEMINI_*` variables, `METRICS_TOKEN`, and `OTEL_EXPORTER_OTLP_ENDPOINT`. Keep `METRICS_ENABLED=false`. Optional configuration is normalized from blank strings to disabled features.
 
 Tests must not call paid or network providers. Use the backend fakes:
 
@@ -87,7 +87,7 @@ Tests must not call paid or network providers. Use the backend fakes:
 - `FakeEmailProvider`
 - `FakeAiImageProvider` or `DisabledAiImageProvider`
 
-The real adapters are exercised with controlled client doubles in their unit tests. Never put a service-role key, Resend key, Gemini key, production database URL, signing key, or EAS access token into a client repository, test fixture, issue, log, or committed example.
+The real adapters are exercised with controlled client doubles in their unit tests. Never put a service-role key, Brevo key, Resend key, Gemini key, production database URL, signing key, or EAS access token into a client repository, test fixture, issue, log, or committed example. For real email, follow [Brevo setup](brevo-email.md).
 
 ## Database connections and migrations
 

@@ -40,8 +40,6 @@ const productionRequiredVariables = [
   'SUPABASE_URL',
   'SUPABASE_SERVICE_ROLE_KEY',
   'SUPABASE_STORAGE_BUCKET',
-  'RESEND_API_KEY',
-  'RESEND_FROM_EMAIL',
   ...identityRequiredVariables,
 ] as const;
 
@@ -135,6 +133,7 @@ const corsAllowedOrigins = z
 const resendFromEmail = z
   .string()
   .trim()
+  .refine((value) => !/[\r\n]/u.test(value), 'Sender address must be a single line.')
   .refine(
     (value) => {
       const displayAddress = value.match(/^[^<>]+<([^<>]+)>$/u);
@@ -245,6 +244,13 @@ const rawEnvironmentSchema = z
     SUPABASE_STORAGE_BUCKET: optionalString,
     RESEND_API_KEY: optionalString,
     RESEND_FROM_EMAIL: optionalString.pipe(resendFromEmail.optional()),
+    BREVO_API_KEY: optionalString.pipe(
+      z
+        .string()
+        .regex(/^[^\r\n]+$/u)
+        .optional(),
+    ),
+    BREVO_FROM_EMAIL: optionalString.pipe(resendFromEmail.optional()),
     AI_IMAGE_PROVIDER: optionalString.pipe(z.literal('gemini').optional()),
     GEMINI_API_KEY: optionalString,
     GEMINI_IMAGE_MODEL: optionalString,
@@ -330,6 +336,21 @@ const rawEnvironmentSchema = z
       context,
     );
     requireAllOrNone(environment, ['RESEND_API_KEY', 'RESEND_FROM_EMAIL'], context);
+    requireAllOrNone(environment, ['BREVO_API_KEY', 'BREVO_FROM_EMAIL'], context);
+    const hasBrevo =
+      environment.BREVO_API_KEY !== undefined || environment.BREVO_FROM_EMAIL !== undefined;
+    const hasResend =
+      environment.RESEND_API_KEY !== undefined || environment.RESEND_FROM_EMAIL !== undefined;
+    if (hasBrevo && hasResend) {
+      context.addIssue({
+        code: 'custom',
+        path: ['BREVO_API_KEY'],
+        message: 'Configure only one email provider.',
+      });
+    }
+    if (deployed && !hasBrevo && !hasResend) {
+      requireVariables(environment, ['BREVO_API_KEY', 'BREVO_FROM_EMAIL'], context);
+    }
 
     if (environment.AI_IMAGE_PROVIDER === 'gemini') {
       requireVariables(environment, ['GEMINI_API_KEY', 'GEMINI_IMAGE_MODEL'], context);
@@ -361,7 +382,9 @@ type StorageConfig =
       bucket: string;
     }>;
 type EmailConfig =
-  DisabledProvider | Readonly<{ enabled: true; resendApiKey: string; fromEmail: string }>;
+  | DisabledProvider
+  | Readonly<{ enabled: true; provider: 'resend'; resendApiKey: string; fromEmail: string }>
+  | Readonly<{ enabled: true; provider: 'brevo'; apiKey: string; fromEmail: string }>;
 type AiImageConfig =
   Readonly<{ provider: null }> | Readonly<{ provider: 'gemini'; apiKey: string; model: string }>;
 type MetricsConfig = DisabledProvider | Readonly<{ enabled: true; token: string }>;
@@ -508,6 +531,8 @@ function pickEnvironment(source: EnvironmentSource): EnvironmentSource {
     SUPABASE_STORAGE_BUCKET: source.SUPABASE_STORAGE_BUCKET,
     RESEND_API_KEY: source.RESEND_API_KEY,
     RESEND_FROM_EMAIL: source.RESEND_FROM_EMAIL,
+    BREVO_API_KEY: source.BREVO_API_KEY,
+    BREVO_FROM_EMAIL: source.BREVO_FROM_EMAIL,
     AI_IMAGE_PROVIDER: source.AI_IMAGE_PROVIDER,
     GEMINI_API_KEY: source.GEMINI_API_KEY,
     GEMINI_IMAGE_MODEL: source.GEMINI_IMAGE_MODEL,
@@ -577,13 +602,21 @@ function createConfig(environment: RawEnvironment): BackendConfig {
         })
       : Object.freeze({ enabled: false });
   const email: EmailConfig =
-    environment.RESEND_API_KEY !== undefined && environment.RESEND_FROM_EMAIL !== undefined
+    environment.BREVO_API_KEY !== undefined && environment.BREVO_FROM_EMAIL !== undefined
       ? Object.freeze({
           enabled: true,
-          resendApiKey: environment.RESEND_API_KEY,
-          fromEmail: environment.RESEND_FROM_EMAIL,
+          provider: 'brevo',
+          apiKey: environment.BREVO_API_KEY,
+          fromEmail: environment.BREVO_FROM_EMAIL,
         })
-      : Object.freeze({ enabled: false });
+      : environment.RESEND_API_KEY !== undefined && environment.RESEND_FROM_EMAIL !== undefined
+        ? Object.freeze({
+            enabled: true,
+            provider: 'resend',
+            resendApiKey: environment.RESEND_API_KEY,
+            fromEmail: environment.RESEND_FROM_EMAIL,
+          })
+        : Object.freeze({ enabled: false });
   const aiImage: AiImageConfig =
     environment.AI_IMAGE_PROVIDER === 'gemini' &&
     environment.GEMINI_API_KEY !== undefined &&

@@ -11,7 +11,7 @@ type HttpStatusClass = '1xx' | '2xx' | '3xx' | '4xx' | '5xx' | 'aborted' | 'unkn
 type HttpMethod =
   'CONNECT' | 'DELETE' | 'GET' | 'HEAD' | 'OPTIONS' | 'PATCH' | 'POST' | 'PUT' | 'TRACE' | 'OTHER';
 export type ProviderModule = 'ai_image' | 'email' | 'storage';
-export type ProviderName = 'gemini' | 'resend' | 'supabase_storage';
+export type ProviderName = 'brevo' | 'gemini' | 'resend' | 'supabase_storage';
 export type ProviderOutcome = 'failure' | 'success' | 'timeout' | 'unavailable';
 
 export interface ProviderObservation {

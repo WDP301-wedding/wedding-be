@@ -20,13 +20,14 @@ npm run dev
 
 The API listens on `http://localhost:3001` by default. Check `GET /health/live` for process liveness and `GET /health/ready` for readiness. The committed contract is available at `GET /api/v1/openapi.json` outside production.
 
-The values in `.env.example` are placeholders. For offline development, clear both database URLs and every Supabase, Resend, and Gemini variable as complete groups; leave `AI_IMAGE_PROVIDER` blank. Provider adapters are not contacted merely by starting the current foundation server.
+The values in `.env.example` are placeholders. For offline development, clear both database URLs and every Supabase, Brevo, Resend, and Gemini variable as complete groups; leave `AI_IMAGE_PROVIDER` blank. Provider adapters are not contacted merely by starting the current foundation server.
 
 ## Environment and secrets
 
 - `DATABASE_URL` is used by the running application. `MIGRATION_DATABASE_URL` is used only by Prisma Migrate. They may identify the same local database, but they are separate credentials in deployed environments.
-- Supabase service-role, Resend, Gemini, database, and metrics credentials belong only in the backend environment.
+- Supabase service-role, Brevo, Resend, Gemini, database, and metrics credentials belong only in the backend environment.
 - A provider configuration is all-or-none. Enabling Gemini also requires `GEMINI_API_KEY` and `GEMINI_IMAGE_MODEL`.
+- Use `BREVO_API_KEY` and `BREVO_FROM_EMAIL` for transactional email. Configure only one email provider; legacy `RESEND_*` credentials remain supported. Staging and production require a complete email provider configuration. See [Brevo setup](docs/brevo-email.md).
 - Never commit `.env`, credentials, private keys, service-account files, or real values copied into `.env.example`.
 - Staging and production database URLs require TLS; see [database migrations](docs/database-migrations.md).
 
@@ -58,10 +59,10 @@ Only this repository changes `prisma/schema.prisma`, migration history, Zod API 
 
 ## Offline provider tests
 
-Unit tests use `FakeStorageProvider`, `FakeEmailProvider`, and `FakeAiImageProvider`, so they make no paid or network calls. The real Supabase, Resend, and Gemini adapters are tested through controlled client doubles. Run the focused provider suites with:
+Unit tests use `FakeStorageProvider`, `FakeEmailProvider`, and `FakeAiImageProvider`, so they make no paid or network calls. The real Supabase, Brevo, Resend, and Gemini adapters are tested through controlled client doubles. Run the focused provider suites with:
 
 ```powershell
-npx vitest run src/integrations/storage/storage-provider.test.ts src/integrations/email/email-provider.test.ts src/integrations/ai-image/ai-image-provider.test.ts
+npx vitest run src/integrations/storage/storage-provider.test.ts src/integrations/email src/integrations/ai-image/ai-image-provider.test.ts
 ```
 
 See [cross-repository development](docs/cross-repo-development.md) for boot order, contract updates, troubleshooting, and the Android/EAS boundary.
