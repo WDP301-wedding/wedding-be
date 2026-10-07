@@ -122,6 +122,22 @@ enum DepositIntentPinStatus {
   FAILED
 }
 
+enum BookingTimelineRevisionState {
+  CURRENT
+  SUPERSEDED
+  EFFECTIVE
+}
+
+enum BookingTimelineParty {
+  MANAGER
+  COUPLE
+}
+
+enum BookingTimelineDecisionType {
+  APPROVED
+  WITHDRAWN
+}
+
 model AuditLog {
   id         String         @id @default(uuid()) @db.Uuid
   occurredAt DateTime       @default(now()) @db.Timestamptz(6)
@@ -353,22 +369,81 @@ model Consultation {
 }
 
 model Booking {
-  id                String                   @id @db.Uuid
-  consultationId    String                   @unique @db.Uuid
-  hallId            String                   @db.Uuid
-  eventDate         DateTime                 @db.Date
-  shiftCode         RestaurantShiftCode
-  phase             BookingPhase             @default(DRAFT)
-  revision          Int                      @default(1)
-  planningHeadcount Int
-  createdAt         DateTime                 @default(now()) @db.Timestamptz(6)
-  updatedAt         DateTime                 @updatedAt @db.Timestamptz(6)
-  consultation      Consultation             @relation(fields: [consultationId], references: [id], onDelete: Restrict)
-  proposalSnapshot  BookingProposalSnapshot?
-  slotHolds         BookingSlotHold[]
+  id                          String                    @id @db.Uuid
+  consultationId              String                    @unique @db.Uuid
+  hallId                      String                    @db.Uuid
+  eventDate                   DateTime                  @db.Date
+  shiftCode                   RestaurantShiftCode
+  phase                       BookingPhase              @default(DRAFT)
+  revision                    Int                       @default(1)
+  planningHeadcount           Int
+  currentTimelineRevisionId   String?                   @unique @db.Uuid
+  effectiveTimelineRevisionId String?                   @unique @db.Uuid
+  createdAt                   DateTime                  @default(now()) @db.Timestamptz(6)
+  updatedAt                   DateTime                  @updatedAt @db.Timestamptz(6)
+  consultation                Consultation              @relation(fields: [consultationId], references: [id], onDelete: Restrict)
+  proposalSnapshot            BookingProposalSnapshot?
+  slotHolds                   BookingSlotHold[]
+  timelineRevisions           BookingTimelineRevision[] @relation("BookingTimelineRevisions")
+  currentTimelineRevision     BookingTimelineRevision?  @relation("BookingCurrentTimeline", fields: [currentTimelineRevisionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  effectiveTimelineRevision   BookingTimelineRevision?  @relation("BookingEffectiveTimeline", fields: [effectiveTimelineRevisionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
 
   @@index([hallId, eventDate, shiftCode])
   @@index([phase, eventDate])
+}
+
+model BookingTimelineRevision {
+  id                    String                       @id @db.Uuid
+  bookingId             String                       @db.Uuid
+  revisionNumber        Int
+  predecessorRevisionId String?                      @db.Uuid
+  state                 BookingTimelineRevisionState @default(CURRENT)
+  managerApprovedAt     DateTime?                    @db.Timestamptz(6)
+  coupleApprovedAt      DateTime?                    @db.Timestamptz(6)
+  contentHash           String
+  createdByAccountId    String                       @db.Uuid
+  createdAt             DateTime                     @db.Timestamptz(6)
+  booking               Booking                      @relation("BookingTimelineRevisions", fields: [bookingId], references: [id], onDelete: Restrict)
+  currentFor            Booking?                     @relation("BookingCurrentTimeline")
+  effectiveFor          Booking?                     @relation("BookingEffectiveTimeline")
+  predecessor           BookingTimelineRevision?     @relation("BookingTimelinePredecessor", fields: [predecessorRevisionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  successors            BookingTimelineRevision[]    @relation("BookingTimelinePredecessor")
+  items                 BookingTimelineItem[]
+  decisions             BookingTimelineDecision[]
+
+  @@unique([bookingId, revisionNumber])
+  @@unique([bookingId], map: "BookingTimelineRevision_one_current_key", where: raw("\"state\" = 'CURRENT'"))
+  @@index([bookingId, createdAt(sort: Desc)])
+}
+
+model BookingTimelineItem {
+  id                 String                  @id @db.Uuid
+  timelineRevisionId String                  @db.Uuid
+  itemId             String                  @db.Uuid
+  displayOrder       Int
+  startTime          DateTime                @db.Time(0)
+  title              String
+  description        String?
+  timelineRevision   BookingTimelineRevision @relation(fields: [timelineRevisionId], references: [id], onDelete: Restrict)
+
+  @@unique([timelineRevisionId, itemId])
+  @@unique([timelineRevisionId, displayOrder])
+}
+
+model BookingTimelineDecision {
+  id                 String                      @id @db.Uuid
+  timelineRevisionId String                      @db.Uuid
+  party              BookingTimelineParty
+  decision           BookingTimelineDecisionType
+  sequence           Int
+  reason             String?
+  actorAccountId     String                      @db.Uuid
+  requestId          String                      @db.Uuid
+  occurredAt         DateTime                    @db.Timestamptz(6)
+  timelineRevision   BookingTimelineRevision     @relation(fields: [timelineRevisionId], references: [id], onDelete: Restrict)
+
+  @@unique([timelineRevisionId, party, sequence])
+  @@index([timelineRevisionId, occurredAt])
 }
 
 model BookingSlotHold {
