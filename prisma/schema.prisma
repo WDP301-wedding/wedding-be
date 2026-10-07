@@ -150,6 +150,12 @@ enum BookingPromotionStatus {
   SUCCEEDED
 }
 
+enum BookingCancellationRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model AuditLog {
   id         String         @id @default(uuid()) @db.Uuid
   occurredAt DateTime       @default(now()) @db.Timestamptz(6)
@@ -381,29 +387,61 @@ model Consultation {
 }
 
 model Booking {
-  id                          String                    @id @db.Uuid
-  consultationId              String                    @unique @db.Uuid
-  hallId                      String                    @db.Uuid
-  eventDate                   DateTime                  @db.Date
+  id                          String                       @id @db.Uuid
+  consultationId              String                       @unique @db.Uuid
+  hallId                      String                       @db.Uuid
+  eventDate                   DateTime                     @db.Date
   shiftCode                   RestaurantShiftCode
-  phase                       BookingPhase              @default(DRAFT)
-  revision                    Int                       @default(1)
+  phase                       BookingPhase                 @default(DRAFT)
+  revision                    Int                          @default(1)
   planningHeadcount           Int
-  currentTimelineRevisionId   String?                   @unique @db.Uuid
-  effectiveTimelineRevisionId String?                   @unique @db.Uuid
-  createdAt                   DateTime                  @default(now()) @db.Timestamptz(6)
-  updatedAt                   DateTime                  @updatedAt @db.Timestamptz(6)
-  consultation                Consultation              @relation(fields: [consultationId], references: [id], onDelete: Restrict)
+  cancelledAt                 DateTime?                    @db.Timestamptz(6)
+  completedAt                 DateTime?                    @db.Timestamptz(6)
+  currentTimelineRevisionId   String?                      @unique @db.Uuid
+  effectiveTimelineRevisionId String?                      @unique @db.Uuid
+  createdAt                   DateTime                     @default(now()) @db.Timestamptz(6)
+  updatedAt                   DateTime                     @updatedAt @db.Timestamptz(6)
+  consultation                Consultation                 @relation(fields: [consultationId], references: [id], onDelete: Restrict)
   proposalSnapshot            BookingProposalSnapshot?
   slotHolds                   BookingSlotHold[]
-  timelineRevisions           BookingTimelineRevision[] @relation("BookingTimelineRevisions")
-  currentTimelineRevision     BookingTimelineRevision?  @relation("BookingCurrentTimeline", fields: [currentTimelineRevisionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
-  effectiveTimelineRevision   BookingTimelineRevision?  @relation("BookingEffectiveTimeline", fields: [effectiveTimelineRevisionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  timelineRevisions           BookingTimelineRevision[]    @relation("BookingTimelineRevisions")
+  currentTimelineRevision     BookingTimelineRevision?     @relation("BookingCurrentTimeline", fields: [currentTimelineRevisionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  effectiveTimelineRevision   BookingTimelineRevision?     @relation("BookingEffectiveTimeline", fields: [effectiveTimelineRevisionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
   depositIntents              BookingDepositIntent[]
   depositSettlement           BookingDepositSettlement?
+  cancellationRequests        BookingCancellationRequest[]
+  headcountEvidence           BookingHeadcountEvidence?
 
   @@index([hallId, eventDate, shiftCode])
   @@index([phase, eventDate])
+}
+
+model BookingCancellationRequest {
+  id                   String                           @id @db.Uuid
+  bookingId            String                           @db.Uuid
+  status               BookingCancellationRequestStatus @default(PENDING)
+  reason               String
+  requestedByAccountId String                           @db.Uuid
+  requestedAt          DateTime                         @db.Timestamptz(6)
+  decidedByAccountId   String?                          @db.Uuid
+  decisionReason       String?
+  decidedAt            DateTime?                        @db.Timestamptz(6)
+  booking              Booking                          @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+
+  @@unique([bookingId], map: "BookingCancellationRequest_one_pending_key", where: raw("\"status\" = 'PENDING'"))
+  @@index([status, requestedAt])
+}
+
+model BookingHeadcountEvidence {
+  bookingId            String   @id @db.Uuid
+  sourceRsvpRevisionId String   @db.Uuid
+  sourceSequence       Int
+  expectedAttendees    Int
+  appliedAt            DateTime @db.Timestamptz(6)
+  booking              Booking  @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+
+  @@unique([sourceRsvpRevisionId])
+  @@index([sourceSequence])
 }
 
 model BookingTimelineRevision {
