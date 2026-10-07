@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment -- Vitest asymmetric matchers are typed as any. */
 import { describe, expect, it, vi } from 'vitest';
 
 import type { ConsultationRecord, InvitationIntent } from '../application/consultation.service.js';

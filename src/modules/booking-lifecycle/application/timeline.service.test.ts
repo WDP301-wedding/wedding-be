@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/unbound-method -- Vitest asymmetric matchers and method spies intentionally cross the typed mock boundary. */
 import { describe, expect, it, vi } from 'vitest';
 
 import type { ConsultationAccessReader } from '../../identity-access/authorization/authorization.service.js';

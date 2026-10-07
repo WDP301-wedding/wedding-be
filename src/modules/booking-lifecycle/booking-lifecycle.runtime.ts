@@ -13,10 +13,6 @@ import {
   createConsultationAccessReader,
   createPrismaConsultationAccessRepository,
 } from '../identity-access/authorization/authorization.service.js';
-import {
-  createCoupleAccessPromoter,
-  createPrismaCoupleAccessPromotionRepository,
-} from '../identity-access/authorization/couple-access-promotion.js';
 import { createAuthenticatedActorResolver } from '../identity-access/authorization/authenticated-actor.middleware.js';
 import { createIdentityEmailNotificationPort } from '../identity-access/identity-notification.port.js';
 import { createPrismaSessionRepository } from '../identity-access/session/session.repository.js';

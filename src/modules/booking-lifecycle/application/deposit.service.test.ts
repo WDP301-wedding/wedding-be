@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method -- Vitest intentionally inspects method spies. */
 import { describe, expect, it, vi } from 'vitest';
 
 import type { CoupleAccessPromoter } from '../../identity-access/authorization/couple-access-promotion.js';
