@@ -38,6 +38,15 @@ export function createPrismaConsultationRepository(
   now: () => Date = () => new Date(),
 ): ConsultationRepository {
   return Object.freeze({
+    async getInvitationRecipient(consultationId: string, managerAccountId: string) {
+      const consultation = await prisma.consultation.findFirst({
+        where: { id: consultationId, managerAccountId },
+        select: { intendedEmail: true },
+      });
+      if (consultation === null) throw new BookingLifecycleNotFoundError();
+      return Object.freeze({ intendedEmail: consultation.intendedEmail });
+    },
+
     async create(record: Parameters<ConsultationRepository['create']>[0]) {
       const email = normalizeEmail(record.intendedEmail);
       try {

@@ -19,6 +19,10 @@ class FakeConsultationRepository implements ConsultationRepository {
     return Promise.resolve(record);
   }
 
+  getInvitationRecipient(): Promise<Readonly<{ intendedEmail: string }>> {
+    return Promise.resolve({ intendedEmail: 'couple@example.com' });
+  }
+
   getOrCreateInvitationIntent(input: InvitationIntent): Promise<InvitationIntent> {
     const current = this.intents.get(input.consultationId);
     if (current !== undefined) return Promise.resolve(current);
@@ -119,7 +123,6 @@ describe('ConsultationService', () => {
       consultationId: '00000000-0000-4000-8000-000000000010',
       expectedRevision: 1,
       managerAccountId: '00000000-0000-4000-8000-000000000012',
-      intendedEmail: 'couple@example.com',
       requestId: '00000000-0000-4000-8000-000000000013',
     } as const;
 

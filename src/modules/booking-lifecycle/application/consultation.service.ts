@@ -29,6 +29,10 @@ export type InvitationIntent = Readonly<{
 
 export interface ConsultationRepository {
   create(record: ConsultationRecord): Promise<ConsultationRecord>;
+  getInvitationRecipient(
+    consultationId: string,
+    managerAccountId: string,
+  ): Promise<Readonly<{ intendedEmail: string }>>;
   getOrCreateInvitationIntent(input: InvitationIntent): Promise<InvitationIntent>;
   markInvitationIssued(consultationId: string, invitationId: string): Promise<InvitationIntent>;
 }
@@ -76,7 +80,6 @@ export type RequestWorkspaceInvitationInput = Readonly<{
   consultationId: string;
   expectedRevision: number;
   managerAccountId: string;
-  intendedEmail: string;
   requestId: string;
 }>;
 
@@ -123,10 +126,14 @@ export function createConsultationService(
     },
 
     async requestWorkspaceInvitation(input: RequestWorkspaceInvitationInput) {
+      const recipient = await options.repository.getInvitationRecipient(
+        input.consultationId,
+        input.managerAccountId,
+      );
       const intent = await options.repository.getOrCreateInvitationIntent({
         consultationId: input.consultationId,
         invitationIntentId: createId(),
-        intendedEmail: input.intendedEmail,
+        intendedEmail: recipient.intendedEmail,
         managerAccountId: input.managerAccountId,
         expectedRevision: input.expectedRevision,
         requestId: input.requestId,
