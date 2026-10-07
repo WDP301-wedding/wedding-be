@@ -18,6 +18,8 @@ import { createLogger } from './core/logging/logger.js';
 import { getActiveTracingResource } from './core/observability/tracing.js';
 import { createIdentityRuntime } from './modules/identity-access/identity.runtime.js';
 import { createVenueCatalogRuntime } from './modules/venue-catalog/venue-catalog.runtime.js';
+import { createSeatingPlanRuntime } from './modules/seating-plan/seating-plan.runtime.js';
+import { createStaffOperationsRuntime } from './modules/staff-operations/staff-operations.runtime.js';
 
 type ProcessExitCode = NodeJS.Process['exitCode'];
 type ProcessSignal = 'SIGINT' | 'SIGTERM';
@@ -281,6 +283,23 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     await identityRuntime.resource.close();
     throw error;
   }
+  let seatingPlanRuntime: Awaited<ReturnType<typeof createSeatingPlanRuntime>>;
+  try {
+    seatingPlanRuntime = await createSeatingPlanRuntime(config);
+  } catch (error: unknown) {
+    await venueCatalogRuntime.resource.close();
+    await identityRuntime.resource.close();
+    throw error;
+  }
+  let staffOperationsRuntime: Awaited<ReturnType<typeof createStaffOperationsRuntime>>;
+  try {
+    staffOperationsRuntime = await createStaffOperationsRuntime(config);
+  } catch (error: unknown) {
+    await seatingPlanRuntime.resource.close();
+    await venueCatalogRuntime.resource.close();
+    await identityRuntime.resource.close();
+    throw error;
+  }
 
   return startServer({
     corsConfig: config.cors,
@@ -290,11 +309,13 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     port: config.runtime.port,
     resources:
       tracingResource === undefined
-        ? [identityRuntime.resource, venueCatalogRuntime.resource]
-        : [tracingResource, identityRuntime.resource, venueCatalogRuntime.resource],
+        ? [identityRuntime.resource, venueCatalogRuntime.resource, seatingPlanRuntime.resource, staffOperationsRuntime.resource]
+        : [tracingResource, identityRuntime.resource, venueCatalogRuntime.resource, seatingPlanRuntime.resource, staffOperationsRuntime.resource],
     registerRoutes: (app) => {
       app.use('/api/v1', identityRuntime.router);
       app.use('/api/v1', venueCatalogRuntime.router);
+      app.use('/api/v1', seatingPlanRuntime.router);
+      app.use('/api/v1', staffOperationsRuntime.router);
     },
     runtimeEnvironment: config.runtime.environment,
     securityConfig: config.security,

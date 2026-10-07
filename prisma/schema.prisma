@@ -617,3 +617,158 @@ model CatalogMediaAsset {
   @@unique([resourceType, resourceId, displayOrder], map: "CatalogMediaAsset_attached_order_key", where: raw("\"detachedAt\" IS NULL"))
   @@index([resourceType, resourceId, detachedAt])
 }
+
+enum SeatingPlanStatus {
+  DRAFT
+  CONFIRMED
+  REQUIRES_REVIEW
+}
+
+model SeatingPlan {
+  id                  String            @id @default(uuid()) @db.Uuid
+  bookingId           String            @unique @db.Uuid
+  status              SeatingPlanStatus @default(DRAFT)
+  currentRevisionId   String?           @db.Uuid
+  confirmedRevisionId String?           @db.Uuid
+  planRevision        Int               @default(1)
+  createdByAccountId  String            @db.Uuid
+  updatedByAccountId  String            @db.Uuid
+  createdAt           DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime          @updatedAt @db.Timestamptz(6)
+  revisions           SeatingPlanRevision[]
+  exceptionRecord     SeatingPlanExceptionRecord?
+
+  @@index([bookingId, status])
+}
+
+model SeatingPlanRevision {
+  id                      String            @id @default(uuid()) @db.Uuid
+  seatingPlanId           String            @db.Uuid
+  revisionNumber          Int
+  layoutTemplateVersionId String            @db.Uuid
+  expectedAttendees       Int
+  revisionDigest          String
+  createdByAccountId      String            @db.Uuid
+  createdAt               DateTime          @default(now()) @db.Timestamptz(6)
+  seatingPlan             SeatingPlan       @relation(fields: [seatingPlanId], references: [id], onDelete: Restrict)
+  labels                  SeatingPlanLabel[]
+  registration            SeatingRevisionRegistration?
+
+  @@unique([seatingPlanId, revisionNumber])
+  @@index([seatingPlanId, revisionNumber(sort: Desc)])
+}
+
+model SeatingPlanLabel {
+  id            String              @id @default(uuid()) @db.Uuid
+  revisionId    String              @db.Uuid
+  layoutTableId String              @db.Uuid
+  guestGroupId  String              @db.Uuid
+  colorSnapshot String
+  displayOrder  Int
+  revision      SeatingPlanRevision @relation(fields: [revisionId], references: [id], onDelete: Restrict)
+
+  @@unique([revisionId, layoutTableId])
+  @@unique([revisionId, displayOrder])
+  @@index([revisionId])
+}
+
+model SeatingPlanExceptionRecord {
+  id                      String      @id @default(uuid()) @db.Uuid
+  seatingPlanId           String      @unique @db.Uuid
+  planRevisionAtException Int
+  bookingRevisionSnapshot Int
+  headcountSnapshot       Int
+  layoutTemplateVersionId String      @db.Uuid
+  reason                  String
+  grantedByAccountId      String      @db.Uuid
+  createdAt               DateTime    @default(now()) @db.Timestamptz(6)
+  seatingPlan             SeatingPlan @relation(fields: [seatingPlanId], references: [id], onDelete: Restrict)
+
+  @@index([seatingPlanId])
+}
+
+model SeatingRevisionRegistration {
+  id                   String              @id @default(uuid()) @db.Uuid
+  revisionId           String              @unique @db.Uuid
+  validityProofJson    Json                @db.JsonB
+  digestAtRegistration String
+  registeredAt         DateTime            @default(now()) @db.Timestamptz(6)
+  invalidatedAt        DateTime?           @db.Timestamptz(6)
+  revision             SeatingPlanRevision @relation(fields: [revisionId], references: [id], onDelete: Restrict)
+
+  @@index([invalidatedAt])
+}
+
+enum StaffAssignmentStatus {
+  ACTIVE
+  REVOKED
+}
+
+model StaffEventAssignment {
+  id                  String                @id @default(uuid()) @db.Uuid
+  bookingId           String                @db.Uuid
+  staffAccountId      String                @db.Uuid
+  status              StaffAssignmentStatus @default(ACTIVE)
+  revision            Int                   @default(1)
+  revokedAt           DateTime?             @db.Timestamptz(6)
+  revocationReason    String?
+  assignedByAccountId String                @db.Uuid
+  createdAt           DateTime              @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime              @updatedAt @db.Timestamptz(6)
+
+  @@unique([bookingId, staffAccountId])
+  @@index([bookingId, status])
+  @@index([staffAccountId, status])
+}
+
+model HouseholdAttendanceLedger {
+  id                    String                 @id @default(uuid()) @db.Uuid
+  bookingId             String                 @db.Uuid
+  invitationHouseholdId String                 @db.Uuid
+  guestGroupIdSnapshot  String                 @db.Uuid
+  actualAttendees       Int                    @default(0)
+  ledgerRevision        Int                    @default(1)
+  createdAt             DateTime               @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime               @updatedAt @db.Timestamptz(6)
+  arrivals              AttendanceArrival[]
+  corrections           AttendanceCorrection[]
+
+  @@unique([bookingId, invitationHouseholdId])
+  @@index([bookingId])
+}
+
+model AttendanceArrival {
+  id                     String                     @id @default(uuid()) @db.Uuid
+  ledgerId               String                     @db.Uuid
+  bookingId              String                     @db.Uuid
+  invitationHouseholdId  String                     @db.Uuid
+  attendeeCount          Int
+  guestGroupIdSnapshot   String                     @db.Uuid
+  eventTime              DateTime                   @default(now()) @db.Timestamptz(6)
+  recordedByAccountId    String                     @db.Uuid
+  managerOverrideReason  String?
+  createdAt              DateTime                   @default(now()) @db.Timestamptz(6)
+  ledger                 HouseholdAttendanceLedger  @relation(fields: [ledgerId], references: [id], onDelete: Restrict)
+  corrections            AttendanceCorrection[]
+
+  @@index([ledgerId])
+  @@index([bookingId, invitationHouseholdId])
+}
+
+model AttendanceCorrection {
+  id                     String                    @id @default(uuid()) @db.Uuid
+  ledgerId               String                    @db.Uuid
+  arrivalId              String                    @db.Uuid
+  bookingId              String                    @db.Uuid
+  invitationHouseholdId  String                    @db.Uuid
+  delta                  Int
+  expectedLedgerRevision Int
+  reason                 String
+  recordedByAccountId    String                    @db.Uuid
+  createdAt              DateTime                  @default(now()) @db.Timestamptz(6)
+  ledger                 HouseholdAttendanceLedger @relation(fields: [ledgerId], references: [id], onDelete: Restrict)
+  arrival                AttendanceArrival         @relation(fields: [arrivalId], references: [id], onDelete: Restrict)
+
+  @@index([ledgerId])
+  @@index([arrivalId])
+}
