@@ -107,6 +107,21 @@ enum BookingInvitationIntentStatus {
   ISSUED
 }
 
+enum BookingSlotHoldStatus {
+  ACTIVE
+  EXPIRED
+  RELEASED
+  CONSUMED
+}
+
+enum DepositIntentPinStatus {
+  NONE
+  ACTIVE
+  UNKNOWN
+  SETTLED
+  FAILED
+}
+
 model AuditLog {
   id         String         @id @default(uuid()) @db.Uuid
   occurredAt DateTime       @default(now()) @db.Timestamptz(6)
@@ -350,9 +365,47 @@ model Booking {
   updatedAt         DateTime                 @updatedAt @db.Timestamptz(6)
   consultation      Consultation             @relation(fields: [consultationId], references: [id], onDelete: Restrict)
   proposalSnapshot  BookingProposalSnapshot?
+  slotHolds         BookingSlotHold[]
 
   @@index([hallId, eventDate, shiftCode])
   @@index([phase, eventDate])
+}
+
+model BookingSlotHold {
+  id                  String                 @id @db.Uuid
+  bookingId           String                 @db.Uuid
+  hallId              String                 @db.Uuid
+  eventDate           DateTime               @db.Date
+  shiftCode           RestaurantShiftCode
+  status              BookingSlotHoldStatus  @default(ACTIVE)
+  depositIntentPin    DepositIntentPinStatus @default(NONE)
+  expiresAt           DateTime               @db.Timestamptz(6)
+  terminalAt          DateTime?              @db.Timestamptz(6)
+  acquiredByAccountId String                 @db.Uuid
+  createdAt           DateTime               @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime               @updatedAt @db.Timestamptz(6)
+  booking             Booking                @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  hall                Hall                   @relation(fields: [hallId], references: [id], onDelete: Restrict)
+
+  @@unique([hallId, eventDate, shiftCode], map: "BookingSlotHold_one_active_slot_key", where: raw("\"status\" = 'ACTIVE'"))
+  @@unique([bookingId], map: "BookingSlotHold_one_active_booking_key", where: raw("\"status\" = 'ACTIVE'"))
+  @@index([bookingId, createdAt(sort: Desc)])
+  @@index([status, expiresAt])
+}
+
+model BookingOutboxEvent {
+  id                String    @id @db.Uuid
+  eventType         String
+  aggregateId       String    @db.Uuid
+  aggregateRevision Int
+  occurredAt        DateTime  @db.Timestamptz(6)
+  payload           Json      @db.JsonB
+  publishedAt       DateTime? @db.Timestamptz(6)
+  attemptCount      Int       @default(0)
+  createdAt         DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@unique([eventType, aggregateId, aggregateRevision])
+  @@index([publishedAt, occurredAt])
 }
 
 model BookingProposalSnapshot {
@@ -442,6 +495,7 @@ model Hall {
   updatedAt                DateTime                  @updatedAt @db.Timestamptz(6)
   layoutTemplates          LayoutTemplate[]
   bookingProposalSnapshots BookingProposalSnapshot[]
+  bookingSlotHolds         BookingSlotHold[]
 
   @@unique([nameNormalized], map: "Hall_active_name_key", where: raw("\"lifecycle\" = 'ACTIVE'"))
   @@index([lifecycle, displayOrder, id])
