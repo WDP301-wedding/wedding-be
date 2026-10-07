@@ -94,6 +94,19 @@ enum CatalogMediaResourceType {
   LAYOUT_TEMPLATE_VERSION
 }
 
+enum BookingPhase {
+  DRAFT
+  AWAITING_DEPOSIT
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum BookingInvitationIntentStatus {
+  PENDING
+  ISSUED
+}
+
 model AuditLog {
   id         String         @id @default(uuid()) @db.Uuid
   occurredAt DateTime       @default(now()) @db.Timestamptz(6)
@@ -307,6 +320,87 @@ model AccountRetentionEligibilityFact {
   @@index([accountId, eligibleAfter])
 }
 
+model Consultation {
+  id                      String                   @id @db.Uuid
+  managerAccountId        String                   @db.Uuid
+  intendedEmailNormalized String
+  intendedEmail           String
+  displayName             String
+  note                    String?
+  revision                Int                      @default(1)
+  createdAt               DateTime                 @default(now()) @db.Timestamptz(6)
+  updatedAt               DateTime                 @updatedAt @db.Timestamptz(6)
+  booking                 Booking?
+  invitationIntent        BookingInvitationIntent?
+
+  @@index([managerAccountId, createdAt(sort: Desc)])
+  @@index([intendedEmailNormalized])
+}
+
+model Booking {
+  id                String                   @id @db.Uuid
+  consultationId    String                   @unique @db.Uuid
+  hallId            String                   @db.Uuid
+  eventDate         DateTime                 @db.Date
+  shiftCode         RestaurantShiftCode
+  phase             BookingPhase             @default(DRAFT)
+  revision          Int                      @default(1)
+  planningHeadcount Int
+  createdAt         DateTime                 @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime                 @updatedAt @db.Timestamptz(6)
+  consultation      Consultation             @relation(fields: [consultationId], references: [id], onDelete: Restrict)
+  proposalSnapshot  BookingProposalSnapshot?
+
+  @@index([hallId, eventDate, shiftCode])
+  @@index([phase, eventDate])
+}
+
+model BookingProposalSnapshot {
+  id                   String              @id @default(uuid()) @db.Uuid
+  bookingId            String              @unique @db.Uuid
+  hallId               String              @db.Uuid
+  hallName             String
+  hallDescription      String
+  hallMaxGuests        Int
+  shiftCode            RestaurantShiftCode
+  shiftStartTime       DateTime            @db.Time(0)
+  shiftEndTime         DateTime            @db.Time(0)
+  menuPackageId        String              @db.Uuid
+  menuPackageVersionId String              @db.Uuid
+  menuVersionNumber    Int
+  menuName             String
+  menuDescription      String
+  menuPriceVndPerTable Decimal             @db.Decimal(18, 0)
+  tableCount           Int
+  planningHeadcount    Int
+  baseChargeVnd        Decimal             @db.Decimal(18, 0)
+  depositAmountVnd     Decimal             @db.Decimal(18, 0)
+  createdAt            DateTime            @default(now()) @db.Timestamptz(6)
+  booking              Booking             @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  hall                 Hall                @relation(fields: [hallId], references: [id], onDelete: Restrict)
+  menuPackageVersion   MenuPackageVersion  @relation(fields: [menuPackageVersionId], references: [id], onDelete: Restrict)
+
+  @@index([hallId, shiftCode])
+  @@index([menuPackageVersionId])
+}
+
+model BookingInvitationIntent {
+  id               String                        @id @db.Uuid
+  consultationId   String                        @unique @db.Uuid
+  intendedEmail    String
+  managerAccountId String                        @db.Uuid
+  requestId        String                        @db.Uuid
+  status           BookingInvitationIntentStatus @default(PENDING)
+  invitationId     String?                       @unique @db.Uuid
+  failureCount     Int                           @default(0)
+  issuedAt         DateTime?                     @db.Timestamptz(6)
+  createdAt        DateTime                      @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime                      @updatedAt @db.Timestamptz(6)
+  consultation     Consultation                  @relation(fields: [consultationId], references: [id], onDelete: Restrict)
+
+  @@index([status, createdAt])
+}
+
 model RestaurantProfile {
   id                 String   @id @default(uuid()) @db.Uuid
   singletonKey       String   @unique @default("RESTAURANT")
@@ -333,19 +427,20 @@ model RestaurantShift {
 }
 
 model Hall {
-  id                 String           @id @default(uuid()) @db.Uuid
-  name               String
-  nameNormalized     String
-  description        String
-  maxGuests          Int
-  displayOrder       Int
-  lifecycle          CatalogLifecycle @default(ACTIVE)
-  revision           Int              @default(1)
-  retiredAt          DateTime?        @db.Timestamptz(6)
-  updatedByAccountId String           @db.Uuid
-  createdAt          DateTime         @default(now()) @db.Timestamptz(6)
-  updatedAt          DateTime         @updatedAt @db.Timestamptz(6)
-  layoutTemplates    LayoutTemplate[]
+  id                       String                    @id @default(uuid()) @db.Uuid
+  name                     String
+  nameNormalized           String
+  description              String
+  maxGuests                Int
+  displayOrder             Int
+  lifecycle                CatalogLifecycle          @default(ACTIVE)
+  revision                 Int                       @default(1)
+  retiredAt                DateTime?                 @db.Timestamptz(6)
+  updatedByAccountId       String                    @db.Uuid
+  createdAt                DateTime                  @default(now()) @db.Timestamptz(6)
+  updatedAt                DateTime                  @updatedAt @db.Timestamptz(6)
+  layoutTemplates          LayoutTemplate[]
+  bookingProposalSnapshots BookingProposalSnapshot[]
 
   @@unique([nameNormalized], map: "Hall_active_name_key", where: raw("\"lifecycle\" = 'ACTIVE'"))
   @@index([lifecycle, displayOrder, id])
@@ -420,22 +515,23 @@ model MenuPackage {
 }
 
 model MenuPackageVersion {
-  id                 String              @id @default(uuid()) @db.Uuid
-  menuPackageId      String              @db.Uuid
-  versionNumber      Int?
-  revision           Int                 @default(1)
-  state              CatalogVersionState @default(DRAFT)
-  name               String
-  description        String
-  priceVndPerTable   Decimal             @db.Decimal(18, 0)
-  createdByAccountId String              @db.Uuid
-  publishedAt        DateTime?           @db.Timestamptz(6)
-  createdAt          DateTime            @default(now()) @db.Timestamptz(6)
-  updatedAt          DateTime            @updatedAt @db.Timestamptz(6)
-  menuPackage        MenuPackage         @relation("MenuPackageVersions", fields: [menuPackageId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  currentFor         MenuPackage?        @relation("MenuPackageCurrentVersion")
-  draftFor           MenuPackage?        @relation("MenuPackageDraftVersion")
-  items              MenuPackageItem[]
+  id                       String                    @id @default(uuid()) @db.Uuid
+  menuPackageId            String                    @db.Uuid
+  versionNumber            Int?
+  revision                 Int                       @default(1)
+  state                    CatalogVersionState       @default(DRAFT)
+  name                     String
+  description              String
+  priceVndPerTable         Decimal                   @db.Decimal(18, 0)
+  createdByAccountId       String                    @db.Uuid
+  publishedAt              DateTime?                 @db.Timestamptz(6)
+  createdAt                DateTime                  @default(now()) @db.Timestamptz(6)
+  updatedAt                DateTime                  @updatedAt @db.Timestamptz(6)
+  menuPackage              MenuPackage               @relation("MenuPackageVersions", fields: [menuPackageId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  currentFor               MenuPackage?              @relation("MenuPackageCurrentVersion")
+  draftFor                 MenuPackage?              @relation("MenuPackageDraftVersion")
+  items                    MenuPackageItem[]
+  bookingProposalSnapshots BookingProposalSnapshot[]
 
   @@unique([id, menuPackageId])
   @@unique([menuPackageId, versionNumber])
