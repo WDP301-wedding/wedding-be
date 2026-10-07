@@ -21,6 +21,10 @@ describe('backend CI contract', () => {
     expect(workflow).toContain('run: npm run test:unit');
     expect(workflow).toContain('run: npm run test:contract');
     expect(workflow).toContain('run: npm run test:coverage -- --maxWorkers=2');
+    expect(workflow.match(/run: npm run test:coverage -- --maxWorkers=2/gu)).toHaveLength(1);
+    expect(workflow).toMatch(
+      /postgresql-integration:[\s\S]*run: npm run test:coverage -- --maxWorkers=2/u,
+    );
     expect(workflow).toContain('run: npm run api:check');
     expect(workflow).toContain('run: npm run build');
     expect(workflow).toContain('run: npm run audit:ci');

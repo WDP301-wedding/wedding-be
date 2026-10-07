@@ -54,9 +54,6 @@ jobs:
       - name: Verify generated OpenAPI artifact
         run: npm run api:check
 
-      - name: Enforce coverage thresholds
-        run: npm run test:coverage -- --maxWorkers=2
-
       - name: Build production output
         run: npm run build
 
@@ -108,3 +105,7 @@ jobs:
 
       - name: Run PostgreSQL integration tests
         run: npm run test:integration
+
+      # Database-backed modules need their real integration tests in the coverage run.
+      - name: Enforce full-suite coverage with PostgreSQL
+        run: npm run test:coverage -- --maxWorkers=2
