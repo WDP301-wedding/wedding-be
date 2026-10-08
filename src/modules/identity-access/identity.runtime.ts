@@ -5,8 +5,7 @@ import type { Router } from 'express';
 import type { Config } from '../../config/config.js';
 import { createPrismaClient } from '../../core/database/prisma.js';
 import type { ShutdownResource } from '../../core/http/lifecycle.js';
-import { FakeEmailProvider } from '../../integrations/email/fake-email-provider.js';
-import { createResendEmailProvider } from '../../integrations/email/resend-email-provider.js';
+import { createEmailProvider } from '../../integrations/email/email-provider.factory.js';
 import { createPrismaAccountRepository } from './account/account.repository.js';
 import { createAccountService } from './account/account.service.js';
 import { createAuthenticatedActorResolver } from './authorization/authenticated-actor.middleware.js';
@@ -67,12 +66,7 @@ export async function createIdentityRuntime(config: Config): Promise<IdentityRun
       recordSecurityEvent: (event) => recordSecurityEvent(prisma, event),
     });
     const publicWebBaseUrl = resolvePublicWebBaseUrl(config);
-    const emailProvider = config.email.enabled
-      ? createResendEmailProvider({
-          apiKey: config.email.resendApiKey,
-          fromEmail: config.email.fromEmail,
-        })
-      : new FakeEmailProvider();
+    const emailProvider = createEmailProvider(config.email);
     const notificationPort = createIdentityEmailNotificationPort(emailProvider, publicWebBaseUrl);
     const passwordResetService = createPasswordResetService({
       repository: createPrismaPasswordResetRepository(prisma),

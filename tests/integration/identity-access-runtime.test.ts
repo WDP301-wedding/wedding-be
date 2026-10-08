@@ -129,24 +129,34 @@ describeWithDatabase('IA-08 identity runtime composition', () => {
     });
   });
 
-  it('composes the email provider with the local notification origin fallback', async () => {
-    const emailRuntime = await createIdentityRuntime(
-      withTestScrypt(
-        parseEnvironment({
-          NODE_ENV: 'test',
-          DATABASE_URL: scopedUrl,
-          RESEND_API_KEY: 're_test_only',
-          RESEND_FROM_EMAIL: 'Wedding Test <notifications@example.com>',
-        }),
-      ),
-    );
+  it.each(['brevo', 'resend'] as const)(
+    'composes %s with the local notification origin fallback',
+    async (provider) => {
+      const emailRuntime = await createIdentityRuntime(
+        withTestScrypt(
+          parseEnvironment({
+            NODE_ENV: 'test',
+            DATABASE_URL: scopedUrl,
+            ...(provider === 'brevo'
+              ? {
+                  BREVO_API_KEY: 'test_only_brevo',
+                  BREVO_FROM_EMAIL: 'Wedding Test <sender@gmail.com>',
+                }
+              : {
+                  RESEND_API_KEY: 're_test_only',
+                  RESEND_FROM_EMAIL: 'Wedding Test <notifications@example.com>',
+                }),
+          }),
+        ),
+      );
 
-    try {
-      expect(emailRuntime.router).toBeTypeOf('function');
-    } finally {
-      await emailRuntime.resource.close();
-    }
-  });
+      try {
+        expect(emailRuntime.router).toBeTypeOf('function');
+      } finally {
+        await emailRuntime.resource.close();
+      }
+    },
+  );
 });
 
 function withTestScrypt(config: BackendConfig): BackendConfig {

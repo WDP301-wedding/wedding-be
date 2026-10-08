@@ -182,6 +182,7 @@ describe('parseEnvironment', () => {
     });
     expect(parsed.email).toEqual({
       enabled: true,
+      provider: 'resend',
       resendApiKey: 'resend-secret',
       fromEmail: 'notifications@example.com',
     });
@@ -372,6 +373,77 @@ describe('parseEnvironment', () => {
         RESEND_FROM_EMAIL: 'not-an-email',
       }),
     ).toThrow(EnvironmentConfigurationError);
+  });
+
+  it('enables Brevo from a complete credential group and disables blank email groups', () => {
+    const parsed = parseEnvironment({
+      BREVO_API_KEY: 'brevo-test-key',
+      BREVO_FROM_EMAIL: 'Wedding <sender@gmail.com>',
+    });
+    expect(parsed.email).toEqual({
+      enabled: true,
+      provider: 'brevo',
+      apiKey: 'brevo-test-key',
+      fromEmail: 'Wedding <sender@gmail.com>',
+    });
+    expect(Object.isFrozen(parsed.email)).toBe(true);
+    expect(
+      parseEnvironment({
+        BREVO_API_KEY: ' ',
+        BREVO_FROM_EMAIL: '',
+        RESEND_API_KEY: '',
+        RESEND_FROM_EMAIL: '',
+      }).email,
+    ).toEqual({ enabled: false });
+  });
+
+  it.each(['BREVO_API_KEY', 'BREVO_FROM_EMAIL'] as const)(
+    'requires %s when using Brevo in production',
+    (key) => {
+      const source: Record<string, string | undefined> = {
+        ...validProductionEnvironment,
+        RESEND_API_KEY: '',
+        RESEND_FROM_EMAIL: '',
+        BREVO_API_KEY: 'brevo-test-key',
+        BREVO_FROM_EMAIL: 'Wedding <sender@gmail.com>',
+      };
+      expect(parseEnvironment(source).email).toMatchObject({ provider: 'brevo', enabled: true });
+      delete source[key];
+      expect(() => parseEnvironment(source)).toThrow(key);
+    },
+  );
+
+  it.each([
+    { BREVO_API_KEY: 'test-key' },
+    { BREVO_FROM_EMAIL: 'sender@gmail.com' },
+    { BREVO_API_KEY: 'test-key', BREVO_FROM_EMAIL: 'bad-address' },
+    { BREVO_API_KEY: 'test-key', BREVO_FROM_EMAIL: 'Wedding\r\nRestaurant <sender@gmail.com>' },
+    { BREVO_API_KEY: 'key\nheader', BREVO_FROM_EMAIL: 'sender@gmail.com' },
+  ])('rejects incomplete or invalid Brevo configuration: %j', (source) => {
+    expect(() => parseEnvironment(source)).toThrow(EnvironmentConfigurationError);
+  });
+
+  it('rejects simultaneous email providers', () => {
+    expect(() =>
+      parseEnvironment({
+        RESEND_API_KEY: 'resend-key',
+        RESEND_FROM_EMAIL: 'sender@example.com',
+        BREVO_API_KEY: 'brevo-key',
+        BREVO_FROM_EMAIL: 'sender@gmail.com',
+      }),
+    ).toThrow(EnvironmentConfigurationError);
+  });
+
+  it('requires email credentials in deployed environments and never prints the Brevo key', () => {
+    const source = { ...validProductionEnvironment, RESEND_API_KEY: '', RESEND_FROM_EMAIL: '' };
+    expect(() => parseEnvironment(source)).toThrow('BREVO_API_KEY');
+    try {
+      parseEnvironment({ BREVO_API_KEY: 'private-brevo-key' });
+      throw new Error('Expected invalid configuration');
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(EnvironmentConfigurationError);
+      expect(String(error)).not.toContain('private-brevo-key');
+    }
   });
 
   it.each(['GEMINI_API_KEY', 'GEMINI_IMAGE_MODEL'] as const)(
