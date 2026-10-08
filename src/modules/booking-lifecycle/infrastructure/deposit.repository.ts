@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 import { AppError } from '../../../core/errors/app-error.js';
+import { bookingEventMetadata } from '../../../core/integration-events/booking-event.js';
 import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
 import type {
   BookingDepositRepository,
@@ -127,6 +128,7 @@ export function createPrismaBookingDepositRepository(
             bookingRevision,
             timelineRevisionId: input.timelineRevisionId,
             requestId: input.requestId,
+            causationId: input.causationId ?? null,
             actorAccountId: input.actorAccountId,
             occurredAt: now(),
           });
@@ -146,7 +148,14 @@ export function createPrismaBookingDepositRepository(
           where: { id: input.paymentAttemptId, bookingId: input.bookingId, status: 'ACTIVE' },
           data: { status: 'UNKNOWN' },
         });
-        if (updated.count !== 1) throw new BookingDepositConflictError('PAYMENT_EVIDENCE_CONFLICT');
+        if (updated.count !== 1) {
+          const current = await transaction.bookingDepositIntent.findUnique({
+            where: { id: input.paymentAttemptId },
+          });
+          if (current?.bookingId !== input.bookingId || current.status !== 'UNKNOWN') {
+            throw new BookingDepositConflictError('PAYMENT_EVIDENCE_CONFLICT');
+          }
+        }
         await transaction.bookingSlotHold.updateMany({
           where: { bookingId: input.bookingId, status: 'ACTIVE' },
           data: { depositIntentPin: 'UNKNOWN' },
@@ -203,7 +212,8 @@ export function createPrismaBookingDepositRepository(
             if (
               existing.bookingId !== input.bookingId ||
               existing.timelineRevisionId !== input.timelineRevisionId ||
-              decimalNumber(existing.amountVnd) !== input.amountVnd
+              decimalNumber(existing.amountVnd) !== input.amountVnd ||
+              existing.settledAt.getTime() !== input.settledAt.getTime()
             ) {
               throw new BookingDepositConflictError('PAYMENT_EVIDENCE_CONFLICT');
             }
@@ -397,6 +407,7 @@ async function appendEvidence(
     bookingRevision: number;
     timelineRevisionId: string;
     requestId: string;
+    causationId?: string | null;
     actorAccountId: string | null;
     occurredAt: Date;
   }>,
@@ -418,6 +429,7 @@ async function appendEvidence(
   });
   await transaction.bookingOutboxEvent.create({
     data: {
+      ...bookingEventMetadata(input),
       id: createId(),
       eventType: input.eventType,
       aggregateId: input.bookingId,
@@ -427,6 +439,9 @@ async function appendEvidence(
         bookingId: input.bookingId,
         timelineRevisionId: input.timelineRevisionId,
         bookingRevision: input.bookingRevision,
+        ...(input.eventType === 'booking.deposit-eligible'
+          ? { eligibleAt: input.occurredAt.toISOString() }
+          : {}),
       },
     },
   });

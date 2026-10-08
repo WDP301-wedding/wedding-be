@@ -1,11 +1,13 @@
 import { createHash, randomUUID } from 'node:crypto';
 
+import { bookingEventMetadata } from '../../../core/integration-events/booking-event.js';
 import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
 import type { TimelineContext, TimelineRepository } from '../application/timeline.service.js';
 import { TimelineConflictError } from '../application/timeline.service.js';
 import type { TimelineParty, TimelineRevision } from '../domain/timeline.policy.js';
 import { BookingLifecycleNotFoundError } from './consultation.repository.js';
 import { BookingPolicyError } from '../domain/booking-policy.js';
+import { AppError } from '../../../core/errors/app-error.js';
 
 export function createPrismaTimelineRepository(
   prisma: PrismaClient,
@@ -54,6 +56,13 @@ export function createPrismaTimelineRepository(
             input.expectedBookingRevision,
           );
           await requireNoDepositIntent(transaction, input.revision.bookingId);
+          if ((booking.phase === 'CONFIRMED') !== (input.changeReason !== undefined)) {
+            throw new AppError({
+              status: 409,
+              code: 'INVALID_BOOKING_TRANSITION',
+              message: 'Confirmed timeline changes require a change request.',
+            });
+          }
           if (booking.currentTimelineRevisionId !== input.revision.predecessorRevisionId) {
             throw new TimelineConflictError('TIMELINE_REVISION_SUPERSEDED');
           }
@@ -113,7 +122,22 @@ export function createPrismaTimelineRepository(
             requestId: input.requestId,
             occurredAt: input.revision.createdAt,
             party: input.party,
+            ...(input.changeReason === undefined ? {} : { reason: input.changeReason }),
           });
+          if (input.revision.predecessorRevisionId !== null && !keepsEffectivePredecessor) {
+            await appendEvidence(transaction, createId, {
+              action: 'booking.timeline-superseded',
+              eventType: 'booking.timeline-superseded',
+              bookingId: input.revision.bookingId,
+              bookingRevision,
+              timelineRevisionId: input.revision.predecessorRevisionId,
+              successorRevisionId: input.revision.revisionId,
+              actorAccountId: input.actorAccountId,
+              requestId: input.requestId,
+              occurredAt: input.revision.createdAt,
+              party: input.party,
+            });
+          }
           return immutable({
             changed: true as const,
             revision: input.revision,
@@ -219,9 +243,8 @@ async function persistDecision(
           decision === 'APPROVED'
             ? 'booking.timeline-approved'
             : 'booking.timeline-approval-withdrawn',
-        eventType: activatesReplacement
-          ? 'booking.timeline-superseded'
-          : decision === 'APPROVED'
+        eventType:
+          decision === 'APPROVED'
             ? 'booking.timeline-approved'
             : 'booking.timeline-approval-withdrawn',
         bookingId: input.bookingId,
@@ -232,6 +255,20 @@ async function persistDecision(
         occurredAt,
         party: input.party,
       });
+      if (activatesReplacement && booking.effectiveTimelineRevisionId !== null) {
+        await appendEvidence(transaction, createId, {
+          action: 'booking.timeline-superseded',
+          eventType: 'booking.timeline-superseded',
+          bookingId: input.bookingId,
+          bookingRevision,
+          timelineRevisionId: booking.effectiveTimelineRevisionId,
+          successorRevisionId: input.timelineRevisionId,
+          actorAccountId: input.actorAccountId,
+          requestId: input.requestId,
+          occurredAt,
+          party: input.party,
+        });
+      }
       return immutable({ revision: nextRevision, bookingRevision });
     },
     { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
@@ -307,6 +344,8 @@ async function appendEvidence(
     requestId: string;
     occurredAt: Date;
     party: TimelineParty;
+    reason?: string;
+    successorRevisionId?: string;
   }>,
 ): Promise<void> {
   await transaction.auditLog.create({
@@ -322,11 +361,25 @@ async function appendEvidence(
         bookingId: input.bookingId,
         bookingRevision: input.bookingRevision,
         party: input.party,
+        ...(input.eventType === 'booking.timeline-review-requested'
+          ? { requestedBy: input.actorAccountId, requestedAt: input.occurredAt.toISOString() }
+          : {}),
+        ...(input.eventType === 'booking.timeline-approved'
+          ? { approvedAt: input.occurredAt.toISOString() }
+          : {}),
+        ...(input.eventType === 'booking.timeline-superseded'
+          ? {
+              successorRevisionId: input.successorRevisionId!,
+              supersededAt: input.occurredAt.toISOString(),
+            }
+          : {}),
+        ...(input.reason === undefined ? {} : { reason: input.reason }),
       },
     },
   });
   await transaction.bookingOutboxEvent.create({
     data: {
+      ...bookingEventMetadata(input),
       id: createId(),
       eventType: input.eventType,
       aggregateId: input.bookingId,
@@ -337,6 +390,18 @@ async function appendEvidence(
         timelineRevisionId: input.timelineRevisionId,
         bookingRevision: input.bookingRevision,
         party: input.party,
+        ...(input.eventType === 'booking.timeline-review-requested'
+          ? { requestedBy: input.actorAccountId, requestedAt: input.occurredAt.toISOString() }
+          : {}),
+        ...(input.eventType === 'booking.timeline-approved'
+          ? { approvedAt: input.occurredAt.toISOString() }
+          : {}),
+        ...(input.eventType === 'booking.timeline-superseded'
+          ? {
+              successorRevisionId: input.successorRevisionId!,
+              supersededAt: input.occurredAt.toISOString(),
+            }
+          : {}),
       },
     },
   });

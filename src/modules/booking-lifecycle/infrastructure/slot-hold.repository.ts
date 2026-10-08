@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 import { AppError } from '../../../core/errors/app-error.js';
+import { bookingEventMetadata } from '../../../core/integration-events/booking-event.js';
 import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
 import type { AcquiredSlotHold, SlotHoldRepository } from '../application/slot-hold.service.js';
 import { createSlotHold, slotKey } from '../domain/slot-hold.policy.js';
@@ -27,6 +28,16 @@ export function createPrismaSlotHoldRepository(
 ): SlotHoldRepository {
   return Object.freeze({
     async inspect(input: Parameters<SlotHoldRepository['inspect']>[0]) {
+      const confirmed = await prisma.booking.findFirst({
+        where: {
+          hallId: input.hallId,
+          eventDate: localDate(input.eventDate),
+          shiftCode: input.shiftCode,
+          phase: { in: ['CONFIRMED', 'COMPLETED'] },
+        },
+        select: { id: true },
+      });
+      if (confirmed !== null) return Object.freeze({ available: false, activeHold: null });
       const active = await prisma.bookingSlotHold.findFirst({
         where: {
           hallId: input.hallId,
@@ -62,6 +73,7 @@ export function createPrismaSlotHoldRepository(
                 eventDate: true,
                 shiftCode: true,
                 revision: true,
+                phase: true,
                 consultation: { select: { managerAccountId: true } },
               },
             });
@@ -71,6 +83,22 @@ export function createPrismaSlotHoldRepository(
             ) {
               throw new BookingLifecycleNotFoundError();
             }
+            const confirmed = await transaction.booking.findFirst({
+              where: {
+                hallId: input.hallId,
+                eventDate: localDate(input.eventDate),
+                shiftCode: input.shiftCode,
+                phase: { in: ['CONFIRMED', 'COMPLETED'] },
+              },
+              select: { id: true },
+            });
+            if (confirmed !== null) throw new BookingSlotConflictError('SLOT_NOT_AVAILABLE');
+            if (booking.phase === 'CANCELLED')
+              throw new AppError({
+                status: 409,
+                code: 'INVALID_BOOKING_TRANSITION',
+                message: 'A cancelled booking cannot acquire a hold.',
+              });
             if (
               booking.hallId !== input.hallId ||
               isoLocalDate(booking.eventDate) !== input.eventDate ||
@@ -93,7 +121,12 @@ export function createPrismaSlotHoldRepository(
                 depositIntentPin: true,
               },
             });
-            if (current?.bookingId === input.bookingId) {
+            if (
+              current?.bookingId === input.bookingId &&
+              (current.expiresAt.getTime() > input.acquiredAt.getTime() ||
+                current.depositIntentPin === 'ACTIVE' ||
+                current.depositIntentPin === 'UNKNOWN')
+            ) {
               return immutable({
                 holdId: current.id,
                 bookingId: input.bookingId,
@@ -157,6 +190,7 @@ export function createPrismaSlotHoldRepository(
             });
             await transaction.bookingOutboxEvent.create({
               data: {
+                ...bookingEventMetadata(input),
                 id: createId(),
                 eventType: 'booking.slot-held',
                 aggregateId: input.bookingId,

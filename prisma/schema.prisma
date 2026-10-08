@@ -269,6 +269,7 @@ model WorkspaceInvitation {
   issuedByAccountId        String                    @db.Uuid
   sequence                 Int
   tokenHash                String                    @unique
+  deliveryIntentId         String                    @default(uuid()) @db.Uuid
   status                   WorkspaceInvitationStatus @default(ACTIVE)
   expiresAt                DateTime                  @db.Timestamptz(6)
   acceptedAt               DateTime?                 @db.Timestamptz(6)
@@ -360,12 +361,13 @@ model AccountRetentionEligibilityFact {
   id                     String   @id @default(uuid()) @db.Uuid
   accountId              String   @db.Uuid
   consultationId         String   @db.Uuid
-  sourceBusinessRecordId String   @unique @db.Uuid
+  sourceBusinessRecordId String   @db.Uuid
   eligibleAfter          DateTime @db.Timestamptz(6)
   recordedAt             DateTime @default(now()) @db.Timestamptz(6)
   account                Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   @@unique([accountId, consultationId])
+  @@unique([accountId, sourceBusinessRecordId])
   @@index([accountId, eligibleAfter])
 }
 
@@ -413,6 +415,7 @@ model Booking {
   headcountEvidence           BookingHeadcountEvidence?
 
   @@index([hallId, eventDate, shiftCode])
+  @@unique([hallId, eventDate, shiftCode], map: "Booking_one_confirmed_slot_key", where: raw("\"phase\" IN ('CONFIRMED', 'COMPLETED')"))
   @@index([phase, eventDate])
 }
 
@@ -561,6 +564,9 @@ model BookingSlotHold {
 model BookingOutboxEvent {
   id                String    @id @db.Uuid
   eventType         String
+  eventVersion      Int       @default(1)
+  correlationId     String    @db.Uuid
+  causationId       String?   @db.Uuid
   aggregateId       String    @db.Uuid
   aggregateRevision Int
   occurredAt        DateTime  @db.Timestamptz(6)
@@ -571,6 +577,28 @@ model BookingOutboxEvent {
 
   @@unique([eventType, aggregateId, aggregateRevision])
   @@index([publishedAt, occurredAt])
+}
+
+model BookingReportingSequence {
+  owner String @id
+  value Int    @default(0)
+}
+
+model BookingAutomationCommand {
+  commandId        String   @id @db.Uuid
+  bookingId        String   @db.Uuid
+  expectedRevision Int
+  requestedAt      DateTime @db.Timestamptz(6)
+  completedAt      DateTime @db.Timestamptz(6)
+}
+
+model BookingReportingSnapshot {
+  sequence  Int      @id
+  bookingId String   @db.Uuid
+  changedAt DateTime @db.Timestamptz(6)
+  value     Json     @db.JsonB
+
+  @@index([bookingId, sequence])
 }
 
 model BookingProposalSnapshot {

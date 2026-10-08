@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 import { AppError } from '../../../core/errors/app-error.js';
+import { bookingEventMetadata } from '../../../core/integration-events/booking-event.js';
 import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
 import type { ContractContext } from '../application/deposit.service.js';
 import type { BookingPhase } from '../domain/booking-policy.js';
@@ -15,7 +16,14 @@ import { BookingLifecycleNotFoundError } from './consultation.repository.js';
 export type BookingLifecycleMutationContext = Readonly<{
   requestId: string;
   actorAccountId: string | null;
+  causationId?: string;
 }>;
+
+export type BookingTerminalRetentionRecorder = (
+  transaction: Prisma.TransactionClient,
+  input: Readonly<{ bookingId: string; consultationId: string; eligibleAfter: Date }>,
+  context: BookingLifecycleMutationContext,
+) => Promise<void>;
 
 export interface BookingPlanningHeadcountSynchronizer {
   synchronizeHeadcount(
@@ -96,6 +104,7 @@ export function createPrismaBookingLifecycleRepository(
   prisma: PrismaClient,
   now: () => Date = () => new Date(),
   createId: () => string = randomUUID,
+  recordRetention: BookingTerminalRetentionRecorder = () => Promise.resolve(),
 ): BookingLifecycleRepository {
   return Object.freeze({
     async getAuthorizationContext(bookingId: string) {
@@ -134,6 +143,15 @@ export function createPrismaBookingLifecycleRepository(
             { phase: 'CANCELLED', cancelledAt },
             booking.phase,
           );
+          await transaction.bookingCancellationRequest.updateMany({
+            where: { bookingId: input.bookingId, status: 'PENDING' },
+            data: {
+              status: 'APPROVED',
+              decidedByAccountId: requireActor(input.context),
+              decisionReason: normalizedReason(input.reason),
+              decidedAt: cancelledAt,
+            },
+          });
           await appendLifecycleEvidence(transaction, createId, {
             action: 'booking.cancelled',
             eventType: 'booking.cancelled',
@@ -142,8 +160,17 @@ export function createPrismaBookingLifecycleRepository(
             requestId: input.context.requestId,
             actorAccountId: input.context.actorAccountId,
             occurredAt: cancelledAt,
-            metadata: { reason: normalizedReason(input.reason) },
+            metadata: { reason: normalizedReason(input.reason), reasonCode: 'MANAGER_CANCELLED' },
           });
+          await recordRetention(
+            transaction,
+            {
+              bookingId: input.bookingId,
+              consultationId: booking.consultationId,
+              eligibleAfter: cancelledAt,
+            },
+            input.context,
+          );
           return Object.freeze({ phase: 'CANCELLED' as const, bookingRevision });
         },
         { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
@@ -200,6 +227,7 @@ export function createPrismaBookingLifecycleRepository(
             bookingId: input.bookingId,
             bookingRevision,
             requestId: context.requestId,
+            causationId: context.causationId ?? null,
             actorAccountId: context.actorAccountId,
             occurredAt: appliedAt,
             metadata: {
@@ -246,6 +274,19 @@ export function createPrismaBookingLifecycleRepository(
           input.expectedBookingRevision,
           {},
         );
+        await appendLifecycleEvidence(transaction, createId, {
+          action: 'booking.cancellation-requested',
+          eventType: 'booking.cancellation-requested',
+          bookingId: input.bookingId,
+          bookingRevision,
+          requestId: input.context.requestId,
+          actorAccountId: input.context.actorAccountId,
+          occurredAt: now(),
+          metadata: {
+            cancellationRequestId: input.cancellationRequestId,
+            reason: normalizedReason(input.reason),
+          },
+        });
         return Object.freeze({
           cancellationRequestId: input.cancellationRequestId,
           bookingRevision,
@@ -280,7 +321,7 @@ export function createPrismaBookingLifecycleRepository(
             );
             await requireNoDepositIntent(transaction, input.bookingId);
           }
-          await transaction.bookingCancellationRequest.updateMany({
+          const decided = await transaction.bookingCancellationRequest.updateMany({
             where: { id: request.id, status: 'PENDING' },
             data: {
               status: input.decision === 'APPROVE' ? 'APPROVED' : 'REJECTED',
@@ -289,6 +330,8 @@ export function createPrismaBookingLifecycleRepository(
               decidedAt,
             },
           });
+          if (decided.count !== 1)
+            throw new BookingLifecycleStateError('CANCELLATION_REQUEST_CONFLICT');
           const phase = input.decision === 'APPROVE' ? ('CANCELLED' as const) : booking.phase;
           const bookingRevision = await incrementBooking(
             transaction,
@@ -307,8 +350,26 @@ export function createPrismaBookingLifecycleRepository(
             requestId: input.context.requestId,
             actorAccountId: input.context.actorAccountId,
             occurredAt: decidedAt,
-            metadata: { cancellationRequestId: request.id },
+            metadata: {
+              cancellationRequestId: request.id,
+              reason: normalizedReason(input.reason),
+              reasonCode:
+                input.decision === 'APPROVE'
+                  ? 'COUPLE_REQUEST_APPROVED'
+                  : 'COUPLE_REQUEST_REJECTED',
+            },
           });
+          if (input.decision === 'APPROVE') {
+            await recordRetention(
+              transaction,
+              {
+                bookingId: input.bookingId,
+                consultationId: booking.consultationId,
+                eligibleAfter: decidedAt,
+              },
+              input.context,
+            );
+          }
           return Object.freeze({ phase, bookingRevision });
         },
         { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
@@ -346,6 +407,15 @@ export function createPrismaBookingLifecycleRepository(
             occurredAt: completedAt,
             metadata: {},
           });
+          await recordRetention(
+            transaction,
+            {
+              bookingId: input.bookingId,
+              consultationId: booking.consultationId,
+              eligibleAfter: completedAt,
+            },
+            input.context,
+          );
           return Object.freeze({ phase: 'COMPLETED' as const, bookingRevision });
         },
         { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
@@ -359,6 +429,7 @@ async function requireLifecycleBooking(transaction: Prisma.TransactionClient, bo
     where: { id: bookingId },
     select: {
       id: true,
+      consultationId: true,
       revision: true,
       phase: true,
       eventDate: true,
@@ -410,6 +481,7 @@ async function appendLifecycleEvidence(
     bookingId: string;
     bookingRevision: number;
     requestId: string;
+    causationId?: string | null;
     actorAccountId: string | null;
     occurredAt: Date;
     metadata: Readonly<Record<string, string | number>>;
@@ -434,12 +506,29 @@ async function appendLifecycleEvidence(
   });
   await transaction.bookingOutboxEvent.create({
     data: {
+      ...bookingEventMetadata(input),
       id: createId(),
       eventType: input.eventType,
       aggregateId: input.bookingId,
       aggregateRevision: input.bookingRevision,
       occurredAt: input.occurredAt,
-      payload,
+      payload: {
+        bookingId: input.bookingId,
+        bookingRevision: input.bookingRevision,
+        ...Object.fromEntries(Object.entries(input.metadata).filter(([key]) => key !== 'reason')),
+        ...(input.eventType === 'booking.cancelled'
+          ? { cancelledAt: input.occurredAt.toISOString() }
+          : {}),
+        ...(input.eventType === 'booking.completed'
+          ? { completedAt: input.occurredAt.toISOString() }
+          : {}),
+        ...(input.eventType === 'booking.expected-headcount-changed'
+          ? {
+              planningHeadcount: input.metadata.expectedAttendees,
+              changedAt: input.occurredAt.toISOString(),
+            }
+          : {}),
+      },
     },
   });
 }

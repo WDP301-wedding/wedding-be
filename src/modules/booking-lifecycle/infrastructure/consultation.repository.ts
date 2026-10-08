@@ -313,7 +313,11 @@ export function createPrismaConsultationWorkspaceRepository(
               },
             },
           });
-          return immutable({ ...record, bookingRevision: 1 });
+          return immutable({
+            ...record,
+            bookingRevision: 1,
+            consultationRevision: record.expectedConsultationRevision + 1,
+          });
         },
         { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
       );
@@ -363,8 +367,7 @@ function validateIntentReplay(stored: StoredIntent, input: InvitationIntent): In
     stored.managerAccountId !== input.managerAccountId ||
     normalizeEmail(stored.intendedEmail).normalized !==
       normalizeEmail(input.intendedEmail).normalized ||
-    stored.expectedRevision !== input.expectedRevision ||
-    stored.requestId !== input.requestId
+    stored.expectedRevision !== input.expectedRevision
   ) {
     throw new BookingLifecycleConflictError('INVITATION_INTENT_CONFLICT');
   }
