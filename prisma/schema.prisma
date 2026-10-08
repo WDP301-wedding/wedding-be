@@ -418,8 +418,8 @@ model Booking {
   billingPaymentAttempts      BillingPaymentAttempt[]
   billingInvoices             BillingInvoice[]
 
-  @@index([hallId, eventDate, shiftCode])
   @@unique([hallId, eventDate, shiftCode], map: "Booking_one_confirmed_slot_key", where: raw("\"phase\" IN ('CONFIRMED', 'COMPLETED')"))
+  @@index([hallId, eventDate, shiftCode])
   @@index([phase, eventDate])
 }
 
@@ -623,20 +623,23 @@ model BillingLedgerHead {
 }
 
 model BillingPaymentAttempt {
-  id                 String                 @id @db.Uuid
-  bookingId          String                 @db.Uuid
-  commandId          String                 @unique @db.Uuid
-  purpose            BillingPaymentPurpose
-  provider           BillingPaymentProvider
-  amountVnd          Decimal                @db.Decimal(18, 0)
-  timelineRevisionId String?                @db.Uuid
-  state              BillingAttemptState    @default(CREATED)
-  terminalEvidenceId String?                @db.Uuid
-  expiresAt          DateTime               @db.Timestamptz(6)
-  createdAt          DateTime               @default(now()) @db.Timestamptz(6)
-  updatedAt          DateTime               @updatedAt @db.Timestamptz(6)
-  booking            Booking                @relation(fields: [bookingId], references: [id], onDelete: Restrict)
-  paymentEntries     BillingLedgerEntry[]
+  id                   String                       @id @db.Uuid
+  bookingId            String                       @db.Uuid
+  commandId            String                       @unique @db.Uuid
+  purpose              BillingPaymentPurpose
+  provider             BillingPaymentProvider
+  amountVnd            Decimal                      @db.Decimal(18, 0)
+  timelineRevisionId   String?                      @db.Uuid
+  state                BillingAttemptState          @default(CREATED)
+  terminalEvidenceId   String?                      @db.Uuid
+  expiresAt            DateTime                     @db.Timestamptz(6)
+  createdAt            DateTime                     @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime                     @updatedAt @db.Timestamptz(6)
+  booking              Booking                      @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  paymentEntries       BillingLedgerEntry[]
+  vnpayCheckout        BillingVnpayCheckout?
+  providerEvidence     BillingProviderEvidence[]
+  providerTransactions BillingProviderTransaction[]
 
   @@unique([id, bookingId])
   @@unique([bookingId, purpose], map: "BillingPaymentAttempt_one_unresolved_key", where: raw("\"state\" IN ('CREATED', 'PENDING', 'UNKNOWN')"))
@@ -644,25 +647,25 @@ model BillingPaymentAttempt {
 }
 
 model BillingLedgerEntry {
-  id                    String                 @id @db.Uuid
-  bookingId             String                 @db.Uuid
+  id                    String                     @id @db.Uuid
+  bookingId             String                     @db.Uuid
   revision              Int
   kind                  BillingLedgerKind
   sourceType            BillingSourceType
-  sourceRevisionId      String                 @db.Uuid
-  amountVnd             Decimal                @db.Decimal(18, 0)
-  occurredAt            DateTime               @db.Timestamptz(6)
-  sourceEntryId         String?                @db.Uuid
-  paymentAttemptId      String?                @unique @db.Uuid
-  decisionId            String?                @db.Uuid
-  approvedRefundableVnd Decimal?               @db.Decimal(18, 0)
+  sourceRevisionId      String                     @db.Uuid
+  amountVnd             Decimal                    @db.Decimal(18, 0)
+  occurredAt            DateTime                   @db.Timestamptz(6)
+  sourceEntryId         String?                    @db.Uuid
+  paymentAttemptId      String?                    @unique @db.Uuid
+  decisionId            String?                    @db.Uuid
+  approvedRefundableVnd Decimal?                   @db.Decimal(18, 0)
   reason                String?
   evidenceReference     String?
-  createdAt             DateTime               @default(now()) @db.Timestamptz(6)
-  booking               Booking                @relation(fields: [bookingId], references: [id], onDelete: Restrict)
-  sourceEntry           BillingLedgerEntry?    @relation("BillingAdjustments", fields: [sourceEntryId, bookingId], references: [id, bookingId], onDelete: Restrict, onUpdate: NoAction)
-  adjustments           BillingLedgerEntry[]   @relation("BillingAdjustments")
-  paymentAttempt        BillingPaymentAttempt? @relation(fields: [paymentAttemptId, bookingId], references: [id, bookingId], onDelete: Restrict, onUpdate: NoAction)
+  createdAt             DateTime                   @default(now()) @db.Timestamptz(6)
+  booking               Booking                    @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  sourceEntry           BillingLedgerEntry?        @relation("BillingAdjustments", fields: [sourceEntryId, bookingId], references: [id, bookingId], onDelete: Restrict, onUpdate: NoAction)
+  adjustments           BillingLedgerEntry[]       @relation("BillingAdjustments")
+  paymentAttempt        BillingPaymentAttempt?     @relation(fields: [paymentAttemptId, bookingId], references: [id, bookingId], onDelete: Restrict, onUpdate: NoAction)
   events                BillingOutboxEvent[]
   invoices              BillingInvoice[]
   depositApplication    BillingDepositApplication?
@@ -679,6 +682,41 @@ model BillingDepositApplication {
   paymentId String             @id @db.Uuid
   appliedAt DateTime           @db.Timestamptz(6)
   payment   BillingLedgerEntry @relation(fields: [paymentId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+}
+
+model BillingVnpayCheckout {
+  paymentAttemptId String                @id @db.Uuid
+  parameters       Json                  @db.JsonB
+  attempt          BillingPaymentAttempt @relation(fields: [paymentAttemptId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+}
+
+model BillingProviderEvidence {
+  id               String                       @id @db.Uuid
+  paymentAttemptId String                       @db.Uuid
+  merchantCode     String
+  transactionId    String
+  channel          String
+  payloadHash      String
+  amountVnd        Decimal                      @db.Decimal(18, 0)
+  outcome          BillingAttemptState
+  settledAt        DateTime?                    @db.Timestamptz(6)
+  decision         String
+  observedAt       DateTime                     @default(now()) @db.Timestamptz(6)
+  attempt          BillingPaymentAttempt        @relation(fields: [paymentAttemptId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  claims           BillingProviderTransaction[]
+
+  @@unique([paymentAttemptId, channel, payloadHash])
+}
+
+model BillingProviderTransaction {
+  merchantCode     String
+  transactionId    String
+  paymentAttemptId String                  @db.Uuid
+  evidenceId       String                  @db.Uuid
+  attempt          BillingPaymentAttempt   @relation(fields: [paymentAttemptId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  evidence         BillingProviderEvidence @relation(fields: [evidenceId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@id([merchantCode, transactionId])
 }
 
 model BillingInvoice {
