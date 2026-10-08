@@ -1,13 +1,13 @@
 # SPEC-04 Payments and Billing implementation evidence
 
-Status: **W1-W3 technical evidence; module implementation acceptance pending.**
+Status: **W1-W4 technical evidence; module implementation acceptance pending.**
 Authority: approved `SPEC-payments-billing.md`, `WEDDING-CONTRACT-1@1.1.0`,
 and the eight-wave plan in `tasks/plan.md` Section 21.
 
 ## Branch and scope
 
 All four repositories use `codex/payments-billing` for W1-W8. Verified increments
-are committed on that branch. W1-W3 change only the backend; the three client
+are committed on that branch. W1-W4 change only the backend; the three client
 branches retain their existing Booking baseline. These checkpoints do not mark
 the module ACCEPTED or publish a new HTTP/OpenAPI contract.
 
@@ -213,10 +213,173 @@ The full unit result and final cleanup are recorded in the W3 checkpoint in
 `tasks/todo.md`. Provider IPN verification/reconciliation stays with W4, Manager
 manual/balance/refund flows with W5, and route/API publication with W6.
 
+## W4 VNPay verification and reconciliation
+
+Source commits on the same module branch:
+
+- `a8973f0`: official PAY/IPN canonical form and querydr pipe signatures.
+- `21b2b84`: immutable checkout, normalized proof and transaction claim storage.
+- `06f42ad`: complete backend-only merchant configuration and validation.
+- `6775dfc`: checkout, durable callback acknowledgement and reconciliation services.
+- `5381af0`: bounded sandbox transport, real composition and provider amount bound.
+- `28af844`: real Booking/Identity concurrency, fault recovery and upgrade fixtures.
+- `17ea68d`: strict streamed response bytes and test typing.
+- `071ffa5`: signed foreign-currency evidence quarantine.
+- `4810f29`: expired UNKNOWN reservation and conflicting ReturnURL hint proof.
+- `09c9c35`: completed historical W3 application status without invented provider proof.
+
+### Protocol and durable decisions
+
+The mapping follows the official
+[PAY/IPN documentation](https://sandbox.vnpayment.vn/apis/docs/thanh-toan-pay/pay.html)
+and [querydr documentation](https://sandbox.vnpayment.vn/apis/docs/truy-van-hoan-tien/querydr%26refund.html),
+checked 2026-10-08. Controlled fixtures adapt the published sandbox response shape,
+use an independently assembled checksum and a test-only merchant key, and never
+contact VNPay. PAY uses sorted encoded parameters; querydr uses the separately
+specified request/response pipe order, including empty optional fields. HMAC-SHA512
+comparison is constant-time. Duplicate decoded keys, unsupported fields, invalid
+amount scaling, merchant/order mismatch and invalid calendar dates are rejected.
+
+Checkout derives the amount and fifteen-minute window from the persisted Booking
+deposit attempt. Provider amount is limited to twelve scaled digits before claiming
+the intent. Checkout saves thirteen safe parameters without hash/signature/secret,
+then commits PENDING before returning the locally signed URL. Replay preserves its
+original IP, return URL, create date and expiry. ReturnURL verification writes no
+money or owner state and rejects a signed currency conflict.
+
+IPN runs as internal SYSTEM, without a trusted client account or role. The shared
+boundary commits normalized proof, its deduplication decision and attempt/Booking
+transition before acknowledgement. Amount mismatch returns 04, invalid signature
+97, missing order 01, conflict/storage failure 99, first accepted receipt 00 and
+accepted replay 02. A signed unsupported currency is retained as CONFLICT with a
+minimal CURRENCY reason; no raw provider payload, bank/card data or signature enters
+storage/audit. Merchant/normalized positive transaction claims prevent reuse across
+attempts; transaction zero remains unclaimed. Contradictory terminal proof and
+changed positive-transaction IPN payloads cannot replace terminal evidence.
+
+Only response/status 00/00 proves success. Verified status 02 can prove failure with
+the appropriate IPN/query response. Other statuses, invalid query evidence, missing
+orders and transport timeout remain UNKNOWN. Expiry never releases that reservation.
+Queries run outside the transaction against the fixed sandbox endpoint with a fresh
+request ID, original transaction date, five-second abort deadline, no redirects and
+a 16 KiB response cap. An IPN winning during a timed-out query remains terminal.
+
+Accepted success invokes ADR-005's recoverable real-owner worker. A money-write or
+owner failure retains the committed proof for retry. Reconciliation skips provider
+queries for terminal attempts and records the same payment/application once. True
+late money on a cancelled booking remains retained with application PENDING and
+RESTRICTED access. Historical terminal attempts with no stored VNPay proof are not
+invented or queried again: unapplied history stays PENDING, while a preexisting
+immutable completion marker still returns application SUCCEEDED.
+
+Configuration uses four server variables, all blank to disable or all valid to
+enable. Errors disclose variable names only. The real factory returns `vnpay: null`
+when disabled; W6 must reject unavailable checkout before claiming an intent.
+
+### Migration and PB-C2 provider review
+
+Forward migration `20261008008000_vnpay_provider_evidence` adds three immutable
+Billing tables, unique proof/transaction identities and SQL claim/checkout guards.
+All sixteen earlier migrations remain unchanged. Fresh and W3 upgrade rehearsals
+preserve money, completion markers, grants, audit, outbox and idempotency history;
+no historical checkout or provider proof is inferred.
+
+The real Billing factory at `5381af0` retains W3's shared Booking/Billing scope and
+Identity promotion. Booking and Identity provider references in the W3 hand-off
+remain applicable. Source review checks transaction boundaries, bounded transport,
+exact VND arithmetic, replay/claim uniqueness, audit minimization, disabled settings
+and historical compatibility. No new public owner contract, event, route, OpenAPI
+artifact, dependency or client lock is changed. PB-C2 proves the internal real money
+and access composition; W6's immutable API digest and W8 owner acceptance remain
+required for INTEGRATION_READY publication and ACCEPTED respectively.
+
+| W4 concern | Executable proof |
+| --- | --- |
+| Official canonical/pipe signatures, decoded aliases, amounts and dates | `infrastructure/vnpay.protocol.test.ts` |
+| Backend config completeness and secret-safe failures | `src/config/env.test.ts` |
+| Fixed endpoint, timeout, response byte cap and malformed responses | `infrastructure/vnpay.gateway.test.ts` |
+| Durable acknowledgement and invalid signature without owner reads | `application/vnpay.service.test.ts`; real proof-insert fault in `vnpay.test.ts` |
+| Concurrent duplicate IPNs/query, reordered proof and transaction reuse | `tests/integration/payments-billing/vnpay.test.ts` |
+| UNKNOWN expiry pinning, query recovery and timeout-after-IPN race | Real VNPay suite with controlled transport and clock |
+| Money-write failure, restart, one payment/promotion/event/marker | Real VNPay suite through actual Booking and Identity providers |
+| Late cancellation and historical status | Real VNPay suite; `vnpay-upgrade.test.ts` |
+| Immutability, scoped rollback, changed proof and audit redaction | `vnpay-evidence.test.ts` |
+| Fresh/upgrade history | `migration-policy.test.ts`; `vnpay-upgrade.test.ts` |
+
+Design rationale: [ADR-006](../../docs/decisions/0006-durable-vnpay-evidence-and-reconciliation.md).
+
+### W4 final verification
+
+Pinned Node 24.21.0/npm 11.19.0 and disposable PostgreSQL 17 on loopback 55434 are
+used. `DATABASE_URL`, `MIGRATION_DATABASE_URL` and `TEST_MIGRATION_DATABASE_URL`
+are all process-scoped to this container. No test reads the actual environment's
+database implicitly or uses a live merchant credential.
+
+An isolated full coverage run at `4810f29` passed all 1,016 tests in 126 files
+(96.83% lines, 93.20% branches). After the historical compatibility fix, final
+checks use a temporary Vitest execution profile importing the unchanged repository
+configuration. It retains the full test inventory, coverage include/exclude/reporters
+and 80% line/branch thresholds per file. One fork worker reuses modules for 121 files;
+the five files declaring module mocks run isolated:
+
+- `src/core/http/lifecycle.test.ts`
+- `src/modules/venue-catalog/venue-catalog.runtime.test.ts`
+- `src/core/observability/observability.test.ts`
+- `src/core/observability/instrumentation-observability.test.ts`
+- `tests/integration/security.test.ts`
+
+Discovery confirms 126 unique files without duplicate or omitted suites. The
+profile sets `extends: false` on each inline project to avoid Vitest 5 merging the
+root include list into the isolated subset; each project copies the original test
+options, with only its isolation and file selection differing. Root coverage remains
+the original configuration. Repository configuration and baseline tests are unchanged.
+
+Parallel early gates encountered migration/test timeouts under load and were stopped.
+A later separate fully isolated integration run timed out in two five-second tests
+(VNPay concurrency and existing Booking collaboration), despite both passing in the
+preceding full isolated coverage run. Fully shared workers exposed cached-module
+mock conflicts in existing server/runtime tests. Those attempts are not counted as
+successful gates. The final profile isolates every module-mock suite; no test,
+production transaction deadline, timeout, coverage target or assertion is weakened.
+
+Final source: `09c9c35084f1eb784ff538534a78227db00c49ce`.
+
+- Full coverage: 1,016/1,016 tests in 126 files; 96.82% lines, 93.19% branches.
+  Every included source file meets both unchanged 80% thresholds.
+- Separate real integration gate: 133/133 tests in 36 files.
+- Separate contract gate: 22/22 tests in six files.
+- Commands: `vitest run --coverage --config <temporary-profile> --maxWorkers=1
+  --pool=forks`, then the same profile/worker options with `run tests/integration`
+  and `run tests/contract`. Coverage and those suites run sequentially.
+- Targeted source scan finds no private-key/live-key patterns or sensitive-file
+  changes. Controlled fixture keys are explicitly test-only; persisted proof and
+  audit redaction are exercised by real PostgreSQL tests.
+
+- Full backend `format:check`, `lint`, `typecheck`, `api:generate`, `api:check`,
+  `build` and `audit:ci` pass. Audit uses the two preexisting documented, unexpired
+  exceptions 1145093 and 1153173; no dependency/lockfile change is made.
+- `db:migrate:deploy` applies the W4 migration to the independent rehearsal database;
+  `prisma migrate status --config prisma.config.ts` confirms all seventeen migrations
+  are current. The complete-history and W3 upgrade tests above also pass.
+- `git diff --check` passes. Generated OpenAPI and the contract baseline remain
+  identical to W3. Approved planning/evidence Markdown stays manually formatted
+  under the existing Prettier ignore policy.
+- The disposable `wedding-pbw4-postgres` container and its temporary databases are
+  stopped/removed. The temporary Vitest profile is removed. The preexisting Booking
+  container on loopback 55433 is untouched. All four repos retain the same
+  `codex/payments-billing` branch; client working trees are unchanged. Local commits
+  only; no push, PR, HTTP publication or owner acceptance is performed.
+
+PB-C2 technical checkpoint complete. Progress: W1-W4 complete, 4/8 waves and 16/32
+microtasks; final SPEC-04 acceptance remains pending W5-W8.
+
 ## Remaining acceptance
 
-W4-W8 remain open: verified provider callbacks and
-reconciliation, Manager manual/refund approval flows, safe invoice/reporting reads,
+W5-W8 remain open: Manager manual/refund approval flows, safe invoice/reporting reads,
 HTTP/OpenAPI publication, generated clients, three client UIs and final four-repository
 acceptance. Real Booking/Identity providers must be proved at the integration gate;
 storage fixtures do not replace that evidence.
+
+The W4 provider orchestration and checkout guards currently target DEPOSIT. W5
+owns BALANCE eligibility/outstanding checks and the corresponding provider intent,
+settlement and forward storage changes before W6 exposes those routes.

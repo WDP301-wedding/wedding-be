@@ -234,3 +234,25 @@ normal application error envelope.
 Source: [official VNPay PAY integration documentation](https://sandbox.vnpayment.vn/apis/docs/thanh-toan-pay/pay.html),
 checked 2026-10-06. Adapter tests include encoding/amount/signature/IPN duplicate fixtures
 and keep credentials/configuration out of source.
+
+### W4 querydr mapping verification (2026-10-08)
+
+The sandbox status endpoint is
+`https://sandbox.vnpayment.vn/merchant_webapi/api/transaction` (POST JSON).
+Use version 2.1.0 and command `querydr`. Request HMAC-SHA512 signs these pipe-separated
+fields in order: RequestId, Version, Command, TmnCode, TxnRef, TransactionDate,
+CreateDate, IpAddr, OrderInfo (all prefixed `vnp_`). TransactionDate is the persisted
+checkout creation date; each status request has a fresh alphanumeric RequestId.
+
+Response verification signs ResponseId, Command, ResponseCode, Message, TmnCode,
+TxnRef, Amount, BankCode, PayDate, TransactionNo, TransactionType, TransactionStatus,
+OrderInfo, PromotionCode, PromotionAmount in that order, preserving empty segments.
+TransactionType must be payment `01`. Query ResponseCode `00` proves the query was
+processed; settlement still requires TransactionStatus `00`. Treat status `02` as
+verified failure only with a successfully processed query. Other unresolved or
+contradictory statuses and unavailable/missing/unverified responses remain UNKNOWN.
+Expiry is not failure evidence. ReturnURL remains display-only.
+
+Source: [official querydr documentation](https://sandbox.vnpayment.vn/apis/docs/truy-van-hoan-tien/querydr%26refund.html).
+The transport uses a fixed sandbox URL, bounded response and timeout. Controlled
+tests verify request/response checksum order independently and never call VNPay.

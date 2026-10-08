@@ -2601,18 +2601,49 @@ All temporary test databases are disposed of and the W3 container is stopped/rem
 All four repositories remain on the single `codex/payments-billing` module branch;
 client trees are unchanged. No push, callback/checkout, HTTP/OpenAPI publication,
 INTEGRATION_READY digest hand-off or module ACCEPTED decision occurs in this wave.
-Progress: W1-W3 complete (3/8 waves, 12/32 microtasks); W4-W8 remain open.
+At the W3 checkpoint: W1-W3 complete (3/8 waves, 12/32 microtasks); W4-W8 remained open.
 
 #### PB-W4 — VNPay verification and reconciliation
 
-- [ ] Implement provider-defined canonical parameter parsing, duplicate-key rejection,
+- [x] Implement provider-defined canonical parameter parsing, duplicate-key rejection,
       amount/currency/order correlation and HMAC verification from the approved mapping.
-- [ ] Persist callback decision and deduplication evidence before acknowledging IPN;
+- [x] Persist callback decision and deduplication evidence before acknowledging IPN;
       keep ReturnURL display-only and callbacks free of trusted client role assumptions.
-- [ ] Prove invalid signature, changed payload, replay, reordered callback, timeout,
+- [x] Prove invalid signature, changed payload, replay, reordered callback, timeout,
       unknown outcome and reconciliation recovery using official sandbox fixtures.
-- [ ] Keep credentials in backend runtime configuration; tests use controlled doubles
+- [x] Keep credentials in backend runtime configuration; tests use controlled doubles
       and never contact VNPay.
+
+**W4 implementation evidence (2026-10-08, source commits `a8973f0` through
+`09c9c35`):** The real VNPay adapter implements server-derived checkout, official
+PAY/IPN and querydr signatures, durable decisions before acknowledgement, immutable
+proof/transaction claims and recoverable settlement through actual Booking/Identity
+providers. Exact callback/query replay cannot duplicate money or account promotion.
+Signature, merchant/order, amount and signed currency conflicts are rejected or
+quarantined. UNKNOWN remains reserved after timeout/expiry; a verified query can
+recover it. Money-write failure retains successful proof, while historical completed
+W3 applications retain their status without fabricated VNPay evidence. Server-only
+configuration defaults to disabled; controlled tests make no VNPay network call.
+[ADR-006](../docs/decisions/0006-durable-vnpay-evidence-and-reconciliation.md) and
+[W4 evidence](./evidence/payments-billing.md#w4-vnpay-verification-and-reconciliation)
+record the protocol, migration, race proof and PB-C2 provider hand-off review.
+
+**PB-C2 verification:** Final source `09c9c35` passes all 1,016 backend tests in 126
+files, with 96.82% line and 93.19% branch coverage; every included file meets the
+unchanged 80% line/branch bar. Separate integration and contract gates pass 133 tests
+in 36 files and 22 tests in six files. A temporary single-worker profile reuses
+workers for regular suites and isolates the five module-mock suites; no test,
+timeout, assertion, baseline configuration or coverage threshold is weakened.
+Full backend format/lint/typecheck/API generation/check/build/audit, diff and targeted
+secret checks pass. Audit retains two existing documented, unexpired exceptions.
+The forward migration deploy/status verifies all seventeen migrations. Real-owner
+replay, concurrency, expiry, failure/recovery and W3 upgrade proof are recorded in
+the evidence above. The disposable W4 PostgreSQL container and temporary runner
+profile are removed; the existing Booking database is untouched. All four
+repositories retain `codex/payments-billing`, and client trees are unchanged.
+HTTP/OpenAPI publication, INTEGRATION_READY digest hand-off and owner ACCEPTED remain
+with later waves. No push occurs.
+Progress: W1-W4 complete (4/8 waves, 16/32 microtasks); W5-W8 remain open.
 
 #### PB-W5 — Manual payments, refunds and invoice views
 
