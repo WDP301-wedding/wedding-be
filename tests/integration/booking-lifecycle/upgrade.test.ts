@@ -42,13 +42,11 @@ describeWithDatabase('booking forward upgrade with existing business data', () =
         try {
           await client.connect();
           await seedVenueCatalog(prisma);
-          await prisma.account.create({
-            data: {
-              id: managerId,
-              emailNormalized: 'upgrade@example.com',
-              displayEmail: 'upgrade@example.com',
-            },
-          });
+          // The historical Account schema predates fields in the current Prisma client.
+          await client.query(
+            'INSERT INTO "Account" ("id", "emailNormalized", "displayEmail", "updatedAt") VALUES ($1, $2, $2, NOW())',
+            [managerId, 'upgrade@example.com'],
+          );
           await client.query(
             'INSERT INTO "Consultation" ("id","managerAccountId","intendedEmailNormalized","intendedEmail","displayName","updatedAt") VALUES ($1,$2,$3,$3,$4,NOW())',
             [consultationId, managerId, 'couple@example.com', 'Upgrade couple'],
@@ -93,6 +91,14 @@ describeWithDatabase('booking forward upgrade with existing business data', () =
           await prisma.$disconnect();
           await client.end();
         }
+      });
+      expect(
+        await database.prisma.account.findUniqueOrThrow({ where: { id: managerId } }),
+      ).toMatchObject({
+        emailNormalized: 'upgrade@example.com',
+        displayEmail: 'upgrade@example.com',
+        displayName: null,
+        profileRevision: 1,
       });
       const invitation = await database.prisma.workspaceInvitation.findUniqueOrThrow({
         where: { id: invitationId },
