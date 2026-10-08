@@ -40,7 +40,7 @@ verification changes remain separate from these API commits.
 
 ## Immutable API hand-off
 
-- Published backend artifact commit:
+- Frozen backend artifact commit (local, not yet pushed):
   `168f61dd16fa58760b0d6238b7ebfd73503471c7`.
 - SHA-256: `cc57e41c60f5e8e4edf9c5c835f986a7e4b17bfd64bbb3853888b29a9968ff40`.
 - All three clients pin this commit/digest and regenerate the OpenAPI schema.
@@ -238,6 +238,89 @@ Remaining work, in order:
 1. Review the recorded current-build browser/Android proof and acceptance matrix.
 2. Review intended diffs and this evidence with the project owner. Only then mark
    BK-C4 / SPEC-03 ACCEPTED and begin SPEC-04 payment integration.
+
+## SPEC-03 review and local-only checkpoint
+
+Reviewed on 2026-10-08 against ACC-001 and TML-001 through TML-008, the approved
+eight-wave plan, current source, and the runtime evidence above. BK-W1 through
+BK-W7 are implemented; BK-W8 technical verification is complete. BK-C4 owner
+acceptance remains pending, so this record does not mark SPEC-03 ACCEPTED or
+authorize starting SPEC-04.
+
+The owner subsequently requested **commits only, with publication and merge
+deferred**. No feature branch was pushed, no pull request was created, and no
+SPEC-03 change was merged into `main` during this review. The backend had already
+integrated upstream `dc633a6` (Brevo email support) into the feature branch at
+`2ca905a` before that instruction. The remaining three upstream branches had no
+new commits to integrate. `tasks/todo.md` remains unchanged in this review.
+
+Two functional gaps and one related access-denial path were closed:
+
+- Booking invitations now use the canonical email-provider factory. This preserves
+  disabled-email and Resend behavior and supports the newly integrated Brevo
+  configuration. A real PostgreSQL/runtime HTTP regression proves that retrying
+  the same invitation intent creates one identity invitation and makes one mocked
+  Brevo request. It failed before the factory change and passed afterward; no live
+  email credential or recipient was used.
+- Management Web now offers published, active catalog timeline templates when the
+  booking editor is empty (TML-001). It copies ordered title/description/time values
+  into independently editable booking items, converts offsets relative to the
+  booked shift, rejects milestones outside the shift, and omits catalog item IDs.
+  Applying a template changes the local editor; only explicit Save persists a new
+  booking-owned revision. Existing manual/empty-draft editing remains available.
+- Template loading goes through the workspace's existing command/error boundary.
+  An authenticated HTTP 401 clears the previously displayed proposal. The
+  regression was rerun with a valid local API base: removing the fix leaves the
+  private proposal visible and fails the assertion; restoring it passes.
+
+Actual Management browser verification used the current template-copy UI, real
+local HTTP API, all 14 migrations, disposable PostgreSQL, and synthetic accounts.
+The Manager loaded a published template, edited its first title, and explicitly
+saved a distinct DRAFT revision 4. The copied milestones were displayed at 17:00
+and 17:30. At a 375px viewport the document and scroll widths were both 360px;
+captured browser warning/error lists were empty. Ignored screenshot:
+`wedding-manage-web/test-results/booking-lifecycle/manager-template-copy-review.png`.
+This browser run predates the subsequent access-denial wrapper; that wrapper is
+covered by the failing-then-passing HTTP regression and the final full Web suite.
+Android implementation is unchanged; the recorded emulator sequence above still
+applies, and its repository quality gates were rerun.
+
+Final review gates passed in all four repositories: formatting, lint, typecheck,
+immutable API check, full coverage tests, build, and dependency audit policy.
+
+| Repository | Passing tests | Lines / branches | Latest implementation commit |
+| --- | --- | --- | --- |
+| wedding-be | 897 / 110 files | 96.84% / 92.79% | `70983d4` |
+| wedding-manage-web | 91 / 13 files | 97.50% / 93.30% | `3e9d833` (template feature: `b577b01`) |
+| wedding-web | 50 / 7 files | 98.13% / 96.49% | `7d1826a` (unchanged) |
+| wedding-app | 30 / 3 suites | 96.66% / 88.55% | `ef7f6c8` (unchanged) |
+
+Total: **1,068 passing feature/unit/integration tests**, plus audit-policy suites.
+An earlier backend attempt found the disposable root database had no migrations
+and failed foundation tests; it was not counted as passing. Applying all 14
+migrations to the local Docker database and rerunning the full suite passed.
+Database URLs were overridden to local port 55433 and live provider variables were
+blanked in check processes. The owner's ignored `.env` files were not modified.
+
+Review covered correctness, readability, module boundaries, security, and bounded
+catalog loading. A separate timeline-policy mutation inverted the no-op condition,
+failed two focused tests, and was restored. No mutation remains in committed code.
+The frozen OpenAPI artifact and all three client pins are unchanged. Exact diff
+and secret checks passed; `.env`, generated coverage, local logs, screenshots,
+preview scripts, and build output are excluded from the commits. Generated Next
+environment declarations were restored after build. Owned preview processes and
+temporary browser tabs were closed and viewport overrides reset.
+
+Audit gates retain their previously documented, expiring exceptions; a passing
+audit policy is not a claim of zero vulnerabilities. Neither thresholds nor
+exceptions were weakened for this checkpoint. Logs are ignored under each
+repository's `test-results/spec03-review/`; the final backend coverage log is
+`test-coverage-final.log`, and final Management logs use the `final-` prefix.
+
+Next: review this checkpoint with the owner for BK-C4 acceptance. Publication,
+GitHub CI, and merge await a later instruction. Actual payment-gateway integration
+belongs to SPEC-04; SPEC-03's deposit-provider contracts and settlement behavior
+are already covered by the PostgreSQL tests above.
 
 ## Reproduction notes
 
