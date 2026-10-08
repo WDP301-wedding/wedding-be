@@ -1,5 +1,9 @@
 import type { ZodOpenApiObject, ZodOpenApiResponseObject } from 'zod-openapi';
 import type { z } from 'zod';
+import {
+  experienceOpenApiPaths,
+  experienceOpenApiSchemas,
+} from '../../modules/booking-lifecycle/http/experience.openapi.js';
 
 import {
   errorDetailSchema,
@@ -163,6 +167,7 @@ export const openApiRegistry = {
     },
   ],
   paths: {
+    ...experienceOpenApiPaths,
     ...venueCatalogOpenApiPaths,
     ...bookingLifecycleOpenApiPaths,
     '/health/live': {
@@ -484,6 +489,7 @@ export const openApiRegistry = {
   },
   components: {
     schemas: {
+      ...experienceOpenApiSchemas,
       ErrorDetail: errorDetailSchema,
       ErrorResponse: errorResponseSchema,
       HealthLiveResponse: healthLiveResponseSchema,

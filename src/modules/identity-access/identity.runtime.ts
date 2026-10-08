@@ -8,6 +8,7 @@ import type { ShutdownResource } from '../../core/http/lifecycle.js';
 import { createEmailProvider } from '../../integrations/email/email-provider.factory.js';
 import { createPrismaAccountRepository } from './account/account.repository.js';
 import { createAccountService } from './account/account.service.js';
+import { createAccountSettingsRouter } from './account/settings.router.js';
 import { createAuthenticatedActorResolver } from './authorization/authenticated-actor.middleware.js';
 import { hashPassword, verifyPassword } from './crypto/password.js';
 import { createIdentityRouter } from './identity.router.js';
@@ -108,6 +109,7 @@ export async function createIdentityRuntime(config: Config): Promise<IdentityRun
       allowedWebOrigins: config.cors.allowedOrigins,
       refreshCookieName: config.identityAccess.refreshCookie.name,
     });
+    router.use(createAccountSettingsRouter(prisma, actorResolver, passwordCrypto));
     return Object.freeze({
       router,
       resource: Object.freeze({

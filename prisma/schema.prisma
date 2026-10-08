@@ -198,6 +198,8 @@ model Account {
   id                     String                            @id @default(uuid()) @db.Uuid
   emailNormalized        String                            @unique
   displayEmail           String
+  displayName            String?
+  profileRevision        Int                               @default(1)
   status                 AccountStatus                     @default(ACTIVE)
   disabledAt             DateTime?                         @db.Timestamptz(6)
   piiRetentionEligibleAt DateTime?                         @db.Timestamptz(6)
@@ -372,6 +374,7 @@ model AccountRetentionEligibilityFact {
 }
 
 model Consultation {
+  intakeRequest           ConsultationRequest?
   id                      String                   @id @db.Uuid
   managerAccountId        String                   @db.Uuid
   intendedEmailNormalized String
@@ -386,6 +389,25 @@ model Consultation {
 
   @@index([managerAccountId, createdAt(sort: Desc)])
   @@index([intendedEmailNormalized])
+}
+
+model ConsultationRequest {
+  id             String        @id @default(uuid()) @db.Uuid
+  submissionId   String        @unique @db.Uuid
+  payloadHash    String
+  displayName    String
+  email          String
+  phone          String
+  preferredDate  DateTime?     @db.Date
+  expectedGuests Int?
+  message        String
+  status         String        @default("NEW")
+  consultationId String?       @unique @db.Uuid
+  consultation   Consultation? @relation(fields: [consultationId], references: [id], onDelete: Restrict)
+  createdAt      DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime      @updatedAt @db.Timestamptz(6)
+
+  @@index([status, createdAt, id], map: "ConsultationRequest_status_created")
 }
 
 model Booking {
@@ -414,8 +436,8 @@ model Booking {
   cancellationRequests        BookingCancellationRequest[]
   headcountEvidence           BookingHeadcountEvidence?
 
-  @@index([hallId, eventDate, shiftCode])
   @@unique([hallId, eventDate, shiftCode], map: "Booking_one_confirmed_slot_key", where: raw("\"phase\" IN ('CONFIRMED', 'COMPLETED')"))
+  @@index([hallId, eventDate, shiftCode])
   @@index([phase, eventDate])
 }
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { createOpenApiDocument } from '../../src/core/openapi/generate.js';
+import { bookingLifecycleOpenApiPaths } from '../../src/modules/booking-lifecycle/http/booking-lifecycle.openapi.js';
 
 describe('BK-C3 immutable booking lifecycle contract', () => {
   it('publishes every approved consultation, timeline, and lifecycle route', () => {
@@ -41,7 +42,7 @@ describe('BK-C3 immutable booking lifecycle contract', () => {
   it('requires bearer authentication and idempotency for every write', () => {
     const paths = createOpenApiDocument().paths ?? {};
     for (const [path, item] of Object.entries(paths)) {
-      if (!path.includes('booking') && !path.includes('consultation')) continue;
+      if (!(path in bookingLifecycleOpenApiPaths)) continue;
       const post = item?.post;
       if (post === undefined) continue;
       expect(post.security).toEqual([{ bearerAuth: [] }]);

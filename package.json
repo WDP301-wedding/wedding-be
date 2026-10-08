@@ -31,6 +31,7 @@
     "api:check": "tsx scripts/openapi.ts --check",
     "catalog:seed": "tsx scripts/catalog-seed.ts",
     "retention:identity": "tsx scripts/identity-retention.ts",
+    "retention:consultation": "tsx scripts/intake-retention.ts",
     "audit:ci": "tsx scripts/dependency-audit.ts"
   },
   "dependencies": {

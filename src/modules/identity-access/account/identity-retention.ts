@@ -231,6 +231,7 @@ async function anonymizeAccount(
     data: {
       emailNormalized: anonymizedEmail,
       displayEmail: 'anonymized@identity.invalid',
+      displayName: null,
       piiAnonymizedAt: input.now,
     },
   });
