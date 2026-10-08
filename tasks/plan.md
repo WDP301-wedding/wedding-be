@@ -5,7 +5,8 @@ Post-core program extension status: Approved by project owner on 2026-09-27<br>
 Cross-module contract baseline: Locked as
 [`WEDDING-CONTRACT-1@1.1.0`](../CONTRACT-BASELINE.md) on 2026-10-06 (1.0.0 history retained)<br>
 SPEC-03 through SPEC-11 and three-person ownership: Approved on 2026-10-06;<br>
-bounded module task/wave plans and implementation acceptance remain pending.<br>
+SPEC-03 bounded plan: Approved by project owner on 2026-10-07; implementation
+accepted at BK-C4 on 2026-10-08. Other bounded module plans remain pending.<br>
 Approved platform specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)<br>
 Approved product requirements: [`../PRODUCT-REQUIREMENTS.md`](../PRODUCT-REQUIREMENTS.md)<br>
 Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)<br>
@@ -859,3 +860,83 @@ real integration waits for specific provider readiness, not every upstream clien
 Names and one integration steward must be selected before shared-file concurrency;
 SPEC-09 through SPEC-11 ownership is deferred to the next allocation round.
 See the team guide Section 8 and task Checkpoint CB2 for the recorded approval scope.
+
+## 20. SPEC-03 `booking-lifecycle` bounded implementation plan
+
+Status: **Plan approved on 2026-10-07; BK-W1–BK-W8 complete and implementation
+ACCEPTED at BK-C4 on 2026-10-08.** Acceptance and merge authorization are recorded in
+[`booking lifecycle evidence`](./evidence/booking-lifecycle.md#bk-c4-implementation-acceptance--2026-10-08).
+This plan consumes the approved `SPEC-booking-lifecycle.md`, accepted
+venue-catalog V4 evidence, identity I3 providers, and `WEDDING-CONTRACT-1@1.1.0`.
+
+### 20.1 Objective and dependency order
+
+Deliver authoritative consultation, availability, slot hold, proposal, immutable
+timeline, dual approval, deposit eligibility/recording, post-deposit change,
+cancellation, headcount, completion, and reporting behavior. Backend ownership lands
+before generated client integration. The execution dependency is:
+
+```text
+consultation/proposal snapshots
+  -> slot allocation and holds
+  -> timeline revisions and approvals
+  -> deposit intent and settlement evidence
+  -> change/cancellation/headcount/completion
+  -> HTTP/OpenAPI contract
+  -> Management Web + Public Web + Android consumers
+  -> real-provider and cross-repository acceptance
+```
+
+The integration steward exclusively owns Prisma migration order, `src/app.ts`, shared
+unit-of-work/outbox wiring, OpenAPI generation, and client contract publication.
+Module work remains in `src/modules/booking-lifecycle/`, module tests, and the matching
+client feature directories. Each checklist item is implemented as a focused task that
+touches no more than five human-authored files; generated Prisma/OpenAPI/client files
+are reviewed separately.
+
+### 20.2 Eight continuous waves
+
+| Wave | Vertical outcome | Provider/checkpoint gate |
+| --- | --- | --- |
+| BK-W1 | A Manager creates a consultation and immutable proposal snapshot; invitation retry is durable and idempotent. | Identity invitation/access and venue snapshot fakes conform; migration lane reserved. |
+| BK-W2 | A Manager can inspect availability and acquire exactly one 15-minute hold for a hall/date/shift. | Real PostgreSQL proves one winner, expiry, and unresolved-deposit pinning. |
+| BK-W3 | Authorized Manager and restricted prospect edit an immutable timeline and approve the exact current revision. | Stale edit/approval and no-op-save races pass; TML-001–004 evidence recorded. |
+| BK-W4 | Payments can reserve eligibility and record settlement once without allowing price, slot, or timeline invalidation. | Deposit ports pass fake/real conformance and PostgreSQL serialization; TML-005/006 evidence recorded. |
+| BK-W5 | Confirmed bookings support replacement timelines, cancellation requests/decisions, ordered headcount, and guarded completion. | Previous effective revision remains active until atomic replacement; TML-007/008 evidence recorded. |
+| BK-W6 | Stable authenticated HTTP routes and deterministic OpenAPI expose the approved commands, queries, failures, and idempotency contract. | Backend full contract gate and immutable digest pass before any client network integration. |
+| BK-W7 | Management Web, Public Web, and Android consume generated types and deliver their role-specific booking workflows. | Each client uses the frozen digest; browser/native authority remains presentation-only. |
+| BK-W8 | Real identity/venue/PostgreSQL integration and four-repository acceptance close ACC-001 and TML-001–008. | Clean migration, race, security, UI runtime, full quality gates, evidence, and owner acceptance. |
+
+### 20.3 Verification checkpoints
+
+- **BK-C1 after W1–W2:** focused domain/repository tests, empty migration, real
+  PostgreSQL slot races, changed-file formatting, typecheck, and diff/secret scans.
+- **BK-C2 after W3–W4:** timeline and deposit fake/real conformance, stale/replay/race
+  tests, audit/outbox atomicity, full backend lint/typecheck/test/contract/build/audit
+  gate, and provider hand-off package.
+- **BK-C3 after W5–W6:** lifecycle/headcount/completion tests, deterministic OpenAPI
+  generation, committed digest, backend coverage, and additive contract review.
+- **BK-C4 after W7–W8:** all affected client format/lint/typecheck/test/build gates,
+  browser and Android runtime review, clean/upgrade migration proof, end-to-end
+  acceptance matrix, evidence file, and project-owner acceptance.
+
+Focused tests use repository-local Vitest commands and one worker where the Windows
+runbook requires it. PostgreSQL verification uses the disposable acceptance database;
+no shared Supabase schema or live provider credential is used. UI implementation follows
+the installed `wedding-design-system` skill and keeps loading, empty, error, denied,
+stale, success, and narrow-screen states explicit.
+
+### 20.4 Risks and stop conditions
+
+| Risk | Mitigation / required stop |
+| --- | --- |
+| Slot, edit, or settlement races create two winners | Fail the wave unless a real PostgreSQL concurrency test proves one winner and atomic audit/outbox state. |
+| Client computes deposit eligibility or amount | Keep commercial snapshots and eligibility backend-only; clients render returned values. |
+| Active/unknown payment intent loses its slot or approved revision | Serialize intent reservation with edits, expiry, withdrawal, cancellation, and settlement; stop on any unresolved ordering ambiguity. |
+| Generated clients drift across repositories | Publish backend artifact first, pin exact commit/SHA-256, regenerate each client, and run `api:check`. |
+| Shared migration/OpenAPI files conflict with parallel work | Integration steward serializes those files; do not merge independent proposals directly. |
+| A new business decision changes locked money, history, access, or cancellation semantics | Update the approved SPEC/baseline and return to the project owner before continuing. |
+
+No open product decision was found while preparing this plan. Named A/B/C assignment is
+only required before concurrent shared-file work; this single sequential implementation
+is authorized by the project owner's “Tiến hành đi” approval on 2026-10-07.

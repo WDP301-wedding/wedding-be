@@ -656,7 +656,7 @@ describe('FT-V3 venue catalog HTTP contract', () => {
     const catalogServices = services();
     const venue = mockedService(catalogServices.venue);
     const mediaService = mockedService(catalogServices.media);
-    venue.listActiveHalls.mockResolvedValueOnce([
+    venue.listActiveHalls.mockResolvedValue([
       {
         id: hallId,
         name: 'Lotus',

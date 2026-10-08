@@ -33,6 +33,10 @@ import {
   venueCatalogOpenApiPaths,
   venueCatalogOpenApiSchemas,
 } from '../../modules/venue-catalog/http/venue-catalog.openapi.js';
+import {
+  bookingLifecycleOpenApiPaths,
+  bookingLifecycleOpenApiSchemas,
+} from '../../modules/booking-lifecycle/http/booking-lifecycle.openapi.js';
 
 function errorResponse(
   description: string,
@@ -153,9 +157,14 @@ export const openApiRegistry = {
       description:
         'Public current catalog reads and Manager-owned immutable catalog administration.',
     },
+    {
+      name: 'Booking Lifecycle',
+      description: 'Consultation, proposal, slot, timeline, approval, and lifecycle workflows.',
+    },
   ],
   paths: {
     ...venueCatalogOpenApiPaths,
+    ...bookingLifecycleOpenApiPaths,
     '/health/live': {
       get: {
         operationId: 'getHealthLive',
@@ -497,6 +506,7 @@ export const openApiRegistry = {
       SessionInventoryResponse: sessionInventoryResponseSchema,
       SessionSummary: sessionSummarySchema,
       ...venueCatalogOpenApiSchemas,
+      ...bookingLifecycleOpenApiSchemas,
     },
     parameters: {
       IdempotencyKey: {
