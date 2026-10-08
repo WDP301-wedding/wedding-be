@@ -1,7 +1,8 @@
 # Specification: Booking Lifecycle
 
-- Status: **Approved specification — module plan and implementation acceptance pending**
+- Status: **ACCEPTED — SPEC-03 implementation complete; BK-C4 passed**
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
+- Implementation accepted: 2026-10-08 under the owner's conditional acceptance and merge instruction; verification: [`booking lifecycle evidence`](./tasks/evidence/booking-lifecycle.md#bk-c4-implementation-acceptance--2026-10-08)
 - Module ID: `booking-lifecycle` (`SPEC-03`)
 - Contract baseline: `WEDDING-CONTRACT-1@1.1.0`
 - Inherited baseline: `WEDDING-CONTRACT-1@1.0.0` (historical contract)

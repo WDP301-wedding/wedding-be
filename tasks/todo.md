@@ -2370,8 +2370,8 @@ mark any provider ready, complete CP/IA/VC work again, or approve a release.
 - [x] Run Prettier and `git diff --check` on the affected documentation.
 
 **Dependencies:** The locked baseline authorizes drafting and venue-catalog V4 is
-accepted. Runtime implementation remains blocked only on approval of the bounded plan
-below and applicable provider/checkpoint gates.
+accepted. The bounded plan below was approved on 2026-10-07; implementation is
+complete and ACCEPTED at BK-C4 on 2026-10-08.
 
 **Files likely touched:** `wedding-be/SPEC-booking-lifecycle.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
 
@@ -2379,84 +2379,89 @@ below and applicable provider/checkpoint gates.
 
 #### BK-W1 — Consultation and immutable proposal foundation
 
-- [ ] Define booking-owned value objects, state transitions, provider ports, conforming
+- [x] Define booking-owned value objects, state transitions, provider ports, conforming
       identity/venue fakes, and focused contract tests without importing provider internals.
-- [ ] Add the serialized Prisma migration for consultations, bookings, snapshots, and
+- [x] Add the serialized Prisma migration for consultations, bookings, snapshots, and
       durable invitation request intents; verify empty and upgrade migration paths.
-- [ ] Implement Manager consultation/proposal creation so provider failure leaves one
+- [x] Implement Manager consultation/proposal creation so provider failure leaves one
       retryable intent and retry creates one restricted workspace invitation (ACC-001).
-- [ ] Run focused unit/integration tests, changed-file Prettier, typecheck, and diff/secret checks.
+- [x] Run focused unit/integration tests, changed-file Prettier, typecheck, and diff/secret checks.
 
 #### BK-W2 — Availability and exclusive slot holds
 
-- [ ] Implement local-date/shift slot identity, 15-minute hold policy, expiry, and
+- [x] Implement local-date/shift slot identity, 15-minute hold policy, expiry, and
       unresolved-deposit pin rules as pure tested behavior.
-- [ ] Persist availability/holds with database constraints and transactional allocation;
+- [x] Persist availability/holds with database constraints and transactional allocation;
       prove concurrent requests yield one winner and no partial booking.
-- [ ] Add Manager availability/hold application services with audit/outbox writes and
+- [x] Add Manager availability/hold application services with audit/outbox writes and
       real venue snapshot validation.
-- [ ] Pass Checkpoint BK-C1: focused gates plus disposable-PostgreSQL migration and race proof.
+- [x] Pass Checkpoint BK-C1: focused gates plus disposable-PostgreSQL migration and race proof.
 
 #### BK-W3 — Immutable timeline collaboration and exact approvals
 
-- [ ] Implement template copy, empty draft, 0–100 item validation, ordering, time/text
+- [x] Implement template copy, empty draft, 0–100 item validation, ordering, time/text
       bounds, canonical no-op saves, immutable predecessors, and revision monotonicity.
-- [ ] Implement authorization-aware timeline persistence and exact-revision Manager/Couple
+- [x] Implement authorization-aware timeline persistence and exact-revision Manager/Couple
       approval or withdrawal without carrying approvals to successors.
-- [ ] Prove stale edit/approval, edit/withdrawal, and same-content races while preserving
+- [x] Prove stale edit/approval, edit/withdrawal, and same-content races while preserving
       concealed not-found behavior and redacted audit history (TML-001–004).
 
 #### BK-W4 — Deposit eligibility, reservation, and settlement evidence
 
-- [ ] Implement server-owned commercial snapshots, checked VND arithmetic, upward 30%
+- [x] Implement server-owned commercial snapshots, checked VND arithmetic, upward 30%
       deposit rounding, and fresh eligibility reason codes.
-- [ ] Implement `BookingDepositIntentCoordinator` serialization so active/unknown intents
+- [x] Implement `BookingDepositIntentCoordinator` serialization so active/unknown intents
       block invalidating edits, expiry, withdrawal, and cancellation.
-- [ ] Implement idempotent settlement recording by `paymentId`, conflict detection, Couple
+- [x] Implement idempotent settlement recording by `paymentId`, conflict detection, Couple
       promotion hand-off, and fake/real provider conformance (TML-005/006).
-- [ ] Pass Checkpoint BK-C2: deposit/timeline races and full backend provider gate.
+- [x] Pass Checkpoint BK-C2: deposit/timeline races and full backend provider gate.
 
 #### BK-W5 — Post-deposit lifecycle and downstream read models
 
-- [ ] Implement replacement timeline proposals and dual approval with atomic effective
+- [x] Implement replacement timeline proposals and dual approval with atomic effective
       pointer switching while the previous confirmed revision remains valid (TML-007/008).
-- [ ] Implement Couple cancellation requests, Manager cancellation decisions, ordered
+- [x] Implement Couple cancellation requests, Manager cancellation decisions, ordered
       headcount synchronization/conflicts, and guarded Manager/worker completion.
-- [ ] Implement commercial/planning/timeline/reporting readers plus replay-safe automation
+- [x] Implement commercial/planning/timeline/reporting readers plus replay-safe automation
       commands without reading payment or guest repositories.
 
 #### BK-W6 — HTTP, runtime composition, and immutable OpenAPI
 
-- [ ] Add strict Zod schemas and typed response/error envelopes for every approved
+- [x] Add strict Zod schemas and typed response/error envelopes for every approved
       management, booking, timeline, approval, withdrawal, change, cancellation, and completion route.
-- [ ] Wire authenticated authorization, expected revision, durable idempotency, audit,
+- [x] Wire authenticated authorization, expected revision, durable idempotency, audit,
       runtime composition, and concealed ownership errors.
-- [ ] Generate deterministic OpenAPI, run route/contract/integration/coverage/lint/typecheck/
+- [x] Generate deterministic OpenAPI, run route/contract/integration/coverage/lint/typecheck/
       build/audit gates, commit the artifact, and publish the exact backend digest.
-- [ ] Pass Checkpoint BK-C3: lifecycle evidence and frozen additive contract.
+- [x] Pass Checkpoint BK-C3: lifecycle evidence and frozen additive contract.
 
 #### BK-W7 — Generated clients and role-specific interfaces
 
-- [ ] Update all client lock files from the committed backend artifact, regenerate schemas,
+- [x] Update all client lock files from the committed backend artifact, regenerate schemas,
       and pass `api:check` before network integration.
-- [ ] Implement Management Web consultation, availability, proposal, hold, approval,
+- [x] Implement Management Web consultation, availability, proposal, hold, approval,
       cancellation, and completion operations with stale/denied/error/success states.
-- [ ] Implement Public Web restricted/full collaboration for proposal, timeline,
+- [x] Implement Public Web restricted/full collaboration for proposal, timeline,
       approval/withdrawal, change, and cancellation request flows.
-- [ ] Implement Android confirmed-booking planning summary and timeline view for FULL
+- [x] Implement Android confirmed-booking planning summary and timeline view for FULL
       Couple access; do not expose pre-deposit restricted workspace behavior.
-- [ ] Apply `wedding-design-system` and verify desktop/mobile accessibility, overflow,
+- [x] Apply `wedding-design-system` and verify desktop/mobile accessibility, overflow,
       focus, runtime console, and Android rendering.
 
 #### BK-W8 — Cross-repository acceptance and owner review
 
-- [ ] Prove ACC-001 and TML-001–008 against real identity, venue, PostgreSQL, immutable
+- [x] Prove ACC-001 and TML-001–008 against real identity, venue, PostgreSQL, immutable
       catalog snapshots, and the frozen client digest, including duplicate/reordered races.
-- [ ] Run clean installs and all format, lint, typecheck, test/coverage, contract/API,
+- [x] Run clean installs and all format, lint, typecheck, test/coverage, contract/API,
       migration, build/export, dependency-audit, browser, Android, secret, and PII gates.
-- [ ] Save `tasks/evidence/booking-lifecycle.md` with requirement/test/commit/digest trace,
+- [x] Save `tasks/evidence/booking-lifecycle.md` with requirement/test/commit/digest trace,
       review intended diffs, and obtain project-owner implementation acceptance.
-- [ ] Pass Checkpoint BK-C4 and mark `booking-lifecycle` ACCEPTED before payment integration.
+- [x] Pass Checkpoint BK-C4 and mark `booking-lifecycle` ACCEPTED before payment integration.
+
+**Implementation accepted:** 2026-10-08. The owner authorized completion and merge
+after the technical gates passed. BK-C1–BK-C4 are green; see the
+[BK-C4 acceptance record](./evidence/booking-lifecycle.md#bk-c4-implementation-acceptance--2026-10-08).
+SPEC-04 remains a separate implementation and acceptance task.
 
 #### Checkpoint H2 — Consultation and catalog planning ready
 

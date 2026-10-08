@@ -6,7 +6,7 @@ Cross-module contract baseline: Locked as
 [`WEDDING-CONTRACT-1@1.1.0`](../CONTRACT-BASELINE.md) on 2026-10-06 (1.0.0 history retained)<br>
 SPEC-03 through SPEC-11 and three-person ownership: Approved on 2026-10-06;<br>
 SPEC-03 bounded plan: Approved by project owner on 2026-10-07; implementation
-acceptance remains pending. Other bounded module plans remain pending.<br>
+accepted at BK-C4 on 2026-10-08. Other bounded module plans remain pending.<br>
 Approved platform specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)<br>
 Approved product requirements: [`../PRODUCT-REQUIREMENTS.md`](../PRODUCT-REQUIREMENTS.md)<br>
 Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)<br>
@@ -863,8 +863,10 @@ See the team guide Section 8 and task Checkpoint CB2 for the recorded approval s
 
 ## 20. SPEC-03 `booking-lifecycle` bounded implementation plan
 
-Status: **Approved by the project owner on 2026-10-07; runtime implementation may
-start at BK-W1.** This plan consumes the approved `SPEC-booking-lifecycle.md`, accepted
+Status: **Plan approved on 2026-10-07; BK-W1–BK-W8 complete and implementation
+ACCEPTED at BK-C4 on 2026-10-08.** Acceptance and merge authorization are recorded in
+[`booking lifecycle evidence`](./evidence/booking-lifecycle.md#bk-c4-implementation-acceptance--2026-10-08).
+This plan consumes the approved `SPEC-booking-lifecycle.md`, accepted
 venue-catalog V4 evidence, identity I3 providers, and `WEDDING-CONTRACT-1@1.1.0`.
 
 ### 20.1 Objective and dependency order
