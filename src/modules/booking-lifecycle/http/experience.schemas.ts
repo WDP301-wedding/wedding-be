@@ -1,5 +1,11 @@
 import { z } from 'zod';
 
+function minimumPreferredDate(): string {
+  const vietnamDate = new Date(Date.now() + 7 * 60 * 60_000);
+  vietnamDate.setUTCDate(vietnamDate.getUTCDate() + 2);
+  return vietnamDate.toISOString().slice(0, 10);
+}
+
 export const consultationRequestBodySchema = z.strictObject({
   submissionId: z.uuid(),
   displayName: z
@@ -17,7 +23,12 @@ export const consultationRequestBodySchema = z.strictObject({
     .trim()
     .max(30)
     .regex(/^[+\d\s().-]*$/u),
-  preferredDate: z.iso.date().nullable(),
+  preferredDate: z.iso
+    .date()
+    .refine((value) => value >= minimumPreferredDate(), {
+      message: 'Ngày tổ chức dự kiến phải từ ngày mốt trở đi (theo giờ Việt Nam).',
+    })
+    .nullable(),
   expectedGuests: z.number().int().min(1).max(10000).nullable(),
   message: z.string().trim().max(2000),
 });
@@ -27,6 +38,8 @@ export const intakeAcknowledgementSchema = z.strictObject({
 export const intakeRecordSchema = consultationRequestBodySchema
   .omit({ submissionId: true })
   .extend({
+    // Stored requests remain readable after their preferred date has passed.
+    preferredDate: z.iso.date().nullable(),
     id: z.uuid(),
     status: z.enum(['NEW', 'CONVERTED', 'CLOSED']),
     consultationId: z.uuid().nullable(),
