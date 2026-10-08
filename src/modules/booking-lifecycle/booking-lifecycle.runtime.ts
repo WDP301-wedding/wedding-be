@@ -8,8 +8,7 @@ import { createIdempotencyMiddleware } from '../../core/idempotency/idempotency.
 import { defineIdempotencyPolicy } from '../../core/idempotency/idempotency.policy.js';
 import { createPrismaIdempotencyRepository } from '../../core/idempotency/idempotency.repository.js';
 import { createIdempotencyService } from '../../core/idempotency/idempotency.service.js';
-import { FakeEmailProvider } from '../../integrations/email/fake-email-provider.js';
-import { createResendEmailProvider } from '../../integrations/email/resend-email-provider.js';
+import { createEmailProvider } from '../../integrations/email/email-provider.factory.js';
 import {
   createConsultationAccessReader,
   createPrismaConsultationAccessRepository,
@@ -75,12 +74,7 @@ export async function createBookingLifecycleRuntime(
     const identityInvitations = createWorkspaceInvitationService({
       repository: createPrismaWorkspaceInvitationRepository(prisma),
       notificationPort: createIdentityEmailNotificationPort(
-        config.email.enabled
-          ? createResendEmailProvider({
-              apiKey: config.email.resendApiKey,
-              fromEmail: config.email.fromEmail,
-            })
-          : new FakeEmailProvider(),
+        createEmailProvider(config.email),
         publicWebBaseUrl(config),
       ),
       tokenEntropyBytes: config.identityAccess.tokenEntropyBytes,

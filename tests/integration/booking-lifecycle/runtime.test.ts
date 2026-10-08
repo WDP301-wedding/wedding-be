@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 import request from 'supertest';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { seedVenueCatalog, CATALOG_SEED_IDS } from '../../../scripts/catalog-seed.js';
 import { createApp } from '../../../src/app.js';
@@ -154,6 +154,7 @@ describeWithDatabase('booking runtime with real identity, venue, and PostgreSQL'
       email: {
         ...runtimeConfig.email,
         enabled: true,
+        provider: 'resend',
         resendApiKey: 're_test_only',
         fromEmail: 'Wedding Test <notifications@example.com>',
       },
@@ -190,6 +191,69 @@ describeWithDatabase('booking runtime with real identity, venue, and PostgreSQL'
         workerContext,
       ),
     ).toEqual({ items: [], nextCursor: null });
+  });
+
+  it('delivers one consultation invitation through configured Brevo and replays its HTTP intent', async () => {
+    const fetchMock = vi.fn<typeof fetch>().mockImplementation(() =>
+      Promise.resolve(
+        new Response(JSON.stringify({ messageId: '<booking-invitation@brevo.example>' }), {
+          status: 201,
+        }),
+      ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    let configuredBooking: BookingLifecycleRuntime | undefined;
+    try {
+      configuredBooking = await createBookingLifecycleRuntime({
+        ...runtimeConfig,
+        email: {
+          enabled: true,
+          provider: 'brevo',
+          apiKey: 'booking-test-only-key',
+          fromEmail: 'Wedding Test <sender@example.com>',
+        },
+      });
+      const configuredApp = createApp({
+        runtimeEnvironment: 'test',
+        registerRoutes: (express) => express.use('/api/v1', configuredBooking!.router),
+      });
+      const createdResponse = await request(configuredApp)
+        .post('/api/v1/management/consultations')
+        .set('Authorization', `Bearer ${managerToken}`)
+        .set('Idempotency-Key', randomUUID())
+        .send({ intendedEmail: 'brevo-couple@example.com', displayName: 'Brevo Couple' });
+      expect(createdResponse.status).toBe(201);
+      const created = consultationResponseSchema.parse(createdResponse.body as unknown).data;
+      const key = randomUUID();
+      const invite = () =>
+        request(configuredApp)
+          .post(`/api/v1/management/consultations/${created.consultationId}/workspace-invitations`)
+          .set('Authorization', `Bearer ${managerToken}`)
+          .set('Idempotency-Key', key)
+          .send({ expectedRevision: created.revision });
+      expect((await invite()).status).toBe(202);
+      expect((await invite()).status).toBe(202);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(fetchMock.mock.calls[0]?.[0]).toBe('https://api.brevo.com/v3/smtp/email');
+      const body = fetchMock.mock.calls[0]?.[1]?.body;
+      if (typeof body !== 'string') throw new Error('Expected a JSON invitation request.');
+      expect(JSON.parse(body) as unknown).toMatchObject({
+        sender: { email: 'sender@example.com', name: 'Wedding Test' },
+        to: [{ email: 'brevo-couple@example.com' }],
+      });
+      expect(JSON.parse(body) as unknown).toHaveProperty(
+        'textContent',
+        expect.stringContaining('http://localhost:3000/workspace-invitation#'),
+      );
+      expect(
+        await database.prisma.workspaceInvitation.count({
+          where: { consultationId: created.consultationId },
+        }),
+      ).toBe(1);
+    } finally {
+      await configuredBooking?.resource.close();
+      vi.unstubAllGlobals();
+    }
   });
 
   it('collaborates before deposit and retains the effective timeline until both replacement approvals commit', async () => {
