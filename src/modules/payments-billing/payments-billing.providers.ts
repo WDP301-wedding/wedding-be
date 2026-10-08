@@ -24,6 +24,8 @@ import { createVnpayStatusGateway } from './infrastructure/vnpay.gateway.js';
 import { createBillingOperationsRepository } from './infrastructure/billing-operations.repository.js';
 import { createBillingOperationsService } from './application/billing-operations.service.js';
 import type { ContractContext } from './application/payments-billing.providers.js';
+import { createBillingViewsService } from './application/billing-views.service.js';
+import { createBillingReportingReader } from './infrastructure/billing-reporting.repository.js';
 
 // Real owner/provider composition. HTTP/OpenAPI publication remains the W6 lane.
 export function createPaymentsBillingProviders(
@@ -67,9 +69,10 @@ export function createPaymentsBillingProviders(
     boundary,
   });
   const settings = options.vnpay ?? config.vnpay;
+  const operationsRepository = createBillingOperationsRepository(prisma, scope);
   const operations = createBillingOperationsService({
     ledger: billing.repository,
-    operations: createBillingOperationsRepository(prisma, scope),
+    operations: operationsRepository,
     boundary,
     booking: booking.lifecycleReader,
     commercial: booking.commercial,
@@ -79,6 +82,12 @@ export function createPaymentsBillingProviders(
   });
   return Object.freeze({
     operations,
+    views: createBillingViewsService({
+      ledger: billing.repository,
+      operations: operationsRepository,
+      boundary,
+    }),
+    reporting: createBillingReportingReader(prisma),
     boundary,
     ledger: billing.repository,
     charges: createChargeRegistrationService({
