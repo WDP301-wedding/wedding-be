@@ -135,6 +135,27 @@ function setup() {
 }
 
 describe('deposit orchestration through owner contracts', () => {
+  it('rejects amounts outside the official VNPay transport range before claiming an attempt or hold', async () => {
+    const fixture = setup();
+    const amount = 10_000_000_000;
+    const eligibility = await fixture.booking.requireDepositEligibility({
+      bookingId,
+      timelineRevisionId,
+    });
+    fixture.booking.requireDepositEligibility.mockResolvedValue({
+      ...eligibility,
+      depositAmountVnd: amount,
+    });
+    const command = { bookingId, timelineRevisionId, commandId: randomUUID() };
+    const commercial = await fixture.commercial.getAccepted(command, context);
+    fixture.commercial.getAccepted.mockResolvedValue({ ...commercial, depositAmountVnd: amount });
+    await expect(fixture.service.createDeposit(command, context)).rejects.toMatchObject({
+      status: 422,
+      code: 'PAYMENT_PROVIDER_AMOUNT_UNSUPPORTED',
+    });
+    expect(fixture.ledger.createAttempt).not.toHaveBeenCalled();
+    expect(fixture.coordinator.reserve).not.toHaveBeenCalled();
+  });
   it('preserves the original base acceptance when a later timeline retains its commercial revision', async () => {
     const fixture = setup();
     const command = { bookingId, timelineRevisionId, commandId: randomUUID() };

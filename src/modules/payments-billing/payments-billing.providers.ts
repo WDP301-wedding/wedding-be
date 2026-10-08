@@ -1,5 +1,8 @@
 import { randomUUID } from 'node:crypto';
 
+import { config } from '../../config/config.js';
+import type { BackendConfig } from '../../config/env.js';
+
 import {
   createBookingBoundaryUnitOfWork,
   type BookingBoundaryUnitOfWork,
@@ -12,11 +15,19 @@ import {
 } from '../identity-access/authorization/authorization.service.js';
 import { createChargeRegistrationService } from './application/charge-registration.service.js';
 import { createDepositOrchestrationService } from './application/deposit-orchestration.service.js';
+import { createVnpayService } from './application/vnpay.service.js';
+import type { VnpayStatusGateway } from './application/vnpay.port.js';
 import { createPrismaBillingPersistence } from './infrastructure/billing.persistence.js';
+import { createVnpayEvidenceRepository } from './infrastructure/vnpay.persistence.js';
+import { createVnpayProtocol } from './infrastructure/vnpay.protocol.js';
+import { createVnpayStatusGateway } from './infrastructure/vnpay.gateway.js';
 import type { ContractContext } from './application/payments-billing.providers.js';
 
-// Controlled provider composition only. HTTP/VNPay wiring waits for W4/W6.
-export function createPaymentsBillingProviders(prisma: PrismaClient) {
+// Real owner/provider composition. HTTP/OpenAPI publication remains the W6 lane.
+export function createPaymentsBillingProviders(
+  prisma: PrismaClient,
+  options: Readonly<{ vnpay?: BackendConfig['vnpay']; gateway?: VnpayStatusGateway }> = {},
+) {
   const scope = createBookingBoundaryUnitOfWork(prisma);
   const booking = createBookingLifecycleProviders(
     prisma,
@@ -45,6 +56,15 @@ export function createPaymentsBillingProviders(prisma: PrismaClient) {
       }
     },
   });
+  const deposits = createDepositOrchestrationService({
+    ledger: billing.repository,
+    booking: booking.lifecycleReader,
+    commercial: booking.commercial,
+    coordinator: booking.deposits,
+    recorder: booking.deposits,
+    boundary,
+  });
+  const settings = options.vnpay ?? config.vnpay;
   return Object.freeze({
     boundary,
     ledger: billing.repository,
@@ -57,13 +77,17 @@ export function createPaymentsBillingProviders(prisma: PrismaClient) {
         authority: 'SYSTEM',
       }),
     }),
-    deposits: createDepositOrchestrationService({
-      ledger: billing.repository,
-      booking: booking.lifecycleReader,
-      commercial: booking.commercial,
-      coordinator: booking.deposits,
-      recorder: booking.deposits,
-      boundary,
-    }),
+    deposits,
+    vnpay: settings.enabled
+      ? createVnpayService({
+          deposits,
+          ledger: billing.repository,
+          coordinator: booking.deposits,
+          evidence: createVnpayEvidenceRepository(prisma, scope),
+          protocol: createVnpayProtocol(settings),
+          gateway: options.gateway ?? createVnpayStatusGateway(),
+          boundary,
+        })
+      : null,
   });
 }

@@ -100,6 +100,13 @@ export function createDepositOrchestrationService(
         )
           throw conflict();
         const createdAt = now();
+        // VNPay 2.1.0 accepts at most 12 digits after scaling VND by 100.
+        if (eligibility.depositAmountVnd > 9_999_999_999)
+          throw new AppError({
+            status: 422,
+            code: 'PAYMENT_PROVIDER_AMOUNT_UNSUPPORTED',
+            message: 'The deposit exceeds the payment provider amount range.',
+          });
         const result = await options.ledger.createAttempt(
           {
             id: randomUUID(),
