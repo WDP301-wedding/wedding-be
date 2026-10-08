@@ -22,6 +22,7 @@ const evidenceSchema = z
     settledAt: z.iso.datetime({ offset: true }).nullable(),
     payloadHash: z.string().regex(/^[a-f0-9]{64}$/u),
     channel: z.enum(['IPN', 'QUERY']),
+    correlationConflict: z.literal('CURRENCY').optional(),
   })
   .refine((input) => (input.outcome === 'SUCCEEDED') === (input.settledAt !== null));
 const checkoutSchema = z
@@ -169,15 +170,17 @@ export function createVnpayEvidenceRepository(
         const decision =
           Number(attempt.amountVnd) !== proof.amountVnd
             ? 'AMOUNT_MISMATCH'
-            : (claim !== null && claim.paymentAttemptId !== attempt.id) ||
+            : proof.correlationConflict !== undefined ||
+                (claim !== null && claim.paymentAttemptId !== attempt.id) ||
                 priorIpn !== null ||
                 (terminal !== null && !sameSettlement(terminal, proof)) ||
                 (['SUCCEEDED', 'FAILED'].includes(attempt.state) && terminal === null)
               ? 'CONFLICT'
               : 'ACCEPTED';
+        const { correlationConflict, ...normalizedProof } = proof;
         const stored = await client.billingProviderEvidence.create({
           data: {
-            ...proof,
+            ...normalizedProof,
             id: randomUUID(),
             decision,
             settledAt: proof.settledAt === null ? null : new Date(proof.settledAt),
@@ -207,6 +210,7 @@ export function createVnpayEvidenceRepository(
               decision,
               outcome: proof.outcome,
               amountVnd: proof.amountVnd,
+              ...(correlationConflict === undefined ? {} : { conflictReason: correlationConflict }),
             },
           },
         });

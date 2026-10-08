@@ -79,10 +79,13 @@ databaseDescribe('PB-W4 verified VNPay with real Booking/Identity/PostgreSQL', (
     expect(await f.vnpay.processIpn(ipnFixture(f.id, { vnp_Amount: '100' }))).toMatchObject({
       RspCode: '04',
     });
+    const foreignCurrency = ipnFixture(f.id, { vnp_CurrCode: 'USD' });
+    expect(await f.vnpay.processIpn(foreignCurrency)).toMatchObject({ RspCode: '99' });
+    expect(await f.vnpay.processIpn(foreignCurrency)).toMatchObject({ RspCode: '99' });
     expect(await paid(f.bookingId)).toBe(0);
     expect(
       await database.prisma.billingProviderEvidence.findMany({ where: { paymentAttemptId: f.id } }),
-    ).toMatchObject([{ decision: 'AMOUNT_MISMATCH' }]);
+    ).toMatchObject([{ decision: 'AMOUNT_MISMATCH' }, { decision: 'CONFLICT' }]);
     expect(
       (await database.prisma.billingPaymentAttempt.findUniqueOrThrow({ where: { id: f.id } }))
         .state,

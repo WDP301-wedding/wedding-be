@@ -22,6 +22,7 @@ export type ProviderEvidence = Readonly<{
   settledAt: string | null;
   payloadHash: string;
   channel: 'IPN' | 'QUERY';
+  correlationConflict?: 'CURRENCY' | undefined;
 }>;
 export type StoredProviderEvidence = ProviderEvidence &
   Readonly<{ id: string; decision: 'ACCEPTED' | 'CONFLICT' | 'AMOUNT_MISMATCH' }>;

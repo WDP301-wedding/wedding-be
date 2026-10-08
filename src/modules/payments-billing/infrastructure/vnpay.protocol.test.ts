@@ -51,7 +51,6 @@ describe('VNPay official 2.1.0 PAY/querydr protocol', () => {
     { vnp_Amount: '0' },
     { vnp_Amount: '1000001' },
     { vnp_Amount: '1000000000000' },
-    { vnp_CurrCode: 'USD' },
     { vnp_PayDate: undefined },
     { vnp_PayDate: '20230230120000' },
     { vnp_TransactionNo: '0' },
@@ -66,6 +65,9 @@ describe('VNPay official 2.1.0 PAY/querydr protocol', () => {
     },
   );
   it('requires both success codes, recognizes proven failure and normalizes transaction aliases', () => {
+    expect(verifyIpn(ipn({ vnp_CurrCode: 'USD' }), config)).toMatchObject({
+      correlationConflict: 'CURRENCY',
+    });
     expect(
       verifyIpn(
         ipn({ vnp_ResponseCode: '24', vnp_TransactionStatus: '02', vnp_PayDate: undefined }),

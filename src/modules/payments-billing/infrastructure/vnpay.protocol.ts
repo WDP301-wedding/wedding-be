@@ -33,7 +33,10 @@ const responseSchema = z.object({
     .string()
     .regex(/^\d{14}$/u)
     .optional(),
-  vnp_CurrCode: z.literal('VND').optional(),
+  vnp_CurrCode: z
+    .string()
+    .regex(/^[A-Z]{3}$/u)
+    .optional(),
 });
 const ipnKeys = new Set([
   ...Object.keys(responseSchema.shape),
@@ -229,5 +232,8 @@ function normalize(
     settledAt: outcome === 'SUCCEEDED' ? settledAt : null,
     payloadHash: createHash('sha256').update(canonical).digest('hex'),
     channel,
+    ...(fields.vnp_CurrCode !== undefined && fields.vnp_CurrCode !== 'VND'
+      ? { correlationConflict: 'CURRENCY' as const }
+      : {}),
   });
 }
