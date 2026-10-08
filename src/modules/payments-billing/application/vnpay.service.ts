@@ -57,7 +57,20 @@ export function createVnpayService(
     const proof = await options.boundary.run({ bookingId, context }, (scoped) =>
       options.evidence.getTerminalEvidence(bookingId, attempt.id, scoped),
     );
-    if (proof?.decision !== 'ACCEPTED' || proof.outcome !== 'SUCCEEDED' || proof.settledAt === null)
+    if (proof === null) {
+      // Preserve a completed historical application without fabricating VNPay proof.
+      return options.boundary.run({ bookingId, context }, async (scoped) => {
+        const ledger = await options.ledger.getLedger(bookingId, scoped);
+        const payment = ledger.entries.find(
+          (entry) => entry.kind === 'PAYMENT' && entry.paymentAttemptId === attempt.id,
+        );
+        return payment !== undefined &&
+          (await options.ledger.isDepositApplied(bookingId, payment.id, scoped))
+          ? ('SUCCEEDED' as const)
+          : ('PENDING' as const);
+      });
+    }
+    if (proof.decision !== 'ACCEPTED' || proof.outcome !== 'SUCCEEDED' || proof.settledAt === null)
       return 'PENDING' as const;
     try {
       return (

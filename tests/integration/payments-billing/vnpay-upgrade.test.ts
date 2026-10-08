@@ -10,12 +10,15 @@ import {
   catalogMigrationDatabaseUrl,
 } from '../venue-catalog/catalog-test-database.js';
 import { createPayableBooking } from './deposit-fixture.js';
+import { controlledVnpay } from './vnpay-fixture.js';
 
 const databaseDescribe = catalogMigrationDatabaseUrl ? describe : describe.skip;
 databaseDescribe('PB-W4 forward evidence upgrade', () => {
   it('preserves W3 settlement/application/audit/outbox without inventing historical provider proofs', async () => {
     const database = new CatalogTestDatabase('billing_vnpay_upgrade');
     let historical = '';
+    let oldBookingId = '';
+    let oldAttemptId = '';
     async function read(prisma: ReturnType<typeof createPrismaClient>) {
       return {
         ledger: await prisma.billingLedgerEntry.findMany(),
@@ -37,6 +40,8 @@ databaseDescribe('PB-W4 forward evidence upgrade', () => {
           const providers = createPaymentsBillingProviders(prisma);
           const { attempt } = await providers.deposits.createDeposit(f.command, f.context);
           const input = { bookingId: f.bookingId, paymentAttemptId: attempt.id };
+          oldBookingId = f.bookingId;
+          oldAttemptId = attempt.id;
           await providers.ledger.transitionAttempt(
             { ...input, evidence: 'PROVIDER_REQUESTED', providerEvidenceId: null },
             f.system,
@@ -61,6 +66,26 @@ databaseDescribe('PB-W4 forward evidence upgrade', () => {
       expect(await database.prisma.billingVnpayCheckout.count()).toBe(0);
       expect(await database.prisma.billingProviderEvidence.count()).toBe(0);
       expect(await database.prisma.billingProviderTransaction.count()).toBe(0);
+      let queryCalls = 0;
+      const upgraded = createPaymentsBillingProviders(database.prisma, {
+        vnpay: controlledVnpay,
+        gateway: {
+          query: () => {
+            queryCalls++;
+            return Promise.reject(new Error('Historical completion must not query the provider.'));
+          },
+        },
+      });
+      expect(
+        await upgraded.vnpay!.reconcile(oldBookingId, oldAttemptId, {
+          requestId: randomUUID(),
+          causationId: randomUUID(),
+          actorAccountId: null,
+          authority: 'SYSTEM',
+        }),
+      ).toEqual({ status: 'SUCCEEDED', applicationStatus: 'SUCCEEDED' });
+      expect(queryCalls).toBe(0);
+      expect(JSON.stringify(await read(database.prisma))).toBe(historical);
     } finally {
       await database.disconnect();
     }
