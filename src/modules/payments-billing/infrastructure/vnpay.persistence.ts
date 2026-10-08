@@ -217,10 +217,11 @@ export function createVnpayEvidenceRepository(
       return enlisted(bookingId, context, async (client) => {
         const attempt = await requireAttempt(client, bookingId, paymentAttemptId);
         if (attempt.terminalEvidenceId === null) return null;
-        const stored = await client.billingProviderEvidence.findUniqueOrThrow({
+        const stored = await client.billingProviderEvidence.findUnique({
           where: { id: attempt.terminalEvidenceId },
         });
-        return toEvidence(stored);
+        // Forward migration never fabricates proof for historical attempts.
+        return stored === null ? null : toEvidence(stored);
       });
     },
   });
