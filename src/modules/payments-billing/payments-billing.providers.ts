@@ -94,6 +94,7 @@ export function createPaymentsBillingProviders(
     vnpay: settings.enabled
       ? createVnpayService({
           deposits,
+          balances: operations,
           ledger: billing.repository,
           coordinator: booking.deposits,
           evidence: createVnpayEvidenceRepository(prisma, scope),

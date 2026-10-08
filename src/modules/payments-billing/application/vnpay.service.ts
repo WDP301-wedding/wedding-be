@@ -6,6 +6,7 @@ import type { BookingBoundaryUnitOfWork } from '../../../core/database/booking-u
 import { AppError } from '../../../core/errors/app-error.js';
 import type { BillingLedgerRepository, PaymentAttempt } from './billing-ledger.port.js';
 import type { createDepositOrchestrationService } from './deposit-orchestration.service.js';
+import type { createBillingOperationsService } from './billing-operations.service.js';
 import type {
   BookingDepositIntentCoordinator,
   ContractContext,
@@ -19,6 +20,10 @@ import {
 } from './vnpay.port.js';
 
 type Deposits = ReturnType<typeof createDepositOrchestrationService>;
+type Balances = Pick<
+  ReturnType<typeof createBillingOperationsService>,
+  'createBalance' | 'applySettledBalance'
+>;
 const acknowledgements = {
   '00': 'Confirm success',
   '02': 'Order already confirmed',
@@ -42,6 +47,7 @@ function systemContext(): ContractContext {
 export function createVnpayService(
   options: Readonly<{
     deposits: Deposits;
+    balances?: Balances;
     ledger: BillingLedgerRepository;
     coordinator: BookingDepositIntentCoordinator;
     evidence: VnpayEvidenceRepository;
@@ -65,7 +71,8 @@ export function createVnpayService(
           (entry) => entry.kind === 'PAYMENT' && entry.paymentAttemptId === attempt.id,
         );
         return payment !== undefined &&
-          (await options.ledger.isDepositApplied(bookingId, payment.id, scoped))
+          (attempt.purpose === 'BALANCE' ||
+            (await options.ledger.isDepositApplied(bookingId, payment.id, scoped)))
           ? ('SUCCEEDED' as const)
           : ('PENDING' as const);
       });
@@ -73,12 +80,12 @@ export function createVnpayService(
     if (proof.decision !== 'ACCEPTED' || proof.outcome !== 'SUCCEEDED' || proof.settledAt === null)
       return 'PENDING' as const;
     try {
-      return (
-        await options.deposits.applySettledDeposit(
-          { bookingId, paymentAttemptId: attempt.id, settledAt: proof.settledAt },
-          context,
-        )
-      ).applicationStatus;
+      const input = { bookingId, paymentAttemptId: attempt.id, settledAt: proof.settledAt };
+      if (attempt.purpose === 'BALANCE')
+        return options.balances === undefined
+          ? ('PENDING' as const)
+          : (await options.balances.applySettledBalance(input, context)).applicationStatus;
+      return (await options.deposits.applySettledDeposit(input, context)).applicationStatus;
     } catch {
       return 'PENDING' as const;
     }
@@ -109,12 +116,12 @@ export function createVnpayService(
         },
         scoped,
       );
-      if (proof.outcome === 'FAILED')
+      if (attempt.purpose === 'DEPOSIT' && proof.outcome === 'FAILED')
         await options.coordinator.releaseVerifiedFailure(
           { bookingId, paymentAttemptId: attempt.id, providerEvidenceId: stored.evidence.id },
           scoped,
         );
-      if (proof.outcome === 'UNKNOWN')
+      if (attempt.purpose === 'DEPOSIT' && proof.outcome === 'UNKNOWN')
         await options.coordinator.recordUnknown(
           { bookingId, paymentAttemptId: attempt.id },
           scoped,
@@ -135,8 +142,46 @@ export function createVnpayService(
         { bookingId, paymentAttemptId, evidence: 'OUTCOME_UNKNOWN', providerEvidenceId: null },
         scoped,
       );
-      await options.coordinator.recordUnknown({ bookingId, paymentAttemptId }, scoped);
+      if (attempt.purpose === 'DEPOSIT')
+        await options.coordinator.recordUnknown({ bookingId, paymentAttemptId }, scoped);
       return unknown;
+    });
+  }
+  async function prepareCheckout(
+    bookingId: string,
+    created: Readonly<{ attempt: PaymentAttempt; replayed: boolean }>,
+    ip: string,
+    context: ContractContext,
+  ) {
+    return options.boundary.run({ bookingId, context }, async (scoped) => {
+      let attempt = await options.ledger.getAttempt(bookingId, created.attempt.id, scoped);
+      const previous = await options.evidence.getCheckout(bookingId, attempt.id, scoped);
+      const checkout =
+        previous ??
+        (await options.evidence.saveCheckout(
+          bookingId,
+          {
+            paymentAttemptId: attempt.id,
+            parameters: options.protocol.createCheckout(attempt, ip).parameters,
+          },
+          scoped,
+        ));
+      if (attempt.state === 'CREATED')
+        attempt = await options.ledger.transitionAttempt(
+          {
+            bookingId,
+            paymentAttemptId: attempt.id,
+            evidence: 'PROVIDER_REQUESTED',
+            providerEvidenceId: null,
+          },
+          scoped,
+        );
+      // Checkout is durable before its locally signed URL is exposed.
+      return Object.freeze({
+        attempt,
+        replayed: created.replayed,
+        checkoutUrl: options.protocol.checkoutUrl(checkout.parameters),
+      });
     });
   }
   return Object.freeze({
@@ -147,36 +192,22 @@ export function createVnpayService(
     ) {
       z.union([z.ipv4(), z.ipv6()]).parse(ip);
       const created = await options.deposits.createDeposit(input, context);
-      return options.boundary.run({ bookingId: input.bookingId, context }, async (scoped) => {
-        let attempt = await options.ledger.getAttempt(input.bookingId, created.attempt.id, scoped);
-        const previous = await options.evidence.getCheckout(input.bookingId, attempt.id, scoped);
-        const checkout =
-          previous ??
-          (await options.evidence.saveCheckout(
-            input.bookingId,
-            {
-              paymentAttemptId: attempt.id,
-              parameters: options.protocol.createCheckout(attempt, ip).parameters,
-            },
-            scoped,
-          ));
-        if (attempt.state === 'CREATED')
-          attempt = await options.ledger.transitionAttempt(
-            {
-              bookingId: input.bookingId,
-              paymentAttemptId: attempt.id,
-              evidence: 'PROVIDER_REQUESTED',
-              providerEvidenceId: null,
-            },
-            scoped,
-          );
-        // Only local URL construction occurs here; no provider network call precedes commit.
-        return Object.freeze({
-          attempt,
-          replayed: created.replayed,
-          checkoutUrl: options.protocol.checkoutUrl(checkout.parameters),
+      return prepareCheckout(input.bookingId, created, ip, context);
+    },
+    async startBalanceCheckout(
+      input: Parameters<Balances['createBalance']>[0],
+      ip: string,
+      context: ContractContext,
+    ) {
+      z.union([z.ipv4(), z.ipv6()]).parse(ip);
+      if (options.balances === undefined)
+        throw new AppError({
+          status: 503,
+          code: 'PAYMENT_PROVIDER_UNAVAILABLE',
+          message: 'Balance collection is unavailable.',
         });
-      });
+      const created = await options.balances.createBalance(input, context);
+      return prepareCheckout(input.bookingId, created, ip, context);
     },
     async processIpn(rawQuery: string) {
       let proof: ProviderEvidence;
