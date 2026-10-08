@@ -11,6 +11,7 @@ export default defineConfig(
     'node_modules/**',
     'playwright-report/**',
     'test-results/**',
+    '.local-demo/**',
   ]),
   {
     linterOptions: {

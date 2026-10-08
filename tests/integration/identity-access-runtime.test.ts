@@ -13,7 +13,8 @@ import { createApp } from '../../src/app.js';
 import type { BackendConfig } from '../../src/config/env.js';
 import { parseEnvironment } from '../../src/config/env.js';
 import { createPrismaClient } from '../../src/core/database/prisma.js';
-import { hashPassword } from '../../src/modules/identity-access/crypto/password.js';
+import { hashPassword, verifyPassword } from '../../src/modules/identity-access/crypto/password.js';
+import { createPasswordOtpService } from '../../src/modules/identity-access/password-otp/password-otp.service.js';
 import {
   createIdentityRuntime,
   type IdentityRuntime,
@@ -113,6 +114,72 @@ describeWithDatabase('IA-08 identity runtime composition', () => {
       data: { displayEmail: 'Couple@example.com', roles: ['COUPLE'] },
     });
     expect(failedLogin.status).toBe(401);
+  });
+
+  it('locks profile and OTP mutations inside the configured schema', async () => {
+    const app = createApp({
+      runtimeEnvironment: 'test',
+      registerRoutes: (server) => server.use('/api/v1', runtime.router),
+    });
+    const login = await request(app)
+      .post('/api/v1/auth/web-sessions')
+      .send({ email: 'couple@example.com', password: 'correct-password' });
+    const issued = issuedSessionResponseSchema.parse(login.body).data;
+    const profile = await request(app)
+      .patch('/api/v1/auth/profile')
+      .set('Authorization', `Bearer ${issued.accessToken}`)
+      .send({ displayName: 'Lan & Minh', expectedRevision: 1 });
+    expect(profile.status).toBe(200);
+    expect(profile.body).toMatchObject({ data: { displayName: 'Lan & Minh', revision: 2 } });
+    const prisma = createPrismaClient(scopedUrl);
+    let deliveredCode = '';
+    const crypto = {
+      hash: (value: string) => hashPassword(value, runtimeConfig.identityAccess.password),
+      verify: (value: string, verifier: unknown) =>
+        verifyPassword(value, verifier, runtimeConfig.identityAccess.password),
+    };
+    const otp = createPasswordOtpService({
+      prisma,
+      schema: schemaName,
+      passwordCrypto: crypto,
+      hashKey: 'a'.repeat(64),
+      emailEnabled: true,
+      emailProvider: {
+        send(command) {
+          deliveredCode = command.text.match(/\b\d{6}\b/u)![0];
+          return Promise.resolve({
+            idempotencyKey: command.idempotencyKey,
+            messageId: randomUUID(),
+          });
+        },
+      },
+    });
+    try {
+      const actor = { ...issued.account, sessionId: issued.sessionId };
+      const challenge = await otp.request({
+        actor,
+        currentPassword: 'correct-password',
+        clientIp: '127.0.0.1',
+        requestId: randomUUID(),
+      });
+      await otp.complete({
+        actor,
+        challengeId: challenge.challengeId,
+        code: deliveredCode,
+        newPassword: 'replacement-password-123',
+        clientIp: '127.0.0.1',
+        requestId: randomUUID(),
+      });
+      expect(
+        (
+          await request(app)
+            .get('/api/v1/auth/me')
+            .set('Authorization', `Bearer ${issued.accessToken}`)
+        ).status,
+      ).toBe(401);
+    } finally {
+      await prisma.$disconnect();
+    }
   });
 
   it('disconnects the database when runtime initialization fails', async () => {

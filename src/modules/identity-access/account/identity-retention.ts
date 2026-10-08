@@ -78,6 +78,7 @@ export function createPrismaIdentityRetentionRepository(
   const retentionFactTable = Prisma.raw(`"${schema}"."AccountRetentionEligibilityFact"`);
   const invitationTable = Prisma.raw(`"${schema}"."WorkspaceInvitation"`);
   const passwordResetTable = Prisma.raw(`"${schema}"."PasswordResetCredential"`);
+  const passwordOtpTable = Prisma.raw(`"${schema}"."PasswordOtpChallenge"`);
   const sessionTable = Prisma.raw(`"${schema}"."Session"`);
 
   return {
@@ -133,7 +134,7 @@ export function createPrismaIdentityRetentionRepository(
           `,
           input.batchSize,
         );
-        const deletedPasswordResets = await deleteTerminalMetadataBatch(
+        const deletedResetLinks = await deleteTerminalMetadataBatch(
           transaction,
           passwordResetTable,
           Prisma.sql`
@@ -143,6 +144,13 @@ export function createPrismaIdentityRetentionRepository(
           `,
           input.batchSize,
         );
+        const deletedOtps = await deleteTerminalMetadataBatch(
+          transaction,
+          passwordOtpTable,
+          Prisma.sql`"expiresAt" <= ${passwordResetCutoff}`,
+          input.batchSize,
+        );
+        const deletedPasswordResets = deletedResetLinks + deletedOtps;
         const deletedSessions = await deleteTerminalMetadataBatch(
           transaction,
           sessionTable,
@@ -266,6 +274,10 @@ async function anonymizeAccount(
   await transaction.passwordResetCredential.updateMany({
     where: { accountId: account.id, status: 'ACTIVE' },
     data: { status: 'REVOKED', revokedAt: input.now },
+  });
+  await transaction.passwordOtpChallenge.updateMany({
+    where: { accountId: account.id, status: 'ACTIVE' },
+    data: { status: 'REVOKED' },
   });
   await transaction.workspaceInvitation.updateMany({
     where: {

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { otpCompletionSchema } from '../password-otp/password-otp.schemas.js';
 
 export const profileWriteSchema = z.strictObject({
   displayName: z
@@ -9,10 +10,7 @@ export const profileWriteSchema = z.strictObject({
     .overwrite((value) => value.normalize('NFC')),
   expectedRevision: z.number().int().positive(),
 });
-export const passwordChangeSchema = z.strictObject({
-  currentPassword: z.string().min(1).max(512),
-  newPassword: z.string().min(12).max(128),
-});
+export const passwordChangeSchema = otpCompletionSchema;
 export const profileSchema = z.strictObject({
   accountId: z.uuid(),
   displayEmail: z.email(),

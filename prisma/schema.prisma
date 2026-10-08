@@ -214,6 +214,7 @@ model Account {
   issuedInvitations      WorkspaceInvitation[]             @relation("InvitationIssuer")
   sessions               Session[]
   passwordResets         PasswordResetCredential[]
+  passwordOtpChallenges  PasswordOtpChallenge[]
   retentionFacts         AccountRetentionEligibilityFact[]
 
   @@index([status])
@@ -341,6 +342,24 @@ model RefreshCredential {
 
   @@index([sessionId, status])
   @@index([status, expiresAt])
+}
+
+model PasswordOtpChallenge {
+  id                    String           @id @default(uuid()) @db.Uuid
+  accountId             String           @db.Uuid
+  purpose               String
+  sessionId             String?          @db.Uuid
+  codeHash              String
+  credentialFingerprint String
+  attempts              Int              @default(0)
+  status                CredentialStatus @default(ACTIVE)
+  expiresAt             DateTime         @db.Timestamptz(6)
+  createdAt             DateTime         @default(now()) @db.Timestamptz(6)
+  consumedAt            DateTime?        @db.Timestamptz(6)
+  account               Account          @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, purpose, createdAt(sort: Desc)])
+  @@index([expiresAt])
 }
 
 model PasswordResetCredential {

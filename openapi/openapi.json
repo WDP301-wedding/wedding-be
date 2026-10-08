@@ -3365,9 +3365,13 @@
       "PasswordChangeBody": {
         "additionalProperties": false,
         "properties": {
-          "currentPassword": {
-            "maxLength": 512,
-            "minLength": 1,
+          "challengeId": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "code": {
+            "pattern": "^\\d{6}$",
             "type": "string"
           },
           "newPassword": {
@@ -3377,8 +3381,72 @@
           }
         },
         "required": [
-          "currentPassword",
+          "challengeId",
+          "code",
           "newPassword"
+        ],
+        "type": "object"
+      },
+      "PasswordOtpCompletionBody": {
+        "additionalProperties": false,
+        "properties": {
+          "challengeId": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "code": {
+            "pattern": "^\\d{6}$",
+            "type": "string"
+          },
+          "newPassword": {
+            "maxLength": 128,
+            "minLength": 12,
+            "type": "string"
+          }
+        },
+        "required": [
+          "challengeId",
+          "code",
+          "newPassword"
+        ],
+        "type": "object"
+      },
+      "PasswordOtpRequestResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "additionalProperties": false,
+            "properties": {
+              "accepted": {
+                "const": true,
+                "type": "boolean"
+              },
+              "challengeId": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "expiresInSeconds": {
+                "const": 600,
+                "type": "number"
+              },
+              "resendAfterSeconds": {
+                "const": 60,
+                "type": "number"
+              }
+            },
+            "required": [
+              "accepted",
+              "challengeId",
+              "expiresInSeconds",
+              "resendAfterSeconds"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
         ],
         "type": "object"
       },
@@ -3909,6 +3977,71 @@
         ]
       }
     },
+    "/auth/password-change-otp-requests": {
+      "post": {
+        "operationId": "requestPasswordChangeOtp",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "currentPassword": {
+                    "maxLength": 512,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "currentPassword"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PasswordOtpRequestResponse"
+                }
+              }
+            },
+            "description": "Successful operation"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Product experience"
+        ]
+      }
+    },
     "/auth/password-changes": {
       "post": {
         "operationId": "changeOwnPassword",
@@ -3987,9 +4120,146 @@
         ]
       }
     },
+    "/auth/password-otp-completions": {
+      "post": {
+        "operationId": "completePasswordResetOtp",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChangeBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "completed": {
+                          "const": true,
+                          "type": "boolean"
+                        },
+                        "requiresLogin": {
+                          "const": true,
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "completed",
+                        "requiresLogin"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful operation"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        },
+        "security": [],
+        "tags": [
+          "Product experience"
+        ]
+      }
+    },
+    "/auth/password-otp-requests": {
+      "post": {
+        "operationId": "requestPasswordResetOtp",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "email": {
+                    "format": "email",
+                    "maxLength": 320,
+                    "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PasswordOtpRequestResponse"
+                }
+              }
+            },
+            "description": "Successful operation"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        },
+        "security": [],
+        "tags": [
+          "Product experience"
+        ]
+      }
+    },
     "/auth/password-reset-completions": {
       "post": {
-        "description": "Unsafe to replay after an unknown outcome; a consumed credential directs the user to normal login.",
+        "deprecated": true,
+        "description": "Runtime returns 410 PASSWORD_OTP_REQUIRED. Request a new code with the email OTP endpoints.",
         "operationId": "completePasswordReset",
         "requestBody": {
           "content": {
@@ -4002,41 +4272,21 @@
           "required": true
         },
         "responses": {
-          "200": {
+          "410": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PasswordResetCompletionResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             },
-            "description": "The password was changed and all existing sessions were revoked.",
-            "headers": {
-              "Cache-Control": {
-                "schema": {
-                  "const": "no-store",
-                  "type": "string"
-                }
-              },
-              "x-request-id": {
-                "$ref": "#/components/headers/RequestId"
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
+            "description": "Use the email OTP flow."
           },
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity"
-          },
-          "429": {
-            "$ref": "#/components/responses/TooManyRequests"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
           }
         },
-        "summary": "Complete a password reset",
+        "summary": "Retired link-based password reset completion",
         "tags": [
           "Identity"
         ]
@@ -4044,7 +4294,8 @@
     },
     "/auth/password-reset-requests": {
       "post": {
-        "description": "Enumeration-safe and unsafe to retry automatically; every eligible request creates a new single-use credential.",
+        "deprecated": true,
+        "description": "Runtime returns 410 PASSWORD_OTP_REQUIRED. Request a new code with the email OTP endpoints.",
         "operationId": "requestPasswordReset",
         "requestBody": {
           "content": {
@@ -4057,47 +4308,21 @@
           "required": true
         },
         "responses": {
-          "202": {
+          "410": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PasswordResetRequestResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             },
-            "description": "The request was accepted regardless of account eligibility.",
-            "headers": {
-              "Cache-Control": {
-                "schema": {
-                  "const": "no-store",
-                  "type": "string"
-                }
-              },
-              "x-request-id": {
-                "$ref": "#/components/headers/RequestId"
-              }
-            }
+            "description": "Use the email OTP flow."
           },
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity"
-          },
-          "429": {
-            "$ref": "#/components/responses/TooManyRequests"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          },
-          "502": {
-            "$ref": "#/components/responses/BadGateway"
-          },
-          "503": {
-            "$ref": "#/components/responses/ServiceUnavailable"
-          },
-          "504": {
-            "$ref": "#/components/responses/GatewayTimeout"
           }
         },
-        "summary": "Request a password reset",
+        "summary": "Retired link-based password reset request",
         "tags": [
           "Identity"
         ]

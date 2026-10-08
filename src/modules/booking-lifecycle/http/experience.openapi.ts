@@ -1,6 +1,13 @@
 import type { z } from 'zod';
 import type { ZodOpenApiObject, ZodOpenApiOperationObject } from 'zod-openapi';
 import {
+  changeOtpRequestSchema,
+  otpCompletionSchema,
+  otpCompletionResponseSchema,
+  otpRequestResponseSchema,
+  resetOtpRequestSchema,
+} from '../../identity-access/password-otp/password-otp.schemas.js';
+import {
   consultationRequestBodySchema,
   intakeAcknowledgementSchema,
   intakeActionSchema,
@@ -88,6 +95,25 @@ function operation(
   };
 }
 export const experienceOpenApiPaths = {
+  '/auth/password-otp-requests': {
+    post: operation('requestPasswordResetOtp', otpRequestResponseSchema, {
+      body: resetOtpRequestSchema,
+      public: true,
+      accepted: true,
+    }),
+  },
+  '/auth/password-otp-completions': {
+    post: operation('completePasswordResetOtp', otpCompletionResponseSchema, {
+      body: otpCompletionSchema,
+      public: true,
+    }),
+  },
+  '/auth/password-change-otp-requests': {
+    post: operation('requestPasswordChangeOtp', otpRequestResponseSchema, {
+      body: changeOtpRequestSchema,
+      accepted: true,
+    }),
+  },
   '/consultation-requests': {
     post: operation('submitConsultationRequest', intakeAcknowledgementSchema, {
       body: consultationRequestBodySchema,
@@ -118,6 +144,8 @@ export const experienceOpenApiPaths = {
   },
 } satisfies NonNullable<ZodOpenApiObject['paths']>;
 export const experienceOpenApiSchemas = {
+  PasswordOtpRequestResponse: otpRequestResponseSchema,
+  PasswordOtpCompletionBody: otpCompletionSchema,
   ConsultationRequestBody: consultationRequestBodySchema,
   ConsultationRequestList: intakeListSchema,
   CoupleOverviewResponse: overviewResponseSchema,

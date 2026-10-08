@@ -1,3 +1,6 @@
+import { otpRequestResponseSchema } from '../../../src/modules/identity-access/password-otp/password-otp.schemas.js';
+import { createPasswordOtpService } from '../../../src/modules/identity-access/password-otp/password-otp.service.js';
+import { createPasswordOtpRouter } from '../../../src/modules/identity-access/password-otp/password-otp.router.js';
 import { randomUUID } from 'node:crypto';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -67,8 +70,25 @@ suite('post-booking experience persistence and authority', () => {
     expectedGuests: 200,
     message: 'Tư vấn sảnh và thực đơn',
   };
+  let otp: ReturnType<typeof createPasswordOtpService>;
+  let deliveredCode = '';
   beforeAll(async () => {
     await db.connect();
+    otp = createPasswordOtpService({
+      prisma: db.prisma,
+      passwordCrypto: crypto,
+      hashKey: 'a'.repeat(64),
+      emailEnabled: true,
+      emailProvider: {
+        send(command) {
+          deliveredCode = command.text.match(/\b\d{6}\b/u)![0];
+          return Promise.resolve({
+            idempotencyKey: command.idempotencyKey,
+            messageId: randomUUID(),
+          });
+        },
+      },
+    });
     await db.prisma.account.createMany({
       data: [
         { id: managerId, emailNormalized: actor.displayEmail, displayEmail: actor.displayEmail },
@@ -103,7 +123,8 @@ suite('post-booking experience persistence and authority', () => {
       runtimeEnvironment: 'test',
       registerRoutes(server) {
         server.use('/api/v1', createBookingExperienceRouter(db.prisma, resolver));
-        server.use('/api/v1', createAccountSettingsRouter(db.prisma, resolver, crypto));
+        server.use('/api/v1', createPasswordOtpRouter(otp, resolver));
+        server.use('/api/v1', createAccountSettingsRouter(db.prisma, resolver, otp));
       },
     });
 
@@ -285,13 +306,19 @@ suite('post-booking experience persistence and authority', () => {
     expect((await db.prisma.session.findUniqueOrThrow({ where: { id: sessionId } })).status).toBe(
       'ACTIVE',
     );
+    const challenge = await request(server)
+      .post('/api/v1/auth/password-change-otp-requests')
+      .set('Authorization', 'Bearer test-manager')
+      .send({ currentPassword: 'initial-password-123' });
+    expect(challenge.status).toBe(202);
     expect(
       (
         await request(server)
           .post('/api/v1/auth/password-changes')
           .set('Authorization', 'Bearer test-manager')
           .send({
-            currentPassword: 'initial-password-123',
+            challengeId: otpRequestResponseSchema.parse(challenge.body).data.challengeId,
+            code: deliveredCode,
             newPassword: 'replacement-password-123',
           })
       ).status,

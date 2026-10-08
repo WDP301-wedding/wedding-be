@@ -32,7 +32,11 @@
     "catalog:seed": "tsx scripts/catalog-seed.ts",
     "retention:identity": "tsx scripts/identity-retention.ts",
     "retention:consultation": "tsx scripts/intake-retention.ts",
-    "audit:ci": "tsx scripts/dependency-audit.ts"
+    "audit:ci": "tsx scripts/dependency-audit.ts",
+    "demo:setup": "node scripts/demo-setup.mjs setup",
+    "demo:db:start": "node scripts/demo-setup.mjs start-db",
+    "demo:db:stop": "node scripts/demo-setup.mjs stop-db",
+    "demo:dev": "node --env-file=.env.demo --import tsx --import ./src/instrumentation.ts src/server.ts"
   },
   "dependencies": {
     "@google/genai": "2.24.0",
