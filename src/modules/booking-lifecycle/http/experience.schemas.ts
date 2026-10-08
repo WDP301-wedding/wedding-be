@@ -1,10 +1,5 @@
 import { z } from 'zod';
-
-function minimumPreferredDate(): string {
-  const vietnamDate = new Date(Date.now() + 7 * 60 * 60_000);
-  vietnamDate.setUTCDate(vietnamDate.getUTCDate() + 2);
-  return vietnamDate.toISOString().slice(0, 10);
-}
+import { minimumEventDate } from '../domain/event-date.js';
 
 export const consultationRequestBodySchema = z.strictObject({
   submissionId: z.uuid(),
@@ -25,7 +20,7 @@ export const consultationRequestBodySchema = z.strictObject({
     .regex(/^[+\d\s().-]*$/u),
   preferredDate: z.iso
     .date()
-    .refine((value) => value >= minimumPreferredDate(), {
+    .refine((value) => value >= minimumEventDate(), {
       message: 'Ngày tổ chức dự kiến phải từ ngày mốt trở đi (theo giờ Việt Nam).',
     })
     .nullable(),
