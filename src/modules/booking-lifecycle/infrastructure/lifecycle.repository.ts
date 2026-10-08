@@ -143,6 +143,13 @@ export function createPrismaBookingLifecycleRepository(
             { phase: 'CANCELLED', cancelledAt },
             booking.phase,
           );
+          await releaseCancellationHolds(
+            transaction,
+            createId,
+            input,
+            bookingRevision,
+            cancelledAt,
+          );
           await transaction.bookingCancellationRequest.updateMany({
             where: { bookingId: input.bookingId, status: 'PENDING' },
             data: {
@@ -340,6 +347,15 @@ export function createPrismaBookingLifecycleRepository(
             input.decision === 'APPROVE' ? { phase: 'CANCELLED', cancelledAt: decidedAt } : {},
             input.decision === 'APPROVE' ? booking.phase : undefined,
           );
+          if (input.decision === 'APPROVE') {
+            await releaseCancellationHolds(
+              transaction,
+              createId,
+              input,
+              bookingRevision,
+              decidedAt,
+            );
+          }
           await appendLifecycleEvidence(transaction, createId, {
             action:
               input.decision === 'APPROVE' ? 'booking.cancelled' : 'booking.cancellation-rejected',
@@ -451,6 +467,49 @@ async function requireNoDepositIntent(
     select: { id: true },
   });
   if (unresolved !== null) throw new BookingLifecycleStateError('DEPOSIT_INTENT_ACTIVE');
+}
+
+async function releaseCancellationHolds(
+  transaction: Prisma.TransactionClient,
+  createId: () => string,
+  input: Readonly<{ bookingId: string; context: BookingLifecycleMutationContext }>,
+  bookingRevision: number,
+  releasedAt: Date,
+): Promise<void> {
+  const holds = await transaction.bookingSlotHold.findMany({
+    where: {
+      bookingId: input.bookingId,
+      status: 'ACTIVE',
+      depositIntentPin: { notIn: ['ACTIVE', 'UNKNOWN'] },
+    },
+    select: { id: true },
+  });
+  for (const hold of holds) {
+    const released = await transaction.bookingSlotHold.updateMany({
+      where: {
+        id: hold.id,
+        status: 'ACTIVE',
+        depositIntentPin: { notIn: ['ACTIVE', 'UNKNOWN'] },
+      },
+      data: { status: 'RELEASED', terminalAt: releasedAt },
+    });
+    if (released.count !== 1) throw new BookingLifecycleStateError('STALE_BOOKING_REVISION');
+    await appendLifecycleEvidence(transaction, createId, {
+      action: 'booking.slot-released',
+      eventType: 'booking.slot-released',
+      bookingId: input.bookingId,
+      bookingRevision,
+      requestId: input.context.requestId,
+      causationId: input.context.causationId ?? null,
+      actorAccountId: input.context.actorAccountId,
+      occurredAt: releasedAt,
+      metadata: {
+        holdId: hold.id,
+        releasedAt: releasedAt.toISOString(),
+        reasonCode: 'BOOKING_CANCELLED',
+      },
+    });
+  }
 }
 
 async function incrementBooking(
