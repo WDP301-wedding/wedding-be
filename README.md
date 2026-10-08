@@ -4,6 +4,11 @@ Express REST API and the authoritative source for business rules, PostgreSQL sch
 
 The platform spans four sibling repositories. Start with the [cross-repository development guide](docs/cross-repo-development.md) when setting up the full system.
 
+For current implementation status and remaining work, use the [implementation plan](tasks/plan.md)
+and [task list](tasks/todo.md). Completed checklists and earlier acceptance records are
+indexed in the [documentation archive](docs/archive/README.md). Product requirements,
+module SPECs, the contract baseline, and operational guides remain current references.
+
 ## Prerequisites
 
 - Node.js 24.21.0 (see `.node-version`)

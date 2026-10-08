@@ -14,4 +14,7 @@ CAPABILITY-MAP.md
 SPEC-core-platform.md
 tasks/
 
+# Archived checkpoint snapshots retain their original authored formatting.
+docs/archive/*/
+
 .local-demo/

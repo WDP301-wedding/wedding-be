@@ -6,6 +6,7 @@ src/generated/prisma/
 test-results/
 .local-demo/
 playwright-report/
+.playwright-mcp/
 
 .env
 .env.*
