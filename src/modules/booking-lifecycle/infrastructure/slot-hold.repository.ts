@@ -38,6 +38,7 @@ export function createPrismaSlotHoldRepository(
         select: { id: true },
       });
       if (confirmed !== null) return Object.freeze({ available: false, activeHold: null });
+      const databaseNow = await readDatabaseTime(prisma);
       const active = await prisma.bookingSlotHold.findFirst({
         where: {
           hallId: input.hallId,
@@ -45,7 +46,7 @@ export function createPrismaSlotHoldRepository(
           shiftCode: input.shiftCode,
           status: 'ACTIVE',
           OR: [
-            { expiresAt: { gt: input.databaseNow } },
+            { expiresAt: { gt: databaseNow } },
             { depositIntentPin: { in: ['ACTIVE', 'UNKNOWN'] } },
           ],
         },
@@ -65,6 +66,8 @@ export function createPrismaSlotHoldRepository(
             await transaction.$executeRaw(
               Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${slotKey(input)}))`,
             );
+            // A contender may wait on the slot lock; its TTL starts only after that wait.
+            const acquiredAt = await readDatabaseTime(transaction);
             const booking = await transaction.booking.findUnique({
               where: { id: input.bookingId },
               select: {
@@ -123,7 +126,7 @@ export function createPrismaSlotHoldRepository(
             });
             if (
               current?.bookingId === input.bookingId &&
-              (current.expiresAt.getTime() > input.acquiredAt.getTime() ||
+              (current.expiresAt.getTime() > acquiredAt.getTime() ||
                 current.depositIntentPin === 'ACTIVE' ||
                 current.depositIntentPin === 'UNKNOWN')
             ) {
@@ -136,7 +139,7 @@ export function createPrismaSlotHoldRepository(
               });
             }
             if (current !== null) {
-              const elapsed = current.expiresAt.getTime() <= input.acquiredAt.getTime();
+              const elapsed = current.expiresAt.getTime() <= acquiredAt.getTime();
               const pinned =
                 current.depositIntentPin === 'ACTIVE' || current.depositIntentPin === 'UNKNOWN';
               if (!elapsed || pinned) throw new BookingSlotConflictError('SLOT_NOT_AVAILABLE');
@@ -146,14 +149,14 @@ export function createPrismaSlotHoldRepository(
                   status: 'ACTIVE',
                   depositIntentPin: { notIn: ['ACTIVE', 'UNKNOWN'] },
                 },
-                data: { status: 'EXPIRED', terminalAt: input.acquiredAt },
+                data: { status: 'EXPIRED', terminalAt: acquiredAt },
               });
             }
             if (booking.revision !== input.expectedRevision) {
               throw new BookingSlotConflictError('STALE_BOOKING_REVISION');
             }
 
-            const hold = createSlotHold(input);
+            const hold = createSlotHold({ ...input, acquiredAt });
             await transaction.bookingSlotHold.create({
               data: {
                 id: hold.holdId,
@@ -165,7 +168,7 @@ export function createPrismaSlotHoldRepository(
                 depositIntentPin: 'NONE',
                 expiresAt: hold.expiresAt,
                 acquiredByAccountId: input.managerAccountId,
-                createdAt: input.acquiredAt,
+                createdAt: acquiredAt,
               },
             });
             const updated = await transaction.booking.updateMany({
@@ -178,7 +181,7 @@ export function createPrismaSlotHoldRepository(
             const bookingRevision = input.expectedRevision + 1;
             await transaction.auditLog.create({
               data: {
-                occurredAt: input.acquiredAt,
+                occurredAt: acquiredAt,
                 requestId: input.requestId,
                 actorType: 'USER',
                 actorId: input.managerAccountId,
@@ -195,7 +198,7 @@ export function createPrismaSlotHoldRepository(
                 eventType: 'booking.slot-held',
                 aggregateId: input.bookingId,
                 aggregateRevision: bookingRevision,
-                occurredAt: input.acquiredAt,
+                occurredAt: acquiredAt,
                 payload: {
                   bookingId: input.bookingId,
                   holdId: input.holdId,
@@ -221,6 +224,17 @@ export function createPrismaSlotHoldRepository(
       }
     },
   });
+}
+
+async function readDatabaseTime(
+  prisma: Pick<Prisma.TransactionClient, '$queryRaw'>,
+): Promise<Date> {
+  const rows = await prisma.$queryRaw<ReadonlyArray<Readonly<{ now: Date }>>>(
+    Prisma.sql`SELECT clock_timestamp() AS "now"`,
+  );
+  const clock = rows.at(0);
+  if (clock === undefined) throw new Error('The database clock is unavailable.');
+  return clock.now;
 }
 
 function localDate(value: string): Date {
