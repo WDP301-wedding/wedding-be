@@ -75,6 +75,42 @@ export function createPrismaBillingPersistence(
   }
 
   const repository: BillingLedgerRepository = Object.freeze({
+    isDepositApplied(bookingId: string, paymentId: string, context: ContractContext) {
+      return transact(bookingId, context, async (tx) => {
+        const entry = await tx.billingLedgerEntry.findUnique({ where: { id: paymentId } });
+        if (entry === null || entry.bookingId !== bookingId || entry.kind !== 'PAYMENT')
+          throw new NotFoundError();
+        return (await tx.billingDepositApplication.findUnique({ where: { paymentId } })) !== null;
+      });
+    },
+    async markDepositApplied(
+      bookingId: string,
+      paymentId: string,
+      appliedAt: string,
+      context: ContractContext,
+    ) {
+      if (context.transactionScopeId === undefined)
+        throw new BillingPersistenceConflict('INVALID_TRANSACTION_SCOPE');
+      return transact(bookingId, context, async (tx) => {
+        const entry = await tx.billingLedgerEntry.findUnique({ where: { id: paymentId } });
+        if (entry === null || entry.bookingId !== bookingId || entry.kind !== 'PAYMENT')
+          throw new BillingPersistenceConflict('PAYMENT_EVIDENCE_CONFLICT');
+        if ((await tx.billingDepositApplication.findUnique({ where: { paymentId } })) !== null)
+          return;
+        await tx.billingDepositApplication.create({
+          data: { paymentId, appliedAt: new Date(appliedAt) },
+        });
+        await audit(tx, context, bookingId, paymentId, 'billing.deposit-applied', {});
+      });
+    },
+    findAttemptByCommand(bookingId: string, commandId: string, context: ContractContext) {
+      return transact(bookingId, context, async (tx) => {
+        const stored = await tx.billingPaymentAttempt.findUnique({ where: { commandId } });
+        if (stored !== null && stored.bookingId !== bookingId)
+          throw new BillingPersistenceConflict('PAYMENT_EVIDENCE_CONFLICT');
+        return stored === null ? null : toAttempt(stored);
+      });
+    },
     getAttempt(bookingId: string, paymentAttemptId: string, context?: ContractContext) {
       return transact(bookingId, context, async (tx) => {
         const stored = await tx.billingPaymentAttempt.findUnique({

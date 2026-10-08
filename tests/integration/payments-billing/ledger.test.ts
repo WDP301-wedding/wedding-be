@@ -74,15 +74,15 @@ databaseDescribe('PB-W2 ledger persistence on PostgreSQL', () => {
     };
   }
 
-  async function payment(bookingId: string, amountVnd = 100_000) {
+  async function payment(bookingId: string, amountVnd = 100_000, deposit = false) {
     const attempt = {
       id: randomUUID(),
       bookingId,
       commandId: randomUUID(),
-      purpose: 'BALANCE' as const,
+      purpose: deposit ? ('DEPOSIT' as const) : ('BALANCE' as const),
       provider: 'MANUAL' as const,
       amountVnd,
-      timelineRevisionId: null,
+      timelineRevisionId: deposit ? randomUUID() : null,
       createdAt: timestamp,
       expiresAt: '2026-10-08T06:15:00.000Z',
     };
@@ -118,6 +118,46 @@ databaseDescribe('PB-W2 ledger persistence on PostgreSQL', () => {
       context,
     );
   }
+
+  it('keeps deposit application pending across restart and marks completion only in the owner boundary', async () => {
+    const bookingId = await newBooking();
+    const settled = await payment(bookingId, 100_000, true);
+    const paymentId = settled.entry.id;
+    expect(await billing.repository.isDepositApplied(bookingId, paymentId, context)).toBe(false);
+    await expect(
+      billing.boundary.run({ bookingId, context }, async (scoped) => {
+        await billing.repository.markDepositApplied(bookingId, paymentId, timestamp, scoped);
+        throw new Error('downstream rollback');
+      }),
+    ).rejects.toThrow('downstream rollback');
+    const restarted = createPrismaBillingPersistence(database.prisma);
+    expect(await restarted.repository.isDepositApplied(bookingId, paymentId, context)).toBe(false);
+    await expect(
+      restarted.repository.markDepositApplied(bookingId, paymentId, timestamp, context),
+    ).rejects.toMatchObject({ code: 'INVALID_TRANSACTION_SCOPE' });
+    await restarted.boundary.run({ bookingId, context }, (scoped) =>
+      restarted.repository.markDepositApplied(bookingId, paymentId, timestamp, scoped),
+    );
+    expect(await restarted.repository.isDepositApplied(bookingId, paymentId, context)).toBe(true);
+    await expect(
+      database.prisma.billingDepositApplication.delete({ where: { paymentId } }),
+    ).rejects.toThrow();
+    await expect(
+      database.prisma.billingDepositApplication.update({
+        where: { paymentId },
+        data: { appliedAt: new Date() },
+      }),
+    ).rejects.toThrow();
+    await expect(
+      restarted.repository.isDepositApplied(await newBooking(), paymentId, context),
+    ).rejects.toMatchObject({ status: 404 });
+    const command = await database.prisma.billingPaymentAttempt.findUniqueOrThrow({
+      where: { id: settled.entry.paymentAttemptId! },
+    });
+    expect(
+      await restarted.repository.findAttemptByCommand(bookingId, command.commandId, context),
+    ).toMatchObject({ id: command.id });
+  });
 
   it('claims one accepted source under concurrent replay and writes one audit/outbox fact', async () => {
     const bookingId = await newBooking();

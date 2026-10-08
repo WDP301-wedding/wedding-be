@@ -136,6 +136,22 @@ export type InvoiceRecord = Readonly<{
 // Internal persistence port: callers must authorize and supply owner-approved facts.
 // The opaque context enlists owner work; no ORM client crosses this boundary.
 export interface BillingLedgerRepository {
+  isDepositApplied(
+    bookingId: string,
+    paymentId: string,
+    context: ContractContext,
+  ): Promise<boolean>;
+  markDepositApplied(
+    bookingId: string,
+    paymentId: string,
+    appliedAt: string,
+    context: ContractContext,
+  ): Promise<void>;
+  findAttemptByCommand(
+    bookingId: string,
+    commandId: string,
+    context: ContractContext,
+  ): Promise<PaymentAttempt | null>;
   getAttempt(
     bookingId: string,
     paymentAttemptId: string,

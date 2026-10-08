@@ -665,6 +665,7 @@ model BillingLedgerEntry {
   paymentAttempt        BillingPaymentAttempt? @relation(fields: [paymentAttemptId, bookingId], references: [id, bookingId], onDelete: Restrict, onUpdate: NoAction)
   events                BillingOutboxEvent[]
   invoices              BillingInvoice[]
+  depositApplication    BillingDepositApplication?
 
   @@unique([id, bookingId])
   @@unique([sourceType, sourceRevisionId])
@@ -672,6 +673,12 @@ model BillingLedgerEntry {
   @@index([bookingId, occurredAt])
   @@index([sourceEntryId])
   @@index([decisionId])
+}
+
+model BillingDepositApplication {
+  paymentId String             @id @db.Uuid
+  appliedAt DateTime           @db.Timestamptz(6)
+  payment   BillingLedgerEntry @relation(fields: [paymentId], references: [id], onDelete: Restrict, onUpdate: NoAction)
 }
 
 model BillingInvoice {
