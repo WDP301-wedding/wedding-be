@@ -140,7 +140,6 @@ export function createPrismaBookingCommercialSnapshotReader(
         select: {
           id: true,
           revision: true,
-          currentTimelineRevisionId: true,
           timelineRevisions: {
             where: { id: input.timelineRevisionId },
             select: { managerApprovedAt: true, coupleApprovedAt: true },
@@ -149,6 +148,8 @@ export function createPrismaBookingCommercialSnapshotReader(
           proposalSnapshot: {
             select: {
               id: true,
+              commercialRevisionId: true,
+              commercialAcceptedAt: true,
               baseChargeVnd: true,
               depositAmountVnd: true,
               menuPackageVersionId: true,
@@ -164,19 +165,20 @@ export function createPrismaBookingCommercialSnapshotReader(
         timeline === undefined ||
         timeline.managerApprovedAt === null ||
         timeline.coupleApprovedAt === null ||
-        booking.currentTimelineRevisionId !== input.timelineRevisionId
+        booking.proposalSnapshot.commercialRevisionId === null ||
+        booking.proposalSnapshot.commercialAcceptedAt === null
       ) {
         throw new BookingLifecycleNotFoundError();
       }
       return Object.freeze({
         bookingId: booking.id,
-        commercialRevisionId: booking.proposalSnapshot.id,
+        commercialRevisionId: booking.proposalSnapshot.commercialRevisionId,
         bookingRevision: booking.revision,
         baseChargeVnd: decimalNumber(booking.proposalSnapshot.baseChargeVnd),
         depositAmountVnd: decimalNumber(booking.proposalSnapshot.depositAmountVnd),
         menuPackageVersionId: booking.proposalSnapshot.menuPackageVersionId,
         tableCount: booking.proposalSnapshot.tableCount,
-        acceptedAt: latest(timeline.managerApprovedAt, timeline.coupleApprovedAt).toISOString(),
+        acceptedAt: booking.proposalSnapshot.commercialAcceptedAt.toISOString(),
       });
     },
   });
@@ -207,10 +209,6 @@ function isoDate(value: Date): string {
 
 function timeText(value: Date): string {
   return value.toISOString().slice(11, 16);
-}
-
-function latest(left: Date, right: Date): Date {
-  return left.getTime() >= right.getTime() ? left : right;
 }
 
 function decimalNumber(value: unknown): number {

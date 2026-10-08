@@ -198,6 +198,12 @@ async function persistDecision(
         },
       });
       if (updated.count !== 1) throw new TimelineConflictError('TIMELINE_REVISION_SUPERSEDED');
+      if (decision === 'APPROVED' && nextRevision.mutuallyApproved) {
+        await transaction.bookingProposalSnapshot.updateMany({
+          where: { bookingId: input.bookingId, commercialRevisionId: null },
+          data: { commercialRevisionId: createId(), commercialAcceptedAt: input.decisionAt },
+        });
+      }
       if (activatesReplacement && booking.effectiveTimelineRevisionId !== null) {
         const superseded = await transaction.bookingTimelineRevision.updateMany({
           where: {

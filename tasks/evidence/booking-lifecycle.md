@@ -351,3 +351,40 @@ checks; generated Next environment declarations were restored. Browser viewport
 overrides were reset and temporary tabs closed. The owned Docker PostgreSQL container
 remains available for future disposable tests. Use the correct `/api/v1` base from
 each corrected `.env.example` when restarting.
+
+## Review remediation — 2026-10-08
+
+The five backend review findings on codex/booking-lifecycle are addressed:
+
+- Deposit reservation persists the initiating active consultation account. SYSTEM
+  eligibility/reservation resolves the intended active recipient; grant creation order
+  does not choose the beneficiary. Replay rejects a different authenticated account.
+- Durable invitation replay accepts its original or the current consultation revision,
+  preserving owner, recipient, and original evidence across booking creation.
+- First mutual timeline approval freezes commercialRevisionId and commercialAcceptedAt
+  on the immutable proposal in the same transaction. Reapproval preserves them;
+  approved historical timelines remain readable after a successor. Migration
+  20261008007000_booking_commercial_acceptance backfills existing dual-approved
+  proposals while preserving their previous source IDs. The existing immutability
+  trigger permits only the first acceptance attachment and rejects later mutation.
+- Slot allocation reads PostgreSQL clock_timestamp() after its advisory lock, using
+  the database clock for expiry, TTL and evidence. Clock-read failure refuses allocation.
+- Direct cancellation and approved cancellation requests release unpinned ACTIVE holds
+  atomically with cancellation and durable booking.slot-released evidence.
+
+Independent verification uses a disposable PostgreSQL 18 cluster in UTC, with all
+database URLs pointing to that cluster:
+
+- Full suite and coverage: **111 files / 917 tests passed**, no skipped tests.
+- Coverage: **96.85% lines, 92.81% branches**; existing 80% per-file gates pass.
+- Command: npm run test:coverage -- --no-cache --no-fsModuleCache --maxWorkers=2 --pool=threads --testTimeout=30000 --hookTimeout=60000.
+- Worker threads are used on this Windows host because coverage with worker forks
+  crashes in the existing idempotency repository stress test. That test also passes
+  independently with forks without coverage.
+- Typecheck, production build, OpenAPI drift check, ESLint, and changed-file formatting pass.
+- Six new PostgreSQL regression tests cover all five findings, unauthorized payer
+  rejection, persisted acceptance, and database rejection of acceptance mutation.
+- The upgrade test covers backfill from an existing immutable proposal and approvals.
+
+This remediation preserves the owner-acceptance gate above. SPEC-04 implementation
+remains a separate task; no acceptance or production migration is asserted here.

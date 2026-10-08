@@ -22,6 +22,20 @@ describeWithDatabase('booking forward upgrade with existing business data', () =
     const tokenHash = 'a'.repeat(43);
     try {
       await database.connect(async (migration, url) => {
+        if (migration === '20261008007000_booking_commercial_acceptance') {
+          const client = new Client({ connectionString: url });
+          try {
+            await client.connect();
+            await client.query(
+              `INSERT INTO "BookingTimelineRevision" ("id", "bookingId", "revisionNumber", "state", "managerApprovedAt", "coupleApprovedAt", "contentHash", "createdByAccountId", "createdAt")
+               VALUES ($1, $2, 1, 'CURRENT', '2026-10-06T00:00:00Z', '2026-10-06T01:00:00Z', 'historic-approval', $3, '2026-10-05T00:00:00Z')`,
+              [randomUUID(), bookingId, managerId],
+            );
+          } finally {
+            await client.end();
+          }
+          return;
+        }
         if (migration !== '20261008000000_invitation_delivery_intent') return;
         const prisma = createPrismaClient(url);
         const client = new Client({ connectionString: url });
@@ -107,6 +121,8 @@ describeWithDatabase('booking forward upgrade with existing business data', () =
       });
       expect(snapshot.hallName).toBe('Historic hall');
       expect(snapshot.baseChargeVnd.toNumber()).toBe(35000000);
+      expect(snapshot.commercialRevisionId).toBe(snapshot.id);
+      expect(snapshot.commercialAcceptedAt?.toISOString()).toBe('2026-10-06T01:00:00.000Z');
       expect(await database.prisma.bookingReportingSnapshot.count({ where: { bookingId } })).toBe(
         1,
       );

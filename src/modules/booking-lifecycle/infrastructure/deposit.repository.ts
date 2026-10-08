@@ -61,6 +61,8 @@ export function createPrismaBookingDepositRepository(
             if (
               existing.bookingId !== input.bookingId ||
               existing.timelineRevisionId !== input.timelineRevisionId ||
+              (input.actorAccountId !== null &&
+                existing.coupleAccountId !== input.actorAccountId) ||
               decimalNumber(existing.amountVnd) !== input.amountVnd ||
               existing.expiresAt.toISOString() !== input.expiresAt
             ) {
@@ -78,7 +80,12 @@ export function createPrismaBookingDepositRepository(
           });
           if (unresolved !== null) throw new BookingDepositConflictError('DEPOSIT_INTENT_ACTIVE');
 
-          const eligibility = await readEligibility(transaction, input, now());
+          const eligibility = await readEligibility(
+            transaction,
+            input,
+            now(),
+            input.actorAccountId,
+          );
           if (!eligibility.eligible) {
             throw new BookingDepositConflictError(
               eligibility.reasonCode as Exclude<
@@ -345,11 +352,13 @@ async function readEligibility(
   client: EligibilityClient,
   input: Readonly<{ bookingId: string; timelineRevisionId: string }>,
   databaseNow: Date,
+  actorAccountId: string | null = null,
 ): Promise<DepositEligibility> {
   const booking = await client.booking.findUnique({
     where: { id: input.bookingId },
     select: {
       consultationId: true,
+      consultation: { select: { intendedEmailNormalized: true } },
       phase: true,
       revision: true,
       currentTimelineRevisionId: true,
@@ -368,8 +377,17 @@ async function readEligibility(
     throw new BookingLifecycleNotFoundError();
   }
   const access = await client.consultationAccess.findFirst({
-    where: { consultationId: booking.consultationId },
-    orderBy: { createdAt: 'asc' },
+    where: {
+      consultationId: booking.consultationId,
+      ...(actorAccountId === null
+        ? {
+            account: {
+              emailNormalized: booking.consultation.intendedEmailNormalized,
+              status: 'ACTIVE',
+            },
+          }
+        : { accountId: actorAccountId, account: { status: 'ACTIVE' } }),
+    },
     select: { accountId: true },
   });
   if (access === null) throw new BookingLifecycleNotFoundError();

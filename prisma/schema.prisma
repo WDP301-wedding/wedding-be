@@ -621,6 +621,8 @@ model BookingProposalSnapshot {
   planningHeadcount    Int
   baseChargeVnd        Decimal             @db.Decimal(18, 0)
   depositAmountVnd     Decimal             @db.Decimal(18, 0)
+  commercialRevisionId String?             @unique @db.Uuid
+  commercialAcceptedAt DateTime?           @db.Timestamptz(6)
   createdAt            DateTime            @default(now()) @db.Timestamptz(6)
   booking              Booking             @relation(fields: [bookingId], references: [id], onDelete: Restrict)
   hall                 Hall                @relation(fields: [hallId], references: [id], onDelete: Restrict)
