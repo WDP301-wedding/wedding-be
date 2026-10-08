@@ -1,0 +1,52 @@
+import type { ContractContext } from './payments-billing.providers.js';
+
+export type VnpaySettings = Readonly<{
+  merchantCode: string;
+  hashSecret: string;
+  returnUrl: string;
+  queryIp: string;
+}>;
+export type ProviderEvidence = Readonly<{
+  paymentAttemptId: string;
+  merchantCode: string;
+  transactionId: string;
+  amountVnd: number;
+  outcome: 'SUCCEEDED' | 'FAILED' | 'UNKNOWN';
+  settledAt: string | null;
+  payloadHash: string;
+  channel: 'IPN' | 'QUERY';
+}>;
+export type StoredProviderEvidence = ProviderEvidence &
+  Readonly<{ id: string; decision: 'ACCEPTED' | 'CONFLICT' | 'AMOUNT_MISMATCH' }>;
+export type CheckoutSnapshot = Readonly<{
+  paymentAttemptId: string;
+  parameters: Readonly<Record<string, string>>;
+}>;
+
+export interface VnpayEvidenceRepository {
+  findAttemptBooking(paymentAttemptId: string): Promise<string | null>;
+  saveCheckout(
+    bookingId: string,
+    input: CheckoutSnapshot,
+    context: ContractContext,
+  ): Promise<CheckoutSnapshot>;
+  getCheckout(
+    bookingId: string,
+    paymentAttemptId: string,
+    context: ContractContext,
+  ): Promise<CheckoutSnapshot | null>;
+  recordEvidence(
+    bookingId: string,
+    input: ProviderEvidence,
+    context: ContractContext,
+  ): Promise<Readonly<{ evidence: StoredProviderEvidence; replayed: boolean }>>;
+  getTerminalEvidence(
+    bookingId: string,
+    paymentAttemptId: string,
+    context: ContractContext,
+  ): Promise<StoredProviderEvidence | null>;
+}
+
+export interface VnpayStatusGateway {
+  query(request: Readonly<Record<string, string>>): Promise<unknown>;
+}
