@@ -2538,13 +2538,34 @@ client billing UI is part of this wave. The three client module branches remain 
 
 #### PB-W2 — Immutable ledger and persistence
 
-- [ ] Add ledger schema and constraints for immutable facts, unique accepted sources,
+- [x] Add ledger schema and constraints for immutable facts, unique accepted sources,
       VND bounds, replay identity, invoice revisions and adjustment linkage.
-- [ ] Implement repositories and unit-of-work operations without importing Prisma into
+- [x] Implement repositories and unit-of-work operations without importing Prisma into
       domain/application policy; atomically write audit and outbox evidence.
-- [ ] Verify migration from empty and current schema plus upgrade behavior on disposable
+- [x] Verify migration from empty and current schema plus upgrade behavior on disposable
       PostgreSQL; prove uniqueness and rollback under duplicate requests.
-- [ ] Pass focused persistence tests, formatting, typecheck and diff/secret checks.
+- [x] Pass focused persistence tests, formatting, typecheck and diff/secret checks.
+
+**W2 implementation evidence (2026-10-08, backend commits `1952a8d` and `b9fa8d8`):** The new forward migration
+`20261008006000_payments_billing_ledger` adds immutable ledger facts, durable attempts,
+invoice revisions and transactional outbox storage without changing old business data
+or applied migrations. The internal application port contains no Prisma imports;
+its adapter enlists in the existing Booking unit of work and records audit/outbox
+atomically. SQL/application checks prove source uniqueness, safe VND aggregates,
+adjustment/refund caps, terminal evidence and snapshot immutability.
+
+**PB-C1 verification:** 47 focused tests in six files pass (36 Billing unit tests,
+10 Billing PostgreSQL/upgrade tests and the migration-policy test). All 819 backend
+unit tests pass in 79 files; the three existing Booking integration files pass eight
+tests and the legacy idempotency repository passes two tests. Final checks use the
+pinned Node 24.21.0/npm 11.19.0; the complete related gate passes 57 tests in ten files.
+Changed-file ESLint,
+Prettier, typecheck, build and `git diff --check` pass. A deliberate replay-guard
+mutation is detected and restored. Full source/requirement/rehearsal details are in
+[`evidence/payments-billing.md`](./evidence/payments-billing.md). W3-W8 and module
+ACCEPTED remain pending; no HTTP/OpenAPI/client contract has been published.
+The disposable W2 PostgreSQL container is stopped/removed; all four repositories
+remain on `codex/payments-billing`, and the three client working trees remain clean.
 
 #### PB-W3 — Charges, credits and deposit orchestration
 
