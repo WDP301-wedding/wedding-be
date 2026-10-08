@@ -1,4 +1,11 @@
 import type { ContractContext } from './payments-billing.providers.js';
+import type { PaymentAttempt } from './billing-ledger.port.js';
+
+export class VnpayProtocolError extends Error {
+  constructor(readonly reason: 'SIGNATURE' | 'FIELDS' | 'CORRELATION') {
+    super('VNPay evidence could not be verified.');
+  }
+}
 
 export type VnpaySettings = Readonly<{
   merchantCode: string;
@@ -49,4 +56,22 @@ export interface VnpayEvidenceRepository {
 
 export interface VnpayStatusGateway {
   query(request: Readonly<Record<string, string>>): Promise<unknown>;
+}
+
+export interface VnpayProtocol {
+  createCheckout(
+    attempt: PaymentAttempt,
+    ip: string,
+  ): Readonly<{ parameters: Readonly<Record<string, string>>; url: string }>;
+  checkoutUrl(parameters: Readonly<Record<string, string>>): string;
+  verifyIpn(rawQuery: string): ProviderEvidence;
+  verifyQuery(raw: unknown): ProviderEvidence;
+  createQuery(
+    input: Readonly<{
+      paymentAttemptId: string;
+      transactionDate: string;
+      requestId: string;
+      createdAt: string;
+    }>,
+  ): Readonly<Record<string, string>>;
 }

@@ -4,13 +4,19 @@ import { isIP } from 'node:net';
 import { z } from 'zod';
 
 import type { ProviderEvidence, VnpaySettings } from '../application/vnpay.port.js';
+import { VnpayProtocolError, type VnpayProtocol } from '../application/vnpay.port.js';
+export { VnpayProtocolError } from '../application/vnpay.port.js';
 
 export const VNPAY_CHECKOUT_URL = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
 export const VNPAY_QUERY_URL = 'https://sandbox.vnpayment.vn/merchant_webapi/api/transaction';
-export class VnpayProtocolError extends Error {
-  constructor(readonly reason: 'SIGNATURE' | 'FIELDS' | 'CORRELATION') {
-    super('VNPay evidence could not be verified.');
-  }
+export function createVnpayProtocol(config: VnpaySettings): VnpayProtocol {
+  return Object.freeze<VnpayProtocol>({
+    createCheckout: (attempt, ip) => createCheckout(attempt, ip, config),
+    checkoutUrl: (parameters) => checkoutUrl(parameters, config),
+    verifyIpn: (rawQuery) => verifyIpn(rawQuery, config),
+    verifyQuery: (raw) => verifyQuery(raw, config),
+    createQuery: (input) => createQuery(input, config),
+  });
 }
 
 const field = z.string().max(255);
