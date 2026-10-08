@@ -107,6 +107,30 @@ suite('email OTP password confirmation', () => {
     clock = new Date(clock.getTime() + 61_000);
   };
 
+  it('does not spend the hourly quota on requests rejected during the resend cooldown', async () => {
+    const f = await fixture();
+    const initialCount = messages.length;
+    const request = () =>
+      service.request({
+        actor: f.actor,
+        currentPassword: 'Initial-password-123',
+        ...requestMeta(),
+      });
+    await request();
+    for (let i = 0; i < 4; i++) {
+      await expect(request()).rejects.toMatchObject({ code: 'RATE_LIMITED' });
+    }
+    expect(messages).toHaveLength(initialCount + 1);
+    advance();
+    await request();
+    advance();
+    await request();
+    expect(messages).toHaveLength(initialCount + 3);
+    advance();
+    await expect(request()).rejects.toMatchObject({ code: 'RATE_LIMITED' });
+    expect(messages).toHaveLength(initialCount + 3);
+  });
+
   it('does not expose a code or account existence; OTPs are HMAC digests, never plaintext', async () => {
     const f = await fixture();
     const known = await service.request({ email: f.email, ...requestMeta() });

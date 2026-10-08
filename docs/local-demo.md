@@ -39,6 +39,10 @@ The fixture contains two accounts, two halls with two shifts, a small dish/menu 
 
 The deposit record is local demo evidence, not a real payment or provider integration. No email is sent by setup. OTP emails are sent only when a user requests them. Brevo settings are inherited from `.env`; OTP hashing and database settings come from `.env.demo`.
 
+If OTP delivery fails even with Brevo configured, check **Settings > Security > Authorized IPs** in Brevo. When IP blocking is enabled, the backend's current public IP must be authorized; a network change can cause Brevo to reject API calls with HTTP 401. Authorize the current trusted IP, then request a new OTP after the resend cooldown. The initial demo emails in `.env.demo` must also match the account's actual recipient email.
+
+OTP requests have a 60-second resend cooldown and a limit of three requests per account/purpose per hour. HTTP 429 includes `Retry-After` in seconds; the account page shows the wait and disables sending until it ends. Rapid retries rejected during the cooldown do not consume the hourly quota. After editing backend code or `.env`, restart `demo:dev` to load the changes.
+
 ## Demonstrate
 
 1. Open the public halls/menus and submit a consultation request.

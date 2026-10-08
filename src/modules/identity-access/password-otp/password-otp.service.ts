@@ -46,18 +46,19 @@ export function createPasswordOtpService(options: {
     const normalized = input.email?.trim().toLowerCase() ?? input.actor!.accountId;
     const requestedAt = now();
     const subject = createHash('sha256').update(`${purpose}:${normalized}`).digest('hex');
+    // Reject rapid retries before consuming the longer hourly quota.
     for (const rule of [
-      {
-        bucket: 'reset-request-subject' as const,
-        key: subject,
-        maxAttempts: 3,
-        windowSeconds: 3600,
-      },
       {
         bucket: 'reset-request-subject' as const,
         key: `cooldown:${subject}`,
         maxAttempts: 1,
         windowSeconds: 60,
+      },
+      {
+        bucket: 'reset-request-subject' as const,
+        key: subject,
+        maxAttempts: 3,
+        windowSeconds: 3600,
       },
       {
         bucket: 'reset-request-ip' as const,
