@@ -66,6 +66,99 @@ databaseDescribe('W5 immutable invoice and receivable views', () => {
     );
     return { ...f, payment, print, charge, credit };
   }
+  it('handles empty authorized ledgers and rejects invalid, foreign and mismatched history fences', async () => {
+    const empty = await createManualBillingFixture(database.prisma);
+    expect(
+      await empty.providers.views.read({ bookingId: empty.bookingId, limit: 1 }, empty.manager),
+    ).toMatchObject({
+      billingRevision: 0,
+      history: [],
+      nextCursor: null,
+      totals: { paidVnd: 0, outstandingVnd: 0 },
+    });
+    const f = await fixture();
+    const first = await f.providers.views.read({ bookingId: f.bookingId, limit: 1 }, f.manager);
+    for (const query of [
+      { cursor: 'not-json' },
+      { throughBillingRevision: 6 },
+      { cursor: first.nextCursor!, throughBillingRevision: 4 },
+      {
+        cursor: Buffer.from(
+          JSON.stringify({ bookingId: empty.bookingId, throughBillingRevision: 5, revision: 1 }),
+        ).toString('base64url'),
+      },
+      {
+        cursor: Buffer.from(
+          JSON.stringify({ bookingId: f.bookingId, throughBillingRevision: 5, revision: 6 }),
+        ).toString('base64url'),
+      },
+    ])
+      await expect(
+        f.providers.views.read({ bookingId: f.bookingId, limit: 1, ...query }, f.manager),
+      ).rejects.toMatchObject({ status: 422 });
+    await expect(
+      f.providers.views.read({ bookingId: f.bookingId, limit: 0 }, f.manager),
+    ).rejects.toThrow();
+    expect(
+      await f.providers.views.read(
+        { bookingId: f.bookingId, limit: 100, throughBillingRevision: 1 },
+        f.manager,
+      ),
+    ).toMatchObject({
+      billingRevision: 1,
+      history: [{ kind: 'CHARGE' }],
+      totals: { paidVnd: 0, outstandingVnd: 50_000_000 },
+    });
+  });
+  it('rejects malformed reporting cursors/fences, preserves empty pages and immutable stored snapshots', async () => {
+    const f = await fixture();
+    const counter = await database.prisma.billingReportingSequence.findUniqueOrThrow({
+      where: { owner: 'billing' },
+    });
+    const query = { afterSequence: counter.value - 5, throughSequence: counter.value, limit: 1 };
+    const first = await f.providers.reporting.readPage(query, f.manager);
+    for (const changed of [
+      { cursor: 'invalid' },
+      { afterSequence: counter.value + 1 },
+      { cursor: first.nextCursor!, afterSequence: query.afterSequence - 1 },
+      {
+        cursor: Buffer.from(
+          JSON.stringify({
+            afterSequence: query.afterSequence,
+            throughSequence: counter.value,
+            sequence: counter.value + 1,
+          }),
+        ).toString('base64url'),
+      },
+      {
+        cursor: Buffer.from(
+          JSON.stringify({
+            afterSequence: query.afterSequence,
+            throughSequence: counter.value,
+            sequence: query.afterSequence - 1,
+          }),
+        ).toString('base64url'),
+      },
+    ])
+      await expect(
+        f.providers.reporting.readPage({ ...query, ...changed }, f.manager),
+      ).rejects.toMatchObject({ status: 422 });
+    await expect(
+      f.providers.reporting.readPage({ afterSequence: 0, limit: 0 }, f.manager),
+    ).rejects.toThrow();
+    expect(
+      await f.providers.reporting.readPage({ afterSequence: counter.value, limit: 1 }, f.manager),
+    ).toEqual({ throughSequence: counter.value, nextCursor: null, rows: [] });
+    await expect(
+      database.prisma.billingReportingSnapshot.update({
+        where: { sequence: counter.value },
+        data: { value: {} },
+      }),
+    ).rejects.toThrow();
+    await expect(
+      database.prisma.billingReportingSnapshot.delete({ where: { sequence: counter.value } }),
+    ).rejects.toThrow();
+  });
   it('paginates a fixed ledger revision with exact print/payment/refund/credit sources and redacted evidence', async () => {
     const f = await fixture();
     const first = await f.providers.views.read({ bookingId: f.bookingId, limit: 2 }, f.context);
