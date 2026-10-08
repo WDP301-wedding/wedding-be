@@ -244,7 +244,9 @@ export function createVnpayService(
     },
     // ReturnURL is a display hint only: verification has no persistence side effects.
     verifyReturnHint(rawQuery: string) {
-      return options.protocol.verifyIpn(rawQuery);
+      const hint = options.protocol.verifyIpn(rawQuery);
+      if (hint.correlationConflict !== undefined) throw new VnpayProtocolError('CORRELATION');
+      return hint;
     },
   });
 }

@@ -50,6 +50,7 @@ databaseDescribe('PB-W4 verified VNPay with real Booking/Identity/PostgreSQL', (
       replayed: true,
     });
     expect(f.vnpay.verifyReturnHint(ipnFixture(f.id)).outcome).toBe('SUCCEEDED');
+    expect(() => f.vnpay.verifyReturnHint(ipnFixture(f.id, { vnp_CurrCode: 'USD' }))).toThrow();
     expect(await paid(f.bookingId)).toBe(0);
     expect(
       await database.prisma.billingProviderEvidence.count({ where: { paymentAttemptId: f.id } }),
@@ -83,9 +84,22 @@ databaseDescribe('PB-W4 verified VNPay with real Booking/Identity/PostgreSQL', (
     expect(await f.vnpay.processIpn(foreignCurrency)).toMatchObject({ RspCode: '99' });
     expect(await f.vnpay.processIpn(foreignCurrency)).toMatchObject({ RspCode: '99' });
     expect(await paid(f.bookingId)).toBe(0);
-    expect(
-      await database.prisma.billingProviderEvidence.findMany({ where: { paymentAttemptId: f.id } }),
-    ).toMatchObject([{ decision: 'AMOUNT_MISMATCH' }, { decision: 'CONFLICT' }]);
+    const decisions = await database.prisma.billingProviderEvidence.findMany({
+      where: { paymentAttemptId: f.id },
+    });
+    expect(decisions.map((proof) => proof.decision).sort()).toEqual([
+      'AMOUNT_MISMATCH',
+      'CONFLICT',
+    ]);
+    const audits = await database.prisma.auditLog.findMany({
+      where: {
+        action: 'billing.provider-evidence',
+        entityId: { in: decisions.map((proof) => proof.id) },
+      },
+    });
+    expect(audits.some((audit) => JSON.stringify(audit.metadata).includes('CURRENCY'))).toBe(true);
+    for (const rawValue of [controlledVnpay.hashSecret, 'vnp_SecureHash', 'BankTranNo', 'CardType'])
+      expect(JSON.stringify(audits)).not.toContain(rawValue);
     expect(
       (await database.prisma.billingPaymentAttempt.findUniqueOrThrow({ where: { id: f.id } }))
         .state,
@@ -150,10 +164,17 @@ databaseDescribe('PB-W4 verified VNPay with real Booking/Identity/PostgreSQL', (
   it('holds UNKNOWN through timeout/expiry and recovers from a signed querydr success without a second payment', async () => {
     const query = vi.fn<VnpayStatusGateway['query']>().mockRejectedValueOnce(new Error('timeout'));
     const f = await fixture({ query });
-    expect(await f.vnpay.reconcile(f.bookingId, f.id, f.system)).toEqual({
-      status: 'UNKNOWN',
-      applicationStatus: null,
-    });
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(Date.parse(f.checkout.attempt.expiresAt) + 1000));
+    try {
+      expect(Date.now()).toBeGreaterThan(Date.parse(f.checkout.attempt.expiresAt));
+      expect(await f.vnpay.reconcile(f.bookingId, f.id, f.system)).toEqual({
+        status: 'UNKNOWN',
+        applicationStatus: null,
+      });
+    } finally {
+      vi.useRealTimers();
+    }
     expect(
       (
         await database.prisma.bookingSlotHold.findFirstOrThrow({
