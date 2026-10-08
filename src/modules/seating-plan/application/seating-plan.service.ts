@@ -184,7 +184,11 @@ export function createSeatingPlanService(
           : null;
         if (rev !== null && rev.layoutTemplateVersionId === input.layoutTemplateVersionId) {
           const exRec = await repository.getExceptionRecord(existing.id);
-          return buildResult(existing, rev, exRec !== null);
+          const hasValidException =
+            exRec !== null &&
+            exRec.headcountSnapshot === booking.planningHeadcount &&
+            exRec.bookingRevisionSnapshot === booking.bookingRevision;
+          return buildResult(existing, rev, hasValidException);
         }
 
         // Selected a different layout -> create a replacement DRAFT revision
@@ -324,7 +328,7 @@ export function createSeatingPlanService(
       return buildResult(
         { ...updatedPlan, planRevision: result.planRevision },
         rev,
-        hasException,
+        hasValidException,
       );
     },
 
@@ -405,7 +409,7 @@ export function createSeatingPlanService(
       return buildResult(
         { ...updatedPlan, planRevision: confirmed.planRevision },
         rev,
-        hasException,
+        hasValidException,
       );
     },
 
