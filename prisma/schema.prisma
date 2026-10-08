@@ -417,6 +417,8 @@ model Booking {
   billingLedgerEntries        BillingLedgerEntry[]
   billingPaymentAttempts      BillingPaymentAttempt[]
   billingInvoices             BillingInvoice[]
+  billingCommands             BillingOperationCommand[]
+  billingRefundApprovals      BillingRefundApproval[]
 
   @@unique([hallId, eventDate, shiftCode], map: "Booking_one_confirmed_slot_key", where: raw("\"phase\" IN ('CONFIRMED', 'COMPLETED')"))
   @@index([hallId, eventDate, shiftCode])
@@ -730,6 +732,48 @@ model BillingInvoice {
   sourceLedgerEntry     BillingLedgerEntry @relation(fields: [bookingId, sourceBillingRevision], references: [bookingId, revision], onDelete: Restrict, onUpdate: NoAction)
 
   @@index([bookingId, issuedAt])
+}
+
+model BillingOperationCommand {
+  commandId      String   @id @db.Uuid
+  bookingId      String   @db.Uuid
+  actorAccountId String   @db.Uuid
+  kind           String
+  bodyHash       String
+  result         Json     @db.JsonB
+  completedAt    DateTime @default(now()) @db.Timestamptz(6)
+  booking        Booking  @relation(fields: [bookingId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+}
+
+model BillingRefundApproval {
+  id                    String   @id @db.Uuid
+  bookingId             String   @db.Uuid
+  basisKind             String
+  basisId               String   @db.Uuid
+  cancellationSequence  Int?
+  approvedRefundableVnd Decimal  @db.Decimal(18, 0)
+  reason                String
+  evidenceReference     String
+  approvedByAccountId   String   @db.Uuid
+  approvedAt            DateTime @db.Timestamptz(6)
+  booking               Booking  @relation(fields: [bookingId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@index([basisKind, basisId])
+  @@index([bookingId])
+}
+
+model BillingReportingSequence {
+  owner String @id
+  value Int    @default(0)
+}
+
+model BillingReportingSnapshot {
+  sequence  Int      @id
+  bookingId String   @db.Uuid
+  changedAt DateTime @db.Timestamptz(6)
+  value     Json     @db.JsonB
+
+  @@index([bookingId, sequence])
 }
 
 model BillingOutboxEvent {

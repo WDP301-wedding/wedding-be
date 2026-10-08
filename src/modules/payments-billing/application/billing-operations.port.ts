@@ -83,6 +83,7 @@ export type RefundApproval = Readonly<{
 export interface BillingOperationsRepository {
   requireManager(bookingId: string, context: ContractContext): Promise<void>;
   requireReadAccess(bookingId: string, context: ContractContext): Promise<{ phase: string }>;
+  requireBalanceAvailable(bookingId: string, context: ContractContext): Promise<void>;
   findCommand(
     bookingId: string,
     commandId: string,
@@ -95,6 +96,12 @@ export interface BillingOperationsRepository {
     context: ContractContext,
   ): Promise<RefundApproval>;
   saveApproval(approval: RefundApproval, context: ContractContext): Promise<void>;
+  getApprovedTotal(
+    bookingId: string,
+    basisKind: RefundApproval['basisKind'],
+    basisId: string,
+    context: ContractContext,
+  ): Promise<number>;
   getInvoice(
     bookingId: string,
     invoiceId: string,
