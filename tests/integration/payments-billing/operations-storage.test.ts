@@ -50,6 +50,13 @@ databaseDescribe('W5 immutable command storage and current account authorization
       await repo.saveCommand(command, scoped);
       expect(await repo.findCommand(f.bookingId, command.commandId, scoped)).toEqual(command);
     });
+    const other = await createPayableBooking(database.prisma);
+    await expect(
+      scope.boundary.run({ bookingId: other.bookingId, context }, async (scoped) => {
+        await repo.requireManager(other.bookingId, scoped);
+        return repo.findCommand(other.bookingId, command.commandId, scoped);
+      }),
+    ).rejects.toMatchObject({ status: 422, code: 'IDEMPOTENCY_KEY_REUSED' });
     for (const operation of [
       database.prisma.billingOperationCommand.update({
         where: { commandId: command.commandId },

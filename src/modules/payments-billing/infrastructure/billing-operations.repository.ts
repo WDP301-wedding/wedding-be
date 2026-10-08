@@ -1,5 +1,9 @@
 import { createBookingBoundaryUnitOfWork } from '../../../core/database/booking-unit-of-work.js';
-import { AppError, NotFoundError } from '../../../core/errors/app-error.js';
+import {
+  AppError,
+  IdempotencyKeyReusedError,
+  NotFoundError,
+} from '../../../core/errors/app-error.js';
 import type { PrismaClient } from '../../../generated/prisma/client.js';
 import { invoiceSnapshotSchema } from '../application/billing-ledger.port.js';
 import {
@@ -91,8 +95,7 @@ export function createBillingOperationsRepository(
       return enlisted(bookingId, context, async (client) => {
         const row = await client.billingOperationCommand.findUnique({ where: { commandId } });
         if (row === null) return null;
-        if (row.bookingId !== bookingId)
-          throw new BillingPersistenceConflict('PAYMENT_EVIDENCE_CONFLICT');
+        if (row.bookingId !== bookingId) throw new IdempotencyKeyReusedError();
         return Object.freeze({
           commandId: row.commandId,
           bookingId: row.bookingId,
