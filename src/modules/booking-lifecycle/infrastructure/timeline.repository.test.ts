@@ -87,8 +87,17 @@ describe('PrismaTimelineRepository', () => {
         },
       }),
     });
-    expect(transaction.auditLog.create).toHaveBeenCalledOnce();
-    expect(transaction.bookingOutboxEvent.create).toHaveBeenCalledOnce();
+    expect(transaction.auditLog.create).toHaveBeenCalledTimes(2);
+    expect(transaction.bookingOutboxEvent.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        eventType: 'booking.timeline-superseded',
+        payload: expect.objectContaining({
+          timelineRevisionId: revision.predecessorRevisionId,
+          successorRevisionId: revision.revisionId,
+          supersededAt: revision.createdAt.toISOString(),
+        }),
+      }),
+    });
   });
 
   it('records an exact party approval as immutable decision evidence', async () => {
@@ -119,6 +128,12 @@ describe('PrismaTimelineRepository', () => {
     });
     expect(transaction.bookingTimelineDecision.create).toHaveBeenCalledWith({
       data: expect.objectContaining({ party: 'MANAGER', decision: 'APPROVED', sequence: 1 }),
+    });
+    expect(transaction.bookingOutboxEvent.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        eventType: 'booking.timeline-approved',
+        payload: expect.objectContaining({ approvedAt: approvedAt.toISOString() }),
+      }),
     });
   });
 
@@ -163,6 +178,7 @@ describe('PrismaTimelineRepository', () => {
     });
 
     await createPrismaTimelineRepository(client(transaction), ids()).save({
+      changeReason: 'Updated confirmed programme',
       revision,
       expectedBookingRevision: 1,
       actorAccountId: '00000000-0000-4000-8000-000000000005',

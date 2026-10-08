@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment -- Vitest asymmetric matchers are typed as any. */
 import { describe, expect, it, vi } from 'vitest';
 
 import {
@@ -12,6 +13,184 @@ const context: BookingLifecycleMutationContext = Object.freeze({
 const now = new Date('2026-12-21T03:00:00.000Z');
 
 describe('PrismaBookingLifecycleRepository', () => {
+  it('conceals missing booking facts and authorization and rejects stale commands', async () => {
+    const transaction = fixture();
+    const repository = createPrismaBookingLifecycleRepository(client(transaction));
+    const booking = await transaction.booking.findUnique();
+    for (const stored of [null, { ...booking, proposalSnapshot: null }]) {
+      transaction.booking.findUnique.mockResolvedValue(stored);
+      await expect(
+        repository.complete({ bookingId: 'booking', expectedBookingRevision: 4, context }),
+      ).rejects.toMatchObject({ code: 'BOOKING_NOT_FOUND' });
+    }
+    transaction.booking.findUnique.mockResolvedValue(null);
+    await expect(repository.getAuthorizationContext('booking')).rejects.toMatchObject({
+      code: 'BOOKING_NOT_FOUND',
+    });
+    await expect(
+      repository.synchronizeHeadcount(
+        {
+          bookingId: 'booking',
+          sourceRsvpRevisionId: 'revision',
+          sourceSequence: 1,
+          expectedAttendees: 10,
+        },
+        context,
+      ),
+    ).rejects.toMatchObject({ code: 'BOOKING_NOT_FOUND' });
+    transaction.booking.findUnique.mockResolvedValue({
+      ...booking,
+      consultation: { id: 'consultation', managerAccountId: 'manager' },
+    });
+    expect(await repository.getAuthorizationContext('booking')).toEqual({
+      consultationId: 'consultation',
+      managerAccountId: 'manager',
+    });
+    const input = {
+      bookingId: 'booking',
+      cancellationRequestId: 'request',
+      expectedBookingRevision: 3,
+      reason: 'Reason',
+      context,
+    };
+    for (const command of [
+      () => repository.cancel(input),
+      () => repository.requestCancellation(input),
+      () => repository.decideCancellation({ ...input, decision: 'REJECT' }),
+      () => repository.complete(input),
+    ])
+      await expect(command()).rejects.toMatchObject({ code: 'STALE_BOOKING_REVISION' });
+  });
+
+  it('refuses unresolved deposits, invalid reasons, absent request actors, and lost CAS writes', async () => {
+    const transaction = fixture();
+    const repository = createPrismaBookingLifecycleRepository(
+      client(transaction),
+      () => new Date('2026-12-19T00:00:00Z'),
+    );
+    const input = {
+      bookingId: 'booking',
+      cancellationRequestId: 'request',
+      expectedBookingRevision: 4,
+      reason: 'Reason',
+      context,
+    };
+    transaction.bookingDepositIntent.findFirst.mockResolvedValue({ id: 'active-attempt' });
+    await expect(repository.cancel(input)).rejects.toMatchObject({ code: 'DEPOSIT_INTENT_ACTIVE' });
+    transaction.bookingDepositIntent.findFirst.mockResolvedValue(null);
+    for (const reason of ['', ' '.repeat(501), 'a'.repeat(501)])
+      await expect(repository.cancel({ ...input, reason })).rejects.toThrow('1 through 500');
+    await expect(
+      repository.requestCancellation({ ...input, context: { ...context, actorAccountId: null } }),
+    ).rejects.toThrow('requires an account actor');
+    transaction.booking.updateMany.mockResolvedValue({ count: 0 });
+    await expect(repository.cancel(input)).rejects.toMatchObject({
+      code: 'STALE_BOOKING_REVISION',
+    });
+    await expect(
+      repository.synchronizeHeadcount(
+        {
+          bookingId: 'booking',
+          sourceRsvpRevisionId: 'revision',
+          sourceSequence: 1,
+          expectedAttendees: 10,
+        },
+        context,
+      ),
+    ).rejects.toMatchObject({ code: 'STALE_BOOKING_REVISION' });
+  });
+
+  it('rejects mismatched cancellation decisions and prevents a raced decision from committing', async () => {
+    const transaction = fixture();
+    const repository = createPrismaBookingLifecycleRepository(
+      client(transaction),
+      () => new Date('2026-12-19T00:00:00Z'),
+    );
+    const input = {
+      bookingId: 'booking',
+      cancellationRequestId: 'request',
+      expectedBookingRevision: 4,
+      reason: 'Keep event',
+      decision: 'REJECT' as const,
+      context,
+    };
+    for (const stored of [
+      null,
+      { id: 'request', bookingId: 'other', status: 'PENDING' },
+      { id: 'request', bookingId: 'booking', status: 'REJECTED' },
+    ]) {
+      transaction.bookingCancellationRequest.findUnique.mockResolvedValue(stored);
+      await expect(repository.decideCancellation(input)).rejects.toMatchObject({
+        code: 'CANCELLATION_REQUEST_CONFLICT',
+      });
+    }
+    transaction.bookingCancellationRequest.findUnique.mockResolvedValue({
+      id: 'request',
+      bookingId: 'booking',
+      status: 'PENDING',
+    });
+    expect(await repository.decideCancellation(input)).toEqual({
+      phase: 'CONFIRMED',
+      bookingRevision: 5,
+    });
+    transaction.bookingCancellationRequest.updateMany.mockResolvedValue({ count: 0 });
+    await expect(repository.decideCancellation(input)).rejects.toMatchObject({
+      code: 'CANCELLATION_REQUEST_CONFLICT',
+    });
+  });
+  it('audits a cancellation request and omits personal reasons from its event', async () => {
+    const transaction = fixture();
+    const repository = createPrismaBookingLifecycleRepository(
+      client(transaction),
+      () => new Date('2026-12-19T00:00:00Z'),
+      ids(),
+    );
+    await repository.requestCancellation({
+      bookingId: 'booking',
+      cancellationRequestId: 'request',
+      expectedBookingRevision: 4,
+      reason: ' Private reason ',
+      context,
+    });
+    expect(transaction.auditLog.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          metadata: expect.objectContaining({
+            reason: 'Private reason',
+            cancellationRequestId: 'request',
+          }),
+        }),
+      }),
+    );
+    expect(transaction.bookingOutboxEvent.create).toHaveBeenCalledOnce();
+    expect(JSON.stringify(transaction.bookingOutboxEvent.create.mock.calls)).not.toContain(
+      'Private reason',
+    );
+  });
+
+  it('resolves pending requests during direct Manager cancellation without leaking its reason', async () => {
+    const transaction = fixture();
+    const repository = createPrismaBookingLifecycleRepository(
+      client(transaction),
+      () => new Date('2026-12-19T00:00:00Z'),
+      ids(),
+    );
+    await repository.cancel({
+      bookingId: 'booking',
+      expectedBookingRevision: 4,
+      reason: 'Private decision',
+      context,
+    });
+    expect(transaction.bookingCancellationRequest.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { bookingId: 'booking', status: 'PENDING' },
+        data: expect.objectContaining({ status: 'APPROVED', decisionReason: 'Private decision' }),
+      }),
+    );
+    expect(JSON.stringify(transaction.bookingOutboxEvent.create.mock.calls)).not.toContain(
+      'Private decision',
+    );
+  });
   it('applies a newer aggregate headcount sequence and ignores an older one', async () => {
     const transaction = fixture();
     const repository = createPrismaBookingLifecycleRepository(
@@ -143,6 +322,7 @@ function fixture() {
 
 function client(transaction: object) {
   return {
+    booking: (transaction as ReturnType<typeof fixture>).booking,
     $transaction: vi.fn(async (operation: (value: object) => Promise<unknown>) =>
       operation(transaction),
     ),
