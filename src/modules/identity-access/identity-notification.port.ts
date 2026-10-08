@@ -11,6 +11,7 @@ export type PasswordResetNotification = Readonly<{
 
 export type WorkspaceInvitationNotification = Readonly<{
   invitationId: string;
+  deliveryIntentId?: string;
   recipientEmail: string;
   invitationToken: string;
 }>;
@@ -46,7 +47,7 @@ export function createIdentityEmailNotificationPort(
       link.hash = command.invitationToken;
       await emailProvider.send({
         idempotencyKey: createEmailIntentIdempotencyKey({
-          entityId: command.invitationId,
+          entityId: command.deliveryIntentId ?? command.invitationId,
           intentType: 'workspace-invitation',
         }),
         subject: 'Your wedding workspace invitation',

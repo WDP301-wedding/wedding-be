@@ -10,6 +10,7 @@ export interface WorkspaceInvitationIssuer {
 }
 
 export type InvitationIssueInput = Readonly<{
+  invitationIntentId?: string;
   consultationId: string;
   recipientEmail: string;
   issuedByAccountId: string;
@@ -51,6 +52,9 @@ export function createWorkspaceInvitationService(
     const token = issueOpaqueToken('invitation', options.tokenEntropyBytes);
     const expiresAt = addSeconds(createdAt, options.lifetimeSeconds);
     const stored = await options.repository[operation]({
+      ...(input.invitationIntentId === undefined
+        ? {}
+        : { invitationIntentId: input.invitationIntentId }),
       consultationId: input.consultationId,
       recipientEmailNormalized: email.normalized,
       issuedByAccountId: input.issuedByAccountId,
@@ -61,16 +65,21 @@ export function createWorkspaceInvitationService(
       reissueLimit: options.reissueLimit,
       reissueWindowSeconds: options.reissueWindowSeconds,
     });
-    await options.notificationPort.sendWorkspaceInvitation({
-      invitationId: stored.invitationId,
-      recipientEmail: email.display,
-      invitationToken: token.token,
-    });
+    if (stored.accepted !== true) {
+      await options.notificationPort.sendWorkspaceInvitation({
+        invitationId: stored.invitationId,
+        ...(stored.deliveryIntentId === undefined
+          ? {}
+          : { deliveryIntentId: stored.deliveryIntentId }),
+        recipientEmail: email.display,
+        invitationToken: token.token,
+      });
+    }
     return Object.freeze({
       invitationId: stored.invitationId,
       invitationToken: token.token,
       sequence: stored.sequence,
-      expiresAt,
+      expiresAt: stored.expiresAt ?? expiresAt,
     });
   }
 
