@@ -940,3 +940,79 @@ stale, success, and narrow-screen states explicit.
 No open product decision was found while preparing this plan. Named A/B/C assignment is
 only required before concurrent shared-file work; this single sequential implementation
 is authorized by the project owner's “Tiến hành đi” approval on 2026-10-07.
+
+## 21. Approved product completion sequence (2026-10-08)
+
+The project owner approved the product additions discussed in this chat and explicitly
+kept the entire notification center in SPEC-09. This records scope and sequencing;
+detailed additive contracts and bounded tasks are prepared at the corresponding milestone.
+Existing SPEC numbers, module ownership, baseline 1.1.0, and accepted CP/IA/VC history
+remain the coordination references. Current SPEC-03 acceptance closes its approved scope
+before the post-SPEC-03 additions begin.
+
+### 21.1 After SPEC-03 implementation acceptance
+
+| Addition | Scope and owning module | Completion evidence |
+| --- | --- | --- |
+| Public Website | `wedding-web` landing page, hall list/detail, menus/prices, and contact/consultation entry points; consume SPEC-02 public catalog APIs. | Responsive public journey, published catalog data, loading/empty/error states, and working consultation entry. |
+| Consultation intake | `booking-lifecycle` owns public request submission and Manager review/conversion into a consultation; identity retains workspace invitation ownership. | Guest request -> Manager review -> consultation -> existing restricted invitation/workspace, with duplicate-submission and authorization proof. |
+| Couple overview | Web navigation and restricted proposal/timeline overview; full Couple Web/App navigation, event details, preparation progress, and required actions use backend capabilities. | Restricted access stays bounded; Web/App views use real approved APIs and backend-owned state. |
+| Account settings | `identity-access` owns profile edits and authenticated password change; complete the existing SPEC-01 forgot/reset-password experience. | Own-account updates, safe profile fields, credential verification/session policy, and existing reset flow tested across the applicable clients. |
+
+Prepare an additive specification and bounded plan for these additions before product
+implementation. Intake fields/lifecycle, permitted profile fields, password-change
+session behavior, route ownership, and the screen/API/acceptance matrix must be explicit;
+do not infer a public registration or automatic booking flow from a consultation request.
+Keep account security contracts with identity and consultation state with booking.
+
+The overview is extended incrementally with real provider readiness: payment/billing
+after SPEC-04, invitation/media/print after SPEC-05, RSVP after SPEC-06, and seating
+after SPEC-07. Upcoming features are not presented as completed workflows. Android
+remains available only after FULL access and confirmed deposit. Notification lists,
+unread badges, read actions, email/push expansion, and notification navigation wait
+for SPEC-09; they are not an early post-SPEC-03 slice. Existing identity credential
+email delivery continues through its accepted provider boundary.
+
+### 21.2 After SPEC-05 implementation acceptance
+
+`invitation-studio` owns the print-file output follow-up: approved revision preview,
+file generation, authorized download, and delivery to the restaurant for printing.
+Specify format, physical dimensions, front/back arrangement, font handling, image
+quality, QR readability, and revision identity in its bounded plan before implementation.
+Generated output must resolve the exact accepted immutable printable snapshot rather
+than current mutable invitation content. It preserves the no-recipient-name and generic
+QR rules and keeps private originals behind authorized access.
+
+Complete file output without seating first. Output containing seating reaches real
+integration acceptance only after SPEC-07 provides accepted seating snapshots; the
+SPEC-05 registry contract/fakes alone cannot close that integration.
+
+### 21.3 At SPEC-09
+
+Deliver the notification center together with SPEC-09 notification settings, email,
+Android push, and scheduled reminders. User-facing inbox entries, unread/read state,
+and authorized links to relevant screens are distinct from Manager delivery-attempt
+status. Specify their account/booking scope, safe content, lifecycle, APIs, and client
+acceptance in the SPEC-09 bounded plan. Opening or reading a notification never approves
+a timeline, settles a payment, or grants resource access.
+
+### 21.4 Acceptance and allocation
+
+The follow-up plans name repository/module owners and map each screen to provider APIs
+and focused acceptance scenarios. Final cross-module and release evidence includes the
+public-to-consultation journey, progressive Couple overview, account settings/reset,
+exact-revision print output, and SPEC-09 inbox. New additions remain pending until
+their actual implementation and evidence are accepted; this scheduling decision does
+not mark any existing or new implementation complete.
+
+### 21.5 Post-SPEC-03 implementation record
+
+The owner's 2026-10-08 request authorizes implementation after completed SPEC-03.
+The additive [experience SPEC](../SPEC-post-booking-experience.md) defines four bounded
+waves: backend/persistence/security; OpenAPI/public discovery/Manager intake; Couple
+overview/account settings; verification and evidence. Codex is the sequential
+implementation owner across all four repositories, keeping migration/OpenAPI writes
+in one lane. The current implementation and quality checks are recorded in
+[post-SPEC-03 evidence](./evidence/post-spec03-experience.md). Physical Android review,
+shared database deployment, and project-owner visual acceptance remain explicit
+runtime/release checks. This does not advance SPEC-04–SPEC-11 or their deferred features.

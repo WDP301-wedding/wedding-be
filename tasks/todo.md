@@ -2691,6 +2691,52 @@ execution and acceptance wait for every preceding real implementation.
 - [ ] Release planning covers the restricted-workspace-to-event-check-in journey and all four repositories.
 - [ ] No deferred or out-of-scope feature was silently promoted into the required release.
 
+## Approved product completion follow-ups (2026-10-08)
+
+Scope and order were approved by the project owner in this chat, with the entire
+notification center deferred to SPEC-09. See [plan Section 21](./plan.md#21-approved-product-completion-sequence-2026-10-08).
+The post-SPEC-03 implementation was authorized in this chat and is recorded below.
+Later milestone follow-ups and existing acceptance history remain intact.
+
+### After SPEC-03 implementation acceptance
+
+- [x] Prepare additive specifications and bounded tasks with screen/API ownership for
+      Public Website, consultation intake, Couple overview, and account settings.
+- [x] Implement Public Website: landing page, halls, menus/prices, contact, and
+      consultation entry using the accepted public catalog APIs.
+- [x] Implement booking-owned public intake -> Manager review -> consultation ->
+      existing identity invitation/restricted workspace, including safe retries.
+- [x] Implement Couple Web overview/navigation and FULL Android overview/navigation
+      using backend capabilities and real booking data.
+- [x] Implement identity-owned profile editing and authenticated password change;
+      complete and verify the existing forgot/reset-password experience.
+- [ ] Extend the overview with real payment, invitation, guest, and seating providers
+      as SPEC-04, SPEC-05, SPEC-06, and SPEC-07 become accepted.
+
+Contract and bounded waves: [post-SPEC-03 SPEC](../SPEC-post-booking-experience.md).
+Implementation/testing owner: Codex. See [implementation evidence](./evidence/post-spec03-experience.md).
+Shared database deployment, physical Android review, and owner visual acceptance remain
+runtime/release checks; notification and print follow-ups below remain pending.
+
+### After SPEC-05 implementation acceptance
+
+- [ ] Specify print-file format/dimensions/front-back/fonts/image quality, QR checks,
+      revision identity, and authorized preview/download acceptance.
+- [ ] Implement print-file output from exact approved snapshots without seating.
+- [ ] Complete seating-inclusive output integration after SPEC-07 acceptance.
+
+### At SPEC-09
+
+- [ ] Specify and implement the entire notification center: scoped inbox, unread/read
+      state, authorized screen links, and Web/App presentation.
+- [ ] Integrate the center with SPEC-09 settings, email, Android push, and reminders;
+      keep inbox/read state distinct from delivery-attempt status and business state.
+
+### Product completion acceptance
+
+- [ ] Record named owners, focused runtime/security proof, and cross-module evidence
+      for the additions; include these journeys in final release acceptance.
+
 ## Rolling-Plan Rule
 
 When a SPEC task is approved, insert that module's compact implementation waves
