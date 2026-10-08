@@ -3,14 +3,101 @@ import request from 'supertest';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createApp } from '../../../app.js';
+import { AppError } from '../../../core/errors/app-error.js';
+import { BookingPolicyError } from '../domain/booking-policy.js';
 import {
   createBookingLifecycleRouter,
   type BookingLifecycleHttpServices,
+  type CreateBookingLifecycleRouterOptions,
 } from './booking-lifecycle.router.js';
 
 const consultationId = '00000000-0000-4000-8000-000000000001';
 
 describe('BookingLifecycleRouter', () => {
+  it.each([401, 403, 404])(
+    'audits protected %s denials without raw credentials, query or body',
+    async (status) => {
+      const audit = vi.fn().mockResolvedValue(undefined);
+      const app = appWith(
+        {
+          getProposal: vi
+            .fn()
+            .mockRejectedValue(
+              new AppError({ code: 'BOOKING_NOT_FOUND', status, message: 'Denied' }),
+            ),
+        },
+        audit,
+      );
+      const response = await request(app)
+        .get('/api/v1/bookings/' + consultationId + '/proposal?privateNote=omit')
+        .set('Authorization', 'Bearer private-token');
+      expect(response.status).toBe(status);
+      expect(audit).toHaveBeenCalledWith({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Vitest matcher represents the generated request UUID.
+        requestId: expect.any(String),
+        actorAccountId: '00000000-0000-4000-8000-000000000010',
+        code: 'BOOKING_NOT_FOUND',
+        status,
+        operation: 'GET /bookings/:bookingId/proposal',
+      });
+      expect(JSON.stringify(audit.mock.calls)).not.toMatch(/private-token|privateNote|omit/);
+    },
+  );
+  it('fails closed when protected audit storage is unavailable', async () => {
+    const app = appWith(
+      {
+        getProposal: vi
+          .fn()
+          .mockRejectedValue(new AppError({ code: 'FORBIDDEN', status: 403, message: 'Denied' })),
+      },
+      vi.fn().mockRejectedValue(new Error('audit unavailable')),
+    );
+    expect(
+      (
+        await request(app)
+          .get('/api/v1/bookings/' + consultationId + '/proposal')
+          .set('Authorization', 'Bearer token')
+      ).status,
+    ).toBe(503);
+  });
+  it('routes a strict cancellation decision to the owning Manager service', async () => {
+    const decideCancellation = vi
+      .fn()
+      .mockResolvedValue({ phase: 'CONFIRMED', bookingRevision: 5 });
+    const app = appWith({ decideCancellation });
+    const response = await request(app)
+      .post(
+        `/api/v1/management/bookings/${consultationId}/cancellation-requests/${consultationId}/decision`,
+      )
+      .set('Authorization', 'Bearer test-token')
+      .set('Idempotency-Key', 'reject-cancellation')
+      .send({ expectedRevision: 4, decision: 'REJECT', reason: 'Continue event' });
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({ data: { phase: 'CONFIRMED', bookingRevision: 5 } });
+    expect(decideCancellation).toHaveBeenCalledWith(
+      expect.objectContaining({
+        cancellationRequestId: consultationId,
+        decision: 'REJECT',
+        expectedBookingRevision: 4,
+      }),
+    );
+  });
+  it('returns a stable conflict for a rejected domain transition', async () => {
+    const app = appWith({
+      complete: vi
+        .fn()
+        .mockRejectedValue(
+          new BookingPolicyError('INVALID_BOOKING_TRANSITION', 'Cannot complete a draft.'),
+        ),
+    });
+    const response = await request(app)
+      .post(`/api/v1/management/bookings/${consultationId}/completion`)
+      .set('Authorization', 'Bearer test-token')
+      .set('Idempotency-Key', 'complete-draft')
+      .send({ expectedRevision: 1 });
+    expect(response.status).toBe(409);
+    expect(response.body).toMatchObject({ error: { code: 'INVALID_BOOKING_TRANSITION' } });
+  });
   it('creates a consultation with a strict Manager command', async () => {
     const createConsultation = vi.fn().mockResolvedValue({ consultationId, revision: 1 });
     const app = appWith({ createConsultation });
@@ -46,7 +133,10 @@ describe('BookingLifecycleRouter', () => {
   });
 });
 
-function appWith(overrides: Partial<BookingLifecycleHttpServices>): ReturnType<typeof createApp> {
+function appWith(
+  overrides: Partial<BookingLifecycleHttpServices>,
+  auditProtectedDenial?: CreateBookingLifecycleRouterOptions['auditProtectedDenial'],
+): ReturnType<typeof createApp> {
   const unused = () => Promise.reject(new Error('unused'));
   const services: BookingLifecycleHttpServices = {
     resolveActor: {
@@ -69,6 +159,7 @@ function appWith(overrides: Partial<BookingLifecycleHttpServices>): ReturnType<t
     withdrawTimeline: unused,
     requestChange: unused,
     requestCancellation: unused,
+    decideCancellation: unused,
     cancel: unused,
     complete: unused,
     ...overrides,
@@ -79,6 +170,7 @@ function appWith(overrides: Partial<BookingLifecycleHttpServices>): ReturnType<t
         '/api/v1',
         createBookingLifecycleRouter({
           services,
+          ...(auditProtectedDenial === undefined ? {} : { auditProtectedDenial }),
           createIdempotencyHandler: () =>
             ((_request, _response, next) => next()) satisfies RequestHandler,
         }),

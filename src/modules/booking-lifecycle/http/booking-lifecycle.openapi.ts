@@ -16,6 +16,7 @@ import {
   approvalBodySchema,
   bookingResponseSchema,
   cancellationBodySchema,
+  cancellationDecisionBodySchema,
   changeRequestBodySchema,
   consultationResponseSchema,
   createBookingBodySchema,
@@ -252,6 +253,20 @@ export const bookingLifecycleOpenApiPaths: Paths = {
       {
         parameters: [path('bookingId')],
       },
+    ),
+  },
+  '/management/bookings/{bookingId}/cancellation-requests/{requestId}/decision': {
+    post: mutation(
+      'decideBookingCancellation',
+      'Approve or reject a pending cancellation request',
+      cancellationDecisionBodySchema,
+      z.strictObject({
+        data: z.strictObject({
+          phase: z.enum(['DRAFT', 'AWAITING_DEPOSIT', 'CONFIRMED', 'CANCELLED', 'COMPLETED']),
+          bookingRevision: revision,
+        }),
+      }),
+      { parameters: [path('bookingId'), path('requestId')] },
     ),
   },
   '/management/bookings/{bookingId}/completion': {

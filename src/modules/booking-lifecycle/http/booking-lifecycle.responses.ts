@@ -31,6 +31,9 @@ export const proposalResponseSchema = z.strictObject({
     revision,
     eventDate: z.iso.date(),
     planningHeadcount: z.int().min(0).max(10000),
+    cancellationRequests: z
+      .array(z.strictObject({ requestId: uuid, reason: z.string(), requestedAt: timestamp }))
+      .optional(),
     proposal: z.strictObject({
       hall: z.strictObject({
         id: uuid,

@@ -9,6 +9,15 @@ const reason = z.string().trim().min(1).max(500);
 export const consultationParamsSchema = z.strictObject({ consultationId: uuid });
 export const bookingParamsSchema = z.strictObject({ bookingId: uuid });
 export const timelineParamsSchema = z.strictObject({ bookingId: uuid, revisionId: uuid });
+export const cancellationDecisionParamsSchema = z.strictObject({
+  bookingId: uuid,
+  requestId: uuid,
+});
+export const cancellationDecisionBodySchema = z.strictObject({
+  expectedRevision: revision,
+  decision: z.enum(['APPROVE', 'REJECT']),
+  reason,
+});
 
 export const createConsultationBodySchema = z.strictObject({
   intendedEmail: z.email(),
@@ -74,5 +83,5 @@ export const consultationResponseSchema = z.strictObject({
 });
 
 export const bookingResponseSchema = z.strictObject({
-  data: z.strictObject({ bookingId: uuid, revision }),
+  data: z.strictObject({ bookingId: uuid, revision, consultationRevision: revision }),
 });

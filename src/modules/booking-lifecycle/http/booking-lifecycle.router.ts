@@ -4,9 +4,15 @@ import {
   type Request,
   type RequestHandler,
   type Response,
+  type ErrorRequestHandler,
 } from 'express';
 
 import { validateRequest, validatedRequest } from '../../../core/http/validate.js';
+import { AppError } from '../../../core/errors/app-error.js';
+import { BookingPolicyError } from '../domain/booking-policy.js';
+import { BookingTimelinePolicyError } from '../domain/timeline.policy.js';
+import { BookingSlotPolicyError } from '../domain/slot-hold.policy.js';
+import { BookingLifecyclePolicyError } from '../domain/lifecycle.policy.js';
 import type {
   AuthenticatedActor,
   AuthenticatedActorResolver,
@@ -18,12 +24,15 @@ import {
 import { requireAnyRole } from '../../identity-access/authorization/authorization.service.js';
 import type { RestaurantShiftCode } from '../../venue-catalog/application/venue.service.js';
 import type { TimelineRevision } from '../domain/timeline.policy.js';
+import { holdResponseSchema, proposalResponseSchema } from './booking-lifecycle.responses.js';
 import {
   approvalBodySchema,
   availabilityQuerySchema,
   bookingParamsSchema,
   bookingResponseSchema,
   cancellationBodySchema,
+  cancellationDecisionParamsSchema,
+  cancellationDecisionBodySchema,
   changeRequestBodySchema,
   consultationParamsSchema,
   consultationResponseSchema,
@@ -92,7 +101,9 @@ export interface BookingLifecycleHttpServices {
       managerAccountId: string;
       requestId: string;
     }>,
-  ): Promise<Readonly<{ bookingId: string; bookingRevision: number }>>;
+  ): Promise<
+    Readonly<{ bookingId: string; bookingRevision: number; consultationRevision: number }>
+  >;
   acquireSlotHold(
     input: Readonly<{
       bookingId: string;
@@ -161,6 +172,22 @@ export interface BookingLifecycleHttpServices {
       requestId: string;
     }>,
   ): Promise<Readonly<{ phase: 'CANCELLED'; bookingRevision: number }>>;
+  decideCancellation(
+    input: Readonly<{
+      bookingId: string;
+      cancellationRequestId: string;
+      expectedBookingRevision: number;
+      decision: 'APPROVE' | 'REJECT';
+      reason: string;
+      actor: Actor;
+      requestId: string;
+    }>,
+  ): Promise<
+    Readonly<{
+      phase: 'DRAFT' | 'AWAITING_DEPOSIT' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+      bookingRevision: number;
+    }>
+  >;
   complete(
     input: Readonly<{
       bookingId: string;
@@ -174,6 +201,15 @@ export interface BookingLifecycleHttpServices {
 export interface CreateBookingLifecycleRouterOptions {
   readonly services: BookingLifecycleHttpServices;
   readonly createIdempotencyHandler: (normalizedRoute: string) => RequestHandler;
+  readonly auditProtectedDenial?: (
+    input: Readonly<{
+      requestId: string;
+      actorAccountId: string | null;
+      code: string;
+      status: number;
+      operation: string;
+    }>,
+  ) => Promise<void>;
 }
 
 const actorContexts = new WeakMap<Request, AuthenticatedActor>();
@@ -272,7 +308,11 @@ export function createBookingLifecycleRouter(options: CreateBookingLifecycleRout
       });
       response.status(201).json(
         bookingResponseSchema.parse({
-          data: { bookingId: result.bookingId, revision: result.bookingRevision },
+          data: {
+            bookingId: result.bookingId,
+            revision: result.bookingRevision,
+            consultationRevision: result.consultationRevision,
+          },
         }),
       );
     }),
@@ -294,7 +334,16 @@ export function createBookingLifecycleRouter(options: CreateBookingLifecycleRout
         managerAccountId: actor(request).accountId,
         requestId: request.requestId,
       });
-      response.status(201).json({ data: { ...result, expiresAt: result.expiresAt.toISOString() } });
+      response.status(201).json(
+        holdResponseSchema.parse({
+          data: {
+            holdId: result.holdId,
+            expiresAt: result.expiresAt.toISOString(),
+            bookingRevision: result.bookingRevision,
+            replayed: result.replayed,
+          },
+        }),
+      );
     }),
   );
 
@@ -304,12 +353,14 @@ export function createBookingLifecycleRouter(options: CreateBookingLifecycleRout
     validateRequest({ params: bookingParamsSchema }),
     asyncHandler(async (request, response) => {
       const { params } = validatedRequest(response, { params: bookingParamsSchema });
-      response.json({
-        data: await options.services.getProposal({
-          bookingId: params.bookingId,
-          actor: actor(request),
+      response.json(
+        proposalResponseSchema.parse({
+          data: await options.services.getProposal({
+            bookingId: params.bookingId,
+            actor: actor(request),
+          }),
         }),
-      });
+      );
     }),
   );
 
@@ -422,6 +473,33 @@ export function createBookingLifecycleRouter(options: CreateBookingLifecycleRout
   );
 
   router.post(
+    '/management/bookings/:bookingId/cancellation-requests/:requestId/decision',
+    ...manager,
+    idempotent('/management/bookings/{bookingId}/cancellation-requests/{requestId}/decision'),
+    validateRequest({
+      params: cancellationDecisionParamsSchema,
+      body: cancellationDecisionBodySchema,
+    }),
+    asyncHandler(async (request, response) => {
+      const { params, body } = validatedRequest(response, {
+        params: cancellationDecisionParamsSchema,
+        body: cancellationDecisionBodySchema,
+      });
+      response.json({
+        data: await options.services.decideCancellation({
+          bookingId: params.bookingId,
+          cancellationRequestId: params.requestId,
+          expectedBookingRevision: body.expectedRevision,
+          decision: body.decision,
+          reason: body.reason,
+          actor: actor(request),
+          requestId: request.requestId,
+        }),
+      });
+    }),
+  );
+
+  router.post(
     '/management/bookings/:bookingId/cancellation',
     ...manager,
     idempotent('/management/bookings/{bookingId}/cancellation'),
@@ -464,6 +542,45 @@ export function createBookingLifecycleRouter(options: CreateBookingLifecycleRout
     }),
   );
 
+  const auditDenial: ErrorRequestHandler = (error: unknown, request, _response, next) => {
+    if (
+      !(error instanceof AppError) ||
+      ![401, 403, 404].includes(error.status) ||
+      options.auditProtectedDenial === undefined
+    ) {
+      next(error);
+      return;
+    }
+    const route: unknown = request.route;
+    void options
+      .auditProtectedDenial({
+        requestId: request.requestId,
+        actorAccountId: actorContexts.get(request)?.accountId ?? null,
+        code: error.code,
+        status: error.status,
+        operation:
+          request.method +
+          ' ' +
+          (typeof route === 'object' &&
+          route !== null &&
+          'path' in route &&
+          typeof route.path === 'string'
+            ? route.path
+            : 'booking'),
+      })
+      .then(() => next(error))
+      .catch((cause: unknown) =>
+        next(
+          new AppError({
+            status: 503,
+            code: 'PROVIDER_UNAVAILABLE',
+            message: 'The protected access audit could not be recorded.',
+            cause,
+          }),
+        ),
+      );
+  };
+  router.use(auditDenial);
   return router;
 }
 
@@ -530,5 +647,23 @@ function serializeTimelineResult(
 function asyncHandler(
   handler: (request: Request, response: Response, next: NextFunction) => Promise<void>,
 ): RequestHandler {
-  return (request, response, next) => void handler(request, response, next).catch(next);
+  return (request, response, next) =>
+    void handler(request, response, next).catch((error: unknown) => {
+      if (
+        error instanceof BookingPolicyError ||
+        error instanceof BookingTimelinePolicyError ||
+        error instanceof BookingSlotPolicyError ||
+        error instanceof BookingLifecyclePolicyError
+      ) {
+        next(
+          new AppError({
+            status: error.code.endsWith('_INVALID') ? 422 : 409,
+            code: error.code,
+            message: error.message,
+          }),
+        );
+        return;
+      }
+      next(error);
+    });
 }
