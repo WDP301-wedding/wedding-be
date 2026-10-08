@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { AppError } from '../../../core/errors/app-error.js';
 
 import type { RestaurantShiftCode } from '../../venue-catalog/application/venue.service.js';
 import type { ProposalSnapshot } from '../domain/booking-policy.js';
@@ -143,13 +144,22 @@ export function createConsultationService(
       if (intent.status === 'ISSUED' && intent.invitationId !== null) {
         return Object.freeze({ invitationId: intent.invitationId, replayed: true });
       }
-      const issued = await options.identity.issueRestrictedWorkspace({
-        invitationIntentId: intent.invitationIntentId,
-        consultationId: intent.consultationId,
-        recipientEmail: intent.intendedEmail,
-        issuedByAccountId: intent.managerAccountId,
-        requestId: intent.requestId,
-      });
+      const issued = await options.identity
+        .issueRestrictedWorkspace({
+          invitationIntentId: intent.invitationIntentId,
+          consultationId: intent.consultationId,
+          recipientEmail: intent.intendedEmail,
+          issuedByAccountId: intent.managerAccountId,
+          requestId: intent.requestId,
+        })
+        .catch((cause: unknown) => {
+          throw new AppError({
+            status: 503,
+            code: 'PROVIDER_UNAVAILABLE',
+            message: 'Invitation delivery is unavailable; retry this consultation intent.',
+            cause,
+          });
+        });
       await options.repository.markInvitationIssued(intent.consultationId, issued.invitationId);
       return Object.freeze({ invitationId: issued.invitationId, replayed: false });
     },

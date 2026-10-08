@@ -29,7 +29,9 @@ export interface ConsultationWorkspaceRepository {
   createConsultation(record: ConsultationWorkspaceRecord): Promise<ConsultationWorkspaceRecord>;
   createBooking(
     record: BookingProposalRecord,
-  ): Promise<Readonly<BookingProposalRecord & { bookingRevision: number }>>;
+  ): Promise<
+    Readonly<BookingProposalRecord & { bookingRevision: number; consultationRevision: number }>
+  >;
 }
 
 export function createConsultationWorkspaceService(

@@ -126,7 +126,10 @@ describe('ConsultationService', () => {
       requestId: '00000000-0000-4000-8000-000000000013',
     } as const;
 
-    await expect(service.requestWorkspaceInvitation(input)).rejects.toThrow('provider unavailable');
+    await expect(service.requestWorkspaceInvitation(input)).rejects.toMatchObject({
+      status: 503,
+      code: 'PROVIDER_UNAVAILABLE',
+    });
     expect(repository.intents.get(input.consultationId)?.status).toBe('PENDING');
 
     const issued = await service.requestWorkspaceInvitation(input);

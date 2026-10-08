@@ -9,6 +9,20 @@ import {
 } from './consultation-workspace.service.js';
 
 describe('ConsultationWorkspaceService', () => {
+  it('generates a new consultation identity when no ID factory is supplied', async () => {
+    const result = await createConsultationWorkspaceService({
+      repository: repositoryFixture(),
+      catalog: catalogFixture(),
+    }).createConsultation({
+      intendedEmail: 'couple@example.com',
+      displayName: 'Couple',
+      note: null,
+      managerAccountId: 'manager',
+      requestId: 'request',
+    });
+    expect(result.consultationId).toMatch(/^[0-9a-f-]{36}$/u);
+    expect(result.revision).toBe(1);
+  });
   it('creates the consultation before any proposal or invitation exists', async () => {
     const repository = repositoryFixture();
     const service = createConsultationWorkspaceService({
