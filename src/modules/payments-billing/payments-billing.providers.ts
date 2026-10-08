@@ -21,6 +21,8 @@ import { createPrismaBillingPersistence } from './infrastructure/billing.persist
 import { createVnpayEvidenceRepository } from './infrastructure/vnpay.persistence.js';
 import { createVnpayProtocol } from './infrastructure/vnpay.protocol.js';
 import { createVnpayStatusGateway } from './infrastructure/vnpay.gateway.js';
+import { createBillingOperationsRepository } from './infrastructure/billing-operations.repository.js';
+import { createBillingOperationsService } from './application/billing-operations.service.js';
 import type { ContractContext } from './application/payments-billing.providers.js';
 
 // Real owner/provider composition. HTTP/OpenAPI publication remains the W6 lane.
@@ -65,7 +67,18 @@ export function createPaymentsBillingProviders(
     boundary,
   });
   const settings = options.vnpay ?? config.vnpay;
+  const operations = createBillingOperationsService({
+    ledger: billing.repository,
+    operations: createBillingOperationsRepository(prisma, scope),
+    boundary,
+    booking: booking.lifecycleReader,
+    commercial: booking.commercial,
+    reporting: booking.reporting,
+    coordinator: booking.deposits,
+    recorder: booking.deposits,
+  });
   return Object.freeze({
+    operations,
     boundary,
     ledger: billing.repository,
     charges: createChargeRegistrationService({
