@@ -176,13 +176,41 @@ export function createSeatingPlanService(
         layoutEligibility.maxGuests,
       );
 
-      // Idempotent: if a plan already exists for this booking, return it
+      // If a plan already exists for this booking:
       const existing = await repository.findPlanByBookingId(input.bookingId);
       if (existing !== null) {
         const rev = existing.currentRevisionId
           ? await repository.getCurrentRevisionWithLabels(existing.currentRevisionId)
           : null;
-        return buildResult(existing, rev, false);
+        if (rev !== null && rev.layoutTemplateVersionId === input.layoutTemplateVersionId) {
+          const exRec = await repository.getExceptionRecord(existing.id);
+          return buildResult(existing, rev, exRec !== null);
+        }
+
+        // Selected a different layout -> create a replacement DRAFT revision
+        const revisionId = randomUUID();
+        const digest = buildRevisionDigest(
+          input.layoutTemplateVersionId,
+          booking.planningHeadcount,
+          [],
+        );
+        const appendRes = await repository.appendRevision({
+          planId: existing.id,
+          revisionId,
+          expectedPlanRevision: existing.planRevision,
+          layoutTemplateVersionId: input.layoutTemplateVersionId,
+          expectedAttendees: booking.planningHeadcount,
+          revisionDigest: digest,
+          labels: [],
+          createdByAccountId: input.actorAccountId,
+        });
+        const updatedPlan = await repository.requirePlanById(existing.id);
+        const newRev = await repository.getCurrentRevisionWithLabels(revisionId);
+        return buildResult(
+          { ...updatedPlan, planRevision: appendRes.planRevision },
+          newRev,
+          false,
+        );
       }
 
       const planId = randomUUID();
