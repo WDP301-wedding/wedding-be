@@ -67,7 +67,7 @@ Audit each rendered screen for these locks:
 
 - **Color:** every color has a semantic role from the Wedding palette. Gold remains detail, navy remains structure/action, and powder blue remains a quiet surface.
 - **Shape:** square and low-radius surfaces dominate; pills remain limited to compact statuses, counters, avatars, and progress.
-- **Typography:** display serif, restrained script, and body sans retain their assigned roles. Vietnamese glyphs render cleanly.
+- **Typography:** Vietnamese headings, accents, labels and body use the shared sans-serif tokens with normal tracking and authored case. Serif is restricted to explicit Latin-only wordmarks. Vietnamese glyphs render cleanly.
 - **Iconography:** one coherent icon family or the platform-native set is used within a product surface. Icons are not hand-drawn merely for differentiation.
 - **Motion:** durations and easing form a small consistent vocabulary. Reduced-motion behavior is present when motion exceeds basic state feedback.
 - **Terminology:** the same domain concept uses the same Vietnamese label across web, management, and mobile where roles align.

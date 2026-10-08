@@ -34,6 +34,15 @@ The user has approved this system for subsequent Wedding screens. Make routine v
 
 When several layouts are valid, choose the one that best preserves content hierarchy, task clarity, and the product-specific pattern in the references. Do not invent novelty merely to make screens look different.
 
+## Vietnamese typography regression prevention
+
+- Audit every affected heading and shared stylesheet, not just the reported selector. Remove direct serif overrides and serif fallbacks from Vietnamese UI; changing the root token alone does not fix feature-level overrides.
+- Browser UI uses shared Be Vietnam Pro tokens. Never add CSS uppercase or nonzero letter spacing to Vietnamese text. Keep headings at a diacritic-safe line height of at least 1.25.
+- Decorative serif/tracking must be isolated in an explicit Latin-only element; never apply it to a translated container or dynamic venue name.
+- In wedding-web and wedding-manage-web, run `npm test -- src/design-system/typography.test.ts` with the normal checks for every UI change. Do not weaken the regression guard to introduce a visual treatment.
+- Inspect actual browser glyphs at desktop and mobile widths, including “Điều phối đặt tiệc”, “Hồ sơ tư vấn” and “Đề xuất & vòng đời”. DOM text assertions alone cannot prove correct shaping.
+- These rules override generic serif or uppercase suggestions in other design references.
+
 ## Completion standard
 
 A UI task is complete only when the relevant automated checks pass, the rendered result has been inspected at its target viewport, browser/runtime errors are absent, the taste pre-flight passes, and the screen remains consistent with the approved visual foundation and product pattern. Temporary photography is acceptable for prototypes but must be identified as replaceable before production.

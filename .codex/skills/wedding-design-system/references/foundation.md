@@ -63,7 +63,7 @@ Marketing and invitation views should have generous vertical pauses and occasion
 
 ## Interaction and accessibility
 
-- Primary buttons are estate forest with pressed-ivory text, rectangular/low-radius, uppercase semibold labels, and enough padding for a 44px target. Hover deepens toward evergreen; never rely on letter-spacing animation as the only feedback.
+- Primary buttons are estate forest with pressed-ivory text, rectangular/low-radius, semibold labels in authored case, and enough padding for a 44px target. Hover deepens toward evergreen; never rely on letter-spacing animation as the only feedback.
 - Secondary actions use a sage or champagne hairline with charcoal text; editorial links use a subtle underlined text treatment and may include a trailing arrow.
 - Every form control has a visible label, useful help/error text, a clear forest focus state, and a stable disabled state. Inputs are lightly framed or bottom-ruled—not floating rounded capsules.
 - Preserve heading order, landmarks, accessible names, keyboard navigation, live regions for async status, and a deliberate narrow-screen strategy for data tables.
