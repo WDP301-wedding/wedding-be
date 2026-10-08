@@ -125,6 +125,17 @@ This module emits the baseline `booking.timeline-review-requested`,
 events. An outbox saves each fact atomically with its state change. Payloads contain
 only the baseline IDs/timestamps/revisions and no contact, token, or live catalog data.
 
+Additive v1 facts emitted by this implementation are `booking.slot-held`
+(`bookingId, holdId, expiresAt`), `booking.deposit-recorded`
+(`bookingId, timelineRevisionId, bookingRevision`),
+`booking.timeline-approval-withdrawn`
+(`bookingId, timelineRevisionId, bookingRevision, party`),
+`booking.cancellation-requested` and `booking.cancellation-rejected`
+(`bookingId, bookingRevision, cancellationRequestId`). Cancellation reasons remain
+in protected audit history and are excluded from event payloads. Delivery reconstructs
+the baseline envelope from durable version/correlation/cause fields and fixed
+producer/aggregate names.
+
 ## 5. Authorization and HTTP hand-off
 
 Managers create consultations, availability, holds, bookings, cancellations, and
@@ -196,21 +207,22 @@ Exact settled-payment replay is checked before rejecting current phase `CONFIRME
 All listed schemas are strict; omitted optional properties preserve their prior value.
 Output timestamps are ISO UTC strings; integers and UUIDs follow baseline conventions.
 
-| Method/path                                                     | Request data                                                                                     | Result / authority                                                                                                                   |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
-| POST /management/consultations                                  | intendedEmail, displayName (1–120), optional note (0–2,000)                                      | 201 consultationId/revision; Manager only; invitation requested by separate command.                                                 |
-| POST /management/consultations/{id}/workspace-invitations       | expectedRevision                                                                                 | 202 consultationId/invitation status; identity owns token/email. Failure leaves consultation and retry intent intact.                |
-| GET /management/availability                                    | hallId, eventDate, shiftCode                                                                     | Slot availability/expiry only; Manager. Public current-slot availability may be read through a separately authorized proposal query. |
-| POST /bookings                                                  | consultationId, hallId, eventDate, shiftCode, menuPackageVersionId, tableCount, expectedRevision | 201 bookingId/revision/safe snapshots; Manager.                                                                                      |
-| POST /bookings/{id}/slot-holds                                  | expectedRevision                                                                                 | holdId/expiresAt/revision; Manager only.                                                                                             |
-| GET /bookings/{id}/proposal                                     | no body                                                                                          | Safe proposal/timeline/access capabilities; Manager or own restricted/full grant.                                                    |
-| POST /bookings/{id}/timeline-revisions                          | expectedRevision, predecessorRevisionId, items[{itemId?, order, startTime, title, description?}] | New exact timeline revision; Manager or own consultation collaborator.                                                               |
-| POST /bookings/{id}/timeline-revisions/{revisionId}/approvals   | expectedRevision                                                                                 | Approval party is derived from actor; no submitted party/role; exact current revision only.                                          |
-| POST /bookings/{id}/timeline-revisions/{revisionId}/withdrawals | expectedRevision, reason                                                                         | Pre-deposit own-party approval withdrawal; never withdraw effective post-deposit history.                                            |
-| POST /bookings/{id}/change-requests                             | expectedRevision, replacement items, reason                                                      | Proposed post-deposit revision; previous effective content remains.                                                                  |
-| POST /bookings/{id}/cancellation-requests                       | expectedRevision, reason                                                                         | Couple request only; does not cancel booking or refund.                                                                              |
-| POST /management/bookings/{id}/cancellation                     | expectedRevision, reason                                                                         | Manager cancellation and audit; refuses active unresolved deposit reservation.                                                       |
-| POST /management/bookings/{id}/completion                       | expectedRevision                                                                                 | Manager invokes same guarded completion domain command as automation.                                                                |
+| Method/path                                                               | Request data                                                                                     | Result / authority                                                                                                                   |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| POST /management/consultations                                            | intendedEmail, displayName (1–120), optional note (0–2,000)                                      | 201 consultationId/revision; Manager only; invitation requested by separate command.                                                 |
+| POST /management/consultations/{id}/workspace-invitations                 | expectedRevision                                                                                 | 202 consultationId/invitation status; identity owns token/email. Failure leaves consultation and retry intent intact.                |
+| GET /management/availability                                              | hallId, eventDate, shiftCode                                                                     | Slot availability/expiry only; Manager. Public current-slot availability may be read through a separately authorized proposal query. |
+| POST /bookings                                                            | consultationId, hallId, eventDate, shiftCode, menuPackageVersionId, tableCount, expectedRevision | 201 bookingId/revision/safe snapshots; Manager.                                                                                      |
+| POST /bookings/{id}/slot-holds                                            | expectedRevision                                                                                 | holdId/expiresAt/revision; Manager only.                                                                                             |
+| GET /bookings/{id}/proposal                                               | no body                                                                                          | Safe proposal/timeline/access capabilities; Manager or own restricted/full grant.                                                    |
+| POST /bookings/{id}/timeline-revisions                                    | expectedRevision, predecessorRevisionId, items[{itemId?, order, startTime, title, description?}] | New exact timeline revision; Manager or own consultation collaborator.                                                               |
+| POST /bookings/{id}/timeline-revisions/{revisionId}/approvals             | expectedRevision                                                                                 | Approval party is derived from actor; no submitted party/role; exact current revision only.                                          |
+| POST /bookings/{id}/timeline-revisions/{revisionId}/withdrawals           | expectedRevision, reason                                                                         | Pre-deposit own-party approval withdrawal; never withdraw effective post-deposit history.                                            |
+| POST /bookings/{id}/change-requests                                       | expectedRevision, replacement items, reason                                                      | Proposed post-deposit revision; previous effective content remains.                                                                  |
+| POST /bookings/{id}/cancellation-requests                                 | expectedRevision, reason                                                                         | Couple request only; does not cancel booking or refund.                                                                              |
+| POST /management/bookings/{id}/cancellation                               | expectedRevision, reason                                                                         | Manager cancellation and audit; refuses active unresolved deposit reservation.                                                       |
+| POST /management/bookings/{id}/completion                                 | expectedRevision                                                                                 | Manager invokes same guarded completion domain command as automation.                                                                |
+| POST /management/bookings/{id}/cancellation-requests/{requestId}/decision | expectedRevision, decision (APPROVE or REJECT), reason                                           | Owning Manager decides the Couple request; approval invokes the guarded cancellation transition; rejection preserves booking phase.  |
 
 Moving to a successor before deposit resets both approval flags for that successor and
 removes deposit eligibility even if an older revision was mutually approved. Booking
