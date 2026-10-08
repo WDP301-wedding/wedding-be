@@ -116,6 +116,16 @@ databaseDescribe('PB-W3 real print charge/credit registrar conformance', () => {
     };
     const first = await registrar.registerCredit(input, context);
     expect(await registrar.registerCredit(input, context)).toEqual({ ...first, replayed: true });
+    for (const changed of [
+      { amountVnd: 50_001 },
+      { acceptedAt: '2026-10-08T07:00:01Z' },
+      { bookingId: await newBooking() },
+      { receivableChargeId: randomUUID() },
+    ]) {
+      await expect(
+        registrar.registerCredit({ ...input, ...changed }, context),
+      ).rejects.toMatchObject({ code: 'RECEIVABLE_ADJUSTMENT_CONFLICT' });
+    }
     await expect(
       registrar.registerCredit({ ...input, reason: 'PRINT_CANCELLED' }, context),
     ).rejects.toMatchObject({ code: 'RECEIVABLE_ADJUSTMENT_CONFLICT' });
