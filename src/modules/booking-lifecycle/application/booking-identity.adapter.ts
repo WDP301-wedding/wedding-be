@@ -9,6 +9,7 @@ export function createBookingIdentityAdapter(
       input: Parameters<BookingIdentityPort['issueRestrictedWorkspace']>[0],
     ) {
       const invitation = await invitations.issue({
+        invitationIntentId: input.invitationIntentId,
         consultationId: input.consultationId,
         recipientEmail: input.recipientEmail,
         issuedByAccountId: input.issuedByAccountId,

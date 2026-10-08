@@ -26,6 +26,7 @@ describe('BookingIdentityAdapter', () => {
     ).resolves.toEqual({ invitationId: '00000000-0000-4000-8000-000000000001' });
 
     expect(issuer.issue).toHaveBeenCalledWith({
+      invitationIntentId: '00000000-0000-4000-8000-000000000002',
       consultationId: '00000000-0000-4000-8000-000000000003',
       recipientEmail: 'couple@example.com',
       issuedByAccountId: '00000000-0000-4000-8000-000000000004',

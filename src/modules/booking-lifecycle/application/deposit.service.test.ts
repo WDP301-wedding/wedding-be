@@ -5,6 +5,54 @@ import type { CoupleAccessPromoter } from '../../identity-access/authorization/c
 import { createBookingDepositService, type BookingDepositRepository } from './deposit.service.js';
 
 describe('BookingDepositService', () => {
+  it('delegates fresh eligibility, UNKNOWN, and verified failure evidence', async () => {
+    const repository = repositoryFixture();
+    const service = createBookingDepositService({ repository, promoter: promoter() });
+    const input = { bookingId: 'booking', timelineRevisionId: 'timeline' };
+    await service.requireDepositEligibility(input);
+    await service.recordUnknown({ bookingId: 'booking', paymentAttemptId: 'attempt' }, context);
+    await service.releaseVerifiedFailure(
+      { bookingId: 'booking', paymentAttemptId: 'attempt', providerEvidenceId: 'verified-failure' },
+      context,
+    );
+    expect(repository.requireDepositEligibility).toHaveBeenCalledWith(input);
+    expect(repository.recordUnknown).toHaveBeenCalledWith({
+      bookingId: 'booking',
+      paymentAttemptId: 'attempt',
+      requestId: 'request',
+    });
+    expect(repository.releaseVerifiedFailure).toHaveBeenCalledWith({
+      bookingId: 'booking',
+      paymentAttemptId: 'attempt',
+      providerEvidenceId: 'verified-failure',
+      requestId: 'request',
+    });
+  });
+
+  it('does not repeat promotion after a successful recorded promotion', async () => {
+    const repository = repositoryFixture();
+    vi.mocked(repository.settle).mockResolvedValue({
+      phase: 'CONFIRMED',
+      replayed: true,
+      promotionPending: false,
+      accountId: 'couple',
+      consultationId: 'consultation',
+      requestId: 'request',
+    });
+    const accessPromoter = promoter();
+    await createBookingDepositService({
+      repository,
+      promoter: accessPromoter,
+    }).recordSuccessfulDeposit({
+      bookingId: 'booking',
+      timelineRevisionId: 'timeline',
+      paymentId: 'payment',
+      amountVnd: 3000001,
+      settledAt: new Date('2026-10-07T10:10:00Z'),
+    });
+    expect(accessPromoter.promote).not.toHaveBeenCalled();
+    expect(repository.markPromotionSucceeded).not.toHaveBeenCalled();
+  });
   it('delegates reservation with immutable contract context', async () => {
     const repository = repositoryFixture();
     const service = createBookingDepositService({ repository, promoter: promoter() });
@@ -23,6 +71,7 @@ describe('BookingDepositService', () => {
     expect(repository.reserve).toHaveBeenCalledWith(
       expect.objectContaining({
         requestId: context.requestId,
+        causationId: context.causationId,
         actorAccountId: context.actorAccountId,
       }),
     );

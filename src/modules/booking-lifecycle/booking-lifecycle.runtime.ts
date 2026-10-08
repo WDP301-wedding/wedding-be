@@ -2,6 +2,7 @@ import type { Request, Router } from 'express';
 
 import type { Config } from '../../config/config.js';
 import { createPrismaClient } from '../../core/database/prisma.js';
+import { createPrismaConsultationRetentionRecorder } from '../identity-access/account/retention-eligibility.port.js';
 import type { ShutdownResource } from '../../core/http/lifecycle.js';
 import { createIdempotencyMiddleware } from '../../core/idempotency/idempotency.middleware.js';
 import { defineIdempotencyPolicy } from '../../core/idempotency/idempotency.policy.js';
@@ -42,10 +43,15 @@ import {
 import { createPrismaBookingLifecycleRepository } from './infrastructure/lifecycle.repository.js';
 import { createPrismaSlotHoldRepository } from './infrastructure/slot-hold.repository.js';
 import { createPrismaTimelineRepository } from './infrastructure/timeline.repository.js';
+import {
+  createBookingLifecycleProviders,
+  type BookingLifecycleProviders,
+} from './booking-lifecycle.providers.js';
 
 export type BookingLifecycleRuntime = Readonly<{
   router: Router;
   resource: ShutdownResource;
+  providers: BookingLifecycleProviders;
 }>;
 
 export async function createBookingLifecycleRuntime(
@@ -101,7 +107,23 @@ export async function createBookingLifecycleRuntime(
       access,
     });
     const lifecycle = createBookingLifecycleService({
-      repository: createPrismaBookingLifecycleRepository(prisma),
+      repository: createPrismaBookingLifecycleRepository(
+        prisma,
+        undefined,
+        undefined,
+        (transaction, input, context) =>
+          createPrismaConsultationRetentionRecorder(
+            transaction,
+            config.identityAccess.retentionDays.disabledAccountPii,
+          ).recordTerminal(
+            {
+              consultationId: input.consultationId,
+              sourceBusinessRecordId: input.bookingId,
+              eligibleAfter: input.eligibleAfter,
+            },
+            context,
+          ),
+      ),
       access,
     });
     const proposalQueries = createProposalQueryService(prisma, access);
@@ -109,6 +131,18 @@ export async function createBookingLifecycleRuntime(
     const idempotency = createIdempotencyService(createPrismaIdempotencyRepository(prisma));
 
     const router = createBookingLifecycleRouter({
+      async auditProtectedDenial(input) {
+        await prisma.auditLog.create({
+          data: {
+            requestId: input.requestId,
+            actorType: input.actorAccountId === null ? 'SYSTEM' : 'USER',
+            actorId: input.actorAccountId,
+            action: 'booking.access-denied',
+            entityType: 'booking-access',
+            metadata: { code: input.code, status: input.status, operation: input.operation },
+          },
+        });
+      },
       services: {
         resolveActor: actorResolver,
         createConsultation: (input) => workspace.createConsultation(input),
@@ -142,9 +176,11 @@ export async function createBookingLifecycleRuntime(
             items: input.items,
             actor: input.actor,
             requestId: input.requestId,
+            changeReason: input.reason,
           });
         },
         requestCancellation: (input) => lifecycle.requestCancellation(input),
+        decideCancellation: (input) => lifecycle.decideCancellation(input),
         cancel: (input) => lifecycle.cancel(input),
         complete: (input) => lifecycle.complete(input),
       },
@@ -161,6 +197,12 @@ export async function createBookingLifecycleRuntime(
     });
     return Object.freeze({
       router,
+      providers: createBookingLifecycleProviders(
+        prisma,
+        access,
+        undefined,
+        config.identityAccess.retentionDays.disabledAccountPii,
+      ),
       resource: Object.freeze({
         name: 'booking-lifecycle-database',
         close: () => prisma.$disconnect(),

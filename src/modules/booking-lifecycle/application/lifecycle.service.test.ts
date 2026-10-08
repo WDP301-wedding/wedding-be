@@ -6,6 +6,31 @@ import type { BookingLifecycleRepository } from '../infrastructure/lifecycle.rep
 import { createBookingLifecycleService } from './lifecycle.service.js';
 
 describe('BookingLifecycleService', () => {
+  it('delegates cancellation only for the owning Manager', async () => {
+    const repository = repositoryFixture();
+    const service = createBookingLifecycleService({ repository, access: accessReader() });
+    const input = {
+      bookingId: 'booking',
+      expectedBookingRevision: 4,
+      reason: 'Plans changed',
+      actor: { accountId: 'manager', roles: ['MANAGER'] as const },
+      requestId: 'request',
+    };
+    await service.cancel(input);
+    expect(repository.cancel).toHaveBeenCalledWith({
+      bookingId: 'booking',
+      expectedBookingRevision: 4,
+      reason: 'Plans changed',
+      context: { requestId: 'request', actorAccountId: 'manager' },
+    });
+    await expect(
+      service.cancel({ ...input, actor: { accountId: 'other', roles: ['MANAGER'] } }),
+    ).rejects.toMatchObject({ code: 'BOOKING_NOT_FOUND' });
+    await expect(
+      service.cancel({ ...input, actor: { accountId: 'manager', roles: ['STAFF'] } }),
+    ).rejects.toMatchObject({ code: 'BOOKING_NOT_FOUND' });
+    expect(repository.cancel).toHaveBeenCalledOnce();
+  });
   it('requires FULL access for a Couple cancellation request', async () => {
     const repository = repositoryFixture();
     const access = accessReader();

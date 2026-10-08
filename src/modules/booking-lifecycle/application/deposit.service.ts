@@ -49,7 +49,8 @@ export interface BookingDepositRepository {
     input: Readonly<{ bookingId: string; timelineRevisionId: string }>,
   ): Promise<DepositEligibility>;
   reserve(
-    input: ReserveDepositInput & Readonly<{ requestId: string; actorAccountId: string | null }>,
+    input: ReserveDepositInput &
+      Readonly<{ requestId: string; actorAccountId: string | null; causationId?: string }>,
   ): Promise<Readonly<{ paymentAttemptId: string; bookingRevision: number; replayed: boolean }>>;
   recordUnknown(
     input: Readonly<{ bookingId: string; paymentAttemptId: string; requestId: string }>,
@@ -106,6 +107,7 @@ export function createBookingDepositService(
       return options.repository.reserve({
         ...input,
         requestId: context.requestId,
+        causationId: context.causationId,
         actorAccountId: context.actorAccountId,
       });
     },

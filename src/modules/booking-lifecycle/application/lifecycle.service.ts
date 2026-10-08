@@ -97,20 +97,6 @@ export function createBookingLifecycleService(
         context: { requestId: input.requestId, actorAccountId: input.actor.accountId },
       });
     },
-
-    completeAsSystem(
-      input: Readonly<{
-        bookingId: string;
-        expectedBookingRevision: number;
-        requestId: string;
-      }>,
-    ) {
-      return options.repository.complete({
-        bookingId: input.bookingId,
-        expectedBookingRevision: input.expectedBookingRevision,
-        context: { requestId: input.requestId, actorAccountId: null },
-      });
-    },
   });
 }
 
