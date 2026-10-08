@@ -35,6 +35,7 @@ export interface TimelineRepository {
       actorAccountId: string;
       party: TimelineParty;
       requestId: string;
+      changeReason?: string;
     }>,
   ): Promise<Readonly<{ changed: true; revision: TimelineRevision; bookingRevision: number }>>;
   approve(
@@ -106,11 +107,28 @@ export function createTimelineService(
         }>[];
         actor: TimelineActor;
         requestId: string;
+        changeReason?: string;
       }>,
     ) {
       const context = await options.repository.getContext(input.bookingId);
       const party = await authorize(options.access, context, input.actor);
       requireBookingRevision(context, input.expectedBookingRevision);
+      requireEditable(context);
+      if ((context.phase === 'CONFIRMED') !== (input.changeReason !== undefined)) {
+        throw new AppError({
+          status: 409,
+          code: 'INVALID_BOOKING_TRANSITION',
+          message: 'Confirmed timeline changes require a change request.',
+        });
+      }
+      const changeReason = input.changeReason?.trim().normalize('NFC');
+      if (changeReason !== undefined && (changeReason.length < 1 || changeReason.length > 500)) {
+        throw new AppError({
+          status: 422,
+          code: 'VALIDATION_ERROR',
+          message: 'A change reason must contain 1 through 500 characters.',
+        });
+      }
       if ((context.currentRevision?.revisionId ?? null) !== input.predecessorRevisionId) {
         throw new TimelineConflictError('TIMELINE_REVISION_SUPERSEDED');
       }
@@ -135,6 +153,7 @@ export function createTimelineService(
         actorAccountId: input.actor.accountId,
         party,
         requestId: input.requestId,
+        ...(changeReason === undefined ? {} : { changeReason }),
       });
     },
 
@@ -150,6 +169,7 @@ export function createTimelineService(
       const context = await options.repository.getContext(input.bookingId);
       const party = await authorize(options.access, context, input.actor);
       requireBookingRevision(context, input.expectedBookingRevision);
+      requireEditable(context);
       const current = requireExactCurrent(context, input.timelineRevisionId);
       const existingApproval =
         party === 'MANAGER' ? current.managerApprovedAt : current.coupleApprovedAt;
@@ -182,6 +202,13 @@ export function createTimelineService(
       const context = await options.repository.getContext(input.bookingId);
       const party = await authorize(options.access, context, input.actor);
       requireBookingRevision(context, input.expectedBookingRevision);
+      if (context.phase !== 'DRAFT' && context.phase !== 'AWAITING_DEPOSIT') {
+        throw new AppError({
+          status: 409,
+          code: 'TIMELINE_WITHDRAWAL_NOT_ALLOWED',
+          message: 'Approval withdrawal is only allowed before deposit.',
+        });
+      }
       const current = requireExactCurrent(context, input.timelineRevisionId);
       const reason = input.reason.trim().normalize('NFC');
       if (reason.length < 1 || reason.length > 500) {
@@ -226,6 +253,16 @@ async function authorize(
 function requireBookingRevision(context: TimelineContext, expected: number): void {
   if (context.bookingRevision !== expected) {
     throw new TimelineConflictError('STALE_BOOKING_REVISION');
+  }
+}
+
+function requireEditable(context: TimelineContext): void {
+  if (context.phase === 'CANCELLED' || context.phase === 'COMPLETED') {
+    throw new AppError({
+      status: 409,
+      code: 'INVALID_BOOKING_TRANSITION',
+      message: 'A terminal booking cannot change its timeline.',
+    });
   }
 }
 

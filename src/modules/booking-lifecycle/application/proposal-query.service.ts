@@ -30,6 +30,11 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
         revision: booking.revision,
         eventDate: booking.eventDate.toISOString().slice(0, 10),
         planningHeadcount: booking.planningHeadcount,
+        cancellationRequests: booking.cancellationRequests.map((request) => ({
+          requestId: request.id,
+          reason: request.reason,
+          requestedAt: request.requestedAt.toISOString(),
+        })),
         proposal: {
           hall: {
             id: snapshot.hallId,
@@ -113,6 +118,11 @@ async function requireProposal(prisma: PrismaClient, bookingId: string) {
       revision: true,
       eventDate: true,
       planningHeadcount: true,
+      cancellationRequests: {
+        where: { status: 'PENDING' },
+        orderBy: [{ requestedAt: 'asc' }, { id: 'asc' }],
+        select: { id: true, reason: true, requestedAt: true },
+      },
       consultation: { select: { managerAccountId: true } },
       proposalSnapshot: true,
       currentTimelineRevision: {
