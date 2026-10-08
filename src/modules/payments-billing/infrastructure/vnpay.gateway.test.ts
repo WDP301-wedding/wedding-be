@@ -5,7 +5,9 @@ import { VNPAY_QUERY_URL } from './vnpay.protocol.js';
 
 describe('controlled VNPay transport', () => {
   it('posts JSON only to the fixed sandbox querydr endpoint with an abort deadline', async () => {
-    const transport = vi.fn<typeof fetch>(async () => new Response('{"vnp_ResponseCode":"91"}'));
+    const transport = vi.fn<typeof fetch>(() =>
+      Promise.resolve(new Response('{"vnp_ResponseCode":"91"}')),
+    );
     const gateway = createVnpayStatusGateway(transport);
     expect(await gateway.query({ vnp_Command: 'querydr' })).toEqual({ vnp_ResponseCode: '91' });
     expect(transport).toHaveBeenCalledWith(
@@ -14,9 +16,9 @@ describe('controlled VNPay transport', () => {
         method: 'POST',
         redirect: 'error',
         body: '{"vnp_Command":"querydr"}',
-        signal: expect.any(AbortSignal),
       }),
     );
+    expect(transport.mock.calls[0]![1]!.signal).toBeInstanceOf(AbortSignal);
   });
   it.each([
     new Response('failure', { status: 503 }),
@@ -24,7 +26,9 @@ describe('controlled VNPay transport', () => {
     new Response('x'.repeat(16385)),
     new Response(null),
   ])('rejects HTTP, parse, body-limit and missing-body failures', async (response) => {
-    await expect(createVnpayStatusGateway(async () => response).query({})).rejects.toThrow();
+    await expect(
+      createVnpayStatusGateway(() => Promise.resolve(response)).query({}),
+    ).rejects.toThrow();
   });
   it('propagates timeout as unavailable evidence, never a terminal provider failure', async () => {
     const transport: typeof fetch = async (_input, init) =>

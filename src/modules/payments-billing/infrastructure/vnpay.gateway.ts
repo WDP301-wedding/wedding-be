@@ -23,12 +23,15 @@ export function createVnpayStatusGateway(
         for (;;) {
           const chunk = await reader.read();
           if (chunk.done) break;
-          size += chunk.value.length;
+          const value: unknown = chunk.value;
+          if (!(value instanceof Uint8Array))
+            throw new Error('VNPay status contained invalid bytes.');
+          size += value.length;
           if (size > 16384) {
             await reader.cancel();
             throw new Error('VNPay status exceeded the response limit.');
           }
-          chunks.push(chunk.value);
+          chunks.push(value);
         }
       } finally {
         reader.releaseLock();

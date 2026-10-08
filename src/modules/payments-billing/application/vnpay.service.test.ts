@@ -26,11 +26,9 @@ describe('VNPay callback boundary', () => {
   it('does not acknowledge persistence failure as durable success', async () => {
     const service = createVnpayService({
       protocol: { verifyIpn: () => ({ paymentAttemptId: randomUUID() }) },
-      evidence: { findAttemptBooking: async () => randomUUID() },
+      evidence: { findAttemptBooking: () => Promise.resolve(randomUUID()) },
       boundary: {
-        run: async () => {
-          throw new Error('storage unavailable');
-        },
+        run: () => Promise.reject(new Error('storage unavailable')),
       },
     } as unknown as Parameters<typeof createVnpayService>[0]);
     expect(await service.processIpn('signed')).toEqual({
