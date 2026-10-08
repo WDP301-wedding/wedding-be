@@ -34,16 +34,31 @@ export function createBookingExperienceRouter(
       const { body } = validatedRequest(response, { body: consultationRequestBodySchema });
       const payloadHash = createHash('sha256').update(JSON.stringify(body)).digest('hex');
       const { preferredDate, ...fields } = body;
-      const record = await prisma.consultationRequest.upsert({
-        where: { submissionId: body.submissionId },
-        create: {
-          ...fields,
-          payloadHash,
-          preferredDate: preferredDate === null ? null : new Date(`${preferredDate}T00:00:00Z`),
-        },
-        update: {},
+      await prisma.$transaction(async (tx) => {
+        const created = await tx.consultationRequest.createMany({
+          data: {
+            ...fields,
+            payloadHash,
+            preferredDate: preferredDate === null ? null : new Date(`${preferredDate}T00:00:00Z`),
+          },
+          skipDuplicates: true,
+        });
+        const record = await tx.consultationRequest.findUniqueOrThrow({
+          where: { submissionId: body.submissionId },
+        });
+        if (record.payloadHash !== payloadHash) throw failure(409, 'SUBMISSION_KEY_REUSED');
+        if (created.count === 1)
+          await tx.auditLog.create({
+            data: {
+              requestId: request.requestId,
+              actorType: 'SYSTEM',
+              action: 'booking.intake-received',
+              entityType: 'consultation-request',
+              entityId: record.id,
+              metadata: {},
+            },
+          });
       });
-      if (record.payloadHash !== payloadHash) throw failure(409, 'SUBMISSION_KEY_REUSED');
       response
         .set('Cache-Control', 'no-store')
         .status(202)

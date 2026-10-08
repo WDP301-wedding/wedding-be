@@ -4,6 +4,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createApp } from '../../../src/app.js';
 import { createBookingExperienceRouter } from '../../../src/modules/booking-lifecycle/http/experience.router.js';
 import { createAccountSettingsRouter } from '../../../src/modules/identity-access/account/settings.router.js';
+import { purgeConsultationIntake } from '../../../src/modules/booking-lifecycle/application/intake-retention.js';
+import { overviewResponseSchema } from '../../../src/modules/booking-lifecycle/http/experience.schemas.js';
 import {
   hashPassword,
   verifyPassword,
@@ -29,6 +31,8 @@ suite('post-booking experience persistence and authority', () => {
   };
   const resolver = {
     resolve(token: string) {
+      if (token === 'test-other')
+        return Promise.resolve({ ...actor, accountId: otherId, roles: ['COUPLE'] as const });
       if (token !== 'test-manager')
         throw new AppError({
           status: 401,
@@ -171,6 +175,102 @@ suite('post-booking experience persistence and authority', () => {
     expect(
       (await db.prisma.account.findUniqueOrThrow({ where: { id: otherId } })).displayName,
     ).toBeNull();
+  });
+  it('scopes the overview by actor and only lists FULL confirmed events on Android', async () => {
+    const ids: string[] = [];
+    for (const [owner, level, phase] of [
+      [managerId, 'RESTRICTED', 'DRAFT'],
+      [managerId, 'FULL', 'CONFIRMED'],
+      [otherId, 'FULL', 'CONFIRMED'],
+    ] as const) {
+      const consultationId = randomUUID(),
+        bookingId = randomUUID();
+      ids.push(bookingId);
+      await db.prisma.consultation.create({
+        data: {
+          id: consultationId,
+          managerAccountId: managerId,
+          intendedEmail: 'scope@example.com',
+          intendedEmailNormalized: 'scope@example.com',
+          displayName: 'Scope',
+        },
+      });
+      await db.prisma.booking.create({
+        data: {
+          id: bookingId,
+          consultationId,
+          hallId: randomUUID(),
+          eventDate: new Date('2026-12-20'),
+          shiftCode: 'DINNER',
+          phase,
+          planningHeadcount: 100,
+        },
+      });
+      await db.prisma.consultationAccess.create({
+        data: {
+          accountId: owner,
+          consultationId,
+          level,
+          ...(level === 'FULL'
+            ? { bookingId, promotedAt: new Date(), sourcePaymentId: randomUUID() }
+            : {}),
+        },
+      });
+    }
+    const server = app();
+    const web = await request(server)
+      .get('/api/v1/couple/bookings?client=WEB')
+      .set('Authorization', 'Bearer test-manager');
+    expect(web.status).toBe(200);
+    expect(overviewResponseSchema.parse(web.body).data).toHaveLength(2);
+    expect(JSON.stringify(web.body)).not.toContain(ids[2]);
+    const native = await request(server)
+      .get('/api/v1/couple/bookings?client=ANDROID')
+      .set('Authorization', 'Bearer test-manager');
+    expect(native.status).toBe(200);
+    const nativePage = overviewResponseSchema.parse(native.body);
+    expect(nativePage.data).toHaveLength(1);
+    expect(nativePage.data[0]!.bookingId).toBe(ids[1]);
+    expect(
+      (
+        await request(server)
+          .get('/api/v1/management/consultation-requests')
+          .set('Authorization', 'Bearer test-other')
+      ).status,
+    ).toBe(403);
+  });
+  it('purges expired requests and scrubs converted contact data without deleting consultations', async () => {
+    const oldDate = new Date(Date.now() - 181 * 86400_000);
+    const expired = await db.prisma.consultationRequest.create({
+      data: {
+        ...body,
+        submissionId: randomUUID(),
+        preferredDate: null,
+        payloadHash: 'hash',
+        createdAt: oldDate,
+      },
+    });
+    const converted = await db.prisma.consultationRequest.findUniqueOrThrow({
+      where: { submissionId: body.submissionId },
+    });
+    await db.prisma.consultationRequest.update({
+      where: { id: converted.id },
+      data: { createdAt: oldDate },
+    });
+    expect(await purgeConsultationIntake(db.prisma)).toEqual({ deleted: 1, scrubbed: 1 });
+    expect(
+      await db.prisma.consultationRequest.findUnique({ where: { id: expired.id } }),
+    ).toBeNull();
+    const retained = await db.prisma.consultationRequest.findUniqueOrThrow({
+      where: { id: converted.id },
+    });
+    expect(retained.email).toBe('');
+    expect(retained.phone).toBe('');
+    expect(retained.message).toBe('');
+    expect(await db.prisma.consultation.count({ where: { id: converted.consultationId! } })).toBe(
+      1,
+    );
+    expect(await purgeConsultationIntake(db.prisma)).toEqual({ deleted: 0, scrubbed: 0 });
   });
   it('refuses wrong current password and atomically revokes sessions on success', async () => {
     const server = app();

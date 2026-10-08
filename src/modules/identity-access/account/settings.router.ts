@@ -112,6 +112,10 @@ export function createAccountSettingsRouter(
         throw failure(422, 'CURRENT_PASSWORD_INVALID');
       const verifier = await crypto.hash(body.newPassword);
       await prisma.$transaction(async (tx) => {
+        // Cùng thứ tự khóa với đặt lại mật khẩu: reset credential, mật khẩu, rồi phiên.
+        await tx.$queryRaw`SELECT "id" FROM "Account" WHERE "id" = ${actor.accountId}::uuid FOR UPDATE`;
+        await tx.$queryRaw`SELECT "id" FROM "PasswordResetCredential" WHERE "accountId" = ${actor.accountId}::uuid ORDER BY "id" FOR UPDATE`;
+        await tx.$queryRaw`SELECT "accountId" FROM "PasswordCredential" WHERE "accountId" = ${actor.accountId}::uuid FOR UPDATE`;
         await requireActiveSession(tx, actor);
         const changed = await tx.passwordCredential.updateMany({
           where: {
