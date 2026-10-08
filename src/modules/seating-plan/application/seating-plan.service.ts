@@ -253,8 +253,13 @@ export function createSeatingPlanService(
       const layoutEligibility = await venueReader.requireLayoutVersionEligible(layoutVersionId);
       if (layoutEligibility.isRetired) throw new LayoutRetiredError();
 
-      const hasException = (await repository.getExceptionRecord(plan.id)) !== null;
-      if (!hasException) {
+      const exRec = await repository.getExceptionRecord(plan.id);
+      const hasValidException =
+        exRec !== null &&
+        exRec.headcountSnapshot === booking.planningHeadcount &&
+        exRec.bookingRevisionSnapshot === booking.bookingRevision;
+
+      if (!hasValidException) {
         validateHeadcountInRange(
           booking.planningHeadcount,
           layoutEligibility.minGuests,
@@ -344,12 +349,16 @@ export function createSeatingPlanService(
         });
       }
 
-      const hasException = exRec !== null;
+      const hasValidException =
+        exRec !== null &&
+        exRec.headcountSnapshot === booking.planningHeadcount &&
+        exRec.bookingRevisionSnapshot === booking.bookingRevision;
+
       const layoutEligibility = await venueReader.requireLayoutVersionEligible(
         rev.layoutTemplateVersionId,
       );
       if (layoutEligibility.isRetired) throw new LayoutRetiredError();
-      if (!hasException) {
+      if (!hasValidException) {
         validateHeadcountInRange(
           booking.planningHeadcount,
           layoutEligibility.minGuests,
@@ -370,7 +379,7 @@ export function createSeatingPlanService(
         hallMaxGuests: layoutEligibility.totalSeatCapacity,
         bookingRevision: booking.bookingRevision,
         planningHeadcount: booking.planningHeadcount,
-        managerExceptionGranted: hasException,
+        managerExceptionGranted: hasValidException,
       };
 
       const registrationId = randomUUID();
@@ -481,13 +490,18 @@ export function createSeatingPlanService(
 
     async getPlan(input: GetPlanInput): Promise<SeatingPlanResult> {
       const plan = await repository.requirePlanByBookingAndPlanId(input.bookingId, input.planId);
-      const [rev, exRec] = await Promise.all([
+      const [booking, rev, exRec] = await Promise.all([
+        bookingReader.requireConfirmedBookingContext(input.bookingId),
         plan.currentRevisionId
           ? repository.getCurrentRevisionWithLabels(plan.currentRevisionId)
           : Promise.resolve(null),
         repository.getExceptionRecord(plan.id),
       ]);
-      return buildResult(plan, rev, exRec !== null);
+      const hasValidException =
+        exRec !== null &&
+        exRec.headcountSnapshot === booking.planningHeadcount &&
+        exRec.bookingRevisionSnapshot === booking.bookingRevision;
+      return buildResult(plan, rev, hasValidException);
     },
 
     async getGuidance(bookingId: string): Promise<SeatingGuidanceResult> {
