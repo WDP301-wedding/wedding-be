@@ -2647,14 +2647,45 @@ Progress: W1-W4 complete (4/8 waves, 16/32 microtasks); W5-W8 remain open.
 
 #### PB-W5 — Manual payments, refunds and invoice views
 
-- [ ] Record Manager-approved manual settlement evidence idempotently and prevent
+- [x] Record Manager-approved manual settlement evidence idempotently and prevent
       balance payment from exceeding the current accepted outstanding amount.
-- [ ] Record manual refunds with reason/evidence only after locking and rechecking the
+- [x] Record manual refunds with reason/evidence only after locking and rechecking the
       source settlement and approved refundable limit; never mutate payment history.
-- [ ] Derive invoice and receivable totals/history from immutable ledger facts; include
+- [x] Derive invoice and receivable totals/history from immutable ledger facts; include
       accepted print charge, payment, refund, credit and billing revision sources.
-- [ ] Prove two-refund and two-balance races, exact arithmetic, replay and audit
+- [x] Prove two-refund and two-balance races, exact arithmetic, replay and audit
       redaction against real PostgreSQL.
+
+**W5 implementation evidence (2026-10-09, source `8694833`):** Manager manual
+settlement is atomic across Billing/Booking/Identity, with immutable intent replay
+and source evidence. Balance amounts derive from the current accepted ledger and
+revision; partial manual collection is bounded, while VNPay collects full outstanding.
+UNKNOWN and durable-success/application gaps block recollection. Refunds load a
+recorded Manager credit/cancellation approval and check source and decision caps
+under the booking lock. Invoice/history/reporting use immutable exact ledger facts,
+safe source links and fixed pagination fences. Real two-refund/two-balance and approval
+races, final-write rollback after promotion, late money, print replay, private audit
+redaction, fake/real reader conformance and W4 upgrade preservation all pass.
+[ADR-007](../docs/decisions/0007-manual-billing-approval-and-ledger-views.md) and
+[W5 evidence](./evidence/payments-billing.md#w5-manual-operations-balance-and-immutable-views)
+record the source hand-off and HTTP recovery requirements for W6.
+
+Full backend coverage passes 1,052 tests in 134 files: 96.86% lines and 93.18%
+branches, every included file above the unchanged 80% thresholds. Separate integration
+and contract gates pass 162 tests in 43 files and 22 tests in six files. Full formatting,
+lint, typecheck, API generation/check, build, audit, diff and targeted source scans
+pass; audit uses two preexisting documented, unexpired exceptions. Fresh deploy/status
+confirms all eighteen migrations, with earlier migrations unchanged. The initial full
+attempt with an uninitialized disposable main schema is excluded from green evidence.
+The final run follows deployment and the targeted foundation retest. A temporary
+worker profile preserves full inventory, original coverage configuration and isolation
+for all five module-mock suites. Test assertions, deadlines and thresholds are unchanged.
+
+All four repositories remain on `codex/payments-billing`; client trees are unchanged.
+Disposable W5 PostgreSQL and temporary profile/schema copy are removed. The preexisting
+Booking database is untouched. Local commits only. HTTP/OpenAPI publication and PB-C3
+completion remain with W6; generated clients, UI and final owner acceptance follow.
+Progress: W1-W5 complete (5/8 waves, 20/32 microtasks); W6-W8 remain open (12 microtasks).
 
 #### PB-W6 — Authenticated HTTP and immutable OpenAPI
 

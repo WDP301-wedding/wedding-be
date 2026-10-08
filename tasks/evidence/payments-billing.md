@@ -1,13 +1,13 @@
 # SPEC-04 Payments and Billing implementation evidence
 
-Status: **W1-W4 technical evidence; module implementation acceptance pending.**
+Status: **W1-W5 technical evidence; module implementation acceptance pending.**
 Authority: approved `SPEC-payments-billing.md`, `WEDDING-CONTRACT-1@1.1.0`,
 and the eight-wave plan in `tasks/plan.md` Section 21.
 
 ## Branch and scope
 
 All four repositories use `codex/payments-billing` for W1-W8. Verified increments
-are committed on that branch. W1-W4 change only the backend; the three client
+are committed on that branch. W1-W5 change only the backend; the three client
 branches retain their existing Booking baseline. These checkpoints do not mark
 the module ACCEPTED or publish a new HTTP/OpenAPI contract.
 
@@ -373,13 +373,154 @@ Final source: `09c9c35084f1eb784ff538534a78227db00c49ce`.
 PB-C2 technical checkpoint complete. Progress: W1-W4 complete, 4/8 waves and 16/32
 microtasks; final SPEC-04 acceptance remains pending W5-W8.
 
-## Remaining acceptance
+## W5 manual operations, balance and immutable views
 
-W5-W8 remain open: Manager manual/refund approval flows, safe invoice/reporting reads,
-HTTP/OpenAPI publication, generated clients, three client UIs and final four-repository
-acceptance. Real Booking/Identity providers must be proved at the integration gate;
-storage fixtures do not replace that evidence.
+Implemented 2026-10-09, continuing the single `codex/payments-billing` branch.
+Focused backend increments preserve the approximate five-authored-file limit:
 
-The W4 provider orchestration and checkout guards currently target DEPOSIT. W5
-owns BALANCE eligibility/outstanding checks and the corresponding provider intent,
-settlement and forward storage changes before W6 exposes those routes.
+- `24df096`: strict internal money commands and normalized evidence schemas.
+- `7986655`: forward operation/approval/reporting storage, SQL guards and real storage tests.
+- `925a060`: atomic Manager manual settlement, recorded approval/refund, balance and invoice operations.
+- `d4aa9eb`: signed balance checkout and W4 evidence repository expansion.
+- `0daad55`: recoverable VNPay BALANCE settlement, immutable proof and recollection guards.
+- `56df457`: authorized invoice/history reads, baseline BillingReader and fenced reporting.
+- `270bfb3`: owner rollback, independent refund limits, cancellation and W4 upgrade proof.
+- `26314e4`: shared produced-reader conformance against controlled fake and real adapters.
+- `8694833`: same operation command reused for another authorized booking returns stable 422.
+
+Final implementation source: `8694833004817dc271bca60dfd28e1861479036a`.
+Real composition remains `src/modules/payments-billing/payments-billing.providers.ts`.
+Booking and Identity versions recorded in W3 remain unchanged. New internal ports:
+`application/billing-operations.port.ts`, `billing-operations.service.ts` and
+`billing-views.service.ts`; baseline produced reader signatures/DTOs are unchanged.
+
+### Money, authority and replay
+
+Active Manager authority is loaded from the database, never request roles. Manual
+DEPOSIT uses the current eligible timeline and accepted commercial deposit amount.
+Its receipt, attempt, base/payment facts, reservation, same-account FULL/COUPLE
+promotion, application marker, command and audit/outbox commit in the shared Booking
+boundary. A forced final command failure rolls all participants back.
+
+Full authorized VNPay BALANCE is server-derived from exact current outstanding;
+manual BALANCE may be partial but cannot exceed it. Both require the expected ledger
+revision and CONFIRMED/COMPLETED phase. CREATED/PENDING/UNKNOWN attempts block another
+collection, as does durable SUCCEEDED proof with no appended payment. UNKNOWN expiry
+does not release collection. Controlled query/IPN recovery applies the original
+frozen money once, without deposit release or another account promotion. True late
+money after credit/cancellation remains recorded as explicit credit.
+
+Operation replay compares actor, kind, booking and normalized submitted intent
+before rechecking changing eligibility/revision. Same key and changed intent is 422;
+stale revision, active attempt and limit conflicts are 409. Manager mutation denials
+are 403; unauthorized private reads/foreign approvals are concealed 404. A same
+balance intent preserves checkout amount, dates, IP and URL after restart/replay.
+
+Refund approval is an immutable Manager decision against an owned print credit or
+an owned CANCELLED Booking reporting sequence. Fresh IDs cannot reset the summed
+basis budget. Refunds load the recorded decision and recheck both remaining source
+payment and approved decision caps under the booking lock. Amounts remain positive
+safe integer VND; reason/evidence are retained privately. Refund appends a fact/event
+and does not mutate original payment, Booking state or Couple access.
+
+### Read models and migration
+
+Immutable invoice issuance freezes server number/time, source ledger revision, exact
+totals and line sources and never collects money. Authorized safe reads include
+charge/payment/refund/credit kinds, amounts, source revisions, source entry links and
+billing revisions. Reasons, receipt references, approval caps and provider material
+are omitted. History pagination binds booking and a fixed ledger revision, preserving
+both page order and totals after later appends.
+
+The context-bound baseline BillingReader returns only the approved four receivable
+totals or a completed deposit proof with the immutable application marker. Manager
+reporting uses immutable minimal snapshots and a fixed committed global sequence,
+with strict cursors and current database authority.
+
+Migration `20261009001000_billing_operations_reporting` adds four Billing tables and
+expands W4 checkout correlation forward for BALANCE. All seventeen prior migrations
+remain unchanged. It backfills one safe current report for each historical ledger,
+without inventing retrospective commands or approvals. W4 upgrade proof preserves
+all original money, attempts, invoices, successful application, checkout/proof/claims,
+grants/roles, audit and owner/Billing outbox exactly.
+
+### Executable W5 requirement mapping
+
+| W5 microtask | Executable proof |
+| --- | --- |
+| Manager manual evidence and bounded balance | `operations.port.test.ts`; `operations.test.ts`; `operations-safety.test.ts` |
+| Locked source/approved manual refund | Two-refund race and independent cap tests; approval-budget race; real Booking cancellation; SQL immutable decisions |
+| Immutable invoice/receivable history | `views.test.ts`: exact 4,000,001 charge, 1,000,001 credit/refund, revision/source links, print replay, frozen invoice and fixed history/report fence |
+| Real races, replay and redaction | `balance-vnpay.test.ts`, `operations.test.ts`, `operations-safety.test.ts` and fake/real `readers-conformance.test.ts` |
+| Fresh/upgrade storage and authority | `operations-storage.test.ts`, `operations-upgrade.test.ts`, complete migration policy rehearsal |
+
+The balance limit sensitivity experiment temporarily inverts the new manual limit
+condition. The bounded partial balance test fails immediately; the original source
+is restored byte-for-byte before the final gates. A separate regression reproduces
+409 on cross-booking command reuse, then passes with the required 422 error.
+
+Early focused runs exposed strict DTO spreads and a TypeScript union narrowing
+issue; explicit persistence inputs and a narrowed credit source fix those failures.
+Fixture corrections use a real Identity Manager account, relation-based application
+counts and an existing owned restricted grant. No database grant constraint is
+weakened to accommodate a test.
+
+The first full backend attempt fails twelve foundation tests because its disposable
+main database had no deployed schema; module fixtures had independently deployed all
+eighteen migrations. That attempt is not accepted. Deploy/status then initializes
+the pinned main rehearsal database, and all fourteen targeted foundation/storage
+tests pass before repeating the full gate. No actual/shared database is involved.
+
+### W5 final verification
+
+Pinned Node 24.21.0/npm 11.19.0 and disposable PostgreSQL 17 on loopback 55434 are
+used. All three database variables are process-scoped to this rehearsal container;
+no live provider credential, actual environment database or network VNPay call is used.
+
+- Full backend coverage: **1,052/1,052 tests in 134 files**, 96.86% lines and 93.18%
+  branches. Every included source file meets both unchanged per-file 80% thresholds;
+  the coverage summary is checked for all 136 included source records.
+- Separate real integration gate: **162/162 tests in 43 files**.
+- Separate contract gate: **22/22 tests in six files**.
+- Full `format:check`, `lint`, `typecheck`, `api:generate`, `api:check`, `build`
+  and `audit:ci` pass. Audit retains only the two preexisting documented, unexpired
+  exceptions 1145093 and 1153173; no package or lockfile change is introduced.
+- `db:migrate:deploy` succeeds on empty PostgreSQL and migration status confirms all
+  eighteen migrations current. Complete migration-policy and W4 upgrade tests pass.
+  Only the new forward migration differs from W4.
+- `git diff --check` and the targeted private/live-key source scan pass. No sensitive
+  environment/key file is changed. The contract baseline, generated OpenAPI and all
+  three client locks remain unchanged.
+
+As in W4, a temporary Vitest profile imports the original repository configuration.
+It retains the complete 134-file inventory and original coverage include/exclude,
+reporters and thresholds. One fork worker shares modules for 129 regular suites and
+isolates the same five module-mock suites listed in the W4 section. `extends: false`
+keeps the inline project file sets disjoint. Discovery matches the physical inventory;
+no test, timeout, assertion, repository configuration or numeric threshold is weakened.
+Full coverage, standalone integration and contracts run sequentially with this profile,
+`--maxWorkers=1 --pool=forks`; other gates use the installed repository tools.
+
+The disposable `wedding-pbw5-postgres` container, temporary Vitest profile and old
+schema copy are removed. The existing `wedding-bk17-postgres` on loopback 55433 remains
+running and untouched. The portable pinned Node runtime remains available for the
+next wave. All four repositories keep the single `codex/payments-billing` branch,
+and client working trees are unchanged. Focused local commits only; no push or PR.
+
+All four W5 microtasks are closed. Progress: **5/8 waves and 20/32 microtasks**.
+PB-C3 and immutable API publication await W6; this does not mark SPEC-04 ACCEPTED.
+
+### W6 hand-off and remaining acceptance
+
+Design rationale and recovery details:
+[ADR-007](../../docs/decisions/0007-manual-billing-approval-and-ledger-views.md).
+W5 exposes internal owner operations; it adds no runtime HTTP route, new OpenAPI
+digest, dependency, contract amendment or client lock. W6 must keep the approved
+public DTOs, resolve timeline/ledger head/recorded refund decision/server time from
+authoritative data and replay the stable public intent before deriving new metadata.
+Recovery after committed money but missing HTTP response must reuse the committed
+source attempt, decision and timestamp. Unavailable VNPay fails before a new intent.
+
+W6-W8 remain open: authenticated HTTP/OpenAPI publication, generated clients,
+Management Web/Public Web/Android billing experiences and final four-repository
+acceptance. PB-C3 completes after W6, and owner ACCEPTED remains with W8.
