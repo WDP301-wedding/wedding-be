@@ -1,18 +1,20 @@
 import { randomUUID } from 'node:crypto';
 
-import { NotFoundError } from '../../../core/errors/app-error.js';
-import type { PrismaClient } from '../../../generated/prisma/client.js';
+import { AppError, NotFoundError } from '../../../core/errors/app-error.js';
+import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
 import {
   buildRevisionDigest,
   ExceptionExceedsPhysicalCapacityError,
   LayoutRetiredError,
+  SeatingRevisionStaleError,
   TableNotInLayoutError,
   GuestGroupUnavailableError,
   validateExceptionReason,
   validateHeadcountInRange,
+  type LabelInput,
 } from '../domain/seating-plan.policy.js';
-import type { LabelInput } from '../domain/seating-plan.policy.js';
 import type {
+  BookingContext,
   BookingPlanningReader,
   CompatibleLayoutOption,
   GuestPlanningReader,
@@ -21,7 +23,6 @@ import type {
   VenueSelectionEligibilityReader,
 } from '../domain/seating-plan.providers.js';
 import type {
-  LabelRow,
   RevisionRow,
   SeatingPlanRepository,
   SeatingPlanRow,
@@ -49,7 +50,7 @@ export interface SaveRevisionInput {
   readonly planId: string;
   readonly expectedRevision: number;
   readonly labels: readonly LabelInput[];
-  readonly layoutTemplateVersionId?: string;
+  readonly layoutTemplateVersionId?: string | undefined;
   readonly accessToken: string;
   readonly requestId: string;
   readonly actorAccountId: string;
@@ -148,7 +149,45 @@ export interface SeatingPlanServiceDependencies {
 export function createSeatingPlanService(
   deps: SeatingPlanServiceDependencies,
 ): SeatingPlanService {
-  const { repository, bookingReader, guestReader, venueReader, registry } = deps;
+  const { repository, bookingReader, guestReader, venueReader, registry, prisma } = deps;
+
+  async function revalidatePlanStatus(
+    plan: SeatingPlanRow,
+    rev: RevisionRow | null,
+    booking: BookingContext,
+    exRec: { headcountSnapshot: number; bookingRevisionSnapshot: number } | null,
+  ): Promise<'DRAFT' | 'CONFIRMED' | 'REQUIRES_REVIEW'> {
+    if (plan.status !== 'CONFIRMED' || rev === null) {
+      return plan.status;
+    }
+    const hasValidException =
+      exRec !== null &&
+      exRec.headcountSnapshot === booking.planningHeadcount &&
+      exRec.bookingRevisionSnapshot === booking.bookingRevision;
+
+    let isInvalid = false;
+    try {
+      const layoutEligibility = await venueReader.requireLayoutVersionEligible(rev.layoutTemplateVersionId);
+      if (layoutEligibility.isRetired) {
+        isInvalid = true;
+      } else if (!hasValidException) {
+        if (booking.planningHeadcount < layoutEligibility.minGuests || booking.planningHeadcount > layoutEligibility.maxGuests) {
+          isInvalid = true;
+        }
+      }
+    } catch {
+      isInvalid = true;
+    }
+
+    if (isInvalid) {
+      await repository.invalidatePlan(plan.id);
+      if (plan.confirmedRevisionId) {
+        await registry.markRequiresReview(plan.confirmedRevisionId);
+      }
+      return 'REQUIRES_REVIEW';
+    }
+    return 'CONFIRMED';
+  }
 
   return Object.freeze({
     async listLayoutOptions(input: ListLayoutOptionsInput): Promise<readonly CompatibleLayoutOption[]> {
@@ -160,23 +199,26 @@ export function createSeatingPlanService(
     },
 
     async selectLayout(input: SelectLayoutInput): Promise<SeatingPlanResult> {
-      // Resolve booking and layout concurrently
       const [booking, layoutEligibility] = await Promise.all([
         bookingReader.requireConfirmedBookingContext(input.bookingId),
         venueReader.requireLayoutVersionEligible(input.layoutTemplateVersionId),
       ]);
 
       if (layoutEligibility.isRetired) throw new LayoutRetiredError();
+      if (layoutEligibility.hallId !== booking.hallId) {
+        throw new TableNotInLayoutError();
+      }
       if (booking.bookingRevision !== input.expectedBookingRevision) {
         throw new SeatingRevisionStaleError();
       }
-      validateHeadcountInRange(
-        booking.planningHeadcount,
-        layoutEligibility.minGuests,
-        layoutEligibility.maxGuests,
-      );
+      if (booking.planningHeadcount > 0) {
+        validateHeadcountInRange(
+          booking.planningHeadcount,
+          layoutEligibility.minGuests,
+          layoutEligibility.maxGuests,
+        );
+      }
 
-      // If a plan already exists for this booking:
       const existing = await repository.findPlanByBookingId(input.bookingId);
       if (existing !== null) {
         const rev = existing.currentRevisionId
@@ -191,12 +233,21 @@ export function createSeatingPlanService(
           return buildResult(existing, rev, hasValidException);
         }
 
-        // Selected a different layout -> create a replacement DRAFT revision
+        const tableIdSet = new Set(layoutEligibility.tableIds);
+        const preservedLabels = (rev?.labels ?? [])
+          .filter((l) => tableIdSet.has(l.layoutTableId))
+          .map((l, idx) => ({
+            layoutTableId: l.layoutTableId,
+            guestGroupId: l.guestGroupId,
+            colorSnapshot: l.colorSnapshot,
+            displayOrder: idx + 1,
+          }));
+
         const revisionId = randomUUID();
         const digest = buildRevisionDigest(
           input.layoutTemplateVersionId,
           booking.planningHeadcount,
-          [],
+          preservedLabels,
         );
         const appendRes = await repository.appendRevision({
           planId: existing.id,
@@ -205,7 +256,7 @@ export function createSeatingPlanService(
           layoutTemplateVersionId: input.layoutTemplateVersionId,
           expectedAttendees: booking.planningHeadcount,
           revisionDigest: digest,
-          labels: [],
+          labels: preservedLabels,
           createdByAccountId: input.actorAccountId,
         });
         const updatedPlan = await repository.requirePlanById(existing.id);
@@ -242,8 +293,6 @@ export function createSeatingPlanService(
 
     async saveRevision(input: SaveRevisionInput): Promise<SeatingPlanResult> {
       const plan = await repository.requirePlanByBookingAndPlanId(input.bookingId, input.planId);
-
-      // Resolve booking and determine layout version to use
       const booking = await bookingReader.requireConfirmedBookingContext(input.bookingId);
       const layoutVersionId =
         input.layoutTemplateVersionId ?? (
@@ -256,6 +305,7 @@ export function createSeatingPlanService(
 
       const layoutEligibility = await venueReader.requireLayoutVersionEligible(layoutVersionId);
       if (layoutEligibility.isRetired) throw new LayoutRetiredError();
+      if (layoutEligibility.hallId !== booking.hallId) throw new TableNotInLayoutError();
 
       const exRec = await repository.getExceptionRecord(plan.id);
       const hasValidException =
@@ -263,7 +313,7 @@ export function createSeatingPlanService(
         exRec.headcountSnapshot === booking.planningHeadcount &&
         exRec.bookingRevisionSnapshot === booking.bookingRevision;
 
-      if (!hasValidException) {
+      if (!hasValidException && booking.planningHeadcount > 0) {
         validateHeadcountInRange(
           booking.planningHeadcount,
           layoutEligibility.minGuests,
@@ -271,7 +321,6 @@ export function createSeatingPlanService(
         );
       }
 
-      // Validate labels: all table IDs must be in the layout, and each table has at most one group label
       const tableIdSet = new Set(layoutEligibility.tableIds);
       const seenTableIds = new Set<string>();
       for (const label of input.labels) {
@@ -286,7 +335,6 @@ export function createSeatingPlanService(
         seenTableIds.add(label.layoutTableId);
       }
 
-      // Resolve guest group colors
       const activeGroups = await guestReader.listActiveGroups(input.bookingId);
       const groupMap = new Map(
         activeGroups.map((g) => [g.guestGroupId, g]),
@@ -372,7 +420,7 @@ export function createSeatingPlanService(
 
       const digest = buildRevisionDigest(
         rev.layoutTemplateVersionId,
-        rev.expectedAttendees,
+        booking.planningHeadcount,
         rev.labels,
       );
 
@@ -386,36 +434,109 @@ export function createSeatingPlanService(
         managerExceptionGranted: hasValidException,
       };
 
-      const registrationId = randomUUID();
-      const confirmed = await repository.confirmPlan({
-        planId: plan.id,
-        revisionId: plan.currentRevisionId,
-        expectedPlanRevision: input.expectedRevision,
-        registrationId,
-        validityProofJson: validityProof,
-        digestAtRegistration: digest,
-        updatedByAccountId: input.actorAccountId,
+      const existingRegistration = await prisma.seatingRevisionRegistration.findUnique({
+        where: { revisionId: rev.id },
       });
 
-      // Register with invitation studio
-      await registry.registerConfirmed({
-        seatingRevisionId: rev.id,
-        revisionNumber: rev.revisionNumber,
-        digest,
-        validityProof,
+      let targetRevision = rev;
+      let targetPlanRevision = input.expectedRevision;
+
+      const result = await prisma.$transaction(async (tx) => {
+        if (existingRegistration !== null || plan.status === 'REQUIRES_REVIEW') {
+          const newRevisionId = randomUUID();
+          const appendRes = await tx.$queryRaw<Array<{ revisionNumber: number; planRevision: number }>>(Prisma.sql`
+            WITH max_rev AS (
+              SELECT COALESCE(MAX("revisionNumber"), 0) + 1 AS next_rev
+              FROM "SeatingPlanRevision"
+              WHERE "seatingPlanId" = ${plan.id}::uuid
+            ),
+            plan_upd AS (
+              UPDATE "SeatingPlan"
+              SET "planRevision" = "planRevision" + 1,
+                  "currentRevisionId" = ${newRevisionId}::uuid,
+                  "updatedByAccountId" = ${input.actorAccountId}::uuid,
+                  "updatedAt" = NOW()
+              WHERE "id" = ${plan.id}::uuid
+                AND "planRevision" = ${input.expectedRevision}
+              RETURNING "planRevision"
+            ),
+            rev_ins AS (
+              INSERT INTO "SeatingPlanRevision" ("id", "seatingPlanId", "revisionNumber", "layoutTemplateVersionId", "expectedAttendees", "revisionDigest", "createdByAccountId", "createdAt")
+              SELECT ${newRevisionId}::uuid, ${plan.id}::uuid, max_rev.next_rev, ${rev.layoutTemplateVersionId}::uuid, ${booking.planningHeadcount}, ${digest}, ${input.actorAccountId}::uuid, NOW()
+              FROM max_rev, plan_upd
+              RETURNING "revisionNumber"
+            )
+            SELECT rev_ins."revisionNumber", plan_upd."planRevision"
+            FROM rev_ins, plan_upd
+          `);
+          if (!appendRes[0]) throw new SeatingRevisionStaleError();
+
+          targetPlanRevision = appendRes[0].planRevision;
+          if (rev.labels.length > 0) {
+            await tx.seatingPlanLabel.createMany({
+              data: rev.labels.map((l) => ({
+                revisionId: newRevisionId,
+                layoutTableId: l.layoutTableId,
+                guestGroupId: l.guestGroupId,
+                colorSnapshot: l.colorSnapshot,
+                displayOrder: l.displayOrder,
+              })),
+            });
+          }
+
+          targetRevision = {
+            ...rev,
+            id: newRevisionId,
+            revisionNumber: appendRes[0].revisionNumber,
+            expectedAttendees: booking.planningHeadcount,
+            revisionDigest: digest,
+          };
+        }
+
+        const confirmRes = await tx.$queryRaw<Array<{ planRevision: number }>>(Prisma.sql`
+          UPDATE "SeatingPlan"
+          SET "planRevision" = "planRevision" + 1,
+              "status" = 'CONFIRMED',
+              "confirmedRevisionId" = ${targetRevision.id}::uuid,
+              "updatedByAccountId" = ${input.actorAccountId}::uuid,
+              "updatedAt" = NOW()
+          WHERE "id" = ${plan.id}::uuid
+            AND "planRevision" = ${targetPlanRevision}
+            AND "currentRevisionId" = ${targetRevision.id}::uuid
+          RETURNING "planRevision"
+        `);
+        if (!confirmRes[0]) throw new SeatingRevisionStaleError();
+
+        const registrationId = randomUUID();
+        await tx.seatingRevisionRegistration.create({
+          data: {
+            id: registrationId,
+            revisionId: targetRevision.id,
+            validityProofJson: validityProof as unknown as Prisma.InputJsonValue,
+            digestAtRegistration: digest,
+          },
+        });
+
+        await registry.registerConfirmed({
+          seatingRevisionId: targetRevision.id,
+          revisionNumber: targetRevision.revisionNumber,
+          digest,
+          validityProof,
+        });
+
+        return { planRevision: confirmRes[0].planRevision };
       });
 
       const updatedPlan = await repository.requirePlanById(plan.id);
       return buildResult(
-        { ...updatedPlan, planRevision: confirmed.planRevision },
-        rev,
+        { ...updatedPlan, planRevision: result.planRevision },
+        targetRevision,
         hasValidException,
       );
     },
 
     async recordManagerException(input: RecordManagerExceptionInput): Promise<SeatingPlanResult> {
       const reason = validateExceptionReason(input.reason);
-
       const plan = await repository.requirePlanById(input.planId);
       if (plan.currentRevisionId === null) throw new NotFoundError();
 
@@ -428,31 +549,22 @@ export function createSeatingPlanService(
         rev.layoutTemplateVersionId,
       );
 
+      // Manager exception cannot override a retired layout
+      if (layoutEligibility.isRetired) {
+        throw new LayoutRetiredError();
+      }
+
       if (booking.bookingRevision !== input.expectedBookingRevision) {
         throw new SeatingRevisionStaleError();
       }
 
-      // Exception still cannot exceed physical hall capacity
       if (booking.planningHeadcount > layoutEligibility.totalSeatCapacity) {
         throw new ExceptionExceedsPhysicalCapacityError();
       }
 
-      const exceptionId = randomUUID();
-      await repository.saveExceptionRecord({
-        planId: plan.id,
-        exceptionId,
-        planRevisionAtException: input.expectedRevision,
-        bookingRevisionSnapshot: booking.bookingRevision,
-        headcountSnapshot: booking.planningHeadcount,
-        layoutTemplateVersionId: rev.layoutTemplateVersionId,
-        reason,
-        grantedByAccountId: input.actorAccountId,
-      });
-
-      // Manager exception confirms the plan and creates confirmed revision registration
       const digest = buildRevisionDigest(
         rev.layoutTemplateVersionId,
-        rev.expectedAttendees,
+        booking.planningHeadcount,
         rev.labels,
       );
 
@@ -466,28 +578,125 @@ export function createSeatingPlanService(
         managerExceptionGranted: true,
       };
 
-      const registrationId = randomUUID();
-      const confirmed = await repository.confirmPlan({
-        planId: plan.id,
-        revisionId: plan.currentRevisionId,
-        expectedPlanRevision: input.expectedRevision,
-        registrationId,
-        validityProofJson: validityProof,
-        digestAtRegistration: digest,
-        updatedByAccountId: input.actorAccountId,
+      const existingRegistration = await prisma.seatingRevisionRegistration.findUnique({
+        where: { revisionId: rev.id },
       });
 
-      await registry.registerConfirmed({
-        seatingRevisionId: rev.id,
-        revisionNumber: rev.revisionNumber,
-        digest,
-        validityProof,
+      let targetRevision = rev;
+      let targetPlanRevision = input.expectedRevision;
+
+      const result = await prisma.$transaction(async (tx) => {
+        await tx.seatingPlanExceptionRecord.upsert({
+          where: { seatingPlanId: plan.id },
+          create: {
+            id: randomUUID(),
+            seatingPlanId: plan.id,
+            planRevisionAtException: input.expectedRevision,
+            bookingRevisionSnapshot: booking.bookingRevision,
+            headcountSnapshot: booking.planningHeadcount,
+            layoutTemplateVersionId: rev.layoutTemplateVersionId,
+            reason,
+            grantedByAccountId: input.actorAccountId,
+          },
+          update: {
+            planRevisionAtException: input.expectedRevision,
+            bookingRevisionSnapshot: booking.bookingRevision,
+            headcountSnapshot: booking.planningHeadcount,
+            layoutTemplateVersionId: rev.layoutTemplateVersionId,
+            reason,
+            grantedByAccountId: input.actorAccountId,
+          },
+        });
+
+        if (existingRegistration !== null || plan.status === 'REQUIRES_REVIEW') {
+          const newRevisionId = randomUUID();
+          const appendRes = await tx.$queryRaw<Array<{ revisionNumber: number; planRevision: number }>>(Prisma.sql`
+            WITH max_rev AS (
+              SELECT COALESCE(MAX("revisionNumber"), 0) + 1 AS next_rev
+              FROM "SeatingPlanRevision"
+              WHERE "seatingPlanId" = ${plan.id}::uuid
+            ),
+            plan_upd AS (
+              UPDATE "SeatingPlan"
+              SET "planRevision" = "planRevision" + 1,
+                  "currentRevisionId" = ${newRevisionId}::uuid,
+                  "updatedByAccountId" = ${input.actorAccountId}::uuid,
+                  "updatedAt" = NOW()
+              WHERE "id" = ${plan.id}::uuid
+                AND "planRevision" = ${input.expectedRevision}
+              RETURNING "planRevision"
+            ),
+            rev_ins AS (
+              INSERT INTO "SeatingPlanRevision" ("id", "seatingPlanId", "revisionNumber", "layoutTemplateVersionId", "expectedAttendees", "revisionDigest", "createdByAccountId", "createdAt")
+              SELECT ${newRevisionId}::uuid, ${plan.id}::uuid, max_rev.next_rev, ${rev.layoutTemplateVersionId}::uuid, ${booking.planningHeadcount}, ${digest}, ${input.actorAccountId}::uuid, NOW()
+              FROM max_rev, plan_upd
+              RETURNING "revisionNumber"
+            )
+            SELECT rev_ins."revisionNumber", plan_upd."planRevision"
+            FROM rev_ins, plan_upd
+          `);
+          if (!appendRes[0]) throw new SeatingRevisionStaleError();
+
+          targetPlanRevision = appendRes[0].planRevision;
+          if (rev.labels.length > 0) {
+            await tx.seatingPlanLabel.createMany({
+              data: rev.labels.map((l) => ({
+                revisionId: newRevisionId,
+                layoutTableId: l.layoutTableId,
+                guestGroupId: l.guestGroupId,
+                colorSnapshot: l.colorSnapshot,
+                displayOrder: l.displayOrder,
+              })),
+            });
+          }
+
+          targetRevision = {
+            ...rev,
+            id: newRevisionId,
+            revisionNumber: appendRes[0].revisionNumber,
+            expectedAttendees: booking.planningHeadcount,
+            revisionDigest: digest,
+          };
+        }
+
+        const confirmRes = await tx.$queryRaw<Array<{ planRevision: number }>>(Prisma.sql`
+          UPDATE "SeatingPlan"
+          SET "planRevision" = "planRevision" + 1,
+              "status" = 'CONFIRMED',
+              "confirmedRevisionId" = ${targetRevision.id}::uuid,
+              "updatedByAccountId" = ${input.actorAccountId}::uuid,
+              "updatedAt" = NOW()
+          WHERE "id" = ${plan.id}::uuid
+            AND "planRevision" = ${targetPlanRevision}
+            AND "currentRevisionId" = ${targetRevision.id}::uuid
+          RETURNING "planRevision"
+        `);
+        if (!confirmRes[0]) throw new SeatingRevisionStaleError();
+
+        const registrationId = randomUUID();
+        await tx.seatingRevisionRegistration.create({
+          data: {
+            id: registrationId,
+            revisionId: targetRevision.id,
+            validityProofJson: validityProof as unknown as Prisma.InputJsonValue,
+            digestAtRegistration: digest,
+          },
+        });
+
+        await registry.registerConfirmed({
+          seatingRevisionId: targetRevision.id,
+          revisionNumber: targetRevision.revisionNumber,
+          digest,
+          validityProof,
+        });
+
+        return { planRevision: confirmRes[0].planRevision };
       });
 
       const updatedPlan = await repository.requirePlanById(plan.id);
       return buildResult(
-        { ...updatedPlan, planRevision: confirmed.planRevision },
-        rev,
+        { ...updatedPlan, planRevision: result.planRevision },
+        targetRevision,
         true,
       );
     },
@@ -505,7 +714,10 @@ export function createSeatingPlanService(
         exRec !== null &&
         exRec.headcountSnapshot === booking.planningHeadcount &&
         exRec.bookingRevisionSnapshot === booking.bookingRevision;
-      return buildResult(plan, rev, hasValidException);
+
+      const status = await revalidatePlanStatus(plan, rev, booking, exRec);
+      const planToReturn = status !== plan.status ? { ...plan, status } : plan;
+      return buildResult(planToReturn, rev, hasValidException);
     },
 
     async getGuidance(bookingId: string): Promise<SeatingGuidanceResult> {
@@ -518,10 +730,17 @@ export function createSeatingPlanService(
         });
       }
 
-      const [rev, activeGroups] = await Promise.all([
+      const [bookingResult, rev, exRec, activeGroups] = await Promise.all([
+        bookingReader.requireConfirmedBookingContext(bookingId).catch(() => null),
         repository.getCurrentRevisionWithLabels(plan.currentRevisionId),
+        repository.getExceptionRecord(plan.id),
         guestReader.listActiveGroups(bookingId),
       ]);
+
+      let planStatus = plan.status;
+      if (bookingResult !== null) {
+        planStatus = await revalidatePlanStatus(plan, rev, bookingResult, exRec);
+      }
 
       const groupLookup = new Map(activeGroups.map((g) => [g.guestGroupId, g]));
       const groupTableMap = new Map<string, string[]>();
@@ -545,7 +764,7 @@ export function createSeatingPlanService(
 
       return Object.freeze({
         seatingPlanRevisionId: rev.id,
-        status: plan.status,
+        status: planStatus,
         groups: Object.freeze(groups),
       });
     },
@@ -555,11 +774,21 @@ export function createSeatingPlanService(
       if (plan === null || plan.currentRevisionId === null) {
         throw new NotFoundError();
       }
-      const rev = await repository.getCurrentRevisionWithLabels(plan.currentRevisionId);
+      const [bookingResult, rev, exRec] = await Promise.all([
+        bookingReader.requireConfirmedBookingContext(bookingId).catch(() => null),
+        repository.getCurrentRevisionWithLabels(plan.currentRevisionId),
+        repository.getExceptionRecord(plan.id),
+      ]);
+
+      let status = plan.status;
+      if (bookingResult !== null) {
+        status = await revalidatePlanStatus(plan, rev, bookingResult, exRec);
+      }
+
       return {
         seatingPlanId: plan.id,
         revisionId: rev.id,
-        status: plan.status,
+        status,
         layoutTemplateVersionId: rev.layoutTemplateVersionId,
         expectedAttendees: rev.expectedAttendees,
         labels: rev.labels.map((l) => ({
@@ -610,9 +839,3 @@ function deepFreezeRevision(rev: RevisionRow): RevisionRow {
     labels: Object.freeze(rev.labels.map((l) => Object.freeze({ ...l }))),
   });
 }
-
-function mapLabel(l: LabelRow): LabelRow {
-  return Object.freeze({ ...l });
-}
-
-void mapLabel; // satisfy TS — used in deepFreezeRevision implicitly

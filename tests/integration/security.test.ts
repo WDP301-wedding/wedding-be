@@ -28,6 +28,31 @@ vi.mock('../../src/modules/venue-catalog/venue-catalog.runtime.js', async () => 
   };
 });
 
+vi.mock('../../src/modules/seating-plan/seating-plan.runtime.js', async () => {
+  const { Router } = await import('express');
+
+  return {
+    createSeatingPlanRuntime: vi.fn(() => ({
+      router: Router(),
+      resource: { name: 'seating-plan-database', close: vi.fn() },
+      service: {} as never,
+    })),
+  };
+});
+
+vi.mock('../../src/modules/staff-operations/staff-operations.runtime.js', async () => {
+  const { Router } = await import('express');
+
+  return {
+    createStaffOperationsRuntime: vi.fn(() => ({
+      router: Router(),
+      resource: { name: 'staff-operations-database', close: vi.fn() },
+      service: {} as never,
+      attendanceReader: {} as never,
+    })),
+  };
+});
+
 const trustedRequestId = '24dcfaac-4408-4d42-8d66-456ed6ee7ea4';
 const allowedOrigin = 'https://wedding.example.com';
 

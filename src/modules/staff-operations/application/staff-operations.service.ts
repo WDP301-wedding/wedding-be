@@ -6,7 +6,6 @@ import {
   validateCorrectionDelta,
   validateReason,
   CheckInWindowClosedError,
-  EventAssignmentRequiredError,
 } from '../domain/staff-operations.policy.js';
 import type {
   BookingEventReader,
@@ -19,7 +18,6 @@ import type {
 import type {
   AttendanceArrivalRow,
   AttendanceCorrectionRow,
-  HouseholdAttendanceSummaryRow,
   StaffAssignmentRow,
   StaffOperationsRepository,
 } from '../infrastructure/staff-operations.repository.js';
@@ -176,7 +174,7 @@ export function createStaffOperationsService(
   async function checkEventWindowAndAssignment(
     bookingId: string,
     actor: StaffActorContext,
-    managerOverrideReason?: string | null | undefined,
+    managerOverrideReason?: string | null,
   ): Promise<void> {
     const eventContext = await bookingReader.requireConfirmedEventContext(bookingId);
 
@@ -360,7 +358,11 @@ export function createStaffOperationsService(
     },
 
     async recordCorrection(bookingId, householdId, input, actor) {
-      await checkEventWindowAndAssignment(bookingId, actor);
+      await checkEventWindowAndAssignment(
+        bookingId,
+        actor,
+        actor.role === 'MANAGER' ? input.reason : undefined,
+      );
 
       if (actor.role === 'STAFF') {
         const history = await repository.getHouseholdAttendance(bookingId, householdId);

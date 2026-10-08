@@ -293,7 +293,9 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
   }
   let staffOperationsRuntime: Awaited<ReturnType<typeof createStaffOperationsRuntime>>;
   try {
-    staffOperationsRuntime = await createStaffOperationsRuntime(config);
+    staffOperationsRuntime = await createStaffOperationsRuntime(config, {
+      seatingGuidance: seatingPlanRuntime.service,
+    });
   } catch (error: unknown) {
     await seatingPlanRuntime.resource.close();
     await venueCatalogRuntime.resource.close();

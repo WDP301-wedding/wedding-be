@@ -9,12 +9,21 @@ import { createPrismaIdempotencyRepository } from '../../core/idempotency/idempo
 import { createIdempotencyService } from '../../core/idempotency/idempotency.service.js';
 import { createAuthenticatedActorResolver } from '../identity-access/authorization/authenticated-actor.middleware.js';
 import { createPrismaSessionRepository } from '../identity-access/session/session.repository.js';
-import { createStaffOperationsService } from './application/staff-operations.service.js';
+import {
+  createAttendanceReader,
+  createStaffOperationsService,
+  type AttendanceReader,
+  type StaffOperationsService,
+} from './application/staff-operations.service.js';
 import {
   FakeBookingEventReader,
   FakeGuestOperationsReader,
-  FakeSeatingGuidanceProvider,
-  FakeStaffAccountProvisioner,
+  PrismaSeatingGuidanceProvider,
+  PrismaStaffAccountProvisioner,
+  type BookingEventReader,
+  type GuestOperationsReader,
+  type SeatingGuidanceProvider,
+  type StaffAccountProvisioner,
 } from './domain/staff-operations.providers.js';
 import { createStaffOperationsRepository } from './infrastructure/staff-operations.repository.js';
 import {
@@ -26,9 +35,21 @@ import {
 export type StaffOperationsRuntime = Readonly<{
   router: Router;
   resource: ShutdownResource;
+  service: StaffOperationsService;
+  attendanceReader: AttendanceReader;
 }>;
 
-export async function createStaffOperationsRuntime(config: Config): Promise<StaffOperationsRuntime> {
+export interface CreateStaffOperationsRuntimeOptions {
+  readonly bookingReader?: BookingEventReader | undefined;
+  readonly guestReader?: GuestOperationsReader | undefined;
+  readonly seatingGuidance?: SeatingGuidanceProvider | undefined;
+  readonly staffProvisioner?: StaffAccountProvisioner | undefined;
+}
+
+export async function createStaffOperationsRuntime(
+  config: Config,
+  options?: CreateStaffOperationsRuntimeOptions,
+): Promise<StaffOperationsRuntime> {
   const prisma = createPrismaClient(config.database.url);
   try {
     await prisma.$connect();
@@ -37,11 +58,10 @@ export async function createStaffOperationsRuntime(config: Config): Promise<Staf
     const idempotency = createIdempotencyService(createPrismaIdempotencyRepository(prisma));
     const repository = createStaffOperationsRepository(prisma);
 
-    // Provider implementations — conforming fakes for standalone runtime / test suites
-    const bookingReader = new FakeBookingEventReader();
-    const guestReader = new FakeGuestOperationsReader();
-    const seatingGuidance = new FakeSeatingGuidanceProvider();
-    const staffProvisioner = new FakeStaffAccountProvisioner();
+    const bookingReader = options?.bookingReader ?? new FakeBookingEventReader();
+    const guestReader = options?.guestReader ?? new FakeGuestOperationsReader();
+    const seatingGuidance = options?.seatingGuidance ?? new PrismaSeatingGuidanceProvider(prisma);
+    const staffProvisioner = options?.staffProvisioner ?? new PrismaStaffAccountProvisioner(prisma);
 
     const staffOperationsService = createStaffOperationsService({
       repository,
@@ -68,12 +88,16 @@ export async function createStaffOperationsRuntime(config: Config): Promise<Staf
         }),
     });
 
+    const attendanceReader = createAttendanceReader(repository, guestReader, prisma);
+
     return Object.freeze({
       router,
       resource: Object.freeze({
         name: 'staff-operations-database',
         close: () => prisma.$disconnect(),
       }),
+      service: staffOperationsService,
+      attendanceReader,
     });
   } catch (error: unknown) {
     await prisma.$disconnect();

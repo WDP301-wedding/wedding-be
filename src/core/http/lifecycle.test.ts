@@ -40,6 +40,30 @@ vi.mock('../../modules/venue-catalog/venue-catalog.runtime.js', async () => {
   };
 });
 
+vi.mock('../../modules/seating-plan/seating-plan.runtime.js', async () => {
+  const { Router } = await import('express');
+
+  return {
+    createSeatingPlanRuntime: vi.fn(() => ({
+      router: Router(),
+      resource: { name: 'seating-plan-database', close: vi.fn() },
+      service: {} as never,
+    })),
+  };
+});
+
+vi.mock('../../modules/staff-operations/staff-operations.runtime.js', async () => {
+  const { Router } = await import('express');
+
+  return {
+    createStaffOperationsRuntime: vi.fn(() => ({
+      router: Router(),
+      resource: { name: 'staff-operations-database', close: vi.fn() },
+      service: {} as never,
+    })),
+  };
+});
+
 class TestSignalTarget extends EventEmitter {
   exitCode: NodeJS.Process['exitCode'];
   exitedWith: number | undefined;

@@ -95,6 +95,7 @@ export interface SeatingPlanRepository {
     readonly reason: string;
     readonly grantedByAccountId: string;
     readonly headcountSnapshot: number;
+    readonly bookingRevisionSnapshot: number;
     readonly createdAt: Date;
   } | null>;
 }
@@ -316,6 +317,7 @@ export function createSeatingPlanRepository(prisma: PrismaClient): SeatingPlanRe
       readonly reason: string;
       readonly grantedByAccountId: string;
       readonly headcountSnapshot: number;
+      readonly bookingRevisionSnapshot: number;
       readonly createdAt: Date;
     } | null> {
       const rec = await prisma.seatingPlanExceptionRecord.findUnique({
@@ -324,6 +326,7 @@ export function createSeatingPlanRepository(prisma: PrismaClient): SeatingPlanRe
           reason: true,
           grantedByAccountId: true,
           headcountSnapshot: true,
+          bookingRevisionSnapshot: true,
           createdAt: true,
         },
       });

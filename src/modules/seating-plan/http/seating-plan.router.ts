@@ -1,7 +1,16 @@
-import { Router, type NextFunction, type Request, type RequestHandler, type Response } from 'express';
+import {
+  Router,
+  type NextFunction,
+  type Request,
+  type RequestHandler,
+  type Response,
+} from 'express';
 
-import { AuthenticationRequiredError } from '../../identity-access/authorization/authenticated-actor.middleware.js';
-import type { AuthenticatedActorResolver } from '../../identity-access/authorization/authenticated-actor.middleware.js';
+import {
+  AuthenticationRequiredError,
+  type AuthenticatedActor,
+  type AuthenticatedActorResolver,
+} from '../../identity-access/authorization/authenticated-actor.middleware.js';
 import {
   ForbiddenIdentityAccessError,
   requireAnyRole,
@@ -21,9 +30,15 @@ import {
 
 // ─── Public interface ─────────────────────────────────────────────────────────
 
+export type BookingAccessAuthorizer = (
+  actor: AuthenticatedActor,
+  bookingId: string,
+) => Promise<void>;
+
 export interface SeatingPlanHttpServices {
   readonly seatingPlan: SeatingPlanService;
   readonly actorResolver: AuthenticatedActorResolver;
+  readonly authorizeBookingAccess?: BookingAccessAuthorizer | undefined;
 }
 
 export interface CreateSeatingPlanRouterOptions {
@@ -31,24 +46,44 @@ export interface CreateSeatingPlanRouterOptions {
   readonly createIdempotencyHandler: (normalizedRoute: string) => RequestHandler;
 }
 
+const authenticatedActors = new WeakMap<Request, AuthenticatedActor>();
+
 // ─── Router factory ───────────────────────────────────────────────────────────
 
 export function createSeatingPlanRouter(options: CreateSeatingPlanRouterOptions): Router {
   const router = Router();
   const { services, createIdempotencyHandler } = options;
+  const auth = createAuthMiddleware(services.actorResolver);
+
+  async function checkBookingAccess(actor: AuthenticatedActor, bookingId: string): Promise<void> {
+    if (services.authorizeBookingAccess !== undefined) {
+      await services.authorizeBookingAccess(actor, bookingId);
+      return;
+    }
+    if (actor.roles.includes('MANAGER')) {
+      return;
+    }
+    if (!actor.roles.includes('COUPLE')) {
+      throw new ForbiddenIdentityAccessError();
+    }
+  }
 
   // ── GET /bookings/:bookingId/seating-layout-options ──────────────────────
   router.get(
     '/bookings/:bookingId/seating-layout-options',
+    auth,
     validateRequest({ params: bookingParamsSchema, query: layoutOptionsQuerySchema }),
     asyncHandler(async (request, response) => {
-      const actor = await resolveActor(services.actorResolver, request);
+      const actor = requireActor(request);
       requireAnyRole(actor, ['MANAGER', 'COUPLE']);
 
       const { params } = validatedRequest(response, {
         params: bookingParamsSchema,
         query: layoutOptionsQuerySchema,
       });
+
+      await checkBookingAccess(actor, params.bookingId);
+
       const options_ = await services.seatingPlan.listLayoutOptions({
         bookingId: params.bookingId,
         accessToken: bearerToken(request) ?? '',
@@ -61,16 +96,20 @@ export function createSeatingPlanRouter(options: CreateSeatingPlanRouterOptions)
   // ── POST /bookings/:bookingId/seating-plans ───────────────────────────────
   router.post(
     '/bookings/:bookingId/seating-plans',
+    auth,
     createIdempotencyHandler('/bookings/{bookingId}/seating-plans'),
     validateRequest({ params: bookingParamsSchema, body: selectLayoutBodySchema }),
     asyncHandler(async (request, response) => {
-      const actor = await resolveActor(services.actorResolver, request);
+      const actor = requireActor(request);
       requireAnyRole(actor, ['MANAGER', 'COUPLE']);
 
       const { params, body } = validatedRequest(response, {
         params: bookingParamsSchema,
         body: selectLayoutBodySchema,
       });
+
+      await checkBookingAccess(actor, params.bookingId);
+
       const result = await services.seatingPlan.selectLayout({
         bookingId: params.bookingId,
         layoutTemplateVersionId: body.layoutTemplateVersionId,
@@ -86,22 +125,28 @@ export function createSeatingPlanRouter(options: CreateSeatingPlanRouterOptions)
   // ── POST /bookings/:bookingId/seating-plans/:planId/revisions ────────────
   router.post(
     '/bookings/:bookingId/seating-plans/:planId/revisions',
+    auth,
     createIdempotencyHandler('/bookings/{bookingId}/seating-plans/{planId}/revisions'),
     validateRequest({ params: planParamsSchema, body: saveRevisionBodySchema }),
     asyncHandler(async (request, response) => {
-      const actor = await resolveActor(services.actorResolver, request);
+      const actor = requireActor(request);
       requireAnyRole(actor, ['MANAGER', 'COUPLE']);
 
       const { params, body } = validatedRequest(response, {
         params: planParamsSchema,
         body: saveRevisionBodySchema,
       });
+
+      await checkBookingAccess(actor, params.bookingId);
+
       const result = await services.seatingPlan.saveRevision({
         bookingId: params.bookingId,
         planId: params.planId,
         expectedRevision: body.expectedRevision,
         labels: body.labels,
-        layoutTemplateVersionId: body.layoutTemplateVersionId,
+        ...(body.layoutTemplateVersionId !== undefined
+          ? { layoutTemplateVersionId: body.layoutTemplateVersionId }
+          : {}),
         accessToken: bearerToken(request) ?? '',
         requestId: request.requestId,
         actorAccountId: actor.accountId,
@@ -113,16 +158,20 @@ export function createSeatingPlanRouter(options: CreateSeatingPlanRouterOptions)
   // ── POST /bookings/:bookingId/seating-plans/:planId/confirmation ─────────
   router.post(
     '/bookings/:bookingId/seating-plans/:planId/confirmation',
+    auth,
     createIdempotencyHandler('/bookings/{bookingId}/seating-plans/{planId}/confirmation'),
     validateRequest({ params: planParamsSchema, body: confirmBodySchema }),
     asyncHandler(async (request, response) => {
-      const actor = await resolveActor(services.actorResolver, request);
+      const actor = requireActor(request);
       requireAnyRole(actor, ['MANAGER', 'COUPLE']);
 
       const { params, body } = validatedRequest(response, {
         params: planParamsSchema,
         body: confirmBodySchema,
       });
+
+      await checkBookingAccess(actor, params.bookingId);
+
       const result = await services.seatingPlan.confirmPlan({
         bookingId: params.bookingId,
         planId: params.planId,
@@ -139,10 +188,11 @@ export function createSeatingPlanRouter(options: CreateSeatingPlanRouterOptions)
   // ── POST /management/seating-plans/:planId/exceptions ───────────────────
   router.post(
     '/management/seating-plans/:planId/exceptions',
+    auth,
     createIdempotencyHandler('/management/seating-plans/{planId}/exceptions'),
     validateRequest({ params: managementPlanParamsSchema, body: exceptionBodySchema }),
     asyncHandler(async (request, response) => {
-      const actor = await resolveActor(services.actorResolver, request);
+      const actor = requireActor(request);
       requireAnyRole(actor, ['MANAGER']);
 
       const { params, body } = validatedRequest(response, {
@@ -165,12 +215,16 @@ export function createSeatingPlanRouter(options: CreateSeatingPlanRouterOptions)
   // ── GET /bookings/:bookingId/seating-plans/:planId ───────────────────────
   router.get(
     '/bookings/:bookingId/seating-plans/:planId',
+    auth,
     validateRequest({ params: planParamsSchema }),
     asyncHandler(async (request, response) => {
-      const actor = await resolveActor(services.actorResolver, request);
+      const actor = requireActor(request);
       requireAnyRole(actor, ['MANAGER', 'COUPLE']);
 
       const { params } = validatedRequest(response, { params: planParamsSchema });
+
+      await checkBookingAccess(actor, params.bookingId);
+
       const result = await services.seatingPlan.getPlan({
         bookingId: params.bookingId,
         planId: params.planId,
@@ -187,8 +241,11 @@ export function createSeatingPlanRouter(options: CreateSeatingPlanRouterOptions)
 // ─── Idempotency actor scope ──────────────────────────────────────────────────
 
 export function seatingActorScope(request: Request): string {
-  const auth = request.headers.authorization;
-  return typeof auth === 'string' ? auth : '';
+  const actor = authenticatedActors.get(request);
+  if (actor === undefined) {
+    throw new AuthenticationRequiredError();
+  }
+  return `account:${actor.accountId}`;
 }
 
 export function seatingIdempotencyPayload(request: Request): unknown {
@@ -196,6 +253,30 @@ export function seatingIdempotencyPayload(request: Request): unknown {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function createAuthMiddleware(actorResolver: AuthenticatedActorResolver): RequestHandler {
+  return (request, response, next) => {
+    const token = bearerToken(request);
+    if (token === null) {
+      return next(new AuthenticationRequiredError());
+    }
+    actorResolver
+      .resolve(token)
+      .then((actor) => {
+        authenticatedActors.set(request, actor);
+        next();
+      })
+      .catch(next);
+  };
+}
+
+function requireActor(request: Request): AuthenticatedActor {
+  const actor = authenticatedActors.get(request);
+  if (actor === undefined) {
+    throw new AuthenticationRequiredError();
+  }
+  return actor;
+}
 
 type AsyncRoute = (request: Request, response: Response, next: NextFunction) => Promise<unknown>;
 
@@ -210,15 +291,6 @@ function bearerToken(request: Request): string | null {
   if (header === undefined) return null;
   const match = /^Bearer ([^\s]+)$/u.exec(header);
   return match?.[1] ?? null;
-}
-
-async function resolveActor(
-  actorResolver: AuthenticatedActorResolver,
-  request: Request,
-) {
-  const token = bearerToken(request);
-  if (token === null) throw new AuthenticationRequiredError();
-  return actorResolver.resolve(token);
 }
 
 function serializePlanResult(result: Awaited<ReturnType<SeatingPlanService['getPlan']>>) {
@@ -243,5 +315,4 @@ function serializePlanResult(result: Awaited<ReturnType<SeatingPlanService['getP
   };
 }
 
-// Re-export for use by other modules that need the ForbiddenIdentityAccessError
 export { ForbiddenIdentityAccessError };

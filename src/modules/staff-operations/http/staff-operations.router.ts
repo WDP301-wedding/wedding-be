@@ -39,21 +39,25 @@ export interface CreateStaffOperationsRouterOptions {
   readonly createIdempotencyHandler: (normalizedRoute: string) => RequestHandler;
 }
 
+const authenticatedActors = new WeakMap<Request, AuthenticatedActor>();
+
 export function createStaffOperationsRouter(
   options: CreateStaffOperationsRouterOptions,
 ): Router {
   const router = Router();
   const { services, createIdempotencyHandler } = options;
+  const auth = createAuthMiddleware(services.actorResolver);
 
   // ─── Management: Provisioning & Operational Access ─────────────────────────
 
   // POST /management/staff-accounts
   router.post(
     '/management/staff-accounts',
+    auth,
     createIdempotencyHandler('/management/staff-accounts'),
     validateRequest({ body: provisionStaffAccountBodySchema }),
     asyncHandler(async (request, response) => {
-      const actor = await resolveActor(services.actorResolver, request);
+      const actor = requireActor(request);
       const manager = requireAnyRole(actor, ['MANAGER']);
 
       const { body } = validatedRequest(response, {
@@ -63,7 +67,7 @@ export function createStaffOperationsRouter(
       const result = await services.staffOperations.provisionStaffAccount(
         body.email,
         body.commandKey,
-        { accountId: manager.accountId, role: 'MANAGER' },
+        toStaffActor(manager),
       );
 
       response.status(201).json({ data: result });
@@ -73,13 +77,14 @@ export function createStaffOperationsRouter(
   // POST /management/staff-accounts/:id/operational-access
   router.post(
     '/management/staff-accounts/:id/operational-access',
+    auth,
     createIdempotencyHandler('/management/staff-accounts/{id}/operational-access'),
     validateRequest({
       params: staffAccountParamsSchema,
       body: operationalAccessBodySchema,
     }),
     asyncHandler(async (request, response) => {
-      const actor = await resolveActor(services.actorResolver, request);
+      const actor = requireActor(request);
       const manager = requireAnyRole(actor, ['MANAGER']);
 
       const { params, body } = validatedRequest(response, {
@@ -91,7 +96,7 @@ export function createStaffOperationsRouter(
         params.id,
         body.enabled,
         body.reason,
-        { accountId: manager.accountId, role: 'MANAGER' },
+        toStaffActor(manager),
       );
 
       response.status(200).json({ data: { success: true } });
@@ -103,9 +108,10 @@ export function createStaffOperationsRouter(
   // GET /management/events/:bookingId/assignments
   router.get(
     '/management/events/:bookingId/assignments',
+    auth,
     validateRequest({ params: bookingParamsSchema }),
     asyncHandler(async (request, response) => {
-      const actor = await resolveActor(services.actorResolver, request);
+      const actor = requireActor(request);
       const authorized = requireAnyRole(actor, ['MANAGER', 'STAFF']);
 
       const { params } = validatedRequest(response, {
@@ -124,13 +130,14 @@ export function createStaffOperationsRouter(
   // POST /management/events/:bookingId/assignments
   router.post(
     '/management/events/:bookingId/assignments',
+    auth,
     createIdempotencyHandler('/management/events/{bookingId}/assignments'),
     validateRequest({
       params: bookingParamsSchema,
       body: assignStaffBodySchema,
     }),
     asyncHandler(async (request, response) => {
-      const actor = await resolveActor(services.actorResolver, request);
+      const actor = requireActor(request);
       const manager = requireAnyRole(actor, ['MANAGER']);
 
       const { params, body } = validatedRequest(response, {
@@ -141,7 +148,7 @@ export function createStaffOperationsRouter(
       const created = await services.staffOperations.assignStaff(
         params.bookingId,
         body.staffAccountId,
-        { accountId: manager.accountId, role: 'MANAGER' },
+        toStaffActor(manager),
       );
 
       response.status(201).json({ data: created });
@@ -151,13 +158,14 @@ export function createStaffOperationsRouter(
   // POST /management/events/:bookingId/assignments/:id/revocation
   router.post(
     '/management/events/:bookingId/assignments/:id/revocation',
+    auth,
     createIdempotencyHandler('/management/events/{bookingId}/assignments/{id}/revocation'),
     validateRequest({
       params: assignmentParamsSchema,
       body: revokeAssignmentBodySchema,
     }),
     asyncHandler(async (request, response) => {
-      const actor = await resolveActor(services.actorResolver, request);
+      const actor = requireActor(request);
       const manager = requireAnyRole(actor, ['MANAGER']);
 
       const { params, body } = validatedRequest(response, {
@@ -170,7 +178,7 @@ export function createStaffOperationsRouter(
         params.id,
         body.expectedRevision,
         body.reason,
-        { accountId: manager.accountId, role: 'MANAGER' },
+        toStaffActor(manager),
       );
 
       response.status(200).json({ data: revoked });
@@ -182,12 +190,13 @@ export function createStaffOperationsRouter(
   // GET /staff/events/:bookingId/households/search
   router.get(
     '/staff/events/:bookingId/households/search',
+    auth,
     validateRequest({
       params: bookingParamsSchema,
       query: householdSearchQuerySchema,
     }),
     asyncHandler(async (request, response) => {
-      const actor = await resolveActor(services.actorResolver, request);
+      const actor = requireActor(request);
       const authorized = requireAnyRole(actor, ['MANAGER', 'STAFF']);
 
       const { params, query } = validatedRequest(response, {
@@ -208,13 +217,14 @@ export function createStaffOperationsRouter(
   // POST /staff/events/:bookingId/households/:id/arrivals
   router.post(
     '/staff/events/:bookingId/households/:id/arrivals',
+    auth,
     createIdempotencyHandler('/staff/events/{bookingId}/households/{id}/arrivals'),
     validateRequest({
       params: householdParamsSchema,
       body: recordArrivalBodySchema,
     }),
     asyncHandler(async (request, response) => {
-      const actor = await resolveActor(services.actorResolver, request);
+      const actor = requireActor(request);
       const authorized = requireAnyRole(actor, ['MANAGER', 'STAFF']);
 
       const { params, body } = validatedRequest(response, {
@@ -240,13 +250,14 @@ export function createStaffOperationsRouter(
   // POST /staff/events/:bookingId/households/:id/corrections
   router.post(
     '/staff/events/:bookingId/households/:id/corrections',
+    auth,
     createIdempotencyHandler('/staff/events/{bookingId}/households/{id}/corrections'),
     validateRequest({
       params: householdParamsSchema,
       body: recordCorrectionBodySchema,
     }),
     asyncHandler(async (request, response) => {
-      const actor = await resolveActor(services.actorResolver, request);
+      const actor = requireActor(request);
       const authorized = requireAnyRole(actor, ['MANAGER', 'STAFF']);
 
       const { params, body } = validatedRequest(response, {
@@ -273,12 +284,13 @@ export function createStaffOperationsRouter(
   // GET /staff/events/:bookingId/households/:id/attendance
   router.get(
     '/staff/events/:bookingId/households/:id/attendance',
+    auth,
     validateRequest({
       params: householdParamsSchema,
       query: attendanceHistoryQuerySchema,
     }),
     asyncHandler(async (request, response) => {
-      const actor = await resolveActor(services.actorResolver, request);
+      const actor = requireActor(request);
       const authorized = requireAnyRole(actor, ['MANAGER', 'STAFF']);
 
       const { params } = validatedRequest(response, {
@@ -301,6 +313,30 @@ export function createStaffOperationsRouter(
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+function createAuthMiddleware(actorResolver: AuthenticatedActorResolver): RequestHandler {
+  return (request, response, next) => {
+    const token = bearerToken(request);
+    if (token === null) {
+      return next(new AuthenticationRequiredError());
+    }
+    actorResolver
+      .resolve(token)
+      .then((actor) => {
+        authenticatedActors.set(request, actor);
+        next();
+      })
+      .catch(next);
+  };
+}
+
+function requireActor(request: Request): AuthenticatedActor {
+  const actor = authenticatedActors.get(request);
+  if (actor === undefined) {
+    throw new AuthenticationRequiredError();
+  }
+  return actor;
+}
+
 function asyncHandler(
   fn: (req: Request, res: Response, next: NextFunction) => Promise<void>,
 ): RequestHandler {
@@ -316,19 +352,13 @@ function bearerToken(request: Request): string | null {
   return match?.[1] ?? null;
 }
 
-async function resolveActor(
-  resolver: AuthenticatedActorResolver,
-  request: Request,
-): Promise<AuthenticatedActor> {
-  const token = bearerToken(request);
-  if (token === null) throw new AuthenticationRequiredError();
-  return resolver.resolve(token);
-}
-
-function toStaffActor(actor: { accountId: string; role: string }): StaffActorContext {
+function toStaffActor(actor: AuthenticatedActor): StaffActorContext {
+  const role: 'MANAGER' | 'STAFF' = actor.roles.includes('MANAGER')
+    ? 'MANAGER'
+    : 'STAFF';
   return {
     accountId: actor.accountId,
-    role: actor.role as 'MANAGER' | 'STAFF',
+    role,
   };
 }
 
@@ -341,6 +371,9 @@ export function staffIdempotencyPayload(request: Request): unknown {
 }
 
 export const staffActorScope = (request: Request): string => {
-  const auth = request.headers.authorization;
-  return typeof auth === 'string' ? auth : '';
+  const actor = authenticatedActors.get(request);
+  if (actor === undefined) {
+    throw new AuthenticationRequiredError();
+  }
+  return `account:${actor.accountId}`;
 };

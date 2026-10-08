@@ -1,4 +1,5 @@
 import { NotFoundError } from '../../../core/errors/app-error.js';
+import type { PrismaClient } from '../../../generated/prisma/client.js';
 
 // ─── Provider interfaces ──────────────────────────────────────────────────────
 
@@ -84,18 +85,20 @@ const FAKE_BOOKING: BookingContext = Object.freeze({
 });
 
 export class FakeBookingPlanningReader implements BookingPlanningReader {
-  async requireConfirmedBookingContext(bookingId: string): Promise<BookingContext> {
+  requireConfirmedBookingContext(bookingId: string): Promise<BookingContext> {
     if (bookingId === FAKE_BOOKING.bookingId) {
-      return { ...FAKE_BOOKING };
+      return Promise.resolve({ ...FAKE_BOOKING });
     }
-    throw new NotFoundError();
+    return Promise.reject(new NotFoundError());
   }
 
-  async requireBookingOwnedByAccount(
-    _bookingId: string,
-    _accountId: string,
+  requireBookingOwnedByAccount(
+    bookingId: string,
+    accountId: string,
   ): Promise<void> {
-    // Fake: always succeeds — in real impl would check consultation access
+    void bookingId;
+    void accountId;
+    return Promise.resolve();
   }
 }
 
@@ -113,8 +116,9 @@ const FAKE_GROUPS: readonly GuestGroup[] = Object.freeze([
 ]);
 
 export class FakeGuestPlanningReader implements GuestPlanningReader {
-  async listActiveGroups(_bookingId: string): Promise<readonly GuestGroup[]> {
-    return FAKE_GROUPS;
+  listActiveGroups(bookingId: string): Promise<readonly GuestGroup[]> {
+    void bookingId;
+    return Promise.resolve(FAKE_GROUPS);
   }
 }
 
@@ -130,38 +134,140 @@ const FAKE_LAYOUT: LayoutEligibility = Object.freeze({
 });
 
 export class FakeVenueSelectionEligibilityReader implements VenueSelectionEligibilityReader {
-  async requireLayoutVersionEligible(layoutTemplateVersionId: string): Promise<LayoutEligibility> {
+  requireLayoutVersionEligible(layoutTemplateVersionId: string): Promise<LayoutEligibility> {
     if (layoutTemplateVersionId === FAKE_LAYOUT.layoutTemplateVersionId) {
-      return { ...FAKE_LAYOUT, tableIds: [...FAKE_LAYOUT.tableIds] };
+      return Promise.resolve({ ...FAKE_LAYOUT, tableIds: [...FAKE_LAYOUT.tableIds] });
     }
-    throw new NotFoundError();
+    return Promise.reject(new NotFoundError());
   }
 
-  async listCompatibleVersionsForHall(
-    _hallId: string,
-    _planningHeadcount: number,
+  listCompatibleVersionsForHall(
+    hallId: string,
+    planningHeadcount: number,
   ): Promise<readonly CompatibleLayoutOption[]> {
-    return Object.freeze([
-      Object.freeze({
-        layoutTemplateVersionId: FAKE_LAYOUT.layoutTemplateVersionId,
-        name: 'Standard Layout',
-        minGuests: FAKE_LAYOUT.minGuests,
-        maxGuests: FAKE_LAYOUT.maxGuests,
-        totalSeatCapacity: FAKE_LAYOUT.totalSeatCapacity,
-        isCompatible: true,
-      }),
-    ]);
+    void hallId;
+    void planningHeadcount;
+    return Promise.resolve(
+      Object.freeze([
+        Object.freeze({
+          layoutTemplateVersionId: FAKE_LAYOUT.layoutTemplateVersionId,
+          name: 'Standard Layout',
+          minGuests: FAKE_LAYOUT.minGuests,
+          maxGuests: FAKE_LAYOUT.maxGuests,
+          totalSeatCapacity: FAKE_LAYOUT.totalSeatCapacity,
+          isCompatible: true,
+        }),
+      ]),
+    );
   }
 }
 
 export class FakePrintableSeatingContentRegistry implements PrintableSeatingContentRegistry {
-  async registerConfirmed(
-    _input: Parameters<PrintableSeatingContentRegistry['registerConfirmed']>[0],
+  registerConfirmed(
+    input: Parameters<PrintableSeatingContentRegistry['registerConfirmed']>[0],
   ): Promise<void> {
-    // no-op in fake
+    void input;
+    return Promise.resolve();
   }
 
-  async markRequiresReview(_seatingRevisionId: string): Promise<void> {
-    // no-op in fake
+  markRequiresReview(seatingRevisionId: string): Promise<void> {
+    void seatingRevisionId;
+    return Promise.resolve();
   }
 }
+
+export class PrismaVenueSelectionEligibilityReader implements VenueSelectionEligibilityReader {
+  constructor(private readonly prisma: PrismaClient) {}
+
+  async requireLayoutVersionEligible(layoutTemplateVersionId: string): Promise<LayoutEligibility> {
+    const version = await this.prisma.layoutTemplateVersion.findUnique({
+      where: { id: layoutTemplateVersionId },
+      include: {
+        layoutTemplate: {
+          include: {
+            hall: true,
+          },
+        },
+        geometry: true,
+      },
+    });
+
+    if (version === null) {
+      throw new NotFoundError();
+    }
+
+    const isRetired =
+      version.layoutTemplate.lifecycle === 'RETIRED' ||
+      version.layoutTemplate.hall.lifecycle === 'RETIRED';
+
+    const totalSeatCapacity = version.geometry.reduce((sum, g) => sum + g.seatCapacity, 0);
+
+    return Object.freeze({
+      layoutTemplateVersionId: version.id,
+      layoutTemplateId: version.layoutTemplateId,
+      hallId: version.layoutTemplate.hallId,
+      minGuests: version.minGuests,
+      maxGuests: version.maxGuests,
+      totalSeatCapacity,
+      tableIds: Object.freeze(version.geometry.map((t) => t.tableId)),
+      isRetired,
+    });
+  }
+
+  async listCompatibleVersionsForHall(
+    hallId: string,
+    planningHeadcount: number,
+  ): Promise<readonly CompatibleLayoutOption[]> {
+    const versions = await this.prisma.layoutTemplateVersion.findMany({
+      where: {
+        state: 'PUBLISHED',
+        layoutTemplate: {
+          hallId,
+          lifecycle: 'ACTIVE',
+        },
+      },
+      include: {
+        geometry: true,
+      },
+    });
+
+    return Object.freeze(
+      versions.map((v) => {
+        const totalSeatCapacity = v.geometry.reduce((sum, g) => sum + g.seatCapacity, 0);
+        return Object.freeze({
+          layoutTemplateVersionId: v.id,
+          name: v.name,
+          minGuests: v.minGuests,
+          maxGuests: v.maxGuests,
+          totalSeatCapacity,
+          isCompatible:
+            planningHeadcount >= v.minGuests &&
+            planningHeadcount <= v.maxGuests,
+        });
+      }),
+    );
+  }
+}
+
+export class PrismaPrintableSeatingContentRegistry implements PrintableSeatingContentRegistry {
+  constructor(private readonly prisma: PrismaClient) {}
+
+  registerConfirmed(input: Parameters<PrintableSeatingContentRegistry['registerConfirmed']>[0]): Promise<void> {
+    void input;
+    // Handled in transaction via seatingRevisionRegistration
+    return Promise.resolve();
+  }
+
+  async markRequiresReview(seatingRevisionId: string): Promise<void> {
+    await this.prisma.seatingRevisionRegistration.updateMany({
+      where: {
+        revisionId: seatingRevisionId,
+        invalidatedAt: null,
+      },
+      data: {
+        invalidatedAt: new Date(),
+      },
+    });
+  }
+}
+

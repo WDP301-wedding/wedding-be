@@ -1,5 +1,5 @@
 import { NotFoundError } from '../../../core/errors/app-error.js';
-import type { Prisma, PrismaClient } from '../../../generated/prisma/client.js';
+import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
 import {
   AssignmentConflictError,
   AttendanceCorrectionConflictError,
@@ -133,14 +133,14 @@ export interface StaffOperationsRepository {
 
 export function createStaffOperationsRepository(prisma: PrismaClient): StaffOperationsRepository {
   return Object.freeze({
-    async findAssignment(bookingId, staffAccountId) {
+    async findAssignment(bookingId: string, staffAccountId: string): Promise<StaffAssignmentRow | null> {
       const row = await prisma.staffEventAssignment.findUnique({
         where: { bookingId_staffAccountId: { bookingId, staffAccountId } },
       });
       return row ? mapAssignment(row) : null;
     },
 
-    async listAssignments(bookingId) {
+    async listAssignments(bookingId: string): Promise<readonly StaffAssignmentRow[]> {
       const rows = await prisma.staffEventAssignment.findMany({
         where: { bookingId },
         orderBy: { createdAt: 'desc' },
@@ -148,7 +148,7 @@ export function createStaffOperationsRepository(prisma: PrismaClient): StaffOper
       return Object.freeze(rows.map(mapAssignment));
     },
 
-    async requireActiveAssignment(bookingId, staffAccountId) {
+    async requireActiveAssignment(bookingId: string, staffAccountId: string): Promise<StaffAssignmentRow> {
       const row = await prisma.staffEventAssignment.findUnique({
         where: { bookingId_staffAccountId: { bookingId, staffAccountId } },
       });
@@ -158,7 +158,11 @@ export function createStaffOperationsRepository(prisma: PrismaClient): StaffOper
       return mapAssignment(row);
     },
 
-    async createAssignment(bookingId, staffAccountId, assignedByAccountId) {
+    async createAssignment(
+      bookingId: string,
+      staffAccountId: string,
+      assignedByAccountId: string,
+    ): Promise<StaffAssignmentRow> {
       const existing = await prisma.staffEventAssignment.findUnique({
         where: { bookingId_staffAccountId: { bookingId, staffAccountId } },
       });
@@ -203,7 +207,12 @@ export function createStaffOperationsRepository(prisma: PrismaClient): StaffOper
       }
     },
 
-    async revokeAssignment(bookingId, assignmentId, expectedRevision, reason) {
+    async revokeAssignment(
+      bookingId: string,
+      assignmentId: string,
+      expectedRevision: number,
+      reason: string,
+    ): Promise<StaffAssignmentRow> {
       return prisma.$transaction(async (tx) => {
         const existing = await tx.staffEventAssignment.findFirst({
           where: { id: assignmentId, bookingId },
@@ -212,7 +221,7 @@ export function createStaffOperationsRepository(prisma: PrismaClient): StaffOper
           throw new NotFoundError();
         }
         if (existing.revision !== expectedRevision) {
-          throw new AttendanceCorrectionConflictError(
+          throw new AssignmentConflictError(
             'Assignment revision conflict: state has changed.',
           );
         }
@@ -229,7 +238,7 @@ export function createStaffOperationsRepository(prisma: PrismaClient): StaffOper
       });
     },
 
-    async revokeAllActiveAssignmentsForStaff(staffAccountId, reason) {
+    async revokeAllActiveAssignmentsForStaff(staffAccountId: string, reason: string): Promise<number> {
       const result = await prisma.staffEventAssignment.updateMany({
         where: { staffAccountId, status: 'ACTIVE' },
         data: {
@@ -241,7 +250,7 @@ export function createStaffOperationsRepository(prisma: PrismaClient): StaffOper
       return result.count;
     },
 
-    async findLedger(bookingId, householdId) {
+    async findLedger(bookingId: string, householdId: string): Promise<HouseholdAttendanceSummaryRow | null> {
       const row = await prisma.householdAttendanceLedger.findUnique({
         where: {
           bookingId_invitationHouseholdId: {
@@ -253,57 +262,70 @@ export function createStaffOperationsRepository(prisma: PrismaClient): StaffOper
       return row ? mapLedger(row) : null;
     },
 
-    async recordArrival(input) {
+    async recordArrival(input: RecordArrivalInput): Promise<{
+      readonly arrivalId: string;
+      readonly ledgerRevision: number;
+      readonly actualAttendees: number;
+      readonly guestGroupIdSnapshot: string;
+      readonly isFirstArrival: boolean;
+    }> {
       return prisma.$transaction(async (tx) => {
-        const existingLedger = await tx.householdAttendanceLedger.findUnique({
-          where: {
-            bookingId_invitationHouseholdId: {
-              bookingId: input.bookingId,
-              invitationHouseholdId: input.invitationHouseholdId,
-            },
+        await tx.$executeRaw(Prisma.sql`
+          INSERT INTO "HouseholdAttendanceLedger" (
+            "id", "bookingId", "invitationHouseholdId", "guestGroupIdSnapshot", "actualAttendees", "ledgerRevision", "createdAt", "updatedAt"
+          )
+          VALUES (
+            gen_random_uuid(),
+            ${input.bookingId}::uuid,
+            ${input.invitationHouseholdId}::uuid,
+            ${input.currentGuestGroupId}::uuid,
+            0,
+            0,
+            NOW(),
+            NOW()
+          )
+          ON CONFLICT ("bookingId", "invitationHouseholdId") DO NOTHING
+        `);
+
+        const lockedRows = await tx.$queryRaw<
+          Array<{
+            id: string;
+            guestGroupIdSnapshot: string;
+            actualAttendees: number;
+            ledgerRevision: number;
+          }>
+        >(Prisma.sql`
+          SELECT "id", "guestGroupIdSnapshot", "actualAttendees", "ledgerRevision"
+          FROM "HouseholdAttendanceLedger"
+          WHERE "bookingId" = ${input.bookingId}::uuid
+            AND "invitationHouseholdId" = ${input.invitationHouseholdId}::uuid
+          FOR UPDATE
+        `);
+
+        const ledger = lockedRows[0];
+        if (ledger === undefined) {
+          throw new Error('Failed to lock household attendance ledger.');
+        }
+
+        const isFirstArrival = ledger.ledgerRevision === 0;
+        const guestGroupIdSnapshot = isFirstArrival
+          ? input.currentGuestGroupId
+          : ledger.guestGroupIdSnapshot;
+        const newActualAttendees = ledger.actualAttendees + input.attendeeCount;
+        const newLedgerRevision = ledger.ledgerRevision + 1;
+
+        await tx.householdAttendanceLedger.update({
+          where: { id: ledger.id },
+          data: {
+            guestGroupIdSnapshot,
+            actualAttendees: newActualAttendees,
+            ledgerRevision: newLedgerRevision,
           },
         });
 
-        let ledgerId: string;
-        let newLedgerRevision: number;
-        let newActualAttendees: number;
-        let guestGroupIdSnapshot: string;
-        let isFirstArrival = false;
-
-        if (existingLedger === null) {
-          isFirstArrival = true;
-          guestGroupIdSnapshot = input.currentGuestGroupId;
-          newActualAttendees = input.attendeeCount;
-          newLedgerRevision = 1;
-
-          const createdLedger = await tx.householdAttendanceLedger.create({
-            data: {
-              bookingId: input.bookingId,
-              invitationHouseholdId: input.invitationHouseholdId,
-              guestGroupIdSnapshot,
-              actualAttendees: newActualAttendees,
-              ledgerRevision: newLedgerRevision,
-            },
-          });
-          ledgerId = createdLedger.id;
-        } else {
-          ledgerId = existingLedger.id;
-          guestGroupIdSnapshot = existingLedger.guestGroupIdSnapshot;
-          newActualAttendees = existingLedger.actualAttendees + input.attendeeCount;
-          newLedgerRevision = existingLedger.ledgerRevision + 1;
-
-          await tx.householdAttendanceLedger.update({
-            where: { id: ledgerId },
-            data: {
-              actualAttendees: newActualAttendees,
-              ledgerRevision: newLedgerRevision,
-            },
-          });
-        }
-
         const arrival = await tx.attendanceArrival.create({
           data: {
-            ledgerId,
+            ledgerId: ledger.id,
             bookingId: input.bookingId,
             invitationHouseholdId: input.invitationHouseholdId,
             attendeeCount: input.attendeeCount,
@@ -324,8 +346,40 @@ export function createStaffOperationsRepository(prisma: PrismaClient): StaffOper
       });
     },
 
-    async recordCorrection(input) {
+    async recordCorrection(input: RecordCorrectionInput): Promise<{
+      readonly correctionId: string;
+      readonly ledgerRevision: number;
+      readonly actualAttendees: number;
+    }> {
       return prisma.$transaction(async (tx) => {
+        const lockedRows = await tx.$queryRaw<
+          Array<{
+            id: string;
+            actualAttendees: number;
+            ledgerRevision: number;
+          }>
+        >(Prisma.sql`
+          SELECT "id", "actualAttendees", "ledgerRevision"
+          FROM "HouseholdAttendanceLedger"
+          WHERE "bookingId" = ${input.bookingId}::uuid
+            AND "invitationHouseholdId" = ${input.invitationHouseholdId}::uuid
+          FOR UPDATE
+        `);
+
+        const ledger = lockedRows[0];
+        if (ledger === undefined) {
+          throw new NotFoundError();
+        }
+
+        if (ledger.ledgerRevision !== input.expectedLedgerRevision) {
+          throw new AttendanceCorrectionConflictError();
+        }
+
+        const newActual = ledger.actualAttendees + input.delta;
+        if (newActual < 0) {
+          throw new AttendanceCorrectionInvalidError();
+        }
+
         const arrival = await tx.attendanceArrival.findFirst({
           where: {
             id: input.arrivalId,
@@ -337,25 +391,15 @@ export function createStaffOperationsRepository(prisma: PrismaClient): StaffOper
           throw new NotFoundError();
         }
 
-        const ledger = await tx.householdAttendanceLedger.findUnique({
-          where: {
-            bookingId_invitationHouseholdId: {
-              bookingId: input.bookingId,
-              invitationHouseholdId: input.invitationHouseholdId,
-            },
-          },
+        const priorCorrections = await tx.attendanceCorrection.findMany({
+          where: { arrivalId: input.arrivalId },
         });
-        if (ledger === null) {
-          throw new NotFoundError();
-        }
-
-        if (ledger.ledgerRevision !== input.expectedLedgerRevision) {
-          throw new AttendanceCorrectionConflictError();
-        }
-
-        const newActual = ledger.actualAttendees + input.delta;
-        if (newActual < 0) {
-          throw new AttendanceCorrectionInvalidError();
+        const priorDeltaSum = priorCorrections.reduce((sum, c) => sum + c.delta, 0);
+        const effectiveArrivalAttendees = arrival.attendeeCount + priorDeltaSum + input.delta;
+        if (effectiveArrivalAttendees < 0) {
+          throw new AttendanceCorrectionInvalidError(
+            'Effective attendees for this arrival cannot fall below zero.',
+          );
         }
 
         const newRevision = ledger.ledgerRevision + 1;
@@ -388,7 +432,14 @@ export function createStaffOperationsRepository(prisma: PrismaClient): StaffOper
       });
     },
 
-    async getHouseholdAttendance(bookingId, householdId) {
+    async getHouseholdAttendance(
+      bookingId: string,
+      householdId: string,
+    ): Promise<{
+      readonly ledger: HouseholdAttendanceSummaryRow | null;
+      readonly arrivals: readonly AttendanceArrivalRow[];
+      readonly corrections: readonly AttendanceCorrectionRow[];
+    }> {
       const [ledger, arrivals, corrections] = await Promise.all([
         prisma.householdAttendanceLedger.findUnique({
           where: {
@@ -415,7 +466,10 @@ export function createStaffOperationsRepository(prisma: PrismaClient): StaffOper
       };
     },
 
-    async getBookingAttendance(bookingId) {
+    async getBookingAttendance(bookingId: string): Promise<{
+      readonly actualAttendees: number;
+      readonly byGuestGroup: readonly { readonly guestGroupId: string; readonly actualAttendees: number }[];
+    }> {
       const ledgers = await prisma.householdAttendanceLedger.findMany({
         where: { bookingId },
       });
