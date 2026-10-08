@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment -- Vitest asymmetric matchers are typed as any. */
 import { describe, expect, it, vi } from 'vitest';
+import { Prisma } from '../../../generated/prisma/client.js';
 
 import type { ConsultationRecord, InvitationIntent } from '../application/consultation.service.js';
 import type { ProposalSnapshot } from '../domain/booking-policy.js';
 import {
   BookingLifecycleConflictError,
   createPrismaConsultationRepository,
+  createPrismaConsultationWorkspaceRepository,
 } from './consultation.repository.js';
 
 const proposal: ProposalSnapshot = Object.freeze({
@@ -56,6 +58,171 @@ const intent: InvitationIntent = Object.freeze({
 });
 
 describe('PrismaConsultationRepository', () => {
+  it('conceals missing recipients and workspace ownership, and guards revisions and existing bookings', async () => {
+    const consultation = {
+      id: record.consultationId,
+      managerAccountId: record.managerAccountId,
+      intendedEmailNormalized: 'couple@example.com',
+      intendedEmail: 'Couple@Example.com',
+      revision: 1,
+      booking: null,
+    };
+    const transaction = {
+      consultation: {
+        findUnique: vi.fn().mockResolvedValue(consultation),
+        findFirst: vi.fn().mockResolvedValue(consultation),
+        updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+      },
+      booking: { create: vi.fn() },
+      auditLog: { create: vi.fn() },
+    };
+    const prisma = {
+      consultation: transaction.consultation,
+      $transaction: vi.fn(async (work: (tx: object) => Promise<unknown>) => work(transaction)),
+    };
+    const repository = createPrismaConsultationRepository(prisma as never);
+    expect(
+      await repository.getInvitationRecipient(record.consultationId, record.managerAccountId),
+    ).toEqual({ intendedEmail: 'Couple@Example.com' });
+    transaction.consultation.findFirst.mockResolvedValue(null);
+    await expect(
+      repository.getInvitationRecipient(record.consultationId, 'outsider'),
+    ).rejects.toMatchObject({ code: 'BOOKING_NOT_FOUND' });
+    const workspace = createPrismaConsultationWorkspaceRepository(prisma as never);
+    const input = {
+      bookingId: record.bookingId,
+      consultationId: record.consultationId,
+      expectedConsultationRevision: 1,
+      managerAccountId: record.managerAccountId,
+      proposal,
+      requestId: record.requestId,
+    };
+    for (const stored of [
+      null,
+      { ...consultation, managerAccountId: 'outsider' },
+      { ...consultation, revision: 2 },
+      { ...consultation, booking: { id: record.bookingId } },
+    ]) {
+      transaction.consultation.findUnique.mockResolvedValue(stored);
+      await expect(workspace.createBooking(input)).rejects.toMatchObject({
+        code:
+          stored === null || stored.managerAccountId === 'outsider'
+            ? 'BOOKING_NOT_FOUND'
+            : 'STALE_BOOKING_REVISION',
+      });
+    }
+    transaction.consultation.findUnique.mockResolvedValue(consultation);
+    transaction.consultation.updateMany.mockResolvedValue({ count: 0 });
+    await expect(workspace.createBooking(input)).rejects.toMatchObject({
+      code: 'STALE_BOOKING_REVISION',
+    });
+  });
+
+  it('preserves unexpected errors and maps duplicate consultation writes to a stable conflict', async () => {
+    const prisma = { $transaction: vi.fn().mockRejectedValue(new Error('database unavailable')) };
+    const legacy = createPrismaConsultationRepository(prisma as never);
+    const workspace = createPrismaConsultationWorkspaceRepository(prisma as never);
+    for (const create of [() => legacy.create(record), () => workspace.createConsultation(record)])
+      await expect(create()).rejects.toThrow('database unavailable');
+    prisma.$transaction.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError('duplicate', {
+        code: 'P2002',
+        clientVersion: 'test',
+      }),
+    );
+    for (const create of [() => legacy.create(record), () => workspace.createConsultation(record)])
+      await expect(create()).rejects.toMatchObject({ code: 'CONSULTATION_ALREADY_EXISTS' });
+  });
+
+  it('guards invitation ownership, recipient, revision, and durable replay evidence', async () => {
+    const consultation = {
+      id: record.consultationId,
+      managerAccountId: record.managerAccountId,
+      intendedEmailNormalized: 'couple@example.com',
+      revision: 1,
+    };
+    const transaction = {
+      consultation: { findUnique: vi.fn() },
+      bookingInvitationIntent: { findUnique: vi.fn().mockResolvedValue(storedIntent(intent)) },
+      auditLog: { create: vi.fn() },
+    };
+    const repository = createPrismaConsultationRepository(transactionClient(transaction));
+    for (const stored of [
+      null,
+      { ...consultation, managerAccountId: 'outsider' },
+      { ...consultation, intendedEmailNormalized: 'other@example.com' },
+      { ...consultation, revision: 2 },
+    ]) {
+      transaction.consultation.findUnique.mockResolvedValue(stored);
+      await expect(repository.getOrCreateInvitationIntent(intent)).rejects.toMatchObject({
+        code: stored?.revision === 2 ? 'STALE_BOOKING_REVISION' : 'BOOKING_NOT_FOUND',
+      });
+    }
+    transaction.consultation.findUnique.mockResolvedValue(consultation);
+    for (const patch of [
+      { managerAccountId: 'outsider' },
+      { intendedEmail: 'other@example.com' },
+      { expectedRevision: 2 },
+    ]) {
+      transaction.bookingInvitationIntent.findUnique.mockResolvedValue({
+        ...storedIntent(intent),
+        ...patch,
+      });
+      await expect(repository.getOrCreateInvitationIntent(intent)).rejects.toMatchObject({
+        code: 'INVITATION_INTENT_CONFLICT',
+      });
+    }
+    transaction.bookingInvitationIntent.findUnique.mockResolvedValue(null);
+    await expect(
+      repository.markInvitationIssued(record.consultationId, 'invitation'),
+    ).rejects.toMatchObject({ code: 'BOOKING_NOT_FOUND' });
+  });
+
+  it('recovers the winning invitation intent after a uniqueness race and rejects absent winners', async () => {
+    const prisma = {
+      $transaction: vi.fn().mockRejectedValue(
+        new Prisma.PrismaClientKnownRequestError('duplicate', {
+          code: 'P2002',
+          clientVersion: 'test',
+        }),
+      ),
+      bookingInvitationIntent: { findUnique: vi.fn().mockResolvedValue(storedIntent(intent)) },
+    };
+    const repository = createPrismaConsultationRepository(prisma as never);
+    expect(await repository.getOrCreateInvitationIntent(intent)).toEqual(intent);
+    prisma.bookingInvitationIntent.findUnique.mockResolvedValue(null);
+    await expect(repository.getOrCreateInvitationIntent(intent)).rejects.toMatchObject({
+      code: 'INVITATION_INTENT_CONFLICT',
+    });
+  });
+  it('returns both server revisions after booking creation advances the consultation', async () => {
+    const transaction = {
+      consultation: {
+        findUnique: vi.fn().mockResolvedValue({
+          id: record.consultationId,
+          revision: 1,
+          managerAccountId: record.managerAccountId,
+          booking: null,
+        }),
+        updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+      },
+      booking: { create: vi.fn().mockResolvedValue({}) },
+      auditLog: { create: vi.fn().mockResolvedValue({}) },
+    };
+    const result = await createPrismaConsultationWorkspaceRepository(
+      transactionClient(transaction),
+      fixedNow,
+    ).createBooking({
+      bookingId: record.bookingId,
+      consultationId: record.consultationId,
+      expectedConsultationRevision: 1,
+      managerAccountId: record.managerAccountId,
+      proposal,
+      requestId: record.requestId,
+    });
+    expect(result.bookingRevision).toBe(1);
+    expect(result.consultationRevision).toBe(2);
+  });
   it('stores consultation, booking, proposal, and audit in one transaction', async () => {
     const transaction = {
       consultation: { create: vi.fn().mockResolvedValue({ id: record.consultationId }) },
@@ -117,7 +284,7 @@ describe('PrismaConsultationRepository', () => {
     expect(transaction.auditLog.create).not.toHaveBeenCalled();
   });
 
-  it('rejects a retry that changes the durable invitation request', async () => {
+  it('preserves the durable invitation request across new HTTP trace IDs', async () => {
     const transaction = {
       consultation: {
         findUnique: vi.fn().mockResolvedValue({
@@ -137,7 +304,10 @@ describe('PrismaConsultationRepository', () => {
     const repository = createPrismaConsultationRepository(transactionClient(transaction), fixedNow);
     await expect(
       repository.getOrCreateInvitationIntent({ ...intent, requestId: record.requestId }),
-    ).rejects.toMatchObject({ code: 'INVITATION_INTENT_CONFLICT' });
+    ).resolves.toMatchObject({
+      requestId: intent.requestId,
+      invitationIntentId: intent.invitationIntentId,
+    });
   });
 
   it('marks issuance once and treats an exact completion replay as success', async () => {

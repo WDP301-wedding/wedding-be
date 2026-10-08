@@ -20,6 +20,21 @@ const input = Object.freeze({
 });
 
 describe('PrismaSlotHoldRepository', () => {
+  it('keeps a confirmed slot unavailable after its temporary hold is consumed', async () => {
+    const transaction = transactionFixture();
+    transaction.booking.findFirst.mockResolvedValue({ id: 'confirmed-booking' });
+    const repository = createPrismaSlotHoldRepository(client(transaction));
+    await expect(
+      repository.inspect({
+        hallId: input.hallId,
+        eventDate: input.eventDate,
+        shiftCode: input.shiftCode,
+        databaseNow: input.acquiredAt,
+      }),
+    ).resolves.toMatchObject({ available: false });
+    await expect(repository.acquire(input)).rejects.toMatchObject({ code: 'SLOT_NOT_AVAILABLE' });
+    expect(transaction.bookingSlotHold.create).not.toHaveBeenCalled();
+  });
   it('allocates the slot and commits revision, audit, and outbox together', async () => {
     const transaction = transactionFixture();
     const repository = createPrismaSlotHoldRepository(client(transaction));
@@ -117,6 +132,7 @@ function transactionFixture() {
   return {
     $executeRaw: vi.fn().mockResolvedValue(1),
     booking: {
+      findFirst: vi.fn().mockResolvedValue(null),
       findUnique: vi.fn().mockResolvedValue({
         id: input.bookingId,
         hallId: input.hallId,
@@ -139,6 +155,7 @@ function transactionFixture() {
 
 function client(transaction: object) {
   return {
+    booking: (transaction as ReturnType<typeof transactionFixture>).booking,
     bookingSlotHold: (transaction as ReturnType<typeof transactionFixture>).bookingSlotHold,
     $transaction: vi.fn(async (operation: (value: object) => Promise<unknown>) =>
       operation(transaction),
