@@ -2569,14 +2569,39 @@ remain on `codex/payments-billing`, and the three client working trees remain cl
 
 #### PB-W3 — Charges, credits and deposit orchestration
 
-- [ ] Register an accepted print revision once and reject changed booking/amount/date;
+- [x] Register an accepted print revision once and reject changed booking/amount/date;
       append cancellation/replacement credits against their immutable decision source.
-- [ ] Create a deposit intent only after a fresh booking eligibility check and durable
+- [x] Create a deposit intent only after a fresh booking eligibility check and durable
       booking reservation; derive amount and timeline revision from booking authority.
-- [ ] Apply only proven settlement once, then record booking settlement and promote the
+- [x] Apply only proven settlement once, then record booking settlement and promote the
       same account; retain recoverable state until all downstream effects complete.
-- [ ] Gate real money/access integration on Booking reservation/recorder and identity
+- [x] Gate real money/access integration on Booking reservation/recorder and identity
       promotion PROVIDER_READY evidence; fake-only evidence remains ISOLATED_READY.
+
+**W3 implementation evidence (2026-10-08, backend commits `b7f0fa4`, `8d95c4a`,
+`1dd5237`, `7a5ac1f` and `7021228`):** Real print registration/decision credits,
+server-derived deposit intents, shared Booking reservation, proven money recording,
+same-account Identity promotion and durable application completion are implemented.
+One scope is explicitly injected into the owner adapters. A payment without its
+completion marker remains PENDING; a failure after real promotion rolls all owner
+effects back while retaining the payment. Restart/concurrent retry completes that
+same payment once. Exact successful replay bypasses fresh payability rejection;
+changed date conflicts. The new additive migration preserves W2 history and adds
+no inferred completion. [ADR-005](../docs/decisions/0005-recover-deposit-application-after-durable-settlement.md)
+and [W3 evidence](./evidence/payments-billing.md#w3-charge-and-deposit-orchestration)
+record the boundaries, provider commits and requirement proof.
+
+**W3 verification:** All 833 unit tests in 81 files pass on pinned Node 24.21.0/npm
+11.19.0 (`vitest run --exclude "tests/**/*.test.ts" --maxWorkers=2`). The final real
+PostgreSQL gate passes 29 tests in nine files (Billing, Booking and migration policy,
+one worker with fork reuse). Typecheck, build, changed-module ESLint/Prettier,
+diff/targeted-secret checks and deploy/status for all sixteen migrations pass.
+An inverted eligibility guard fails eight tests and is restored before final gates.
+All temporary test databases are disposed of and the W3 container is stopped/removed.
+All four repositories remain on the single `codex/payments-billing` module branch;
+client trees are unchanged. No push, callback/checkout, HTTP/OpenAPI publication,
+INTEGRATION_READY digest hand-off or module ACCEPTED decision occurs in this wave.
+Progress: W1-W3 complete (3/8 waves, 12/32 microtasks); W4-W8 remain open.
 
 #### PB-W4 — VNPay verification and reconciliation
 
