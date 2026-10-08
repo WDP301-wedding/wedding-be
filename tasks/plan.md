@@ -6,7 +6,9 @@ Cross-module contract baseline: Locked as
 [`WEDDING-CONTRACT-1@1.1.0`](../CONTRACT-BASELINE.md) on 2026-10-06 (1.0.0 history retained)<br>
 SPEC-03 through SPEC-11 and three-person ownership: Approved on 2026-10-06;<br>
 SPEC-03 bounded plan: Approved by project owner on 2026-10-07; implementation
-acceptance remains pending. Other bounded module plans remain pending.<br>
+acceptance remains pending.<br>
+SPEC-04 bounded plan: Execution authorized on 2026-10-08; one module branch per repository.<br>
+Other bounded module plans and implementation acceptance remain pending.<br>
 Approved platform specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)<br>
 Approved product requirements: [`../PRODUCT-REQUIREMENTS.md`](../PRODUCT-REQUIREMENTS.md)<br>
 Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)<br>
@@ -938,3 +940,92 @@ stale, success, and narrow-screen states explicit.
 No open product decision was found while preparing this plan. Named A/B/C assignment is
 only required before concurrent shared-file work; this single sequential implementation
 is authorized by the project owner's “Tiến hành đi” approval on 2026-10-07.
+
+## 21. SPEC-04 `payments-billing` bounded implementation plan
+
+Status: **Approved by the project owner on 2026-10-08; implementation may proceed
+incrementally.** This plan consumes the approved `SPEC-payments-billing.md`,
+`WEDDING-CONTRACT-1@1.1.0`, and the booking/identity provider contracts. It preserves
+the distinction between isolated payment work and deposit integration against real
+booking reservation, settlement-recording, and identity-promotion providers.
+
+Use one `codex/payments-billing` branch per repository for the whole module, PB-W1
+through PB-W8. Save verified increments as focused commits on that branch. This
+single sequential task reserves the SPEC-04 migration and OpenAPI lane for PB-W2
+and PB-W6; stop shared-file work if another writer needs that lane. Named team
+assignments remain required before concurrent shared-file work.
+
+### 21.1 Objective and dependency order
+
+Deliver an immutable VND ledger, idempotent payment/refund/charge transitions, verified
+VNPay evidence, invoice and receivable views, and role-appropriate billing experiences.
+Booking owns eligibility and its commercial snapshot; billing owns money facts and
+derived totals; clients display backend-returned values. The execution dependency is:
+
+```text
+contract and accounting rules
+  -> ledger constraints, unit-of-work and audit/outbox
+  -> charge/credit registration and isolated payment/refund services
+  -> booking reservation/settlement and identity promotion integration
+  -> VNPay verification and unknown-outcome reconciliation
+  -> manual payment, balance, refund and invoice HTTP/OpenAPI
+  -> Management Web, Public Web and Android billing views
+  -> real-provider, migration, race and cross-repository acceptance
+```
+
+The integration steward exclusively owns `prisma/schema.prisma`, migrations, shared
+unit-of-work/outbox support, `src/app.ts`, OpenAPI registration/publication and digest
+updates. The payments owner works in `src/modules/payments-billing/`, its tests and
+matching client feature directories. Keep focused tasks to approximately five
+human-authored files; review generated Prisma/OpenAPI/client artifacts separately.
+
+### 21.2 Eight continuous waves
+
+| Wave | Vertical outcome | Provider/checkpoint gate |
+| --- | --- | --- |
+| PB-W1 | Reviewed accounting rules and owner ports define immutable payments, charges, credits, refunds and reporting DTOs. | SPEC and plan approved; fixtures cover VND bounds, replay, conflict and authorization; migration/OpenAPI work stays with the serialized steward before shared-file waves. |
+| PB-W2 | Ledger persistence enforces unique sources, immutable facts, checked totals, durable idempotency and transactional audit/outbox. | Empty/upgrade migrations and repository constraints pass against disposable PostgreSQL; steward reviews schema/order. |
+| PB-W3 | Accepted print charges and cancellation credits register once; deposit and balance services use server-owned eligibility, amount snapshots and durable attempts. | Charge registrar conformance passes with doubles; real booking reservation/recorder and identity promotion are required before money/access integration. |
+| PB-W4 | VNPay checkout and authoritative IPN verification correlate canonical signed evidence; duplicate, reordered and unknown outcomes reconcile without a second charge. | Official sandbox mapping and fixtures pass controlled adapter tests; secrets remain backend-only; no live provider credential is used in tests. |
+| PB-W5 | Manager manual evidence, balance collection, refunds and immutable invoice/receivable reporting produce exact ledger-derived totals. | Refund and balance races plus print-source replay pass on real PostgreSQL; approval limits and redacted audit evidence are verified. |
+| PB-W6 | Authenticated routes expose deposit, balance, callback, manual payment, refund, attempt status and billing reads through deterministic OpenAPI. | Route/contract tests, authorization and idempotency pass; publish immutable API artifact and digest before client network wiring. |
+| PB-W7 | Management Web supports payment review/manual evidence/refunds; Public Web and Android show authorized Couple billing and payment status. | Generated clients pin the published digest; local fixtures may precede it, while network integration uses committed OpenAPI types. |
+| PB-W8 | Cross-repository journeys prove booking deposit, print charge, receivable, invoice, reconciliation and refund behavior end to end. | Real booking/identity providers, disposable PostgreSQL, provider callback fixtures, concurrency, security, client runtime, quality gates and owner acceptance pass. |
+
+### 21.3 Verification checkpoints
+
+- **PB-C1 after W1–W2:** focused accounting/ledger tests, source uniqueness and
+  immutability constraints, empty/upgrade migration and real PostgreSQL checks,
+  changed-file formatting, typecheck and diff/secret scans.
+- **PB-C2 after W3–W4:** charge/deposit conformance, eligibility-supersession,
+  callback signature/correlation/replay and unknown-outcome tests; real booking and
+  identity evidence before wired money/access effects; backend quality and provider
+  hand-off review.
+- **PB-C3 after W5–W6:** manual-payment/refund/balance race tests, invoice arithmetic,
+  redacted audit/outbox behavior, deterministic OpenAPI and frozen digest; run full
+  backend format/lint/typecheck/coverage/integration/contract/build/audit gates.
+- **PB-C4 after W7–W8:** generated-client digest checks, affected-client format/lint/
+  typecheck/coverage/build and browser/Android review, migration upgrade proof,
+  cross-repository acceptance matrix, evidence file and project-owner ACCEPTED decision.
+
+Focused slices use repository-local tests and the disposable PostgreSQL acceptance
+database. Automated tests use controlled provider doubles and official sandbox fixtures;
+they never call VNPay or use live merchant credentials. Client views follow the installed
+`wedding-design-system` skill and include loading, empty, error, denied, unknown/pending,
+success, destructive-refund and narrow-screen states.
+
+### 21.4 Risks and stop conditions
+
+| Risk | Mitigation / required stop |
+| --- | --- |
+| Duplicate callback, retry or source registration creates duplicate money facts | Require stable provider/source identity, canonical payload correlation, unique constraints and replay/race tests; fail the wave on any second fact. |
+| Stale booking eligibility, timeline or amount permits a deposit | Recheck through the booking owner immediately before reservation and settlement; real reservation/recorder evidence is mandatory before integration. |
+| Timeout is mistaken for a failed charge or releases a held booking | Keep outcome UNKNOWN, retain reservation and reconcile from verified provider evidence; never issue a replacement attempt until terminal failure is proven. |
+| Refund or balance concurrency exceeds authorized amount | Lock and recheck the accepted source/outstanding amount in the serialized unit of work and prove with real PostgreSQL races. |
+| Client or print module becomes money authority | Expose only owner ports and generated DTOs; clients render returned totals and invitation-studio submits accepted immutable source revisions. |
+| Schema/OpenAPI changes collide with another module | The current sequential task reserves the migration/OpenAPI lane; stop if the lane becomes contested and assign a named integration steward before concurrent shared-file work. |
+| New accounting, retention or provider semantics are needed | Amend the approved SPEC/baseline and obtain an owner decision before continuing. |
+
+Plan approval does not mark runtime work complete or ACCEPTED. Name the SPEC-04 owner
+and integration steward before shared-file concurrency; real deposit integration
+remains ordered after booking provider readiness.

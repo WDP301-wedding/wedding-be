@@ -2475,24 +2475,151 @@ BK-W1. Final provider, integration, and implementation acceptance gates remain a
 
 **Acceptance criteria:**
 
-- [ ] `SPEC-payments-billing.md` covers the existing payment scope and PRN-006.
-- [ ] Deposit eligibility recheck, print-charge registration, receivable inclusion, idempotency, reconciliation, and refund boundaries are explicit.
-- [ ] A compact plan of at most eight continuous implementation waves covers database
+- [x] `SPEC-payments-billing.md` covers the existing payment scope and PRN-006.
+- [x] Deposit eligibility recheck, print-charge registration, receivable inclusion, idempotency, reconciliation, and refund boundaries are explicit.
+- [x] A compact plan of at most eight continuous implementation waves covers database
       constraints, provider callbacks, audit evidence, API contracts, and billing views.
+- [x] Project owner approves the bounded plan before implementation.
+- [ ] Name the SPEC-04 owner and integration steward before concurrent shared-file work.
 
 **Verification:**
 
 - [ ] Trace PRN-006 and all payment state transitions to automated tests, including concurrency and callback replay.
-- [ ] Confirm `invitation-studio` can register an accepted charge without owning billing state.
-- [ ] Run Prettier and `git diff --check` on the affected documentation.
+- [ ] Prove `invitation-studio` registers an accepted charge through the billing-owned
+      registrar without owning billing state.
+- [x] Run Prettier and `git diff --check` on the affected documentation.
 
-**Dependencies:** Drafting may overlap SPEC-03. Final approval requires the approved
-SPEC-03 provider contract; real payment integration requires the implemented booking
-provider.
+**Dependencies:** SPEC-04 is approved as a specification. Isolated slices may start
+only after approval of the bounded plan. Deposit/money-access integration requires the
+implemented booking reservation/recorder and identity promotion providers; client
+network integration requires a committed backend OpenAPI artifact and digest.
 
 **Files likely touched:** `wedding-be/SPEC-payments-billing.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
 
 **Estimated scope:** Medium
+
+**Plan approval evidence (2026-10-08):** After reviewing the summarized eight-wave
+plan, the project owner instructed: “chuyển qua nhánh mới và tiến hành W1 sau đó báo
+cáo lại.” This approves incremental plan execution; it does not mark SPEC-04 ACCEPTED
+or waive provider, migration, client, or final-acceptance gates.
+
+**Branch correction (2026-10-08):** The project owner requires all SPEC-04 waves on
+one `codex/payments-billing` branch in each of `wedding-be`, `wedding-manage-web`,
+`wedding-web` and `wedding-app`. The backend W1 branch was renamed and the empty
+planning branch removed. All four branches retain their existing Booking baseline;
+verified waves become focused commits on this module branch.
+
+#### PB-W1 — Ledger rules and provider contracts
+
+- [x] Translate the approved accounting definitions into tested payment, charge,
+      credit-adjustment and refund rules with checked integer-VND arithmetic.
+- [x] Define owner ports and strict DTOs for booking eligibility/reservation/recording,
+      identity promotion, print charge/credit registration and billing readers.
+- [x] Build conforming provider fixtures for success, denied, stale, conflict, replay,
+      unknown and unavailable outcomes; record PRN-006 trace points.
+- [x] Reserve the migration/OpenAPI lane for this single sequential task before
+      W2/W6; confirm W1 needs no new business decision or baseline amendment.
+
+**W1 implementation evidence (2026-10-08, backend commit `5018c66`):** The four files in
+`src/modules/payments-billing/domain/` and `application/` implement checked VND
+totals/refund limits, verified-evidence attempt transitions, Billing-owned ports and
+strict readonly reporting schemas. Consumed Booking/Identity interfaces are imported
+from their owner modules. Focused fixtures cover own restricted access, concealed
+denial, stale eligibility, replay/conflict and unavailable providers; PRN-006 traces
+accepted print-source registration through a Billing fixture. These fixtures establish
+ISOLATED_READY only; real persistence, callback, provider and cross-repository proof
+remain assigned to W2-W8.
+
+**W1 verification:** `npm run test:unit -- payments-billing` passes 27 tests in two
+files; `npm run typecheck`, changed-file ESLint/Prettier and `git diff --check` pass.
+Temporarily changing the refund cap condition from OR to AND fails its boundary test;
+the original source is restored. No database migration, HTTP/OpenAPI publication or
+client billing UI is part of this wave. The three client module branches remain clean.
+
+#### PB-W2 — Immutable ledger and persistence
+
+- [ ] Add ledger schema and constraints for immutable facts, unique accepted sources,
+      VND bounds, replay identity, invoice revisions and adjustment linkage.
+- [ ] Implement repositories and unit-of-work operations without importing Prisma into
+      domain/application policy; atomically write audit and outbox evidence.
+- [ ] Verify migration from empty and current schema plus upgrade behavior on disposable
+      PostgreSQL; prove uniqueness and rollback under duplicate requests.
+- [ ] Pass focused persistence tests, formatting, typecheck and diff/secret checks.
+
+#### PB-W3 — Charges, credits and deposit orchestration
+
+- [ ] Register an accepted print revision once and reject changed booking/amount/date;
+      append cancellation/replacement credits against their immutable decision source.
+- [ ] Create a deposit intent only after a fresh booking eligibility check and durable
+      booking reservation; derive amount and timeline revision from booking authority.
+- [ ] Apply only proven settlement once, then record booking settlement and promote the
+      same account; retain recoverable state until all downstream effects complete.
+- [ ] Gate real money/access integration on Booking reservation/recorder and identity
+      promotion PROVIDER_READY evidence; fake-only evidence remains ISOLATED_READY.
+
+#### PB-W4 — VNPay verification and reconciliation
+
+- [ ] Implement provider-defined canonical parameter parsing, duplicate-key rejection,
+      amount/currency/order correlation and HMAC verification from the approved mapping.
+- [ ] Persist callback decision and deduplication evidence before acknowledging IPN;
+      keep ReturnURL display-only and callbacks free of trusted client role assumptions.
+- [ ] Prove invalid signature, changed payload, replay, reordered callback, timeout,
+      unknown outcome and reconciliation recovery using official sandbox fixtures.
+- [ ] Keep credentials in backend runtime configuration; tests use controlled doubles
+      and never contact VNPay.
+
+#### PB-W5 — Manual payments, refunds and invoice views
+
+- [ ] Record Manager-approved manual settlement evidence idempotently and prevent
+      balance payment from exceeding the current accepted outstanding amount.
+- [ ] Record manual refunds with reason/evidence only after locking and rechecking the
+      source settlement and approved refundable limit; never mutate payment history.
+- [ ] Derive invoice and receivable totals/history from immutable ledger facts; include
+      accepted print charge, payment, refund, credit and billing revision sources.
+- [ ] Prove two-refund and two-balance races, exact arithmetic, replay and audit
+      redaction against real PostgreSQL.
+
+#### PB-W6 — Authenticated HTTP and immutable OpenAPI
+
+- [ ] Add strict request/response schemas for deposit, balance, callback, manual
+      payment, refund, attempt status and paginated booking billing reads.
+- [ ] Wire Manager/Couple/restricted-prospect permissions, concealed unowned reads,
+      durable idempotency, stable errors and audit/outbox behavior.
+- [ ] Test callback acknowledgment codes, duplicate/in-progress commands, changed-body
+      keys, authorization denials, stale billing revisions and unknown outcomes.
+- [ ] Generate deterministic OpenAPI, pass backend contract/coverage/build/audit gates,
+      and publish the exact artifact commit/digest for client lock updates.
+
+#### PB-W7 — Generated clients and billing experiences
+
+- [ ] Update affected client locks only from the committed backend artifact, regenerate
+      API declarations and pass each `api:check` before network integration.
+- [ ] Add Manager billing review, manual evidence and refund flows in Management Web;
+      display backend-derived amounts and include confirmation/error/pending states.
+- [ ] Add authorized Couple billing/payment status to Public Web and Android using
+      generated types; restricted actors see only the deposit status allowed by contract.
+- [ ] Verify loading, empty, error, denied, unknown/pending, success, destructive and
+      narrow-screen states; inspect browser and Android runtime output.
+
+#### PB-W8 — Cross-repository acceptance
+
+- [ ] Prove PRN-006 print-source registration and receivable/invoice inclusion once,
+      deposit amount/eligibility recheck, balance, credits and manual refunds end to end.
+- [ ] Exercise callback duplication/reordering, timeout reconciliation, edit race,
+      crash recovery, refund/balance concurrency and immutable totals with real providers.
+- [ ] Run affected repository format/lint/typecheck/test/coverage/API/build/audit gates,
+      clean/upgrade migration checks, browser runtime, Android export and secret/PII scan.
+- [ ] Save `tasks/evidence/payments-billing.md` with requirement/test/commit/digest
+      trace and obtain project-owner ACCEPTED decision before dependent print acceptance.
+
+#### Checkpoint P4 — Payments plan ready
+
+- [x] Project owner approves the eight-wave plan and its provider, race, client and
+      verification boundaries before implementation begins.
+- [ ] Assign the named SPEC-04 owner and integration steward before concurrent shared
+      schema, migration, OpenAPI or composition-root work.
+- [ ] Keep real deposit integration and final acceptance gated on implemented Booking
+      reservation/settlement and identity promotion providers.
 
 ### SPEC-05: Specify `invitation-studio`
 

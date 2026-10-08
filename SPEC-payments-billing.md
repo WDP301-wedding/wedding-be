@@ -1,6 +1,7 @@
 # Specification: Payments and Billing
 
-- Status: **Approved specification — module plan and implementation acceptance pending**
+- Status: **Approved specification and module plan — implementation acceptance pending**
+- Module plan: approved 2026-10-08; [`tasks/plan.md` Section 21](./tasks/plan.md#21-spec-04-payments-billing-bounded-implementation-plan)
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
 - Module ID: `payments-billing` (`SPEC-04`)
 - Contract baseline: `WEDDING-CONTRACT-1@1.1.0`
