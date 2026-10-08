@@ -99,7 +99,13 @@ function parsePayDate(value: string): string {
   return date.toISOString();
 }
 export function createCheckout(
-  attempt: Readonly<{ id: string; amountVnd: number; createdAt: string; expiresAt: string }>,
+  attempt: Readonly<{
+    id: string;
+    amountVnd: number;
+    createdAt: string;
+    expiresAt: string;
+    purpose?: 'DEPOSIT' | 'BALANCE';
+  }>,
   ip: string,
   config: VnpaySettings,
 ) {
@@ -117,7 +123,7 @@ export function createCheckout(
     vnp_Amount: (BigInt(attempt.amountVnd) * 100n).toString(),
     vnp_CurrCode: 'VND',
     vnp_TxnRef: attempt.id,
-    vnp_OrderInfo: `Deposit ${attempt.id}`,
+    vnp_OrderInfo: `${attempt.purpose === 'BALANCE' ? 'Balance' : 'Deposit'} ${attempt.id}`,
     vnp_OrderType: 'other',
     vnp_Locale: 'vn',
     vnp_IpAddr: ip,

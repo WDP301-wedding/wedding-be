@@ -58,12 +58,7 @@ export function createVnpayEvidenceRepository(
   }
   async function requireAttempt(client: PrismaClient, bookingId: string, id: string) {
     const attempt = await client.billingPaymentAttempt.findUnique({ where: { id } });
-    if (
-      attempt === null ||
-      attempt.bookingId !== bookingId ||
-      attempt.provider !== 'VNPAY' ||
-      attempt.purpose !== 'DEPOSIT'
-    )
+    if (attempt === null || attempt.bookingId !== bookingId || attempt.provider !== 'VNPAY')
       throw new BillingPersistenceConflict('PAYMENT_EVIDENCE_CONFLICT');
     return attempt;
   }

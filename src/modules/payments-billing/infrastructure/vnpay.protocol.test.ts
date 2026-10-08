@@ -38,6 +38,25 @@ const expectedCanonical = `vnp_Amount=1000000&vnp_BankCode=NCB&vnp_BankTranNo=VN
 const signed = `${expectedCanonical}&vnp_SecureHash=${createHmac('sha512', secret).update(expectedCanonical).digest('hex')}`;
 
 describe('VNPay official 2.1.0 PAY/querydr protocol', () => {
+  it('signs a balance using its frozen amount and purpose', () => {
+    const checkout = createCheckout(
+      {
+        id: attemptId,
+        purpose: 'BALANCE',
+        amountVnd: 35_000_000,
+        createdAt: '2026-10-08T16:00:00Z',
+        expiresAt: '2026-10-08T16:15:00Z',
+      },
+      '127.0.0.1',
+      config,
+    );
+    expect(checkout.parameters).toMatchObject({
+      vnp_OrderInfo: `Balance ${attemptId}`,
+      vnp_Amount: '3500000000',
+      vnp_TxnRef: attemptId,
+    });
+    expect(new URL(checkout.url).searchParams.get('vnp_SecureHash')).toHaveLength(128);
+  });
   function ipn(changes: Record<string, string | undefined>) {
     const fields: Record<string, string> = { ...officialFields };
     for (const [key, value] of Object.entries(changes)) {
