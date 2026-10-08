@@ -31,6 +31,8 @@ Use separate browser profiles or an incognito window to demonstrate Manager and 
 
 Setup saves Manager/Couple emails and initial generated passwords in ignored `.env.demo` (`DEMO_MANAGER_EMAIL`, `DEMO_MANAGER_PASSWORD`, `DEMO_COUPLE_EMAIL`, `DEMO_COUPLE_PASSWORD`). Passwords are hashed with the normal application policy in PostgreSQL. Do not publish this file. The setup is repeatable and preserves edits and changed passwords; it never resets an existing account password.
 
+Rerunning `demo:setup` reuses the complete catalog even after Manager edits increase the restaurant revision or change its display name. It still refuses a catalog with a different restaurant ID or missing seed records. The separate `catalog:seed` command retains its strict conflict checks.
+
 To choose other recipient emails before the first setup, set `DEMO_MANAGER_EMAIL` and `DEMO_COUPLE_EMAIL` in the terminal. With an existing setup, change account emails explicitly in the database as well as `.env.demo`. Default aliases are derived from a Gmail sender configured in `.env`, so both aliases reach that mailbox. Otherwise setup uses `.example` addresses that need replacing before email delivery can be demonstrated.
 
 The fixture contains two accounts, two halls with two shifts, a small dish/menu catalog, catalog timeline/layout templates, two consultations/bookings (one confirmed with a mutually approved timeline and one restricted draft), a SPEC-03 deposit settlement fixture, and one new consultation intake. Event dates are relative to setup time. No guest, RSVP, invitation-printing, seating, notification-center, or later-SPEC dataset is inserted. The full current schema is needed for the running application, including the additive profile/intake/OTP migrations.

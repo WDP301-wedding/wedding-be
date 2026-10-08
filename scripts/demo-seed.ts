@@ -30,7 +30,7 @@ const timelineId = '30000000-0000-4000-8000-000000000030';
 const paymentId = '30000000-0000-4000-8000-000000000040';
 const now = new Date();
 try {
-  await seedVenueCatalog(prisma);
+  await seedVenueCatalog(prisma, { preserveExistingEdits: true });
   await prisma.$transaction(
     async (tx) => {
       for (const [id, email, password, role, displayName] of [

@@ -49,6 +49,7 @@ export class CatalogSeedConflictError extends Error {
 
 export async function seedVenueCatalog(
   prisma: PrismaClient,
+  options: { readonly preserveExistingEdits?: boolean } = {},
 ): Promise<'CREATED' | 'ALREADY_PRESENT'> {
   const existing = await prisma.restaurantProfile.findUnique({
     where: { singletonKey: 'RESTAURANT' },
@@ -56,8 +57,8 @@ export async function seedVenueCatalog(
   if (existing !== null) {
     if (
       existing.id !== CATALOG_SEED_IDS.restaurant ||
-      existing.displayName !== 'Wedding Estate Demo' ||
-      existing.revision !== 1
+      (!options.preserveExistingEdits &&
+        (existing.displayName !== 'Wedding Estate Demo' || existing.revision !== 1))
     ) {
       throw new CatalogSeedConflictError();
     }

@@ -43,4 +43,55 @@ describeWithDatabase('VC-16 deterministic catalog seed', () => {
       CatalogSeedConflictError,
     );
   });
+
+  it('reuses the complete demo catalog after Manager edits without changing existing data', async () => {
+    const profileBefore = await database.prisma.restaurantProfile.findUniqueOrThrow({
+      where: { id: CATALOG_SEED_IDS.restaurant },
+    });
+    const hallBefore = await database.prisma.hall.update({
+      where: { id: CATALOG_SEED_IDS.lotusHall },
+      data: { name: 'Manager Hall', nameNormalized: 'manager hall', revision: { increment: 1 } },
+    });
+
+    await expect(seedVenueCatalog(database.prisma, { preserveExistingEdits: true })).resolves.toBe(
+      'ALREADY_PRESENT',
+    );
+    await expect(
+      database.prisma.restaurantProfile.findUniqueOrThrow({
+        where: { id: CATALOG_SEED_IDS.restaurant },
+      }),
+    ).resolves.toEqual(profileBefore);
+    await expect(
+      database.prisma.hall.findUniqueOrThrow({ where: { id: CATALOG_SEED_IDS.lotusHall } }),
+    ).resolves.toEqual(hallBefore);
+  });
+
+  it('still rejects a different restaurant identity when preserving demo edits', async () => {
+    const otherId = '10000000-0000-4000-8000-000000000099';
+    await database.prisma.restaurantProfile.update({
+      where: { id: CATALOG_SEED_IDS.restaurant },
+      data: { id: otherId },
+    });
+    try {
+      await expect(
+        seedVenueCatalog(database.prisma, { preserveExistingEdits: true }),
+      ).rejects.toBeInstanceOf(CatalogSeedConflictError);
+    } finally {
+      await database.prisma.restaurantProfile.update({
+        where: { id: otherId },
+        data: { id: CATALOG_SEED_IDS.restaurant },
+      });
+    }
+  });
+
+  it('still rejects missing seed records when preserving demo edits', async () => {
+    const hall = await database.prisma.hall.delete({ where: { id: CATALOG_SEED_IDS.orchidHall } });
+    try {
+      await expect(
+        seedVenueCatalog(database.prisma, { preserveExistingEdits: true }),
+      ).rejects.toBeInstanceOf(CatalogSeedConflictError);
+    } finally {
+      await database.prisma.hall.create({ data: hall });
+    }
+  });
 });
