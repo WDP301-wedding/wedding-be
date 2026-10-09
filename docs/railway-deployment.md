@@ -6,6 +6,8 @@ environment; it uses the existing Supabase PostgreSQL database, Supabase Storage
 bucket, and Brevo configuration. AI image generation is disabled.
 
 - API base URL: `https://wedding-be-production-e1dc.up.railway.app/api/v1`
+- Swagger UI: `https://wedding-be-production-e1dc.up.railway.app/docs`
+- OpenAPI: `https://wedding-be-production-e1dc.up.railway.app/api/v1/openapi.json`
 - Liveness: `https://wedding-be-production-e1dc.up.railway.app/health/live`
 - Readiness: `https://wedding-be-production-e1dc.up.railway.app/health/ready`
 - Project ID: `1c56721d-021a-442c-9e01-bb91abe73adb`
@@ -62,11 +64,19 @@ Brevo, with these deployment-specific settings:
 | `PORT`                  | `3001` (the generated domain targets this port)   |
 | `AUTH_TRUST_PROXY_HOPS` | `1`                                               |
 | `BACKEND_REPLICA_COUNT` | `1`                                               |
+| `OPENAPI_ENABLED`       | `true` (Swagger UI and OpenAPI exposed)           |
 | `AUTH_OTP_HASH_KEY`     | Independent random secret, stable across restarts |
 | `CORS_ALLOWED_ORIGINS`  | Exact HTTPS browser origins; public web first     |
 
 Do not configure `TEST_MIGRATION_DATABASE_URL` in the deployed service. Keep
 the AI and legacy Resend groups blank when using Brevo with AI disabled.
+
+Swagger UI's **Try it out** targets this production service and executes real
+requests, including writes. Normal API authentication and role checks still
+apply. Use **Authorize** with an access token; web login/refresh cookies are
+managed by the browser on this origin, which must remain in the CORS allowlist.
+Tokens are not persisted by Swagger UI. `/docs/openapi.json` adapts route prefixes
+for the browser; `/api/v1/openapi.json` remains the exact canonical client artifact.
 
 Both database URLs use `sslmode=verify-full` and
 `sslrootcert=/app/certs/supabase-root-ca.crt`. The local `.env` contains a Windows
