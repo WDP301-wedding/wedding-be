@@ -23,6 +23,7 @@
     "types": ["node"]
   },
   "include": [
+    ".railway/**/*.ts",
     "src/**/*.ts",
     "tests/**/*.ts",
     "scripts/**/*.ts",
