@@ -66,3 +66,6 @@ npx vitest run src/integrations/storage/storage-provider.test.ts src/integration
 ```
 
 See [cross-repository development](docs/cross-repo-development.md) for boot order, contract updates, troubleshooting, and the Android/EAS boundary.
+
+See [Railway deployment](docs/railway-deployment.md) for the deployed backend,
+container build, Supabase TLS configuration, and release verification.
