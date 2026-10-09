@@ -1,11 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
-import type { Prisma, PrismaClient } from '../../../generated/prisma/client.js';
+import type { PrismaClient } from '../../../generated/prisma/client.js';
 import type {
   ContractContext,
   PrismaBookingBoundary,
 } from '../../../core/database/booking-boundary.js';
 import { createBookingBoundaryUnitOfWork } from '../../../core/database/booking-unit-of-work.js';
+import { enlistedPrismaClient } from '../../../core/database/enlisted-prisma-client.js';
 import { createPrismaBillingPersistence } from './billing.persistence.js';
 import { createChargeRegistrationService } from '../application/charge-registration.service.js';
 import type {
@@ -30,15 +31,7 @@ export function createPrismaBillingAdapter(
       const tx = boundary.current(bookingId);
       if (tx === undefined) return ownerScope.withClient(bookingId, context, work);
       if (context?.transactionScopeId !== undefined) boundary.requireScope(bookingId, context);
-      const client = new Proxy(prisma, {
-        get(_target, property) {
-          if (property === '$transaction')
-            return <R>(callback: (client: Prisma.TransactionClient) => Promise<R>) => callback(tx);
-          const value: unknown = Reflect.get(tx, property);
-          const scopedValue: unknown = typeof value === 'function' ? value.bind(tx) : value;
-          return scopedValue;
-        },
-      });
+      const client = enlistedPrismaClient(tx);
       return work(client);
     },
   };

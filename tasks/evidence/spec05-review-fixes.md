@@ -58,3 +58,13 @@ skips. All 26 migrations deploy successfully to a fresh PostgreSQL database.
 Formatting, production build, OpenAPI consistency, and the dependency audit pass.
 The audit uses the repository's documented, unexpired exception. PostgreSQL
 integration and CI gates are checked separately before merging this release.
+
+The first release CI run passes all 1,445 tests, including 318 PostgreSQL
+integration tests, but identifies four files below the existing per-file coverage
+gate. Added native tests for missing/foreign orders, stale commands, invalid
+transitions, couple/manager pagination, cancellation authority and intent freshness,
+cutoff pagination, and enlisted Billing rollback. Snapshot validation tests reject
+missing or inconsistent reporting evidence. Shared transaction enlistment retains
+the existing Prisma callback and method-binding behavior and has a focused test.
+The 80% line/branch thresholds remain unchanged. Focused checks exceed those
+thresholds for the affected files; full CI is required again before merging.

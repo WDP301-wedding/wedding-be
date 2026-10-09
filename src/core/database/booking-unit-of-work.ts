@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 
 import { Prisma, type PrismaClient } from '../../generated/prisma/client.js';
 import { AppError } from '../errors/app-error.js';
+import { enlistedPrismaClient } from './enlisted-prisma-client.js';
 
 type Context = Readonly<{
   requestId: string;
@@ -50,16 +51,7 @@ export function createBookingBoundaryUnitOfWork(prisma: PrismaClient) {
           const context = Object.freeze({ ...input.context, transactionScopeId: randomUUID() });
           // Owner repositories use interactive transactions. Enlist those callbacks rather
           // than starting independent transactions that could commit before the boundary.
-          const client = new Proxy(transaction, {
-            get(target, key) {
-              if (key === '$transaction') {
-                return (callback: (tx: Prisma.TransactionClient) => Promise<unknown>) =>
-                  callback(transaction);
-              }
-              const value: unknown = Reflect.get(target, key);
-              return typeof value === 'function' ? (value.bind(target) as unknown) : value;
-            },
-          }) as PrismaClient;
+          const client = enlistedPrismaClient(transaction);
           const scope: Scope = { bookingId: input.bookingId, context, client, active: true };
           return storage.run(scope, async () => {
             try {
