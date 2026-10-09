@@ -15,6 +15,7 @@ import {
   billingResponseSchema,
   paymentResponseSchema,
   refundResponseSchema,
+  refundApprovalResponseSchema,
 } from '../../../src/modules/payments-billing/http/payments-billing.schemas.js';
 import { errorResponseSchema } from '../../../src/core/http/common.schemas.js';
 
@@ -121,6 +122,83 @@ type Providers = ReturnType<typeof createPaymentsBillingProviders>;
         { ...f.manual, bookingId: other.bookingId },
         'recovery-manual',
       ).expect(422);
+    });
+    it('recovers a committed refund approval after a response failure and a newer ledger revision', async () => {
+      let fail = true;
+      const f = await fixture((providers) => ({
+        ...providers,
+        operations: {
+          ...providers.operations,
+          async approveRefund(...args) {
+            const result = await providers.operations.approveRefund(...args);
+            if (fail) {
+              fail = false;
+              throw new Error('approval committed but response interrupted');
+            }
+            return result;
+          },
+        },
+      }));
+      await f.operations.recordManualPayment(f.deposit, f.manager);
+      const charge = await f.providers.charges.registerAcceptedCharge({
+        bookingId: f.bookingId,
+        sourceType: 'PRINT_ORDER',
+        sourceRevisionId: randomUUID(),
+        amountVnd: 1_000_000,
+        acceptedAt: new Date('2026-10-08T16:01:00Z'),
+      });
+      const credit = await f.providers.charges.registerCredit(
+        {
+          bookingId: f.bookingId,
+          receivableChargeId: charge.receivableChargeId,
+          sourceAdjustmentId: randomUUID(),
+          amountVnd: 1_000_000,
+          reason: 'PRINT_CANCELLED',
+          acceptedAt: '2026-10-08T16:02:00Z',
+        },
+        f.system,
+      );
+      const body = {
+        bookingId: f.bookingId,
+        expectedBillingRevision: 4,
+        basis: { kind: 'CREDIT', sourceEntryId: credit.adjustmentId },
+        approvedRefundableVnd: 1_000_000,
+        reason: 'Approved refund',
+        evidenceReference: 'private-decision',
+      };
+      await post(f.app, '/management/billing/refund-approvals', body, 'recovery-approval').expect(
+        500,
+      );
+      const decision = await database.prisma.billingRefundApproval.findFirstOrThrow({
+        where: { bookingId: f.bookingId },
+      });
+      await f.operations.recordManualPayment(
+        {
+          bookingId: f.bookingId,
+          commandId: randomUUID(),
+          purpose: 'BALANCE',
+          expectedBillingRevision: 4,
+          amountVnd: 1,
+          settledAt: f.deposit.settledAt,
+          reason: 'Receipt',
+          evidenceReference: 'balance',
+        },
+        f.manager,
+      );
+      const result = refundApprovalResponseSchema.parse(
+        (
+          await post(
+            f.app,
+            '/management/billing/refund-approvals',
+            body,
+            'recovery-approval',
+          ).expect(201)
+        ).body,
+      );
+      expect(result.data.refundApprovalId).toBe(decision.id);
+      expect(
+        await database.prisma.billingRefundApproval.count({ where: { bookingId: f.bookingId } }),
+      ).toBe(1);
     });
     it('recovers a committed refund after its approval consumption and billing revision change', async () => {
       let fail = true;

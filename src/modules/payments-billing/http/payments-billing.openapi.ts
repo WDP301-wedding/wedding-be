@@ -5,9 +5,11 @@ import {
   balanceBodySchema,
   manualBodySchema,
   refundBodySchema,
+  refundApprovalBodySchema,
   checkoutResponseSchema,
   paymentResponseSchema,
   refundResponseSchema,
+  refundApprovalResponseSchema,
   attemptResponseSchema,
   billingResponseSchema,
   ipnResponseSchema,
@@ -107,6 +109,14 @@ export const paymentsBillingOpenApiPaths: NonNullable<ZodOpenApiObject['paths']>
       paymentResponseSchema,
     ),
   },
+  '/management/billing/refund-approvals': {
+    post: mutation(
+      'approveBillingRefund',
+      'Manager explicitly approves a bounded refund against an accepted credit or server-resolved Booking cancellation. No money is refunded by approval.',
+      refundApprovalBodySchema,
+      refundApprovalResponseSchema,
+    ),
+  },
   '/management/billing/refunds': {
     post: mutation(
       'recordBillingRefund',
@@ -193,9 +203,11 @@ export const paymentsBillingOpenApiSchemas = {
   BillingBalanceBody: balanceBodySchema,
   BillingManualPaymentBody: manualBodySchema,
   BillingRefundBody: refundBodySchema,
+  BillingRefundApprovalBody: refundApprovalBodySchema,
   BillingCheckoutResponse: checkoutResponseSchema,
   BillingPaymentResponse: paymentResponseSchema,
   BillingRefundResponse: refundResponseSchema,
+  BillingRefundApprovalResponse: refundApprovalResponseSchema,
   BillingAttemptResponse: attemptResponseSchema,
   BookingBillingResponse: billingResponseSchema,
   BillingIpnResponse: ipnResponseSchema,

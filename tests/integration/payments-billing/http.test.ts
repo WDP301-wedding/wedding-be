@@ -15,11 +15,18 @@ import { AuthenticationRequiredError } from '../../../src/modules/identity-acces
 import { errorResponseSchema } from '../../../src/core/http/common.schemas.js';
 import { createPaymentsBillingProviders } from '../../../src/modules/payments-billing/payments-billing.providers.js';
 import type { PrismaClient } from '../../../src/generated/prisma/client.js';
+import { createBookingLifecycleService } from '../../../src/modules/booking-lifecycle/application/lifecycle.service.js';
+import { createPrismaBookingLifecycleRepository } from '../../../src/modules/booking-lifecycle/infrastructure/lifecycle.repository.js';
+import {
+  createConsultationAccessReader,
+  createPrismaConsultationAccessRepository,
+} from '../../../src/modules/identity-access/authorization/authorization.service.js';
 import {
   attemptResponseSchema,
   billingResponseSchema,
   checkoutResponseSchema,
   ipnResponseSchema,
+  refundApprovalResponseSchema,
 } from '../../../src/modules/payments-billing/http/payments-billing.schemas.js';
 
 (catalogMigrationDatabaseUrl ? describe : describe.skip)('W6 real billing HTTP', () => {
@@ -320,6 +327,111 @@ import {
     expect(JSON.stringify(read.body)).not.toMatch(
       /private-refund|private-decision|approvedRefundableVnd|reason|evidenceReference/,
     );
+  });
+  it('lets a Manager approve a credit refund over HTTP, then refund with replay and budget protection', async () => {
+    const f = await fixture();
+    const payment = await f.operations.recordManualPayment(f.deposit, f.manager);
+    const charge = await f.providers.charges.registerAcceptedCharge({
+      bookingId: f.bookingId,
+      sourceType: 'PRINT_ORDER',
+      sourceRevisionId: randomUUID(),
+      amountVnd: 1_000_000,
+      acceptedAt: new Date(),
+    });
+    const credit = await f.providers.charges.registerCredit(
+      {
+        bookingId: f.bookingId,
+        receivableChargeId: charge.receivableChargeId,
+        sourceAdjustmentId: randomUUID(),
+        amountVnd: 1_000_000,
+        reason: 'PRINT_CANCELLED',
+        acceptedAt: new Date().toISOString(),
+      },
+      f.system,
+    );
+    const body = {
+      bookingId: f.bookingId,
+      expectedBillingRevision: 4,
+      approvedRefundableVnd: 1_000_000,
+      basis: { kind: 'CREDIT', sourceEntryId: credit.adjustmentId },
+      reason: 'Approved credit refund',
+      evidenceReference: 'approval-evidence',
+    };
+    const approve = (value: object, key: string, actor = 'manager') =>
+      request(f.app)
+        .post('/api/v1/management/billing/refund-approvals')
+        .auth(actor, { type: 'bearer' })
+        .set('Idempotency-Key', key)
+        .send(value);
+    await approve(body, 'approval-denied', 'prospect').expect(403);
+    await approve({ ...body, expectedBillingRevision: 3 }, 'approval-stale').expect(409);
+    const first = await approve(body, 'approval-1').expect(201);
+    expect(refundApprovalResponseSchema.parse(first.body).data.refundApprovalId).toMatch(
+      /^[0-9a-f-]{36}$/,
+    );
+    expect((await f.providers.ledger.getLedger(f.bookingId)).revision).toBe(4);
+    await request(f.app)
+      .post('/api/v1/management/billing/refunds')
+      .auth('manager', { type: 'bearer' })
+      .set('Idempotency-Key', 'approved-http-refund')
+      .send({
+        sourcePaymentId: payment.resourceId,
+        amountVnd: 1_000_000,
+        expectedBillingRevision: 4,
+        reason: 'Completed refund',
+        evidenceReference: 'refund-evidence',
+      })
+      .expect(201);
+    expect((await approve(body, 'approval-1').expect(201)).body).toEqual(first.body);
+    await approve({ ...body, approvedRefundableVnd: 1 }, 'approval-1').expect(422);
+    await approve({ ...body, expectedBillingRevision: 5 }, 'approval-over-budget').expect(409);
+    expect(
+      await database.prisma.billingRefundApproval.count({ where: { bookingId: f.bookingId } }),
+    ).toBe(1);
+    expect((await f.providers.ledger.getLedger(f.bookingId)).totals.refundedVnd).toBe(1_000_000);
+  });
+  it('resolves cancellation approval evidence from Booking instead of accepting a client sequence', async () => {
+    const f = await fixture();
+    await f.operations.recordManualPayment(f.deposit, f.manager);
+    const body = {
+      bookingId: f.bookingId,
+      expectedBillingRevision: 2,
+      approvedRefundableVnd: 15_000_000,
+      basis: { kind: 'CANCELLATION' },
+      reason: 'Cancelled booking',
+      evidenceReference: 'cancellation-evidence',
+    };
+    const approve = (value: object, key: string) =>
+      request(f.app)
+        .post('/api/v1/management/billing/refund-approvals')
+        .auth('manager', { type: 'bearer' })
+        .set('Idempotency-Key', key)
+        .send(value);
+    await approve(body, 'not-cancelled').expect(409);
+    const lifecycle = createBookingLifecycleService({
+      repository: createPrismaBookingLifecycleRepository(database.prisma),
+      access: createConsultationAccessReader(
+        createPrismaConsultationAccessRepository(database.prisma),
+      ),
+    });
+    const booking = await database.prisma.booking.findUniqueOrThrow({ where: { id: f.bookingId } });
+    await lifecycle.cancel({
+      bookingId: f.bookingId,
+      expectedBookingRevision: booking.revision,
+      reason: 'Recorded cancellation',
+      actor: { accountId: f.manager.actorAccountId, roles: ['MANAGER'] },
+      requestId: randomUUID(),
+    });
+    await approve(
+      { ...body, basis: { kind: 'CANCELLATION', sequence: 1 } },
+      'client-sequence',
+    ).expect(422);
+    const result = await approve(body, 'cancelled-approval').expect(201);
+    const decision = await database.prisma.billingRefundApproval.findUniqueOrThrow({
+      where: { id: (result.body as { data: { refundApprovalId: string } }).data.refundApprovalId },
+    });
+    expect(decision.basisKind).toBe('CANCELLATION');
+    expect(decision.cancellationSequence).toBeGreaterThan(0);
   });
   it('authorizes balance, rejects stale heads and keeps UNKNOWN unavailable for a second collection', async () => {
     const f = await fixture();

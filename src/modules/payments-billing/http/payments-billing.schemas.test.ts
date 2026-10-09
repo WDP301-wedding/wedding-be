@@ -5,6 +5,7 @@ import {
   depositBodySchema,
   manualBodySchema,
   refundBodySchema,
+  refundApprovalBodySchema,
   billingQuerySchema,
   attemptResponseSchema,
 } from './payments-billing.schemas.js';
@@ -46,6 +47,28 @@ describe('billing HTTP boundary schemas', () => {
     expect(refundBodySchema.safeParse({ ...refund, approvedRefundableVnd: 999 }).success).toBe(
       false,
     );
+  });
+  it('requires an explicit owned refund basis without accepting a cancellation sequence or authority override', () => {
+    const approval = {
+      bookingId: randomUUID(),
+      expectedBillingRevision: 2,
+      approvedRefundableVnd: 1,
+      basis: { kind: 'CREDIT', sourceEntryId: randomUUID() },
+      reason: 'Approved refund',
+      evidenceReference: 'approval-1',
+    };
+    expect(refundApprovalBodySchema.safeParse(approval).success).toBe(true);
+    expect(
+      refundApprovalBodySchema.safeParse({ ...approval, basis: { kind: 'CANCELLATION' } }).success,
+    ).toBe(true);
+    for (const input of [
+      { ...approval, basis: { kind: 'CANCELLATION', sequence: 123 } },
+      { ...approval, basis: { kind: 'CREDIT' } },
+      { ...approval, approvedRefundableVnd: 0 },
+      { ...approval, expectedBillingRevision: 0 },
+      { ...approval, approvedByAccountId: randomUUID() },
+    ])
+      expect(refundApprovalBodySchema.safeParse(input).success).toBe(false);
   });
   it('bounds integer VND, evidence, revision and pagination', () => {
     expect(balanceBodySchema.safeParse({ expectedBillingRevision: 0 }).success).toBe(false);

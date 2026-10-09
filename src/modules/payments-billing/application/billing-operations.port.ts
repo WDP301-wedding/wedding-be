@@ -36,6 +36,7 @@ export const manualPaymentSchema = z.discriminatedUnion('purpose', [
 export const refundApprovalSchema = z.strictObject({
   ...identity,
   ...evidence,
+  expectedBillingRevision: z.int().positive().optional(),
   approvedRefundableVnd: vnd,
   basis: z.discriminatedUnion('kind', [
     z.strictObject({ kind: z.literal('CREDIT'), sourceEntryId: z.uuid() }),

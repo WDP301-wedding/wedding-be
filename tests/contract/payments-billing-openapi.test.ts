@@ -5,7 +5,7 @@ import {
 } from '../../src/core/openapi/generate.js';
 
 describe('PB-C3 billing HTTP contract', () => {
-  it('publishes all seven approved operations with authentication and durable write keys', () => {
+  it('publishes billing operations and explicit refund approval with authentication and durable write keys', () => {
     const paths = createOpenApiDocument().paths ?? {};
     const expected = [
       ['/bookings/{bookingId}/payments/deposit', 'post', 'createDepositPayment'],
@@ -13,6 +13,7 @@ describe('PB-C3 billing HTTP contract', () => {
       ['/bookings/{bookingId}/payments/{attemptId}', 'get', 'getPaymentAttempt'],
       ['/management/billing/payments/manual', 'post', 'recordManualPayment'],
       ['/management/billing/refunds', 'post', 'recordBillingRefund'],
+      ['/management/billing/refund-approvals', 'post', 'approveBillingRefund'],
       ['/bookings/{bookingId}/billing', 'get', 'getBookingBilling'],
       ['/billing/callbacks/vnpay', 'get', 'receiveVnpayIpn'],
     ] as const;

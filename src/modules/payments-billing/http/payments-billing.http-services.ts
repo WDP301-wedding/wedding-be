@@ -11,25 +11,29 @@ import {
   depositBodySchema,
   manualBodySchema,
   refundBodySchema,
+  refundApprovalBodySchema,
   checkoutResponseSchema,
   paymentResponseSchema,
   refundResponseSchema,
+  refundApprovalResponseSchema,
   attemptResponseSchema,
 } from './payments-billing.schemas.js';
 
 type Providers = ReturnType<typeof createPaymentsBillingProviders>;
-export type BillingHttpOperation = 'DEPOSIT' | 'BALANCE' | 'MANUAL' | 'REFUND';
+export type BillingHttpOperation = 'DEPOSIT' | 'BALANCE' | 'MANUAL' | 'REFUND' | 'APPROVAL';
 const routes = {
   DEPOSIT: '/bookings/{bookingId}/payments/deposit',
   BALANCE: '/bookings/{bookingId}/payments/balance',
   MANUAL: '/management/billing/payments/manual',
   REFUND: '/management/billing/refunds',
+  APPROVAL: '/management/billing/refund-approvals',
 } as const;
 const schemas = {
   DEPOSIT: depositBodySchema,
   BALANCE: balanceBodySchema,
   MANUAL: manualBodySchema,
   REFUND: refundBodySchema,
+  APPROVAL: refundApprovalBodySchema,
 };
 function forbidden() {
   return new AppError({ status: 403, code: 'FORBIDDEN', message: 'The request is forbidden.' });
@@ -68,7 +72,7 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
     if (managerOnly && !manager) throw forbidden();
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
-      select: { consultationId: true, currentTimelineRevisionId: true },
+      select: { consultationId: true, currentTimelineRevisionId: true, phase: true },
     });
     if (booking === null) throw new NotFoundError();
     if (!manager || ownOnly) {
@@ -125,12 +129,14 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
           ? await refundBooking(refundBodySchema.parse(body).sourcePaymentId, input.actor)
           : input.operation === 'MANUAL'
             ? manualBodySchema.parse(body).bookingId
-            : input.bookingId!;
+            : input.operation === 'APPROVAL'
+              ? refundApprovalBodySchema.parse(body).bookingId
+              : input.bookingId!;
       const booking = await authorize(
         bookingId,
         input.actor,
         input.operation === 'DEPOSIT' ? 'RESTRICTED' : 'FULL',
-        ['MANUAL', 'REFUND'].includes(input.operation),
+        ['MANUAL', 'REFUND', 'APPROVAL'].includes(input.operation),
         input.operation === 'DEPOSIT',
       );
       if (['DEPOSIT', 'BALANCE'].includes(input.operation) && providers.vnpay === null)
@@ -180,7 +186,10 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
             if (
               previous.bookingId !== bookingId ||
               previous.actorAccountId !== input.actor.accountId ||
-              previous.kind !== (input.operation === 'MANUAL' ? 'MANUAL_PAYMENT' : 'REFUND')
+              previous.kind !==
+                { MANUAL: 'MANUAL_PAYMENT', REFUND: 'REFUND', APPROVAL: 'REFUND_APPROVAL' }[
+                  input.operation
+                ]
             )
               throw new AppError({
                 status: 422,
@@ -218,6 +227,33 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
                 ctx,
               );
             }
+          } else if (input.operation === 'APPROVAL') {
+            const approval = refundApprovalBodySchema.parse(body);
+            let basis;
+            if (approval.basis.kind === 'CREDIT') basis = approval.basis;
+            else {
+              if (booking.phase !== 'CANCELLED')
+                throw new AppError({
+                  status: 409,
+                  code: 'PAYMENT_EVIDENCE_CONFLICT',
+                  message: 'A recorded booking cancellation is required.',
+                });
+              const cancellation = await prisma.bookingReportingSnapshot.findFirst({
+                where: { bookingId, value: { path: ['phase'], equals: 'CANCELLED' } },
+                orderBy: { sequence: 'desc' },
+              });
+              if (cancellation === null)
+                throw new AppError({
+                  status: 409,
+                  code: 'PAYMENT_EVIDENCE_CONFLICT',
+                  message: 'A recorded booking cancellation is required.',
+                });
+              basis = { kind: 'CANCELLATION' as const, sequence: cancellation.sequence };
+            }
+            result = await providers.operations.approveRefund(
+              { ...approval, basis, commandId },
+              ctx,
+            );
           } else {
             const refund = refundBodySchema.parse(body);
             const ledger = await providers.ledger.getLedger(bookingId, ctx);
@@ -260,7 +296,11 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
                       paymentAttemptId: result.paymentAttemptId,
                     },
                   })
-                : refundResponseSchema.parse({ data: { refundId: result.resourceId } }),
+                : input.operation === 'APPROVAL'
+                  ? refundApprovalResponseSchema.parse({
+                      data: { refundApprovalId: result.resourceId },
+                    })
+                  : refundResponseSchema.parse({ data: { refundId: result.resourceId } }),
           };
         },
       );

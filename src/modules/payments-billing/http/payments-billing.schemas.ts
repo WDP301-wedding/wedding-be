@@ -25,6 +25,16 @@ export const refundBodySchema = z.strictObject({
   expectedBillingRevision: revision,
   ...evidence,
 });
+export const refundApprovalBodySchema = z.strictObject({
+  bookingId: uuid,
+  expectedBillingRevision: revision,
+  approvedRefundableVnd: vnd.positive(),
+  basis: z.discriminatedUnion('kind', [
+    z.strictObject({ kind: z.literal('CREDIT'), sourceEntryId: uuid }),
+    z.strictObject({ kind: z.literal('CANCELLATION') }),
+  ]),
+  ...evidence,
+});
 const queryInteger = z
   .string()
   .regex(/^(0|[1-9][0-9]*)$/)
@@ -56,6 +66,9 @@ export const paymentResponseSchema = z.strictObject({
   data: z.strictObject({ paymentId: uuid, paymentAttemptId: uuid }),
 });
 export const refundResponseSchema = z.strictObject({ data: z.strictObject({ refundId: uuid }) });
+export const refundApprovalResponseSchema = z.strictObject({
+  data: z.strictObject({ refundApprovalId: uuid }),
+});
 export const billingTotalsSchema = z.strictObject({
   acceptedChargesVnd: vnd,
   paidVnd: vnd,

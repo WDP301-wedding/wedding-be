@@ -186,18 +186,22 @@ environment inputs. Contract-ready provider tests include official sandbox fixtu
 
 ## 9. HTTP schema hand-off and races
 
-| Method/path                              | Strict request / response                                                       | Authorized actor                                                                                       |
-| ---------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| POST /bookings/{id}/payments/deposit     | timelineRevisionId; result paymentAttemptId/status/checkoutUrl/expiresAt        | Own restricted/full access; no amount or role accepted.                                                |
-| GET /bookings/{id}/payments/{attemptId}  | Safe status, amountVnd, purpose, downstream application status                  | Own restricted/full booking grant or Manager.                                                          |
-| POST /bookings/{id}/payments/balance     | expectedBillingRevision; server full outstanding amount                         | Own FULL account or Manager.                                                                           |
-| POST /management/billing/payments/manual | bookingId, purpose, amountVnd, settledAt, evidenceReference (1–120), reason     | Manager; deposit still requires eligibility/reservation; balance cannot exceed authorized outstanding. |
-| POST /management/billing/refunds         | sourcePaymentId, amountVnd, expectedBillingRevision, reason, evidenceReference  | Manager; refundable limit checked transactionally.                                                     |
-| GET /bookings/{id}/billing               | Totals above, payment/charge/refund history with pagination and billingRevision | FULL own booking or Manager; restricted actor sees deposit status only.                                |
-| GET /billing/callbacks/vnpay             | Provider-defined IPN query; provider-required acknowledgement                   | Signature/correlation, not user role; authoritative GET IPN as specified below.                        |
+| Method/path                               | Strict request / response                                                                                            | Authorized actor                                                                                                     |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| POST /bookings/{id}/payments/deposit      | timelineRevisionId; result paymentAttemptId/status/checkoutUrl/expiresAt                                             | Own restricted/full access; no amount or role accepted.                                                              |
+| GET /bookings/{id}/payments/{attemptId}   | Safe status, amountVnd, purpose, downstream application status                                                       | Own restricted/full booking grant or Manager.                                                                        |
+| POST /bookings/{id}/payments/balance      | expectedBillingRevision; server full outstanding amount                                                              | Own FULL account or Manager.                                                                                         |
+| POST /management/billing/payments/manual  | bookingId, purpose, amountVnd, settledAt, evidenceReference (1–120), reason                                          | Manager; deposit still requires eligibility/reservation; balance cannot exceed authorized outstanding.               |
+| POST /management/billing/refunds          | sourcePaymentId, amountVnd, expectedBillingRevision, reason, evidenceReference                                       | Manager; refundable limit checked transactionally.                                                                   |
+| POST /management/billing/refund-approvals | bookingId, expectedBillingRevision, approvedRefundableVnd, basis, reason, evidenceReference; result refundApprovalId | Manager; CREDIT basis names a credit ledger entry, CANCELLATION uses a server-resolved immutable reporting snapshot. |
+| GET /bookings/{id}/billing                | Totals above, payment/charge/refund history with pagination and billingRevision                                      | FULL own booking or Manager; restricted actor sees deposit status only.                                              |
+| GET /billing/callbacks/vnpay              | Provider-defined IPN query; provider-required acknowledgement                                                        | Signature/correlation, not user role; authoritative GET IPN as specified below.                                      |
 
 Callbacks use provider-specific verification/deduplication rather than a client
 `Idempotency-Key` requirement. Client/server mutations use the platform durable key.
+Refund approval is an explicit durable decision before refund recording. It checks
+the current billing revision and available cancellation/credit budget without
+recording a refund or changing ledger totals; retries replay the committed decision.
 Balance initiation serializes against another in-flight balance/manual payment to prevent
 concurrent collection of the same outstanding amount. Every true settlement is recorded;
 a late duplicate business payment becomes explicit credit/reconciliation, not data loss.

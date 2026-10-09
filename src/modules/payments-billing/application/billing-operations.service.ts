@@ -313,6 +313,11 @@ export function createBillingOperationsService(
       const command = refundApprovalSchema.parse(input);
       return execute(command, 'REFUND_APPROVAL', context, async (scoped) => {
         const ledger = await options.ledger.getLedger(command.bookingId, scoped);
+        if (
+          command.expectedBillingRevision !== undefined &&
+          ledger.revision !== command.expectedBillingRevision
+        )
+          throw error('STALE_BILLING_REVISION');
         let limit: number;
         let basisId: string;
         let cancellationSequence: number | null = null;

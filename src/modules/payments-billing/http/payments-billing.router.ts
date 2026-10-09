@@ -19,6 +19,7 @@ import {
   balanceBodySchema,
   manualBodySchema,
   refundBodySchema,
+  refundApprovalBodySchema,
   billingQuerySchema,
   billingResponseSchema,
   ipnResponseSchema,
@@ -56,6 +57,7 @@ export function createPaymentsBillingRouter(
     ['BALANCE', '/bookings/:bookingId/payments/balance', balanceBodySchema, bookingParamsSchema],
     ['MANUAL', '/management/billing/payments/manual', manualBodySchema, undefined],
     ['REFUND', '/management/billing/refunds', refundBodySchema, undefined],
+    ['APPROVAL', '/management/billing/refund-approvals', refundApprovalBodySchema, undefined],
   ] as const;
   for (const [operation, path, bodySchema, paramsSchema] of writes) {
     const schemas = {
