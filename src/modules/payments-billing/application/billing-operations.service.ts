@@ -202,6 +202,7 @@ export function createBillingOperationsService(
               expectedBookingRevision: eligibility.bookingRevision,
               amountVnd: attempt.amountVnd,
               expiresAt: attempt.expiresAt,
+              reserveForIntendedCouple: true,
             },
             scoped,
           );

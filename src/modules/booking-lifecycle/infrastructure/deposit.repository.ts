@@ -58,7 +58,7 @@ export function createPrismaBookingDepositRepository(
           // authenticated actor for audit while resolving the reservation owner
           // from Booking; other actors must own their consultation access.
           const manager =
-            input.actorAccountId === null
+            input.reserveForIntendedCouple !== true || input.actorAccountId === null
               ? null
               : await transaction.account.findFirst({
                   where: {
@@ -68,7 +68,11 @@ export function createPrismaBookingDepositRepository(
                   },
                   select: { id: true },
                 });
-          const reservationAccountId = manager === null ? input.actorAccountId : null;
+          if (input.reserveForIntendedCouple === true && manager === null) {
+            throw new BookingLifecycleNotFoundError();
+          }
+          const reservationAccountId =
+            input.reserveForIntendedCouple === true ? null : input.actorAccountId;
           const existing = await transaction.bookingDepositIntent.findUnique({
             where: { id: input.paymentAttemptId },
           });

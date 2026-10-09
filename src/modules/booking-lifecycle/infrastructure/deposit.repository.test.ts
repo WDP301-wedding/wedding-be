@@ -5,12 +5,14 @@ import {
   BookingDepositConflictError,
   createPrismaBookingDepositRepository,
 } from './deposit.repository.js';
+import { BookingLifecycleNotFoundError } from './consultation.repository.js';
 
 const now = new Date('2026-10-07T10:00:00.000Z');
 
 describe('PrismaBookingDepositRepository', () => {
-  it('binds the deposit to the requesting consultation account rather than the oldest grant', async () => {
+  it('binds a requesting Couple with a Manager role to their own grant rather than the oldest grant', async () => {
     const transaction = fixture();
+    transaction.account.findFirst.mockResolvedValue({ id: 'payer' });
     transaction.consultationAccess.findFirst.mockImplementation((query: unknown) => {
       const where = (query as { where: { accountId?: string } }).where;
       return Promise.resolve({ accountId: where.accountId ?? 'older-account' });
@@ -31,6 +33,28 @@ describe('PrismaBookingDepositRepository', () => {
       }),
     );
   });
+  it.each(['staff', null])(
+    'denies intended-Couple manual reservation without a verified Manager: %s',
+    async (actorAccountId) => {
+      const transaction = fixture();
+      await expect(
+        createPrismaBookingDepositRepository(client(transaction), () => now).reserve({
+          bookingId: 'booking',
+          timelineRevisionId: 'timeline',
+          paymentAttemptId: 'attempt',
+          expectedBookingRevision: 4,
+          amountVnd: 3_000_001,
+          expiresAt: '2026-10-07T10:15:00.000Z',
+          requestId: 'request',
+          actorAccountId,
+          reserveForIntendedCouple: true,
+        }),
+      ).rejects.toThrow(BookingLifecycleNotFoundError);
+      expect(transaction.bookingDepositIntent.create).not.toHaveBeenCalled();
+      expect(transaction.auditLog.create).not.toHaveBeenCalled();
+    },
+  );
+
   it('requires exact reservation replay and rejects stale, competing, invalid-amount, expired, and raced attempts', async () => {
     const transaction = fixture();
     const repository = createPrismaBookingDepositRepository(client(transaction), () => now, ids());
