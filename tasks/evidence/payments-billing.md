@@ -1,7 +1,7 @@
 # SPEC-04 Payments and Billing implementation evidence
 
-Status: **W1-W6 verified; W7 client implementation and browser evidence recorded;
-Android runtime review deferred by the owner; module acceptance pending.**
+Status: **W1-W6 verified; W7 implemented; W8 real-owner backend and browser
+acceptance recorded. Android runtime remains unverified; module ACCEPTED pending.**
 Authority: approved `SPEC-payments-billing.md`, `WEDDING-CONTRACT-1@1.1.0`,
 and the eight-wave plan in `tasks/plan.md` Section 21.
 
@@ -10,7 +10,8 @@ and the eight-wave plan in `tasks/plan.md` Section 21.
 All four repositories use `codex/payments-billing` for W1-W8. Verified increments
 are committed on that branch. W1-W6 change only the backend. W7 adds billing to
 the three clients while retaining their Booking baseline. W6 publishes the seven approved
-HTTP routes and immutable OpenAPI artifact. Module ACCEPTED remains pending W8.
+HTTP routes and immutable OpenAPI artifact. W8 adds the authenticated real-owner
+acceptance test. Module ACCEPTED awaits native runtime review and the owner decision.
 
 W1 accounting policy and owner ports: backend commit `5018c66`.
 W1 plan/branch/evidence record: backend commit `293e982`.
@@ -793,3 +794,138 @@ at W6. Documentation receives only W7 evidence, checklist status and ADR-009.
 W7 implementation is complete with three closed microtasks and a partially verified
 fourth. **27/32 microtasks are closed**; Android runtime plus all four W8 tasks
 remain. PB-C4, owner ACCEPTED and dependent print acceptance stay pending.
+
+## W8 cross-repository acceptance
+
+Date: 2026-10-09. The owner requested W8 on the existing shared feature branch.
+No production code, migration, API contract, dependency or accounting policy changes
+are needed by this acceptance increment.
+
+### Source and contract trace
+
+| Repository | Verified source commit | W8 change |
+| --- | --- | --- |
+| Backend | `3eb58e581b4476e653d3d567acac7c00c5ec2319` | Authenticated acceptance fixture and cross-owner journey test. |
+| Public Web | `c5e6e0a56d8274bd09abbca3c592a00472f732aa` | Existing W7 implementation verified with real API. |
+| Management Web | `0b573a98d3263de0a53bf4350a88e61c1d56176f` | Existing W7 implementation verified with real API. |
+| Android | `3866846079da2c44d6be0ab6a318ac2f36a03b52` | Automated gates/export verified; native runtime unverified. |
+
+All repositories retain `codex/payments-billing`. All three client locks still pin
+backend artifact source `40bc1d279cc6514f2cadbb17fdd6a393e2e3b0f4`, with OpenAPI
+SHA-256 `056df7eb37bc9ff8892bdd1271791e0919f8b03db3c6ddb9d4891a5b869c3408`.
+Backend regeneration is byte-stable and every `api:check` passes. Generated declaration
+hashes are `e3af6b73127a480c6261e6467aafc31038bce0c1c48ab86439dae9fb1a1c83b1`
+for Public Web/Android and `75f2f1167098150171ff9631b69a48f8f47bf559e4bf297fb091e7c86a41a286`
+for Management Web; differing declarations preserve each consumer's generation options.
+
+### Acceptance boundary and requirement matrix
+
+`tests/integration/payments-billing/acceptance-fixture.ts` composes the production
+Identity and Booking runtimes, actual billing services/router, actual PostgreSQL
+session resolver and the real Booking/Identity/Billing owner adapters. Credentials
+are random fixture-only passwords. Initial catalog/approved booking facts are seeded;
+all session, settlement, access, charge, credit, refund and invoice transitions use
+their production owners. The external transport is controlled: timeout responses and
+independently signed VNPay fixtures pass through the production verifier. No live
+VNPay request, merchant credential or real money transaction is used.
+
+The PRN-006 evidence covers the published `BookingChargeRegistrar` and accepted-source
+boundary. The source is a frozen print commercial fixture; the future invitation-studio
+editor/quotation/approval implementation is not represented as completed.
+
+| Requirement / invariant | Real acceptance evidence |
+| --- | --- |
+| PRN-006: one accepted print source in receivables/invoice | `acceptance.test.ts` delivers one source concurrently, checks one charge/history line, derives 54m accepted charges and freezes the same line into the invoice; `charge-registration.test.ts` rejects changed source identity. |
+| Deposit amount and eligibility; same restricted account becomes FULL | `acceptance.test.ts` logs in through Identity, denies restricted full billing, checks 15m signed checkout amount, repeats exact IPN and proves one application plus CONFIRMED/FULL; `deposit-orchestration.test.ts` and `operations-safety.test.ts` cover stale timeline/amount/current role and invalidating edit races. |
+| Base + print + deposit/balance + credit/refund arithmetic | `acceptance.test.ts` settles 15m deposit and 39m balance, applies 1m print credit, approves/refunds 1m and checks all six final totals. Browser proof also collects a real 2m manual balance before the 37m remaining checkout. |
+| Duplicate/reordered evidence, UNKNOWN, reconciliation | `vnpay.test.ts`, `vnpay-evidence.test.ts` and `balance-vnpay.test.ts` exercise independent signatures, correlated evidence, reordered/contradictory delivery, timeout beyond expiry, signed query recovery and concurrent query/IPN success. |
+| Crash recovery and current authority on replay | `deposit-orchestration.test.ts`, `http-recovery.test.ts` and `operations-safety.test.ts` inject real SQL/boundary failures and restart providers; the new journey revokes a real session and denies its cached refund replay. |
+| Refund/balance concurrency and immutable snapshots | `operations.test.ts`, `operations-safety.test.ts`, `balance-vnpay.test.ts` and `views.test.ts` use PostgreSQL serialization/constraints. The new journey proves an issued invoice stays identical after credit/refund and replays without recollecting money. |
+| Privacy and bounded history | The journey excludes private reason/evidence/provider payloads from customer history and billing audit. Existing HTTP/storage/reporting suites verify authorization, current roles, immutable revision fences, private evidence and bounded pagination. |
+
+### Real API browser review
+
+The two Next development servers use process-only loopback API configuration.
+An isolated Edge context logs in through the real Identity HTTP API; fixture-control
+requests invoke the actual registrar/approval ports and deliver signed callbacks
+through the actual billing HTTP route. There are no stubbed financial HTTP responses.
+Only the external sandbox navigation is blocked to prevent a provider request.
+
+The final browser run passes **17 screenshots** at 1440px and 390px, covering anonymous
+access, restricted deposit, confirmation, UNKNOWN, recovery after reload, verified
+deposit/FULL promotion, print receivable, manual balance, remaining checkout, settlement,
+approved refund and final totals. No page-level horizontal overflow, unexpected console
+error or page exception is recorded. Representative screenshots are inspected. Final
+customer screenshots are recaptured after loading finishes and checked against the
+settled totals through a fresh authenticated session.
+
+The UI and database both show: accepted charges **53,000,000 VND**, paid **54,000,000**,
+refunded **1,000,000**, net paid **53,000,000**, outstanding **0**, credit **0**. Exactly
+one deposit application and one print-source charge remain. The account retains FULL.
+
+### Quality, migration and review evidence
+
+| Repository | Full tests | Line / branch coverage | Gates |
+| --- | --- | --- | --- |
+| Backend | **1,078 / 1,078**, 141 files | **96.93% / 93.22%** | Format, lint, typecheck, deterministic API generation/check, coverage, build and audit pass. |
+| Public Web | **85 / 85**, 11 files | **98.16% / 95.88%** | Format, lint, typecheck, API check, coverage, build, audit and real browser journey pass. |
+| Management Web | **124 / 124**, 18 files | **97.43% / 92.84%** | Same web gates pass. |
+| Android | **54 / 54**, six suites | **97.92% / 90.47%** | Format, lint, typecheck, API check, coverage, Android export and audit pass; Expo Doctor **21 / 21**. |
+
+Pinned Node 24.21.0/npm 11.19.0 and the owned disposable PostgreSQL 17.11 container on
+loopback 55435 are used. All **18 migrations** deploy onto the empty main acceptance
+database; migration status reports up to date. Catalog seed reruns report ALREADY_PRESENT.
+The full suite executes all five billing upgrade suites (ledger, application, VNPay,
+operations and their retained historical evidence) against separately owned databases.
+The separate integration run passes **181/181 tests in 48 files**; the separate
+contract run passes **25/25 tests in seven files**. No PostgreSQL suite is skipped.
+
+The temporary runner imports the unchanged repository configuration. One fork worker
+shares modules for 136 ordinary suites and isolates the same five module-mock suites
+documented in W6. Discovery matches all 141 physical test files without missing,
+duplicate or extra files. All 142 covered source records satisfy the unchanged 80%
+line and branch thresholds per file. Assertions and timeouts are unchanged.
+
+Review covers correctness, readability, module ownership, security and bounded work.
+A controlled inversion of ledger existing-record checks makes the new journey fail;
+the source is restored exactly before the passing full run. Backend audit uses only
+the two existing documented exceptions 1145093/1153173. Client audit uses only its
+existing lockfile-scoped development-tool exceptions, expiring 2026-10-15; no new
+exception is added and audit is not represented as zero vulnerabilities.
+
+Credential-pattern scanning covers **525 tracked text files** in all four repositories;
+**66 public JS/export artifacts** are checked for fixture-secret/private-evidence sentinels.
+There are no findings. This is a scoped heuristic scan; privacy assertions and real
+authorization/redaction suites provide the behavior evidence. Logs and reproducible
+local helpers remain ignored under `test-results/pbw8/`.
+
+### Failed attempts and remaining acceptance
+
+The first temporary runner attempt stalls and is stopped; the final profile explicitly
+uses fork workers and retains all original test options. An earlier coverage run has
+one new-journey timeout under concurrent load. Expensive runtime creation and password
+login move into the existing setup hook; the test deadline is unchanged and the final
+full run passes. Earlier fixture mistakes (invoice command fields, login labels and
+new provider transaction numbers for a purported duplicate callback) are corrected.
+Production builds correctly reject HTTP API configuration; loopback browser proof uses
+development mode while production build gates remain separate. These failed attempts
+are preserved locally and are not counted as successful evidence.
+
+**Android runtime is still not verified.** W8's normal localhost/offline Expo startup
+is again rejected by automatic review with only "blocked by policy" and no reason.
+The owner's W7 instruction "Ghi rõ Android runtime chưa kiểm tra" remains explicit.
+No alternate command bypasses the rejection. Export/Jest/Doctor do not prove native
+keyboard, font scale, dark mode, back navigation or provider-browser behavior.
+
+W8's first two microtasks are verified. The quality/runtime microtask stays open for
+the native review required by PB-C4; its automated, migration and browser portions
+have passed. The evidence/ACCEPTED microtask stays open for the project-owner decision.
+W7's remaining runtime microtask is also open: **29/32 microtasks closed**, three
+checklist entries still open across W7/W8. PB-C4, SPEC-04 ACCEPTED and dependent print
+acceptance remain pending. Commits are local; no push, PR, merge or deployment occurs.
+
+Owned API/fixture-control and Next processes are stopped. The disposable PostgreSQL
+container is stopped and auto-removed. The exact temporary runner is removed after
+saving its execution profile with the ignored proof logs; fixture credentials are
+removed. Other databases, containers and browser profiles are untouched. All four
+working trees are clean after the acceptance documentation commit.

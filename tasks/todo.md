@@ -2743,21 +2743,48 @@ attempts without a specific reason. The owner explicitly selected
 and is carried to W8. The fourth W7 checklist remains open solely for that proof;
 its automated and browser state checks are done. W7 implementation is complete,
 three of its four verification microtasks are closed. W1-W6 remain fully verified;
-**27/32 microtasks are closed**, with this runtime check plus all four W8 tasks
-remaining. PB-C4 and SPEC-04 ACCEPTED remain pending. W8 has not started.
+**At the W7 checkpoint, 27/32 microtasks were closed**, with this runtime check plus
+all four W8 tasks remaining. W8 results are recorded below; PB-C4 and SPEC-04
+ACCEPTED remain pending.
 All four repositories retain one `codex/payments-billing` branch, local commits
 only and no push/PR.
 
 #### PB-W8 — Cross-repository acceptance
 
-- [ ] Prove PRN-006 print-source registration and receivable/invoice inclusion once,
+- [x] Prove PRN-006 print-source registration and receivable/invoice inclusion once,
       deposit amount/eligibility recheck, balance, credits and manual refunds end to end.
-- [ ] Exercise callback duplication/reordering, timeout reconciliation, edit race,
+- [x] Exercise callback duplication/reordering, timeout reconciliation, edit race,
       crash recovery, refund/balance concurrency and immutable totals with real providers.
 - [ ] Run affected repository format/lint/typecheck/test/coverage/API/build/audit gates,
       clean/upgrade migration checks, browser runtime, Android export and secret/PII scan.
 - [ ] Save `tasks/evidence/payments-billing.md` with requirement/test/commit/digest
       trace and obtain project-owner ACCEPTED decision before dependent print acceptance.
+
+**W8 evidence (2026-10-09):** Backend commit
+`3eb58e581b4476e653d3d567acac7c00c5ec2319` adds an authenticated acceptance journey
+using real Identity/Booking/Billing adapters on disposable PostgreSQL. Accepted
+print sources register once and appear in receivables/invoices; signed deposit and
+balance callbacks, approved credits/refunds, immutable invoice replay and current
+session authority pass. VNPay transport remains controlled, per the approved plan.
+Two web clients pass a 17-screen real-API browser journey including actual manual
+collection/refund and exact final totals. No live merchant credential or transaction
+is required by this automated acceptance scope.
+
+All four repository automated quality/API/coverage/build/audit gates pass; backend
+coverage is **1,078/1,078** tests, **96.93% lines / 93.22% branches** with all per-file
+thresholds retained. Clean/upgrade migrations, seed rerun, scoped secret scans and
+privacy assertions pass. Expo Doctor passes **21/21** and Android export passes.
+[W8 evidence](evidence/payments-billing.md#w8-cross-repository-acceptance) records
+source commits, frozen digest, test trace and review limitations.
+
+**Remaining:** Expo startup is again blocked by automatic review without a specific
+reason, so native runtime is explicitly **not verified**. The third W8 microtask
+remains open for PB-C4's Android review; all its other gates pass. Evidence is saved,
+but the fourth microtask still requires the project-owner ACCEPTED decision.
+Together with W7's native runtime item, **29/32 microtasks are closed** and three
+checklist entries remain open. SPEC-04/PB-C4 and dependent print acceptance are not
+marked complete. All four repositories remain on `codex/payments-billing`; local
+commits only, no push/PR/merge/deployment.
 
 #### Checkpoint P4 — Payments plan ready
 
