@@ -25,6 +25,9 @@ export type ReserveDepositInput = Readonly<{
   expectedBookingRevision: number;
   amountVnd: number;
   expiresAt: string;
+  // Internal manual-payment callers request Booking's intended Couple; the
+  // repository still verifies the authenticated Manager and audits that actor.
+  reserveForIntendedCouple?: true;
 }>;
 
 export type RecordSuccessfulDepositInput = Readonly<{

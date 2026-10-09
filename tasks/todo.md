@@ -2480,24 +2480,330 @@ BK-W1. Final provider, integration, and implementation acceptance gates remain a
 
 **Acceptance criteria:**
 
-- [ ] `SPEC-payments-billing.md` covers the existing payment scope and PRN-006.
-- [ ] Deposit eligibility recheck, print-charge registration, receivable inclusion, idempotency, reconciliation, and refund boundaries are explicit.
-- [ ] A compact plan of at most eight continuous implementation waves covers database
+- [x] `SPEC-payments-billing.md` covers the existing payment scope and PRN-006.
+- [x] Deposit eligibility recheck, print-charge registration, receivable inclusion, idempotency, reconciliation, and refund boundaries are explicit.
+- [x] A compact plan of at most eight continuous implementation waves covers database
       constraints, provider callbacks, audit evidence, API contracts, and billing views.
+- [x] Project owner approves the bounded plan before implementation.
+- [ ] Name the SPEC-04 owner and integration steward before concurrent shared-file work.
 
 **Verification:**
 
 - [ ] Trace PRN-006 and all payment state transitions to automated tests, including concurrency and callback replay.
-- [ ] Confirm `invitation-studio` can register an accepted charge without owning billing state.
-- [ ] Run Prettier and `git diff --check` on the affected documentation.
+- [ ] Prove `invitation-studio` registers an accepted charge through the billing-owned
+      registrar without owning billing state.
+- [x] Run Prettier and `git diff --check` on the affected documentation.
 
-**Dependencies:** Drafting may overlap SPEC-03. Final approval requires the approved
-SPEC-03 provider contract; real payment integration requires the implemented booking
-provider.
+**Dependencies:** SPEC-04 is approved as a specification. Isolated slices may start
+only after approval of the bounded plan. Deposit/money-access integration requires the
+implemented booking reservation/recorder and identity promotion providers; client
+network integration requires a committed backend OpenAPI artifact and digest.
 
 **Files likely touched:** `wedding-be/SPEC-payments-billing.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
 
 **Estimated scope:** Medium
+
+**Plan approval evidence (2026-10-08):** After reviewing the summarized eight-wave
+plan, the project owner instructed: “chuyển qua nhánh mới và tiến hành W1 sau đó báo
+cáo lại.” This approves incremental plan execution; it does not mark SPEC-04 ACCEPTED
+or waive provider, migration, client, or final-acceptance gates.
+
+**Branch correction (2026-10-08):** The project owner requires all SPEC-04 waves on
+one `codex/payments-billing` branch in each of `wedding-be`, `wedding-manage-web`,
+`wedding-web` and `wedding-app`. The backend W1 branch was renamed and the empty
+planning branch removed. All four branches retain their existing Booking baseline;
+verified waves become focused commits on this module branch.
+
+#### PB-W1 — Ledger rules and provider contracts
+
+- [x] Translate the approved accounting definitions into tested payment, charge,
+      credit-adjustment and refund rules with checked integer-VND arithmetic.
+- [x] Define owner ports and strict DTOs for booking eligibility/reservation/recording,
+      identity promotion, print charge/credit registration and billing readers.
+- [x] Build conforming provider fixtures for success, denied, stale, conflict, replay,
+      unknown and unavailable outcomes; record PRN-006 trace points.
+- [x] Reserve the migration/OpenAPI lane for this single sequential task before
+      W2/W6; confirm W1 needs no new business decision or baseline amendment.
+
+**W1 implementation evidence (2026-10-08, backend commit `5018c66`):** The four files in
+`src/modules/payments-billing/domain/` and `application/` implement checked VND
+totals/refund limits, verified-evidence attempt transitions, Billing-owned ports and
+strict readonly reporting schemas. Consumed Booking/Identity interfaces are imported
+from their owner modules. Focused fixtures cover own restricted access, concealed
+denial, stale eligibility, replay/conflict and unavailable providers; PRN-006 traces
+accepted print-source registration through a Billing fixture. These fixtures establish
+ISOLATED_READY only; real persistence, callback, provider and cross-repository proof
+remain assigned to W2-W8.
+
+**W1 verification:** `npm run test:unit -- payments-billing` passes 27 tests in two
+files; `npm run typecheck`, changed-file ESLint/Prettier and `git diff --check` pass.
+Temporarily changing the refund cap condition from OR to AND fails its boundary test;
+the original source is restored. No database migration, HTTP/OpenAPI publication or
+client billing UI is part of this wave. The three client module branches remain clean.
+
+#### PB-W2 — Immutable ledger and persistence
+
+- [x] Add ledger schema and constraints for immutable facts, unique accepted sources,
+      VND bounds, replay identity, invoice revisions and adjustment linkage.
+- [x] Implement repositories and unit-of-work operations without importing Prisma into
+      domain/application policy; atomically write audit and outbox evidence.
+- [x] Verify migration from empty and current schema plus upgrade behavior on disposable
+      PostgreSQL; prove uniqueness and rollback under duplicate requests.
+- [x] Pass focused persistence tests, formatting, typecheck and diff/secret checks.
+
+**W2 implementation evidence (2026-10-08, backend commits `1952a8d` and `b9fa8d8`):** The new forward migration
+`20261008006000_payments_billing_ledger` adds immutable ledger facts, durable attempts,
+invoice revisions and transactional outbox storage without changing old business data
+or applied migrations. The internal application port contains no Prisma imports;
+its adapter enlists in the existing Booking unit of work and records audit/outbox
+atomically. SQL/application checks prove source uniqueness, safe VND aggregates,
+adjustment/refund caps, terminal evidence and snapshot immutability.
+
+**PB-C1 verification:** 47 focused tests in six files pass (36 Billing unit tests,
+10 Billing PostgreSQL/upgrade tests and the migration-policy test). All 819 backend
+unit tests pass in 79 files; the three existing Booking integration files pass eight
+tests and the legacy idempotency repository passes two tests. Final checks use the
+pinned Node 24.21.0/npm 11.19.0; the complete related gate passes 57 tests in ten files.
+Changed-file ESLint,
+Prettier, typecheck, build and `git diff --check` pass. A deliberate replay-guard
+mutation is detected and restored. Full source/requirement/rehearsal details are in
+[`evidence/payments-billing.md`](./evidence/payments-billing.md). W3-W8 and module
+ACCEPTED remain pending; no HTTP/OpenAPI/client contract has been published.
+The disposable W2 PostgreSQL container is stopped/removed; all four repositories
+remain on `codex/payments-billing`, and the three client working trees remain clean.
+
+#### PB-W3 — Charges, credits and deposit orchestration
+
+- [x] Register an accepted print revision once and reject changed booking/amount/date;
+      append cancellation/replacement credits against their immutable decision source.
+- [x] Create a deposit intent only after a fresh booking eligibility check and durable
+      booking reservation; derive amount and timeline revision from booking authority.
+- [x] Apply only proven settlement once, then record booking settlement and promote the
+      same account; retain recoverable state until all downstream effects complete.
+- [x] Gate real money/access integration on Booking reservation/recorder and identity
+      promotion PROVIDER_READY evidence; fake-only evidence remains ISOLATED_READY.
+
+**W3 implementation evidence (2026-10-08, backend commits `b7f0fa4`, `8d95c4a`,
+`1dd5237`, `7a5ac1f` and `7021228`):** Real print registration/decision credits,
+server-derived deposit intents, shared Booking reservation, proven money recording,
+same-account Identity promotion and durable application completion are implemented.
+One scope is explicitly injected into the owner adapters. A payment without its
+completion marker remains PENDING; a failure after real promotion rolls all owner
+effects back while retaining the payment. Restart/concurrent retry completes that
+same payment once. Exact successful replay bypasses fresh payability rejection;
+changed date conflicts. The new additive migration preserves W2 history and adds
+no inferred completion. [ADR-005](../docs/decisions/0005-recover-deposit-application-after-durable-settlement.md)
+and [W3 evidence](./evidence/payments-billing.md#w3-charge-and-deposit-orchestration)
+record the boundaries, provider commits and requirement proof.
+
+**W3 verification:** All 833 unit tests in 81 files pass on pinned Node 24.21.0/npm
+11.19.0 (`vitest run --exclude "tests/**/*.test.ts" --maxWorkers=2`). The final real
+PostgreSQL gate passes 29 tests in nine files (Billing, Booking and migration policy,
+one worker with fork reuse). Typecheck, build, changed-module ESLint/Prettier,
+diff/targeted-secret checks and deploy/status for all sixteen migrations pass.
+An inverted eligibility guard fails eight tests and is restored before final gates.
+All temporary test databases are disposed of and the W3 container is stopped/removed.
+All four repositories remain on the single `codex/payments-billing` module branch;
+client trees are unchanged. No push, callback/checkout, HTTP/OpenAPI publication,
+INTEGRATION_READY digest hand-off or module ACCEPTED decision occurs in this wave.
+At the W3 checkpoint: W1-W3 complete (3/8 waves, 12/32 microtasks); W4-W8 remained open.
+
+#### PB-W4 — VNPay verification and reconciliation
+
+- [x] Implement provider-defined canonical parameter parsing, duplicate-key rejection,
+      amount/currency/order correlation and HMAC verification from the approved mapping.
+- [x] Persist callback decision and deduplication evidence before acknowledging IPN;
+      keep ReturnURL display-only and callbacks free of trusted client role assumptions.
+- [x] Prove invalid signature, changed payload, replay, reordered callback, timeout,
+      unknown outcome and reconciliation recovery using official sandbox fixtures.
+- [x] Keep credentials in backend runtime configuration; tests use controlled doubles
+      and never contact VNPay.
+
+**W4 implementation evidence (2026-10-08, source commits `a8973f0` through
+`09c9c35`):** The real VNPay adapter implements server-derived checkout, official
+PAY/IPN and querydr signatures, durable decisions before acknowledgement, immutable
+proof/transaction claims and recoverable settlement through actual Booking/Identity
+providers. Exact callback/query replay cannot duplicate money or account promotion.
+Signature, merchant/order, amount and signed currency conflicts are rejected or
+quarantined. UNKNOWN remains reserved after timeout/expiry; a verified query can
+recover it. Money-write failure retains successful proof, while historical completed
+W3 applications retain their status without fabricated VNPay evidence. Server-only
+configuration defaults to disabled; controlled tests make no VNPay network call.
+[ADR-006](../docs/decisions/0006-durable-vnpay-evidence-and-reconciliation.md) and
+[W4 evidence](./evidence/payments-billing.md#w4-vnpay-verification-and-reconciliation)
+record the protocol, migration, race proof and PB-C2 provider hand-off review.
+
+**PB-C2 verification:** Final source `09c9c35` passes all 1,016 backend tests in 126
+files, with 96.82% line and 93.19% branch coverage; every included file meets the
+unchanged 80% line/branch bar. Separate integration and contract gates pass 133 tests
+in 36 files and 22 tests in six files. A temporary single-worker profile reuses
+workers for regular suites and isolates the five module-mock suites; no test,
+timeout, assertion, baseline configuration or coverage threshold is weakened.
+Full backend format/lint/typecheck/API generation/check/build/audit, diff and targeted
+secret checks pass. Audit retains two existing documented, unexpired exceptions.
+The forward migration deploy/status verifies all seventeen migrations. Real-owner
+replay, concurrency, expiry, failure/recovery and W3 upgrade proof are recorded in
+the evidence above. The disposable W4 PostgreSQL container and temporary runner
+profile are removed; the existing Booking database is untouched. All four
+repositories retain `codex/payments-billing`, and client trees are unchanged.
+HTTP/OpenAPI publication, INTEGRATION_READY digest hand-off and owner ACCEPTED remain
+with later waves. No push occurs.
+Progress: W1-W4 complete (4/8 waves, 16/32 microtasks); W5-W8 remain open.
+
+#### PB-W5 — Manual payments, refunds and invoice views
+
+- [x] Record Manager-approved manual settlement evidence idempotently and prevent
+      balance payment from exceeding the current accepted outstanding amount.
+- [x] Record manual refunds with reason/evidence only after locking and rechecking the
+      source settlement and approved refundable limit; never mutate payment history.
+- [x] Derive invoice and receivable totals/history from immutable ledger facts; include
+      accepted print charge, payment, refund, credit and billing revision sources.
+- [x] Prove two-refund and two-balance races, exact arithmetic, replay and audit
+      redaction against real PostgreSQL.
+
+**W5 implementation evidence (2026-10-09, source `8694833`):** Manager manual
+settlement is atomic across Billing/Booking/Identity, with immutable intent replay
+and source evidence. Balance amounts derive from the current accepted ledger and
+revision; partial manual collection is bounded, while VNPay collects full outstanding.
+UNKNOWN and durable-success/application gaps block recollection. Refunds load a
+recorded Manager credit/cancellation approval and check source and decision caps
+under the booking lock. Invoice/history/reporting use immutable exact ledger facts,
+safe source links and fixed pagination fences. Real two-refund/two-balance and approval
+races, final-write rollback after promotion, late money, print replay, private audit
+redaction, fake/real reader conformance and W4 upgrade preservation all pass.
+[ADR-007](../docs/decisions/0007-manual-billing-approval-and-ledger-views.md) and
+[W5 evidence](./evidence/payments-billing.md#w5-manual-operations-balance-and-immutable-views)
+record the source hand-off and HTTP recovery requirements for W6.
+
+Full backend coverage passes 1,052 tests in 134 files: 96.86% lines and 93.18%
+branches, every included file above the unchanged 80% thresholds. Separate integration
+and contract gates pass 162 tests in 43 files and 22 tests in six files. Full formatting,
+lint, typecheck, API generation/check, build, audit, diff and targeted source scans
+pass; audit uses two preexisting documented, unexpired exceptions. Fresh deploy/status
+confirms all eighteen migrations, with earlier migrations unchanged. The initial full
+attempt with an uninitialized disposable main schema is excluded from green evidence.
+The final run follows deployment and the targeted foundation retest. A temporary
+worker profile preserves full inventory, original coverage configuration and isolation
+for all five module-mock suites. Test assertions, deadlines and thresholds are unchanged.
+
+All four repositories remain on `codex/payments-billing`; client trees are unchanged.
+Disposable W5 PostgreSQL and temporary profile/schema copy are removed. The preexisting
+Booking database is untouched. Local commits only. HTTP/OpenAPI publication and PB-C3
+completion remain with W6; generated clients, UI and final owner acceptance follow.
+Progress: W1-W5 complete (5/8 waves, 20/32 microtasks); W6-W8 remain open (12 microtasks).
+
+#### PB-W6 — Authenticated HTTP and immutable OpenAPI
+
+- [x] Add strict request/response schemas for deposit, balance, callback, manual
+      payment, refund, attempt status and paginated booking billing reads.
+- [x] Wire Manager/Couple/restricted-prospect permissions, concealed unowned reads,
+      durable idempotency, stable errors and audit/outbox behavior.
+- [x] Test callback acknowledgment codes, duplicate/in-progress commands, changed-body
+      keys, authorization denials, stale billing revisions and unknown outcomes.
+- [x] Generate deterministic OpenAPI, pass backend contract/coverage/build/audit gates,
+      and publish the exact artifact commit/digest for client lock updates.
+
+W6 closes all four microtasks and technical checkpoint PB-C3. Exact tested backend
+source: `40bc1d279cc6514f2cadbb17fdd6a393e2e3b0f4`; OpenAPI SHA-256:
+`056df7eb37bc9ff8892bdd1271791e0919f8b03db3c6ddb9d4891a5b869c3408`.
+[Billing evidence](evidence/payments-billing.md) records 1,077/1,077 tests in 140 files,
+96.93% lines/93.22% branches, 180/180 standalone integration tests and 25/25 contracts.
+All 142 source coverage records meet unchanged per-file bars; backend quality,
+artifact and eighteen-migration gates pass. W6 changes only backend HTTP/runtime,
+tests, generated OpenAPI and documentation; client locks/trees remain unchanged.
+All four repositories retain `codex/payments-billing`, with local commits and no push/PR.
+Progress: W1-W6 complete (**6/8 waves, 24/32 microtasks**); W7/W8 retain eight
+microtasks. Project-owner ACCEPTED remains pending W8.
+
+#### PB-W7 — Generated clients and billing experiences
+
+- [x] Update affected client locks only from the committed backend artifact, regenerate
+      API declarations and pass each `api:check` before network integration.
+- [x] Add Manager billing review, manual evidence and refund flows in Management Web;
+      display backend-derived amounts and include confirmation/error/pending states.
+- [x] Add authorized Couple billing/payment status to Public Web and Android using
+      generated types; restricted actors see only the deposit status allowed by contract.
+- [ ] Verify loading, empty, error, denied, unknown/pending, success, destructive and
+      narrow-screen states; inspect browser and Android runtime output.
+
+**W7 implementation evidence (2026-10-09):** All three client locks and generated
+declarations pin W6 source `40bc1d279cc6514f2cadbb17fdd6a393e2e3b0f4` and SHA-256
+`056df7eb37bc9ff8892bdd1271791e0919f8b03db3c6ddb9d4891a5b869c3408`.
+Manager billing/manual/refund, Public Web restricted deposit and FULL billing,
+and Android FULL plus confirmed-booking billing/status are implemented. Durable
+client keys preserve original revisions through uncertain responses and reload;
+verified attempt status gates recollection. Server totals and fixed history fences
+remain authoritative. [ADR-009](../docs/decisions/0009-preserve-client-billing-intents-and-authoritative-status.md)
+and [W7 evidence](evidence/payments-billing.md#w7-generated-clients-and-billing-experiences)
+record the decision and verification.
+
+Final coverage passes Manager **124/124**, Web **85/85**, Android **54/54** tests;
+format/lint/typecheck/API/coverage/build/audit pass in all three clients.
+Expo Doctor passes **21/21** checks. Browser inspection covers 21 controlled-fixture
+screens at desktop and 390px widths without unexpected console/page errors.
+
+**Owner-authorized remaining check:** Automatic review rejected both Expo startup
+attempts without a specific reason. The owner explicitly selected
+“Ghi rõ Android runtime chưa kiểm tra”. Android runtime is therefore **not verified**
+and is carried to W8. The fourth W7 checklist remains open solely for that proof;
+its automated and browser state checks are done. W7 implementation is complete,
+three of its four verification microtasks are closed. W1-W6 remain fully verified;
+**At the W7 checkpoint, 27/32 microtasks were closed**, with this runtime check plus
+all four W8 tasks remaining. W8 results are recorded below; PB-C4 and SPEC-04
+ACCEPTED remain pending.
+All four repositories retain one `codex/payments-billing` branch, local commits
+only and no push/PR.
+
+#### PB-W8 — Cross-repository acceptance
+
+- [x] Prove PRN-006 print-source registration and receivable/invoice inclusion once,
+      deposit amount/eligibility recheck, balance, credits and manual refunds end to end.
+- [x] Exercise callback duplication/reordering, timeout reconciliation, edit race,
+      crash recovery, refund/balance concurrency and immutable totals with real providers.
+- [ ] Run affected repository format/lint/typecheck/test/coverage/API/build/audit gates,
+      clean/upgrade migration checks, browser runtime, Android export and secret/PII scan.
+- [x] Save `tasks/evidence/payments-billing.md` with requirement/test/commit/digest
+      trace and obtain project-owner ACCEPTED decision before dependent print acceptance.
+
+**W8 evidence (2026-10-09):** Backend commit
+`3eb58e581b4476e653d3d567acac7c00c5ec2319` adds an authenticated acceptance journey
+using real Identity/Booking/Billing adapters on disposable PostgreSQL. Accepted
+print sources register once and appear in receivables/invoices; signed deposit and
+balance callbacks, approved credits/refunds, immutable invoice replay and current
+session authority pass. VNPay transport remains controlled, per the approved plan.
+Two web clients pass a 17-screen real-API browser journey including actual manual
+collection/refund and exact final totals. No live merchant credential or transaction
+is required by this automated acceptance scope.
+
+All four repository automated quality/API/coverage/build/audit gates pass; backend
+coverage is **1,078/1,078** tests, **96.93% lines / 93.22% branches** with all per-file
+thresholds retained. Clean/upgrade migrations, seed rerun, scoped secret scans and
+privacy assertions pass. Expo Doctor passes **21/21** and Android export passes.
+[W8 evidence](evidence/payments-billing.md#w8-cross-repository-acceptance) records
+source commits, frozen digest, test trace and review limitations.
+
+**Owner acceptance (2026-10-09):** After the wording revision, the owner explicitly
+states: "được rồi, nếu test đã ổn, tôi accepted, tiến hành push code". Refreshed
+coverage passes: Management **124/124**, Public **85/85**, Android **54/54**;
+backend contract tests pass **25/25**. Client builds/Android export, API checks and
+the existing audit policy pass. The fourth W8 microtask is complete and SPEC-04
+owner ACCEPTED is recorded. Publication of all four existing
+`codex/payments-billing` branches is authorized.
+
+**Remaining:** Native Android runtime is explicitly **not verified** after the
+documented automatic-review blocks. W7's runtime item and W8's third microtask
+remain open for that proof: **30/32 microtasks closed**, two checklist entries
+open. PB-C4 is not claimed fully verified. The acceptance and push authorization
+do not authorize merging or deployment.
+
+#### Checkpoint P4 — Payments plan ready
+
+- [x] Project owner approves the eight-wave plan and its provider, race, client and
+      verification boundaries before implementation begins.
+- [ ] Assign the named SPEC-04 owner and integration steward before concurrent shared
+      schema, migration, OpenAPI or composition-root work.
+- [ ] Keep real deposit integration and final acceptance gated on implemented Booking
+      reservation/settlement and identity promotion providers.
 
 ### SPEC-05: Specify `invitation-studio`
 

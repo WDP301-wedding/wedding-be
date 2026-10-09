@@ -10,6 +10,7 @@ import { createApp } from '../../app.js';
 import { parseEnvironment } from '../../config/env.js';
 import { bootstrap, isMainModule, runMain, startServer, type RunningServer } from '../../server.js';
 import { createVenueCatalogRuntime } from '../../modules/venue-catalog/venue-catalog.runtime.js';
+import { createPaymentsBillingRuntime } from '../../modules/payments-billing/payments-billing.runtime.js';
 import { createLogger } from '../logging/logger.js';
 import {
   createHttpLifecycle,
@@ -25,6 +26,16 @@ vi.mock('../../modules/identity-access/identity.runtime.js', async () => {
     createIdentityRuntime: vi.fn(() => ({
       router: Router(),
       resource: { name: 'identity-database', close: vi.fn() },
+    })),
+  };
+});
+
+vi.mock('../../modules/payments-billing/payments-billing.runtime.js', async () => {
+  const { Router } = await import('express');
+  return {
+    createPaymentsBillingRuntime: vi.fn(() => ({
+      router: Router(),
+      resource: { name: 'payments-billing-database', close: vi.fn() },
     })),
   };
 });
@@ -286,8 +297,21 @@ describe('server startup and process signals', () => {
     runningServers.push(running);
 
     expect(createVenueCatalogRuntime).toHaveBeenCalledWith(config);
+    expect(createPaymentsBillingRuntime).toHaveBeenCalledWith(config);
     expect(running.httpServer.listening).toBe(true);
     expect(running.readiness.isReady()).toBe(true);
+  });
+
+  it('closes the initialized owner runtimes when billing startup fails', async () => {
+    vi.mocked(createPaymentsBillingRuntime).mockRejectedValueOnce(
+      new Error('billing startup failed'),
+    );
+    const config = parseEnvironment({ NODE_ENV: 'test' });
+    await expect(bootstrap({ loadConfig: () => Promise.resolve(config) })).rejects.toThrow(
+      'billing startup failed',
+    );
+    const venue: unknown = await vi.mocked(createVenueCatalogRuntime).mock.results.at(-1)?.value;
+    expect((venue as { resource: { close: () => unknown } }).resource.close).toHaveBeenCalledOnce();
   });
 
   it('reports signal-triggered shutdown failures and sets a failing exit code', async () => {

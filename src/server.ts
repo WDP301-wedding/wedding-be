@@ -19,6 +19,7 @@ import { getActiveTracingResource } from './core/observability/tracing.js';
 import { createIdentityRuntime } from './modules/identity-access/identity.runtime.js';
 import { createVenueCatalogRuntime } from './modules/venue-catalog/venue-catalog.runtime.js';
 import { createBookingLifecycleRuntime } from './modules/booking-lifecycle/booking-lifecycle.runtime.js';
+import { createPaymentsBillingRuntime } from './modules/payments-billing/payments-billing.runtime.js';
 
 type ProcessExitCode = NodeJS.Process['exitCode'];
 type ProcessSignal = 'SIGINT' | 'SIGTERM';
@@ -293,6 +294,18 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     throw error;
   }
 
+  let paymentsBillingRuntime: Awaited<ReturnType<typeof createPaymentsBillingRuntime>>;
+  try {
+    paymentsBillingRuntime = await createPaymentsBillingRuntime(config);
+  } catch (error: unknown) {
+    await Promise.allSettled([
+      identityRuntime.resource.close(),
+      venueCatalogRuntime.resource.close(),
+      bookingLifecycleRuntime.resource.close(),
+    ]);
+    throw error;
+  }
+
   return startServer({
     corsConfig: config.cors,
     enableOpenApiInProduction: config.openApi.enabledInProduction,
@@ -301,17 +314,24 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     port: config.runtime.port,
     resources:
       tracingResource === undefined
-        ? [identityRuntime.resource, venueCatalogRuntime.resource, bookingLifecycleRuntime.resource]
+        ? [
+            identityRuntime.resource,
+            venueCatalogRuntime.resource,
+            bookingLifecycleRuntime.resource,
+            paymentsBillingRuntime.resource,
+          ]
         : [
             tracingResource,
             identityRuntime.resource,
             venueCatalogRuntime.resource,
             bookingLifecycleRuntime.resource,
+            paymentsBillingRuntime.resource,
           ],
     registerRoutes: (app) => {
       app.use('/api/v1', identityRuntime.router);
       app.use('/api/v1', venueCatalogRuntime.router);
       app.use('/api/v1', bookingLifecycleRuntime.router);
+      app.use('/api/v1', paymentsBillingRuntime.router);
     },
     runtimeEnvironment: config.runtime.environment,
     securityConfig: config.security,

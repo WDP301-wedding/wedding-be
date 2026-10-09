@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
@@ -217,6 +217,25 @@ describe('OpenAPI contract', () => {
     expect(productionEnabledResponse.body).toEqual(expectedDocument);
   });
 
+  it('serves the configured artifact from a hidden worktree directory', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'billing-openapi-worktree-'));
+    const hidden = join(directory, '.codex');
+    try {
+      await mkdir(hidden);
+      const artifactPath = join(hidden, 'openapi.json');
+      await writeFile(artifactPath, '{"openapi":"3.1.0"}\n', 'utf8');
+      const response = await request(createApp({ openApiArtifactPath: artifactPath })).get(
+        '/api/v1/openapi.json',
+      );
+      expect(response.status).toBe(200);
+      expect(response.text).toBe('{"openapi":"3.1.0"}\n');
+      await request(createApp({ openApiArtifactPath: artifactPath }))
+        .get('/api/v1/.codex/openapi.json')
+        .expect(404);
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
   it('returns the standard error contract when the configured artifact is unavailable', async () => {
     const response = await request(
       createApp({

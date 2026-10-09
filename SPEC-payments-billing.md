@@ -1,6 +1,7 @@
 # Specification: Payments and Billing
 
-- Status: **Approved specification — module plan and implementation acceptance pending**
+- Status: **ACCEPTED by the project owner (2026-10-09) — Android native runtime verification remains open**
+- Module plan: approved 2026-10-08; [`tasks/plan.md` Section 21](./tasks/plan.md#21-spec-04-payments-billing-bounded-implementation-plan)
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
 - Module ID: `payments-billing` (`SPEC-04`)
 - Contract baseline: `WEDDING-CONTRACT-1@1.1.0`
@@ -11,6 +12,22 @@
 - Requirement ownership: PRN-006
 - Depends on: `booking-lifecycle`
 - Consumers: `invitation-studio`, `notifications-automation`, `analytics-dashboard`
+
+### Implementation acceptance record
+
+On 2026-10-09, after reviewing the web screenshots, requesting clearer Vietnamese
+payment labels and receiving the explicit Android-runtime limitation, the project
+owner stated: "được rồi, nếu test đã ổn, tôi accepted, tiến hành push code".
+The refreshed client coverage suites pass (Management 124/124, Public 85/85,
+Android 54/54), as do backend contract tests (25/25), client contract checks,
+web production builds and Android export. See the
+[acceptance evidence](./tasks/evidence/payments-billing.md#owner-acceptance-and-pre-push-verification--2026-10-09).
+
+This records owner acceptance and authorization to publish the existing
+`codex/payments-billing` branches. Android native runtime is still unverified;
+the two native-review checklist items in W7/W8 remain open. Export and automated
+tests do not prove native behavior. PB-C4's technical checklist is not marked
+fully verified, and this approval does not authorize a merge or deployment.
 
 ## 1. Purpose and ownership
 
@@ -169,18 +186,22 @@ environment inputs. Contract-ready provider tests include official sandbox fixtu
 
 ## 9. HTTP schema hand-off and races
 
-| Method/path                              | Strict request / response                                                       | Authorized actor                                                                                       |
-| ---------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| POST /bookings/{id}/payments/deposit     | timelineRevisionId; result paymentAttemptId/status/checkoutUrl/expiresAt        | Own restricted/full access; no amount or role accepted.                                                |
-| GET /bookings/{id}/payments/{attemptId}  | Safe status, amountVnd, purpose, downstream application status                  | Own restricted/full booking grant or Manager.                                                          |
-| POST /bookings/{id}/payments/balance     | expectedBillingRevision; server full outstanding amount                         | Own FULL account or Manager.                                                                           |
-| POST /management/billing/payments/manual | bookingId, purpose, amountVnd, settledAt, evidenceReference (1–120), reason     | Manager; deposit still requires eligibility/reservation; balance cannot exceed authorized outstanding. |
-| POST /management/billing/refunds         | sourcePaymentId, amountVnd, expectedBillingRevision, reason, evidenceReference  | Manager; refundable limit checked transactionally.                                                     |
-| GET /bookings/{id}/billing               | Totals above, payment/charge/refund history with pagination and billingRevision | FULL own booking or Manager; restricted actor sees deposit status only.                                |
-| GET /billing/callbacks/vnpay             | Provider-defined IPN query; provider-required acknowledgement                   | Signature/correlation, not user role; authoritative GET IPN as specified below.                        |
+| Method/path                               | Strict request / response                                                                                            | Authorized actor                                                                                                     |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| POST /bookings/{id}/payments/deposit      | timelineRevisionId; result paymentAttemptId/status/checkoutUrl/expiresAt                                             | Own restricted/full access; no amount or role accepted.                                                              |
+| GET /bookings/{id}/payments/{attemptId}   | Safe status, amountVnd, purpose, downstream application status                                                       | Own restricted/full booking grant or Manager.                                                                        |
+| POST /bookings/{id}/payments/balance      | expectedBillingRevision; server full outstanding amount                                                              | Own FULL account or Manager.                                                                                         |
+| POST /management/billing/payments/manual  | bookingId, purpose, amountVnd, settledAt, evidenceReference (1–120), reason                                          | Manager; deposit still requires eligibility/reservation; balance cannot exceed authorized outstanding.               |
+| POST /management/billing/refunds          | sourcePaymentId, amountVnd, expectedBillingRevision, reason, evidenceReference                                       | Manager; refundable limit checked transactionally.                                                                   |
+| POST /management/billing/refund-approvals | bookingId, expectedBillingRevision, approvedRefundableVnd, basis, reason, evidenceReference; result refundApprovalId | Manager; CREDIT basis names a credit ledger entry, CANCELLATION uses a server-resolved immutable reporting snapshot. |
+| GET /bookings/{id}/billing                | Totals above, payment/charge/refund history with pagination and billingRevision                                      | FULL own booking or Manager; restricted actor sees deposit status only.                                              |
+| GET /billing/callbacks/vnpay              | Provider-defined IPN query; provider-required acknowledgement                                                        | Signature/correlation, not user role; authoritative GET IPN as specified below.                                      |
 
 Callbacks use provider-specific verification/deduplication rather than a client
 `Idempotency-Key` requirement. Client/server mutations use the platform durable key.
+Refund approval is an explicit durable decision before refund recording. It checks
+the current billing revision and available cancellation/credit budget without
+recording a refund or changing ledger totals; retries replay the committed decision.
 Balance initiation serializes against another in-flight balance/manual payment to prevent
 concurrent collection of the same outstanding amount. Every true settlement is recorded;
 a late duplicate business payment becomes explicit credit/reconciliation, not data loss.
@@ -233,3 +254,25 @@ normal application error envelope.
 Source: [official VNPay PAY integration documentation](https://sandbox.vnpayment.vn/apis/docs/thanh-toan-pay/pay.html),
 checked 2026-10-06. Adapter tests include encoding/amount/signature/IPN duplicate fixtures
 and keep credentials/configuration out of source.
+
+### W4 querydr mapping verification (2026-10-08)
+
+The sandbox status endpoint is
+`https://sandbox.vnpayment.vn/merchant_webapi/api/transaction` (POST JSON).
+Use version 2.1.0 and command `querydr`. Request HMAC-SHA512 signs these pipe-separated
+fields in order: RequestId, Version, Command, TmnCode, TxnRef, TransactionDate,
+CreateDate, IpAddr, OrderInfo (all prefixed `vnp_`). TransactionDate is the persisted
+checkout creation date; each status request has a fresh alphanumeric RequestId.
+
+Response verification signs ResponseId, Command, ResponseCode, Message, TmnCode,
+TxnRef, Amount, BankCode, PayDate, TransactionNo, TransactionType, TransactionStatus,
+OrderInfo, PromotionCode, PromotionAmount in that order, preserving empty segments.
+TransactionType must be payment `01`. Query ResponseCode `00` proves the query was
+processed; settlement still requires TransactionStatus `00`. Treat status `02` as
+verified failure only with a successfully processed query. Other unresolved or
+contradictory statuses and unavailable/missing/unverified responses remain UNKNOWN.
+Expiry is not failure evidence. ReturnURL remains display-only.
+
+Source: [official querydr documentation](https://sandbox.vnpayment.vn/apis/docs/truy-van-hoan-tien/querydr%26refund.html).
+The transport uses a fixed sandbox URL, bounded response and timeout. Controlled
+tests verify request/response checksum order independently and never call VNPay.

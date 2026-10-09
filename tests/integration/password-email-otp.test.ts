@@ -75,17 +75,21 @@ suite('email OTP password confirmation', () => {
             id: sessionId,
             clientKind: 'WEB',
             refreshFamilyId: randomUUID(),
+            createdAt: clock,
+            lastSeenAt: clock,
             idleExpiresAt: new Date(clock.getTime() + 86400_000),
             absoluteExpiresAt: new Date(clock.getTime() + 86400_000),
             accessCredentials: {
               create: {
                 tokenHash: randomBytes(32).toString('base64url'),
+                createdAt: clock,
                 expiresAt: new Date(clock.getTime() + 86400_000),
               },
             },
             refreshCredentials: {
               create: {
                 tokenHash: randomBytes(32).toString('base64url'),
+                createdAt: clock,
                 expiresAt: new Date(clock.getTime() + 86400_000),
               },
             },
