@@ -929,3 +929,39 @@ container is stopped and auto-removed. The exact temporary runner is removed aft
 saving its execution profile with the ignored proof logs; fixture credentials are
 removed. Other databases, containers and browser profiles are untouched. All four
 working trees are clean after the acceptance documentation commit.
+
+## Owner UI wording revision — 2026-10-09
+
+The owner requests plain Vietnamese payment labels after reviewing the screenshot
+gallery. This follow-up is implemented on the existing `codex/payments-billing`
+branch in all three clients:
+
+- Management Web `2e94e71`: "Quản lý thanh toán", "Tổng hợp tiền đặt tiệc",
+  "Lịch sử giao dịch" and "Tra cứu trạng thái giao dịch". The lookup now explains
+  that a payment transaction ID retrieves its result and booking update status.
+- Public Web `4b20ef9` and Android source `57ac677`: matching history, transaction
+  ID and uncertainty wording; totals use customer-facing payment terminology.
+- Technical revision/credit notes under totals are removed. Net paid is named
+  explicitly as paid after refunds; positive credit is named excess payment,
+  without promising a refund. Ledger reference IDs remain distinct from payment
+  transaction IDs. Existing test selectors are aligned with the new labels.
+
+No money calculation, permission gate, revision guard, request identity or provider
+verification logic is changed. Backend code and the frozen API contract are unchanged.
+
+All three clients pass lint, typecheck and focused Prettier checks. Unit, integration,
+coverage and build suites are not rerun for this wording-only follow-up; the earlier
+W8 results describe the earlier commits.
+
+Four fresh screenshots render the updated Next.js applications using the existing
+controlled DTO fixture, at 1440px and 390px. Each page reports document width equal
+to viewport width. The screenshots are visually inspected; they are copy review
+evidence, not real API/provider acceptance evidence. Local files are under
+`test-results/ui-review/copy/`; the gallery at `http://127.0.0.1:8019/#N`
+identifies N1–N4 as the new images and A/B as the archived pre-edit W8 images.
+
+**Android runtime is still not verified.** No native screenshot is claimed, and the
+archived C0 image remains dated and labeled as an older version. Owner acceptance
+and W7/W8 native review remain pending. Commits are local; nothing is pushed.
+The owned fixture and Next.js processes are stopped after capture; the screenshot
+gallery remains available for owner review.
