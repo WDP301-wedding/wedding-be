@@ -62,7 +62,7 @@ body, .swagger-ui, .swagger-ui * { font-family: var(--font-sans) !important; let
 .docs-intro p { line-height: 1.65; }
 .docs-intro a { color: #24573d; }
 .swagger-ui .info { margin: 24px 0; }
-@media (max-width: 600px) { .docs-intro { padding: 20px 12px; } .docs-intro h1 { font-size: 24px; } }`;
+@media (max-width: 600px) { .docs-intro { padding: 20px 12px; } .docs-intro h1 { font-size: 24px; } .swagger-ui .responses-inner { overflow-x: auto; } }`;
 
 export function createDocsRouter(options: OpenApiRouterOptions = {}): Router {
   const router = Router();
