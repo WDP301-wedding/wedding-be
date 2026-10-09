@@ -1,4 +1,4 @@
-import type { z } from 'zod';
+import { z } from 'zod';
 import type { ZodOpenApiObject } from 'zod-openapi';
 import {
   depositBodySchema,
@@ -12,6 +12,24 @@ import {
   billingResponseSchema,
   ipnResponseSchema,
 } from './payments-billing.schemas.js';
+import { vnpayIpnFieldsSchema } from '../infrastructure/vnpay.protocol.js';
+
+const ipnParameters = [
+  ...Object.entries(vnpayIpnFieldsSchema.shape).map(([name, schema]) =>
+    schema.meta({ param: { name, in: 'query', required: !schema.isOptional() } }),
+  ),
+  z
+    .string()
+    .regex(/^[\da-f]{128}$/iu)
+    .meta({ param: { name: 'vnp_SecureHash', in: 'query', required: true } }),
+  ...['vnp_BankTranNo', 'vnp_CardType', 'vnp_SecureHashType'].map((name) =>
+    z
+      .string()
+      .max(512)
+      .optional()
+      .meta({ param: { name, in: 'query', required: false } }),
+  ),
+];
 
 const bearer = [{ bearerAuth: [] }];
 const path = (name: string) => ({
@@ -160,7 +178,7 @@ export const paymentsBillingOpenApiPaths: NonNullable<ZodOpenApiObject['paths']>
         'Provider-defined vnp_* parameters including vnp_TxnRef, vnp_Amount, vnp_TmnCode, vnp_ResponseCode, vnp_TransactionStatus and vnp_SecureHash. HTTP 200 acknowledgement codes: 00 processed, 02 already processed, 01 unknown order, 04 amount mismatch, 97 invalid signature, 99 processing failure. Durable evidence acknowledgment can precede downstream application. ReturnURL is display-only.',
       tags: ['Payments and Billing'],
       security: [],
-      parameters: [],
+      parameters: ipnParameters,
       responses: {
         '200': response(
           'Provider acknowledgment, explicitly outside the application envelope.',

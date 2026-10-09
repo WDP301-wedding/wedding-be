@@ -4404,7 +4404,136 @@
       "get": {
         "description": "Provider-defined vnp_* parameters including vnp_TxnRef, vnp_Amount, vnp_TmnCode, vnp_ResponseCode, vnp_TransactionStatus and vnp_SecureHash. HTTP 200 acknowledgement codes: 00 processed, 02 already processed, 01 unknown order, 04 amount mismatch, 97 invalid signature, 99 processing failure. Durable evidence acknowledgment can precede downstream application. ReturnURL is display-only.",
         "operationId": "receiveVnpayIpn",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "vnp_TmnCode",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9]{8}$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vnp_TxnRef",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vnp_Amount",
+            "required": true,
+            "schema": {
+              "pattern": "^\\d{1,12}$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vnp_ResponseCode",
+            "required": true,
+            "schema": {
+              "pattern": "^\\d{2}$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vnp_TransactionStatus",
+            "required": true,
+            "schema": {
+              "pattern": "^\\d{2}$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vnp_TransactionNo",
+            "required": true,
+            "schema": {
+              "pattern": "^\\d{1,15}$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vnp_BankCode",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9]{3,20}$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vnp_OrderInfo",
+            "required": true,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vnp_PayDate",
+            "required": false,
+            "schema": {
+              "pattern": "^\\d{14}$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vnp_CurrCode",
+            "required": false,
+            "schema": {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vnp_SecureHash",
+            "required": true,
+            "schema": {
+              "pattern": "^[\\da-f]{128}$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vnp_BankTranNo",
+            "required": false,
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vnp_CardType",
+            "required": false,
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vnp_SecureHashType",
+            "required": false,
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {

@@ -49,6 +49,12 @@ describe('PB-C3 billing HTTP contract', () => {
     expect(callback?.parameters).not.toContainEqual({
       $ref: '#/components/parameters/IdempotencyKey',
     });
+    expect(callback?.parameters).toContainEqual(
+      expect.objectContaining({ name: 'vnp_SecureHash', in: 'query', required: true }),
+    );
+    expect(callback?.parameters).toContainEqual(
+      expect.objectContaining({ name: 'vnp_Amount', in: 'query', required: true }),
+    );
     const read = document.paths?.['/bookings/{bookingId}/billing']?.get;
     expect(JSON.stringify(read?.parameters)).toMatch(/limit/);
     expect(JSON.stringify(read?.parameters)).toMatch(/throughBillingRevision/);

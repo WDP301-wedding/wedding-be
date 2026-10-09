@@ -20,7 +20,7 @@ export function createVnpayProtocol(config: VnpaySettings): VnpayProtocol {
 }
 
 const field = z.string().max(255);
-const responseSchema = z.object({
+export const vnpayIpnFieldsSchema = z.object({
   vnp_TmnCode: z.string().regex(/^[A-Za-z0-9]{8}$/u),
   vnp_TxnRef: z.string().min(1).max(100),
   vnp_Amount: z.string().regex(/^\d{1,12}$/u),
@@ -39,7 +39,7 @@ const responseSchema = z.object({
     .optional(),
 });
 const ipnKeys = new Set([
-  ...Object.keys(responseSchema.shape),
+  ...Object.keys(vnpayIpnFieldsSchema.shape),
   'vnp_BankTranNo',
   'vnp_CardType',
   'vnp_SecureHash',
@@ -211,7 +211,7 @@ function normalize(
   channel: ProviderEvidence['channel'],
   config: VnpaySettings,
 ): ProviderEvidence {
-  const parsed = responseSchema.safeParse(parameters);
+  const parsed = vnpayIpnFieldsSchema.safeParse(parameters);
   if (!parsed.success) throw new VnpayProtocolError('FIELDS');
   const fields = parsed.data;
   if (fields.vnp_TmnCode !== config.merchantCode) throw new VnpayProtocolError('CORRELATION');
