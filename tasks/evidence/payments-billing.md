@@ -1,14 +1,15 @@
 # SPEC-04 Payments and Billing implementation evidence
 
-Status: **W1-W6 technical evidence; module implementation acceptance pending.**
+Status: **W1-W6 verified; W7 client implementation and browser evidence recorded;
+Android runtime review deferred by the owner; module acceptance pending.**
 Authority: approved `SPEC-payments-billing.md`, `WEDDING-CONTRACT-1@1.1.0`,
 and the eight-wave plan in `tasks/plan.md` Section 21.
 
 ## Branch and scope
 
 All four repositories use `codex/payments-billing` for W1-W8. Verified increments
-are committed on that branch. W1-W6 change only the backend; the three client
-branches retain their existing Booking baseline. W6 publishes the seven approved
+are committed on that branch. W1-W6 change only the backend. W7 adds billing to
+the three clients while retaining their Booking baseline. W6 publishes the seven approved
 HTTP routes and immutable OpenAPI artifact. Module ACCEPTED remains pending W8.
 
 W1 accounting policy and owner ports: backend commit `5018c66`.
@@ -658,3 +659,137 @@ All four W6 microtasks and the **PB-C3 technical checkpoint** are closed. Progre
 clients, billing experiences and four-repository owner acceptance. This does not mark
 SPEC-04 ACCEPTED. All work remains on the single `codex/payments-billing` branch per
 repository, with local commits only and no push or PR.
+
+## W7 generated clients and billing experiences
+
+W7 implements the three client experiences on 2026-10-09. Backend runtime, schema,
+migrations, baseline and OpenAPI remain unchanged. The first three microtasks are
+closed. The fourth has automated/browser proof, with Android runtime explicitly
+deferred by the owner as recorded below. W8 and module ACCEPTED are not claimed.
+
+### Immutable hand-off and commits
+
+All three `api-contract.lock.json` files pin backend source
+`40bc1d279cc6514f2cadbb17fdd6a393e2e3b0f4`, path `openapi/openapi.json`, SHA-256:
+
+`056df7eb37bc9ff8892bdd1271791e0919f8b03db3c6ddb9d4891a5b869c3408`.
+
+Generated declarations are reviewed separately from authored feature files.
+Each client passes `api:check` before network integration and again on final source.
+No dependency, environment, baseline or public contract changes are introduced.
+
+| Repository | Generated contract | Gateway, journal and UI increments | Final client source |
+| --- | --- | --- | --- |
+| Management Web | `27579a1` | `216ed20`, `23e891d`, `c71195a`, `44a121d`, `0990918`, `39d51af`, `bae87c2` | `0b573a9` |
+| Public Web | `2481d1a` | `ed8665c`, `0a46b9b`, `6fa8191`, `ca0f2e3`, `fbc03ca` | `c5e6e0a` |
+| Android | `209b06b` | `99102ee`, `3d84157`, `3604844`, `e15be7b`, `b33368e` | `3866846` |
+
+All commits remain on the same `codex/payments-billing` branch per repository.
+No branch split, push, PR, merge or deployment occurs.
+
+### Delivered behavior and proof
+
+- Management Web adds `/billing`, Manager navigation, six returned totals, immutable
+  history and safe attempt status. Staff and anonymous presentations have no billing
+  controls. Manual evidence includes purpose, positive integer VND, settled time,
+  reason and receipt reference, followed by confirmation. Refund selects a loaded
+  PAYMENT source and confirms evidence plus original expected billing revision.
+  The server checks recorded approval/caps; the UI never creates approval or sends
+  a bank transfer. Successful money recording stays successful if its refresh fails.
+- Public Web adds `/billing` and workspace navigation. Current per-booking FULL
+  access permits totals/history and balance collection; RESTRICTED permits the
+  proposal's deposit amount, authorized deposit initiation and deposit status only.
+  Access downgrade and 401/403/404 remove private billing/attempt data. Checkout
+  bodies contain only the generated timeline UUID or expected billing revision.
+- Android adds its billing route and Home navigation. It retains CONTRACT-BASELINE
+  Section 8.3's FULL grant plus CONFIRMED/COMPLETED booking gate. Prospects are
+  directed to Public Web. Totals, balance confirmation and verified status use the
+  same generated contract. Fixed-revision history holds one page with next/previous
+  navigation. Actions use the installed native `@expo/ui` components and existing
+  theme; opening a browser alone never marks money as received.
+- Each client journals an actor/operation/booking-scoped command UUID, hashes and
+  minimal original replay metadata. Receipt/reason text, amounts and tokens are not
+  persisted there. Network/timeout/5xx/REQUEST_IN_PROGRESS retains the command;
+  changed evidence is blocked; exact retry/reload restores the original revision
+  even after the current head advances or outstanding reaches zero. Corrupt or
+  unavailable storage fails before money execution.
+- Checkout/attempt IDs survive navigation as nonsecret IDs only. Provider return
+  fields are ignored. A restored attempt must be read authoritatively before another
+  collection is enabled; failed status reads keep collection blocked. UNKNOWN hides
+  the continuation link and never becomes failure due to expiry. Settlement success
+  and downstream application completion are displayed separately.
+- Responsive screens preserve the existing ivory/forest visual system, sentence-case
+  Vietnamese, 44px controls, visible focus and contained horizontal history scrolling.
+  UUIDs do not stretch the page. Browser screenshots are inspected directly.
+
+[ADR-009](../../docs/decisions/0009-preserve-client-billing-intents-and-authoritative-status.md)
+records retry persistence and platform/access decisions. Gateway, journal, display,
+form and page/screen test suites prove the exact DTOs, authorization, fixed fences,
+confirmation, uncertain retry, stale response, post-success read failure, denial,
+restricted privacy, reload recovery and settlement/application separation.
+
+The original revision regression first fails before the pending-metadata helper
+exists, then passes with recovery. Temporarily reversing metadata precedence in
+Android's helper fails its recovery test; original bytes are restored before final
+gates. Thresholds, assertions and deadlines are not reduced. Coverage is expanded
+to include the new billing source in each client.
+
+### W7 final local verification
+
+Pinned Node 24.21.0/npm 11.19.0 are used. Every client passes full `format:check`,
+zero-warning `lint`, `typecheck`, `api:check`, `test:coverage`, `build`, `audit:ci`
+and `git diff --check` on the final committed source.
+
+| Client | Full tests | Lines | Branches |
+| --- | --- | --- | --- |
+| Management Web | 124/124 in 18 files | 97.43% | 92.84% |
+| Public Web | 85/85 in 11 files | 98.16% | 95.88% |
+| Android | 54/54 in six suites | 97.92% | 90.47% |
+
+Web per-file 80% line/branch bars and Android's original global bars remain unchanged.
+Fully covered gateway files are present in JSON summaries even when the text reporter
+hides them. Android's production export succeeds. Expo Doctor 1.20.4 passes all
+**21/21** checks on the final retry; earlier network/metadata fetch errors are
+superseded and are not counted as green checks.
+
+### Browser runtime review and Android exception
+
+An isolated headless Edge context runs each web client against a loopback HTTP
+fixture matching W6 DTOs, using fixture-only accounts and inputs. The fixture and
+process-only development base URL do not change production sources or environment
+files. No live VNPay call, merchant credential or real money operation is involved.
+Existing personal browser sessions are not used.
+
+The review captures **21 screens**, with 1440px and 390px viewports. It exercises
+anonymous/Staff denial, loading, server totals, fixed-revision pagination, manual
+confirmation, uncertain manual retry with identical key/body, refund confirmation
+and success, empty history, cached background error, FULL Couple balance,
+checkout pending, UNKNOWN, settlement/application pending, success, denied access,
+and RESTRICTED deposit/status. Reloading a remembered UNKNOWN attempt still blocks
+collection. No page-level horizontal overflow, unexpected console error or page
+exception is recorded.
+
+Ignored local artifacts are retained in backend `test-results/pbw7/`:
+`browser-review.json`, `browser-review.txt`, `browser-review.cjs`,
+`runtime-fixture.mjs` and 21 screenshots. Client final logs use
+`test-results/pbw7-final-*.txt`; coverage summaries remain in each ignored
+`coverage/` directory. These fixtures prove client transport/display behavior;
+W8 must still prove the real Booking/Identity/Billing/database/provider journeys.
+
+**Android runtime is not verified.** The owned emulator booted and Expo Go 57.0.9
+was available, but automatic approval review rejected both Expo startup attempts
+(including localhost/offline), without a specific reason. On 2026-10-09 the owner
+explicitly selected **“Ghi rõ Android runtime chưa kiểm tra”**. No alternate startup
+is used to bypass that rejection. No native rendered-screen, keyboard, font-scale,
+dark-mode, back-navigation or provider-browser claim is made from Jest or export.
+This remaining W7 check is carried into W8 by that owner decision.
+
+Owned fixture/web processes and emulator are stopped. The portable Node runtime
+and ignored proof artifacts are retained. Next's automatically changed mode-specific
+`next-env.d.ts` imports are restored to the original committed mode; API declarations
+retain the verified frozen artifact. Backend code and all eighteen migrations stay
+at W6. Documentation receives only W7 evidence, checklist status and ADR-009.
+
+W7 implementation is complete with three closed microtasks and a partially verified
+fourth. **27/32 microtasks are closed**; Android runtime plus all four W8 tasks
+remain. PB-C4, owner ACCEPTED and dependent print acceptance stay pending.

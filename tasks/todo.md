@@ -2712,14 +2712,41 @@ microtasks. Project-owner ACCEPTED remains pending W8.
 
 #### PB-W7 — Generated clients and billing experiences
 
-- [ ] Update affected client locks only from the committed backend artifact, regenerate
+- [x] Update affected client locks only from the committed backend artifact, regenerate
       API declarations and pass each `api:check` before network integration.
-- [ ] Add Manager billing review, manual evidence and refund flows in Management Web;
+- [x] Add Manager billing review, manual evidence and refund flows in Management Web;
       display backend-derived amounts and include confirmation/error/pending states.
-- [ ] Add authorized Couple billing/payment status to Public Web and Android using
+- [x] Add authorized Couple billing/payment status to Public Web and Android using
       generated types; restricted actors see only the deposit status allowed by contract.
 - [ ] Verify loading, empty, error, denied, unknown/pending, success, destructive and
       narrow-screen states; inspect browser and Android runtime output.
+
+**W7 implementation evidence (2026-10-09):** All three client locks and generated
+declarations pin W6 source `40bc1d279cc6514f2cadbb17fdd6a393e2e3b0f4` and SHA-256
+`056df7eb37bc9ff8892bdd1271791e0919f8b03db3c6ddb9d4891a5b869c3408`.
+Manager billing/manual/refund, Public Web restricted deposit and FULL billing,
+and Android FULL plus confirmed-booking billing/status are implemented. Durable
+client keys preserve original revisions through uncertain responses and reload;
+verified attempt status gates recollection. Server totals and fixed history fences
+remain authoritative. [ADR-009](../docs/decisions/0009-preserve-client-billing-intents-and-authoritative-status.md)
+and [W7 evidence](evidence/payments-billing.md#w7-generated-clients-and-billing-experiences)
+record the decision and verification.
+
+Final coverage passes Manager **124/124**, Web **85/85**, Android **54/54** tests;
+format/lint/typecheck/API/coverage/build/audit pass in all three clients.
+Expo Doctor passes **21/21** checks. Browser inspection covers 21 controlled-fixture
+screens at desktop and 390px widths without unexpected console/page errors.
+
+**Owner-authorized remaining check:** Automatic review rejected both Expo startup
+attempts without a specific reason. The owner explicitly selected
+“Ghi rõ Android runtime chưa kiểm tra”. Android runtime is therefore **not verified**
+and is carried to W8. The fourth W7 checklist remains open solely for that proof;
+its automated and browser state checks are done. W7 implementation is complete,
+three of its four verification microtasks are closed. W1-W6 remain fully verified;
+**27/32 microtasks are closed**, with this runtime check plus all four W8 tasks
+remaining. PB-C4 and SPEC-04 ACCEPTED remain pending. W8 has not started.
+All four repositories retain one `codex/payments-billing` branch, local commits
+only and no push/PR.
 
 #### PB-W8 — Cross-repository acceptance
 
