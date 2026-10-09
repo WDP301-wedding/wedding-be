@@ -2757,7 +2757,7 @@ only and no push/PR.
       crash recovery, refund/balance concurrency and immutable totals with real providers.
 - [ ] Run affected repository format/lint/typecheck/test/coverage/API/build/audit gates,
       clean/upgrade migration checks, browser runtime, Android export and secret/PII scan.
-- [ ] Save `tasks/evidence/payments-billing.md` with requirement/test/commit/digest
+- [x] Save `tasks/evidence/payments-billing.md` with requirement/test/commit/digest
       trace and obtain project-owner ACCEPTED decision before dependent print acceptance.
 
 **W8 evidence (2026-10-09):** Backend commit
@@ -2777,14 +2777,19 @@ privacy assertions pass. Expo Doctor passes **21/21** and Android export passes.
 [W8 evidence](evidence/payments-billing.md#w8-cross-repository-acceptance) records
 source commits, frozen digest, test trace and review limitations.
 
-**Remaining:** Expo startup is again blocked by automatic review without a specific
-reason, so native runtime is explicitly **not verified**. The third W8 microtask
-remains open for PB-C4's Android review; all its other gates pass. Evidence is saved,
-but the fourth microtask still requires the project-owner ACCEPTED decision.
-Together with W7's native runtime item, **29/32 microtasks are closed** and three
-checklist entries remain open. SPEC-04/PB-C4 and dependent print acceptance are not
-marked complete. All four repositories remain on `codex/payments-billing`; local
-commits only, no push/PR/merge/deployment.
+**Owner acceptance (2026-10-09):** After the wording revision, the owner explicitly
+states: "được rồi, nếu test đã ổn, tôi accepted, tiến hành push code". Refreshed
+coverage passes: Management **124/124**, Public **85/85**, Android **54/54**;
+backend contract tests pass **25/25**. Client builds/Android export, API checks and
+the existing audit policy pass. The fourth W8 microtask is complete and SPEC-04
+owner ACCEPTED is recorded. Publication of all four existing
+`codex/payments-billing` branches is authorized.
+
+**Remaining:** Native Android runtime is explicitly **not verified** after the
+documented automatic-review blocks. W7's runtime item and W8's third microtask
+remain open for that proof: **30/32 microtasks closed**, two checklist entries
+open. PB-C4 is not claimed fully verified. The acceptance and push authorization
+do not authorize merging or deployment.
 
 #### Checkpoint P4 — Payments plan ready
 

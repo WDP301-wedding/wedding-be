@@ -1,6 +1,6 @@
 # Specification: Payments and Billing
 
-- Status: **Approved specification and module plan — implementation acceptance pending**
+- Status: **ACCEPTED by the project owner (2026-10-09) — Android native runtime verification remains open**
 - Module plan: approved 2026-10-08; [`tasks/plan.md` Section 21](./tasks/plan.md#21-spec-04-payments-billing-bounded-implementation-plan)
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
 - Module ID: `payments-billing` (`SPEC-04`)
@@ -12,6 +12,22 @@
 - Requirement ownership: PRN-006
 - Depends on: `booking-lifecycle`
 - Consumers: `invitation-studio`, `notifications-automation`, `analytics-dashboard`
+
+### Implementation acceptance record
+
+On 2026-10-09, after reviewing the web screenshots, requesting clearer Vietnamese
+payment labels and receiving the explicit Android-runtime limitation, the project
+owner stated: "được rồi, nếu test đã ổn, tôi accepted, tiến hành push code".
+The refreshed client coverage suites pass (Management 124/124, Public 85/85,
+Android 54/54), as do backend contract tests (25/25), client contract checks,
+web production builds and Android export. See the
+[acceptance evidence](./tasks/evidence/payments-billing.md#owner-acceptance-and-pre-push-verification--2026-10-09).
+
+This records owner acceptance and authorization to publish the existing
+`codex/payments-billing` branches. Android native runtime is still unverified;
+the two native-review checklist items in W7/W8 remain open. Export and automated
+tests do not prove native behavior. PB-C4's technical checklist is not marked
+fully verified, and this approval does not authorize a merge or deployment.
 
 ## 1. Purpose and ownership
 

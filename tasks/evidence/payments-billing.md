@@ -965,3 +965,50 @@ archived C0 image remains dated and labeled as an older version. Owner acceptanc
 and W7/W8 native review remain pending. Commits are local; nothing is pushed.
 The owned fixture and Next.js processes are stopped after capture; the screenshot
 gallery remains available for owner review.
+
+## Owner acceptance and pre-push verification — 2026-10-09
+
+The owner explicitly states: "được rồi, nếu test đã ổn, tôi accepted, tiến hành
+push code". This follows the wording review and the repeated explicit statement
+that Android runtime has not been verified. Owner acceptance is recorded for
+SPEC-04, and publishing all four existing `codex/payments-billing` branches is
+authorized. The two native-review checklist items remain open; PB-C4 is not
+misrepresented as fully verified. No merge, production deployment or live VNPay
+transaction is authorized by this request.
+
+### Refreshed checks after the wording revision
+
+| Repository | Source commit | Coverage tests | Lines / branches | Fresh build result |
+| --- | --- | --- | --- | --- |
+| Management Web | `2e94e717dce189940606adcc79dff4fe19fff0eb` | 124/124 in 18 files | 97.43% / 92.84% | Next.js production build passes |
+| Public Web | `290d5758253b645b240b54575e4998334708f4f5` | 85/85 in 11 files | 98.16% / 95.88% | Next.js production build passes |
+| Android app | `46dacfb1d6917fd8a70bb20f15be611a965ae4af` | 54/54 in 6 files | 97.92% / 90.47% | Android export passes |
+
+The first refreshed Public and Android runs each fail one old expectation that
+still references removed technical revision copy. The tests are corrected without
+changing application behavior or weakening revision guards: Public retries the
+history read and directly verifies `throughBillingRevision: 4`; Android verifies
+the visible page number and retains the previous ledger entry after a mismatched
+page. The full suites above then pass with all existing per-file coverage gates.
+
+Client format checks and frozen-contract checks pass; Public and Android full lint
+and Android typecheck pass again. Management lint/typecheck passed after the
+wording change; both fresh Next.js builds also complete TypeScript checking.
+All four `audit:ci` gates pass under the existing documented exceptions, which
+remain due for review on 2026-10-15. This is not a zero-vulnerability claim.
+
+Backend code is unchanged from the W8 implementation proof. Backend contract tests
+are rerun and pass **25/25 across seven files**; `api:check` passes. The previous
+W8 full-suite, real-PostgreSQL integration, migration and browser proofs retain
+their original scope and source commits and are not claimed rerun here.
+
+The OpenAPI SHA-256 remains
+`056df7eb37bc9ff8892bdd1271791e0919f8b03db3c6ddb9d4891a5b869c3408`.
+Pinned backend artifact commit
+`40bc1d279cc6514f2cadbb17fdd6a393e2e3b0f4` is an ancestor of the branch being
+published. Branch inventories contain no committed runtime environment files,
+private key files or ignored test-result/runtime helpers. Generated Next.js
+environment declaration changes from build commands are restored.
+
+The release scope is owner-accepted source on feature branches. Android native
+runtime remains unverified; the archived C0 image is not current native proof.
