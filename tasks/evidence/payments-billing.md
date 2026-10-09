@@ -1012,3 +1012,131 @@ environment declaration changes from build commands are restored.
 
 The release scope is owner-accepted source on feature branches. Android native
 runtime remains unverified; the archived C0 image is not current native proof.
+
+## Branch review repairs — 2026-10-10
+
+The owner requests fixes for the SPEC-04 branch review across Backend, Public Web,
+Management Web and Android. These repairs remain local on `codex/payments-billing`.
+
+- Verified UNKNOWN IPN evidence can progress to SUCCESS or FAILURE for the same
+  provider transaction. Exact duplicates remain deduplicated; terminal conflicts
+  and transaction ownership conflicts remain quarantined.
+- Managers can explicitly approve a bounded cancellation/credit refund through
+  `POST /management/billing/refund-approvals`, before recording the refund. Strict
+  requests carry the billing revision, reason and evidence; cancellation reporting
+  sequences and approving actor identity are resolved by the server. The approval
+  is serialized by booking, durable and replayable after response loss. It does not
+  change ledger totals. OpenAPI and all three client schema pins are refreshed.
+- Public Web and Android retain the account/booking-scoped checkout key and original
+  revision after checkout creation, restoring the attempt after reload/restart.
+  Money remains blocked until a failure or proven settlement with completed
+  downstream application. All three clients clear the loaded financial view when
+  the editable booking ID changes, and keep unresolved intent targets locked.
+- Android clears cached identity when its persisted refresh token has been removed,
+  so local logout prevents a previously mounted billing session from restoring the
+  old account's checkout recovery.
+- All three clients preserve uncertain request identities through pre-command
+  authorization/not-found failures (401/403/404) and rate limiting (429). A 429
+  result keeps the original draft retryable with the same key and payload.
+- Management distinguishes a local request fingerprint mismatch from an uncertain
+  network result, so an incorrectly retyped draft can be corrected without issuing
+  a fresh money command. Nested approval basis fields participate in the hash.
+- The fixed OpenAPI artifact can be served from a managed `.codex` worktree parent;
+  arbitrary hidden paths remain unroutable. Both web typography guards are restored
+  and shared Vietnamese font/case/spacing declarations meet those guards.
+
+Focused regression tests first reproduced the original callback/HTTP/recovery and
+client-state failures. Real PostgreSQL HTTP/VNPay suites pass 30 tests; the approval
+response-loss recovery suite passes 6 tests; OpenAPI contract suites pass 26 tests.
+
+### Complete repair verification
+
+| Repository | Full coverage tests | Lines / branches | Final gates |
+| --- | --- | --- | --- |
+| Backend | 1,085/1,085, 141 files | 96.92% / 93.22% | Format, lint, typecheck, API check and build pass. No tests skipped; all 142 source coverage records pass the unchanged 80% per-file thresholds. |
+| Management Web | 138/138, 20 files | 97.68% / 93.05% | Format, lint, typecheck, API check, production Webpack build and browser checks pass. |
+| Public Web | 96/96, 12 files | 98.08% / 96.36% | Format, lint, typecheck, API check, production Webpack build and browser checks pass. |
+| Android app | 68/68, seven suites | 97.92% / 90.72% | Format, lint, typecheck, API check and Android export pass. |
+
+The client Vitest runs use one thread worker and CLI-only test/hook deadlines of
+30/60 seconds to accommodate the constrained Windows host. Assertions, application
+deadlines and the existing coverage thresholds remain unchanged. Checks run
+sequentially; interrupted or startup-timeout attempts are not passing evidence.
+
+Backend runs on the owned PostgreSQL 18 cluster, with separate migrated foundation
+and per-suite databases. The temporary runner imports the repository configuration,
+shares modules for 136 ordinary suites and isolates the five module-mock suites.
+Discovery matches all 141 physical test files, with no missing/duplicate files.
+One thread worker and the same CLI-only 30/60-second test/hook allowance preserve
+the original assertions, production deadlines, coverage include/exclude/reporters
+and per-file thresholds. The complete coverage run exits zero in 153.56 seconds;
+the local log is `test-results/review-coverage-complete.log`.
+
+The first complete attempt is not passing evidence: four foundation suites are
+skipped because only the migration-test URL is supplied, and the security bootstrap
+fixture omits the new billing runtime mock. The corrected fixture explicitly mocks
+and verifies billing construction alongside its other module mocks, while retaining
+real CORS/rate-limit assertions. A separate migrated `DATABASE_URL` enables all 12
+foundation tests. A focused fork-worker attempt encounters a Windows native process
+exit; its two idempotency race tests pass with a thread worker, followed by the
+complete no-skip run above. Real billing runtime/HTTP/PostgreSQL suites remain active.
+
+Management browser checks use mocked HTTPS API responses on the production build,
+at 1440px and 390px. Manual payment recovery follows 503, reload, a local payload
+mismatch, 429 and success: the three HTTP writes use the same key and body, and
+the mismatch sends no write. Refund approval sends no command before explicit
+confirmation, then one bounded CREDIT approval with the displayed ledger entry
+and revision; it sends no refund automatically. Editing the booking identifier
+clears the loaded financial forms. Actual `/bookings` glyphs for “Điều phối đặt
+tiệc”, “Hồ sơ tư vấn” and “Đề xuất & vòng đời” use Be Vietnam Pro, authored case
+and normal letter spacing. Screenshots are visually inspected; these pages have
+no horizontal overflow. This verifies those glyphs and billing flows, not every
+existing booking-page layout detail. The owned browser and server are stopped.
+Screenshots are retained locally under ignored `test-results/review-repairs/ui/`.
+
+Public Web first reproduces stale-target and uncertain-key loss with seven failing
+regressions, then passes the focused and complete suites. The final production
+browser fixture verifies that editing A to B removes A's money and actions. All
+three checkout POSTs target B and use the same key through 429, exact retry and
+reload. The unresolved identifier remains locked. Fresh desktop/mobile screenshots
+show Be Vietnam Pro, normal letter spacing and no document overflow; no page errors
+or unexpected console errors occur. The intentional synthetic 429 resource error
+is expected. The browser/server are stopped, and generated Next.js environment
+declarations are restored. These controlled DTO/provider responses are client
+behavior evidence, not a live VNPay transaction.
+
+Android reproduces the missing-credential cached-session failure across separate
+Home/Billing instances, including offline logout, before the four-line restoration
+fix. Five additional failures reproduce lost checkout identity after 401/403/404/429
+and the missing exact 429 retry. All eight focused cases pass after the bounded
+fixes. Full Jest coverage runs in band with the existing global 80% line/branch
+thresholds and unchanged assertions/deadlines.
+The Android Metro export passes with 1,424 modules and a 3.6 MB Hermes bundle.
+All owned App command sessions exit and no App process remains running.
+
+The immutable backend artifact source is
+`bac44777a943820e32d6979963be0c17c927e0cb`, containing the separate IPN,
+refund-approval and managed-artifact repairs. Its working-tree bytes and committed
+Git blob both have SHA-256
+`f84550987077c3669b853018caaacf42e6a2669fa6c751578263957e0758cda5`.
+Client locks and generated headers are regenerated against that source; only pin
+metadata changes after the passing source/build/browser checks. Frozen API and
+format/diff checks are repeated before each local client commit.
+The owned PostgreSQL cluster is stopped after verification; no other task's
+database or runtime is changed.
+
+Local client repair commits are:
+
+| Repository | Commit |
+| --- | --- |
+| Management Web | `562e40b42311c7f414406dfe3ead32b88f5da105` |
+| Public Web | `882469031ae1557533ea5c2545c3fe38be157ed4` |
+| Android app | `cddda19e6e710b6f0baba19630d81ba77026da60` |
+
+All four worktrees remain on `codex/payments-billing`. The client worktrees are
+clean after their commits; this evidence is committed separately from the immutable
+backend artifact source above.
+
+Android native runtime remains unverified: `adb devices` reports no connected device
+or emulator. The export and mocked native boundary tests are not native UI evidence.
+No live provider transaction, push, merge or deployment is performed for these fixes.
