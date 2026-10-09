@@ -167,7 +167,8 @@ export function createVnpayEvidenceRepository(
             ? 'AMOUNT_MISMATCH'
             : proof.correlationConflict !== undefined ||
                 (claim !== null && claim.paymentAttemptId !== attempt.id) ||
-                priorIpn !== null ||
+                (priorIpn !== null &&
+                  !(priorIpn.outcome === 'UNKNOWN' && proof.outcome !== 'UNKNOWN')) ||
                 (terminal !== null && !sameSettlement(terminal, proof)) ||
                 (['SUCCEEDED', 'FAILED'].includes(attempt.state) && terminal === null)
               ? 'CONFLICT'

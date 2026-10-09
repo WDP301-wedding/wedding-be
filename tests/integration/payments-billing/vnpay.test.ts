@@ -161,6 +161,32 @@ databaseDescribe('PB-W4 verified VNPay with real Booking/Identity/PostgreSQL', (
     ).toMatchObject({ RspCode: '99' });
     expect(await paid(another.bookingId)).toBe(0);
   });
+  it.each(['SUCCEEDED', 'FAILED'] as const)(
+    'accepts a proven %s IPN after UNKNOWN evidence for the same provider transaction',
+    async (outcome) => {
+      const f = await fixture();
+      const transactionId = outcome === 'SUCCEEDED' ? '88888881' : '88888882';
+      const unknown = ipnFixture(f.id, {
+        vnp_TransactionNo: transactionId,
+        vnp_TransactionStatus: '01',
+        vnp_PayDate: undefined,
+      });
+      expect(await f.vnpay.processIpn(unknown)).toMatchObject({ RspCode: '00' });
+      const terminal = ipnFixture(f.id, {
+        vnp_TransactionNo: transactionId,
+        ...(outcome === 'FAILED'
+          ? { vnp_ResponseCode: '24', vnp_TransactionStatus: '02', vnp_PayDate: undefined }
+          : {}),
+      });
+      expect(await f.vnpay.processIpn(terminal)).toMatchObject({ RspCode: '00' });
+      expect(await f.vnpay.processIpn(terminal)).toMatchObject({ RspCode: '02' });
+      expect((await f.providers.ledger.getAttempt(f.bookingId, f.id)).state).toBe(outcome);
+      expect(await paid(f.bookingId)).toBe(outcome === 'SUCCEEDED' ? 1 : 0);
+      expect(
+        (await database.prisma.booking.findUniqueOrThrow({ where: { id: f.bookingId } })).phase,
+      ).toBe(outcome === 'SUCCEEDED' ? 'CONFIRMED' : 'DRAFT');
+    },
+  );
   it('holds UNKNOWN through timeout/expiry and recovers from a signed querydr success without a second payment', async () => {
     const query = vi.fn<VnpayStatusGateway['query']>().mockRejectedValueOnce(new Error('timeout'));
     const f = await fixture({ query });
