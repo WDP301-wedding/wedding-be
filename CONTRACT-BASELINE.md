@@ -1750,3 +1750,33 @@ lock. Therefore retirement either precedes and blocks approval or follows a vali
 captured snapshot; a read followed by an unlocked retirement race is not conformant.
 Venue retirement never waits on booking locks while holding venue locks; dependent
 invalidation is emitted through its outbox after the venue change.
+
+### 21.11 SPEC-05 implementation clarification package — 2026-10-09
+
+Status: **Implemented candidate; owner/consumer review pending**. This section records
+the concrete W2–W4 implementation for review; it does not declare a new approved
+baseline version, notification-dispatch readiness or consumer integration acceptance.
+
+- The application registry accepts the frozen readonly renderSnapshot array/rows.
+  `seatingRenderSchema` and `validityProofSchema` are available through the application
+  contract. The producer validates/normalizes the bounded renderSnapshot then calls
+  `computePrintableSeatingDigest`: lowercase SHA-256 of Core canonical JSON,
+  preserving table-array order. Revision/proof identity is additionally checked on
+  replay. Same ID with changed geometry/proof/digest is409; no existing valid live
+  producer workflow is claimed. Seating must review this recipe before hand-off.
+- Publication changed v1 retains the frozen required payload. The separate removal
+  fact `invitation.unpublished` v1 carries required bookingId/publicInvitationId/
+  publishedRevisionId/changedAt, including the last removed immutable revision.
+  Both envelopes are strict in invitation-owned application/publication.events.ts
+  and persisted with publication state in one transaction. Notification consumer
+  subscription/dispatch of the removal fact requires review; existing publication
+  consumers are not silently given a nullable revision or changed fact meaning.
+- The two additive Manager generation recovery endpoints are documented in
+  docs/spec-05-w2-w4-handoff.md and generated OpenAPI. ABANDONED is an explicitly
+  evidenced local terminal decision, not a provider-failure/refund claim. Recovery
+  from a durable private-media artifact retains the original intent and does not
+  regenerate. Missing/unavailable evidence remains pending; old intents never
+  become permission for another paid provider call.
+
+Formal hand-off retains exact reviewed provider commit/artifact/digest, conforming
+consumer pins and actual Seating confirm/invalidate/UoW rollback/race evidence.

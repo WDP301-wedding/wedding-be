@@ -59,15 +59,25 @@ in dependency order; real-provider and module acceptance gates remain unchanged.
 | `core-platform` | [`SPEC-core-platform.md`](./SPEC-core-platform.md) | Approved |
 | `identity-access` | [`SPEC-identity-access.md`](./SPEC-identity-access.md) | Approved |
 | `venue-catalog` | [`SPEC-venue-catalog.md`](./SPEC-venue-catalog.md) | Approved; implementation remains subject to V4 |
-| `booking-lifecycle` | [`SPEC-booking-lifecycle.md`](./SPEC-booking-lifecycle.md) | Approved SPEC; plan/implementation pending |
-| `payments-billing` | [`SPEC-payments-billing.md`](./SPEC-payments-billing.md) | Approved SPEC; plan/implementation pending |
-| `invitation-studio` | [`SPEC-invitation-studio.md`](./SPEC-invitation-studio.md) | Approved SPEC; plan/implementation pending |
+| `booking-lifecycle` | [`SPEC-booking-lifecycle.md`](./SPEC-booking-lifecycle.md) | Approved SPEC; W1 access/timeline read subset implemented; full module pending |
+| `payments-billing` | [`SPEC-payments-billing.md`](./SPEC-payments-billing.md) | Approved SPEC; W1 settlement read subset implemented; full module pending |
+| `invitation-studio` | [`SPEC-invitation-studio.md`](./SPEC-invitation-studio.md) | Approved SPEC; W1–W4 backend verified, media/template/design/AI/publication/public APIs mounted2026-10-09; W5–W8 and formal provider/module acceptance pending |
 | `guest-rsvp` | [`SPEC-guest-rsvp.md`](./SPEC-guest-rsvp.md) | Approved SPEC; plan/implementation pending |
 | `seating-plan` | [`SPEC-seating-plan.md`](./SPEC-seating-plan.md) | Approved SPEC; plan/implementation pending |
 | `staff-operations` | [`SPEC-staff-operations.md`](./SPEC-staff-operations.md) | Approved SPEC; plan/implementation pending |
 | `notifications-automation` | [`SPEC-notifications-automation.md`](./SPEC-notifications-automation.md) | Approved SPEC; owner/plan/implementation pending |
 | `analytics-dashboard` | [`SPEC-analytics-dashboard.md`](./SPEC-analytics-dashboard.md) | Approved SPEC; owner/plan/implementation pending |
 | `release-demo` | [`SPEC-release-demo.md`](./SPEC-release-demo.md) | Approved SPEC; owner/plan/implementation pending |
+
+W1 progress is tracked in [SPEC-05 Section11](./SPEC-invitation-studio.md#11-w1-backend-implementation-checkpoint--2026-10-09)
+and [todo B-EXEC](./tasks/todo.md#b-exec--execution-waves-and-verified-implementation-status).
+The subsequent [SPEC-05 Section12](./SPEC-invitation-studio.md#12-media-http-server-checkpoint--2026-10-09)
+records five media HTTP operations mounted in the server and documented in OpenAPI.
+The subsequent [SPEC-05 Section13](./SPEC-invitation-studio.md#13-w2w4-backend-implementation-checkpoint--2026-10-09)
+records verified template/design/AI, publication/public/generic QR and printable
+registry/proof/owner-lock implementation; detailed closure is at plan20.15.
+Other W6 APIs, complete Booking/Payments implementation, reviewed committed API/client
+pins, whole-module acceptance and release retain their own gates.
 
 ## Dependency Direction
 

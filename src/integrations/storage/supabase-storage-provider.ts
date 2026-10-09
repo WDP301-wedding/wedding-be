@@ -22,6 +22,7 @@ const DEFAULT_PROVIDER_TIMEOUT_MS = 10_000;
 const bucketPattern = /^[a-z\d][a-z\d_-]{2,62}$/u;
 
 interface SupabaseFileBucketLike {
+  download?(objectKey: string): Promise<unknown>;
   createSignedUrl(objectKey: string, expiresInSeconds: number): Promise<unknown>;
   info(objectKey: string): Promise<unknown>;
   remove(objectKeys: string[]): Promise<unknown>;
@@ -124,6 +125,50 @@ export class SupabaseStorageProvider implements StorageProvider {
     }
 
     return stored;
+  }
+
+  async read(reference: StorageObjectReference): Promise<Uint8Array> {
+    const validated = createStorageObjectReference(reference);
+    const bucket = this.#client.from(this.#bucket);
+    if (bucket.download === undefined) throw new ProviderError('unavailable');
+    const response = parseProviderResponse(
+      {
+        safeParse: (value: unknown) => {
+          if (typeof value !== 'object' || value === null)
+            return { success: false as const, error: null };
+          const record = value as { data?: unknown; error?: unknown };
+          if (!(record.data instanceof Blob) && record.data !== null)
+            return { success: false as const, error: null };
+          return { success: true as const, data: { data: record.data, error: record.error } };
+        },
+      },
+      await this.#invoke(() => bucket.download!(validated.objectKey)),
+    );
+    throwProviderFailure(response.error);
+    if (response.data === null || response.data.size < 1 || response.data.size > 25 * 1024 * 1024)
+      throw new ProviderError('failure');
+    const blob = response.data;
+    const buffer = await this.#invoke(() => blob.arrayBuffer());
+    if (!(buffer instanceof ArrayBuffer)) throw new ProviderError('failure');
+    const bytes = new Uint8Array(buffer);
+    const contentType = validated.objectKey.endsWith('.png')
+      ? 'image/png'
+      : validated.objectKey.endsWith('.jpg')
+        ? 'image/jpeg'
+        : 'image/webp';
+    let actual: StoredObject;
+    try {
+      actual = createStoredObject({
+        bytes,
+        contentType,
+        purpose: validated.purpose,
+        resourceId: validated.resourceId,
+      });
+    } catch {
+      throw new ProviderError('failure');
+    }
+    if (actual.objectKey !== validated.objectKey) throw new ProviderError('failure');
+    return bytes;
   }
 
   async createSignedReadUrl(

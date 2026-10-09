@@ -617,3 +617,408 @@ model CatalogMediaAsset {
   @@unique([resourceType, resourceId, displayOrder], map: "CatalogMediaAsset_attached_order_key", where: raw("\"detachedAt\" IS NULL"))
   @@index([resourceType, resourceId, detachedAt])
 }
+
+// SPEC-05 owns these records; bookingId is an opaque upstream reference.
+// No Booking schema or private-media cleanup ownership is introduced here.
+model InvitationMediaPolicy {
+  bookingId String   @id @db.Uuid
+  revision  Int
+  cutoffAt  DateTime @db.Timestamptz(6)
+}
+
+model InvitationMediaAsset {
+  id                    String                @id @db.Uuid
+  bookingId             String                @db.Uuid
+  revision              Int
+  currentFileRevisionId String                @db.Uuid
+  detachedAt            DateTime?             @db.Timestamptz(6)
+  files                 InvitationMediaFile[]
+  currentFile           InvitationMediaFile   @relation("CurrentMediaFile", fields: [currentFileRevisionId, id, bookingId], references: [id, assetId, bookingId], onDelete: NoAction, onUpdate: NoAction, map: "InvitationMediaAsset_current_file_fkey")
+
+  @@unique([id, bookingId])
+  @@unique([currentFileRevisionId, id, bookingId])
+  @@index([bookingId, detachedAt, id])
+}
+
+model InvitationMediaFile {
+  id              String                       @id @db.Uuid
+  bookingId       String                       @db.Uuid
+  assetId         String                       @db.Uuid
+  revision        Int
+  objectKey       String                       @db.VarChar(256)
+  checksumSha256  String                       @db.Char(64)
+  contentType     String                       @db.VarChar(16)
+  sizeBytes       Int
+  width           Int
+  height          Int
+  altText         String                       @db.VarChar(250)
+  acceptedAt      DateTime                     @db.Timestamptz(6)
+  policyRevision  Int
+  cutoffAt        DateTime                     @db.Timestamptz(6)
+  uploadAttemptId String                       @db.Uuid
+  asset           InvitationMediaAsset         @relation(fields: [assetId, bookingId], references: [id, bookingId], onDelete: Restrict)
+  attempt         InvitationMediaUploadAttempt @relation(fields: [uploadAttemptId, bookingId], references: [id, bookingId], onDelete: Restrict)
+  currentFor      InvitationMediaAsset?        @relation("CurrentMediaFile")
+
+  @@unique([assetId, revision])
+  @@unique([id, assetId, bookingId])
+  @@index([bookingId, acceptedAt, id])
+  @@index([objectKey])
+}
+
+model InvitationMediaReceipt {
+  bookingId       String @db.Uuid
+  intentKeyDigest String @db.Char(64)
+  commandDigest   String @db.Char(64)
+  result          Json   @db.JsonB
+
+  @@id([bookingId, intentKeyDigest])
+}
+
+model InvitationMediaAudit {
+  id               String    @id @default(uuid()) @db.Uuid
+  bookingId        String    @db.Uuid
+  action           String    @db.VarChar(64)
+  actorId          String    @db.Uuid
+  requestId        String    @db.Uuid
+  occurredAt       DateTime  @db.Timestamptz(6)
+  assetId          String?   @db.Uuid
+  revision         Int
+  previousCutoffAt DateTime? @db.Timestamptz(6)
+  cutoffAt         DateTime? @db.Timestamptz(6)
+
+  @@index([bookingId, occurredAt, id])
+}
+
+model InvitationMediaUploadAttempt {
+  sequence        BigInt                @unique @default(autoincrement())
+  id              String                @id @db.Uuid
+  bookingId       String                @db.Uuid
+  objectKey       String                @db.VarChar(256)
+  checksumSha256  String                @db.Char(64)
+  contentType     String                @db.VarChar(16)
+  sizeBytes       Int
+  intentKeyDigest String                @db.Char(64)
+  commandDigest   String                @db.Char(64)
+  createdAt       DateTime              @db.Timestamptz(6)
+  policyRevision  Int
+  files           InvitationMediaFile[]
+
+  @@unique([id, bookingId])
+  @@index([bookingId, createdAt, id])
+  @@index([bookingId, sequence])
+  @@index([bookingId, intentKeyDigest, commandDigest])
+}
+
+model InvitationMediaCommand {
+  bookingId       String @db.Uuid
+  intentKeyDigest String @db.Char(64)
+  commandDigest   String @db.Char(64)
+
+  @@id([bookingId, intentKeyDigest])
+}
+
+// W1 prerequisite read-side facts owned by Booking and Payments. No media command
+// creates these records or promotes a booking/payment to CONFIRMED.
+model Booking {
+  id                          String                    @id @default(uuid()) @db.Uuid
+  consultationId              String                    @unique @db.Uuid
+  hallId                      String                    @db.Uuid
+  shiftCode                   String
+  eventDate                   DateTime                  @db.Date
+  phase                       String                    @default("DRAFT")
+  revision                    Int                       @default(1)
+  planningHeadcount           Int                       @default(0)
+  effectiveTimelineRevisionId String?                   @db.Uuid
+  confirmedPaymentId          String?                   @db.Uuid
+  confirmedAt                 DateTime?                 @db.Timestamptz(6)
+  timelines                   BookingTimelineRevision[] @relation("BookingTimelines")
+  deposit                     DepositSettlement?        @relation("BookingDeposit")
+  effectiveTimeline           BookingTimelineRevision?  @relation("EffectiveBookingTimeline", fields: [id, effectiveTimelineRevisionId], references: [bookingId, id], onDelete: NoAction, onUpdate: NoAction, map: "Booking_effective_timeline_fkey")
+  confirmedPayment            DepositSettlement?        @relation("ConfirmedBookingPayment", fields: [id, confirmedPaymentId], references: [bookingId, paymentId], onDelete: NoAction, onUpdate: NoAction, map: "Booking_confirmed_payment_fkey")
+
+  @@unique([id, effectiveTimelineRevisionId])
+  @@unique([id, confirmedPaymentId])
+}
+
+model BookingTimelineRevision {
+  id                  String    @id @default(uuid()) @db.Uuid
+  bookingId           String    @db.Uuid
+  revisionNumber      Int
+  eventDate           DateTime  @db.Date
+  hallName            String
+  shiftCode           String
+  shiftStartTime      String
+  shiftEndTime        String
+  items               Json
+  approvedByManagerAt DateTime? @db.Timestamptz(6)
+  approvedByCoupleAt  DateTime? @db.Timestamptz(6)
+  booking             Booking   @relation("BookingTimelines", fields: [bookingId], references: [id], onDelete: Restrict)
+  effectiveFor        Booking?  @relation("EffectiveBookingTimeline")
+
+  @@unique([bookingId, revisionNumber])
+  @@unique([bookingId, id])
+}
+
+model DepositSettlement {
+  paymentId         String   @id @db.Uuid
+  bookingId         String   @unique @db.Uuid
+  amountVnd         Decimal  @db.Decimal(18, 0)
+  settledAt         DateTime @db.Timestamptz(6)
+  evidenceReference String
+  booking           Booking  @relation("BookingDeposit", fields: [bookingId], references: [id], onDelete: Restrict)
+  confirmedFor      Booking? @relation("ConfirmedBookingPayment")
+
+  @@unique([bookingId, paymentId])
+}
+
+model InvitationTemplate {
+  id               String  @id @db.Uuid
+  revision         Int
+  active           Boolean @default(true)
+  currentVersionId String  @unique @db.Uuid
+}
+
+model InvitationTemplateVersion {
+  id         String   @id @db.Uuid
+  templateId String   @db.Uuid
+  revision   Int
+  content    Json     @db.JsonB
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([templateId, revision])
+}
+
+model InvitationDesign {
+  id                String @id @db.Uuid
+  bookingId         String @db.Uuid
+  revision          Int
+  currentRevisionId String @unique @db.Uuid
+
+  @@index([bookingId, id])
+}
+
+model InvitationDesignRevision {
+  id        String   @id @db.Uuid
+  designId  String   @db.Uuid
+  bookingId String   @db.Uuid
+  revision  Int
+  content   Json     @db.JsonB
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([designId, revision])
+  @@index([bookingId, id])
+}
+
+model InvitationDerivedAsset {
+  id           String   @id @db.Uuid
+  bookingId    String   @db.Uuid
+  sourceFileId String   @db.Uuid
+  object       Json     @db.JsonB
+  width        Int
+  height       Int
+  publicSlug   String   @unique
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([bookingId, id])
+}
+
+model InvitationPublicIdentity {
+  bookingId            String  @id @db.Uuid
+  id                   String  @unique @db.Uuid
+  slug                 String  @unique
+  publicUrl            String
+  revision             Int     @default(0)
+  currentPublicationId String? @unique @db.Uuid
+}
+
+model InvitationPublishedRevision {
+  id               String   @id @db.Uuid
+  bookingId        String   @db.Uuid
+  designRevisionId String   @db.Uuid
+  content          Json     @db.JsonB
+  assetIds         String[] @db.Uuid
+  createdAt        DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([bookingId, id])
+}
+
+model InvitationSeatingRevision {
+  id                      String   @id @db.Uuid
+  bookingId               String   @db.Uuid
+  revisionNumber          Int
+  layoutTemplateVersionId String   @db.Uuid
+  contentDigest           String   @db.Char(64)
+  renderSnapshot          Json     @db.JsonB
+  validityProof           Json?    @db.JsonB
+  createdAt               DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([bookingId, revisionNumber])
+}
+
+model InvitationSeatingState {
+  bookingId      String @id @db.Uuid
+  revisionNumber Int
+  revisionId     String @db.Uuid
+  status         String
+}
+
+model InvitationSeatingInvalidation {
+  id                    String   @id @db.Uuid
+  bookingId             String   @db.Uuid
+  seatingPlanRevisionId String   @unique @db.Uuid
+  revisionNumber        Int
+  reasonCode            String
+  createdAt             DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([bookingId, revisionNumber])
+}
+
+model InvitationPrintableRevision {
+  id                    String   @id @db.Uuid
+  bookingId             String   @db.Uuid
+  designRevisionId      String   @db.Uuid
+  timelineRevisionId    String   @db.Uuid
+  seatingPlanRevisionId String?  @db.Uuid
+  publicInvitationId    String   @db.Uuid
+  contentDigest         String   @db.Char(64)
+  content               Json     @db.JsonB
+  createdAt             DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([bookingId, id])
+}
+
+model InvitationStudioCommand {
+  bookingId     String @db.Uuid
+  intentDigest  String @db.Char(64)
+  commandDigest String @db.Char(64)
+
+  @@id([bookingId, intentDigest])
+}
+
+model InvitationStudioReceipt {
+  bookingId    String @db.Uuid
+  intentDigest String @db.Char(64)
+  result       Json   @db.JsonB
+
+  @@id([bookingId, intentDigest])
+}
+
+model InvitationGenerationIntent {
+  bookingId     String   @db.Uuid
+  intentDigest  String   @db.Char(64)
+  commandDigest String   @db.Char(64)
+  status        String   @default("PENDING")
+  mediaAssetId  String?  @db.Uuid
+  errorCode     String?
+  errorStatus   Int?
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
+
+  @@id([bookingId, intentDigest])
+}
+
+model InvitationStudioOutbox {
+  eventId   String   @id @db.Uuid
+  bookingId String   @db.Uuid
+  eventType String
+  envelope  Json     @db.JsonB
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([bookingId, createdAt, eventId])
+}
+
+model InvitationDerivedUploadAttempt {
+  bookingId    String   @db.Uuid
+  intentDigest String   @db.Char(64)
+  assetId      String   @unique @db.Uuid
+  sourceFileId String   @db.Uuid
+  object       Json     @db.JsonB
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+
+  @@id([bookingId, intentDigest])
+}
+
+model InvitationPrintOrder {
+  id                          String    @id @db.Uuid
+  bookingId                   String    @db.Uuid
+  status                      String
+  revision                    Int       @default(1)
+  currentCommercialRevisionId String?   @db.Uuid
+  receivableChargeId          String?   @db.Uuid
+  approvedAt                  DateTime? @db.Timestamptz(6)
+  readyAt                     DateTime? @db.Timestamptz(6)
+  handedOverAt                DateTime? @db.Timestamptz(6)
+  evidenceReference           String?
+  createdAt                   DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt                   DateTime  @updatedAt @db.Timestamptz(6)
+
+  @@index([bookingId, createdAt])
+}
+
+model InvitationPrintLine {
+  id                  String   @id @db.Uuid
+  orderId             String   @db.Uuid
+  bookingId           String   @db.Uuid
+  designId            String   @db.Uuid
+  quantity            Int
+  printableRevisionId String?  @db.Uuid
+  createdAt           DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([orderId, id])
+  @@index([bookingId, orderId])
+}
+
+model InvitationCommercialRevision {
+  id                  String   @id @db.Uuid
+  orderId             String   @db.Uuid
+  bookingId           String   @db.Uuid
+  revisionNumber      Int
+  linesJson           Json     @db.JsonB
+  orderTotalVnd       Decimal  @db.Decimal(18, 0)
+  estimatedHandoverAt DateTime @db.Timestamptz(6)
+  expiresAt           DateTime @db.Timestamptz(6)
+  createdAt           DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([orderId, revisionNumber])
+  @@index([bookingId, orderId])
+}
+
+model InvitationPrintAudit {
+  sequence   BigInt   @unique @default(autoincrement())
+  id         String   @id @db.Uuid
+  bookingId  String   @db.Uuid
+  orderId    String   @db.Uuid
+  actorId    String   @db.Uuid
+  action     String
+  fromStatus String?
+  toStatus   String
+  metadata   Json?    @db.JsonB
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([bookingId, orderId, createdAt])
+  @@index([bookingId, sequence])
+}
+
+model BookingReceivableCharge {
+  id               String   @id @db.Uuid
+  bookingId        String   @db.Uuid
+  sourceType       String
+  sourceRevisionId String   @db.Uuid
+  amountVnd        Decimal  @db.Decimal(18, 0)
+  acceptedAt       DateTime @db.Timestamptz(6)
+
+  @@unique([bookingId, sourceRevisionId])
+  @@index([bookingId, id])
+}
+
+model BookingChargeCredit {
+  id                 String   @id @db.Uuid
+  bookingId          String   @db.Uuid
+  receivableChargeId String   @db.Uuid
+  sourceAdjustmentId String   @unique @db.Uuid
+  amountVnd          Decimal  @db.Decimal(18, 0)
+  reason             String
+  acceptedAt         DateTime @db.Timestamptz(6)
+
+  @@index([bookingId, receivableChargeId])
+}

@@ -34,6 +34,8 @@ export interface StoredObject extends StorageObjectReference {
 }
 
 export interface StorageProvider {
+  /** Additive server-only original read; older providers fail closed at consumers. */
+  read?(reference: StorageObjectReference): Promise<Uint8Array>;
   put(command: PutObjectCommand): Promise<StoredObject>;
   createSignedReadUrl(
     reference: StorageObjectReference,

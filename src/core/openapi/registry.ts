@@ -33,6 +33,22 @@ import {
   venueCatalogOpenApiPaths,
   venueCatalogOpenApiSchemas,
 } from '../../modules/venue-catalog/http/venue-catalog.openapi.js';
+import {
+  invitationMediaOpenApiPaths,
+  invitationMediaOpenApiSchemas,
+} from '../../modules/invitation-studio/http/media.openapi.js';
+import {
+  invitationStudioOpenApiPaths,
+  invitationStudioOpenApiSchemas,
+} from '../../modules/invitation-studio/http/studio.openapi.js';
+import {
+  invitationPrintOrdersOpenApiPaths,
+  invitationPrintOrdersOpenApiSchemas,
+} from '../../modules/invitation-studio/http/print-orders.openapi.js';
+import {
+  bookingLifecycleOpenApiPaths,
+  bookingLifecycleOpenApiSchemas,
+} from '../../modules/booking-lifecycle/http/booking-lifecycle.openapi.js';
 
 function errorResponse(
   description: string,
@@ -146,6 +162,10 @@ export const openApiRegistry = {
     description: 'Canonical HTTP contract for the wedding management backend.',
   },
   tags: [
+    {
+      name: 'Invitation Media',
+      description: 'Authorized private wedding originals and audited cutoff policy.',
+    },
     { name: 'Health', description: 'Process liveness and dependency readiness.' },
     { name: 'Identity', description: 'Authentication and caller-owned session lifecycle.' },
     {
@@ -153,9 +173,17 @@ export const openApiRegistry = {
       description:
         'Public current catalog reads and Manager-owned immutable catalog administration.',
     },
+    {
+      name: 'Booking Lifecycle',
+      description: 'Consultation, proposal, slot, timeline, approval, and lifecycle workflows.',
+    },
   ],
   paths: {
+    ...invitationMediaOpenApiPaths,
+    ...invitationStudioOpenApiPaths,
+    ...invitationPrintOrdersOpenApiPaths,
     ...venueCatalogOpenApiPaths,
+    ...bookingLifecycleOpenApiPaths,
     '/health/live': {
       get: {
         operationId: 'getHealthLive',
@@ -497,6 +525,10 @@ export const openApiRegistry = {
       SessionInventoryResponse: sessionInventoryResponseSchema,
       SessionSummary: sessionSummarySchema,
       ...venueCatalogOpenApiSchemas,
+      ...invitationMediaOpenApiSchemas,
+      ...invitationStudioOpenApiSchemas,
+      ...invitationPrintOrdersOpenApiSchemas,
+      ...bookingLifecycleOpenApiSchemas,
     },
     parameters: {
       IdempotencyKey: {

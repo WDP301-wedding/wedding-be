@@ -18,6 +18,7 @@ import { createLogger } from './core/logging/logger.js';
 import { getActiveTracingResource } from './core/observability/tracing.js';
 import { createIdentityRuntime } from './modules/identity-access/identity.runtime.js';
 import { createVenueCatalogRuntime } from './modules/venue-catalog/venue-catalog.runtime.js';
+import { createInvitationStudioRuntime } from './modules/invitation-studio/invitation-studio.runtime.js';
 
 type ProcessExitCode = NodeJS.Process['exitCode'];
 type ProcessSignal = 'SIGINT' | 'SIGTERM';
@@ -282,6 +283,17 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     throw error;
   }
 
+  let invitationStudioRuntime: Awaited<ReturnType<typeof createInvitationStudioRuntime>>;
+  try {
+    invitationStudioRuntime = await createInvitationStudioRuntime(config);
+  } catch (error: unknown) {
+    await Promise.allSettled([
+      identityRuntime.resource.close(),
+      venueCatalogRuntime.resource.close(),
+    ]);
+    throw error;
+  }
+
   return startServer({
     corsConfig: config.cors,
     enableOpenApiInProduction: config.openApi.enabledInProduction,
@@ -290,11 +302,17 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     port: config.runtime.port,
     resources:
       tracingResource === undefined
-        ? [identityRuntime.resource, venueCatalogRuntime.resource]
-        : [tracingResource, identityRuntime.resource, venueCatalogRuntime.resource],
+        ? [identityRuntime.resource, venueCatalogRuntime.resource, invitationStudioRuntime.resource]
+        : [
+            tracingResource,
+            identityRuntime.resource,
+            venueCatalogRuntime.resource,
+            invitationStudioRuntime.resource,
+          ],
     registerRoutes: (app) => {
       app.use('/api/v1', identityRuntime.router);
       app.use('/api/v1', venueCatalogRuntime.router);
+      app.use('/api/v1', invitationStudioRuntime.router);
     },
     runtimeEnvironment: config.runtime.environment,
     securityConfig: config.security,

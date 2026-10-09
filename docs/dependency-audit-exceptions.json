@@ -9,16 +9,6 @@
       "mitigation": "CI uses the immutable lockfile and a bounded runner; runtime requests do not load @prisma/config. Upgrade the locked Prisma 7 line when it accepts deepmerge-ts 8 without a forced or major Prisma change.",
       "owner": "backend maintainers",
       "reviewBy": "2026-10-16"
-    },
-    {
-      "advisoryId": "1153173",
-      "package": "mysql2",
-      "severity": "high",
-      "advisoryUrl": "https://github.com/advisories/GHSA-3f6p-5ww8-9rcr",
-      "reachability": "mysql2 is an unused transitive dependency of the pinned Prisma CLI. This service has a PostgreSQL-only Prisma datasource and @prisma/adapter-pg runtime; it never accepts or opens a MySQL connection.",
-      "mitigation": "The lockfile is immutable in CI, PostgreSQL is the only configured provider, and no MySQL credentials or endpoints exist. Upgrade the locked Prisma 7 line when it removes or patches this transitive dependency.",
-      "owner": "backend maintainers",
-      "reviewBy": "2026-10-16"
     }
   ]
 }

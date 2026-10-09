@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { ValidationError } from '../../core/errors/app-error.js';
+import { containsAuthenticationMaterial } from '../../core/security/authentication-material.js';
 
 export const MAX_AI_IMAGE_PROMPT_CHARACTERS = 2_000;
 export const MAX_AI_IMAGE_BYTES = 10 * 1024 * 1024;
@@ -86,6 +87,7 @@ export function parseAiImageInput<TSchema extends z.ZodType>(
 }
 
 function containsProhibitedSensitiveData(value: string): boolean {
+  if (containsAuthenticationMaterial(value)) return true;
   const sensitivePatterns = [
     /\b[\w.%+-]+@[\w.-]+\.[a-z]{2,}\b/iu,
     /(?:\+?\d[\d .()-]{7,}\d)/u,
