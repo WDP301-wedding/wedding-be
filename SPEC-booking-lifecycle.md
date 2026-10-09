@@ -1,7 +1,8 @@
 # Specification: Booking Lifecycle
 
-- Status: **Approved specification — module plan and implementation acceptance pending**
+- Status: **ACCEPTED — SPEC-03 implementation complete; BK-C4 passed**
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
+- Implementation accepted: 2026-10-08 under the owner's conditional acceptance and merge instruction; verification: [`booking lifecycle evidence`](./tasks/evidence/booking-lifecycle.md#bk-c4-implementation-acceptance--2026-10-08)
 - Module ID: `booking-lifecycle` (`SPEC-03`)
 - Contract baseline: `WEDDING-CONTRACT-1@1.1.0`
 - Inherited baseline: `WEDDING-CONTRACT-1@1.0.0` (historical contract)
@@ -126,7 +127,8 @@ events. An outbox saves each fact atomically with its state change. Payloads con
 only the baseline IDs/timestamps/revisions and no contact, token, or live catalog data.
 
 Additive v1 facts emitted by this implementation are `booking.slot-held`
-(`bookingId, holdId, expiresAt`), `booking.deposit-recorded`
+(`bookingId, holdId, expiresAt`), `booking.slot-released`
+(`bookingId, bookingRevision, holdId, releasedAt, reasonCode=BOOKING_CANCELLED`), `booking.deposit-recorded`
 (`bookingId, timelineRevisionId, bookingRevision`),
 `booking.timeline-approval-withdrawn`
 (`bookingId, timelineRevisionId, bookingRevision, party`),
@@ -197,7 +199,11 @@ payment/guest repository read. Payments passes persisted settlement evidence; gu
 passes ordered aggregate plan evidence.
 
 The source commercial revision is created when the latest proposal is accepted for
-deposit. During a reserved/unresolved deposit attempt, price/slot/timeline edits and
+deposit. The first mutual timeline approval freezes the proposal's commercial revision
+ID and acceptance timestamp atomically. Timeline withdrawal, reapproval, and successors
+do not change those immutable commercial terms; approved historical timelines remain
+resolvable. Cancellation releases unpinned active holds in the same transaction and
+retains their terminal history. During a reserved/unresolved deposit attempt, price/slot/timeline edits and
 withdrawals that would invalidate it fail with `DEPOSIT_INTENT_ACTIVE`. Real-provider
 contract tests serialize eligibility/reservation versus edit, expiry, and settlement.
 Exact settled-payment replay is checked before rejecting current phase `CONFIRMED`.
@@ -245,6 +251,10 @@ effective-pointer switch emits supersession. An approved revision is never edite
 Produced/consumed event names and minimum payloads are Section 4 and baseline Section 7.
 Outbox insertion, state revision, audit, and reporting source sequence commit together.
 Invitation-issuance reconciliation is keyed by consultation/request intent, not retry time.
+An existing intent can replay with its original or the current consultation revision,
+while retaining its original recipient, owner, and evidence. Deposit reservations bind
+the authenticated consultation account; system reservations resolve the consultation's
+intended active recipient rather than selecting a grant by creation time.
 A failed email does not create a duplicate consultation/account.
 
 ## 10. Parallel implementation matrix and proposed waves

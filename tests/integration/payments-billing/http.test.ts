@@ -206,6 +206,16 @@ import {
         .set('Idempotency-Key', key)
         .send(body);
     const deposit = await post(receipt(f.bookingId), 'manual-deposit').expect(201);
+    const intent = await database.prisma.bookingDepositIntent.findFirstOrThrow({
+      where: { bookingId: f.bookingId },
+    });
+    expect(intent.coupleAccountId).toBe(f.accountId);
+    expect(
+      await database.prisma.auditLog.findFirst({
+        where: { entityId: f.bookingId, action: 'booking.deposit-intent-reserved' },
+        select: { actorId: true },
+      }),
+    ).toEqual({ actorId: CATALOG_SEED_IDS.actor });
     expect((await post(receipt(f.bookingId), 'manual-deposit').expect(201)).body).toEqual(
       deposit.body,
     );

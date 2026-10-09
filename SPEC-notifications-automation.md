@@ -160,7 +160,7 @@ leakage. Core email/push doubles isolate tests from paid/network providers.
 | Completion/deadline automation                    | Client screens and analytics           | Real due-list/complete command ports; time-controlled integration tests.    |
 
 Proposed waves: durable intents/channel registry; credential/recipient/device adapters;
-event handlers; due scheduler/reconciliation; settings/operations API/client; acceptance.
+event handlers; due scheduler/reconciliation; settings/inbox/operations API/client; acceptance.
 
 | Requirements/scope | Proof                                                                                                           |
 | ------------------ | --------------------------------------------------------------------------------------------------------------- |
@@ -168,3 +168,17 @@ event handlers; due scheduler/reconciliation; settings/operations API/client; ac
 | OPS-002            | No plaintext credential/PII/media in ordinary events/logs/status; encrypted privileged credential path expires. |
 | Automation         | Fake-clock deadline revision change, cancellation, restart, stale reminder, due completion replay.              |
 | Delivery           | Duplicate outbox fact, concurrent claims, unknown timeout, dead-letter/requeue without second intent.           |
+
+## 10. Approved notification-center addition (2026-10-08)
+
+The project owner assigns the entire user-facing notification center to SPEC-09,
+including the scoped inbox, unread/read state, and authorized links to relevant screens.
+No notification-center slice is scheduled immediately after SPEC-03. Existing identity
+credential email delivery retains its accepted implementation and provider boundary.
+
+Inbox/read state is distinct from provider delivery attempts and from business state.
+Reading a notification does not approve, pay, or authorize any domain action. The bounded
+SPEC-09 plan must define inbox DTOs/routes, recipient and booking scope, content privacy,
+retention, deduplication/read semantics, and Web/App acceptance, then integrate real
+producer events and settings/email/push/reminders. This scope approval does not mark
+the new contracts or implementation ready. See [plan Section 21](./tasks/plan.md#21-approved-product-completion-sequence-2026-10-08).

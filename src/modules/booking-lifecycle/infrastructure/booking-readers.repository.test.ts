@@ -76,6 +76,8 @@ function commercial() {
     timelineRevisions: [{ managerApprovedAt: approvedAt, coupleApprovedAt: laterApproval }],
     proposalSnapshot: {
       id: 'commercial',
+      commercialRevisionId: 'commercial',
+      commercialAcceptedAt: approvedAt,
       baseChargeVnd: 10000000 as unknown,
       depositAmountVnd: 3000000 as unknown,
       menuPackageVersionId: 'menu-v1',
@@ -200,7 +202,7 @@ describe('booking provider snapshot repositories', () => {
       depositAmountVnd: 3000000,
       menuPackageVersionId: 'menu-v1',
       tableCount: 2,
-      acceptedAt: laterApproval.toISOString(),
+      acceptedAt: approvedAt.toISOString(),
     });
     f.booking.mockResolvedValue({
       ...value,
@@ -216,7 +218,7 @@ describe('booking provider snapshot repositories', () => {
     ).toMatchObject({
       baseChargeVnd: 10000000,
       depositAmountVnd: 3000000,
-      acceptedAt: laterApproval.toISOString(),
+      acceptedAt: approvedAt.toISOString(),
     });
   });
 
@@ -232,7 +234,10 @@ describe('booking provider snapshot repositories', () => {
       ...commercial(),
       timelineRevisions: [{ managerApprovedAt: approvedAt, coupleApprovedAt: null }],
     },
-    { ...commercial(), currentTimelineRevisionId: 'successor' },
+    {
+      ...commercial(),
+      proposalSnapshot: { ...commercial().proposalSnapshot, commercialAcceptedAt: null },
+    },
   ])('refuses stale or incomplete commercial evidence (%j)', async (value) => {
     const f = fixture();
     f.booking.mockResolvedValue(value);
@@ -242,5 +247,18 @@ describe('booking provider snapshot repositories', () => {
         context,
       ),
     ).rejects.toMatchObject({ code: 'BOOKING_NOT_FOUND' });
+  });
+  it('resolves an accepted historical timeline after its successor becomes current', async () => {
+    const f = fixture();
+    f.booking.mockResolvedValue({ ...commercial(), currentTimelineRevisionId: 'successor' });
+    await expect(
+      createPrismaBookingCommercialSnapshotReader(f.prisma).getAccepted(
+        { bookingId: 'booking', timelineRevisionId: 'timeline' },
+        context,
+      ),
+    ).resolves.toMatchObject({
+      commercialRevisionId: 'commercial',
+      acceptedAt: approvedAt.toISOString(),
+    });
   });
 });

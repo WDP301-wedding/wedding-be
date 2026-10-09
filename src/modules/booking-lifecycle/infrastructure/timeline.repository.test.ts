@@ -255,6 +255,7 @@ function fixture() {
     },
     bookingDepositIntent: { findFirst: vi.fn().mockResolvedValue(null) },
     bookingTimelineItem: {},
+    bookingProposalSnapshot: { updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
     auditLog: { create: vi.fn().mockResolvedValue({}) },
     bookingOutboxEvent: { create: vi.fn().mockResolvedValue({}) },
   };

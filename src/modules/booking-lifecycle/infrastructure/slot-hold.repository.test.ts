@@ -20,6 +20,14 @@ const input = Object.freeze({
 });
 
 describe('PrismaSlotHoldRepository', () => {
+  it('refuses allocation when the database clock cannot be read', async () => {
+    const transaction = transactionFixture();
+    transaction.$queryRaw.mockResolvedValue([]);
+    await expect(
+      createPrismaSlotHoldRepository(client(transaction)).acquire(input),
+    ).rejects.toThrow('The database clock is unavailable.');
+    expect(transaction.bookingSlotHold.create).not.toHaveBeenCalled();
+  });
   it('keeps a confirmed slot unavailable after its temporary hold is consumed', async () => {
     const transaction = transactionFixture();
     transaction.booking.findFirst.mockResolvedValue({ id: 'confirmed-booking' });
@@ -60,6 +68,85 @@ describe('PrismaSlotHoldRepository', () => {
     });
     expect(transaction.auditLog.create).toHaveBeenCalledOnce();
     expect(transaction.bookingOutboxEvent.create).toHaveBeenCalledOnce();
+  });
+
+  it('starts the full hold duration from database time after acquiring the slot lock', async () => {
+    const transaction = transactionFixture();
+    const databaseNow = new Date('2026-10-07T10:05:00.000Z');
+    transaction.$queryRaw.mockResolvedValue([{ now: databaseNow }]);
+
+    await expect(
+      createPrismaSlotHoldRepository(client(transaction)).acquire(input),
+    ).resolves.toMatchObject({ expiresAt: new Date('2026-10-07T10:20:00.000Z') });
+
+    expect(transaction.$executeRaw.mock.invocationCallOrder[0]).toBeLessThan(
+      transaction.$queryRaw.mock.invocationCallOrder[0]!,
+    );
+    expect(transaction.bookingSlotHold.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({ createdAt: databaseNow }),
+    });
+    expect(transaction.auditLog.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({ occurredAt: databaseNow }),
+    });
+  });
+
+  it('does not expire another booking hold when the application clock is ahead', async () => {
+    const transaction = transactionFixture();
+    transaction.bookingSlotHold.findFirst.mockResolvedValue({
+      id: 'other-hold',
+      bookingId: 'other-booking',
+      expiresAt: new Date('2026-10-07T10:10:00.000Z'),
+      depositIntentPin: 'NONE',
+    });
+
+    await expect(
+      createPrismaSlotHoldRepository(client(transaction)).acquire({
+        ...input,
+        acquiredAt: new Date('2026-10-07T11:00:00.000Z'),
+      }),
+    ).rejects.toMatchObject({ code: 'SLOT_NOT_AVAILABLE' });
+    expect(transaction.bookingSlotHold.updateMany).not.toHaveBeenCalled();
+  });
+
+  it('expires elapsed holds even when the application clock is behind', async () => {
+    const transaction = transactionFixture();
+    transaction.bookingSlotHold.findFirst.mockResolvedValue({
+      id: 'other-hold',
+      bookingId: 'other-booking',
+      expiresAt: new Date('2026-10-07T09:59:00.000Z'),
+      depositIntentPin: 'NONE',
+    });
+
+    await expect(
+      createPrismaSlotHoldRepository(client(transaction)).acquire({
+        ...input,
+        acquiredAt: new Date('2026-10-07T09:00:00.000Z'),
+      }),
+    ).resolves.toMatchObject({ replayed: false });
+    expect(transaction.bookingSlotHold.updateMany).toHaveBeenCalledWith({
+      where: expect.objectContaining({ id: 'other-hold' }),
+      data: { status: 'EXPIRED', terminalAt: input.acquiredAt },
+    });
+  });
+
+  it('uses database time to inspect availability despite application clock skew', async () => {
+    const transaction = transactionFixture();
+    await createPrismaSlotHoldRepository(client(transaction)).inspect({
+      hallId: input.hallId,
+      eventDate: input.eventDate,
+      shiftCode: input.shiftCode,
+      databaseNow: new Date('2026-10-07T11:00:00.000Z'),
+    });
+
+    expect(transaction.bookingSlotHold.findFirst).toHaveBeenCalledWith({
+      where: expect.objectContaining({
+        OR: [
+          { expiresAt: { gt: input.acquiredAt } },
+          { depositIntentPin: { in: ['ACTIVE', 'UNKNOWN'] } },
+        ],
+      }),
+      select: { id: true, expiresAt: true },
+    });
   });
 
   it('expires an elapsed unpinned hold before allocating the next contender', async () => {
@@ -131,6 +218,7 @@ describe('PrismaSlotHoldRepository', () => {
 function transactionFixture() {
   return {
     $executeRaw: vi.fn().mockResolvedValue(1),
+    $queryRaw: vi.fn().mockResolvedValue([{ now: input.acquiredAt }]),
     booking: {
       findFirst: vi.fn().mockResolvedValue(null),
       findUnique: vi.fn().mockResolvedValue({
@@ -155,6 +243,7 @@ function transactionFixture() {
 
 function client(transaction: object) {
   return {
+    $queryRaw: (transaction as ReturnType<typeof transactionFixture>).$queryRaw,
     booking: (transaction as ReturnType<typeof transactionFixture>).booking,
     bookingSlotHold: (transaction as ReturnType<typeof transactionFixture>).bookingSlotHold,
     $transaction: vi.fn(async (operation: (value: object) => Promise<unknown>) =>

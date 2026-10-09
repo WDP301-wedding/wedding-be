@@ -154,6 +154,7 @@ describe('PrismaConsultationRepository', () => {
       { ...consultation, revision: 2 },
     ]) {
       transaction.consultation.findUnique.mockResolvedValue(stored);
+      transaction.bookingInvitationIntent.findUnique.mockResolvedValue(null);
       await expect(repository.getOrCreateInvitationIntent(intent)).rejects.toMatchObject({
         code: stored?.revision === 2 ? 'STALE_BOOKING_REVISION' : 'BOOKING_NOT_FOUND',
       });
@@ -283,6 +284,48 @@ describe('PrismaConsultationRepository', () => {
     expect(transaction.bookingInvitationIntent.create).not.toHaveBeenCalled();
     expect(transaction.auditLog.create).not.toHaveBeenCalled();
   });
+
+  it.each(['PENDING', 'ISSUED'] as const)(
+    'reuses the %s invitation after booking creation advances the consultation revision',
+    async (status) => {
+      const durable = { ...storedIntent(intent), status };
+      const transaction = {
+        consultation: {
+          findUnique: vi.fn().mockResolvedValue({
+            id: record.consultationId,
+            managerAccountId: record.managerAccountId,
+            intendedEmailNormalized: 'couple@example.com',
+            revision: 2,
+          }),
+        },
+        bookingInvitationIntent: {
+          findUnique: vi.fn().mockResolvedValue(durable),
+          create: vi.fn(),
+        },
+        auditLog: { create: vi.fn() },
+      };
+      const repository = createPrismaConsultationRepository(transactionClient(transaction));
+      for (const expectedRevision of [1, 2]) {
+        await expect(
+          repository.getOrCreateInvitationIntent({ ...intent, expectedRevision }),
+        ).resolves.toEqual({ ...intent, status });
+      }
+      await expect(
+        repository.getOrCreateInvitationIntent({ ...intent, expectedRevision: 3 }),
+      ).rejects.toMatchObject({ code: 'STALE_BOOKING_REVISION' });
+      transaction.consultation.findUnique.mockResolvedValue({
+        id: record.consultationId,
+        managerAccountId: record.managerAccountId,
+        intendedEmailNormalized: 'couple@example.com',
+        revision: 4,
+      });
+      await expect(
+        repository.getOrCreateInvitationIntent({ ...intent, expectedRevision: 3 }),
+      ).rejects.toMatchObject({ code: 'STALE_BOOKING_REVISION' });
+      expect(transaction.bookingInvitationIntent.create).not.toHaveBeenCalled();
+      expect(transaction.auditLog.create).not.toHaveBeenCalled();
+    },
+  );
 
   it('preserves the durable invitation request across new HTTP trace IDs', async () => {
     const transaction = {

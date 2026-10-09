@@ -9,6 +9,28 @@ import {
 const now = new Date('2026-10-07T10:00:00.000Z');
 
 describe('PrismaBookingDepositRepository', () => {
+  it('binds the deposit to the requesting consultation account rather than the oldest grant', async () => {
+    const transaction = fixture();
+    transaction.consultationAccess.findFirst.mockImplementation((query: unknown) => {
+      const where = (query as { where: { accountId?: string } }).where;
+      return Promise.resolve({ accountId: where.accountId ?? 'older-account' });
+    });
+    await createPrismaBookingDepositRepository(client(transaction), () => now).reserve({
+      bookingId: 'booking',
+      timelineRevisionId: 'timeline',
+      paymentAttemptId: 'attempt',
+      expectedBookingRevision: 4,
+      amountVnd: 3_000_001,
+      expiresAt: '2026-10-07T10:15:00.000Z',
+      requestId: 'request',
+      actorAccountId: 'payer',
+    });
+    expect(transaction.bookingDepositIntent.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ coupleAccountId: 'payer' }),
+      }),
+    );
+  });
   it('requires exact reservation replay and rejects stale, competing, invalid-amount, expired, and raced attempts', async () => {
     const transaction = fixture();
     const repository = createPrismaBookingDepositRepository(client(transaction), () => now, ids());
@@ -24,6 +46,7 @@ describe('PrismaBookingDepositRepository', () => {
     };
     const stored = {
       ...input,
+      coupleAccountId: input.actorAccountId,
       id: input.paymentAttemptId,
       expiresAt: new Date(input.expiresAt),
       bookingRevisionReserved: 5,
@@ -373,6 +396,7 @@ function fixture() {
   const booking = {
     id: 'booking',
     consultationId: 'consultation',
+    consultation: { intendedEmailNormalized: 'couple@example.com' },
     phase: 'DRAFT',
     revision: 4,
     currentTimelineRevisionId: 'timeline',

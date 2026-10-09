@@ -13,6 +13,128 @@ const context: BookingLifecycleMutationContext = Object.freeze({
 const now = new Date('2026-12-21T03:00:00.000Z');
 
 describe('PrismaBookingLifecycleRepository', () => {
+  it.each(['direct', 'approved request'] as const)(
+    'releases the unpinned Draft hold when cancellation is %s',
+    async (mode) => {
+      const transaction = fixture();
+      const booking = await transaction.booking.findUnique();
+      transaction.booking.findUnique.mockResolvedValue({ ...booking, phase: 'DRAFT' });
+      transaction.bookingCancellationRequest.findUnique.mockResolvedValue({
+        id: 'request',
+        bookingId: 'booking',
+        status: 'PENDING',
+      });
+      const hold = { id: 'hold', status: 'ACTIVE', terminalAt: null as Date | null };
+      transaction.bookingSlotHold.findMany.mockResolvedValue([hold]);
+      transaction.bookingSlotHold.updateMany.mockImplementation(() => {
+        hold.status = 'RELEASED';
+        hold.terminalAt = new Date('2026-12-19T00:00:00Z');
+        return Promise.resolve({ count: 1 });
+      });
+      const repository = createPrismaBookingLifecycleRepository(
+        client(transaction),
+        () => new Date('2026-12-19T00:00:00Z'),
+        ids(),
+      );
+      const input = {
+        bookingId: 'booking',
+        expectedBookingRevision: 4,
+        reason: 'Private reason',
+        context,
+      };
+      const result =
+        mode === 'direct'
+          ? await repository.cancel(input)
+          : await repository.decideCancellation({
+              ...input,
+              cancellationRequestId: 'request',
+              decision: 'APPROVE',
+            });
+      expect(result).toEqual({ phase: 'CANCELLED', bookingRevision: 5 });
+      expect(hold).toMatchObject({
+        status: 'RELEASED',
+        terminalAt: new Date('2026-12-19T00:00:00Z'),
+      });
+      expect(transaction.bookingSlotHold.findMany).toHaveBeenCalledWith({
+        where: {
+          bookingId: 'booking',
+          status: 'ACTIVE',
+          depositIntentPin: { notIn: ['ACTIVE', 'UNKNOWN'] },
+        },
+        select: { id: true },
+      });
+      expect(transaction.auditLog.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ action: 'booking.slot-released' }),
+        }),
+      );
+      expect(transaction.bookingOutboxEvent.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ eventType: 'booking.slot-released' }),
+        }),
+      );
+      expect(JSON.stringify(transaction.bookingOutboxEvent.create.mock.calls)).not.toContain(
+        'Private reason',
+      );
+    },
+  );
+
+  it('preserves the hold when a cancellation request is rejected', async () => {
+    const transaction = fixture();
+    transaction.bookingCancellationRequest.findUnique.mockResolvedValue({
+      id: 'request',
+      bookingId: 'booking',
+      status: 'PENDING',
+    });
+    const repository = createPrismaBookingLifecycleRepository(client(transaction));
+    await expect(
+      repository.decideCancellation({
+        bookingId: 'booking',
+        cancellationRequestId: 'request',
+        expectedBookingRevision: 4,
+        decision: 'REJECT',
+        reason: 'Keep event',
+        context,
+      }),
+    ).resolves.toEqual({ phase: 'CONFIRMED', bookingRevision: 5 });
+    expect(transaction.bookingSlotHold.updateMany).not.toHaveBeenCalled();
+    expect(transaction.bookingOutboxEvent.create).toHaveBeenCalledOnce();
+  });
+
+  it.each(['direct', 'approved request'] as const)(
+    'does not release a deposit-pinned hold during blocked %s cancellation',
+    async (mode) => {
+      const transaction = fixture();
+      transaction.bookingDepositIntent.findFirst.mockResolvedValue({ id: 'unknown-deposit' });
+      transaction.bookingCancellationRequest.findUnique.mockResolvedValue({
+        id: 'request',
+        bookingId: 'booking',
+        status: 'PENDING',
+      });
+      const repository = createPrismaBookingLifecycleRepository(
+        client(transaction),
+        () => new Date('2026-12-19T00:00:00Z'),
+      );
+      const input = {
+        bookingId: 'booking',
+        expectedBookingRevision: 4,
+        reason: 'Cancel',
+        context,
+      };
+      await expect(
+        mode === 'direct'
+          ? repository.cancel(input)
+          : repository.decideCancellation({
+              ...input,
+              cancellationRequestId: 'request',
+              decision: 'APPROVE',
+            }),
+      ).rejects.toMatchObject({ code: 'DEPOSIT_INTENT_ACTIVE' });
+      expect(transaction.bookingSlotHold.updateMany).not.toHaveBeenCalled();
+      expect(transaction.booking.updateMany).not.toHaveBeenCalled();
+      expect(transaction.bookingOutboxEvent.create).not.toHaveBeenCalled();
+    },
+  );
   it('conceals missing booking facts and authorization and rejects stale commands', async () => {
     const transaction = fixture();
     const repository = createPrismaBookingLifecycleRepository(client(transaction));
@@ -314,6 +436,10 @@ function fixture() {
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
     },
     bookingDepositIntent: { findFirst: vi.fn().mockResolvedValue(null) },
+    bookingSlotHold: {
+      findMany: vi.fn().mockResolvedValue([]),
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+    },
     bookingDepositSettlement: {},
     auditLog: { create: vi.fn().mockResolvedValue({}) },
     bookingOutboxEvent: { create: vi.fn().mockResolvedValue({}) },

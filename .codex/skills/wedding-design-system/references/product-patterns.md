@@ -14,7 +14,7 @@ Preferred composition:
 - A calm editorial header: Latin wordmark may use Lora; Vietnamese navigation and actions use Be Vietnam Pro.
 - A full-bleed or split hero with warm photography, restrained ivory/forest overlay only where copy needs it, and a concise Be Vietnam Pro statement.
 - Pressed-ivory canvas, asymmetrical but balanced editorial sections, measured photo mattes, and hairline rules instead of decorative color bands.
-- Short labels used selectively; serif section titles; Be Vietnam Pro body copy at a comfortable reading width. Do not force Vietnamese labels or headings to uppercase.
+- Short labels used selectively; Be Vietnam Pro section titles and body copy at a comfortable reading width. Serif styling is restricted to explicit Latin-only wordmarks. Preserve Vietnamese case and normal letter spacing.
 - Alabaster fact or RSVP groups with sage borders; champagne is reserved for framing and small emphasis.
 - One dominant action per section. Vary page rhythm to match the story rather than repeating a card grid.
 

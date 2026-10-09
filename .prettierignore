@@ -3,6 +3,7 @@ dist/
 coverage/
 test-results/
 playwright-report/
+.playwright-mcp/
 package-lock.json
 openapi/openapi.json
 
@@ -13,3 +14,5 @@ openapi/openapi.json
 CAPABILITY-MAP.md
 SPEC-core-platform.md
 tasks/
+
+.local-demo/

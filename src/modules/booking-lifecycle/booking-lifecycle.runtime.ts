@@ -1,6 +1,7 @@
 import type { Request, Router } from 'express';
 
 import type { Config } from '../../config/config.js';
+import { createBookingExperienceRouter } from './http/experience.router.js';
 import { createPrismaClient } from '../../core/database/prisma.js';
 import { createPrismaConsultationRetentionRecorder } from '../identity-access/account/retention-eligibility.port.js';
 import type { ShutdownResource } from '../../core/http/lifecycle.js';
@@ -189,6 +190,7 @@ export async function createBookingLifecycleRuntime(
           }),
         }),
     });
+    router.use(createBookingExperienceRouter(prisma, actorResolver));
     return Object.freeze({
       router,
       providers: createBookingLifecycleProviders(

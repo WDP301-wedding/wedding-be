@@ -4,6 +4,7 @@ coverage/
 src/generated/prisma/
 .vitest/
 test-results/
+.local-demo/
 playwright-report/
 
 .env

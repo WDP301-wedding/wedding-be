@@ -253,3 +253,23 @@ A pending invalidation event cannot make an out-of-range snapshot valid for prin
 Venue eligibility reads hold the lifecycle shared lock until snapshot approval commits;
 a concurrent retirement cannot slip between checking eligibility and accepting the charge.
 The accepted venue eligibility dependency is explicit; no live seating read is introduced.
+
+## 11. Approved print-file output follow-up (2026-10-08)
+
+The project owner schedules print-file output after SPEC-05 implementation acceptance.
+This module retains ownership of approved-revision preview, generated print files,
+and authorized download for restaurant printing. The follow-up plan must specify file
+format, physical dimensions, front/back arrangement, fonts, image quality, QR readability,
+and exact printable revision identity before implementation.
+
+Render the accepted immutable snapshot and its retained assets, not the latest mutable
+design, timeline, or seating plan. No recipient name or personalized credential enters
+the output; all variants retain the booking's generic QR. Private originals remain
+authorized-only. Verify file preview/download, snapshot fidelity after later edits,
+and QR readability with representative generated files.
+
+Output without seating can complete after SPEC-05. Seating-inclusive output requires
+real accepted SPEC-07 snapshot integration; conforming registry fakes cannot close it.
+See [plan Section 21](./tasks/plan.md#21-approved-product-completion-sequence-2026-10-08)
+for the approved product completion sequence. Detailed output contracts and tasks
+remain follow-up work rather than a claim of implementation acceptance.

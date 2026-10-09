@@ -46,6 +46,31 @@ describeWithDatabase('PostgreSQL foundation', () => {
     expect(migration[0]?.rolledBackAt).toBeNull();
   });
 
+  it('uses UTC for timestamp reads and writes while preserving other connection options', async () => {
+    const url = new URL(testDatabaseUrl);
+    url.searchParams.set('options', '-c timezone=Asia/Ho_Chi_Minh -c statement_timeout=12345');
+    const client = createPrismaClient(url.toString());
+    const instant = new Date('2026-10-06T01:00:00.000Z');
+    const read = (connection: Pick<typeof client, '$queryRaw'>) =>
+      connection.$queryRaw<
+        Array<{ timezone: string; statementTimeout: string; instant: Date; epoch: number }>
+      >`
+        SELECT current_setting('TimeZone') AS timezone,
+          current_setting('statement_timeout') AS "statementTimeout",
+          '2026-10-06T01:00:00Z'::timestamptz AS instant,
+          EXTRACT(EPOCH FROM ${instant}::timestamptz)::double precision AS epoch
+      `;
+    try {
+      const expected = [
+        { timezone: 'UTC', statementTimeout: '12345ms', instant, epoch: instant.getTime() / 1000 },
+      ];
+      expect(await read(client)).toEqual(expected);
+      expect(await client.$transaction((transaction) => read(transaction))).toEqual(expected);
+    } finally {
+      await client.$disconnect();
+    }
+  });
+
   it('commits and rolls back PostgreSQL transactions', async () => {
     const namespace = `database-test-${randomUUID()}`;
     const expiresAt = new Date(Date.now() + 60_000);

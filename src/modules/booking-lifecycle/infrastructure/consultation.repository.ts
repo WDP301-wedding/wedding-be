@@ -123,14 +123,15 @@ export function createPrismaConsultationRepository(
             ) {
               throw new BookingLifecycleNotFoundError();
             }
-            if (consultation.revision !== input.expectedRevision) {
-              throw new BookingLifecycleConflictError('STALE_BOOKING_REVISION');
-            }
-
             const existing = await transaction.bookingInvitationIntent.findUnique({
               where: { consultationId: input.consultationId },
             });
-            if (existing !== null) return validateIntentReplay(existing, input);
+            if (existing !== null) {
+              return validateIntentReplay(existing, input, consultation.revision);
+            }
+            if (consultation.revision !== input.expectedRevision) {
+              throw new BookingLifecycleConflictError('STALE_BOOKING_REVISION');
+            }
 
             const created = await transaction.bookingInvitationIntent.create({
               data: {
@@ -362,14 +363,27 @@ type StoredIntent = Readonly<{
   invitationId: string | null;
 }>;
 
-function validateIntentReplay(stored: StoredIntent, input: InvitationIntent): InvitationIntent {
+function validateIntentReplay(
+  stored: StoredIntent,
+  input: InvitationIntent,
+  currentRevision: number = input.expectedRevision,
+): InvitationIntent {
   if (
+    stored.consultationId !== input.consultationId ||
     stored.managerAccountId !== input.managerAccountId ||
     normalizeEmail(stored.intendedEmail).normalized !==
       normalizeEmail(input.intendedEmail).normalized ||
-    stored.expectedRevision !== input.expectedRevision
+    stored.expectedRevision > currentRevision
   ) {
     throw new BookingLifecycleConflictError('INVITATION_INTENT_CONFLICT');
+  }
+  // A durable request survives unrelated workspace writes. Accept its original
+  // revision or the refreshed workspace revision without replacing its evidence.
+  if (
+    input.expectedRevision !== stored.expectedRevision &&
+    input.expectedRevision !== currentRevision
+  ) {
+    throw new BookingLifecycleConflictError('STALE_BOOKING_REVISION');
   }
   return toInvitationIntent(stored);
 }

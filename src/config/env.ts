@@ -195,6 +195,7 @@ const rawEnvironmentSchema = z
     AUTH_REFRESH_ABSOLUTE_TTL_SECONDS: approvedInteger(
       approvedIdentityPolicy.refreshAbsoluteTtlSeconds,
     ),
+    AUTH_OTP_HASH_KEY: optionalString.pipe(z.string().min(32).optional()),
     AUTH_PASSWORD_RESET_TTL_SECONDS: approvedInteger(
       approvedIdentityPolicy.passwordResetTtlSeconds,
     ),
@@ -441,6 +442,7 @@ export type BackendConfig = Readonly<{
     replicaCount: 1;
   }>;
   identityAccess: Readonly<{
+    passwordOtpHashKey: string | undefined;
     trustedProxyHops: 0 | 1;
     refreshCookie: Readonly<{
       name: '__Host-wedding-refresh';
@@ -535,6 +537,7 @@ function pickEnvironment(source: EnvironmentSource): EnvironmentSource {
     AUTH_ACCESS_TOKEN_TTL_SECONDS: source.AUTH_ACCESS_TOKEN_TTL_SECONDS,
     AUTH_REFRESH_IDLE_TTL_SECONDS: source.AUTH_REFRESH_IDLE_TTL_SECONDS,
     AUTH_REFRESH_ABSOLUTE_TTL_SECONDS: source.AUTH_REFRESH_ABSOLUTE_TTL_SECONDS,
+    AUTH_OTP_HASH_KEY: source.AUTH_OTP_HASH_KEY,
     AUTH_PASSWORD_RESET_TTL_SECONDS: source.AUTH_PASSWORD_RESET_TTL_SECONDS,
     AUTH_INVITATION_TTL_SECONDS: source.AUTH_INVITATION_TTL_SECONDS,
     AUTH_INVITATION_REISSUE_LIMIT: source.AUTH_INVITATION_REISSUE_LIMIT,
@@ -694,6 +697,7 @@ function createConfig(environment: RawEnvironment): BackendConfig {
       replicaCount: environment.BACKEND_REPLICA_COUNT,
     }),
     identityAccess: Object.freeze({
+      passwordOtpHashKey: environment.AUTH_OTP_HASH_KEY,
       trustedProxyHops: environment.AUTH_TRUST_PROXY_HOPS ?? 0,
       refreshCookie: Object.freeze({
         name: '__Host-wedding-refresh' as const,

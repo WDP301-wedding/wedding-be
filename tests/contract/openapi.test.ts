@@ -102,8 +102,8 @@ describe('OpenAPI contract', () => {
     const document = createOpenApiDocument();
     const paths = document.paths ?? {};
 
-    expect(paths).toHaveProperty('/auth/password-reset-requests.post.responses.202');
-    expect(paths).toHaveProperty('/auth/password-reset-completions.post.responses.200');
+    expect(paths).toHaveProperty('/auth/password-reset-requests.post.responses.410');
+    expect(paths).toHaveProperty('/auth/password-reset-completions.post.responses.410');
     expect(paths).toHaveProperty('/workspace-invitation-acceptances.post.responses.201');
     expect(paths['/auth/password-reset-completions']?.post?.requestBody).toBeDefined();
     expect(paths['/workspace-invitation-acceptances']?.post?.requestBody).toBeDefined();

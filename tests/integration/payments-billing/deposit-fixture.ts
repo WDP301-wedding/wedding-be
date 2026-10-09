@@ -40,6 +40,8 @@ export async function createPayableBooking(prisma: PrismaClient) {
           proposalSnapshot: {
             create: {
               id: commercialRevisionId,
+              commercialRevisionId,
+              commercialAcceptedAt: now,
               hallId,
               hallName: 'Lotus Hall',
               hallDescription: 'Deposit fixture',

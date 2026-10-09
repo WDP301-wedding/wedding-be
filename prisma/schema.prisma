@@ -198,6 +198,8 @@ model Account {
   id                     String                            @id @default(uuid()) @db.Uuid
   emailNormalized        String                            @unique
   displayEmail           String
+  displayName            String?
+  profileRevision        Int                               @default(1)
   status                 AccountStatus                     @default(ACTIVE)
   disabledAt             DateTime?                         @db.Timestamptz(6)
   piiRetentionEligibleAt DateTime?                         @db.Timestamptz(6)
@@ -212,6 +214,7 @@ model Account {
   issuedInvitations      WorkspaceInvitation[]             @relation("InvitationIssuer")
   sessions               Session[]
   passwordResets         PasswordResetCredential[]
+  passwordOtpChallenges  PasswordOtpChallenge[]
   retentionFacts         AccountRetentionEligibilityFact[]
 
   @@index([status])
@@ -341,6 +344,24 @@ model RefreshCredential {
   @@index([status, expiresAt])
 }
 
+model PasswordOtpChallenge {
+  id                    String           @id @default(uuid()) @db.Uuid
+  accountId             String           @db.Uuid
+  purpose               String
+  sessionId             String?          @db.Uuid
+  codeHash              String
+  credentialFingerprint String
+  attempts              Int              @default(0)
+  status                CredentialStatus @default(ACTIVE)
+  expiresAt             DateTime         @db.Timestamptz(6)
+  createdAt             DateTime         @default(now()) @db.Timestamptz(6)
+  consumedAt            DateTime?        @db.Timestamptz(6)
+  account               Account          @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, purpose, createdAt(sort: Desc)])
+  @@index([expiresAt])
+}
+
 model PasswordResetCredential {
   id         String           @id @default(uuid()) @db.Uuid
   accountId  String           @db.Uuid
@@ -372,6 +393,7 @@ model AccountRetentionEligibilityFact {
 }
 
 model Consultation {
+  intakeRequest           ConsultationRequest?
   id                      String                   @id @db.Uuid
   managerAccountId        String                   @db.Uuid
   intendedEmailNormalized String
@@ -386,6 +408,25 @@ model Consultation {
 
   @@index([managerAccountId, createdAt(sort: Desc)])
   @@index([intendedEmailNormalized])
+}
+
+model ConsultationRequest {
+  id             String        @id @default(uuid()) @db.Uuid
+  submissionId   String        @unique @db.Uuid
+  payloadHash    String
+  displayName    String
+  email          String
+  phone          String
+  preferredDate  DateTime?     @db.Date
+  expectedGuests Int?
+  message        String
+  status         String        @default("NEW")
+  consultationId String?       @unique @db.Uuid
+  consultation   Consultation? @relation(fields: [consultationId], references: [id], onDelete: Restrict)
+  createdAt      DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime      @updatedAt @db.Timestamptz(6)
+
+  @@index([status, createdAt, id], map: "ConsultationRequest_status_created")
 }
 
 model Booking {
@@ -837,6 +878,8 @@ model BookingProposalSnapshot {
   planningHeadcount    Int
   baseChargeVnd        Decimal             @db.Decimal(18, 0)
   depositAmountVnd     Decimal             @db.Decimal(18, 0)
+  commercialRevisionId String?             @unique @db.Uuid
+  commercialAcceptedAt DateTime?           @db.Timestamptz(6)
   createdAt            DateTime            @default(now()) @db.Timestamptz(6)
   booking              Booking             @relation(fields: [bookingId], references: [id], onDelete: Restrict)
   hall                 Hall                @relation(fields: [hallId], references: [id], onDelete: Restrict)
