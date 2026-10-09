@@ -67,7 +67,7 @@ databaseDescribe('SPEC-05 upgrade from accepted Booking ownership', () => {
               [revision, orderId, bookingId, number, amount],
             );
             await client.query(
-              `INSERT INTO "BookingReceivableCharge" (id,"bookingId","sourceType","sourceRevisionId","amountVnd","acceptedAt") VALUES ($1,$2,'PRINT_ORDER',$3,$4,$5)`,
+              `INSERT INTO "BillingLedgerEntry" (id,"bookingId",kind,"sourceType","sourceRevisionId","amountVnd","occurredAt",revision) VALUES ($1,$2,'CHARGE','PRINT_ORDER',$3,$4,$5,0)`,
               [charge, bookingId, revision, amount, time],
             );
           }

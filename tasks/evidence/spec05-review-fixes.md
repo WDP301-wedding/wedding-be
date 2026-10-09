@@ -43,3 +43,18 @@ The integration merge also fixes serving explicitly allowlisted Swagger assets
 from a managed `.codex` worktree, and makes OTP test creation timestamps use the
 fixture clock so expiry constraints remain valid as calendar time advances.
 Canonical owner constraints replace assertions against the removed fake tables.
+
+## Release integration with SPEC-04
+
+Before publishing, integrated accepted `main` at `4652b5e` (PR #14).
+Invitation print charges and replacement credits now use `BillingLedgerEntry`
+through the accepted Billing service, enlisted in the existing Invitation
+transaction. Removed the unused branch-only financial tables from the new,
+unreleased migrations. Historical print snapshot backfill also reads the canonical
+ledger. The Payments/Billing and Invitation runtimes both remain mounted.
+
+The integrated release passes 1,094 unit tests and 33 contract tests, without
+skips. All 26 migrations deploy successfully to a fresh PostgreSQL database.
+Formatting, production build, OpenAPI consistency, and the dependency audit pass.
+The audit uses the repository's documented, unexpired exception. PostgreSQL
+integration and CI gates are checked separately before merging this release.

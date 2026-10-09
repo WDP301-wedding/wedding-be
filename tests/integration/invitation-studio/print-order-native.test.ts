@@ -169,7 +169,7 @@ describe('Print Order Integration (IS-W5 / PRN-001..009)', () => {
     expect(approvedOrder.lines[1]?.printableRevisionId).not.toBeNull();
 
     // PRN-006: Check registered billing charge
-    const charge = await prisma.bookingReceivableCharge.findUnique({
+    const charge = await prisma.billingLedgerEntry.findUnique({
       where: { id: approvedOrder.receivableChargeId! },
     });
     expect(charge).not.toBeNull();
@@ -289,7 +289,7 @@ describe('Print Order Integration (IS-W5 / PRN-001..009)', () => {
     expect(cancelOrder.revision).toBe(2);
 
     // No charges or credits in database
-    const charges = await prisma.bookingReceivableCharge.findMany({
+    const charges = await prisma.billingLedgerEntry.findMany({
       where: { bookingId: f.bookingId },
     });
     expect(charges).toHaveLength(0);
@@ -381,8 +381,8 @@ describe('Print Order Integration (IS-W5 / PRN-001..009)', () => {
     expect(cancelOrder.revision).toBe(4);
 
     // Verify credit in database
-    const credits = await prisma.bookingChargeCredit.findMany({
-      where: { bookingId: f.bookingId, receivableChargeId: chargeId },
+    const credits = await prisma.billingLedgerEntry.findMany({
+      where: { kind: 'CREDIT_ADJUSTMENT', bookingId: f.bookingId, sourceEntryId: chargeId },
     });
     expect(credits).toHaveLength(1);
     expect(credits[0]?.amountVnd.toNumber()).toBe(50 * 20000); // 1.000.000 VND
@@ -492,15 +492,15 @@ describe('Print Order Integration (IS-W5 / PRN-001..009)', () => {
     expect(replOrder.receivableChargeId).not.toBe(oldChargeId);
 
     // Verify old charge was credited with PRINT_REPLACED
-    const credits = await prisma.bookingChargeCredit.findMany({
-      where: { bookingId: f.bookingId, receivableChargeId: oldChargeId },
+    const credits = await prisma.billingLedgerEntry.findMany({
+      where: { kind: 'CREDIT_ADJUSTMENT', bookingId: f.bookingId, sourceEntryId: oldChargeId },
     });
     expect(credits).toHaveLength(1);
     expect(credits[0]?.reason).toBe('PRINT_REPLACED');
     expect(credits[0]?.amountVnd.toNumber()).toBe(1000000);
 
     // Verify new charge exists with 1.200.000 VND
-    const newCharge = await prisma.bookingReceivableCharge.findUnique({
+    const newCharge = await prisma.billingLedgerEntry.findUnique({
       where: { id: replOrder.receivableChargeId! },
     });
     expect(newCharge).not.toBeNull();

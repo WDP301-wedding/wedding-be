@@ -73,10 +73,10 @@ suite('email OTP password confirmation', () => {
         sessions: {
           create: {
             id: sessionId,
-            createdAt: clock,
-            lastSeenAt: clock,
             clientKind: 'WEB',
             refreshFamilyId: randomUUID(),
+            createdAt: clock,
+            lastSeenAt: clock,
             idleExpiresAt: new Date(clock.getTime() + 86400_000),
             absoluteExpiresAt: new Date(clock.getTime() + 86400_000),
             accessCredentials: {

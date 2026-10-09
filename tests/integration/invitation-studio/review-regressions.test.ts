@@ -68,6 +68,11 @@ describe('SPEC-05 review regressions', () => {
 
   it('rejects superseded replacement approval without changing the accepted charge', async () => {
     const { f, orders, approved, lineId, estimatedHandoverAt } = await approvedOrder();
+    expect(
+      await database.prisma.billingLedgerEntry.findUnique({
+        where: { id: approved.receivableChargeId! },
+      }),
+    ).toMatchObject({ bookingId: f.bookingId, kind: 'CHARGE', sourceType: 'PRINT_ORDER' });
     const older = await orders.proposeReplacement(
       approved.orderId,
       {
@@ -115,7 +120,9 @@ describe('SPEC-05 review regressions', () => {
       receivableChargeId: approved.receivableChargeId,
     });
     expect(
-      await database.prisma.bookingChargeCredit.count({ where: { bookingId: f.bookingId } }),
+      await database.prisma.billingLedgerEntry.count({
+        where: { bookingId: f.bookingId, kind: 'CREDIT_ADJUSTMENT' },
+      }),
     ).toBe(0);
 
     const accepted = await orders.approveReplacement(
@@ -132,8 +139,12 @@ describe('SPEC-05 review regressions', () => {
       newer.pendingReplacementProposal!.commercialRevisionId,
     );
     expect(accepted.currentCommercialRevision!.orderTotalVnd).toBe(30_000);
-    const credits = await database.prisma.bookingChargeCredit.findMany({
-      where: { bookingId: f.bookingId, receivableChargeId: approved.receivableChargeId! },
+    const credits = await database.prisma.billingLedgerEntry.findMany({
+      where: {
+        kind: 'CREDIT_ADJUSTMENT',
+        bookingId: f.bookingId,
+        sourceEntryId: approved.receivableChargeId!,
+      },
     });
     expect(credits).toHaveLength(1);
     expect(Number(credits[0]!.amountVnd)).toBe(10_000);

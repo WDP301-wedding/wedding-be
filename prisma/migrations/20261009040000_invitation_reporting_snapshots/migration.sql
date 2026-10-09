@@ -57,8 +57,8 @@ UPDATE "InvitationPrintAudit" a SET "reportingSnapshot" = jsonb_build_object(
 )
 FROM history h
 LEFT JOIN "InvitationCommercialRevision" rev ON rev."id"::text = h."commercialRevisionId"
-LEFT JOIN "BookingReceivableCharge" charge ON charge."sourceRevisionId" = rev."id"
-  AND charge."bookingId" = h."bookingId" AND h."approvedAt" IS NOT NULL
+LEFT JOIN "BillingLedgerEntry" charge ON charge."sourceRevisionId" = rev."id"
+  AND charge."bookingId" = h."bookingId" AND charge."kind" = 'CHARGE' AND charge."sourceType" = 'PRINT_ORDER' AND h."approvedAt" IS NOT NULL
 WHERE a."id" = h."id";
 
 ALTER TABLE "InvitationPrintAudit" ENABLE TRIGGER studio_immutable;

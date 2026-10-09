@@ -54,6 +54,25 @@ export function createPrismaBookingDepositRepository(
     reserve(input: Parameters<BookingDepositRepository['reserve']>[0]) {
       return prisma.$transaction(
         async (transaction) => {
+          // A Manager records manual evidence for the intended Couple. Keep the
+          // authenticated actor for audit while resolving the reservation owner
+          // from Booking; other actors must own their consultation access.
+          const manager =
+            input.reserveForIntendedCouple !== true || input.actorAccountId === null
+              ? null
+              : await transaction.account.findFirst({
+                  where: {
+                    id: input.actorAccountId,
+                    status: 'ACTIVE',
+                    roles: { some: { role: 'MANAGER' } },
+                  },
+                  select: { id: true },
+                });
+          if (input.reserveForIntendedCouple === true && manager === null) {
+            throw new BookingLifecycleNotFoundError();
+          }
+          const reservationAccountId =
+            input.reserveForIntendedCouple === true ? null : input.actorAccountId;
           const existing = await transaction.bookingDepositIntent.findUnique({
             where: { id: input.paymentAttemptId },
           });
@@ -61,8 +80,8 @@ export function createPrismaBookingDepositRepository(
             if (
               existing.bookingId !== input.bookingId ||
               existing.timelineRevisionId !== input.timelineRevisionId ||
-              (input.actorAccountId !== null &&
-                existing.coupleAccountId !== input.actorAccountId) ||
+              (reservationAccountId !== null &&
+                existing.coupleAccountId !== reservationAccountId) ||
               decimalNumber(existing.amountVnd) !== input.amountVnd ||
               existing.expiresAt.toISOString() !== input.expiresAt
             ) {
@@ -84,7 +103,7 @@ export function createPrismaBookingDepositRepository(
             transaction,
             input,
             now(),
-            input.actorAccountId,
+            reservationAccountId,
           );
           if (!eligibility.eligible) {
             throw new BookingDepositConflictError(

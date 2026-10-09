@@ -1,4 +1,7 @@
+import { isIP } from 'node:net';
+
 import { z } from 'zod';
+import type { VnpaySettings } from '../modules/payments-billing/application/vnpay.port.js';
 
 const deployedEnvironments = new Set(['staging', 'production']);
 const loopbackHosts = new Set(['localhost', '127.0.0.1', '[::1]']);
@@ -244,6 +247,20 @@ const rawEnvironmentSchema = z
     SUPABASE_SERVICE_ROLE_KEY: optionalString,
     SUPABASE_STORAGE_BUCKET: optionalString,
     RESEND_API_KEY: optionalString,
+    VNPAY_TMN_CODE: optionalString.pipe(
+      z
+        .string()
+        .regex(/^[A-Za-z0-9]{8}$/u)
+        .optional(),
+    ),
+    VNPAY_HASH_SECRET: optionalString.pipe(z.string().max(1024).optional()),
+    VNPAY_RETURN_URL: optionalString.pipe(httpUrl.optional()),
+    VNPAY_QUERY_IP: optionalString.pipe(
+      z
+        .string()
+        .refine((value) => isIP(value) !== 0)
+        .optional(),
+    ),
     RESEND_FROM_EMAIL: optionalString.pipe(resendFromEmail.optional()),
     BREVO_API_KEY: optionalString.pipe(
       z
@@ -350,6 +367,26 @@ const rawEnvironmentSchema = z
       context,
     );
     requireAllOrNone(environment, ['RESEND_API_KEY', 'RESEND_FROM_EMAIL'], context);
+    requireAllOrNone(
+      environment,
+      ['VNPAY_TMN_CODE', 'VNPAY_HASH_SECRET', 'VNPAY_RETURN_URL', 'VNPAY_QUERY_IP'],
+      context,
+    );
+    if (environment.VNPAY_RETURN_URL !== undefined && URL.canParse(environment.VNPAY_RETURN_URL)) {
+      const url = new URL(environment.VNPAY_RETURN_URL);
+      if (
+        url.username !== '' ||
+        url.password !== '' ||
+        url.hash !== '' ||
+        (url.protocol !== 'https:' && (deployed || !loopbackHosts.has(url.hostname)))
+      ) {
+        context.addIssue({
+          code: 'custom',
+          path: ['VNPAY_RETURN_URL'],
+          message: 'Use a credential-free HTTPS return URL, or loopback HTTP in development/test.',
+        });
+      }
+    }
     requireAllOrNone(environment, ['BREVO_API_KEY', 'BREVO_FROM_EMAIL'], context);
     const hasBrevo =
       environment.BREVO_API_KEY !== undefined || environment.BREVO_FROM_EMAIL !== undefined;
@@ -469,6 +506,7 @@ export type BackendConfig = Readonly<{
   email: EmailConfig;
   aiImage: AiImageConfig;
   metrics: MetricsConfig;
+  vnpay: DisabledProvider | (Readonly<{ enabled: true }> & VnpaySettings);
   openApi: Readonly<{ enabledInProduction: boolean }>;
   invitationStudio: Readonly<{ publicOrigin: string | null }>;
   telemetry: Readonly<{ otlpEndpoint: string | undefined }>;
@@ -548,6 +586,10 @@ function pickEnvironment(source: EnvironmentSource): EnvironmentSource {
     SUPABASE_SERVICE_ROLE_KEY: source.SUPABASE_SERVICE_ROLE_KEY,
     SUPABASE_STORAGE_BUCKET: source.SUPABASE_STORAGE_BUCKET,
     RESEND_API_KEY: source.RESEND_API_KEY,
+    VNPAY_TMN_CODE: source.VNPAY_TMN_CODE,
+    VNPAY_HASH_SECRET: source.VNPAY_HASH_SECRET,
+    VNPAY_RETURN_URL: source.VNPAY_RETURN_URL,
+    VNPAY_QUERY_IP: source.VNPAY_QUERY_IP,
     RESEND_FROM_EMAIL: source.RESEND_FROM_EMAIL,
     BREVO_API_KEY: source.BREVO_API_KEY,
     BREVO_FROM_EMAIL: source.BREVO_FROM_EMAIL,
@@ -777,6 +819,19 @@ function createConfig(environment: RawEnvironment): BackendConfig {
     email,
     aiImage,
     metrics,
+    vnpay:
+      environment.VNPAY_TMN_CODE !== undefined &&
+      environment.VNPAY_HASH_SECRET !== undefined &&
+      environment.VNPAY_RETURN_URL !== undefined &&
+      environment.VNPAY_QUERY_IP !== undefined
+        ? Object.freeze({
+            enabled: true,
+            merchantCode: environment.VNPAY_TMN_CODE,
+            hashSecret: environment.VNPAY_HASH_SECRET,
+            returnUrl: environment.VNPAY_RETURN_URL,
+            queryIp: environment.VNPAY_QUERY_IP,
+          })
+        : Object.freeze({ enabled: false }),
     openApi: Object.freeze({
       enabledInProduction: environment.OPENAPI_ENABLED,
     }),

@@ -53,6 +53,10 @@ import {
   bookingLifecycleOpenApiPaths,
   bookingLifecycleOpenApiSchemas,
 } from '../../modules/booking-lifecycle/http/booking-lifecycle.openapi.js';
+import {
+  paymentsBillingOpenApiPaths,
+  paymentsBillingOpenApiSchemas,
+} from '../../modules/payments-billing/http/payments-billing.openapi.js';
 
 function errorResponse(
   description: string,
@@ -189,6 +193,7 @@ export const openApiRegistry = {
     ...experienceOpenApiPaths,
     ...venueCatalogOpenApiPaths,
     ...bookingLifecycleOpenApiPaths,
+    ...paymentsBillingOpenApiPaths,
     '/health/live': {
       get: {
         operationId: 'getHealthLive',
@@ -529,6 +534,7 @@ export const openApiRegistry = {
       ...invitationStudioOpenApiSchemas,
       ...invitationPrintOrdersOpenApiSchemas,
       ...bookingLifecycleOpenApiSchemas,
+      ...paymentsBillingOpenApiSchemas,
     },
     parameters: {
       IdempotencyKey: {

@@ -20,6 +20,7 @@ import { createIdentityRuntime } from './modules/identity-access/identity.runtim
 import { createVenueCatalogRuntime } from './modules/venue-catalog/venue-catalog.runtime.js';
 import { createInvitationStudioRuntime } from './modules/invitation-studio/invitation-studio.runtime.js';
 import { createBookingLifecycleRuntime } from './modules/booking-lifecycle/booking-lifecycle.runtime.js';
+import { createPaymentsBillingRuntime } from './modules/payments-billing/payments-billing.runtime.js';
 
 type ProcessExitCode = NodeJS.Process['exitCode'];
 type ProcessSignal = 'SIGINT' | 'SIGTERM';
@@ -294,6 +295,18 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     throw error;
   }
 
+  let paymentsBillingRuntime: Awaited<ReturnType<typeof createPaymentsBillingRuntime>>;
+  try {
+    paymentsBillingRuntime = await createPaymentsBillingRuntime(config);
+  } catch (error: unknown) {
+    await Promise.allSettled([
+      identityRuntime.resource.close(),
+      venueCatalogRuntime.resource.close(),
+      bookingLifecycleRuntime.resource.close(),
+    ]);
+    throw error;
+  }
+
   let invitationStudioRuntime: Awaited<ReturnType<typeof createInvitationStudioRuntime>>;
   try {
     invitationStudioRuntime = await createInvitationStudioRuntime(config);
@@ -302,6 +315,7 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
       identityRuntime.resource.close(),
       venueCatalogRuntime.resource.close(),
       bookingLifecycleRuntime.resource.close(),
+      paymentsBillingRuntime.resource.close(),
     ]);
     throw error;
   }
@@ -319,6 +333,7 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
             venueCatalogRuntime.resource,
             bookingLifecycleRuntime.resource,
             invitationStudioRuntime.resource,
+            paymentsBillingRuntime.resource,
           ]
         : [
             tracingResource,
@@ -326,12 +341,14 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
             venueCatalogRuntime.resource,
             invitationStudioRuntime.resource,
             bookingLifecycleRuntime.resource,
+            paymentsBillingRuntime.resource,
           ],
     registerRoutes: (app) => {
       app.use('/api/v1', identityRuntime.router);
       app.use('/api/v1', venueCatalogRuntime.router);
       app.use('/api/v1', invitationStudioRuntime.router);
       app.use('/api/v1', bookingLifecycleRuntime.router);
+      app.use('/api/v1', paymentsBillingRuntime.router);
     },
     runtimeEnvironment: config.runtime.environment,
     securityConfig: config.security,

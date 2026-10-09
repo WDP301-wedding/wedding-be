@@ -5,6 +5,7 @@ import { createApp } from '../../src/app.js';
 import { parseEnvironment } from '../../src/config/env.js';
 import { bootstrap } from '../../src/server.js';
 import { createVenueCatalogRuntime } from '../../src/modules/venue-catalog/venue-catalog.runtime.js';
+import { createPaymentsBillingRuntime } from '../../src/modules/payments-billing/payments-billing.runtime.js';
 
 vi.mock('../../src/modules/identity-access/identity.runtime.js', async () => {
   const { Router } = await import('express');
@@ -34,6 +35,16 @@ vi.mock('../../src/modules/booking-lifecycle/booking-lifecycle.runtime.js', asyn
     createBookingLifecycleRuntime: vi.fn(() => ({
       router: Router(),
       resource: { name: 'booking-lifecycle-database', close: vi.fn() },
+    })),
+  };
+});
+
+vi.mock('../../src/modules/payments-billing/payments-billing.runtime.js', async () => {
+  const { Router } = await import('express');
+  return {
+    createPaymentsBillingRuntime: vi.fn(() => ({
+      router: Router(),
+      resource: { name: 'payments-billing-database', close: vi.fn() },
     })),
   };
 });
@@ -240,6 +251,7 @@ describe('HTTP security baseline', () => {
 
     try {
       expect(createVenueCatalogRuntime).toHaveBeenCalledWith(config);
+      expect(createPaymentsBillingRuntime).toHaveBeenCalledWith(config);
       const firstResponse = await request(running.httpServer)
         .get('/health/live')
         .set('origin', allowedOrigin);

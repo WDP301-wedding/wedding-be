@@ -13,6 +13,7 @@ import { createVenueCatalogRuntime } from '../../modules/venue-catalog/venue-cat
 import { createIdentityRuntime } from '../../modules/identity-access/identity.runtime.js';
 import { createInvitationStudioRuntime } from '../../modules/invitation-studio/invitation-studio.runtime.js';
 import request from 'supertest';
+import { createPaymentsBillingRuntime } from '../../modules/payments-billing/payments-billing.runtime.js';
 import { createLogger } from '../logging/logger.js';
 import {
   createHttpLifecycle,
@@ -28,6 +29,16 @@ vi.mock('../../modules/identity-access/identity.runtime.js', async () => {
     createIdentityRuntime: vi.fn(() => ({
       router: Router(),
       resource: { name: 'identity-database', close: vi.fn() },
+    })),
+  };
+});
+
+vi.mock('../../modules/payments-billing/payments-billing.runtime.js', async () => {
+  const { Router } = await import('express');
+  return {
+    createPaymentsBillingRuntime: vi.fn(() => ({
+      router: Router(),
+      resource: { name: 'payments-billing-database', close: vi.fn() },
     })),
   };
 });
@@ -303,6 +314,7 @@ describe('server startup and process signals', () => {
 
     expect(createVenueCatalogRuntime).toHaveBeenCalledWith(config);
     expect(createInvitationStudioRuntime).toHaveBeenCalledWith(config);
+    expect(createPaymentsBillingRuntime).toHaveBeenCalledWith(config);
     expect(running.httpServer.listening).toBe(true);
     expect(running.readiness.isReady()).toBe(true);
     expect((await request(running.app).get('/api/v1/bookings/one/media/two')).status).toBe(401);
@@ -325,6 +337,18 @@ describe('server startup and process signals', () => {
       .value as ReturnType<typeof createVenueCatalogRuntime>);
     expect(vi.mocked(identity.resource).close.mock.calls).toHaveLength(1);
     expect(vi.mocked(venue.resource).close.mock.calls).toHaveLength(1);
+  });
+
+  it('closes the initialized owner runtimes when billing startup fails', async () => {
+    vi.mocked(createPaymentsBillingRuntime).mockRejectedValueOnce(
+      new Error('billing startup failed'),
+    );
+    const config = parseEnvironment({ NODE_ENV: 'test' });
+    await expect(bootstrap({ loadConfig: () => Promise.resolve(config) })).rejects.toThrow(
+      'billing startup failed',
+    );
+    const venue: unknown = await vi.mocked(createVenueCatalogRuntime).mock.results.at(-1)?.value;
+    expect((venue as { resource: { close: () => unknown } }).resource.close).toHaveBeenCalledOnce();
   });
 
   it('reports signal-triggered shutdown failures and sets a failing exit code', async () => {

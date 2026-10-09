@@ -40,6 +40,11 @@ export class PrismaBookingBoundary implements BookingBoundaryUnitOfWork {
     return scope.tx;
   }
 
+  currentContext(bookingId?: string): ContractContext | undefined {
+    this.current(bookingId);
+    return this.storage.getStore()?.context;
+  }
+
   requireScope(bookingId: string, context: ContractContext): Prisma.TransactionClient {
     const scope = this.storage.getStore();
     if (

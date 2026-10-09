@@ -73,6 +73,52 @@ const validProductionEnvironment = {
 } as const;
 
 describe('parseEnvironment', () => {
+  it('keeps VNPay disabled by default and requires complete backend-only sandbox configuration', () => {
+    const settings = {
+      VNPAY_TMN_CODE: 'CTTVNP01',
+      VNPAY_HASH_SECRET: 'controlled-only-secret',
+      VNPAY_RETURN_URL: 'https://wedding.example.com/return',
+      VNPAY_QUERY_IP: '127.0.0.1',
+    };
+    expect(parseEnvironment(settings).vnpay).toEqual({
+      enabled: true,
+      merchantCode: 'CTTVNP01',
+      hashSecret: 'controlled-only-secret',
+      returnUrl: 'https://wedding.example.com/return',
+      queryIp: '127.0.0.1',
+    });
+    expect(Object.isFrozen(parseEnvironment(settings).vnpay)).toBe(true);
+    expect(() => parseEnvironment({ VNPAY_HASH_SECRET: settings.VNPAY_HASH_SECRET })).toThrow(
+      EnvironmentConfigurationError,
+    );
+    for (const overrides of [
+      { VNPAY_TMN_CODE: 'bad' },
+      { VNPAY_QUERY_IP: 'host.invalid' },
+      { VNPAY_RETURN_URL: 'http://public.example/return' },
+      { VNPAY_RETURN_URL: 'https://user:password@wedding.example/return' },
+      { VNPAY_RETURN_URL: 'https://wedding.example/return#fragment' },
+    ]) {
+      expect(() => parseEnvironment({ ...settings, ...overrides })).toThrow(
+        EnvironmentConfigurationError,
+      );
+    }
+    expect(
+      parseEnvironment({ ...settings, VNPAY_RETURN_URL: 'http://localhost:3000/return' }).vnpay
+        .enabled,
+    ).toBe(true);
+    expect(() =>
+      parseEnvironment({
+        ...validProductionEnvironment,
+        ...settings,
+        VNPAY_RETURN_URL: 'http://localhost:3000/return',
+      }),
+    ).toThrow(EnvironmentConfigurationError);
+    try {
+      parseEnvironment({ VNPAY_HASH_SECRET: settings.VNPAY_HASH_SECRET });
+    } catch (error) {
+      expect(String(error)).not.toContain(settings.VNPAY_HASH_SECRET);
+    }
+  });
   it('loads one immutable process configuration at module initialization', () => {
     expect(Object.isFrozen(config)).toBe(true);
     expect(config.runtime.environment).toBe('test');
@@ -147,6 +193,7 @@ describe('parseEnvironment', () => {
       email: { enabled: false },
       aiImage: { provider: null },
       metrics: { enabled: false },
+      vnpay: { enabled: false },
       openApi: { enabledInProduction: false },
       telemetry: { otlpEndpoint: undefined },
     });
