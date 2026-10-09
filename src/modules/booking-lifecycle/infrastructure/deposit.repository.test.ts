@@ -416,6 +416,7 @@ function fixture() {
     ],
   };
   return {
+    account: { findFirst: vi.fn().mockResolvedValue(null) },
     booking: {
       findUnique: vi.fn().mockResolvedValue(booking),
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),

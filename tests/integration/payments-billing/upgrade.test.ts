@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { seedVenueCatalog, CATALOG_SEED_IDS } from '../../../scripts/catalog-seed.js';
 import { createPrismaClient } from '../../../src/core/database/prisma.js';
+import { mainBeforeBillingMigrations } from './upgrade-fixture.js';
 import {
   CatalogTestDatabase,
   catalogMigrationDatabaseUrl,
@@ -107,7 +108,7 @@ databaseDescribe('PB-W2 forward migration over the current Booking baseline', ()
         } finally {
           await prisma.$disconnect();
         }
-      });
+      }, mainBeforeBillingMigrations);
       expect(JSON.stringify(await readHistory(database.prisma))).toBe(historical);
       expect(await database.prisma.billingLedgerEntry.count()).toBe(0);
       expect(await database.prisma.billingPaymentAttempt.count()).toBe(0);

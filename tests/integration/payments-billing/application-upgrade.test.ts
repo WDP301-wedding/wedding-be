@@ -10,6 +10,7 @@ import {
   catalogMigrationDatabaseUrl,
 } from '../venue-catalog/catalog-test-database.js';
 import { createPayableBooking } from './deposit-fixture.js';
+import { mainBeforeBillingMigrations } from './upgrade-fixture.js';
 
 const databaseDescribe = catalogMigrationDatabaseUrl ? describe : describe.skip;
 databaseDescribe('PB-W3 forward application-state upgrade', () => {
@@ -88,7 +89,7 @@ databaseDescribe('PB-W3 forward application-state upgrade', () => {
         } finally {
           await prisma.$disconnect();
         }
-      });
+      }, mainBeforeBillingMigrations);
       expect(JSON.stringify(await read(database.prisma))).toBe(historical);
       expect(await database.prisma.billingDepositApplication.count()).toBe(0);
       expect(

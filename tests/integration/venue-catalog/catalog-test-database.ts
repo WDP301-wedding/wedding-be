@@ -35,6 +35,7 @@ export class CatalogTestDatabase {
 
   async connect(
     beforeMigration?: (name: string, databaseUrl: string) => Promise<void>,
+    orderMigrations: (paths: readonly string[]) => readonly string[] = (paths) => paths,
   ): Promise<void> {
     await this.#admin.connect();
     this.#connected = true;
@@ -49,7 +50,7 @@ export class CatalogTestDatabase {
       .map((entry) => join(migrationsRoot, entry.name, 'migration.sql'))
       .sort();
     try {
-      for (const migrationPath of migrationPaths) {
+      for (const migrationPath of orderMigrations(migrationPaths)) {
         await beforeMigration?.(basename(dirname(migrationPath)), this.#testDatabaseUrl);
         await migrationClient.query(await readFile(migrationPath, 'utf8'));
       }
