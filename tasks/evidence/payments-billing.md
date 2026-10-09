@@ -1,15 +1,15 @@
 # SPEC-04 Payments and Billing implementation evidence
 
-Status: **W1-W5 technical evidence; module implementation acceptance pending.**
+Status: **W1-W6 technical evidence; module implementation acceptance pending.**
 Authority: approved `SPEC-payments-billing.md`, `WEDDING-CONTRACT-1@1.1.0`,
 and the eight-wave plan in `tasks/plan.md` Section 21.
 
 ## Branch and scope
 
 All four repositories use `codex/payments-billing` for W1-W8. Verified increments
-are committed on that branch. W1-W5 change only the backend; the three client
-branches retain their existing Booking baseline. These checkpoints do not mark
-the module ACCEPTED or publish a new HTTP/OpenAPI contract.
+are committed on that branch. W1-W6 change only the backend; the three client
+branches retain their existing Booking baseline. W6 publishes the seven approved
+HTTP routes and immutable OpenAPI artifact. Module ACCEPTED remains pending W8.
 
 W1 accounting policy and owner ports: backend commit `5018c66`.
 W1 plan/branch/evidence record: backend commit `293e982`.
@@ -510,7 +510,7 @@ and client working trees are unchanged. Focused local commits only; no push or P
 All four W5 microtasks are closed. Progress: **5/8 waves and 20/32 microtasks**.
 PB-C3 and immutable API publication await W6; this does not mark SPEC-04 ACCEPTED.
 
-### W6 hand-off and remaining acceptance
+### W5 hand-off to W6 and remaining acceptance
 
 Design rationale and recovery details:
 [ADR-007](../../docs/decisions/0007-manual-billing-approval-and-ledger-views.md).
@@ -524,3 +524,137 @@ source attempt, decision and timestamp. Unavailable VNPay fails before a new int
 W6-W8 remain open: authenticated HTTP/OpenAPI publication, generated clients,
 Management Web/Public Web/Android billing experiences and final four-repository
 acceptance. PB-C3 completes after W6, and owner ACCEPTED remains with W8.
+
+## W6 authenticated HTTP and immutable OpenAPI
+
+Completed 2026-10-09. The preceding W5 hand-off records its historical checkpoint;
+this W6 record supersedes its pending HTTP/OpenAPI status.
+
+### Exact backend hand-off
+
+- Final tested source commit: `40bc1d279cc6514f2cadbb17fdd6a393e2e3b0f4`.
+- Latest generated artifact commit: `3d561ad`; that exact artifact is included in
+  the final source commit above. W7 must read the committed artifact from that source.
+- `openapi/openapi.sha256`:
+  `056df7eb37bc9ff8892bdd1271791e0919f8b03db3c6ddb9d4891a5b869c3408`.
+- Focused local commits: `274fe35` strict schemas; `580c488` durable HTTP intents;
+  `1297553` authorized routes and owner recovery; `a1082e6` OpenAPI publication;
+  `89e55eb` runtime/lifecycle; `4172277` recovery/race tests; `3d561ad` shared IPN
+  query documentation; `40bc1d2` current Staff-only authority correction.
+
+No dependency, lockfile, Prisma schema, migration or active contract-baseline change
+is introduced in W6. All three client trees and contract locks remain unchanged;
+their generated-client updates and UI work belong to W7.
+
+### Published routes and authority
+
+Paths below are mounted under `/api/v1` and retain SPEC-04 Section 9's public DTOs.
+
+| Method | Path | Authority |
+| --- | --- | --- |
+| POST | `/bookings/{bookingId}/payments/deposit` | Eligible owned RESTRICTED/FULL grant; amount derived by server. |
+| POST | `/bookings/{bookingId}/payments/balance` | Owned FULL grant or Manager; server derives full outstanding. |
+| POST | `/management/billing/payments/manual` | Current Manager; existing deposit/balance rules apply. |
+| POST | `/management/billing/refunds` | Current Manager; recorded approval and source caps apply. |
+| GET | `/bookings/{bookingId}/payments/{attemptId}` | Manager or owned grant; RESTRICTED sees its deposit attempt only. |
+| GET | `/bookings/{bookingId}/billing` | Current Manager or owned FULL grant; fixed-revision paginated history. |
+| GET | `/billing/callbacks/vnpay` | Verified raw provider signature/correlation; provider acknowledgment. |
+
+- Strict shared request/response schemas reject authority overrides, client amounts
+  on checkout, client approval limits/decision IDs and derived booking metadata.
+  Safe integer VND, bounded evidence/reason, query limits and revision fences are
+  validated. Response whitelists conceal provider proof, bank/signature material.
+- Real Identity sessions and current active database roles/grants govern requests
+  and cached replays. Foreign resources return concealed 404; missing authentication
+  returns 401; insufficient own access returns 403. Staff-only accounts are denied
+  even with an erroneous grant. Legitimate Staff/Couple dual roles preserve owned
+  Couple access. Real session revocation and removal of Manager/Couple authority
+  cannot reuse a cached success. Private responses use `Cache-Control: no-store`;
+  denial audit contains identifiers and stable codes without submitted evidence.
+- Mutations use core durable idempotency and a separate two-integer PostgreSQL
+  advisory request mutex. Same-key concurrency returns canonical core
+  `409 REQUEST_IN_PROGRESS` with `Retry-After: 1`; changed public intent returns 422.
+  Stable actor/route/key command identity excludes processing clock. The durable
+  claim is persisted before the owner commits; terminal replay is exact, 4xx is
+  retained, and 5xx remains recoverable. Money and Booking/Identity/audit/outbox still
+  commit atomically inside the existing booking owner boundary.
+- Recovery checks the committed owner result before resolving a new timeline,
+  billing head, server timestamp or refund approval. Injected failures immediately
+  after committed manual deposit/refund recover the original IDs despite changed
+  booking state, ledger head or consumed approval. New refunds select a stored
+  approved decision with sufficient remaining cap; the owner rechecks revision,
+  source and approval limits transactionally. No automatic refund approval is added.
+- Billing pagination stays at its original revision after later money is recorded.
+  UNKNOWN never becomes a guessed failure; repeated balance collection is blocked.
+  Attempt status separates verified settlement from downstream application status.
+  ReturnURL is display-only. Disabled VNPay fails before creating a claim/attempt.
+- IPN preserves the raw query, rejects duplicate/unknown fields, and documents its
+  provider parameters from the existing verifier schema. HTTP 200 acknowledgment
+  classes 00/02/01/04/97/99 are proved. It has no bearer or client idempotency-key
+  requirement and keeps the provider body outside the application error envelope.
+- Server composition initializes and closes the real billing runtime. An actual
+  database query verifies startup after Prisma's lazy adapter connection; failed
+  billing startup closes previously initialized owner resources.
+
+Recovery, error naming and mutex rationale:
+[ADR-008](../../docs/decisions/0008-recover-billing-http-intents-before-metadata-resolution.md).
+Canonical in-progress naming follows inherited SPEC-core-platform Section 10.4;
+SPEC-04's earlier `IDEMPOTENCY_REQUEST_IN_PROGRESS` wording describes that condition.
+
+### Requirement and proof trace
+
+| W6 obligation | Final-source proof |
+| --- | --- |
+| Strict seven-route schemas and safe output | `payments-billing.schemas.test.ts`; `payments-billing-openapi.test.ts`; authenticated HTTP tests. |
+| Deposit/promotion and manual balance/refund authority | `http.test.ts`; real session/database authority in `runtime.test.ts`; W3/W5 owner suites retained in the full gate. |
+| Retry, changed-body keys, concurrency and post-commit recovery | `http-idempotency.test.ts`; `http-recovery.test.ts`; W4/W5 callback, balance/refund and transaction suites retained. |
+| Provider acknowledgment, UNKNOWN and disabled integration | `http.test.ts`; existing verified VNPay callback/reconciliation suites. |
+| Immutable invoice arithmetic and redacted effects | W5 invoice/accounting/audit/outbox integration suites retained and passing. |
+| Deterministic publication and runtime lifecycle | OpenAPI contract tests and `api:check`; real billing runtime tests; core lifecycle tests. |
+
+The Staff-only regression first failed with actual 201 versus expected 403; its
+correction passes while proving legitimate dual-role behavior. The unreachable
+database startup test first exposed lazy connection success, then passed after
+the explicit query. A temporary inverted Manager predicate caused the intended
+manual-payment test failure; original source bytes were restored before final gates.
+Earlier intermediate test runs are superseded by the final source results below.
+
+### W6 final verification
+
+Pinned Node 24.21.0/npm 11.19.0 and disposable PostgreSQL 17.11 on loopback 55434
+are used. Database URLs are process-scoped to `wedding-pbw6-postgres`; environment
+files are unchanged. Eighteen migrations deploy successfully onto the empty rehearsal
+database, and final migration status confirms all eighteen current. Schema/migrations
+are unchanged from W5. Automated tests use controlled provider doubles and signed
+sandbox fixtures, with no network VNPay call or live merchant credentials.
+
+- Full coverage: **1,077/1,077 tests in 140 files**, **96.93% lines**, **93.22%
+  branches**, 98.65% functions and 96.38% statements; duration 287.38 seconds.
+  All **142 source coverage records** meet unchanged per-file 80% line/branch bars.
+- Separate real integration: **180/180 tests in 47 files**, 272.74 seconds.
+- Separate contract gate: **25/25 tests in seven files**, 4.83 seconds.
+- Full `format:check`, zero-warning typed `lint`, `typecheck`, `api:generate`,
+  `api:check`, production `build`, `audit:ci` and `git diff --check` pass.
+  Audit retains only preexisting documented, unexpired exceptions 1145093/1153173.
+- Working and committed generated artifact digests match the exact value above.
+  Final source has no uncommitted code/test/artifact changes after the gates.
+
+The temporary runner imports the original Vitest configuration and retains the
+complete 140-file inventory and original coverage include/exclude/reporters/thresholds.
+One fork worker shares modules for 135 regular suites and isolates all five module-mock
+suites: core HTTP lifecycle; Venue runtime; both core observability suites; integration
+security. Disjoint inline projects use `extends: false`; discovery matches the physical
+inventory with no omitted file. Assertions, deadlines and numeric thresholds are
+unchanged. Coverage, standalone integration and contracts run sequentially using
+`--maxWorkers=1 --pool=forks`; other gates use the installed repository tools.
+Ignored local logs are retained under `test-results/pbw6/`.
+
+The owned disposable `wedding-pbw6-postgres` container is stopped and auto-removed;
+the exact temporary runner file and its empty directory are removed. No other
+database/container is operated on. The portable pinned Node runtime is retained.
+
+All four W6 microtasks and the **PB-C3 technical checkpoint** are closed. Progress:
+**6/8 waves and 24/32 microtasks**. W7/W8 retain eight open microtasks for generated
+clients, billing experiences and four-repository owner acceptance. This does not mark
+SPEC-04 ACCEPTED. All work remains on the single `codex/payments-billing` branch per
+repository, with local commits only and no push or PR.

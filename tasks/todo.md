@@ -2689,14 +2689,26 @@ Progress: W1-W5 complete (5/8 waves, 20/32 microtasks); W6-W8 remain open (12 mi
 
 #### PB-W6 — Authenticated HTTP and immutable OpenAPI
 
-- [ ] Add strict request/response schemas for deposit, balance, callback, manual
+- [x] Add strict request/response schemas for deposit, balance, callback, manual
       payment, refund, attempt status and paginated booking billing reads.
-- [ ] Wire Manager/Couple/restricted-prospect permissions, concealed unowned reads,
+- [x] Wire Manager/Couple/restricted-prospect permissions, concealed unowned reads,
       durable idempotency, stable errors and audit/outbox behavior.
-- [ ] Test callback acknowledgment codes, duplicate/in-progress commands, changed-body
+- [x] Test callback acknowledgment codes, duplicate/in-progress commands, changed-body
       keys, authorization denials, stale billing revisions and unknown outcomes.
-- [ ] Generate deterministic OpenAPI, pass backend contract/coverage/build/audit gates,
+- [x] Generate deterministic OpenAPI, pass backend contract/coverage/build/audit gates,
       and publish the exact artifact commit/digest for client lock updates.
+
+W6 closes all four microtasks and technical checkpoint PB-C3. Exact tested backend
+source: `40bc1d279cc6514f2cadbb17fdd6a393e2e3b0f4`; OpenAPI SHA-256:
+`056df7eb37bc9ff8892bdd1271791e0919f8b03db3c6ddb9d4891a5b869c3408`.
+[Billing evidence](evidence/payments-billing.md) records 1,077/1,077 tests in 140 files,
+96.93% lines/93.22% branches, 180/180 standalone integration tests and 25/25 contracts.
+All 142 source coverage records meet unchanged per-file bars; backend quality,
+artifact and eighteen-migration gates pass. W6 changes only backend HTTP/runtime,
+tests, generated OpenAPI and documentation; client locks/trees remain unchanged.
+All four repositories retain `codex/payments-billing`, with local commits and no push/PR.
+Progress: W1-W6 complete (**6/8 waves, 24/32 microtasks**); W7/W8 retain eight
+microtasks. Project-owner ACCEPTED remains pending W8.
 
 #### PB-W7 — Generated clients and billing experiences
 
