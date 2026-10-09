@@ -12,7 +12,8 @@ export function createOpenApiRouter(options: OpenApiRouterOptions = {}): Router 
 
   router.get('/openapi.json', (_request, response, next) => {
     response.setHeader('Cache-Control', 'no-store');
-    response.sendFile(artifactPath, (error) => {
+    // Managed worktrees can place this fixed artifact under a hidden parent directory.
+    response.sendFile(artifactPath, { dotfiles: 'allow' }, (error) => {
       if (error !== undefined) {
         next(error);
       }
