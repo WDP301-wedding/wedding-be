@@ -70,12 +70,10 @@ export const invitationPrintOrdersOpenApiPaths = {
     },
   },
   '/bookings/{bookingId}/print-orders/{orderId}': {
-    get: operation(
-      'getPrintOrder',
-      'Couple views print order detail',
-      s.printOrderResponseSchema,
-      ['bookingId', 'orderId'],
-    ),
+    get: operation('getPrintOrder', 'Couple views print order detail', s.printOrderResponseSchema, [
+      'bookingId',
+      'orderId',
+    ]),
   },
   '/bookings/{bookingId}/print-orders/{orderId}/approval': {
     post: operation(

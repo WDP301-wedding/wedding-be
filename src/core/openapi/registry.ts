@@ -1,5 +1,9 @@
 import type { ZodOpenApiObject, ZodOpenApiResponseObject } from 'zod-openapi';
 import type { z } from 'zod';
+import {
+  experienceOpenApiPaths,
+  experienceOpenApiSchemas,
+} from '../../modules/booking-lifecycle/http/experience.openapi.js';
 
 import {
   errorDetailSchema,
@@ -182,6 +186,7 @@ export const openApiRegistry = {
     ...invitationMediaOpenApiPaths,
     ...invitationStudioOpenApiPaths,
     ...invitationPrintOrdersOpenApiPaths,
+    ...experienceOpenApiPaths,
     ...venueCatalogOpenApiPaths,
     ...bookingLifecycleOpenApiPaths,
     '/health/live': {
@@ -276,48 +281,42 @@ export const openApiRegistry = {
     '/auth/password-reset-requests': {
       post: {
         operationId: 'requestPasswordReset',
-        summary: 'Request a password reset',
+        deprecated: true,
+        summary: 'Retired link-based password reset request',
         description:
-          'Enumeration-safe and unsafe to retry automatically; every eligible request creates a new single-use credential.',
+          'Runtime returns 410 PASSWORD_OTP_REQUIRED. Request a new code with the email OTP endpoints.',
         tags: ['Identity'],
         requestBody: {
           required: true,
           content: { 'application/json': { schema: passwordResetRequestBodySchema } },
         },
         responses: {
-          '202': identitySuccessResponse(
-            'The request was accepted regardless of account eligibility.',
-            passwordResetRequestResponseSchema,
-          ),
+          '410': {
+            description: 'Use the email OTP flow.',
+            content: { 'application/json': { schema: errorResponseSchema } },
+          },
           '422': { $ref: '#/components/responses/UnprocessableEntity' },
-          '429': { $ref: '#/components/responses/TooManyRequests' },
-          '500': { $ref: '#/components/responses/InternalServerError' },
-          '502': { $ref: '#/components/responses/BadGateway' },
-          '503': { $ref: '#/components/responses/ServiceUnavailable' },
-          '504': { $ref: '#/components/responses/GatewayTimeout' },
         },
       },
     },
     '/auth/password-reset-completions': {
       post: {
         operationId: 'completePasswordReset',
-        summary: 'Complete a password reset',
+        deprecated: true,
+        summary: 'Retired link-based password reset completion',
         description:
-          'Unsafe to replay after an unknown outcome; a consumed credential directs the user to normal login.',
+          'Runtime returns 410 PASSWORD_OTP_REQUIRED. Request a new code with the email OTP endpoints.',
         tags: ['Identity'],
         requestBody: {
           required: true,
           content: { 'application/json': { schema: passwordResetCompletionBodySchema } },
         },
         responses: {
-          '200': identitySuccessResponse(
-            'The password was changed and all existing sessions were revoked.',
-            passwordResetCompletionResponseSchema,
-          ),
-          '401': { $ref: '#/components/responses/Unauthorized' },
+          '410': {
+            description: 'Use the email OTP flow.',
+            content: { 'application/json': { schema: errorResponseSchema } },
+          },
           '422': { $ref: '#/components/responses/UnprocessableEntity' },
-          '429': { $ref: '#/components/responses/TooManyRequests' },
-          '500': { $ref: '#/components/responses/InternalServerError' },
         },
       },
     },
@@ -503,6 +502,7 @@ export const openApiRegistry = {
   },
   components: {
     schemas: {
+      ...experienceOpenApiSchemas,
       ErrorDetail: errorDetailSchema,
       ErrorResponse: errorResponseSchema,
       HealthLiveResponse: healthLiveResponseSchema,

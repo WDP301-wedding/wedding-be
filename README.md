@@ -18,7 +18,7 @@ Copy-Item .env.example .env
 npm run dev
 ```
 
-The API listens on `http://localhost:3001` by default. Check `GET /health/live` for process liveness and `GET /health/ready` for readiness. The committed contract is available at `GET /api/v1/openapi.json` outside production.
+The API listens on `http://localhost:3001` by default. Check `GET /health/live` for process liveness and `GET /health/ready` for readiness. Swagger UI is available at `/docs`, and the committed contract at `GET /api/v1/openapi.json`, outside production. Set `OPENAPI_ENABLED=true` to expose both in production. Swagger's **Try it out** executes real requests on the current backend, including mutations; protected endpoints still require normal authentication and authorization. Use **Authorize** with an access token; browser-managed refresh cookies are sent automatically. The UI adapts the canonical paths to their deployed `/api/v1` prefix while keeping root health paths and the client artifact unchanged.
 
 The values in `.env.example` are placeholders. For offline development, clear both database URLs and every Supabase, Brevo, Resend, and Gemini variable as complete groups; leave `AI_IMAGE_PROVIDER` blank. Provider adapters are not contacted merely by starting the current foundation server.
 
@@ -66,3 +66,6 @@ npx vitest run src/integrations/storage/storage-provider.test.ts src/integration
 ```
 
 See [cross-repository development](docs/cross-repo-development.md) for boot order, contract updates, troubleshooting, and the Android/EAS boundary.
+
+See [Railway deployment](docs/railway-deployment.md) for the deployed backend,
+container build, Supabase TLS configuration, and release verification.

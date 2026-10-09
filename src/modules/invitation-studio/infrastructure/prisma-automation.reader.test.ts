@@ -60,14 +60,12 @@ describe('PrismaInvitationAutomationReader (IS-W6 / CONTRACT-BASELINE §21.6)', 
         ]),
       },
       booking: {
-        findMany: vi.fn().mockResolvedValue([
-          { id: bookingId1 },
-        ]),
+        findMany: vi.fn().mockResolvedValue([{ id: bookingId1 }]),
       },
       consultationAccess: {
-        findMany: vi.fn().mockResolvedValue([
-          { bookingId: bookingId1, accountId: coupleAccountId1 },
-        ]),
+        findMany: vi
+          .fn()
+          .mockResolvedValue([{ bookingId: bookingId1, accountId: coupleAccountId1 }]),
       },
     } as unknown as PrismaClient;
 
@@ -102,15 +100,10 @@ describe('PrismaInvitationAutomationReader (IS-W6 / CONTRACT-BASELINE §21.6)', 
         ]),
       },
       booking: {
-        findMany: vi.fn().mockResolvedValue([
-          { id: b1 },
-          { id: b2 },
-        ]),
+        findMany: vi.fn().mockResolvedValue([{ id: b1 }, { id: b2 }]),
       },
       consultationAccess: {
-        findMany: vi.fn().mockResolvedValue([
-          { bookingId: b1, accountId: couple1 },
-        ]),
+        findMany: vi.fn().mockResolvedValue([{ bookingId: b1, accountId: couple1 }]),
       },
     } as unknown as PrismaClient;
 
@@ -124,9 +117,10 @@ describe('PrismaInvitationAutomationReader (IS-W6 / CONTRACT-BASELINE §21.6)', 
     expect(res.items).toHaveLength(1);
     expect(res.nextCursor).not.toBeNull();
 
-    const decoded = JSON.parse(
-      Buffer.from(res.nextCursor!, 'base64url').toString('utf8'),
-    ) as { c: string; b: string };
+    const decoded = JSON.parse(Buffer.from(res.nextCursor!, 'base64url').toString('utf8')) as {
+      c: string;
+      b: string;
+    };
     expect(decoded.b).toBe(b1);
   });
 });

@@ -7,6 +7,7 @@ import {
   catalogMigrationDatabaseUrl,
 } from '../venue-catalog/catalog-test-database.js';
 import { studioFixture } from './studio-fixture.js';
+import { nativeTimelineFixture } from './native-booking-fixture.js';
 import { createGeneratedAiImage } from '../../../src/integrations/ai-image/ai-image-provider.js';
 import { ProviderError, NotFoundError } from '../../../src/core/errors/app-error.js';
 import { createStudioRouter } from '../../../src/modules/invitation-studio/http/studio.router.js';
@@ -1636,32 +1637,16 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
     const d = await design(true);
     await publish(d);
     await registered();
-    const prior = await f.prisma.bookingTimelineRevision.findUniqueOrThrow({
-        where: { id: f.timelineId },
-      }),
-      nextTimelineId = key();
-    await f.prisma.bookingTimelineRevision.create({
-      data: {
-        id: nextTimelineId,
-        bookingId: f.bookingId,
-        revisionNumber: 2,
-        eventDate: prior.eventDate,
-        hallName: prior.hallName,
-        shiftCode: prior.shiftCode,
-        shiftStartTime: prior.shiftStartTime,
-        shiftEndTime: prior.shiftEndTime,
-        items: [
-          {
-            itemId: key(),
-            order: 0,
-            startTime: '11:10',
-            title: 'Revised welcome',
-            description: null,
-          },
-        ],
-        approvedByManagerAt: f.now,
-        approvedByCoupleAt: f.now,
-      },
+    const nextTimelineId = key();
+    await nativeTimelineFixture(f.prisma, {
+      bookingId: f.bookingId,
+      timelineId: nextTimelineId,
+      revisionNumber: 2,
+      actorId: f.manager.actorId,
+      now: f.now,
+      startTime: '11:10',
+      title: 'Revised welcome',
+      predecessorRevisionId: f.timelineId,
     });
     let release!: () => void, held!: () => void;
     const gate = new Promise<void>((resolve) => {

@@ -18,9 +18,13 @@ export function createPrismaClient(databaseUrl = config.database.url): PrismaCli
     throw new DatabaseConfigurationError();
   }
 
-  const schema = new URL(connectionString).searchParams.get('schema')?.trim();
+  const url = new URL(connectionString);
+  const schema = url.searchParams.get('schema')?.trim();
+  // Prisma's PostgreSQL adapter serializes and parses timestamps as UTC.
+  const startupOptions = url.searchParams.get('options') ?? process.env.PGOPTIONS ?? '';
+  url.searchParams.set('options', `${startupOptions} -c timezone=UTC`.trim());
   const adapter = new PrismaPg(
-    { connectionString },
+    { connectionString: url.toString() },
     schema === undefined || schema === '' ? undefined : { schema },
   );
 

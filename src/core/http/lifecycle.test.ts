@@ -56,6 +56,16 @@ vi.mock('../../modules/invitation-studio/invitation-studio.runtime.js', async ()
   };
 });
 
+vi.mock('../../modules/booking-lifecycle/booking-lifecycle.runtime.js', async () => {
+  const { Router } = await import('express');
+  return {
+    createBookingLifecycleRuntime: vi.fn(() => ({
+      router: Router(),
+      resource: { name: 'booking-lifecycle-database', close: vi.fn() },
+    })),
+  };
+});
+
 class TestSignalTarget extends EventEmitter {
   exitCode: NodeJS.Process['exitCode'];
   exitedWith: number | undefined;

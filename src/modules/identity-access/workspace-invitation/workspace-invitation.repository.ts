@@ -5,6 +5,7 @@ import type { AccountAuthenticationRecord } from '../account/account.repository.
 import type { ScryptPasswordVerifier } from '../crypto/password.js';
 
 export type PersistInvitationInput = Readonly<{
+  invitationIntentId?: string;
   consultationId: string;
   recipientEmailNormalized: string;
   issuedByAccountId: string;
@@ -24,14 +25,18 @@ export type RevokeInvitationInput = Readonly<{
 }>;
 
 export interface WorkspaceInvitationRepository {
-  issue(
-    input: PersistInvitationInput,
-  ): Promise<Readonly<{ invitationId: string; sequence: number }>>;
-  reissue(
-    input: PersistInvitationInput,
-  ): Promise<Readonly<{ invitationId: string; sequence: number }>>;
+  issue(input: PersistInvitationInput): Promise<PersistedWorkspaceInvitation>;
+  reissue(input: PersistInvitationInput): Promise<PersistedWorkspaceInvitation>;
   revoke(input: RevokeInvitationInput): Promise<boolean>;
 }
+
+export type PersistedWorkspaceInvitation = Readonly<{
+  invitationId: string;
+  sequence: number;
+  accepted?: boolean;
+  expiresAt?: Date;
+  deliveryIntentId?: string;
+}>;
 
 export type InvitationAcceptancePreview = Readonly<{
   invitationId: string;
@@ -390,7 +395,7 @@ async function invitationTransaction(
   prisma: PrismaClient,
   input: PersistInvitationInput,
   operation: 'issue' | 'reissue',
-): Promise<Readonly<{ invitationId: string; sequence: number }>> {
+): Promise<PersistedWorkspaceInvitation> {
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
       return await prisma.$transaction(
@@ -404,6 +409,46 @@ async function invitationTransaction(
             orderBy: { sequence: 'desc' },
             select: { id: true, sequence: true, status: true, expiresAt: true, createdAt: true },
           });
+          const priorIntent =
+            input.invitationIntentId === undefined
+              ? undefined
+              : invitations.find((invitation) => invitation.id === input.invitationIntentId);
+          if (operation === 'issue' && priorIntent !== undefined) {
+            if (priorIntent.status === 'ACCEPTED') {
+              return Object.freeze({
+                invitationId: priorIntent.id,
+                sequence: priorIntent.sequence,
+                accepted: true,
+                expiresAt: priorIntent.expiresAt,
+              });
+            }
+            if (
+              priorIntent.status !== 'ACTIVE' ||
+              priorIntent.expiresAt.getTime() <= input.now.getTime()
+            ) {
+              throw new InvitationNotFoundError();
+            }
+            // Retry a persisted issuance whose notification or caller acknowledgment failed.
+            // Only the hash is stored; a fresh token replaces the unacknowledged credential.
+            const deliveryIntentId = randomUUID();
+            await transaction.workspaceInvitation.update({
+              where: { id: priorIntent.id },
+              data: { tokenHash: input.tokenHash, deliveryIntentId },
+            });
+            await appendAudit(transaction, {
+              requestId: input.requestId,
+              actorAccountId: input.issuedByAccountId,
+              action: 'workspace-invitation.delivery-retried',
+              entityId: priorIntent.id,
+              metadata: { sequence: priorIntent.sequence },
+            });
+            return Object.freeze({
+              invitationId: priorIntent.id,
+              sequence: priorIntent.sequence,
+              expiresAt: priorIntent.expiresAt,
+              deliveryIntentId,
+            });
+          }
           let active = invitations.find(({ status }) => status === 'ACTIVE');
           if (active !== undefined && active.expiresAt.getTime() <= input.now.getTime()) {
             await transaction.workspaceInvitation.updateMany({
@@ -449,6 +494,7 @@ async function invitationTransaction(
           });
           const invitation = await transaction.workspaceInvitation.create({
             data: {
+              ...(input.invitationIntentId === undefined ? {} : { id: input.invitationIntentId }),
               consultationId: input.consultationId,
               recipientEmailNormalized: input.recipientEmailNormalized,
               resolvedAccountId: resolvedAccount?.id ?? null,
@@ -458,7 +504,7 @@ async function invitationTransaction(
               expiresAt: input.expiresAt,
               createdAt: input.now,
             },
-            select: { id: true },
+            select: { id: true, deliveryIntentId: true },
           });
           await appendAudit(transaction, {
             requestId: input.requestId,
@@ -467,7 +513,11 @@ async function invitationTransaction(
             entityId: invitation.id,
             metadata: { sequence },
           });
-          return Object.freeze({ invitationId: invitation.id, sequence });
+          return Object.freeze({
+            invitationId: invitation.id,
+            sequence,
+            deliveryIntentId: invitation.deliveryIntentId,
+          });
         },
         { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
       );

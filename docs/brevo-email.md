@@ -1,6 +1,6 @@
 # Brevo transactional email
 
-The backend uses Brevo's HTTP API for password reset emails and the shared workspace invitation notification port. Startup does not send an email. A blank email configuration uses the offline fake in development/test; staging and production require real email configuration.
+The backend uses Brevo's HTTP API for email OTPs when changing or resetting a password, and for workspace invitations. Startup does not send an email. Password OTP endpoints fail with `EMAIL_NOT_CONFIGURED` when email is disabled; they never return a fake success. Other offline integrations can still use their development/test fakes.
 
 ## Account setup
 
@@ -19,6 +19,9 @@ BREVO_FROM_EMAIL="Wedding Restaurant <your-project-email@gmail.com>"
 
 RESEND_API_KEY=
 RESEND_FROM_EMAIL=
+
+# Generate an independent secret of at least 32 bytes, keep it stable across restarts.
+AUTH_OTP_HASH_KEY=replace-with-random-32-byte-secret
 ```
 
 The sender address must match the sender verified in Brevo. Both Brevo values must be supplied together. Only one provider may be configured at a time; clear both Resend values when using Brevo. All four values may be blank for offline development/test. Never put these credentials in frontend variables, `.env.example`, or Git.
@@ -33,7 +36,18 @@ npm run dev
 
 With PostgreSQL configured and an existing eligible account, request a password reset using the application's forgot-password flow. Inspect **Transactional > Email > Logs** in Brevo, and check the recipient's inbox and spam folder. Unknown accounts do not receive a reset email. A successful API response means Brevo accepted the message; final delivery is reported by Brevo's logs.
 
-If sending fails, check the API key, verified sender, transactional account activation, remaining sending quota, and any IP authorization request from Brevo. The backend deliberately returns sanitized provider errors rather than exposing email addresses, reset links, raw provider messages, or keys.
+If sending fails, check the API key, verified sender, transactional account activation, remaining sending quota, and any IP authorization request from Brevo. The backend returns sanitized errors and revokes undelivered challenges.
+
+## Password confirmation
+
+- Forgot password: `POST /auth/password-otp-requests` with `email`, then `POST /auth/password-otp-completions` with `challengeId`, `code`, and `newPassword`.
+- Change password: authenticated `POST /auth/password-change-otp-requests` with `currentPassword`, then authenticated `POST /auth/password-changes` with `challengeId`, `code`, and `newPassword`.
+- Codes contain six digits, expire after 10 minutes, allow five incorrect attempts, and are consumed atomically once. Resending revokes the previous code; cooldown is 60 seconds and requests are limited to three per subject per hour. Failed attempts persist in PostgreSQL.
+- The database stores a keyed HMAC digest, never the plaintext code. Change challenges bind to the original account/session and current password credential. Successful changes/reset revoke every session and credential, and require login again.
+- Existing link-based request/completion endpoints return `410 PASSWORD_OTP_REQUIRED` in the runtime. Old reset links must request a new OTP; invitation links are unaffected.
+- `AUTH_OTP_HASH_KEY` is required outside development/test. Local demo setup creates a stable secret in ignored `.env.demo`. Development without it uses a temporary key, so restarting invalidates pending codes.
+- The service assumes the existing single-replica deployment contract for IP/subject rate limits. Do not increase replica count without a shared throttle store.
+- Identity retention deletes expired OTP metadata after 30 days; account anonymization revokes pending OTPs.
 
 ## Adapter behavior
 

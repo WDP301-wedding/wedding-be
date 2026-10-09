@@ -12,7 +12,7 @@ export function createOpenApiRouter(options: OpenApiRouterOptions = {}): Router 
 
   router.get('/openapi.json', (_request, response, next) => {
     response.setHeader('Cache-Control', 'no-store');
-    response.sendFile(artifactPath, (error) => {
+    response.sendFile(artifactPath, { dotfiles: 'allow' }, (error) => {
       if (error !== undefined) {
         next(error);
       }

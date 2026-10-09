@@ -28,6 +28,16 @@ vi.mock('../../src/modules/venue-catalog/venue-catalog.runtime.js', async () => 
   };
 });
 
+vi.mock('../../src/modules/booking-lifecycle/booking-lifecycle.runtime.js', async () => {
+  const { Router } = await import('express');
+  return {
+    createBookingLifecycleRuntime: vi.fn(() => ({
+      router: Router(),
+      resource: { name: 'booking-lifecycle-database', close: vi.fn() },
+    })),
+  };
+});
+
 const trustedRequestId = '24dcfaac-4408-4d42-8d66-456ed6ee7ea4';
 const allowedOrigin = 'https://wedding.example.com';
 

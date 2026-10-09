@@ -223,7 +223,7 @@ export class PrismaMediaRepository implements MediaRepository {
     return this.prisma.$transaction(
       async (tx) => {
         await admit(tx);
-        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended('booking:' || ${bookingId}::text, 0))`;
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${bookingId}::text))`;
         return accept(tx, context);
       },
       {

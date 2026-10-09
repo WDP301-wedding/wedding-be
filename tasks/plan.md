@@ -5,7 +5,8 @@ Post-core program extension status: Approved by project owner on 2026-09-27<br>
 Cross-module contract baseline: Locked as
 [`WEDDING-CONTRACT-1@1.1.0`](../CONTRACT-BASELINE.md) on 2026-10-06 (1.0.0 history retained)<br>
 SPEC-03 through SPEC-11 and three-person ownership: Approved on 2026-10-06;<br>
-bounded module task/wave plans and implementation acceptance remain pending.<br>
+SPEC-03 bounded plan: Approved by project owner on 2026-10-07; implementation
+accepted at BK-C4 on 2026-10-08. Other bounded module plans remain pending.<br>
 Approved platform specification: [`../SPEC-core-platform.md`](../SPEC-core-platform.md)<br>
 Approved product requirements: [`../PRODUCT-REQUIREMENTS.md`](../PRODUCT-REQUIREMENTS.md)<br>
 Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)<br>
@@ -860,7 +861,163 @@ Names and one integration steward must be selected before shared-file concurrenc
 SPEC-09 through SPEC-11 ownership is deferred to the next allocation round.
 See the team guide Section 8 and task Checkpoint CB2 for the recorded approval scope.
 
-## 20. SPEC-05/06 bounded implementation plan and readiness review
+## 20. SPEC-03 `booking-lifecycle` bounded implementation plan
+
+Status: **Plan approved on 2026-10-07; BK-W1–BK-W8 complete and implementation
+ACCEPTED at BK-C4 on 2026-10-08.** Acceptance and merge authorization are recorded in
+[`booking lifecycle evidence`](./evidence/booking-lifecycle.md#bk-c4-implementation-acceptance--2026-10-08).
+This plan consumes the approved `SPEC-booking-lifecycle.md`, accepted
+venue-catalog V4 evidence, identity I3 providers, and `WEDDING-CONTRACT-1@1.1.0`.
+
+### 20.1 Objective and dependency order
+
+Deliver authoritative consultation, availability, slot hold, proposal, immutable
+timeline, dual approval, deposit eligibility/recording, post-deposit change,
+cancellation, headcount, completion, and reporting behavior. Backend ownership lands
+before generated client integration. The execution dependency is:
+
+```text
+consultation/proposal snapshots
+  -> slot allocation and holds
+  -> timeline revisions and approvals
+  -> deposit intent and settlement evidence
+  -> change/cancellation/headcount/completion
+  -> HTTP/OpenAPI contract
+  -> Management Web + Public Web + Android consumers
+  -> real-provider and cross-repository acceptance
+```
+
+The integration steward exclusively owns Prisma migration order, `src/app.ts`, shared
+unit-of-work/outbox wiring, OpenAPI generation, and client contract publication.
+Module work remains in `src/modules/booking-lifecycle/`, module tests, and the matching
+client feature directories. Each checklist item is implemented as a focused task that
+touches no more than five human-authored files; generated Prisma/OpenAPI/client files
+are reviewed separately.
+
+### 20.2 Eight continuous waves
+
+| Wave | Vertical outcome | Provider/checkpoint gate |
+| --- | --- | --- |
+| BK-W1 | A Manager creates a consultation and immutable proposal snapshot; invitation retry is durable and idempotent. | Identity invitation/access and venue snapshot fakes conform; migration lane reserved. |
+| BK-W2 | A Manager can inspect availability and acquire exactly one 15-minute hold for a hall/date/shift. | Real PostgreSQL proves one winner, expiry, and unresolved-deposit pinning. |
+| BK-W3 | Authorized Manager and restricted prospect edit an immutable timeline and approve the exact current revision. | Stale edit/approval and no-op-save races pass; TML-001–004 evidence recorded. |
+| BK-W4 | Payments can reserve eligibility and record settlement once without allowing price, slot, or timeline invalidation. | Deposit ports pass fake/real conformance and PostgreSQL serialization; TML-005/006 evidence recorded. |
+| BK-W5 | Confirmed bookings support replacement timelines, cancellation requests/decisions, ordered headcount, and guarded completion. | Previous effective revision remains active until atomic replacement; TML-007/008 evidence recorded. |
+| BK-W6 | Stable authenticated HTTP routes and deterministic OpenAPI expose the approved commands, queries, failures, and idempotency contract. | Backend full contract gate and immutable digest pass before any client network integration. |
+| BK-W7 | Management Web, Public Web, and Android consume generated types and deliver their role-specific booking workflows. | Each client uses the frozen digest; browser/native authority remains presentation-only. |
+| BK-W8 | Real identity/venue/PostgreSQL integration and four-repository acceptance close ACC-001 and TML-001–008. | Clean migration, race, security, UI runtime, full quality gates, evidence, and owner acceptance. |
+
+### 20.3 Verification checkpoints
+
+- **BK-C1 after W1–W2:** focused domain/repository tests, empty migration, real
+  PostgreSQL slot races, changed-file formatting, typecheck, and diff/secret scans.
+- **BK-C2 after W3–W4:** timeline and deposit fake/real conformance, stale/replay/race
+  tests, audit/outbox atomicity, full backend lint/typecheck/test/contract/build/audit
+  gate, and provider hand-off package.
+- **BK-C3 after W5–W6:** lifecycle/headcount/completion tests, deterministic OpenAPI
+  generation, committed digest, backend coverage, and additive contract review.
+- **BK-C4 after W7–W8:** all affected client format/lint/typecheck/test/build gates,
+  browser and Android runtime review, clean/upgrade migration proof, end-to-end
+  acceptance matrix, evidence file, and project-owner acceptance.
+
+Focused tests use repository-local Vitest commands and one worker where the Windows
+runbook requires it. PostgreSQL verification uses the disposable acceptance database;
+no shared Supabase schema or live provider credential is used. UI implementation follows
+the installed `wedding-design-system` skill and keeps loading, empty, error, denied,
+stale, success, and narrow-screen states explicit.
+
+### 20.4 Risks and stop conditions
+
+| Risk | Mitigation / required stop |
+| --- | --- |
+| Slot, edit, or settlement races create two winners | Fail the wave unless a real PostgreSQL concurrency test proves one winner and atomic audit/outbox state. |
+| Client computes deposit eligibility or amount | Keep commercial snapshots and eligibility backend-only; clients render returned values. |
+| Active/unknown payment intent loses its slot or approved revision | Serialize intent reservation with edits, expiry, withdrawal, cancellation, and settlement; stop on any unresolved ordering ambiguity. |
+| Generated clients drift across repositories | Publish backend artifact first, pin exact commit/SHA-256, regenerate each client, and run `api:check`. |
+| Shared migration/OpenAPI files conflict with parallel work | Integration steward serializes those files; do not merge independent proposals directly. |
+| A new business decision changes locked money, history, access, or cancellation semantics | Update the approved SPEC/baseline and return to the project owner before continuing. |
+
+No open product decision was found while preparing this plan. Named A/B/C assignment is
+only required before concurrent shared-file work; this single sequential implementation
+is authorized by the project owner's “Tiến hành đi” approval on 2026-10-07.
+
+## 21. Approved product completion sequence (2026-10-08)
+
+The project owner approved the product additions discussed in this chat and explicitly
+kept the entire notification center in SPEC-09. This records scope and sequencing;
+detailed additive contracts and bounded tasks are prepared at the corresponding milestone.
+Existing SPEC numbers, module ownership, baseline 1.1.0, and accepted CP/IA/VC history
+remain the coordination references. Current SPEC-03 acceptance closes its approved scope
+before the post-SPEC-03 additions begin.
+
+### 21.1 After SPEC-03 implementation acceptance
+
+| Addition | Scope and owning module | Completion evidence |
+| --- | --- | --- |
+| Public Website | `wedding-web` landing page, hall list/detail, menus/prices, and contact/consultation entry points; consume SPEC-02 public catalog APIs. | Responsive public journey, published catalog data, loading/empty/error states, and working consultation entry. |
+| Consultation intake | `booking-lifecycle` owns public request submission and Manager review/conversion into a consultation; identity retains workspace invitation ownership. | Guest request -> Manager review -> consultation -> existing restricted invitation/workspace, with duplicate-submission and authorization proof. |
+| Couple overview | Web navigation and restricted proposal/timeline overview; full Couple Web/App navigation, event details, preparation progress, and required actions use backend capabilities. | Restricted access stays bounded; Web/App views use real approved APIs and backend-owned state. |
+| Account settings | `identity-access` owns profile edits and authenticated password change; complete the existing SPEC-01 forgot/reset-password experience. | Own-account updates, safe profile fields, credential verification/session policy, and existing reset flow tested across the applicable clients. |
+
+Prepare an additive specification and bounded plan for these additions before product
+implementation. Intake fields/lifecycle, permitted profile fields, password-change
+session behavior, route ownership, and the screen/API/acceptance matrix must be explicit;
+do not infer a public registration or automatic booking flow from a consultation request.
+Keep account security contracts with identity and consultation state with booking.
+
+The overview is extended incrementally with real provider readiness: payment/billing
+after SPEC-04, invitation/media/print after SPEC-05, RSVP after SPEC-06, and seating
+after SPEC-07. Upcoming features are not presented as completed workflows. Android
+remains available only after FULL access and confirmed deposit. Notification lists,
+unread badges, read actions, email/push expansion, and notification navigation wait
+for SPEC-09; they are not an early post-SPEC-03 slice. Existing identity credential
+email delivery continues through its accepted provider boundary.
+
+### 21.2 After SPEC-05 implementation acceptance
+
+`invitation-studio` owns the print-file output follow-up: approved revision preview,
+file generation, authorized download, and delivery to the restaurant for printing.
+Specify format, physical dimensions, front/back arrangement, font handling, image
+quality, QR readability, and revision identity in its bounded plan before implementation.
+Generated output must resolve the exact accepted immutable printable snapshot rather
+than current mutable invitation content. It preserves the no-recipient-name and generic
+QR rules and keeps private originals behind authorized access.
+
+Complete file output without seating first. Output containing seating reaches real
+integration acceptance only after SPEC-07 provides accepted seating snapshots; the
+SPEC-05 registry contract/fakes alone cannot close that integration.
+
+### 21.3 At SPEC-09
+
+Deliver the notification center together with SPEC-09 notification settings, email,
+Android push, and scheduled reminders. User-facing inbox entries, unread/read state,
+and authorized links to relevant screens are distinct from Manager delivery-attempt
+status. Specify their account/booking scope, safe content, lifecycle, APIs, and client
+acceptance in the SPEC-09 bounded plan. Opening or reading a notification never approves
+a timeline, settles a payment, or grants resource access.
+
+### 21.4 Acceptance and allocation
+
+The follow-up plans name repository/module owners and map each screen to provider APIs
+and focused acceptance scenarios. Final cross-module and release evidence includes the
+public-to-consultation journey, progressive Couple overview, account settings/reset,
+exact-revision print output, and SPEC-09 inbox. New additions remain pending until
+their actual implementation and evidence are accepted; this scheduling decision does
+not mark any existing or new implementation complete.
+
+### 21.5 Post-SPEC-03 implementation record
+
+The owner's 2026-10-08 request authorizes implementation after completed SPEC-03.
+The additive [experience SPEC](../SPEC-post-booking-experience.md) defines four bounded
+waves: backend/persistence/security; OpenAPI/public discovery/Manager intake; Couple
+overview/account settings; verification and evidence. Codex is the sequential
+implementation owner across all four repositories, keeping migration/OpenAPI writes
+in one lane. The current implementation and quality checks are recorded in
+[post-SPEC-03 evidence](./evidence/post-spec03-experience.md). Physical Android review,
+shared database deployment, and project-owner visual acceptance remain explicit
+runtime/release checks. This does not advance SPEC-04–SPEC-11 or their deferred features.
+
+## 22. SPEC-05/06 bounded implementation plan and readiness review
 
 Prepared: 2026-10-08. Status: **Reviewable draft — no implementation-plan approval or real-provider readiness claimed**.
 
@@ -868,7 +1025,7 @@ The user assigned SPEC-05/06 and requested completion of implementation preparat
 
 The detailed acceptance microchecks, all28 MED/GST/PRN/QRC requirements and19 related ports are in [the implementation guide, Section14](../docs/spec-05-06-implementation-guide.md). The preparation tasks below do not authorize edits to another module owner's implementation, unsafe concurrent shared-file changes, deployment or paid providers.
 
-### 20.1 Scope, paths and owners
+### 22.1 Scope, paths and owners
 
 - B owns `src/modules/invitation-studio/`, `src/modules/guest-rsvp/`, their tests and approved client feature slices. These backend module folders do not yet exist in this checkout.
 - The steward reserves/serializes Prisma schema/migrations, core outbox/UoW, identity/venue prerequisite adapters, composition-root wiring, OpenAPI publication, seeds and scripts. B supplies reviewed fragments/wiring requests.
@@ -876,7 +1033,7 @@ The detailed acceptance microchecks, all28 MED/GST/PRN/QRC requirements and19 re
 - Client checkouts were added and audited on 2026-10-08 at sibling paths `../wedding-web`, `../wedding-manage-web`, `../wedding-app`: all13 project Markdown files,3 API locks, manifests, generators, CI and relevant source locations. See guide Section20 for source hashes/snapshots and remaining client tasks. This static audit does not prove builds or integration pass.
 - Slice scope stays at most five human-authored files; generated artifacts tracked separately. Pure domain/UI fixtures may overlap unfinished providers only after the relevant plan/contract gates; real integration waits for specific verified methods, not every upstream screen.
 
-### 20.2 Preparation and readiness gates
+### 22.2 Preparation and readiness gates
 
 | Gate | Required evidence | Current result |
 | --- | --- | --- |
@@ -888,7 +1045,7 @@ The detailed acceptance microchecks, all28 MED/GST/PRN/QRC requirements and19 re
 | B-I2 — real integration start | Owner commits/migrations/schemas/conformance, UoW enlist/locks, runtime API artifacts | Booking/Payments/UoW/required venue additions not found locally. |
 | B-A — complete acceptance | Actual provider/clients/DB races, all requirements, clean migrations/seed, owner review | Not implemented; no acceptance claimed. |
 
-### 20.3 SPEC-05 — eight bounded waves
+### 22.3 SPEC-05 — eight bounded waves
 
 | Task | Outcome | Real dependency / completion evidence |
 | --- | --- | --- |
@@ -903,7 +1060,7 @@ The detailed acceptance microchecks, all28 MED/GST/PRN/QRC requirements and19 re
 
 Each row expands through guide14.5. PRN-006 stays Payments-owned but is a mandatory real integration check in IS-W5/8. No live Seating repository read is introduced. New print approvals recheck headcount/revision, active venue/capacity and stored proof within the booking unit-of-work, even before an asynchronous invalidation arrives.
 
-### 20.4 SPEC-06 — six bounded waves
+### 22.4 SPEC-06 — six bounded waves
 
 | Task | Outcome | Real dependency / completion evidence |
 | --- | --- | --- |
@@ -916,7 +1073,7 @@ Each row expands through guide14.5. PRN-006 stays Payments-owned but is a mandat
 
 Each row expands through guide14.6. Guest plan activation and Booking headcount synchronization are one transaction; staged503 HEADCOUNT_SYNC_PENDING does not activate a plan or count as completed integration. Manual authorized share is possible before Notifications adapter readiness; automated delivery acceptance remains explicitly pending.
 
-### 20.5 Reviewable HTTP completion proposals
+### 22.5 Reviewable HTTP completion proposals
 
 These are **proposed transport details**, not implemented routes or new approved semantics. Existing SPEC paths and policies remain authoritative. Strict schemas/errors/OpenAPI must be published before client network integration. All paths below are resource paths under the actual API version prefix; no `/api/v2` is introduced.
 
@@ -940,7 +1097,7 @@ These are **proposed transport details**, not implemented routes or new approved
 
 For each path finalize input/output schemas, all required/nullable fields, revision references, error/status cases, audit allowlist, authorization, cursor/limits and retry safety. Existing SPEC routes retain their exact field names; these proposals do not silently extend roles, expose private originals, allow post-cutoff writes, alter printable history or authorize payment/refund ownership changes.
 
-### 20.6 Decisions requiring explicit resolution
+### 22.6 Decisions requiring explicit resolution
 
 | Decision | Reviewable proposal / fixed boundary | Why not automatically approved |
 | --- | --- | --- |
@@ -952,13 +1109,13 @@ For each path finalize input/output schemas, all required/nullable fields, revis
 
 Business/security/history changes follow the approved source hierarchy and change-control process. Routine compatible transport details can be selected within scope and tested; no per-microtask approval ceremony is introduced. These proposals are separated from approved SPEC values such as upload25 MiB, cutoff−72h, quote7 days, import5 MiB/1.000 rows and RSVP−7 days.
 
-### 20.7 Verification, evidence and definition of ready
+### 22.7 Verification, evidence and definition of ready
 
 Focused checks inside waves; full backend quality/coverage/integration/contract/OpenAPI/build/audit at module checkpoint; affected client gates, empty+upgrade migration/seed rerun, real money/access/headcount/snapshot/credential races and security at acceptance. See guide14.9 for commands and28-row trace matrix; old CP/IA/VC test totals are historical only.
 
 **Ready for isolated coding** means approved bounded plan, resolved decisions affecting that slice, CONTRACT_READY and conforming doubles. **Ready for all real integration** additionally requires actual upstream methods/migrations/UoW/lifecycle locks, exact owner artifacts/conformance, actual client docs/locks and working credential adapter for automated delivery. Full acceptance still requires implementation and owner-reviewed evidence. A completed document checklist cannot satisfy these runtime gates.
 
-### 20.8 Client audit and remaining implementation work
+### 22.8 Client audit and remaining implementation work
 
 - All3 clients pin backend commit `168f61dd16fa58760b0d6238b7ebfd73503471c7` / SHA-256 `cc57e41c60f5e8e4edf9c5c835f986a7e4b17bfd64bbb3853888b29a9968ff40`; current BE OpenAPI has digest `caad010d6008cbfc8fc0748f49abad0c651e85ccda5cf008b60ac3f4e6fa3dc5`. Their default local generator will reject this mismatch. Preserve immutable lock semantics; publish implemented contract, then update each lock and regenerate types. Do not bypass digest checking or hand-edit generated files.
 - Public Web currently has Identity/Booking feature code; Management Web additionally has Venue code; App has Identity/Booking API code. No Invitation Studio/Guest RSVP feature folder or generated05/06 path/schema was found. Existing account/workspace invitations are not household invitations.
@@ -967,7 +1124,7 @@ Focused checks inside waves; full backend quality/coverage/integration/contract/
 - Web checks: formatting/lint/typecheck/api:check/coverage/build/audit. Android adds Expo SDK health and local Android export; this export is not an APK or EAS release. Validate real Guest/Manager/Couple flows, accessibility, responsive sizes and Android behavior at the implementation checkpoint; no runtime checks were executed in this documentation audit.
 - Next.js AGENTS instructions require reading installed version documentation before client code. Client source now pins Next16.3.8 while historical baseline evidence names16.3.6; record reviewed dependency drift instead of silently changing versions. Local Node is25.2.1, whereas repositories require Node24.x (`.node-version`24.21.0); no client node_modules is present. Prepare the required runtime/locked install before execution gates.
 
-### 20.9 SPEC-05 W1 isolated implementation checkpoint — 2026-10-08
+### 22.9 SPEC-05 W1 isolated implementation checkpoint — 2026-10-08
 
 Historical checkpoint. Current W1 implementation status is Section20.12/20.13 and SPEC-05§11; pending items below describe this earlier state.
 
@@ -992,7 +1149,7 @@ Five human-authored implementation files were added under `src/modules/invitatio
 
 Status: **isolated application/domain proof only**. IS-W1 remains unchecked until persistence, full decoder, real access/Storage conformance and runtime hand-off evidence are supplied. Entire SPEC-05 is not accepted.
 
-### 20.10 SPEC-05 W1 continuation — checked implementation, real integration still open
+### 22.10 SPEC-05 W1 continuation — checked implementation, real integration still open
 
 Historical checkpoint. Current W1 implementation status is Section20.12/20.13 and SPEC-05§11; pending items below describe this earlier state.
 
@@ -1011,7 +1168,7 @@ Changes were developed as serial small slices: decoder/dependency (package manif
 
 **Final regression,2026-10-09:**83 files/800 tests pass with all database URLs explicitly set to disposable PostgreSQL; no DB suites skipped. Full backend coverage97.18% lines/92.50% branches passes per-file80% gate. Typecheck/build/lint/format/API check pass; dependency audit accepts only existing two documented, unexpired exceptions. An initial full run failed the pre-existing parallel Venue pagination fixture: one-shot `listActiveHalls` mock was consumed by concurrent list/detail/cursor requests. A separate one-file test repair uses a stable snapshot for all calls; full regression then passes. Production Venue remains unchanged. Empty deployment and schema-isolated migration-policy tests include the new migration. Temporary PostgreSQL is stopped after verification; no shared database deployment or release approval is implied.
 
-### 20.11 SPEC-05 W1 completion audit — 2026-10-09
+### 22.11 SPEC-05 W1 completion audit — 2026-10-09
 
 Historical checkpoint. Current W1 implementation status is Section20.12/20.13 and SPEC-05§11; the missing-adapter observations below predate the native read-side prerequisites.
 
@@ -1037,7 +1194,7 @@ Completed serial module slices:
 
 **Latest gate:**84 files/820 tests (92 media tests) pass on Node24.21.0 with explicit disposable PostgreSQL18 URLs; no database suites skipped. Full coverage97.18% lines/92.54% branches passes per-file80%. Typecheck/build/lint/format/API check pass; dependency audit retains the two existing approved exceptions only. Source manifest still contains37 BE Markdown+one JSON;54 BE/client snapshots and12 client technical hashes are verified after the checklist changes. Temporary PostgreSQL is stopped after tests. No production root routes, published OpenAPI or client contract pins change in this continuation.
 
-### 20.12 SPEC-05 W1 remaining-work implementation — 2026-10-09
+### 22.12 SPEC-05 W1 remaining-work implementation — 2026-10-09
 
 The user's “kiểm tra thật kĩ và làm hết các phần còn thiếu cho tôi” authorizes the missing W1 repairs and the limited owner/Core prerequisites needed to exercise them. Sections20.9–20.11 are historical. The scope remains media, cutoff, quota, private originals, persistence and recovery. Full SPEC-03/04 payment/booking workflows, IS-W2…8, SPEC-06, external API publication and deployment are not accepted by this checkpoint.
 
@@ -1059,13 +1216,13 @@ The user's “kiểm tra thật kĩ và làm hết các phần còn thiếu cho 
 
 **Serial file lanes:** core scope; Identity scope and reference-race proof; schema/forward migration; four owner read-contract/adapter files; media scope enlistment; one composition factory; bounded PostgreSQL/upgrade/concurrency proof; strict timeline DTO proof; documentation/checklist. Each logical source/test slice was kept at or below five human-authored files. Shared schema/migration/dependency changes were serialized; generated Prisma types are separate. The earlier applied migrations were not rewritten.
 
-**Provider hand-off inventory:** Core `src/core/database/booking-boundary.ts`; Identity `src/modules/identity-access/authorization/scoped-identity.reader.ts`; Booking `src/modules/booking-lifecycle/application/booking-readers.ts` and its Prisma adapter; Payments `src/modules/payments-billing/application/deposit-settlement.reader.ts` and its Prisma adapter; consumer `src/modules/invitation-studio/infrastructure/media.composition.ts`. Forward migrations are `20261009000000_invitation_media_command_recovery` and `20261009010000_w1_owner_readers`. Conformance/upgrade/native-race evidence is in `tests/integration/invitation-studio/`; strict timeline and corrupted-settlement/reference tests are owner-local. The read-side models are prerequisites, not complete Booking/Payments aggregates, slot allocation, payment callback verification or settlement acceptance implementations. Only trusted owner writers may create verified settlement/approval facts; no production fixture/seed or fake-confirmation fallback is wired.
+**Provider hand-off inventory:** Core `src/core/database/booking-boundary.ts`; Identity `src/modules/identity-access/authorization/scoped-identity.reader.ts`; Booking `src/modules/booking-lifecycle/application/booking-readers.ts` and its Prisma adapter; Payments `src/modules/payments-billing/application/deposit-settlement.reader.ts` and its Prisma adapter; consumer `src/modules/invitation-studio/infrastructure/media.composition.ts`. The media recovery migration is `20261009000000_invitation_media_command_recovery`. The duplicate W1 owner migration was removed during the SPEC-05 review correction; adapters now use the accepted SPEC-03 Booking, normalized TimelineItem and BookingDepositSettlement models. Conformance/upgrade/native-race evidence is in `tests/integration/invitation-studio/`; strict timeline and corrupted-settlement/reference tests are owner-local. The adapters consume canonical owner facts and do not introduce replacement Booking/Payments models or settlement writers. Only trusted owner writers may create verified settlement/approval facts; no production fixture/seed or fake-confirmation fallback is wired.
 
 **Latest gate:**89 files/865 tests pass on Node24.21.0 with all three database URLs explicitly bound to disposable local PostgreSQL18 at127.0.0.1:55471; no DB suites skipped. Full coverage97.16% lines/92.87% branches meets per-file80%. Typecheck/build/lint/format/API/audit pass; audit retains only the two existing documented, unexpired exceptions. All54 BE/client snapshots and12 client technical hashes are verified after refreshing38 BE sources (37 Markdown+one JSON). Native+media focused suite passed135 tests before the two final Identity reference-race tests; full regression includes all137 W1/prerequisite tests. All six migrations deploy on the disposable database; schema diff is empty, and unique disposable database helpers exercise empty migration order plus populated upgrade. Disposable PostgreSQL is stopped after verification; no shared database was migrated.
 
 **W1 implementation status:** completed source/service/persistence and native read-side integration checks; completed items are checked in todo and guide14.5. External media HTTP/OpenAPI/list/download DTO publication remains IS-W6, rather than being incorrectly required to finish W1. The router factory is still unmounted. No `PROVIDER_READY`, `INTEGRATION_READY` or module `ACCEPTED` label is fabricated: exact reviewed provider commit/API checkpoint, complete upstream settlement→confirmation→FULL promotion journey and full SPEC-05 acceptance remain separate hand-offs. Current branch is `huy/spec-05-06`, based on `6bb247bd6fd7e979a64f929f4a0495ea7c5a3de2`, with reviewable working-tree changes; no commit/push/deployment is implied.
 
-### 20.13 SPEC-05 W1 closure cross-check — 2026-10-09
+### 22.13 SPEC-05 W1 closure cross-check — 2026-10-09
 
 The user asked whether every W1 task in the related Markdown/documents was done,
 and requested completing gaps or marking verified status. Reconciled the37-source
@@ -1091,7 +1248,7 @@ format/diff checks are refreshed after these edits. Formal reviewed commit/API
 publication and complete settlement→confirmation→FULL-promotion acceptance remain
 separate gates; they are not falsely checked as W1 code tasks or module acceptance.
 
-### 20.14 SPEC-05 media HTTP server wiring — 2026-10-09
+### 22.14 SPEC-05 media HTTP server wiring — 2026-10-09
 
 The user's subsequent request authorizes mounting media APIs into the server.
 InvitationStudioRuntime composes native Identity/Booking/timeline/deposit readers,
@@ -1141,7 +1298,7 @@ This completes the mounted media transport subset only. Other W6 endpoints,
 bounded media-list/policy reads if finalized, automation/reporting/events, reviewed
 committed API/client pins and whole-module acceptance remain separate. No commit,
 push or deployment is implied.
-### 20.15 SPEC-05 W2–W4 implementation and verification — 2026-10-09
+### 22.15 SPEC-05 W2–W4 implementation and verification — 2026-10-09
 
 The user authorizes completing all three backend waves without further questions.
 The scope is template/design/AI, explicit safe publication/generic QR, and printable
@@ -1213,7 +1370,7 @@ The working-tree OpenAPI SHA-256 is
 Formal PROVIDER_READY/INTEGRATION_READY still requires the reviewed exact commit,
 committed API digest and consumer pins per team contract. No commit, push, deploy or
 whole-module ACCEPTED status is claimed by a local implementation checkpoint.
-## 20.16 SPEC-05 W2–W4 re-audit corrections — 2026-10-09
+## 22.16 SPEC-05 W2–W4 re-audit corrections — 2026-10-09
 
 The owner requested all audit findings corrected and a complete API inventory. Scope
 is backend W2–W4;19 mounted operations and internal ports are listed in
@@ -1248,7 +1405,7 @@ possibly-undefined errors in tests/integration/invitation-studio/print-order-nat
 the latest whole-checkout typecheck as green until W5 fixes these. W2–W4 final104-test
 and owned coverage evidence above remain green; no W5 file was overwritten here.
 
-## 20.17 SPEC-05 W5 (Physical-Invitation Print Orders) implementation — 2026-10-09
+## 22.17 SPEC-05 W5 (Physical-Invitation Print Orders) implementation — 2026-10-09
 
 Wave IS-W5 implementation (PRN-001..009, QRC-001..004, baseline 21.6, guide 14.5: 05-W5) is completed and verified across all layers:
 
@@ -1279,7 +1436,7 @@ Wave IS-W5 implementation (PRN-001..009, QRC-001..004, baseline 21.6, guide 14.5
    - `tests/integration/invitation-studio/studio-waves.test.ts`: 42 native PostgreSQL integration tests passed.
    - `npm run api:check`: Byte-identical contract check passed.
 
-## 20.18 SPEC-05 Waves 1–7 Audit Defect Resolution — 2026-10-09
+## 22.18 SPEC-05 Waves 1–7 Audit Defect Resolution — 2026-10-09
 
 Comprehensive defect resolution across `wedding-be`, `wedding-web`, `wedding-manage-web`, and `wedding-app` for SPEC-05:
 

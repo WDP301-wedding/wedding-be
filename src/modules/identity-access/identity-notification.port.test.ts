@@ -47,4 +47,36 @@ describe('identity email notification adapter', () => {
       createIdentityEmailNotificationPort({ send: vi.fn() }, 'http://localhost:3000'),
     ).not.toThrow();
   });
+
+  it('uses the persisted delivery intent so a rotated credential has a distinct provider key', async () => {
+    const keys: string[] = [];
+    const notifications = createIdentityEmailNotificationPort(
+      {
+        send: (command) => {
+          keys.push(command.idempotencyKey);
+          return Promise.resolve({
+            idempotencyKey: command.idempotencyKey,
+            messageId: randomUUID(),
+          });
+        },
+      },
+      'https://couple.example.com',
+    );
+    const invitationId = randomUUID();
+    const first = {
+      invitationId,
+      deliveryIntentId: randomUUID(),
+      recipientEmail: 'couple@example.com',
+      invitationToken: 'wii_first',
+    };
+    await notifications.sendWorkspaceInvitation(first);
+    await notifications.sendWorkspaceInvitation(first);
+    await notifications.sendWorkspaceInvitation({
+      ...first,
+      deliveryIntentId: randomUUID(),
+      invitationToken: 'wii_rotated',
+    });
+    expect(keys[0]).toBe(keys[1]);
+    expect(keys[2]).not.toBe(keys[0]);
+  });
 });

@@ -8,6 +8,7 @@ import { createInvitationStudioServices } from '../../../src/modules/invitation-
 import type { AiImageProvider } from '../../../src/integrations/ai-image/ai-image-provider.js';
 import { digest } from '../../../src/modules/invitation-studio/domain/studio-policy.js';
 import { controlledStorage } from './controlled-storage.js';
+import { nativeBookingFixture } from './native-booking-fixture.js';
 
 export async function studioFixture(prisma: PrismaClient, ai: AiImageProvider | null = null) {
   const now = new Date();
@@ -103,60 +104,16 @@ export async function studioFixture(prisma: PrismaClient, ai: AiImageProvider | 
     expectedRevision: 1,
     context: ownerContext,
   });
-  await prisma.booking.create({
-    data: {
-      id: bookingId,
-      consultationId,
-      hallId,
-      shiftCode: 'LUNCH',
-      eventDate,
-      planningHeadcount: 20,
-    },
-  });
-  await prisma.bookingTimelineRevision.create({
-    data: {
-      id: timelineId,
-      bookingId,
-      revisionNumber: 1,
-      eventDate,
-      hallName: 'Approved hall',
-      shiftCode: 'LUNCH',
-      shiftStartTime: '11:00',
-      shiftEndTime: '14:00',
-      items: [
-        { itemId: randomUUID(), order: 0, startTime: '11:00', title: 'Welcome', description: null },
-      ],
-      approvedByManagerAt: now,
-      approvedByCoupleAt: now,
-    },
-  });
-  await prisma.depositSettlement.create({
-    data: {
-      paymentId,
-      bookingId,
-      amountVnd: 1000000,
-      settledAt: now,
-      evidenceReference: 'native-reader-fixture-only',
-    },
-  });
-  await prisma.booking.update({
-    where: { id: bookingId },
-    data: {
-      phase: 'CONFIRMED',
-      effectiveTimelineRevisionId: timelineId,
-      confirmedPaymentId: paymentId,
-      confirmedAt: now,
-    },
-  });
-  await prisma.consultationAccess.create({
-    data: {
-      accountId: couple.actorId,
-      consultationId,
-      bookingId,
-      level: 'FULL',
-      sourcePaymentId: paymentId,
-      promotedAt: now,
-    },
+  await nativeBookingFixture(prisma, {
+    bookingId,
+    consultationId,
+    timelineId,
+    paymentId,
+    actorId: couple.actorId,
+    managerId: manager.actorId,
+    hallId,
+    eventDate,
+    now,
   });
   const storage = controlledStorage(),
     services = createInvitationStudioServices(

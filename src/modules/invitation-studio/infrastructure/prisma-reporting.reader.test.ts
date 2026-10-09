@@ -28,10 +28,7 @@ describe('PrismaInvitationReportingReader (IS-W6 / CONTRACT-BASELINE §21.5)', (
       authority: 'AUTHENTICATED',
     };
 
-    const res = await reader.readPage(
-      { afterSequence: 0, limit: 100 },
-      unauthContext,
-    );
+    const res = await reader.readPage({ afterSequence: 0, limit: 100 }, unauthContext);
     expect(res).toEqual({
       throughSequence: 0,
       nextCursor: null,
@@ -49,10 +46,7 @@ describe('PrismaInvitationReportingReader (IS-W6 / CONTRACT-BASELINE §21.5)', (
       purpose: 'invalid:purpose',
     };
 
-    const res = await reader.readPage(
-      { afterSequence: 0, limit: 100 },
-      invalidSystemContext,
-    );
+    const res = await reader.readPage({ afterSequence: 0, limit: 100 }, invalidSystemContext);
     expect(res).toEqual({
       throughSequence: 0,
       nextCursor: null,
@@ -64,15 +58,15 @@ describe('PrismaInvitationReportingReader (IS-W6 / CONTRACT-BASELINE §21.5)', (
     const tCreated = new Date('2026-10-10T10:00:00.000Z');
     const tApproved = new Date('2026-10-10T10:30:00.000Z');
     const tLaterUpdate = new Date('2026-10-10T12:00:00.000Z');
-    const revId = 'rrrrrrrr-rrrr-rrrr-rrrr-rrrrrrrrrrrr';
-    const orderId1 = '11111111-1111-1111-1111-111111111111';
-    const orderId2 = '22222222-2222-2222-2222-222222222222';
+    const revId = '33333333-3333-4333-8333-333333333333';
+    const orderId1 = '11111111-1111-4111-8111-111111111111';
+    const orderId2 = '22222222-2222-4222-8222-222222222222';
 
     const mockAudits = [
       {
         sequence: BigInt(101),
         id: 'audit-1',
-        bookingId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        bookingId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
         orderId: orderId1,
         actorId: 'aaaa-1',
         action: 'invitation.print-order-requested',
@@ -83,7 +77,7 @@ describe('PrismaInvitationReportingReader (IS-W6 / CONTRACT-BASELINE §21.5)', (
       {
         sequence: BigInt(102),
         id: 'audit-2',
-        bookingId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        bookingId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
         orderId: orderId2,
         actorId: 'aaaa-2',
         action: 'invitation.print-order-approved',
@@ -96,7 +90,7 @@ describe('PrismaInvitationReportingReader (IS-W6 / CONTRACT-BASELINE §21.5)', (
     const mockOrders = [
       {
         id: orderId1,
-        bookingId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        bookingId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
         status: 'REQUESTED',
         revision: 1,
         currentCommercialRevisionId: null,
@@ -106,11 +100,11 @@ describe('PrismaInvitationReportingReader (IS-W6 / CONTRACT-BASELINE §21.5)', (
       },
       {
         id: orderId2,
-        bookingId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        bookingId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
         status: 'IN_PRODUCTION', // Order has updated to IN_PRODUCTION later
         revision: 3,
         currentCommercialRevisionId: revId,
-        receivableChargeId: 'cccccccc-cccc-cccc-cccc-cccccccccccc',
+        receivableChargeId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
         approvedAt: tApproved, // Real approved timestamp preserved
         updatedAt: tLaterUpdate, // Later mutation time
       },
@@ -123,31 +117,44 @@ describe('PrismaInvitationReportingReader (IS-W6 / CONTRACT-BASELINE §21.5)', (
       },
     ];
 
+    const liveOrders = vi.fn().mockResolvedValue(mockOrders);
+    const liveRevisions = vi.fn().mockResolvedValue(mockRevisions);
     const mockPrisma = {
       invitationPrintAudit: {
         findFirst: vi.fn().mockResolvedValue({ sequence: BigInt(102) }),
         findMany: vi.fn().mockImplementation((args: { where: { action?: string } }) => {
           if (args?.where?.action === 'invitation.print-order-approved') {
-            return Promise.resolve([
-              { orderId: orderId2, createdAt: tApproved },
-            ]);
+            return Promise.resolve([{ orderId: orderId2, createdAt: tApproved }]);
           }
-          return Promise.resolve(mockAudits);
+          return Promise.resolve(
+            mockAudits.map((a) => ({
+              ...a,
+              reportingSnapshot: {
+                bookingId: a.bookingId,
+                printOrderId: a.orderId,
+                status: a.toStatus,
+                commercialRevisionId:
+                  a.toStatus === 'APPROVED' ? '33333333-3333-4333-8333-333333333333' : null,
+                receivableChargeId:
+                  a.toStatus === 'APPROVED' ? 'cccccccc-cccc-4ccc-8ccc-cccccccccccc' : null,
+                acceptedAmountVnd: a.toStatus === 'APPROVED' ? 7500000 : 0,
+                approvedAt: a.toStatus === 'APPROVED' ? a.createdAt.toISOString() : null,
+                updatedAt: a.createdAt.toISOString(),
+              },
+            })),
+          );
         }),
       },
       invitationPrintOrder: {
-        findMany: vi.fn().mockResolvedValue(mockOrders),
+        findMany: liveOrders,
       },
       invitationCommercialRevision: {
-        findMany: vi.fn().mockResolvedValue(mockRevisions),
+        findMany: liveRevisions,
       },
     } as unknown as PrismaClient;
 
     const reader = new PrismaInvitationReportingReader(mockPrisma);
-    const res = await reader.readPage(
-      { afterSequence: 0, limit: 10 },
-      managerContext,
-    );
+    const res = await reader.readPage({ afterSequence: 0, limit: 10 }, managerContext);
 
     expect(res.throughSequence).toBe(102);
     expect(res.nextCursor).toBeNull();
@@ -168,19 +175,22 @@ describe('PrismaInvitationReportingReader (IS-W6 / CONTRACT-BASELINE §21.5)', (
     expect(row1?.sequence).toBe(102);
     expect(row1?.value.acceptedAmountVnd).toBe(7500000);
     expect(row1?.value.approvedAt).toBe(tApproved.toISOString());
+    expect(row1?.value.updatedAt).toBe(tApproved.toISOString());
+    expect(liveOrders).not.toHaveBeenCalled();
+    expect(liveRevisions).not.toHaveBeenCalled();
     expect(row1?.value.approvedAt).not.toBe(tLaterUpdate.toISOString());
   });
 
   it('respects supplied throughSequence and generates nextCursor when page is bounded', async () => {
     const tCreated = new Date('2026-10-10T10:00:00.000Z');
-    const orderId1 = '11111111-1111-1111-1111-111111111111';
-    const orderId2 = '22222222-2222-2222-2222-222222222222';
+    const orderId1 = '11111111-1111-4111-8111-111111111111';
+    const orderId2 = '22222222-2222-4222-8222-222222222222';
 
     const mockAudits = [
       {
         sequence: BigInt(50),
         id: 'audit-50',
-        bookingId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        bookingId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
         orderId: orderId1,
         actorId: 'aaaa-1',
         action: 'invitation.print-order-requested',
@@ -191,7 +201,7 @@ describe('PrismaInvitationReportingReader (IS-W6 / CONTRACT-BASELINE §21.5)', (
       {
         sequence: BigInt(51),
         id: 'audit-51',
-        bookingId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        bookingId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
         orderId: orderId2,
         actorId: 'aaaa-2',
         action: 'invitation.print-order-quoted',
@@ -204,7 +214,7 @@ describe('PrismaInvitationReportingReader (IS-W6 / CONTRACT-BASELINE §21.5)', (
     const mockOrders = [
       {
         id: orderId1,
-        bookingId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        bookingId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
         status: 'REQUESTED',
         revision: 1,
         currentCommercialRevisionId: null,
@@ -220,7 +230,23 @@ describe('PrismaInvitationReportingReader (IS-W6 / CONTRACT-BASELINE §21.5)', (
           if (args?.where?.action === 'invitation.print-order-approved') {
             return Promise.resolve([]);
           }
-          return Promise.resolve(mockAudits);
+          return Promise.resolve(
+            mockAudits.map((a) => ({
+              ...a,
+              reportingSnapshot: {
+                bookingId: a.bookingId,
+                printOrderId: a.orderId,
+                status: a.toStatus,
+                commercialRevisionId:
+                  a.toStatus === 'APPROVED' ? '33333333-3333-4333-8333-333333333333' : null,
+                receivableChargeId:
+                  a.toStatus === 'APPROVED' ? 'cccccccc-cccc-4ccc-8ccc-cccccccccccc' : null,
+                acceptedAmountVnd: a.toStatus === 'APPROVED' ? 7500000 : 0,
+                approvedAt: a.toStatus === 'APPROVED' ? a.createdAt.toISOString() : null,
+                updatedAt: a.createdAt.toISOString(),
+              },
+            })),
+          );
         }),
       },
       invitationPrintOrder: {
@@ -246,9 +272,10 @@ describe('PrismaInvitationReportingReader (IS-W6 / CONTRACT-BASELINE §21.5)', (
     expect(res.rows[0]?.sequence).toBe(50);
     expect(res.nextCursor).not.toBeNull();
 
-    const decoded = JSON.parse(
-      Buffer.from(res.nextCursor!, 'base64url').toString('utf8'),
-    ) as { s: number; id: string };
+    const decoded = JSON.parse(Buffer.from(res.nextCursor!, 'base64url').toString('utf8')) as {
+      s: number;
+      id: string;
+    };
     expect(decoded.s).toBe(50);
     expect(decoded.id).toBe('audit-50');
   });

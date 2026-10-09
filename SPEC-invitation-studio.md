@@ -256,7 +256,27 @@ Venue eligibility reads hold the lifecycle shared lock until snapshot approval c
 a concurrent retirement cannot slip between checking eligibility and accepting the charge.
 The accepted venue eligibility dependency is explicit; no live seating read is introduced.
 
-## 11. W1 backend implementation checkpoint — 2026-10-09
+## 11. Approved print-file output follow-up (2026-10-08)
+
+The project owner schedules print-file output after SPEC-05 implementation acceptance.
+This module retains ownership of approved-revision preview, generated print files,
+and authorized download for restaurant printing. The follow-up plan must specify file
+format, physical dimensions, front/back arrangement, fonts, image quality, QR readability,
+and exact printable revision identity before implementation.
+
+Render the accepted immutable snapshot and its retained assets, not the latest mutable
+design, timeline, or seating plan. No recipient name or personalized credential enters
+the output; all variants retain the booking's generic QR. Private originals remain
+authorized-only. Verify file preview/download, snapshot fidelity after later edits,
+and QR readability with representative generated files.
+
+Output without seating can complete after SPEC-05. Seating-inclusive output requires
+real accepted SPEC-07 snapshot integration; conforming registry fakes cannot close it.
+See [plan Section 21](./tasks/plan.md#21-approved-product-completion-sequence-2026-10-08)
+for the approved product completion sequence. Detailed output contracts and tasks
+remain follow-up work rather than a claim of implementation acceptance.
+
+## 12. W1 backend implementation checkpoint — 2026-10-09
 
 This records implementation progress against Sections1/4–7/9–10, MED-001…006,
 ACC-004, baseline6.3/6.4/21.1/21.2/21.8 and the team/migration rules. It does not
@@ -295,7 +315,7 @@ Earlier plan20.9–20.11/guide18.4–18.6 are historical checkpoints, superseded
 current W1 status. W2–W8, formal PROVIDER_READY/INTEGRATION_READY/ACCEPTED,
 SPEC-06 and release remain separate gates.
 
-## 12. Media HTTP server checkpoint — 2026-10-09
+## 13. Media HTTP server checkpoint — 2026-10-09
 
 The user's subsequent request authorized mounting the completed media commands/read.
 `src/server.ts` now registers `InvitationStudioRuntime.router` at `/api/v1`.
@@ -319,7 +339,7 @@ The user's subsequent request authorized mounting the completed media commands/r
 Current transport gates are recorded in plan20.14 and guide18.8. Earlier W1
 checkpoint statements about an unmounted factory are historical after this wiring.
 
-## 13. W2–W4 backend implementation checkpoint — 2026-10-09
+## 14. W2–W4 backend implementation checkpoint — 2026-10-09
 
 The project owner authorized completing all three backend waves. Detailed
 implementation/evidence/path decisions are recorded in [plan20.15](./tasks/plan.md#2015-spec-05-w2w4-implementation-and-verification--2026-10-09)
@@ -360,7 +380,7 @@ implementation checks; reviewed provider commit, committed client API pins, actu
 Seating producer integration, W5 billing/print approval/fulfilment, W6 automation/
 reporting, W7 clients and W8 whole-module owner acceptance remain separate.
 
-## 14. W2–W4 re-audit corrections — 2026-10-09
+## 15. W2–W4 re-audit corrections — 2026-10-09
 
 The earlier checkpoint omitted opaque-token prompt filtering, current template-list
 reauthorization, template/private HTTP denial audit, readonly registry compatibility,
@@ -377,3 +397,16 @@ and unknown dependency outcomes as well as ordering/replay/proof cases.
 
 Quality evidence and limitations are recorded at plan20.16. A working-tree backend
 check is not owner review, consumer pin or actual Seating producer acceptance.
+
+## 16. Review corrections against accepted Booking — 2026-10-10
+
+Invitation adapters now consume the accepted SPEC-03 Booking, normalized timeline
+items and deposit settlement; the duplicate W1 owner migration is removed.
+Replacement proposals advance the order revision and only the latest proposal
+can be approved. Print reporting freezes each transition value and allocates its
+sequence under a global transaction lock so historical fences remain stable
+and cannot skip an uncommitted transition from another booking.
+
+Regression, upgrade and verification evidence is recorded in
+[`tasks/evidence/spec05-review-fixes.md`](./tasks/evidence/spec05-review-fixes.md).
+SPEC-06 implementation is not included in this correction.

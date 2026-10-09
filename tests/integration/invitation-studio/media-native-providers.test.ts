@@ -15,6 +15,7 @@ import { createPersistentMediaService } from '../../../src/modules/invitation-st
 import { issueOpaqueToken } from '../../../src/modules/identity-access/crypto/token.js';
 import { createPrismaSessionRepository } from '../../../src/modules/identity-access/session/session.repository.js';
 import { controlledStorage } from './controlled-storage.js';
+import { nativeBookingFixture, nativeTimelineFixture } from './native-booking-fixture.js';
 import {
   CatalogTestDatabase,
   catalogMigrationDatabaseUrl,
@@ -69,67 +70,14 @@ describeDatabase('W1 native owner readers/shared transaction, controlled Storage
     timelineId = randomUUID();
     paymentId = randomUUID();
     actor = await identityFixture();
-    // Native owner adapter fixtures, NOT production seeds or settlement acceptance.
-    await db().booking.create({
-      data: {
-        id: bookingId,
-        consultationId,
-        hallId: randomUUID(),
-        shiftCode: 'LUNCH',
-        eventDate: new Date('2026-10-15'),
-        planningHeadcount: 20,
-      },
-    });
-    await db().bookingTimelineRevision.create({
-      data: {
-        id: timelineId,
-        bookingId,
-        revisionNumber: 1,
-        eventDate: new Date('2026-10-15'),
-        hallName: 'Approved hall',
-        shiftCode: 'LUNCH',
-        shiftStartTime: '11:00',
-        shiftEndTime: '14:00',
-        items: [
-          {
-            itemId: randomUUID(),
-            order: 0,
-            startTime: '11:00',
-            title: 'Welcome',
-            description: null,
-          },
-        ],
-        approvedByManagerAt: new Date('2026-10-07T00:00:00Z'),
-        approvedByCoupleAt: new Date('2026-10-07T01:00:00Z'),
-      },
-    });
-    await db().depositSettlement.create({
-      data: {
-        paymentId,
-        bookingId,
-        amountVnd: 1000000,
-        settledAt: new Date('2026-10-08T00:00:00Z'),
-        evidenceReference: 'verified-fixture-only',
-      },
-    });
-    await db().booking.update({
-      where: { id: bookingId },
-      data: {
-        phase: 'CONFIRMED',
-        effectiveTimelineRevisionId: timelineId,
-        confirmedPaymentId: paymentId,
-        confirmedAt: new Date('2026-10-08T00:00:00Z'),
-      },
-    });
-    await db().consultationAccess.create({
-      data: {
-        accountId: actor.context.actorId,
-        consultationId,
-        bookingId,
-        level: 'FULL',
-        sourcePaymentId: paymentId,
-        promotedAt: now,
-      },
+    await nativeBookingFixture(db(), {
+      bookingId,
+      consultationId,
+      timelineId,
+      paymentId,
+      actorId: actor.context.actorId,
+      eventDate: new Date('2026-10-15'),
+      now: new Date('2026-10-08T00:00:00Z'),
     });
   });
   afterAll(async () => database.disconnect());
@@ -300,7 +248,7 @@ describeDatabase('W1 native owner readers/shared transaction, controlled Storage
     ).rejects.toMatchObject({ status: 404 });
   });
 
-  it.each(['DRAFT', 'AWAITING_DEPOSIT', 'CANCELLED', 'COMPLETED'])(
+  it.each(['DRAFT', 'AWAITING_DEPOSIT', 'CANCELLED', 'COMPLETED'] as const)(
     'denies current %s phase before provider effects',
     async (phase) => {
       await db().booking.update({ where: { id: bookingId }, data: { phase } });
@@ -363,23 +311,18 @@ describeDatabase('W1 native owner readers/shared transaction, controlled Storage
     });
   });
 
-  it('rejects unapproved/mismatched/malformed effective snapshots; never guesses Venue shift times', async () => {
+  it('requires dual approval and reads the canonical booking/proposal and normalized timeline items', async () => {
     const h = harness();
     const id = randomUUID();
-    await db().bookingTimelineRevision.create({
-      data: {
-        id,
-        bookingId,
-        revisionNumber: 2,
-        eventDate: new Date('2026-10-15'),
-        hallName: 'Next',
-        shiftCode: 'LUNCH',
-        shiftStartTime: '10:30',
-        shiftEndTime: '14:00',
-        items: [
-          { itemId: randomUUID(), order: 0, startTime: '10:30', title: 'Next', description: null },
-        ],
-      },
+    await nativeTimelineFixture(db(), {
+      timelineId: id,
+      bookingId,
+      revisionNumber: 2,
+      actorId: actor.context.actorId,
+      now,
+      approved: false,
+      startTime: '11:30',
+      title: 'Next',
     });
     await db().booking.update({
       where: { id: bookingId },
@@ -388,7 +331,7 @@ describeDatabase('W1 native owner readers/shared transaction, controlled Storage
     await expect(h.upload()).rejects.toMatchObject({ status: 404 });
     await db().bookingTimelineRevision.update({
       where: { id },
-      data: { approvedByCoupleAt: now, approvedByManagerAt: now },
+      data: { coupleApprovedAt: now, managerApprovedAt: now, state: 'EFFECTIVE' },
     });
     expect(
       (
@@ -398,30 +341,29 @@ describeDatabase('W1 native owner readers/shared transaction, controlled Storage
         )
       ).isEffective,
     ).toBe(false);
-    await db().booking.update({
-      where: { id: bookingId },
-      data: { eventDate: new Date('2026-10-16') },
-    });
-    await expect(h.upload()).rejects.toMatchObject({ status: 422 });
-    const malformed = randomUUID();
-    await db().bookingTimelineRevision.create({
-      data: {
-        id: malformed,
-        bookingId,
-        revisionNumber: 3,
-        eventDate: new Date('2026-10-15'),
-        hallName: 'Invalid',
-        shiftCode: 'LUNCH',
-        shiftStartTime: '11:00',
-        shiftEndTime: '14:00',
-        items: [{ untrusted: true }],
-        approvedByCoupleAt: now,
-        approvedByManagerAt: now,
-      },
+    const effective = await h.timeline.resolveApprovedRevision(
+      { bookingId, timelineRevisionId: id },
+      contract(),
+    );
+    expect(effective).toMatchObject({
+      isEffective: true,
+      hallName: 'Approved hall',
+      shiftStartTime: '11:00',
+      shiftEndTime: '14:00',
+      items: [{ order: 0, startTime: '11:30', title: 'Next', description: null }],
     });
     await expect(
-      h.timeline.resolveApprovedRevision({ bookingId, timelineRevisionId: malformed }, contract()),
-    ).rejects.toMatchObject({ status: 422 });
+      db().bookingTimelineItem.create({
+        data: {
+          id: randomUUID(),
+          timelineRevisionId: id,
+          itemId: randomUUID(),
+          displayOrder: 1,
+          startTime: new Date('1970-01-01T12:00:00Z'),
+          title: '',
+        },
+      }),
+    ).rejects.toThrow();
     await expect(
       h.timeline.resolveApprovedRevision(
         { bookingId, timelineRevisionId: randomUUID() },
@@ -567,28 +509,14 @@ describeDatabase('W1 native owner readers/shared transaction, controlled Storage
       const h = harness();
       const successor = randomUUID();
       if (kind === 'timeline')
-        await db().bookingTimelineRevision.create({
-          data: {
-            id: successor,
-            bookingId,
-            revisionNumber: 2,
-            eventDate: new Date('2026-10-15'),
-            hallName: 'Next',
-            shiftCode: 'LUNCH',
-            shiftStartTime: '11:30',
-            shiftEndTime: '14:00',
-            items: [
-              {
-                itemId: randomUUID(),
-                order: 0,
-                startTime: '11:30',
-                title: 'Next',
-                description: null,
-              },
-            ],
-            approvedByManagerAt: now,
-            approvedByCoupleAt: now,
-          },
+        await nativeTimelineFixture(db(), {
+          timelineId: successor,
+          bookingId,
+          revisionNumber: 2,
+          actorId: actor.context.actorId,
+          now,
+          startTime: '11:30',
+          title: 'Next',
         });
       let entered!: () => void, release!: () => void;
       const enteredGate = new Promise<void>((r) => {
@@ -645,37 +573,30 @@ describeDatabase('W1 native owner readers/shared transaction, controlled Storage
     },
   );
 
-  it('enforces immutable settlement/timeline content and same-booking effective evidence in PostgreSQL', async () => {
+  it('enforces canonical proposal immutability and normalized owner references in PostgreSQL', async () => {
     await expect(
-      db().depositSettlement.update({ where: { paymentId }, data: { amountVnd: 2 } }),
-    ).rejects.toThrow(/immutable/u);
-    await expect(db().depositSettlement.delete({ where: { paymentId } })).rejects.toThrow(
-      /immutable/u,
-    );
-    await expect(
-      db().bookingTimelineRevision.update({
-        where: { id: timelineId },
-        data: { shiftStartTime: '10:00' },
+      db().bookingProposalSnapshot.update({
+        where: { bookingId },
+        data: { shiftStartTime: new Date('1970-01-01T10:00:00Z') },
       }),
     ).rejects.toThrow(/immutable/u);
-    await expect(
-      db().bookingTimelineRevision.delete({ where: { id: timelineId } }),
-    ).rejects.toThrow(/immutable/u);
-    await expect(
-      db().bookingTimelineRevision.update({
-        where: { id: timelineId },
-        data: { approvedByManagerAt: now },
-      }),
-    ).rejects.toThrow(/immutable/u);
-    await expect(
-      db().booking.update({ where: { id: bookingId }, data: { confirmedPaymentId: randomUUID() } }),
-    ).rejects.toThrow();
     await expect(
       db().booking.update({
         where: { id: bookingId },
-        data: { confirmedAt: new Date('2026-10-07') },
+        data: { effectiveTimelineRevisionId: randomUUID() },
       }),
-    ).resolves.toBeDefined();
-    await expect(harness().upload()).rejects.toMatchObject({ status: 404 });
+    ).rejects.toThrow();
+    await expect(
+      db().bookingDepositSettlement.create({
+        data: {
+          paymentId: randomUUID(),
+          bookingId: randomUUID(),
+          timelineRevisionId: timelineId,
+          amountVnd: 1_000_000,
+          settledAt: now,
+        },
+      }),
+    ).rejects.toThrow();
+    await expect(harness().upload()).resolves.toBeDefined();
   });
 });

@@ -8,12 +8,13 @@ import type { ShutdownResource } from '../../core/http/lifecycle.js';
 import { createEmailProvider } from '../../integrations/email/email-provider.factory.js';
 import { createPrismaAccountRepository } from './account/account.repository.js';
 import { createAccountService } from './account/account.service.js';
+import { createAccountSettingsRouter } from './account/settings.router.js';
 import { createAuthenticatedActorResolver } from './authorization/authenticated-actor.middleware.js';
 import { hashPassword, verifyPassword } from './crypto/password.js';
 import { createIdentityRouter } from './identity.router.js';
-import { createIdentityEmailNotificationPort } from './identity-notification.port.js';
-import { createPrismaPasswordResetRepository } from './password-reset/password-reset.repository.js';
-import { createPasswordResetService } from './password-reset/password-reset.service.js';
+import { AppError } from '../../core/errors/app-error.js';
+import { createPasswordOtpService } from './password-otp/password-otp.service.js';
+import { createPasswordOtpRouter } from './password-otp/password-otp.router.js';
 import { createPrismaSessionRepository } from './session/session.repository.js';
 import {
   createInMemoryAttemptThrottle,
@@ -32,6 +33,9 @@ export async function createIdentityRuntime(config: Config): Promise<IdentityRun
   const prisma = createPrismaClient(config.database.url);
   try {
     await prisma.$connect();
+    const schema = config.database.url
+      ? (new URL(config.database.url).searchParams.get('schema') ?? 'public')
+      : 'public';
     const passwordPolicy = config.identityAccess.password;
     const dummyPasswordVerifier = await hashPassword(
       randomBytes(32).toString('base64url'),
@@ -65,21 +69,30 @@ export async function createIdentityRuntime(config: Config): Promise<IdentityRun
       },
       recordSecurityEvent: (event) => recordSecurityEvent(prisma, event),
     });
-    const publicWebBaseUrl = resolvePublicWebBaseUrl(config);
     const emailProvider = createEmailProvider(config.email);
-    const notificationPort = createIdentityEmailNotificationPort(emailProvider, publicWebBaseUrl);
-    const passwordResetService = createPasswordResetService({
-      repository: createPrismaPasswordResetRepository(prisma),
+    const otpKey = config.identityAccess.passwordOtpHashKey;
+    if (
+      !otpKey &&
+      config.runtime.environment !== 'development' &&
+      config.runtime.environment !== 'test'
+    )
+      throw new TypeError('AUTH_OTP_HASH_KEY is required.');
+    const passwordOtpService = createPasswordOtpService({
+      prisma,
       passwordCrypto,
-      notificationPort,
-      throttle,
-      config: {
-        tokenEntropyBytes: config.identityAccess.tokenEntropyBytes,
-        lifetimeSeconds: config.identityAccess.lifetimesSeconds.passwordReset,
-        requestRateLimit: config.identityAccess.rateLimits.resetRequest,
-        completionRateLimit: config.identityAccess.rateLimits.tokenConsume,
-      },
+      emailProvider,
+      emailEnabled: config.email.enabled,
+      schema,
+      hashKey: otpKey ?? randomBytes(32).toString('hex'),
     });
+    const retiredReset = (): Promise<never> =>
+      Promise.reject(
+        new AppError({
+          status: 410,
+          code: 'PASSWORD_OTP_REQUIRED',
+          message: 'Use the email OTP password confirmation endpoints.',
+        }),
+      );
     const invitationAcceptanceService = createWorkspaceInvitationAcceptanceService({
       repository: createPrismaWorkspaceInvitationRepository(prisma),
       passwordCrypto,
@@ -101,13 +114,15 @@ export async function createIdentityRuntime(config: Config): Promise<IdentityRun
         logout: sessionService.logout,
         listSessions: sessionService.listSessions,
         revokeOwnedSession: sessionService.revokeOwnedSession,
-        requestPasswordReset: passwordResetService.request,
-        completePasswordReset: passwordResetService.complete,
+        requestPasswordReset: retiredReset,
+        completePasswordReset: retiredReset,
         acceptInvitation: invitationAcceptanceService.accept,
       },
       allowedWebOrigins: config.cors.allowedOrigins,
       refreshCookieName: config.identityAccess.refreshCookie.name,
     });
+    router.use(createPasswordOtpRouter(passwordOtpService, actorResolver));
+    router.use(createAccountSettingsRouter(prisma, actorResolver, passwordOtpService, schema));
     return Object.freeze({
       router,
       resource: Object.freeze({
@@ -119,15 +134,6 @@ export async function createIdentityRuntime(config: Config): Promise<IdentityRun
     await prisma.$disconnect();
     throw error;
   }
-}
-
-function resolvePublicWebBaseUrl(config: Config): string {
-  const configured = config.cors.allowedOrigins[0];
-  if (configured !== undefined) return configured;
-  if (config.runtime.environment === 'development' || config.runtime.environment === 'test') {
-    return 'http://localhost:3000';
-  }
-  throw new TypeError('Identity notification links require a configured Public Web origin.');
 }
 
 async function recordSecurityEvent(

@@ -42,12 +42,13 @@ describe('FT-V3 immutable venue catalog contract', () => {
     const serialized = JSON.stringify(createOpenApiDocument());
 
     expect(serialized).not.toMatch(/objectKey|createdByAccountId|updatedByAccountId/iu);
-    const catalogPaths = Object.fromEntries(
-      Object.entries(createOpenApiDocument().paths ?? {}).filter(([path]) =>
-        path.includes('/catalog/'),
-      ),
-    );
-    expect(JSON.stringify(catalogPaths)).not.toMatch(/couple.*(?:geometry|layout).*mutation/iu);
+    for (const [path, operations] of Object.entries(createOpenApiDocument().paths ?? {})) {
+      if (/^\/couple\/.*(?:geometry|layout)/iu.test(path)) {
+        expect(operations?.post).toBeUndefined();
+        expect(operations?.patch).toBeUndefined();
+        expect(operations?.delete).toBeUndefined();
+      }
+    }
     const paths = Object.keys(createOpenApiDocument().paths ?? {});
     expect(paths).not.toContain('/catalog/layout-templates');
     expect(paths).not.toContain('/catalog/timeline-templates');

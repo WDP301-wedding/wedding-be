@@ -157,11 +157,19 @@ describeDatabase('SPEC-05 media upgrade preserves existing data', () => {
         await client.query(await readFile(join(root, migration, 'migration.sql'), 'utf8'));
       expect(
         (
-          await client.query('SELECT row_to_json(a) AS value FROM "Account" a WHERE id=$1', [
+          await client.query(
+            `SELECT (to_jsonb(a) - 'displayName' - 'profileRevision') AS value FROM "Account" a WHERE id=$1`,
+            [accountId],
+          )
+        ).rows,
+      ).toEqual(snapshot.rows);
+      expect(
+        (
+          await client.query('SELECT "displayName", "profileRevision" FROM "Account" WHERE id=$1', [
             accountId,
           ])
         ).rows,
-      ).toEqual(snapshot.rows);
+      ).toEqual([{ displayName: null, profileRevision: 1 }]);
       expect(
         (
           await client.query('SELECT row_to_json(a) AS value FROM "AuditLog" a WHERE id=$1', [

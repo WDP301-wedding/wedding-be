@@ -62,6 +62,13 @@ export interface AccountRepository {
   isPiiErasureAllowed(accountId: string, now: Date): Promise<boolean>;
 }
 
+function inAccountTransaction<T>(
+  prisma: PrismaClient | Prisma.TransactionClient,
+  work: (transaction: Prisma.TransactionClient) => Promise<T>,
+): Promise<T> {
+  return '$transaction' in prisma ? prisma.$transaction(work) : work(prisma);
+}
+
 export class InitialManagerAlreadyExistsRepositoryError extends Error {
   override readonly name = 'InitialManagerAlreadyExistsRepositoryError';
 
@@ -78,7 +85,9 @@ export class RetentionAccessNotFoundRepositoryError extends Error {
   }
 }
 
-export function createPrismaAccountRepository(prisma: PrismaClient): AccountRepository {
+export function createPrismaAccountRepository(
+  prisma: PrismaClient | Prisma.TransactionClient,
+): AccountRepository {
   return {
     async findForAuthentication(emailNormalized) {
       const account = await prisma.account.findUnique({
@@ -104,7 +113,7 @@ export function createPrismaAccountRepository(prisma: PrismaClient): AccountRepo
 
     async bootstrapInitialManager(input) {
       try {
-        return await prisma.$transaction(async (transaction) => {
+        return await inAccountTransaction(prisma, async (transaction) => {
           await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('identity-access.bootstrap-manager'))`;
           const managerCount = await transaction.accountRole.count({ where: { role: 'MANAGER' } });
           if (managerCount > 0) {
@@ -148,7 +157,7 @@ export function createPrismaAccountRepository(prisma: PrismaClient): AccountRepo
     },
 
     async replacePassword(input) {
-      await prisma.$transaction(async (transaction) => {
+      await inAccountTransaction(prisma, async (transaction) => {
         await transaction.passwordCredential.upsert({
           where: { accountId: input.accountId },
           create: { accountId: input.accountId, ...passwordVerifierData(input.passwordVerifier) },
@@ -165,7 +174,7 @@ export function createPrismaAccountRepository(prisma: PrismaClient): AccountRepo
     },
 
     async grantRole(input) {
-      await prisma.$transaction(async (transaction) => {
+      await inAccountTransaction(prisma, async (transaction) => {
         await transaction.accountRole.upsert({
           where: { accountId_role: { accountId: input.accountId, role: input.role } },
           create: { accountId: input.accountId, role: input.role },
@@ -182,7 +191,7 @@ export function createPrismaAccountRepository(prisma: PrismaClient): AccountRepo
     },
 
     async recordRetentionEligibility(input) {
-      return prisma.$transaction(async (transaction) => {
+      return inAccountTransaction(prisma, async (transaction) => {
         const linkedAccess = await transaction.consultationAccess.findUnique({
           where: {
             accountId_consultationId: {

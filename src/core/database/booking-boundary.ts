@@ -109,7 +109,7 @@ export class PrismaBookingBoundary implements BookingBoundaryUnitOfWork {
     return this.prisma.$transaction(
       async (tx) => {
         await admit?.(tx);
-        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended('booking:' || ${bookingId}::text, 0))`;
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${bookingId}::text))`;
         const context = Object.freeze({ ...input.context, transactionScopeId: randomUUID() });
         const scope: Scope = { bookingId, context, tx, active: true };
         try {

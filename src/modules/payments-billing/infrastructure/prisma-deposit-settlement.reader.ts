@@ -11,16 +11,17 @@ export function createPrismaDepositSettlementReader(
   return {
     async requireDepositSettlement(bookingId) {
       bookingId = z.uuid().parse(bookingId).toLowerCase();
-      const row = await (boundary.current(bookingId) ?? prisma).depositSettlement.findUnique({
-        where: { bookingId },
-      });
+      const row = await (boundary.current(bookingId) ?? prisma).bookingDepositSettlement.findUnique(
+        {
+          where: { bookingId },
+        },
+      );
       if (row === null) throw new NotFoundError();
       const amountVnd = row.amountVnd.toNumber();
       if (
         !Number.isSafeInteger(amountVnd) ||
         amountVnd <= 0 ||
-        !Number.isFinite(row.settledAt.getTime()) ||
-        !row.evidenceReference
+        !Number.isFinite(row.settledAt.getTime())
       )
         throw new ValidationError();
       return { paymentId: row.paymentId, amountVnd, settledAt: new Date(row.settledAt) };

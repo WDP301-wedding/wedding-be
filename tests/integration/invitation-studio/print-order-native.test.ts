@@ -7,9 +7,7 @@ import { createErrorHandler } from '../../../src/core/errors/error-handler.js';
 import { createStudioRouter } from '../../../src/modules/invitation-studio/http/studio.router.js';
 import { CatalogTestDatabase } from '../venue-catalog/catalog-test-database.js';
 import { studioFixture } from './studio-fixture.js';
-import {
-  printOrderResponseSchema,
-} from '../../../src/modules/invitation-studio/http/print-orders.schemas.js';
+import { printOrderResponseSchema } from '../../../src/modules/invitation-studio/http/print-orders.schemas.js';
 import { designResponse } from '../../../src/modules/invitation-studio/http/studio.schemas.js';
 import { errorResponseSchema } from '../../../src/core/http/common.schemas.js';
 
@@ -467,7 +465,7 @@ describe('Print Order Integration (IS-W5 / PRN-001..009)', () => {
       .post(`/api/v1/management/print-orders/${orderId}/production`)
       .set('Authorization', `Bearer ${f.manager.accessToken}`)
       .set('Idempotency-Key', randomUUID())
-      .send({ expectedRevision: 3 })
+      .send({ expectedRevision: 4 })
       .expect(409);
 
     // Get the new commercial revision ID from database
@@ -483,13 +481,13 @@ describe('Print Order Integration (IS-W5 / PRN-001..009)', () => {
       .set('Authorization', `Bearer ${f.couple.accessToken}`)
       .set('Idempotency-Key', randomUUID())
       .send({
-        expectedRevision: 3,
+        expectedRevision: 4,
         commercialRevisionId: newRev!.id,
       })
       .expect(200);
 
     const replOrder = printOrderResponseSchema.parse(approveReplRes.body).data;
-    expect(replOrder.revision).toBe(4);
+    expect(replOrder.revision).toBe(5);
     expect(replOrder.currentCommercialRevisionId).toBe(newRev!.id);
     expect(replOrder.receivableChargeId).not.toBe(oldChargeId);
 
@@ -513,7 +511,7 @@ describe('Print Order Integration (IS-W5 / PRN-001..009)', () => {
       .post(`/api/v1/management/print-orders/${orderId}/production`)
       .set('Authorization', `Bearer ${f.manager.accessToken}`)
       .set('Idempotency-Key', randomUUID())
-      .send({ expectedRevision: 4 })
+      .send({ expectedRevision: 5 })
       .expect(200);
   });
 
@@ -561,7 +559,8 @@ describe('Print Order Integration (IS-W5 / PRN-001..009)', () => {
         estimatedHandoverAt: new Date(Date.now() + 5 * 86400000).toISOString(),
       })
       .expect(200);
-    const comRevId = printOrderResponseSchema.parse(quoteRes.body).data.currentCommercialRevision!.commercialRevisionId;
+    const comRevId = printOrderResponseSchema.parse(quoteRes.body).data.currentCommercialRevision!
+      .commercialRevisionId;
 
     // Simulate expiration by advancing clock by 8 days (quote expires in 7 days)
     f.now.setTime(f.now.getTime() + 8 * 86400000);
@@ -626,9 +625,7 @@ describe('Print Order Integration (IS-W5 / PRN-001..009)', () => {
     const app = createTestApp(f);
 
     // Unauthenticated
-    await request(app)
-      .get(`/api/v1/bookings/${f.bookingId}/print-orders`)
-      .expect(401);
+    await request(app).get(`/api/v1/bookings/${f.bookingId}/print-orders`).expect(401);
 
     // Other unowned booking ID
     const otherBookingId = randomUUID();

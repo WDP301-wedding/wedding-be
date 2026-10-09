@@ -13,25 +13,8 @@ import type {
 } from '../application/booking-readers.js';
 import { approvedTimelineSnapshotSchema } from '../application/booking-readers.js';
 
-const time = z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/u);
-const phase = z.enum(['DRAFT', 'AWAITING_DEPOSIT', 'CONFIRMED', 'CANCELLED', 'COMPLETED']);
-const shift = z.enum(['LUNCH', 'DINNER']);
-const itemsSchema = z
-  .array(
-    z.strictObject({
-      itemId: z.uuid(),
-      order: z.number().int().nonnegative(),
-      startTime: time,
-      title: z.string().min(1).max(120),
-      description: z.string().max(2000).nullable(),
-    }),
-  )
-  .max(100)
-  .refine(
-    (items) =>
-      new Set(items.map((i) => i.itemId)).size === items.length &&
-      new Set(items.map((i) => i.order)).size === items.length,
-  );
+import { createPrismaBookingTimelineSnapshotReader } from './booking-readers.repository.js';
+import { BookingLifecycleNotFoundError } from './consultation.repository.js';
 
 export function createPrismaBookingReaders(
   prisma: PrismaClient,
@@ -61,26 +44,19 @@ export function createPrismaBookingReaders(
       return {
         bookingId: row.id,
         consultationId: row.consultationId,
-        phase: phase.parse(row.phase),
+        phase: row.phase,
       };
     },
     async requireConfirmedEventContext(bookingId) {
       const row = await readBooking(bookingId);
-      if (
-        row.phase !== 'CONFIRMED' ||
-        row.effectiveTimelineRevisionId === null ||
-        row.confirmedPaymentId === null ||
-        row.confirmedAt === null
-      )
+      if (row.phase !== 'CONFIRMED' || row.effectiveTimelineRevisionId === null)
         throw new NotFoundError();
-      const settlement = await billing.requireDepositSettlement(row.id);
-      if (settlement.paymentId !== row.confirmedPaymentId || settlement.settledAt > row.confirmedAt)
-        throw new NotFoundError();
+      await billing.requireDepositSettlement(row.id);
       return {
         consultationId: row.consultationId,
         bookingId: row.id,
         hallId: row.hallId,
-        shiftCode: shift.parse(row.shiftCode),
+        shiftCode: row.shiftCode,
         eventDate: row.eventDate.toISOString().slice(0, 10),
         effectiveTimelineRevisionId: row.effectiveTimelineRevisionId,
         planningHeadcount: row.planningHeadcount,
@@ -98,32 +74,16 @@ export function createPrismaBookingReaders(
           ? boundary.current(bookingId)
           : boundary.requireScope(bookingId, context);
       if (tx !== undefined && context.transactionScopeId === undefined) throw new ValidationError();
-      const row = await readBooking(bookingId);
-      const snapshot = await (tx ?? prisma).bookingTimelineRevision.findFirst({
-        where: { bookingId, id },
-      });
-      if (
-        snapshot === null ||
-        snapshot.approvedByManagerAt === null ||
-        snapshot.approvedByCoupleAt === null
+      await readBooking(bookingId);
+      const snapshot = await createPrismaBookingTimelineSnapshotReader(
+        (tx ?? prisma) as PrismaClient,
       )
-        throw new NotFoundError();
-      const items = itemsSchema.safeParse(snapshot.items);
-      if (!items.success) throw new ValidationError();
-      const result = approvedTimelineSnapshotSchema.safeParse({
-        bookingId,
-        timelineRevisionId: id,
-        revisionNumber: snapshot.revisionNumber,
-        eventDate: snapshot.eventDate.toISOString().slice(0, 10),
-        hallName: snapshot.hallName,
-        shiftCode: shift.parse(snapshot.shiftCode),
-        shiftStartTime: time.parse(snapshot.shiftStartTime),
-        shiftEndTime: time.parse(snapshot.shiftEndTime),
-        items: items.data.sort((a, b) => a.order - b.order),
-        approvedByManagerAt: snapshot.approvedByManagerAt.toISOString(),
-        approvedByCoupleAt: snapshot.approvedByCoupleAt.toISOString(),
-        isEffective: row.effectiveTimelineRevisionId === id,
-      });
+        .resolveApprovedRevision({ bookingId, timelineRevisionId: id }, context)
+        .catch((error: unknown) => {
+          if (error instanceof BookingLifecycleNotFoundError) throw new NotFoundError();
+          throw error;
+        });
+      const result = approvedTimelineSnapshotSchema.safeParse(snapshot);
       if (!result.success) throw new ValidationError();
       return result.data;
     },

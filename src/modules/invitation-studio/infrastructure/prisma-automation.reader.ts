@@ -35,9 +35,10 @@ export class PrismaInvitationAutomationReader implements InvitationAutomationRea
 
     if (input.cursor) {
       try {
-        const decoded = JSON.parse(
-          Buffer.from(input.cursor, 'base64url').toString('utf8'),
-        ) as { c: string; b: string };
+        const decoded = JSON.parse(Buffer.from(input.cursor, 'base64url').toString('utf8')) as {
+          c: string;
+          b: string;
+        };
         cursorCutoffAt = new Date(decoded.c);
         cursorBookingId = decoded.b;
       } catch {
@@ -60,10 +61,7 @@ export class PrismaInvitationAutomationReader implements InvitationAutomationRea
 
     const policies = await this.prisma.invitationMediaPolicy.findMany({
       where,
-      orderBy: [
-        { cutoffAt: 'asc' },
-        { bookingId: 'asc' },
-      ],
+      orderBy: [{ cutoffAt: 'asc' }, { bookingId: 'asc' }],
       take: limit + 1,
     });
 
@@ -77,7 +75,8 @@ export class PrismaInvitationAutomationReader implements InvitationAutomationRea
         ? await this.prisma.booking.findMany({
             where: {
               id: { in: bookingIds },
-              confirmedAt: { not: null },
+              phase: 'CONFIRMED',
+              depositSettlement: { isNot: null },
             },
             select: { id: true },
           })

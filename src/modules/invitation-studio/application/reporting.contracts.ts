@@ -33,8 +33,5 @@ export type InvitationReportRow = Readonly<{
 }>;
 
 export interface InvitationReportingReader {
-  readPage(
-    query: SourceQuery,
-    context: ContractContext,
-  ): Promise<SourcePage<InvitationReportRow>>;
+  readPage(query: SourceQuery, context: ContractContext): Promise<SourcePage<InvitationReportRow>>;
 }

@@ -1,14 +1,18 @@
 import { randomUUID } from 'node:crypto';
 import type { Prisma } from '../../../generated/prisma/client.js';
 import { NotFoundError, ValidationError } from '../../../core/errors/app-error.js';
-import type { BookingMediaPrerequisiteReader, BookingTimelineSnapshotReader } from '../../booking-lifecycle/application/booking-readers.js';
-import type { BillingReader, BookingChargeRegistrar, BookingChargeAdjustmentRegistrar } from '../../payments-billing/application/billing.contracts.js';
+import type {
+  BookingMediaPrerequisiteReader,
+  BookingTimelineSnapshotReader,
+} from '../../booking-lifecycle/application/booking-readers.js';
+import type {
+  BillingReader,
+  BookingChargeRegistrar,
+  BookingChargeAdjustmentRegistrar,
+} from '../../payments-billing/application/billing.contracts.js';
 import type { MediaRequestContext } from '../application/media.contracts.js';
 import type { PrintOrderView, QuotedLineView } from '../application/print-order.contracts.js';
-import {
-  id,
-  parseStudio,
-} from '../domain/studio-policy.js';
+import { id, parseStudio } from '../domain/studio-policy.js';
 import {
   type PrintOrderStatus,
   QUOTE_EXPIRY_DAYS,
@@ -270,7 +274,8 @@ export class PrintOrderService {
 
         const expiresAt = new Date(currentTime.getTime() + QUOTE_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
 
-        const quotedLinesWithDesignRevision: Array<QuotedLineView & { designRevisionId: string }> = [];
+        const quotedLinesWithDesignRevision: Array<QuotedLineView & { designRevisionId: string }> =
+          [];
         for (const q of quotedLines) {
           const design = await tx.invitationDesign.findUniqueOrThrow({
             where: { id: q.designId },
@@ -522,9 +527,13 @@ export class PrintOrderService {
             orderId: parsedOrderId,
             revisionNumber: { gt: approvedRevision.revisionNumber },
           },
+          orderBy: { revisionNumber: 'desc' },
         });
 
-        if (pendingProposal !== null && this.now().getTime() <= pendingProposal.expiresAt.getTime()) {
+        if (
+          pendingProposal !== null &&
+          this.now().getTime() <= pendingProposal.expiresAt.getTime()
+        ) {
           throw printOrderConflict(
             'PRINT_REPLACEMENT_PENDING',
             'A replacement proposal is pending approval.',
@@ -1027,7 +1036,8 @@ export class PrintOrderService {
 
         const expiresAt = new Date(currentTime.getTime() + QUOTE_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
 
-        const quotedLinesWithDesignRevision: Array<QuotedLineView & { designRevisionId: string }> = [];
+        const quotedLinesWithDesignRevision: Array<QuotedLineView & { designRevisionId: string }> =
+          [];
         for (const q of quotedLines) {
           const design = await tx.invitationDesign.findUniqueOrThrow({
             where: { id: q.designId },
@@ -1062,6 +1072,11 @@ export class PrintOrderService {
           where: { id: order.currentCommercialRevisionId! },
         });
 
+        const updatedOrder = await tx.invitationPrintOrder.update({
+          where: { id: parsedOrderId },
+          data: { revision: { increment: 1 } },
+        });
+
         await this.repository.printQuotationIssuedEvent(tx, bookingId, scoped, {
           printOrderId: parsedOrderId,
           commercialRevisionId: newCommercialRevisionId,
@@ -1086,7 +1101,12 @@ export class PrintOrderService {
           },
         });
 
-        return this.mapOrderView(order, lines, currentApprovedRev, createdCommercialRevision);
+        return this.mapOrderView(
+          updatedOrder,
+          lines,
+          currentApprovedRev,
+          createdCommercialRevision,
+        );
       },
       { action: 'print-order.replacement-propose', resourceId: parsedOrderId },
     );
@@ -1138,7 +1158,15 @@ export class PrintOrderService {
           throw new NotFoundError();
         }
 
-        if (newRevision.revisionNumber <= oldApprovedRevision.revisionNumber) {
+        const latestProposal = await tx.invitationCommercialRevision.findFirst({
+          where: { orderId: parsedOrderId },
+          orderBy: { revisionNumber: 'desc' },
+          select: { id: true },
+        });
+        if (
+          latestProposal?.id !== newRevision.id ||
+          newRevision.revisionNumber <= oldApprovedRevision.revisionNumber
+        ) {
           throw printOrderConflict('PRINT_QUOTE_STALE');
         }
 

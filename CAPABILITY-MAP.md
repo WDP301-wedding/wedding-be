@@ -49,8 +49,9 @@ acceptance remain provider-ordered. Every module/file/migration need not run sim
 The accepted invitation dependency includes an upstream venue eligibility read.
 Initial ownership is A: 03–04, B: 05–06, C: 07–08; 09–11 remain unassigned.
 
-All later-module documents below are **approved specifications**, not approved module
-execution plans or accepted implementations. The owner approved the assembled contract
+At the 2026-10-06 contract checkpoint, later-module documents below were **approved
+specifications**; module plan and implementation acceptance are recorded separately.
+SPEC-03 implementation is now accepted at BK-C4 on 2026-10-08. The owner approved the assembled contract
 package on 2026-10-06 with “vậy tôi duyệt draft trên”. Provider meanings were reviewed
 in dependency order; real-provider and module acceptance gates remain unchanged.
 
@@ -59,7 +60,7 @@ in dependency order; real-provider and module acceptance gates remain unchanged.
 | `core-platform` | [`SPEC-core-platform.md`](./SPEC-core-platform.md) | Approved |
 | `identity-access` | [`SPEC-identity-access.md`](./SPEC-identity-access.md) | Approved |
 | `venue-catalog` | [`SPEC-venue-catalog.md`](./SPEC-venue-catalog.md) | Approved; implementation remains subject to V4 |
-| `booking-lifecycle` | [`SPEC-booking-lifecycle.md`](./SPEC-booking-lifecycle.md) | Approved SPEC; W1 access/timeline read subset implemented; full module pending |
+| `booking-lifecycle` | [`SPEC-booking-lifecycle.md`](./SPEC-booking-lifecycle.md) | ACCEPTED implementation; BK-C4 passed 2026-10-08 |
 | `payments-billing` | [`SPEC-payments-billing.md`](./SPEC-payments-billing.md) | Approved SPEC; W1 settlement read subset implemented; full module pending |
 | `invitation-studio` | [`SPEC-invitation-studio.md`](./SPEC-invitation-studio.md) | Approved SPEC; W1–W4 backend verified, media/template/design/AI/publication/public APIs mounted2026-10-09; W5–W8 and formal provider/module acceptance pending |
 | `guest-rsvp` | [`SPEC-guest-rsvp.md`](./SPEC-guest-rsvp.md) | Approved SPEC; plan/implementation pending |
@@ -120,7 +121,8 @@ provider-owned contracts or domain events defined by the providing module.
 Drafting may overlap earlier than implementation under `WEDDING-CONTRACT-1@1.0.0`,
 but a draft does not satisfy its contract, plan, implementation, or integration gate.
 `SPEC-02` retains its V1–V4 acceptance history. V4 was accepted on 2026-10-06;
-`SPEC-03` still requires its own bounded implementation-plan approval.
+`SPEC-03` received bounded-plan approval on 2026-10-07 and implementation acceptance
+at BK-C4 on 2026-10-08; see its [acceptance evidence](./tasks/evidence/booking-lifecycle.md#bk-c4-implementation-acceptance--2026-10-08).
 
 `guest-rsvp` owns guest-group definitions because the same group identifies an invitation household before it labels any table. `seating-plan` consumes those stable group identifiers and the fixed layout templates owned by `venue-catalog`; this direction avoids a dependency cycle between the guest list and seating plan.
 

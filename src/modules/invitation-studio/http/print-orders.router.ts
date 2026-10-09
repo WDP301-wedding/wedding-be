@@ -73,12 +73,7 @@ export function createPrintOrdersRouter(
     (req, res) => {
       const { bookingId } = parseStudio(bookParams, req.params);
       const body = parseStudio(schemas.requestPrintOrderBodySchema, req.body);
-      return services.printOrders.requestPrintOrder(
-        bookingId,
-        body,
-        key(req),
-        context(res),
-      );
+      return services.printOrders.requestPrintOrder(bookingId, body, key(req), context(res));
     },
     201,
   );
@@ -102,11 +97,7 @@ export function createPrintOrdersRouter(
     schemas.printOrderResponseSchema,
     (req, res) => {
       const { bookingId, orderId } = parseStudio(bookOrderParams, req.params);
-      return services.printOrders.getPrintOrder(
-        bookingId,
-        orderId,
-        context(res),
-      );
+      return services.printOrders.getPrintOrder(bookingId, orderId, context(res));
     },
   );
 
@@ -184,15 +175,10 @@ export function createPrintOrdersRouter(
   );
 
   // 8. Manager lists print orders
-  route(
-    'get',
-    '/management/print-orders',
-    schemas.printOrderListResponseSchema,
-    (req, res) => {
-      const query = parseStudio(schemas.managementPrintOrderListQuerySchema, req.query);
-      return services.printOrders.listManagementPrintOrders(query, context(res));
-    },
-  );
+  route('get', '/management/print-orders', schemas.printOrderListResponseSchema, (req, res) => {
+    const query = parseStudio(schemas.managementPrintOrderListQuerySchema, req.query);
+    return services.printOrders.listManagementPrintOrders(query, context(res));
+  });
 
   // 9. Manager views single print order
   route(
@@ -213,12 +199,7 @@ export function createPrintOrdersRouter(
     (req, res) => {
       const { orderId } = parseStudio(orderParams, req.params);
       const body = parseStudio(schemas.quotePrintOrderBodySchema, req.body);
-      return services.printOrders.quotePrintOrder(
-        orderId,
-        body,
-        key(req),
-        context(res),
-      );
+      return services.printOrders.quotePrintOrder(orderId, body, key(req), context(res));
     },
   );
 
@@ -230,12 +211,7 @@ export function createPrintOrdersRouter(
     (req, res) => {
       const { orderId } = parseStudio(orderParams, req.params);
       const body = parseStudio(schemas.transitionOrderBodySchema, req.body);
-      return services.printOrders.startProduction(
-        orderId,
-        body,
-        key(req),
-        context(res),
-      );
+      return services.printOrders.startProduction(orderId, body, key(req), context(res));
     },
   );
 
@@ -247,12 +223,7 @@ export function createPrintOrdersRouter(
     (req, res) => {
       const { orderId } = parseStudio(orderParams, req.params);
       const body = parseStudio(schemas.transitionOrderBodySchema, req.body);
-      return services.printOrders.markReadyForHandover(
-        orderId,
-        body,
-        key(req),
-        context(res),
-      );
+      return services.printOrders.markReadyForHandover(orderId, body, key(req), context(res));
     },
   );
 
@@ -264,12 +235,7 @@ export function createPrintOrdersRouter(
     (req, res) => {
       const { orderId } = parseStudio(orderParams, req.params);
       const body = parseStudio(schemas.handoverOrderBodySchema, req.body);
-      return services.printOrders.markHandedOver(
-        orderId,
-        body,
-        key(req),
-        context(res),
-      );
+      return services.printOrders.markHandedOver(orderId, body, key(req), context(res));
     },
   );
 
@@ -300,12 +266,7 @@ export function createPrintOrdersRouter(
     (req, res) => {
       const { orderId } = parseStudio(orderParams, req.params);
       const body = parseStudio(schemas.replacementProposalBodySchema, req.body);
-      return services.printOrders.proposeReplacement(
-        orderId,
-        body,
-        key(req),
-        context(res),
-      );
+      return services.printOrders.proposeReplacement(orderId, body, key(req), context(res));
     },
   );
 

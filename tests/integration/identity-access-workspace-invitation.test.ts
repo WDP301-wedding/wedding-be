@@ -6,9 +6,11 @@ import { join } from 'node:path';
 import { promisify } from 'node:util';
 
 import { Client } from 'pg';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { createPrismaClient } from '../../src/core/database/prisma.js';
+import { hashOpaqueToken } from '../../src/modules/identity-access/crypto/token.js';
+import { createWorkspaceInvitationService } from '../../src/modules/identity-access/workspace-invitation/workspace-invitation.service.js';
 import {
   ActiveInvitationExistsError,
   createPrismaWorkspaceInvitationRepository,
@@ -162,6 +164,56 @@ describeWithDatabase('IA-10 workspace invitation persistence', () => {
       where: { consultationId: concurrentConsultationId },
     });
     expect(rows.filter(({ status }) => status === 'ACTIVE')).toHaveLength(1);
+  });
+
+  it('recovers failed delivery using the same durable intent without duplicating invitations', async () => {
+    let now = new Date('2026-10-07T00:00:00.000Z');
+    const sendWorkspaceInvitation = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('notification unavailable'))
+      .mockResolvedValue(undefined);
+    const service = createWorkspaceInvitationService({
+      repository,
+      notificationPort: { sendWorkspaceInvitation, sendPasswordReset: vi.fn() },
+      tokenEntropyBytes: 32,
+      lifetimeSeconds: 259_200,
+      reissueLimit: 3,
+      reissueWindowSeconds: 86_400,
+      now: () => now,
+    });
+    const command = {
+      invitationIntentId: randomUUID(),
+      consultationId: randomUUID(),
+      recipientEmail: 'retry@example.com',
+      issuedByAccountId: issuerId,
+      requestId: randomUUID(),
+    };
+    await expect(service.issue(command)).rejects.toThrow('notification unavailable');
+    const persisted = await prisma.workspaceInvitation.findUniqueOrThrow({
+      where: { id: command.invitationIntentId },
+    });
+    now = addSeconds(now, 60);
+    const retried = await service.issue(command);
+    expect(retried).toMatchObject({
+      invitationId: persisted.id,
+      sequence: 1,
+      expiresAt: persisted.expiresAt,
+    });
+    expect(
+      await prisma.workspaceInvitation.count({ where: { consultationId: command.consultationId } }),
+    ).toBe(1);
+    const preview = await repository.previewAcceptance(
+      hashOpaqueToken(retried.invitationToken, 'invitation'),
+      now,
+    );
+    expect(preview?.invitationId).toBe(persisted.id);
+    expect(JSON.stringify(persisted)).not.toContain(retried.invitationToken);
+    await prisma.workspaceInvitation.update({
+      where: { id: persisted.id },
+      data: { status: 'ACCEPTED', acceptedAt: now },
+    });
+    await service.issue(command);
+    expect(sendWorkspaceInvitation).toHaveBeenCalledTimes(2);
   });
 });
 

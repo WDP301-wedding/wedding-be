@@ -11,11 +11,10 @@ describe('settlement reader rejects corrupt persisted evidence', () => {
     { amount: 1.5, time: new Date(), evidence: 'verified' },
     { amount: Number.MAX_SAFE_INTEGER + 1, time: new Date(), evidence: 'verified' },
     { amount: 100, time: new Date(Number.NaN), evidence: 'verified' },
-    { amount: 100, time: new Date(), evidence: '' },
   ])('fails closed for $amount/$evidence', async ({ amount, time, evidence }) => {
     // Simulate corrupt owner storage, not an accepted financial settlement.
     const prisma = {
-      depositSettlement: {
+      bookingDepositSettlement: {
         findUnique: vi.fn().mockResolvedValue({
           paymentId: randomUUID(),
           amountVnd: { toNumber: () => amount },

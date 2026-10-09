@@ -17,7 +17,11 @@ export function createPrismaBillingAdapter(
     async registerAcceptedCharge(input) {
       const bookingId = z.uuid().parse(input.bookingId).toLowerCase();
       const sourceRevisionId = z.uuid().parse(input.sourceRevisionId).toLowerCase();
-      if (!Number.isSafeInteger(input.amountVnd) || input.amountVnd <= 0 || input.amountVnd > 1_000_000_000_000) {
+      if (
+        !Number.isSafeInteger(input.amountVnd) ||
+        input.amountVnd <= 0 ||
+        input.amountVnd > 1_000_000_000_000
+      ) {
         throw new ValidationError();
       }
       const db = boundary.current(bookingId) ?? prisma;
@@ -117,19 +121,13 @@ export function createPrismaBillingAdapter(
       const charges = await db.bookingReceivableCharge.findMany({
         where: { bookingId },
       });
-      const grossChargesVnd = charges.reduce(
-        (sum, item) => sum + item.amountVnd.toNumber(),
-        0,
-      );
+      const grossChargesVnd = charges.reduce((sum, item) => sum + item.amountVnd.toNumber(), 0);
       const credits = await db.bookingChargeCredit.findMany({
         where: { bookingId },
       });
-      const creditsVnd = credits.reduce(
-        (sum, item) => sum + item.amountVnd.toNumber(),
-        0,
-      );
+      const creditsVnd = credits.reduce((sum, item) => sum + item.amountVnd.toNumber(), 0);
       const acceptedChargesVnd = Math.max(0, grossChargesVnd - creditsVnd);
-      const deposit = await db.depositSettlement.findUnique({
+      const deposit = await db.bookingDepositSettlement.findUnique({
         where: { bookingId },
       });
       const paidVnd = deposit ? deposit.amountVnd.toNumber() : 0;

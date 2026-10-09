@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 import { randomUUID } from 'node:crypto';
 import { readFile, readdir } from 'node:fs/promises';
-import { join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 
 import { Client } from 'pg';
 
@@ -33,7 +33,9 @@ export class CatalogTestDatabase {
     return this.#prisma;
   }
 
-  async connect(): Promise<void> {
+  async connect(
+    beforeMigration?: (name: string, databaseUrl: string) => Promise<void>,
+  ): Promise<void> {
     await this.#admin.connect();
     this.#connected = true;
     await this.#admin.query(`CREATE DATABASE ${quoteIdentifier(this.databaseName)}`);
@@ -48,6 +50,7 @@ export class CatalogTestDatabase {
       .sort();
     try {
       for (const migrationPath of migrationPaths) {
+        await beforeMigration?.(basename(dirname(migrationPath)), this.#testDatabaseUrl);
         await migrationClient.query(await readFile(migrationPath, 'utf8'));
       }
     } finally {
