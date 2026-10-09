@@ -55,4 +55,13 @@ export class FakeStorageProvider implements StorageProvider {
       this.#objects.delete(validated.objectKey);
     });
   }
+
+  read(reference: StorageObjectReference): Promise<Uint8Array> {
+    return Promise.resolve().then(() => {
+      const validated = createStorageObjectReference(reference);
+      const record = this.#objects.get(validated.objectKey);
+      if (record === undefined) throw new NotFoundError();
+      return record.bytes.slice();
+    });
+  }
 }

@@ -63,7 +63,9 @@
     "resend": "6.31.0",
     "swagger-ui-dist": "5.33.1",
     "zod": "4.6.5",
-    "zod-openapi": "6.0.2"
+    "zod-openapi": "6.0.2",
+    "qrcode": "1.5.4",
+    "sharp": "0.35.5"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
@@ -85,6 +87,10 @@
     "tsx": "4.23.15",
     "typescript": "5.9.3",
     "typescript-eslint": "8.70.1",
-    "vitest": "5.0.1"
+    "vitest": "5.0.1",
+    "@types/qrcode": "1.5.6"
+  },
+  "overrides": {
+    "mysql2": "3.24.5"
   }
 }

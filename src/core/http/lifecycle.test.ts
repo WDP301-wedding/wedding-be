@@ -10,6 +10,9 @@ import { createApp } from '../../app.js';
 import { parseEnvironment } from '../../config/env.js';
 import { bootstrap, isMainModule, runMain, startServer, type RunningServer } from '../../server.js';
 import { createVenueCatalogRuntime } from '../../modules/venue-catalog/venue-catalog.runtime.js';
+import { createIdentityRuntime } from '../../modules/identity-access/identity.runtime.js';
+import { createInvitationStudioRuntime } from '../../modules/invitation-studio/invitation-studio.runtime.js';
+import request from 'supertest';
 import { createPaymentsBillingRuntime } from '../../modules/payments-billing/payments-billing.runtime.js';
 import { createLogger } from '../logging/logger.js';
 import {
@@ -48,6 +51,19 @@ vi.mock('../../modules/venue-catalog/venue-catalog.runtime.js', async () => {
       router: Router(),
       resource: { name: 'venue-catalog-database', close: vi.fn() },
     })),
+  };
+});
+
+vi.mock('../../modules/invitation-studio/invitation-studio.runtime.js', async () => {
+  const { Router } = await import('express');
+  return {
+    createInvitationStudioRuntime: vi.fn(() => {
+      const router = Router();
+      router.get('/bookings/:bookingId/media/:assetId', (_req, res) =>
+        res.status(401).json({ error: { code: 'UNAUTHORIZED' } }),
+      );
+      return { router, resource: { name: 'invitation-studio-database', close: vi.fn() } };
+    }),
   };
 });
 
@@ -297,9 +313,30 @@ describe('server startup and process signals', () => {
     runningServers.push(running);
 
     expect(createVenueCatalogRuntime).toHaveBeenCalledWith(config);
+    expect(createInvitationStudioRuntime).toHaveBeenCalledWith(config);
     expect(createPaymentsBillingRuntime).toHaveBeenCalledWith(config);
     expect(running.httpServer.listening).toBe(true);
     expect(running.readiness.isReady()).toBe(true);
+    expect((await request(running.app).get('/api/v1/bookings/one/media/two')).status).toBe(401);
+    const runtime = await (vi.mocked(createInvitationStudioRuntime).mock.results.at(-1)!
+      .value as ReturnType<typeof createInvitationStudioRuntime>);
+    await running.shutdown();
+    expect(vi.mocked(runtime.resource).close.mock.calls).toHaveLength(1);
+  });
+
+  it('closes earlier owner resources when invitation composition fails', async () => {
+    vi.mocked(createInvitationStudioRuntime).mockRejectedValueOnce(
+      new Error('media startup failed'),
+    );
+    await expect(
+      bootstrap({ loadConfig: () => Promise.resolve(parseEnvironment({})) }),
+    ).rejects.toThrow('media startup failed');
+    const identity = await (vi.mocked(createIdentityRuntime).mock.results.at(-1)!
+      .value as ReturnType<typeof createIdentityRuntime>);
+    const venue = await (vi.mocked(createVenueCatalogRuntime).mock.results.at(-1)!
+      .value as ReturnType<typeof createVenueCatalogRuntime>);
+    expect(vi.mocked(identity.resource).close.mock.calls).toHaveLength(1);
+    expect(vi.mocked(venue.resource).close.mock.calls).toHaveLength(1);
   });
 
   it('closes the initialized owner runtimes when billing startup fails', async () => {

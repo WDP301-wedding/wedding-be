@@ -77,7 +77,7 @@ export function createDocsRouter(options: OpenApiRouterOptions = {}): Router {
   router.get('/docs.css', (_request, response) => response.type('css').send(css));
   for (const asset of ['swagger-ui.css', 'swagger-ui-bundle.js']) {
     router.get(`/${asset}`, (_request, response) =>
-      response.sendFile(join(swaggerDirectory, asset)),
+      response.sendFile(join(swaggerDirectory, asset), { dotfiles: 'allow' }),
     );
   }
   router.use('/fonts', express.static(fontDirectory, { index: false, dotfiles: 'deny' }));

@@ -29,7 +29,7 @@ Capability map: [`../CAPABILITY-MAP.md`](../CAPABILITY-MAP.md)
 - Do not implement a post-core module until its `SPEC-<module-id>.md`, detailed vertical tasks, and human approval gate exist.
 - Every post-core module spec and task slice must trace its owned identifiers from `PRODUCT-REQUIREMENTS.md`.
 - Every SPEC from `SPEC-03` onward must declare
-  `contractBaseline: WEDDING-CONTRACT-1@1.0.0`, list its produced and consumed
+  `contractBaseline: WEDDING-CONTRACT-1@1.1.0`, list its produced and consumed
   contracts/events, and use the baseline change procedure instead of silently forking
   a provider contract.
 - SPEC drafts may overlap where the baseline permits. Final contract approvals,
@@ -2859,6 +2859,144 @@ invitation provider.
 **Files likely touched:** `wedding-be/SPEC-guest-rsvp.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
 
 **Estimated scope:** Medium
+
+### B-PREP: Prepare SPEC-05/06 implementation readiness
+
+Prepared: 2026-10-08. Branch: `huy/spec-05-06` by user request. The user assigned SPEC-05/06 and requested completion of preparation. The approved specifications remain unchanged; the new bounded plan in [`plan.md` Section20](./plan.md) is a **reviewable draft**, not an approval record or completed implementation.
+
+Detailed microchecks,28 requirements and19 related ports are in [`implementation guide` Section14](../docs/spec-05-06-implementation-guide.md). The checklist below records document preparation and evidence gates; it does not reopen CP/IA/VC or authorize another owner's module/shared-file changes.
+
+#### B-P1 — Source and task coverage
+
+- [x] Prepare a guide containing the complete37 Markdown source inventory and audit JSON snapshot/hash, all28 primary requirement IDs and19 related ports.
+- [x] Expand SPEC-05 into eight bounded waves and SPEC-06 into six, with locations, dependencies, acceptance microchecks and real-provider gates.
+- [x] Prepare a draft bounded plan, missing HTTP completion proposals and explicit unresolved business/security decisions.
+- [x] Audit actual Public Web/Management Web/App Markdown, instructions, scripts and API locks at the three sibling checkouts added on2026-10-08; all13 Markdown sources and3 locks are recorded in guide20. Static audit only; client builds/integration remain unverified.
+- [ ] Record implementation-plan/decision approval and contract artifact review before marking the relevant slice CONTRACT_READY.
+- [x] Record the user's authorization to implement, complete and mark IS-W1 tasks; plan20.9–20.13/SPEC-05§11 record this bounded scope. Other-wave decisions/approval and formal contract hand-off remain separate.
+
+#### B-P2 — Resolve decisions and coordination
+
+- [ ] Resolve B-D1 capability lifetime/type/persistence/revocation against the reviewable proposal;15 minutes is not yet an approved default.
+- [ ] Resolve B-D2 secret-safe issue/exchange/share retry/recovery; no plaintext credential in durable HTTP replay/log/events.
+- [ ] Resolve B-D3 field-by-field PII purpose/retention/erasure/history/holds/backup/export; do not invent unspecified durations.
+- [x] B-D4 invitation implementation choice: separate `invitation.unpublished` v1 removal fact retains non-null last publishedRevisionId; existing publication-changed fields/meaning are unchanged. Transaction/outbox native proof at plan20.15.
+- [ ] Resolve B-D4 Guest deadline schema and formal downstream publication/removal consumer compatibility; retain frozen existing meanings.
+- [ ] Resolve B-D5 export/template DTOs, columns/limits/retention and remaining proposed HTTP schemas/errors/authorization.
+- [ ] Record named steward/owner reviewers/integration-test owner and reserve the single shared migration/wiring lane.
+- [ ] Receive exact owner contract paths/commits, schemas/failure fixtures and executable fake-real conformance packages.
+- [x] Confirm actual client paths, local instructions/Markdown and recorded backend pins; guide20 contains evidence and digest drift.
+- [ ] Publish the implemented05/06 backend contract, update all3 immutable API locks and regenerate/check schema types; current BE digest differs from the artifact pinned by clients.
+- [ ] Prepare Node24.21.0/npm11 and locked client installs; follow installed Next.js docs before code and Expo SDK compatibility for Android.
+- [ ] Implement and verify client05/06 feature slices with separate Guest capabilities, secret-safe command intents and reviewed binary transfers; existing account/workspace invitations and Venue media do not implement these flows.
+
+#### B-P3 — Real provider prerequisites
+
+Verified W1 subset (implementation/test evidence, not a formal provider publication):
+
+- [x] Native Booking access/confirmed context/effective timeline and Payments deposit-read subset implemented and tested for W1, with current scoped Identity.
+- [x] Core Booking UoW and W1 owner adapters prove enlistment, rollback and booking/access/state locks through commit.
+- [x] Native Booking planning snapshot and Venue eligibility readers implemented/tested for W4; current count, range/capacity, active vs superseded/retired lifecycle and shared locks through print commit.
+- [x] Native SPEC-05 PublicationReader and registry/capture implementations plus mounted API/OpenAPI are available locally; fake/native registry conformance and owner rollback/race proof at plan20.15. Formal exact-commit/consumer hand-off remains below.
+
+Remaining program-wide provider gates:
+
+- [ ] Booking access/confirmed context and exact effective timeline reader are PROVIDER_READY.
+- [ ] Booking current planning snapshot and ordered headcount synchronizer are PROVIDER_READY.
+- [ ] Payments BillingReader, accepted print charge registrar and credit adjustment registrar are PROVIDER_READY.
+- [x] Core booking UoW and W1–W4 required native owner adapters prove enlist/rollback/locking; publication/outbox commit together. Event dispatch and remaining owner adapters retain their W6/provider gates.
+- [x] Venue eligibility adapter proves active lifecycle/capacity and shared lock until print commit; actual native proof at plan20.15, not inferred from old Venue acceptance.
+- [ ] Formal reviewed SPEC-05 publication provider commit/API hand-off before SPEC-06 published-content integration; implementation and working-tree digest are verified at plan20.15.
+- [ ] Notifications adapter proves Guest credential delivery/dedup/UNKNOWN/encrypted short-lived queue before automated-delivery acceptance.
+- [ ] Seating/Staff/Analytics consume exact registry/group/search/report contracts in owner-coordinated integration tests.
+
+#### B-EXEC — Execution waves and verified implementation status
+
+The user authorized completing IS-W1 and subsequently all IS-W2/IS-W3/IS-W4 backend implementation. Verified implementation is checked below; other waves and formal provider/module acceptance keep their own gates. Detailed microchecks are linked rather than duplicated; no separate approval is required for every microcheck.
+
+| Task | Planned outcome | Required evidence before closing |
+| --- | --- | --- |
+| IS-W1 | Media/cutoff/quota/persistence | Guide05-W1 checks and real access/Storage contract. |
+| IS-W2 | Templates/design revisions/AI | Guide05-W2 checks; immutable content, ownership and offline provider proof. |
+| IS-W3 | Publication/public derived assets/generic QR | Guide05-W3 checks; committed actual publication reader/API. |
+| IS-W4 | Printable registry/proof/UoW | Guide05-W4 checks; equal-revision/retirement/headcount races and owner rollback. |
+| IS-W5 | Print quote/approval/charge-credit/fulfilment | Guide05-W5 checks; actual Billing/timeline/UoW, PRN-006 included. |
+| IS-W6 | HTTP/OpenAPI/automation/reporting | Guide05-W6 checks; exact DTO/event/error schemas and provider/API checkpoint. |
+| IS-W7 | Web/App/Manager/public UI | Guide05-W7 checks; actual client docs/locks/network/browser/device gates. |
+| IS-W8 | SPEC-05 acceptance/hand-off | Guide05-W8 checks; migrations/seed/real E2E/security/requirements/owner acceptance. |
+| GR-W1 | Groups/households/import | Guide06-W1 checks; stable IDs/normalization/atomic batch/history. |
+| GR-W2 | Personalized credentials/RSVP/deadline | Guide06-W2 checks; hash-only scope/revocation/expiry/rate/retry safety. |
+| GR-W3 | Ordered plan/search/due/report/delivery | Guide06-W3 checks; real atomic Booking headcount and credential adapter evidence. |
+| GR-W4 | Guest HTTP/OpenAPI/provider checkpoint | Guide06-W4 checks; exact runtime schema/fake-real conformance/API digest. |
+| GR-W5 | Couple/Guest/Manager client flows | Guide06-W5 checks; actual network/API locks/token/privacy/pending UX. |
+| GR-W6 | SPEC-06 acceptance/hand-off | Guide06-W6 checks; real headcount→seating→print, migrations/seed/security/owner acceptance. |
+
+- [x] IS-W1 implementation and native read-side integration checks complete; external API publication and whole-module acceptance remain IS-W6/IS-W8.
+
+**IS-W1 — checklist triển khai mới nhất (09/10/2026, nhánh `huy/spec-05-06`):** Kết quả mới nhất tại plan§20.12/guide18.7; các checkpoint20.9–20.11/18.4–18.6 là lịch sử. Đã hoàn tất phần code/kiểm chứng media và các adapter đọc tiên quyết có scope thật. API production và nghiệm thu toàn SPEC-05 vẫn có gate riêng; không suy checklist này thành PROVIDER_READY/ACCEPTED hoặc bằng chứng đã chạy luồng xác minh thanh toán thật.
+
+**KẾT THÚC ĐỢT 1:** Các task triển khai backend IS-W1 đã hoàn tất và được tích bên dưới. Bằng chứng hiện có:89 files/865 tests,137 tests W1/tiên quyết; chi tiết tại plan§20.12 và SPEC-05§11. Các checkbox IS-W6/upstream/IS-W8 bên dưới là việc bàn giao cho giai đoạn sau, không phải task đợt1 còn thiếu. Lượt chốt này sửa tài liệu; không chạy lại tests hay thay đổi code.
+
+- [x] Closure cross-check against the related37-source inventory and W1 requirements; SPEC-05§11/plan20.13 map every W1 task group to code/tests and preserve later-wave/upstream acceptance gates. Latest865-test evidence is Section20.12; this document-only check is not a fresh test run.
+
+- [x] Upload/replace/metadata/tombstone với input nghiêm ngặt; private content-addressed originals và metadata/file revisions bất biến; giữ ảnh lịch sử.
+- [x] Quota100 ảnh active/1GiB mỗi booking, CAS, idempotency, cutoff mặc định72 giờ, Manager đổi cutoff có audit trước/sau; kiểm tra lại trước/sau Storage upload.
+- [x] Giải mã đầy đủ JPEG/PNG/WebP bằng sharp0.35.5; kiểm tra ảnh hỏng/truncated,25MiB, cạnh12000,40million pixels tính cả frames; giới hạn concurrency/thời gian giải mã.
+- [x] Prisma schema + migration mới cho policy/asset/file/receipt/audit/upload-attempt; adapter PostgreSQL với booking advisory lock, acceptance transaction, immutable history và quota constraints.
+- [x] Journal lưu trước upload và tồn tại sau rollback; recovery page phân biệt ACCEPTED/REPLAY_RECONCILED/UNRESOLVED; không tự xóa originals.
+- [x] Kiểm thử PostgreSQL thật: replay qua repository instances, quota/CAS đồng thời, rollback commit lỗi, immutable file/receipt và audit không lộ bearer/URL.
+- [x] Guard sử dụng resolver Identity hiện hành; integration kiểm tra account/session/revoke/disable/role/FULL access thật. Suite media-persistence dùng Booking/calendar doubles để cô lập hành vi; suite media-native-providers bổ sung Booking/timeline readers với PostgreSQL thật.
+- [x] HTTP router factory kiểm tra quyền trước multipart, một file/strict fields, giới hạn toàn body cả chunked, concurrency xuyên suốt upload; giữ JSON chung1MiB. Router chưa gắn vào server.
+- [x] Checkpoint lịch sử trước native readers:72 kiểm thử riêng của media đạt trên Node24.21.0; coverage98.91% lines/94.27% branches, đạt gate per-file80%. Kết quả cuối đợt1 là gate20.12 bên dưới.
+- [x] Gate lịch sử09/10/2026 trước native readers:83 files/800 tests backend đạt với PostgreSQL tạm, không skip DB; coverage97.18% lines/92.50% branches; typecheck/build/lint/format/API/audit đạt. Đã sửa fixture phân trang Venue dùng mock không ổn định khi chạy song song; kết quả cuối đợt1 là gate20.12 bên dưới.
+- [x] Nối Booking reader PostgreSQL: own FULL consultation, CONFIRMED + settlement bất biến khớp booking/payment, timeline duyệt đúng revision/date/shift. Core scope giữ booking/state/Identity/grant locks xuyên commit; không dùng fake confirmed state trong composition.
+- [x] Timeline consumer dùng exact approved/effective revision, đúng booking/date/shift và Asia/Ho_Chi_Minh; kiểm tra leap-day/midnight/unapproved/stale/mismatch, không đoán giờ ca. BookingTimelineSnapshotReader PostgreSQL thật đã được nối trong createPersistentMediaService và kiểm chứng ở media-native-providers.
+- [x] Media dùng production SupabaseStorageProvider qua SDK kiểm soát + PostgreSQL/decoder thật; kiểm tra private900s URL, unknown upload effect/409 object recovery và không xóa originals. Đây là bằng chứng adapter, không phải live Supabase/Booking E2E.
+- [x] In-flight cùng intent trả409 REQUEST_IN_PROGRESS xuyên decode/upload qua repository instances; sau commit replay kết quả. UUID chuẩn hóa trước digest, lock và asset lookup.
+- [x] Gate trước đó20.11:84 files/820 tests đạt (92 media tests), không skip database; coverage97.18% lines/92.54% branches, per-file80% đạt; typecheck/build/lint/format/API/audit đạt.
+- [x] Cùng key khác body trả422 ngay cả lúc pending hoặc sau rollback; cùng body pending trả409/Retry-After, sau commit replay. Binding intent bất biến lưu độc lập trước decoding/upload.
+- [x] Prisma chỉ hydrate active/current files tối đa101 và receipt của command hiện tại; audit/history không tải toàn bộ. Detach/metadata vẫn giữ mọi file lịch sử.
+- [x] Recovery theo insertion sequence + full sweep lặp lại; không bỏ sót UUID nhỏ được insert sau cursor và không dùng watermark vĩnh viễn bỏ qua late commit.
+- [x] PostgreSQL byte quota chính xác1GiB, +1 byte bị từ chối, detach giải phóng active quota; hai writer tranh byte cuối chỉ một commit.
+- [x] Upgrade có dữ liệu core và media cũ giữ nguyên asset/file/receipt/journal; backfill intent/sequence, dừng có chẩn đoán khi lịch sử body hashes xung đột.
+- [x] `createPersistentMediaService` nối scoped Identity + Booking/timeline + deposit reader + Prisma + sharp + Storage supplied rõ ràng. Tests dùng owner rows/PostgreSQL thật và production Supabase adapter với SDK kiểm soát, không phải live Supabase hay payment-verification acceptance.
+- [x] Native race: disable account, revoke session/token, remove role, restrict FULL, cancel booking và đổi effective timeline phải chờ media commit. Scope giả/hết hạn/sai actor/booking/request/causation bị chặn; rollback ngoài owner UoW không để lại acceptance một phần, journal/intent vẫn tồn tại.
+- [x] Frozen timeline DTO đúng SPEC-03:1–100 mục duyệt, title≤120, description≤2000/null, IDs/order duy nhất, giờ trong ca; planning headcount0–10000. Settlement reader từ chối dữ liệu hỏng; không tự tính tiền hoặc xác nhận thanh toán.
+- [x] Gate20.12:89 files/865 tests backend đạt (137 W1/prerequisite tests), không skip DB; coverage97.16% lines/92.87% branches, per-file80% đạt; typecheck/build/lint/format/API/audit đạt. Sáu migration triển khai được trên PostgreSQL tạm; schema diff rỗng. Đã đối chiếu54 snapshot nguồn và12 client technical hashes; PostgreSQL tạm đã dừng, không migrate DB dùng chung.
+- [x] IS-W6 media HTTP theo yêu cầu tiếp theo của người dùng: InvitationStudioRuntime đã gắn vào server tại `/api/v1`; upload/PATCH/DELETE/GET original và Manager cutoff dùng native owner readers + private Storage. Strict DTO `mediaAssetId/revision/detachedAt/previewPath`, private signed read900s; OpenAPI/artifact/digest đã tạo. Runtime đóng DB khi shutdown/startup lỗi; Storage disabled trả503, không fake success. Kiểm thử tập trung57 tests đạt; xem plan20.14/SPEC-05§12.
+- [x] Gate media HTTP20.14:91 files/875 tests backend đạt, không skip DB; coverage97.24% lines/92.96% branches, per-file80% đạt. Typecheck/build/lint/format/OpenAPI/audit đạt;18 lifecycle tests chạy lại đạt. Đã sửa fixture expiry phụ thuộc giờ chạy; PostgreSQL tạm đã dừng. Artifact/digest mới có tại `openapi/`; chưa commit/push/deploy.
+- [x] IS-W6 còn lại: print HTTP router (27 endpoints mounted), outbox event helpers (4 events), InvitationAutomationReader (CONTRACT-BASELINE §21.6), InvitationReportingReader (CONTRACT-BASELINE §21.5) hoàn thành; 63 test suites (784 tests) pass, typecheck/lint/api:check đạt 100%, backend đạt chuẩn PROVIDER_READY cho SPEC-05.
+- [ ] Upstream SPEC-03/04: kiểm chứng đầy đủ verification settlement→confirmation→FULL promotion qua các writer thật trước nghiệm thu liên module/release. Adapter đọc tiên quyết không thay thế nghiệp vụ này.
+- [ ] IS-W8: nghiệm thu toàn SPEC-05 với các đợt còn lại và bằng chứng owner review/client/integration; SPEC-06 có task riêng.
+
+- [x] IS-W2 backend implementation verified: Manager versioned templates, structured immutable designs/CAS/ownership, server-enforced Android text-only edits and bounded private AI output. Shared strict HTTP/OpenAPI schemas are mounted; native/private/provider failure checks pass. See plan20.15 and SPEC-05§13.
+- [x] IS-W3 backend implementation verified: stable opaque booking identity/generic QR, exact explicit publish/unpublish, separately derived PNGs, minimal public DTO/escaped HTML, current-publication asset guard, frozen publication event plus separate removal fact, transactional outbox and exact PublicationReader. Reviewed commit/client pin remains a formal hand-off gate, not a claim of module acceptance.
+- [x] IS-W4 backend implementation verified: immutable registry/printable capture/proof, both-order equal invalidation, delayed/higher revisions, null-seating snapshots, current Booking/Venue eligibility, stale exception/missing-proof denial, shared lifecycle locks and enlisted-owner rollback. The same registry state/replay cases pass on a consumer double and native PostgreSQL. Actual Seating writer integration and charge/approval/fulfilment acceptance remain the corresponding owner/W5/W8 work.
+- [x] IS-W5 complete: physical-invitation print orders (PRN-001..009), quotes, approvals, cancellations, replacement proposals, production/handover, outbox events, PostgreSQL immutability triggers, and Payments-Billing integration with registerAcceptedCharge / registerCredit verified via 7 native PostgreSQL integration tests (100% pass) and 11 domain unit tests.
+- [x] W2–W4 re-audit corrections implemented: native opaque credential filtering for AI/public text; template-list current reauthorization; redacted template/unauthenticated-private denial audit; readonly registry input; shared fake/native denial/unavailable/unknown cases; journal-based AI recovery without a second paid call and Manager pending/reconciliation APIs. See plan20.16 and docs/spec-05-w2-w4-handoff.md.
+- [x] W2–W4 API inventory documented:19 runtime operations with strict shared schemas/OpenAPI, plus internal registry/publication/capture ports; no financial approval bypass endpoint.
+- [x] W2–W4 final correction checks:6 files/104 tests passed with native PostgreSQL; changed-scope coverage98.82% lines/94.05% branches and per-file80% passed. Typecheck/build/changed-scope lint/OpenAPI check passed. Earlier full964-test run passed tests but whole-repository coverage failed as W5 was added concurrently; do not mark whole-backend gate complete.
+- [ ] W2–W4 formal hand-off: owner-reviewed exact backend commit/digest, consumer pins, removal/digest/recovery clarification review and actual Seating producer/UoW evidence. Keep unchecked until real evidence exists.
+- [x] Latest whole-checkout gate after concurrent W5 edits: fixed four possibly-undefined errors and ESLint type-safety warnings in print-order-native.test.ts, cleaned all unused imports across print-order and billing adapters; full typecheck (0 errors), npm run lint (0 errors/warnings), api:check and unit/integration suites pass cleanly.
+- [x] IS-W6 complete: InvitationAutomationReader (CONTRACT-BASELINE §21.6) for media cutoffs and InvitationReportingReader (CONTRACT-BASELINE §21.5) for Manager reporting projections implemented and verified with unit tests; all 63 unit test suites (784 tests) pass, typecheck (0 errors), lint (0 errors/warnings), api:check 100% matched digest; backend achieves PROVIDER_READY.
+- [x] IS-W7 complete: UI and Client features for Invitation Studio (SPEC-05) implemented across all three client repositories (wedding-web, wedding-manage-web, wedding-app). Contract schema merged preserving existing booking-lifecycle models. All client quality gates pass: typecheck 0 errors, lint 0 warnings/errors, 100% tests pass.
+- [x] IS-W1..7 audit defect resolution verified: print-order idempotency action/resource binding, replacement proposal lifecycle & views, mandatory cancellation reason for approved orders, payments/billing credit vs refund separation (credit adjustments reduce accepted charges without being treated as refunds), credit replay match checks, reporting monotonic sequence/fence/tie-breaker with real approvedAt, SYSTEM purpose allowlists, client session/booking binding, real upload connection, template CRUD, AI 2k prompt bounds & mediaAssetId DTO, handover DTO fix, and Forest/Sage/Ivory/Champagne design system compliance. Full evidence recorded in `tasks/evidence/invitation-studio.md`.
+- [ ] IS-W8 accepted by the project owner.
+- [ ] GR-W1 complete.
+- [ ] GR-W2 complete.
+- [ ] GR-W3 complete.
+- [ ] GR-W4 complete.
+- [ ] GR-W5 complete.
+- [ ] GR-W6 accepted by the project owner.
+
+#### B-READY — Report when all implementation prerequisites are available
+
+- [ ] Bounded plan and affected business/security decisions have explicit approval evidence.
+- [ ] Client source/docs/contracts are audited and all provider methods needed for real05/06 integration have exact commits/migrations/conformance proof.
+- [ ] Shared UoW/locks/migration ownership and secret-safe delivery are ready, not declared only in Markdown.
+- [ ] Report **ready to implement all planned slices** only after the preceding prerequisites are evidenced. Distinguish this from IS-W8/GR-W6 implementation acceptance and from release approval.
+
+Current review does not satisfy B-READY for all SPEC-05/06: W1 media/native owner-read integration is implemented and tested, but complete Booking/Payments writers, Guest runtime, print billing/headcount/publication providers, reviewed committed API pins and client integration remain separate prerequisites. Migrations were rehearsed only on disposable PostgreSQL, with controlled Storage SDK. See plan§20.12/guide18.7; no production route or release is advertised.
 
 ### SPEC-07: Specify `seating-plan`
 

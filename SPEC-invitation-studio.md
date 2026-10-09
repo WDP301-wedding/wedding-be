@@ -7,6 +7,8 @@
 - Inherited baseline: `WEDDING-CONTRACT-1@1.0.0` (historical contract)
 - Accepted amendment: baseline Section 21
 - Initial owner role: B (member name to be assigned)
+- W1 backend status: **Implementation and verification complete**, 2026-10-09; checklist and limits in Section11. W2–W4 backend/API checkpoints are recorded in Sections13–14; formal integration and whole-module acceptance remain pending.
+- Media HTTP status: **Mounted at `/api/v1`**, 2026-10-09, after the user's subsequent API wiring request; transport scope in Section12. Other W6 work remains pending.
 - Team execution contract: [`docs/team-implementation.md`](./docs/team-implementation.md)
 - Requirement ownership: MED-001 through MED-006; PRN-001 through PRN-005 and PRN-007 through PRN-009; QRC-001 through QRC-004
 - Depends on: `core-platform`, `identity-access`, `venue-catalog` (accepted 1.1.0 eligibility read), `booking-lifecycle`, `payments-billing`
@@ -273,3 +275,138 @@ real accepted SPEC-07 snapshot integration; conforming registry fakes cannot clo
 See [plan Section 21](./tasks/plan.md#21-approved-product-completion-sequence-2026-10-08)
 for the approved product completion sequence. Detailed output contracts and tasks
 remain follow-up work rather than a claim of implementation acceptance.
+
+## 12. W1 backend implementation checkpoint — 2026-10-09
+
+This records implementation progress against Sections1/4–7/9–10, MED-001…006,
+ACC-004, baseline6.3/6.4/21.1/21.2/21.8 and the team/migration rules. It does not
+change approved contracts or accept the complete module. The user authorized W1
+implementation, completion and marking verified tasks.
+
+- [x] Private originals, immutable file/metadata revisions, accepted checksum/type/bytes/dimensions, policy/cutoff snapshots and retained history; no persisted signed URL or bearer.
+- [x] Full JPEG/PNG/WebP decoding;25MiB/file, dimensions1–12000,40million decoded pixels including animation frames, altText1–250, server-generated keys and bounded decoder work.
+- [x] Serialized active quota100 files/1GiB, replacement subtraction, failed replacement preservation, CAS, pending409, different-body422 and durable replay/rollback recovery.
+- [x] Default event start−72h from the approved effective restaurant-local timeline; exact cutoff boundaries, explicit Manager cutoff command with before/after audit and authorized originals after cutoff.
+- [x] Current account/session/role/FULL-own-consultation/CONFIRMED checks with matching persisted settlement; Staff/restricted/public/unowned/revoked/disabled denial and private900-second signed reads.
+- [x] PostgreSQL acceptance, immutable facts, independently committed pre-upload journal/intent, bounded working sets, repeatable recovery sweeps, exact byte/count quota and populated migration/backfill proof.
+- [x] Native owner-read composition/shared Core transaction; scope forgery, access/state/effective-timeline races and outer-owner rollback tested; strict multipart factory keeps global1MiB JSON/security limits.
+
+| Requirement/source                | W1 executable evidence                                                                                                                                                            | Work retained in later waves                                                                            |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| MED-001; ACC-004; baseline6.3/6.4 | Native Booking/timeline/Identity/deposit readers and `tests/integration/invitation-studio/media-native-providers.test.ts`                                                         | Complete upstream settlement verification/confirmation/FULL-promotion journey before module acceptance. |
+| MED-002; SPEC§7 quota/cutoff      | `media.service.test.ts`, `media-persistence.test.ts` and native provider tests: concurrent count/byte claims, exact1GiB/+1 byte, CAS, cutoff and rollback.                        | Multi-upload client UI in W7; external transport publication in W6.                                     |
+| MED-003                           | Authorized original signed reads; native Manager read after cutoff; retained accepted bytes without re-encoding.                                                                  | Public runtime list/download DTO/API hand-off in W6; restaurant UI in W7.                               |
+| MED-004                           | Private object purpose/keys,900-second reads, redacted persistence, no automatic original publication.                                                                            | Explicit separate derived publication in W3.                                                            |
+| MED-005                           | `sharp-media.inspector.test.ts`, service/storage/router tests: full decoding, malformed/truncated/MIME/size/dimension/frame/key boundaries.                                       | Publish reviewed transport/OpenAPI in W6.                                                               |
+| MED-006                           | Tombstone/history and cutoff controls; no photo editor/public album/unrestricted mutation introduced.                                                                             | No additional W1 feature required.                                                                      |
+| baseline21.1/21.2/21.8; team§5    | Core/Identity scope/reference tests and native PostgreSQL denial/race/rollback tests.                                                                                             | Other Guest/seating/print/outbox owner adapters and formal provider checkpoint.                         |
+| Core/migration/quality rules      | Full89 files/865 tests,137 W1/prerequisite tests; coverage97.16% lines/92.87% branches, per-file80%; typecheck/build/lint/format/API/audit and empty/populated migrations passed. | Exact reviewed commit/API/client pins and whole-module/release gates.                                   |
+
+Source implementation is in `src/modules/invitation-studio/`; native prerequisites
+are owner-local Booking/Payments/Identity adapters and `src/core/database/booking-boundary.ts`.
+The Storage proof runs the production Supabase adapter against a controlled SDK,
+not live Supabase. Native owner facts in tests are fixtures, not payment acceptance
+or a production seed. The subsequent media HTTP wiring is recorded in Section12.
+
+Current tracking: [todo B-EXEC](./tasks/todo.md#b-exec--execution-waves-and-verified-implementation-status),
+[plan20.12/20.13](./tasks/plan.md#2013-spec-05-w1-closure-cross-check--2026-10-09),
+and [guide14.5/18.7](./docs/spec-05-06-implementation-guide.md).
+Earlier plan20.9–20.11/guide18.4–18.6 are historical checkpoints, superseded for
+current W1 status. W2–W8, formal PROVIDER_READY/INTEGRATION_READY/ACCEPTED,
+SPEC-06 and release remain separate gates.
+
+## 13. Media HTTP server checkpoint — 2026-10-09
+
+The user's subsequent request authorized mounting the completed media commands/read.
+`src/server.ts` now registers `InvitationStudioRuntime.router` at `/api/v1`.
+
+| Method | Path under `/api/v1`                            | Result                                                                  |
+| ------ | ----------------------------------------------- | ----------------------------------------------------------------------- |
+| POST   | `/bookings/{bookingId}/media`                   | 201; safe asset DTO and authorized preview path.                        |
+| PATCH  | `/bookings/{bookingId}/media/{assetId}`         | 200; JSON metadata or multipart replacement with expectedRevision.      |
+| DELETE | `/bookings/{bookingId}/media/{assetId}`         | 200; detach DTO, retained originals/history.                            |
+| GET    | `/bookings/{bookingId}/media/{assetId}`         | 200; authorized current original signed URL,900-second expiry/no-store. |
+| PATCH  | `/management/bookings/{bookingId}/media-policy` | 200; Manager cutoff revision with before/after audit.                   |
+
+- [x] Native composition/server registration; managed DB shutdown/startup cleanup.
+- [x] Strict request/response schemas, current authority/CAS/durable intent and bounded multipart retaining global JSON/security policy.
+- [x] Safe asset DTO `mediaAssetId/revision/detachedAt/previewPath`; no internal storage/file/journal fields. Preview path contains no credential; separate GET signs the original.
+- [x] Disabled Storage fails503 instead of fake acceptance; native HTTP/PostgreSQL/controlled SDK tests exercise upload/replay/read and unavailable Storage.
+- [x] Five operations in deterministic OpenAPI artifact/digest; focused57-test proof at plan20.14.
+- [x] Full91 files/875 tests, no skipped database suites; coverage97.24% lines/92.96% branches and per-file80% passed. Typecheck/build/lint/format/API/audit gates passed; disposable PostgreSQL stopped. Current working-tree API digest is recorded in plan20.14.
+- [ ] Other W6 endpoints/provider/event/reporting work and reviewed committed API/client pins; whole-module acceptance remains separate.
+
+Current transport gates are recorded in plan20.14 and guide18.8. Earlier W1
+checkpoint statements about an unmounted factory are historical after this wiring.
+
+## 14. W2–W4 backend implementation checkpoint — 2026-10-09
+
+The project owner authorized completing all three backend waves. Detailed
+implementation/evidence/path decisions are recorded in [plan20.15](./tasks/plan.md#2015-spec-05-w2w4-implementation-and-verification--2026-10-09)
+and checked in [todo B-EXEC](./tasks/todo.md#b-exec--execution-waves-and-verified-implementation-status).
+
+- [x] W2: Manager immutable template versions/archive/CAS, own structured design
+      revisions, bounded allowlists, authoritative Android session text-only edits and
+      offline Gemini generation into the private media library. PENDING unknown effects
+      survive rollback and cannot automatically cause another paid generation.
+- [x] W3: exact-revision explicit publication, stable booking identity and generic
+      QR shared by variants, safe separately derived assets, minimal immutable public
+      projection/escaped HTML/QR PNG, concealed unpublication, transactional outbox and
+      exact PublicationReader methods. Public/private paths are mounted in the runtime
+      and described by the same strict Zod schemas as generated OpenAPI.
+- [x] W4: immutable safe geometry/proof registry and printable snapshots; equal
+      invalidation wins in both orders/in one transaction, high-water cannot decrease,
+      reconfirm requires a higher number, missing historical proof cannot authorize a
+      new capture. Native Booking/Venue owner reads retain booking/lifecycle locks through
+      commit and validate current count/range/capacity/exception. Captures do not read
+      Seating repositories. Fake/native conformance and rollback/retirement proof pass.
+
+`PUBLIC_INVITATION_ORIGIN` configures the stable public HTML/QR origin; missing
+configuration disables publication503. Public derivatives are bounded PNGs and remain
+in the private bucket; the server exposes only currently published safe opaque URLs.
+The additive removal fact is `invitation.unpublished` v1 with required
+`bookingId/publicInvitationId/publishedRevisionId/changedAt`; the existing
+`invitation.publication-changed` event meaning and required fields remain unchanged.
+No personalized credential, recipient name/group, private original/library identifier,
+billing or operational field is projected into generic QR/public DTOs.
+
+Full-backend proof:96 files/949 tests on Node24.21.0, no DB suite skipped,
+coverage97.30% lines/92.74% branches with per-file80% passed. The final native
+runtime/conformance check passes42 tests, including production Gemini/Supabase
+adapters with controlled SDKs, print-vs-timeline/headcount locking and no external calls. Seven migrations deploy on
+disposable PostgreSQL18 and schema diff is empty. Typecheck/build/lint/generated
+API/audit and source-manifest evidence are tracked at plan20.15. These are local
+implementation checks; reviewed provider commit, committed client API pins, actual
+Seating producer integration, W5 billing/print approval/fulfilment, W6 automation/
+reporting, W7 clients and W8 whole-module owner acceptance remain separate.
+
+## 15. W2–W4 re-audit corrections — 2026-10-09
+
+The earlier checkpoint omitted opaque-token prompt filtering, current template-list
+reauthorization, template/private HTTP denial audit, readonly registry compatibility,
+and a usable AI recovery path. These are corrected; exact APIs and remaining owner
+gates are in [W2–W4 hand-off](./docs/spec-05-w2-w4-handoff.md).
+
+There are19 mounted W2–W4 operations, including Manager pending-generation list and
+evidenced abandonment. A retry recovers a journaled private image without another
+paid AI call; no verified artifact remains pending until explicit reconciliation.
+Storage acceptance failure after valid AI output remains recoverable rather than
+being classified as a failed generation. Publication events have strict application
+schemas. Shared fake/native registry tests cover readonly input, denials, unavailable
+and unknown dependency outcomes as well as ordering/replay/proof cases.
+
+Quality evidence and limitations are recorded at plan20.16. A working-tree backend
+check is not owner review, consumer pin or actual Seating producer acceptance.
+
+## 16. Review corrections against accepted Booking — 2026-10-10
+
+Invitation adapters now consume the accepted SPEC-03 Booking, normalized timeline
+items and deposit settlement; the duplicate W1 owner migration is removed.
+Replacement proposals advance the order revision and only the latest proposal
+can be approved. Print reporting freezes each transition value and allocates its
+sequence under a global transaction lock so historical fences remain stable
+and cannot skip an uncommitted transition from another booking.
+
+Regression, upgrade and verification evidence is recorded in
+[`tasks/evidence/spec05-review-fixes.md`](./tasks/evidence/spec05-review-fixes.md).
+SPEC-06 implementation is not included in this correction.

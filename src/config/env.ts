@@ -281,10 +281,23 @@ const rawEnvironmentSchema = z
       .enum(['true', 'false'])
       .default('false')
       .transform((value) => value === 'true'),
+    PUBLIC_INVITATION_ORIGIN: optionalString.pipe(corsOrigin.optional()),
     OTEL_EXPORTER_OTLP_ENDPOINT: optionalString.pipe(httpUrl.optional()),
   })
   .superRefine((environment, context) => {
     const deployed = deployedEnvironments.has(environment.NODE_ENV);
+    if (
+      environment.PUBLIC_INVITATION_ORIGIN !== undefined &&
+      URL.canParse(environment.PUBLIC_INVITATION_ORIGIN)
+    ) {
+      const origin = new URL(environment.PUBLIC_INVITATION_ORIGIN);
+      if (origin.protocol !== 'https:' && (deployed || !loopbackHosts.has(origin.hostname)))
+        context.addIssue({
+          code: 'custom',
+          path: ['PUBLIC_INVITATION_ORIGIN'],
+          message: 'Public invitation origins require HTTPS outside loopback development.',
+        });
+    }
 
     if (deployed) {
       for (const variableName of productionRequiredVariables) {
@@ -495,6 +508,7 @@ export type BackendConfig = Readonly<{
   metrics: MetricsConfig;
   vnpay: DisabledProvider | (Readonly<{ enabled: true }> & VnpaySettings);
   openApi: Readonly<{ enabledInProduction: boolean }>;
+  invitationStudio: Readonly<{ publicOrigin: string | null }>;
   telemetry: Readonly<{ otlpEndpoint: string | undefined }>;
 }>;
 
@@ -568,6 +582,7 @@ function pickEnvironment(source: EnvironmentSource): EnvironmentSource {
     DATABASE_URL: source.DATABASE_URL,
     MIGRATION_DATABASE_URL: source.MIGRATION_DATABASE_URL,
     SUPABASE_URL: source.SUPABASE_URL,
+    PUBLIC_INVITATION_ORIGIN: source.PUBLIC_INVITATION_ORIGIN,
     SUPABASE_SERVICE_ROLE_KEY: source.SUPABASE_SERVICE_ROLE_KEY,
     SUPABASE_STORAGE_BUCKET: source.SUPABASE_STORAGE_BUCKET,
     RESEND_API_KEY: source.RESEND_API_KEY,
@@ -820,6 +835,7 @@ function createConfig(environment: RawEnvironment): BackendConfig {
     openApi: Object.freeze({
       enabledInProduction: environment.OPENAPI_ENABLED,
     }),
+    invitationStudio: Object.freeze({ publicOrigin: environment.PUBLIC_INVITATION_ORIGIN ?? null }),
     telemetry: Object.freeze({
       otlpEndpoint: environment.OTEL_EXPORTER_OTLP_ENDPOINT,
     }),

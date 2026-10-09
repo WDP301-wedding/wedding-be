@@ -3,6 +3,27 @@ import { describe, expect, it } from 'vitest';
 import { config } from './config.js';
 import { EnvironmentConfigurationError, parseEnvironment } from './env.js';
 
+describe('Public invitation origin configuration', () => {
+  it('defaults publication to unavailable and accepts explicit HTTPS or loopback test origins', () => {
+    expect(parseEnvironment({ NODE_ENV: 'test' }).invitationStudio.publicOrigin).toBeNull();
+    for (const origin of ['https://wedding.example.test', 'http://127.0.0.1:3000'])
+      expect(
+        parseEnvironment({ NODE_ENV: 'test', PUBLIC_INVITATION_ORIGIN: origin }).invitationStudio
+          .publicOrigin,
+      ).toBe(origin);
+  });
+  it.each([
+    'invalid',
+    'http://public.example.test',
+    'https://wedding.example.test/path',
+    'https://user:secret@example.test',
+  ])('rejects unsafe origin %s', (origin) => {
+    expect(() => parseEnvironment({ NODE_ENV: 'test', PUBLIC_INVITATION_ORIGIN: origin })).toThrow(
+      EnvironmentConfigurationError,
+    );
+  });
+});
+
 const approvedIdentityEnvironment = {
   AUTH_TRUST_PROXY_HOPS: '1',
   AUTH_ACCESS_TOKEN_TTL_SECONDS: '600',
@@ -107,6 +128,7 @@ describe('parseEnvironment', () => {
     const parsed = parseEnvironment({});
 
     expect(parsed).toEqual({
+      invitationStudio: { publicOrigin: null },
       runtime: {
         environment: 'development',
         port: 3001,

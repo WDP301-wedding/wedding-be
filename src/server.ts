@@ -18,6 +18,7 @@ import { createLogger } from './core/logging/logger.js';
 import { getActiveTracingResource } from './core/observability/tracing.js';
 import { createIdentityRuntime } from './modules/identity-access/identity.runtime.js';
 import { createVenueCatalogRuntime } from './modules/venue-catalog/venue-catalog.runtime.js';
+import { createInvitationStudioRuntime } from './modules/invitation-studio/invitation-studio.runtime.js';
 import { createBookingLifecycleRuntime } from './modules/booking-lifecycle/booking-lifecycle.runtime.js';
 import { createPaymentsBillingRuntime } from './modules/payments-billing/payments-billing.runtime.js';
 
@@ -306,6 +307,19 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     throw error;
   }
 
+  let invitationStudioRuntime: Awaited<ReturnType<typeof createInvitationStudioRuntime>>;
+  try {
+    invitationStudioRuntime = await createInvitationStudioRuntime(config);
+  } catch (error: unknown) {
+    await Promise.allSettled([
+      identityRuntime.resource.close(),
+      venueCatalogRuntime.resource.close(),
+      bookingLifecycleRuntime.resource.close(),
+      paymentsBillingRuntime.resource.close(),
+    ]);
+    throw error;
+  }
+
   return startServer({
     corsConfig: config.cors,
     enableOpenApiInProduction: config.openApi.enabledInProduction,
@@ -318,18 +332,21 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
             identityRuntime.resource,
             venueCatalogRuntime.resource,
             bookingLifecycleRuntime.resource,
+            invitationStudioRuntime.resource,
             paymentsBillingRuntime.resource,
           ]
         : [
             tracingResource,
             identityRuntime.resource,
             venueCatalogRuntime.resource,
+            invitationStudioRuntime.resource,
             bookingLifecycleRuntime.resource,
             paymentsBillingRuntime.resource,
           ],
     registerRoutes: (app) => {
       app.use('/api/v1', identityRuntime.router);
       app.use('/api/v1', venueCatalogRuntime.router);
+      app.use('/api/v1', invitationStudioRuntime.router);
       app.use('/api/v1', bookingLifecycleRuntime.router);
       app.use('/api/v1', paymentsBillingRuntime.router);
     },
