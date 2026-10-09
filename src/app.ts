@@ -26,6 +26,7 @@ import {
 } from './core/observability/metrics.js';
 import { createMetricsRouter } from './core/observability/metrics.router.js';
 import { createOpenApiRouter } from './core/openapi/openapi.router.js';
+import { createDocsRouter } from './core/openapi/docs.router.js';
 
 export interface CreateAppOptions {
   readonly corsConfig?: BackendConfig['cors'];
@@ -72,6 +73,14 @@ export function createApp(options: CreateAppOptions = {}): Express {
     app.use(createMetricsRouter({ metrics, token: options.metricsConfig.token }));
   }
   if (shouldServeOpenApi(options)) {
+    app.use(
+      '/docs',
+      createDocsRouter(
+        options.openApiArtifactPath === undefined
+          ? {}
+          : { artifactPath: options.openApiArtifactPath },
+      ),
+    );
     app.use(
       '/api/v1',
       createOpenApiRouter(
