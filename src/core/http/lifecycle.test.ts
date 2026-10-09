@@ -310,8 +310,8 @@ describe('server startup and process signals', () => {
     await expect(bootstrap({ loadConfig: () => Promise.resolve(config) })).rejects.toThrow(
       'billing startup failed',
     );
-    const venue = await vi.mocked(createVenueCatalogRuntime).mock.results.at(-1)?.value;
-    expect(venue?.resource.close).toHaveBeenCalledOnce();
+    const venue: unknown = await vi.mocked(createVenueCatalogRuntime).mock.results.at(-1)?.value;
+    expect((venue as { resource: { close: () => unknown } }).resource.close).toHaveBeenCalledOnce();
   });
 
   it('reports signal-triggered shutdown failures and sets a failing exit code', async () => {
