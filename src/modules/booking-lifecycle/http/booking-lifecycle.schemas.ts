@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isBookableEventDate } from '../domain/event-date.js';
 
 const uuid = z.uuid();
 const revision = z.int().positive();
@@ -36,7 +37,9 @@ export const availabilityQuerySchema = z.strictObject({
 export const createBookingBodySchema = z.strictObject({
   consultationId: uuid,
   hallId: uuid,
-  eventDate: localDate,
+  eventDate: localDate.refine((value) => isBookableEventDate(value), {
+    message: 'Ngày tổ chức phải là ngày hợp lệ, từ ngày mốt trở đi (theo giờ Việt Nam).',
+  }),
   shiftCode: z.enum(['LUNCH', 'DINNER']),
   menuPackageVersionId: uuid,
   tableCount: z.int().min(1).max(500),

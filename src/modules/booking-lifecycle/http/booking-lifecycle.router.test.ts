@@ -14,6 +14,37 @@ import {
 const consultationId = '00000000-0000-4000-8000-000000000001';
 
 describe('BookingLifecycleRouter', () => {
+  it('rejects a past event date before creating a booking', async () => {
+    const createBooking = vi.fn();
+    const response = await request(appWith({ createBooking }))
+      .post('/api/v1/bookings')
+      .set('Authorization', 'Bearer test-token')
+      .set('Idempotency-Key', 'past-event-date')
+      .send({
+        consultationId,
+        hallId: consultationId,
+        eventDate: '2020-01-01',
+        shiftCode: 'DINNER',
+        menuPackageVersionId: consultationId,
+        tableCount: 20,
+        planningHeadcount: 200,
+        expectedRevision: 1,
+      });
+    expect(response.status).toBe(422);
+    expect(response.body).toMatchObject({
+      error: {
+        code: 'VALIDATION_ERROR',
+        details: [
+          expect.objectContaining({
+            path: 'eventDate',
+            message: 'Ngày tổ chức phải là ngày hợp lệ, từ ngày mốt trở đi (theo giờ Việt Nam).',
+          }),
+        ],
+      },
+    });
+    expect(createBooking).not.toHaveBeenCalled();
+  });
+
   it.each([401, 403, 404])(
     'audits protected %s denials without raw credentials, query or body',
     async (status) => {

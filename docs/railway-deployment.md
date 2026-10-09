@@ -38,7 +38,13 @@ railway up --service wedding-be --environment production
 
 Review the plan before applying it. IaC changes and source uploads are separate
 operations: `config apply` updates service settings; `up` uploads local source.
-This service currently uses CLI uploads, not GitHub automatic deployment.
+The first deployment used CLI uploads. The production service is connected to
+`WDP301-wedding/wedding-be`, branch `main`, with automatic deployments and
+**Wait for CI** enabled. Railway deploys only after GitHub checks succeed,
+including PostgreSQL migration/integration coverage. Keep these gates enabled.
+Redeploy the current release from the service's Deployments menu when needed;
+use a new reviewed `main` commit for source changes. Never apply unrelated
+project-wide staged changes while updating this service.
 
 `.railwayignore` excludes environment files, generated output, private local
 tooling and credentials from upload. `.dockerignore` also excludes them from
@@ -50,14 +56,14 @@ Copy the backend variables from `.env.example` into Railway's variables UI or
 a secret-safe import process. Use the existing `.env` values for Supabase and
 Brevo, with these deployment-specific settings:
 
-| Variable                | Deployment value                                    |
-| ----------------------- | --------------------------------------------------- |
-| `NODE_ENV`              | `production`                                        |
-| `PORT`                  | `3001` (the generated domain targets this port)     |
-| `AUTH_TRUST_PROXY_HOPS` | `1`                                                 |
-| `BACKEND_REPLICA_COUNT` | `1`                                                 |
-| `AUTH_OTP_HASH_KEY`     | Independent random secret, stable across restarts   |
-| `CORS_ALLOWED_ORIGINS`  | Exact HTTPS browser origins; API origin temporarily |
+| Variable                | Deployment value                                  |
+| ----------------------- | ------------------------------------------------- |
+| `NODE_ENV`              | `production`                                      |
+| `PORT`                  | `3001` (the generated domain targets this port)   |
+| `AUTH_TRUST_PROXY_HOPS` | `1`                                               |
+| `BACKEND_REPLICA_COUNT` | `1`                                               |
+| `AUTH_OTP_HASH_KEY`     | Independent random secret, stable across restarts |
+| `CORS_ALLOWED_ORIGINS`  | Exact HTTPS browser origins; public web first     |
 
 Do not configure `TEST_MIGRATION_DATABASE_URL` in the deployed service. Keep
 the AI and legacy Resend groups blank when using Brevo with AI disabled.
@@ -100,7 +106,9 @@ For an application rollback, select a previous deployment only after checking
 schema compatibility. Preserve migration history and use forward corrections
 as described in `database-migrations.md`.
 
-Before deploying the web applications, replace the temporary API-only CORS
-origin with their actual HTTPS origins, public web first. That first origin
-also determines credential links in email. Browser login and email links are
-not ready for end-user use until these origins are configured.
+The current CORS allowlist is
+`https://wedding-web-silk.vercel.app,https://wedding-manage-web.vercel.app,https://wedding-be-production-e1dc.up.railway.app`.
+The public web origin comes first because it also determines email credential
+links. Both Vercel applications proxy `/api/v1/*` to this backend so refresh
+cookies stay on the browser application's origin. Verify actual login and
+email delivery through an authorized account workflow separately.
