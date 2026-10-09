@@ -84,6 +84,12 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
       if (grant === null) throw new NotFoundError();
       if (minimum === 'FULL' && grant.level !== 'FULL') throw forbidden();
     }
+    if (
+      !manager &&
+      account.roles.some(({ role }) => role === 'STAFF') &&
+      !account.roles.some(({ role }) => role === 'COUPLE')
+    )
+      throw forbidden();
     return booking;
   }
   async function refundBooking(sourcePaymentId: string, actor: AuthenticatedActor) {

@@ -387,6 +387,47 @@ import {
     expect(await ack(valid)).toBe('00');
     expect(await ack(valid)).toBe('02');
   });
+  it('denies Staff-only authority even with an owned grant and permits legitimate Couple authority', async () => {
+    const f = await fixture();
+    await database.prisma.accountRole.create({ data: { accountId: f.accountId, role: 'STAFF' } });
+    await request(f.app)
+      .post(`/api/v1/bookings/${f.bookingId}/payments/deposit`)
+      .auth('prospect', { type: 'bearer' })
+      .set('Idempotency-Key', 'staff-deposit')
+      .send({ timelineRevisionId: f.timelineRevisionId })
+      .expect(403);
+    expect(
+      await database.prisma.billingPaymentAttempt.count({ where: { bookingId: f.bookingId } }),
+    ).toBe(0);
+    const payment = await f.operations.recordManualPayment(f.deposit, f.manager);
+    // Billing recognizes the owned Couple role, even when the account also staffs events.
+    await request(f.app)
+      .get(`/api/v1/bookings/${f.bookingId}/billing`)
+      .auth('prospect', { type: 'bearer' })
+      .expect(200);
+    await database.prisma.accountRole.delete({
+      where: { accountId_role: { accountId: f.accountId, role: 'COUPLE' } },
+    });
+    await request(f.app)
+      .get(`/api/v1/bookings/${f.bookingId}/billing`)
+      .auth('prospect', { type: 'bearer' })
+      .expect(403);
+    await request(f.app)
+      .get(`/api/v1/bookings/${f.bookingId}/payments/${payment.paymentAttemptId}`)
+      .auth('prospect', { type: 'bearer' })
+      .expect(403);
+    await request(f.app)
+      .post(`/api/v1/bookings/${f.bookingId}/payments/balance`)
+      .auth('prospect', { type: 'bearer' })
+      .set('Idempotency-Key', 'staff-balance')
+      .send({ expectedBillingRevision: 2 })
+      .expect(403);
+    const foreign = await fixture();
+    await request(f.app)
+      .get(`/api/v1/bookings/${foreign.bookingId}/billing`)
+      .auth('prospect', { type: 'bearer' })
+      .expect(404);
+  });
   it('fails disabled VNPay before claiming checkout while retaining historical manual status', async () => {
     const f = await fixture(() =>
       createPaymentsBillingProviders(database.prisma, { vnpay: { enabled: false } }),
