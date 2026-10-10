@@ -99,6 +99,14 @@ outside this revision.
 Deposit requires both parties' approvals on the current commercial AND timeline
 revisions, complete names and valid slot reservation. The contract binds its exact
 timeline revision; a pre-deposit timeline change invalidates commercial eligibility.
+The owner explicitly reconfirmed hall exclusivity on 2026-10-10: each hall may host
+only one couple's confirmed booking for the same local event date and shift
+(`hallId + eventDate + shiftCode`). Different halls or different dates/shifts are
+separate slots. This preserves the existing SPEC-03 rule, not a new per-hall lifetime
+limit. One active hold is allowed per slot; an unresolved/UNKNOWN deposit keeps
+its reservation pinned even after hold expiry. Concurrent allocation/confirmation
+must not double-book the slot; cancellation/release follows the existing audited
+Booking lifecycle rather than silently freeing it on timeout.
 Reservation/settlement rechecks both under existing booking serialization and
 active/unknown payment locks. Deposit = ceil(contractTotalVnd * 30 / 100), using
 checked integer arithmetic. Include menu, thiệp and services, exclude incidental

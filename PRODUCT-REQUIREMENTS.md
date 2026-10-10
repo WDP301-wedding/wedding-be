@@ -69,6 +69,8 @@ Manager adds incidental expenses and finalizes the invoice; Couple pays the rema
 
 Editing an approved timeline creates a new revision and invalidates approval only for the new revision. Before deposit, payment eligibility follows the newest mutually approved revision. After deposit, the previously approved timeline remains effective until a replacement revision completes the change-approval workflow.
 
+Hall allocation is exclusive per local event date and shift: one `hallId + eventDate + shiftCode` slot can have only one couple's confirmed booking. Different halls or different dates/shifts remain independent. Preserve SPEC-03's single active hold, concurrent-allocation protection and unresolved/UNKNOWN deposit pinning; hold timeout alone cannot release a slot pinned by an unresolved payment. Cancellation/release follows the audited Booking lifecycle. The owner reconfirmed this existing rule on 2026-10-10.
+
 ## 5. Functional Requirements
 
 ### 5.1 Restricted Pre-Deposit Workspace and Access Promotion
