@@ -10,7 +10,7 @@ export function mainBeforeBillingMigrations(paths: readonly string[]): readonly 
   // SPEC-05 print reporting depends on the accepted Billing ledger. These new
   // migrations were not part of the pre-Billing production history.
   const invitationPrint = (path: string) =>
-    /_(?:invitation_design_publication_printable|invitation_print_order_and_billing|invitation_reporting_snapshots)$/u.test(
+    /_(?:invitation_design_publication_printable|invitation_print_order_and_billing|invitation_reporting_snapshots|print_commercial_offerings)$/u.test(
       basename(dirname(path)),
     );
   return [
