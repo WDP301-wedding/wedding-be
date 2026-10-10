@@ -55,7 +55,7 @@ export function createInvitationTemplateSelectionProvider(
 ): InvitationTemplateSelectionReader {
   const reader = createInvitationTemplateSelectionReader(prisma);
   return Object.freeze({
-    resolveVersion: reader.resolveVersion,
+    resolveVersion: (templateVersionId: string) => reader.resolveVersion(templateVersionId),
     requireSelection: (
       input: Parameters<InvitationTemplateSelectionReader['requireSelection']>[0],
     ) =>

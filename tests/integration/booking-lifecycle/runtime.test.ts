@@ -288,6 +288,9 @@ describeWithDatabase('booking runtime with real identity, venue, and PostgreSQL'
         title: templateContent.title,
       });
       expect(
+        await invitation.providers.templateSelection.resolveVersion(print.templateVersionId),
+      ).toMatchObject({ templateId: print.templateId, title: templateContent.title });
+      expect(
         await venue.providers.printOfferings.requireSelection({
           offeringId: print.offeringId,
           sourceRevisionId: print.sourceRevisionId,
