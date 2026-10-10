@@ -52,6 +52,8 @@ describe('post-booking external boundaries', () => {
         consultationId: null,
         consultationRevision: null,
         createdAt: '2020-01-01T00:00:00Z',
+        brideName: null,
+        groomName: null,
       }).success,
     ).toBe(true);
   });

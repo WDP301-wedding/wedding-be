@@ -1,4 +1,5 @@
 import type { PrismaClient } from '../../generated/prisma/client.js';
+import { createCoupleProfileService } from './application/couple-profile.service.js';
 import { createPrismaConsultationRetentionRecorder } from '../identity-access/account/retention-eligibility.port.js';
 import { createBookingBoundaryUnitOfWork } from '../../core/database/booking-unit-of-work.js';
 import {
@@ -48,6 +49,7 @@ export function createBookingLifecycleProviders(
       deposits: createPrismaBookingDepositRepository(client),
     });
   return Object.freeze({
+    coupleProfileReader: Object.freeze({ read: createCoupleProfileService(prisma).read }),
     boundary: scope.boundary,
     lifecycleReader: Object.freeze({
       requireBookingAccess(

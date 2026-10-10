@@ -1,4 +1,6 @@
 import type { Request, Router } from 'express';
+import { createCoupleProfileRouter } from './http/couple-profile.router.js';
+import { createCoupleProfileService } from './application/couple-profile.service.js';
 
 import type { Config } from '../../config/config.js';
 import { createBookingExperienceRouter } from './http/experience.router.js';
@@ -191,6 +193,21 @@ export async function createBookingLifecycleRuntime(
         }),
     });
     router.use(createBookingExperienceRouter(prisma, actorResolver));
+    router.use(
+      createCoupleProfileRouter(
+        createCoupleProfileService(prisma),
+        actorResolver,
+        createIdempotencyMiddleware({
+          service: idempotency,
+          policy: defineIdempotencyPolicy({
+            actorScope: (request) => (request.res!.locals.actor as { accountId: string }).accountId,
+            normalizedRoute: '/consultations/{consultationId}/couple-profile',
+            operationVersion: 'v1',
+            payload: bookingIdempotencyPayload,
+          }),
+        }),
+      ),
+    );
     return Object.freeze({
       router,
       providers: createBookingLifecycleProviders(

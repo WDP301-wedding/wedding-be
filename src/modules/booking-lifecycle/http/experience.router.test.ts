@@ -27,6 +27,8 @@ const intake = {
 function record() {
   return {
     ...intake,
+    brideName: null,
+    groomName: null,
     id,
     createdAt: new Date(),
     status: 'NEW',

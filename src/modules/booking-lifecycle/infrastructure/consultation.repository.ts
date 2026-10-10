@@ -58,6 +58,8 @@ export function createPrismaConsultationRepository(
               intendedEmailNormalized: email.normalized,
               intendedEmail: email.display,
               displayName: record.displayName,
+              brideName: record.brideName ?? null,
+              groomName: record.groomName ?? null,
               note: record.note,
               revision: record.revision,
               booking: {
@@ -231,6 +233,8 @@ export function createPrismaConsultationWorkspaceRepository(
               intendedEmailNormalized: email.normalized,
               intendedEmail: email.display,
               displayName: record.displayName,
+              brideName: record.brideName ?? null,
+              groomName: record.groomName ?? null,
               note: record.note,
               revision: record.revision,
             },

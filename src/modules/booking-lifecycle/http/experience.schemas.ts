@@ -1,7 +1,9 @@
 import { z } from 'zod';
+import { coupleNameSchema, coupleProfileFields } from '../domain/couple-profile.js';
 import { minimumEventDate } from '../domain/event-date.js';
 
 export const consultationRequestBodySchema = z.strictObject({
+  ...coupleProfileFields,
   submissionId: z.uuid(),
   displayName: z
     .string()
@@ -34,6 +36,8 @@ export const intakeRecordSchema = consultationRequestBodySchema
   .omit({ submissionId: true })
   .extend({
     // Stored requests remain readable after their preferred date has passed.
+    brideName: coupleNameSchema.nullable(),
+    groomName: coupleNameSchema.nullable(),
     preferredDate: z.iso.date().nullable(),
     id: z.uuid(),
     status: z.enum(['NEW', 'CONVERTED', 'CLOSED']),

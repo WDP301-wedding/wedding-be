@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { coupleNameSchema } from '../domain/couple-profile.js';
 
 import type { RestaurantShiftCode } from '../../venue-catalog/application/venue.service.js';
 import type { ProposalSnapshot } from '../domain/booking-policy.js';
@@ -10,6 +11,8 @@ export type ConsultationWorkspaceRecord = Readonly<{
   consultationId: string;
   intendedEmail: string;
   displayName: string;
+  brideName?: string | undefined;
+  groomName?: string | undefined;
   note: string | null;
   managerAccountId: string;
   revision: number;
@@ -47,6 +50,8 @@ export function createConsultationWorkspaceService(
       input: Readonly<{
         intendedEmail: string;
         displayName: string;
+        brideName?: string | undefined;
+        groomName?: string | undefined;
         note: string | null;
         managerAccountId: string;
         requestId: string;
@@ -56,6 +61,12 @@ export function createConsultationWorkspaceService(
         consultationId: createId(),
         intendedEmail: input.intendedEmail,
         displayName: input.displayName,
+        ...(input.brideName === undefined
+          ? {}
+          : { brideName: coupleNameSchema.parse(input.brideName) }),
+        ...(input.groomName === undefined
+          ? {}
+          : { groomName: coupleNameSchema.parse(input.groomName) }),
         note: input.note,
         managerAccountId: input.managerAccountId,
         revision: 1,
