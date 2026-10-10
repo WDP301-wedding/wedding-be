@@ -266,7 +266,7 @@
     "tlsAuthorized": true,
     "requiredMigrations": 26,
     "matchingMigrations": 26,
-    "compatibilityLimit": "does not prove arbitrary manual schema drift",
+    "compatibilityLimit": "checks required shipped migration history only; extra forward migrations require separate application compatibility review; arbitrary manual schema drift is not detected",
     "deployedFault": {
       "event": "deployed_database_fault_rehearsal",
       "at": "2026-10-10T13:42:43.234Z",

@@ -79,9 +79,10 @@ No applied migrations or frontend source were changed.
 
 The deployed composition owns a one-connection readiness pool, with 4-second
 acquisition, 700-ms query and 5-second HTTP bounds. Concurrent probes share one
-operation; failures destroy the connection. Migration compatibility requires all
-26 shipped checksums and completed records. This is not arbitrary manual schema
-drift detection. Direct Supabase connections use verified TLS with the reviewed
+operation; failures destroy the connection. The probe checks required migration
+history: all 26 shipped checksums and completed records. Extra completed migrations
+are permitted by the probe but require separate application compatibility review;
+arbitrary manual schema drift is not detected. Direct Supabase connections use verified TLS with the reviewed
 CA; runtime inspection confirmed encrypted and authorized TLS and 26/26 matches.
 
 At `2026-10-10T13:42:43.234Z`, a bounded exclusive migration-ledger lock plus

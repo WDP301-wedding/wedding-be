@@ -36,9 +36,11 @@ construction failures also clean supplied resources.
 The probe reads the target schema's `_prisma_migrations`. Every shipped migration
 must have its matching SHA-256 checksum and a completed, non-rolled-back record.
 Unresolved failed migrations deny readiness. Additional completed forward
-migrations are permitted. This checks migration compatibility, not arbitrary
-manual schema drift. Health requests perform no schema writes. The deployment
-pre-step remains `npm run db:migrate:deploy`.
+migrations are permitted. This checks required migration history, not arbitrary
+manual schema drift. Extra forward migrations need separate old/new application
+compatibility review; their presence does not prove compatibility with this build.
+See the [migration review rules](./database-migrations.md). Health requests perform
+no schema writes. The deployment pre-step remains `npm run db:migrate:deploy`.
 
 If a disconnected rehearsal leaves Prisma's migration advisory lock behind,
 inspect the holding session and correlate its PID, start time and migration query
