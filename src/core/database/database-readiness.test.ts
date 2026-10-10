@@ -3,18 +3,16 @@ import { createDatabaseReadiness } from './database-readiness.js';
 
 function fixture() {
   const release = vi.fn();
-  const query = vi
-    .fn()
-    .mockResolvedValue({
-      rows: [
-        {
-          migration_name: 'one',
-          checksum: 'digest',
-          finished_at: new Date(),
-          rolled_back_at: null,
-        },
-      ],
-    });
+  const query = vi.fn().mockResolvedValue({
+    rows: [
+      {
+        migration_name: 'one',
+        checksum: 'digest',
+        finished_at: new Date(),
+        rolled_back_at: null,
+      },
+    ],
+  });
   const connect = vi.fn().mockResolvedValue({ query, release });
   const end = vi.fn().mockResolvedValue(undefined);
   const pool = { connect, end, on: vi.fn() };
