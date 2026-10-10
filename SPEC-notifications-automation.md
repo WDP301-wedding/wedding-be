@@ -1,15 +1,17 @@
 # Specification: Notifications and Automation
 
-- Status: **Approved specification — module plan and implementation acceptance pending**
+> Current scope (confirmed 2026-10-10): [backend amendment](./docs/backend-scope-2026-10-10.md) and [active tasks](./tasks/backend-revision-todo.md). SPEC-06 onward has backend acceptance only; client implementation and visual/native checks belong to the frontend team. Earlier conflicting outlines are superseded.
+
+- Status: **Business scope confirmed 2026-10-10 — backend implementation pending**
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
 - Module ID: `notifications-automation` (`SPEC-09`)
-- Contract baseline: `WEDDING-CONTRACT-1@1.1.0`
+- Contract baseline: `WEDDING-CONTRACT-2@2.0.0`
 - Inherited baseline: `WEDDING-CONTRACT-1@1.0.0` (historical contract)
-- Accepted amendment: baseline Section 21
+- Accepted amendment: baseline Section 22 (2026-10-10); previous Section 21 retained as history
 - Initial owner role: Unassigned (next allocation round)
 - Team execution contract: [`docs/team-implementation.md`](./docs/team-implementation.md)
 - Requirement ownership: OPS-001 and OPS-002
-- Depends on: `identity-access`, `booking-lifecycle`, `payments-billing`, `invitation-studio`, `guest-rsvp`
+- Depends on: `identity-access`, `booking-lifecycle`, `payments-billing`, `invitation-studio`, `guest-management`
 - Consumers: operational views only
 
 ## 1. Purpose and ownership
@@ -17,7 +19,7 @@
 This module consumes durable integration facts and owns notification preferences,
 schedule evaluation, notification intents, delivery attempts, retries, dead-letter
 records, and operational delivery status. It never becomes the source of booking,
-payment, print, RSVP, or attendance truth and it never publishes delivery status as a
+contract, payment, print, invoice or attendance truth and it never publishes delivery status as a
 domain fact that another module may use as authorization or settlement proof.
 
 ## 2. Delivery and privacy contract
@@ -40,7 +42,7 @@ phones beyond a channel's delivery requirement, or complete operational notes.
 | booking-lifecycle | timeline review/approval/supersession, deposit eligible, cancellation, completion |
 | payments-billing  | payment succeeded, receivable accepted, refund recorded                           |
 | invitation-studio | publication change, print quotation/approval/ready                                |
-| guest-rsvp        | RSVP and expected-attendance change                                               |
+| guest-management  | Ordered guest-plan and expected-attendance change                                 |
 
 The exact handler names, recipient derivation, template version, and schedule cadence
 remain local decisions but each handler must be explicit, versioned, and tested against
@@ -80,7 +82,6 @@ and one configured email/push test path without treating delivery as a business 
 | invitation.print-quotation-issued/approved/ready                   | Owning Couple; Manager print recipient when action needs handling                | Email + enabled push with exact order/revision references.                                                 |
 | Personalized invitation via guest delivery port                    | Explicit household email, never inferred from phone                              | Transactional email; approved public content and scoped link only.                                         |
 | Media cutoff due read                                              | Owning Couple                                                                    | One reminder 24 hours before cutoff for policyRevision.                                                    |
-| RSVP deadline due read                                             | Owning Couple                                                                    | One reminder 24 hours before deadline for deadlineRevision.                                                |
 | D-3 due booking read                                               | Owning Couple + operational Manager recipient                                    | Event start − 72 hours using snapshotted local shift/time.                                                 |
 | Completion due booking read                                        | No external recipient needed for command                                         | Worker calls booking-owned completeDue at event end + 12 hours; consumes resulting event for notification. |
 
@@ -93,9 +94,9 @@ reminders and informational push/email may be disabled by scoped preference.
 Worker runs every 60 seconds, claims at most 100 due intents with a two-minute lease,
 and reclaims only with persisted provider outcome/reconciliation rules. Scheduled intent
 key is `(bookingId, purpose, scheduleRevision, dueAt, channel, recipientId, templateVersion)`.
-Each accepted due read is bounded/cursor-paged; handlers recheck current booking/deadline/
+Each accepted due read is bounded/cursor-paged; handlers recheck current booking/
 cutoff revision just before dispatch. Cancelled events suppress reminders and completion
-commands. Missed D-3/deadline/cutoff reminders more than 24 hours late are marked
+commands. Missed D-3/cutoff reminders more than 24 hours late are marked
 `SKIPPED_STALE`; future due reminders remain queued.
 
 ## 7. Credential delivery and private recipient boundaries
@@ -157,16 +158,16 @@ leakage. Core email/push doubles isolate tests from paid/network providers.
 | Intent/retry/channel adapter and scheduler engine | Seating/Staff/Analytics implementation | Frozen envelope/due/credential DTOs; core outbox lane.                      |
 | Individual producer handler                       | Unrelated producer/module work         | That producer's event schema and recipient port, then real outbox evidence. |
 | Credential/delivery adapter                       | Guest personalized-link implementation | Identity/guest actual token/revoke/expiry behavior before acceptance.       |
-| Completion/deadline automation                    | Client screens and analytics           | Real due-list/complete command ports; time-controlled integration tests.    |
+| Completion/reminder automation                    | Client screens and analytics           | Real due-list/complete command ports; time-controlled integration tests.    |
 
 Proposed waves: durable intents/channel registry; credential/recipient/device adapters;
-event handlers; due scheduler/reconciliation; settings/inbox/operations API/client; acceptance.
+event handlers; due scheduler/reconciliation; settings/inbox/operations API; backend evidence and frontend hand-off.
 
 | Requirements/scope | Proof                                                                                                           |
 | ------------------ | --------------------------------------------------------------------------------------------------------------- |
 | OPS-001            | Every table trigger has producer, recipient, schedule, real-provider fixture and redacted rendered content.     |
 | OPS-002            | No plaintext credential/PII/media in ordinary events/logs/status; encrypted privileged credential path expires. |
-| Automation         | Fake-clock deadline revision change, cancellation, restart, stale reminder, due completion replay.              |
+| Automation         | Fake-clock cutoff/reminder revision change, cancellation, restart, stale reminder, due completion replay.       |
 | Delivery           | Duplicate outbox fact, concurrent claims, unknown timeout, dead-letter/requeue without second intent.           |
 
 ## 10. Approved notification-center addition (2026-10-08)
@@ -179,6 +180,14 @@ credential email delivery retains its accepted implementation and provider bound
 Inbox/read state is distinct from provider delivery attempts and from business state.
 Reading a notification does not approve, pay, or authorize any domain action. The bounded
 SPEC-09 plan must define inbox DTOs/routes, recipient and booking scope, content privacy,
-retention, deduplication/read semantics, and Web/App acceptance, then integrate real
+retention, deduplication/read semantics, and backend API acceptance, then integrate real
 producer events and settings/email/push/reminders. This scope approval does not mark
 the new contracts or implementation ready. See [plan Section 21](./tasks/plan.md#21-approved-product-completion-sequence-2026-10-08).
+
+## 11. Commercial Amendment Events
+
+Add reviewed contract-approved/superseded and appendix-approved events from Booking,
+final-invoice-finalized/adjusted facts from Billing, with exact revision IDs and
+minimal totals only. Notify owning Couple and configured Manager recipients using
+existing dedup/privacy rules. No guest response event or response deadline/reminder
+is subscribed or scheduled. Guest plan changes reflect Couple/Manager edits only.

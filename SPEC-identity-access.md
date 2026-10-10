@@ -1,10 +1,12 @@
 # Specification: Identity and Access
 
+> Current amendment: [confirmed backend scope](./docs/backend-scope-2026-10-10.md) and [commercial extensions](./SPEC-commercial-contracts.md). Completed implementation evidence below is historical; new names/catalog/contract/invoice rules are separate backend extension tasks. The 2026-10-10 amendment governs conflicts with older access, pricing and client requirements.
+
 Status: **Approved by project owner on 2026-10-03**
 Module ID: `identity-access`
 Requirement ownership: ACC-002 through ACC-007
 Depends on: `core-platform`
-Consumers: `venue-catalog`, `booking-lifecycle`, `payments-billing`, `invitation-studio`, `guest-rsvp`, `seating-plan`, `staff-operations`, `notifications-automation`, `analytics-dashboard`
+Consumers: `venue-catalog`, `booking-lifecycle`, `payments-billing`, `invitation-studio`, `guest-management`, `seating-plan`, `staff-operations`, `notifications-automation`, `analytics-dashboard`
 
 ## 1. Objective
 
@@ -596,3 +598,12 @@ Checkpoint H1 approved D1 through D7 as written on 2026-10-03:
 
 The approval authorizes the ordered IA-01 through IA-17 implementation plan. Any change
 to the approved decisions or stop conditions still requires project-owner review.
+
+## 2026-10-10 Backend Extension
+
+The restricted prospect guard must allow booking-owned profile and commercial selection/approval/PDF operations before deposit; still deny media/editor/send/guest/seating/print production. Full access remains based only on verified deposit. Update guard contract/conformance within BE-02/07/09 without changing account displayName semantics.
+
+Authority and validation: [commercial specification](./SPEC-commercial-contracts.md),
+[confirmed scope](./docs/backend-scope-2026-10-10.md) and
+[active backend tasks](./tasks/backend-revision-todo.md). These requirements do not
+claim that the pending extension is already mounted in the generated API.

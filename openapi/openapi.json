@@ -21151,7 +21151,7 @@
           }
         },
         "security": [],
-        "summary": "Minimal explicitly published invitation; no RSVP authority",
+        "summary": "Minimal explicitly published invitation; read-only public content",
         "tags": [
           "Invitation Studio"
         ]

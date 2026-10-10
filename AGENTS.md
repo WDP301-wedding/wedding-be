@@ -1,7 +1,23 @@
-# Cross-project UI work
+# Backend Ownership
 
-When editing the sibling `wedding-web`, `wedding-manage-web` or `wedding-app` project, read that project's instructions and apply the `wedding-design-system` skill.
+From SPEC-06 onward, work in this repository is backend-only. The frontend team
+owns wedding-web, wedding-manage-web and wedding-app, including their new UI.
+Do not delete or modify existing frontend code as part of this backend revision.
+Frontend checks, screenshots and native builds are not backend acceptance gates.
 
-Vietnamese browser UI must use the shared Be Vietnam Pro sans-serif tokens, preserve authored case and use normal letter spacing. Never override these tokens with serif fonts, including fallbacks. Serif treatment is limited to explicitly Latin-only brand elements. These requirements take precedence over generic serif or uppercase suggestions in design references.
+Read docs/backend-scope-2026-10-10.md before planning or implementing new work.
+It records the project owner's confirmed requirements and supersedes conflicting
+older requirements, copied guides and task outlines. SPEC-01 through SPEC-04 are
+completed; SPEC-05 is completed for backend scope. Preserve their evidence and add
+the commercial/profile extensions as new work rather than reopening old checklists.
 
-Both web projects have `src/design-system/typography.test.ts`; run it with the normal checks whenever changing UI. Also inspect actual Vietnamese glyphs at desktop and mobile widths, especially “Điều phối đặt tiệc”, “Hồ sơ tư vấn” and “Đề xuất & vòng đời”.
+There is no mandatory frontend design skill. Backend hand-offs include strict
+schemas, OpenAPI, examples, errors, authorization, migrations and provider evidence.
+
+Keep guest lists, groups, planned headcount, seating and event check-in. Guests only
+view invitations; do not add guest response statuses, response endpoints, attendance
+confirmation forms, response deadlines, response reminders or response analytics.
+
+Money uses integer VND and server-calculated totals. Contract, appendix and finalized
+invoice history is immutable. Preserve payment idempotency and settlement evidence.
+Never rewrite applied migrations or infer bride/groom names by splitting legacy text.

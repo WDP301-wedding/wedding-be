@@ -1,5 +1,7 @@
 # Team Implementation Contract: SPEC-03 through SPEC-11
 
+> Current team scope confirmed 2026-10-10: [backend amendment](./backend-scope-2026-10-10.md). SPEC-06 onward and commercial/profile extensions are backend-only. Earlier client requirements/three-person allocation describe historical work; the frontend team owns future UI. [Active tasks](../tasks/backend-revision-todo.md) govern execution.
+
 Status: **Approved contract and team allocation** by the project owner, 2026-10-06.
 Active baseline: `WEDDING-CONTRACT-1@1.1.0`.
 Inherited baseline: `WEDDING-CONTRACT-1@1.0.0`.
@@ -22,13 +24,13 @@ does not issue deployment or release approval.
 
 ## 2. Readiness labels and hand-off package
 
-| Label             | Meaning                                                                                                    | Required evidence                                                                            |
-| ----------------- | ---------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| CONTRACT_READY    | Owner/provider-consumer signatures, DTOs, failures, states, defaults, fixtures, and authorization reviewed | Approved SPEC + contract SHA; module plan approved before coding.                            |
-| ISOLATED_READY    | Slice passes its own focused tests with conforming provider doubles                                        | Passed fake conformance suite; feature remains unwired/disabled.                             |
-| PROVIDER_READY    | Relevant real provider methods, migration, boundary checks, and contract tests work                        | Exact provider commit and PostgreSQL evidence; this may precede all provider client screens. |
-| INTEGRATION_READY | Consumer tests run against those real provider methods                                                     | Duplicate/stale/denial/failure/race tests and committed generated API digest.                |
-| ACCEPTED          | Complete module passes owner-reviewed acceptance                                                           | Requirement matrix, all affected clients, migrations, quality gates, and real integrations.  |
+| Label             | Meaning                                                                                                    | Required evidence                                                                               |
+| ----------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| CONTRACT_READY    | Owner/provider-consumer signatures, DTOs, failures, states, defaults, fixtures, and authorization reviewed | Approved SPEC + contract SHA; module plan approved before coding.                               |
+| ISOLATED_READY    | Slice passes its own focused tests with conforming provider doubles                                        | Passed fake conformance suite; feature remains unwired/disabled.                                |
+| PROVIDER_READY    | Relevant real provider methods, migration, boundary checks, and contract tests work                        | Exact provider commit and PostgreSQL evidence; this may precede all provider client screens.    |
+| INTEGRATION_READY | Consumer tests run against those real provider methods                                                     | Duplicate/stale/denial/failure/race tests and committed generated API digest.                   |
+| ACCEPTED          | Complete module passes owner-reviewed acceptance                                                           | Backend requirement matrix, migrations, quality gates, real integrations and frontend hand-off. |
 
 At contract hand-off, publish:
 
@@ -55,7 +57,7 @@ All starts below assume the consuming SPEC and plan are approved and CONTRACT_RE
 | 03 Booking       | Pure slot/timeline/policy rules, persistence port tests, timeline UI fixtures                           | Identity + venue; SPEC-02 V4 remains the implementation start gate              | Booking provider before deposit integration.                   |
 | 04 Payments      | Payment/refund domain, callback parser, VNPay adapter doubles, ledger repositories after migration lane | Booking deposit reservation/recording + identity promotion                      | Deposit money/access/slot evidence before acceptance.          |
 | 05 Invitation    | Media validation, design/editor, print arithmetic, registry implementation                              | Confirmed booking/timeline + billing charge/credit                              | Print approval after actual billing/timeline boundary.         |
-| 06 Guest         | Groups/households/import, link/RSVP rules, client fixtures                                              | Booking ordered headcount + invitation publication                              | Real publication and headcount proof.                          |
+| 06 Guest         | Groups/households/import, read-only links and ordered planning rules                                    | Booking ordered headcount + invitation publication                              | Real publication and headcount proof.                          |
 | 07 Seating       | Compatibility/remapping/label rules, plan repositories, UI fixtures                                     | Venue + booking + guest + invitation registry                                   | Confirm/invalidate/print races before Staff integration.       |
 | 08 Staff         | Assignment/arrival/correction domain, operational UI fixtures                                           | Identity provisioning + booking + guest search + seating guidance               | Real concurrent attendance before analytics acceptance.        |
 | 09 Notifications | Intent/retry/scheduler/channel doubles, each handler with a frozen producer schema                      | Identity port + each producer/recipient/due-command port                        | May run alongside 07/08/10; complete after required producers. |
@@ -84,7 +86,7 @@ Prisma migration publication and print/settlement boundary changes remain coordi
 ## 4. File lanes and shared resources
 
 Each module owner exclusively edits `src/modules/<module-id>/`, its module-specific
-tests, its own SPEC, and its client `src/features/<module-id>/`. Small slices keep the
+tests and its own SPEC. Client feature directories are owned by the frontend team. Small slices keep the
 existing five-human-authored-file limit; generated artifacts are tracked separately.
 
 One integration steward owns `src/app.ts`/composition root, OpenAPI registration,
@@ -152,7 +154,7 @@ npm run audit:ci
 ```
 
 Final acceptance adds empty/upgrade migrations, seed rerun proof, critical cross-module
-journey, privacy/redaction, and affected-client gates from
+journey and privacy/redaction gates from
 [cross-repository development](cross-repo-development.md). Skipped PostgreSQL tests or
 fake-only money/access/snapshot paths are explicitly incomplete, never accepted.
 
@@ -194,3 +196,16 @@ SPEC-09 through SPEC-11 are approved specifications but remain unassigned for th
 allocation round. Approval alone does not satisfy CONTRACT_READY's published artifact/
 conformance package, PROVIDER_READY, INTEGRATION_READY or ACCEPTED. Module plans,
 implementation and real-provider evidence remain pending.
+
+## Backend Acceptance From SPEC-06
+
+Do not assign frontend source changes, browser/typography checks, client generation,
+Android builds or new frontend design-system work to backend module waves. Preserve
+sibling repositories. Backend hand-off includes exact schemas/OpenAPI digest, fixtures,
+errors, authorization, migrations, money invariants and real provider evidence.
+PROVIDER_READY/INTEGRATION_READY retain their actual implementation requirements;
+backend ACCEPTED requires complete backend evidence, independent of frontend screens.
+Full product release additionally records frontend integration by the frontend team.
+Historical A/B/C assignments are not assignments to the newly separate frontend team.
+The owner has already confirmed the business scope; do not re-ask permission for
+routine backend preparation within these requirements.

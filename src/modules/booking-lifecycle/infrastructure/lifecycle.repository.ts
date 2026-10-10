@@ -29,7 +29,7 @@ export interface BookingPlanningHeadcountSynchronizer {
   synchronizeHeadcount(
     input: Readonly<{
       bookingId: string;
-      sourceRsvpRevisionId: string;
+      sourceGuestPlanRevisionId: string;
       sourceSequence: number;
       expectedAttendees: number;
     }>,
@@ -198,7 +198,7 @@ export function createPrismaBookingLifecycleRepository(
           const stored = await transaction.bookingHeadcountEvidence.findUnique({
             where: { bookingId: input.bookingId },
             select: {
-              sourceRsvpRevisionId: true,
+              sourceGuestPlanRevisionId: true,
               sourceSequence: true,
               expectedAttendees: true,
             },
@@ -216,7 +216,7 @@ export function createPrismaBookingLifecycleRepository(
             where: { bookingId: input.bookingId },
             create: { ...input, appliedAt },
             update: {
-              sourceRsvpRevisionId: input.sourceRsvpRevisionId,
+              sourceGuestPlanRevisionId: input.sourceGuestPlanRevisionId,
               sourceSequence: input.sourceSequence,
               expectedAttendees: input.expectedAttendees,
               appliedAt,
@@ -238,7 +238,7 @@ export function createPrismaBookingLifecycleRepository(
             actorAccountId: context.actorAccountId,
             occurredAt: appliedAt,
             metadata: {
-              sourceRsvpRevisionId: input.sourceRsvpRevisionId,
+              sourceGuestPlanRevisionId: input.sourceGuestPlanRevisionId,
               sourceSequence: input.sourceSequence,
               expectedAttendees: input.expectedAttendees,
             },

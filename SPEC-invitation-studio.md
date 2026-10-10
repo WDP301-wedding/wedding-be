@@ -1,5 +1,7 @@
 # Specification: Invitation Studio
 
+> Current amendment: [confirmed backend scope](./docs/backend-scope-2026-10-10.md) and [commercial extensions](./SPEC-commercial-contracts.md). Completed implementation evidence below is historical; new names/catalog/contract/invoice rules are separate backend extension tasks. The 2026-10-10 amendment governs conflicts with older access, pricing and client requirements.
+
 - Status: **Approved specification — module plan and implementation acceptance pending**
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
 - Module ID: `invitation-studio` (`SPEC-05`)
@@ -12,19 +14,19 @@
 - Team execution contract: [`docs/team-implementation.md`](./docs/team-implementation.md)
 - Requirement ownership: MED-001 through MED-006; PRN-001 through PRN-005 and PRN-007 through PRN-009; QRC-001 through QRC-004
 - Depends on: `core-platform`, `identity-access`, `venue-catalog` (accepted 1.1.0 eligibility read), `booking-lifecycle`, `payments-billing`
-- Consumers: `guest-rsvp`, `seating-plan`, `notifications-automation`, `analytics-dashboard`
+- Consumers: `guest-management`, `seating-plan`, `notifications-automation`, `analytics-dashboard`
 
 ## 1. Purpose and boundaries
 
 This module owns post-deposit private wedding media, invitation designs/revisions,
 generic public invitations, printable snapshots, print orders/lines/quotes, and print
 fulfilment. It provides a full Couple Web editor and a constrained Couple App
-quick-edit/preview/share surface. It does not own payment truth, guest/RSVP data,
+quick-edit/preview/share surface. It does not own payment truth, guest/guest attendance response data,
 catalog geometry, or a live seating repository.
 
 Private media requires current `FULL` access and a confirmed booking. Private original Storage keys and
 signed library URLs never reach public output. A generic public slug is opaque and unguessable,
-but is never RSVP, check-in, or identity authority and returns only published content.
+but is never guest attendance response, check-in, or identity authority and returns only published content.
 
 ## 2. Immutable revision and print state contract
 
@@ -165,7 +167,7 @@ Design DTO includes `designId, revisionId, revisionNumber, title, textFields, se
 derivedAssetIds, includesSeating, updatedAt`. Quick App edits accept textFields only
 and create a new immutable revision through the same backend command. Public DTO contains
 only published titles/text, public event/hall information, approved timeline presentation,
-and safe derived assets; it offers no guest RSVP/check-in mutation.
+and safe derived assets; it offers no guest guest-response/check-in mutation.
 
 ## 8. Print quotation, approval, replacement, and cancellation
 
@@ -246,7 +248,7 @@ HTTP/OpenAPI; Web/App/Manager slices; acceptance (eight).
 | PRN-001–003          | Multi-variant quantities, quote totals/expiry/handover; server rejects submitted totals.                                          |
 | PRN-004/005          | Snapshot digest stays identical after design/timeline/seating changes; same-revision invalidation wins both orders.               |
 | PRN-007/009          | Every actor/state transition, cancellation credit, new quote approval, rollback/retry/replacement.                                |
-| PRN-008; QRC-001–004 | Render has no recipient name and all variants share one generic QR; public cannot RSVP/check-in.                                  |
+| PRN-008; QRC-001–004 | Render has no recipient name and all variants share one generic QR; public cannot guest-response/check-in.                        |
 
 New seating registrations include the optional 1.1.0 `validityProof` field.
 Print approval rechecks current booking headcount/revision and venue active eligibility
@@ -410,3 +412,12 @@ and cannot skip an uncommitted transition from another booking.
 Regression, upgrade and verification evidence is recorded in
 [`tasks/evidence/spec05-review-fixes.md`](./tasks/evidence/spec05-review-fixes.md).
 SPEC-06 implementation is not included in this correction.
+
+## 2026-10-10 Backend Extension
+
+SPEC-05 backend is completed per the owner; preserve evidence. Add safe pre-deposit template selection facts, but full editing/media/sending/production stays after deposit. Post-deposit contract-included printing freezes content without another charge; commercial changes need mutually approved appendix deltas. BE-05/12 are new backend additions, not a reopened frontend wave.
+
+Authority and validation: [commercial specification](./SPEC-commercial-contracts.md),
+[confirmed scope](./docs/backend-scope-2026-10-10.md) and
+[active backend tasks](./tasks/backend-revision-todo.md). These requirements do not
+claim that the pending extension is already mounted in the generated API.

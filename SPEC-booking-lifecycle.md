@@ -1,5 +1,7 @@
 # Specification: Booking Lifecycle
 
+> Current amendment: [confirmed backend scope](./docs/backend-scope-2026-10-10.md) and [commercial extensions](./SPEC-commercial-contracts.md). Completed implementation evidence below is historical; new names/catalog/contract/invoice rules are separate backend extension tasks. The 2026-10-10 amendment governs conflicts with older access, pricing and client requirements.
+
 - Status: **ACCEPTED — SPEC-03 implementation complete; BK-C4 passed**
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
 - Implementation accepted: 2026-10-08 under the owner's conditional acceptance and merge instruction; verification: [`booking lifecycle evidence`](./tasks/evidence/booking-lifecycle.md#bk-c4-implementation-acceptance--2026-10-08)
@@ -11,7 +13,7 @@
 - Team execution contract: [`docs/team-implementation.md`](./docs/team-implementation.md)
 - Requirement ownership: ACC-001; TML-001 through TML-008
 - Depends on: `identity-access`, `venue-catalog`
-- Consumers: `payments-billing`, `invitation-studio`, `guest-rsvp`, `seating-plan`, `staff-operations`, `notifications-automation`, `analytics-dashboard`
+- Consumers: `payments-billing`, `invitation-studio`, `guest-management`, `seating-plan`, `staff-operations`, `notifications-automation`, `analytics-dashboard`
 
 ## 1. Purpose and non-goals
 
@@ -98,7 +100,7 @@ interface BookingDepositRecorder {
 interface BookingPlanningHeadcountUpdater {
   updateFromGuestPlan(input: {
     bookingId: string;
-    sourceRsvpRevisionId: string;
+    sourceGuestPlanRevisionId: string;
     expectedAttendees: number;
   }): Promise<{ bookingRevision: number; changed: boolean }>;
 }
@@ -107,7 +109,7 @@ interface BookingPlanningHeadcountUpdater {
 `requireDepositEligibility` is a fresh-state check, not a token; payments must repeat
 it immediately before money effects. Deposit recording is idempotent by `paymentId`.
 Changing the booking, revision, or amount for an existing payment returns
-`409 PAYMENT_EVIDENCE_CONFLICT`. RSVP updates are idempotent by source revision and an
+`409 PAYMENT_EVIDENCE_CONFLICT`. Guest-plan updates are idempotent by source revision and an
 older revision cannot restore stale planning data. The ordered update path uses
 `BookingPlanningHeadcountSynchronizer` from accepted amendment 1.1.0; UUIDs themselves
 are never compared. The original updater remains for serialized legacy callers only.
@@ -280,3 +282,12 @@ is sliced into at most five human-authored files per task and is planned after S
 | TML-005/006      | Current revision only; reserve/withdraw/edit race; server deposit amount.                        |
 | TML-007/008      | Effective content retained, mutually approved replacement, immutable audit history.              |
 | Shared contracts | Headcount sequence 10 then 9; duplicate settlement; due completion replays; report-page rebuild. |
+
+## 2026-10-10 Backend Extension
+
+Add separate brideName/groomName, multi-menu commercial lines, exact dual contract approval/PDF and appendices (CPL-001–003, CTR-001–006). Deposit eligibility now includes exact current commercial/timeline revisions and ceil(30% entire contract), plus existing slot/payment locks. Follow BE-01/02/06–09/11; do not silently convert legacy settled bookings.
+
+Authority and validation: [commercial specification](./SPEC-commercial-contracts.md),
+[confirmed scope](./docs/backend-scope-2026-10-10.md) and
+[active backend tasks](./tasks/backend-revision-todo.md). These requirements do not
+claim that the pending extension is already mounted in the generated API.

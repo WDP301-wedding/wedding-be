@@ -1,8 +1,0 @@
-interface:
-  display_name: "Wedding Design System"
-  short_description: "Consistent UI for the Wedding product ecosystem"
-  brand_color: "#163A70"
-  default_prompt: "Use $wedding-design-system to design and implement the next Wedding product screen."
-
-policy:
-  allow_implicit_invocation: true

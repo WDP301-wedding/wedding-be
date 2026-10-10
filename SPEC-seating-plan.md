@@ -1,15 +1,17 @@
 # Specification: Seating Plan
 
-- Status: **Approved specification — module plan and implementation acceptance pending**
+> Current scope (confirmed 2026-10-10): [backend amendment](./docs/backend-scope-2026-10-10.md) and [active tasks](./tasks/backend-revision-todo.md). SPEC-06 onward has backend acceptance only; client implementation and visual/native checks belong to the frontend team. Earlier conflicting outlines are superseded.
+
+- Status: **Business scope confirmed 2026-10-10 — backend implementation pending**
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
 - Module ID: `seating-plan` (`SPEC-07`)
-- Contract baseline: `WEDDING-CONTRACT-1@1.1.0`
+- Contract baseline: `WEDDING-CONTRACT-2@2.0.0`
 - Inherited baseline: `WEDDING-CONTRACT-1@1.0.0` (historical contract)
-- Accepted amendment: baseline Section 21
+- Accepted amendment: baseline Section 22 (2026-10-10); previous Section 21 retained as history
 - Initial owner role: C (member name to be assigned)
 - Team execution contract: [`docs/team-implementation.md`](./docs/team-implementation.md)
 - Requirement ownership: SEA-003 through SEA-008
-- Depends on: `venue-catalog`, `booking-lifecycle`, `guest-rsvp`
+- Depends on: `venue-catalog`, `booking-lifecycle`, `guest-management`
 - Consumers: `invitation-studio`, `staff-operations`, `analytics-dashboard`
 
 ## 1. Purpose and hard boundary
@@ -68,7 +70,7 @@ guidance, not raw geometry.
 | ----------------- | -------------------------------------------- | -------------------------------------------------------- |
 | venue-catalog     | exact layout-version resolution              | Filter/rank and safely render restaurant-owned geometry. |
 | booking-lifecycle | confirmed event context and headcount events | Gate access and check current planned count.             |
-| guest-rsvp        | `GuestPlanningReader`                        | Resolve active group IDs/names/colors.                   |
+| guest-management  | `GuestPlanningReader`                        | Resolve active group IDs/names/colors.                   |
 | invitation-studio | `PrintableSeatingContentRegistry`            | Register/invalidate immutable render snapshot.           |
 
 On confirm, resolve the exact layout, build the safe render snapshot, digest it, then
@@ -187,10 +189,10 @@ are 422; unowned booking is concealed 404.
 | Range/group/remap/domain rules      | Guest and Notifications implementation | Frozen provider fixtures.                                               |
 | Plan persistence/guidance           | Staff domain/UI fixtures               | Serialized migration lane.                                              |
 | Confirm/registry/shared transaction | Invitation registry implementation     | Real venue eligibility, guest/booking, registry/UoW before integration. |
-| Web/App group-label UI              | Own HTTP work using local fixture      | Committed generated API for adapters; responsive read-only geometry.    |
+| Backend DTO examples and hand-off   | Own HTTP work                          | Exact API digest and role/error fixtures for the frontend team.         |
 
 Proposed waves: compatibility/remapping; plan persistence/revisions;
-confirmation/exception/registry/guidance; HTTP/OpenAPI; client slices; acceptance.
+confirmation/exception/registry/guidance; HTTP/OpenAPI; backend integration/evidence and frontend hand-off.
 SEA-003/006 tests include boundary equality, zero count, retirement versus supersession,
 exception revalidation, concurrent headcount/confirm and invalidation/print approval.
 SEA-004/005/007/008 tests cover stable group IDs, no person/geometry writes, remap

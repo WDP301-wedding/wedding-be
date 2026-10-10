@@ -1,5 +1,7 @@
 # Implementation Plan: Wedding Management System
 
+> Active revision confirmed 2026-10-10: [backend scope](../docs/backend-scope-2026-10-10.md), [commercial specification](../SPEC-commercial-contracts.md) and [executable backend backlog](./backend-revision-todo.md). All older SPEC-06–11 mixed-client outlines below are superseded. SPEC-01–04 completion and SPEC-05 backend completion are retained; do not reopen frontend checklists as backend work.
+
 Core-platform plan status: Approved by project owner on 2026-09-24<br>
 Post-core program extension status: Approved by project owner on 2026-09-27<br>
 Cross-module contract baseline: Locked as
@@ -60,7 +62,7 @@ The plan remains front-loaded with the highest-risk foundations: PostgreSQL migr
 9. Android is the only mobile acceptance target. `core-platform` validates configuration and Expo health; `release-demo` owns the final EAS artifact.
 10. A prospective couple uses authenticated restricted Web access before deposit; a successful deposit promotes the same identity to full Couple access.
 11. Timeline and print approvals bind to immutable revisions, and deposit eligibility is rechecked authoritatively by the backend.
-12. Guest groups belong to `guest-rsvp`; fixed layout geometry belongs to `venue-catalog`; table labeling belongs to `seating-plan`.
+12. Guest groups belong to `guest-management`; fixed layout geometry belongs to `venue-catalog`; table labeling belongs to `seating-plan`.
 13. Event check-in records invitation-household arrivals and corrections rather than per-seat occupancy or physical-invitation QR credentials.
 14. `payments-billing` precedes `invitation-studio` because accepted print charges become booking receivables.
 15. Cross-module ownership, identifiers, events, snapshot semantics, compatibility,
@@ -333,7 +335,7 @@ The EAS preview cloud build remains a later `release-demo` acceptance action; th
 | Restricted prospect access accidentally exposes full Couple features | High | Specify explicit entitlements, deny-by-default backend authorization, and direct endpoint tests before UI work |
 | Timeline edit races with approval or payment initiation | High | Bind approvals to immutable revisions and add transactional concurrency tests at the booking/payment boundary |
 | Private wedding media leaks through public invitation assets | High | Separate private object purposes, use short-lived signed access, and test cross-booking/public denial |
-| Guest and seating ownership creates a dependency cycle | High | Keep guest-group identity in `guest-rsvp`; consume it from `seating-plan` without reverse imports |
+| Guest and seating ownership creates a dependency cycle | High | Keep guest-group identity in `guest-management`; consume it from `seating-plan` without reverse imports |
 | Concurrent arrivals lose or double-count attendance | High | Store append-only arrival/correction records and test real concurrent updates |
 | Approved print content or price changes silently | High | Snapshot printable and commercial revisions atomically when the Couple approves the quotation |
 
@@ -376,7 +378,7 @@ SPEC-04 payments-billing final approval
         |
 SPEC-05 invitation-studio final approval
         |
-SPEC-06 guest-rsvp final approval
+SPEC-06 guest-management final approval
         |\
         | +--> SPEC-09 notifications-automation final approval --------+
         v                                                              |
@@ -410,7 +412,7 @@ These are planning boundaries, not yet-authorized implementation tasks. The owni
 | `booking-lifecycle` | consultation workspace; timeline revisions; dual approval; deposit eligibility; post-deposit change requests | ACC-001, TML-001 through TML-008 |
 | `payments-billing` | deposit/manual/VNPay flows; balance/invoices; accepted print charges | PRN-006 plus existing payment scope |
 | `invitation-studio` | invitation designs; private media library; generic public QR; printable snapshots; print quotation and fulfillment | MED-001 through MED-006; PRN-001 through PRN-005; PRN-007 through PRN-009; QRC-001 through QRC-004 |
-| `guest-rsvp` | invitation households; default/custom guest groups; personalized delivery and RSVP | GST-001 through GST-008, QRC-005 |
+| `guest-management` | invitation households; default/custom guest groups; personalized delivery and guest planning | GST-001 through GST-008, QRC-005 |
 | `seating-plan` | compatible layout selection; table-level group labels; headcount invalidation and Manager exception | SEA-003 through SEA-008 |
 | `staff-operations` | household search; multi-arrival check-in; over-expected warnings; audited corrections and group guidance | CHK-001 through CHK-008 |
 | `notifications-automation` | domain-event subscriptions; safe operational email/push; deadlines and completion jobs | OPS-001, OPS-002 plus existing automation scope |
@@ -435,7 +437,7 @@ These are planning boundaries, not yet-authorized implementation tasks. The owni
 
 - Separate and concurrent arrivals accumulate correctly, over-expected attendance warns without blocking, and corrections remain auditable.
 - Staff guide guests by group/color without per-person table or seat assignments.
-- The generic physical-invitation QR cannot identify a guest, RSVP for a guest, or mutate check-in state.
+- The generic physical-invitation QR cannot identify a guest, change attendance for a guest, or mutate check-in state.
 
 ## 14. Post-Core Planning Rules
 
@@ -795,7 +797,7 @@ ordering, or integration safety.
 | Module class | Modules | Planned waves |
 | --- | --- | --- |
 | High-risk state/money/media | `booking-lifecycle`, `payments-billing`, `invitation-studio` | At most 8 |
-| Product workflow | `guest-rsvp`, `seating-plan`, `staff-operations` | 4–6 |
+| Product workflow | `guest-management`, `seating-plan`, `staff-operations` | 4–6 |
 | Operations/reporting/release | `notifications-automation`, `analytics-dashboard`, `release-demo` | 4–6 |
 
 Every wave owns a coherent vertical outcome and keeps its detailed microtasks as
@@ -925,7 +927,7 @@ are reviewed separately.
 Focused tests use repository-local Vitest commands and one worker where the Windows
 runbook requires it. PostgreSQL verification uses the disposable acceptance database;
 no shared Supabase schema or live provider credential is used. UI implementation follows
-the installed `wedding-design-system` skill and keeps loading, empty, error, denied,
+the installed the former frontend design policy (retired 2026-10-10) skill and keeps loading, empty, error, denied,
 stale, success, and narrow-screen states explicit.
 
 ### 20.4 Risks and stop conditions
@@ -1013,7 +1015,7 @@ human-authored files; review generated Prisma/OpenAPI/client artifacts separatel
 Focused slices use repository-local tests and the disposable PostgreSQL acceptance
 database. Automated tests use controlled provider doubles and official sandbox fixtures;
 they never call VNPay or use live merchant credentials. Client views follow the installed
-`wedding-design-system` skill and include loading, empty, error, denied, unknown/pending,
+the former frontend design policy (retired 2026-10-10) skill and include loading, empty, error, denied, unknown/pending,
 success, destructive-refund and narrow-screen states.
 
 ### 21.4 Risks and stop conditions
@@ -1057,7 +1059,7 @@ do not infer a public registration or automatic booking flow from a consultation
 Keep account security contracts with identity and consultation state with booking.
 
 The overview is extended incrementally with real provider readiness: payment/billing
-after SPEC-04, invitation/media/print after SPEC-05, RSVP after SPEC-06, and seating
+after SPEC-04, invitation/media/print after SPEC-05, guest planning after SPEC-06, and seating
 after SPEC-07. Upcoming features are not presented as completed workflows. Android
 remains available only after FULL access and confirmed deposit. Notification lists,
 unread badges, read actions, email/push expansion, and notification navigation wait
@@ -1118,7 +1120,7 @@ The detailed acceptance microchecks, all28 MED/GST/PRN/QRC requirements and19 re
 
 ### 22.1 Scope, paths and owners
 
-- B owns `src/modules/invitation-studio/`, `src/modules/guest-rsvp/`, their tests and approved client feature slices. These backend module folders do not yet exist in this checkout.
+- B owns `src/modules/invitation-studio/`, `src/modules/guest-management/`, their tests and approved client feature slices. These backend module folders do not yet exist in this checkout.
 - The steward reserves/serializes Prisma schema/migrations, core outbox/UoW, identity/venue prerequisite adapters, composition-root wiring, OpenAPI publication, seeds and scripts. B supplies reviewed fragments/wiring requests.
 - A provides Booking and Payments; C integrates Seating/Staff. Notifications supplies the Guest-owned delivery adapter. Named colleagues/steward and SPEC-09 ownership are not selected by this draft.
 - Client checkouts were added and audited on 2026-10-08 at sibling paths `../wedding-web`, `../wedding-manage-web`, `../wedding-app`: all13 project Markdown files,3 API locks, manifests, generators, CI and relevant source locations. See guide Section20 for source hashes/snapshots and remaining client tasks. This static audit does not prove builds or integration pass.
@@ -1151,18 +1153,21 @@ The detailed acceptance microchecks, all28 MED/GST/PRN/QRC requirements and19 re
 
 Each row expands through guide14.5. PRN-006 stays Payments-owned but is a mandatory real integration check in IS-W5/8. No live Seating repository read is introduced. New print approvals recheck headcount/revision, active venue/capacity and stored proof within the booking unit-of-work, even before an asynchronous invalidation arrives.
 
-### 22.4 SPEC-06 — six bounded waves
+### 22.4 SPEC-06 — current backend waves
 
-| Task | Outcome | Real dependency / completion evidence |
+The 2026-10-10 scope replaces the previous six mixed-client waves. Use the
+[Guest specification](../SPEC-guest-management.md) and [active backlog](./backend-revision-todo.md).
+
+| Wave | Scope | Required proof |
 | --- | --- | --- |
-| GR-W1 | Stable groups/households, normalized identity, atomic preview/import/history | Identity+confirmed Booking contracts; constraints/defaults/archive/import/privacy fixtures. |
-| GR-W2 | Personalized credentials/exchange/scoped RSVP/deadline/reissue | Real InvitationPublicationReader before integration; hash-only/scoped/privacy/rate/expiry proof. |
-| GR-W3 | Ordered attendance plan, search, due/report and delivery hand-off | Real Booking UoW/Synchronizer, Staff facade and Notifications credential adapter where used. |
-| GR-W4 | Strict HTTP/OpenAPI and provider checkpoint | Exact DTOs/errors/retry schemas, fake-real conformance, committed runtime API SHA/digest. |
-| GR-W5 | Couple/Guest Web and affected Manager workflows | Actual client instructions/API locks; real import/RSVP/token/deadline/pending UX proof. |
-| GR-W6 | Requirement acceptance and downstream hand-off | Real headcount→Seating→Invitation invalidation, PG migrations/seed/races/security/clients, proposed evidence `tasks/evidence/guest-rsvp.md` and owner acceptance. |
+| GM-W1 | Groups/households/import | Stable defaults, atomic validation/import and planned count |
+| GM-W2 | Read-only personalized links | Hash-only credential, scope/reissue/expiry/privacy/rate limits |
+| GM-W3 | Ordered headcount/search/reporting/delivery ports | Real owner synchronization, stale/replay/rollback and minimum data |
+| GM-W4 | HTTP/OpenAPI/runtime | Strict DTOs, RBAC/errors, actual mounted API and exact digest |
+| GM-W5 | Backend acceptance/frontend hand-off | Real headcount/Seating/print integration, migration/race/evidence |
 
-Each row expands through guide14.6. Guest plan activation and Booking headcount synchronization are one transaction; staged503 HEADCOUNT_SYNC_PENDING does not activate a plan or count as completed integration. Manual authorized share is possible before Notifications adapter readiness; automated delivery acceptance remains explicitly pending.
+No guest attendance response, response deadline or response reminder is implemented.
+Frontend builds/screens are independently delivered by the frontend team.
 
 ### 22.5 Reviewable HTTP completion proposals
 
@@ -1183,7 +1188,6 @@ These are **proposed transport details**, not implemented routes or new approved
 | Household archive | POST `/bookings/{id}/households/{householdId}/archive` | Own FULL/Manager; revision/intent, zero contribution after atomic plan sync, preserved attendance/history. |
 | Import preview/commit | POST `/bookings/{id}/households/imports/previews`; POST existing `/bookings/{id}/households/imports` | Preview allowlisted rows/limits; commit exact preview digest/externalRowKey/expected aggregate version+intent; entire batch atomic. |
 | Guest export | GET `/management/bookings/{id}/households/export` | Manager private export; explicit allowlisted columns/safe formula handling; format/limits/retention still require decision, not inherited from Analytics. |
-| Deadline read/change | GET `/bookings/{id}/rsvp-policy`; PATCH `/management/bookings/{id}/rsvp-policy` | Own Couple read; Manager audited deadlineRevision before delivery and near-event exception; no environment override of approved default. |
 | Personalized reissue/revoke | POST `/bookings/{id}/households/{householdId}/personalized-invitations/reissues`; DELETE `/bookings/{id}/households/{householdId}/personalized-invitations/{invitationId}` | Own FULL/Manager; old token revoked atomically, safe retry semantics and explicit delivery intent; no raw secret in durable replay/logs. |
 
 For each path finalize input/output schemas, all required/nullable fields, revision references, error/status cases, audit allowlist, authorization, cursor/limits and retry safety. Existing SPEC routes retain their exact field names; these proposals do not silently extend roles, expose private originals, allow post-cutoff writes, alter printable history or authorize payment/refund ownership changes.
@@ -1195,10 +1199,10 @@ For each path finalize input/output schemas, all required/nullable fields, revis
 | B-D1 — Guest capability | Proposed opaque purpose-separated random32-byte capability, hash-only storage,15-minute lifetime capped by underlying invitation expiry; obtain a new capability by token exchange subject to existing throttles. It cannot outlive token revocation/expiry and never grants account roles. | Capability lifetime/transport/storage mechanism is not fixed in approved SPEC; verify crypto purpose/infrastructure and owner authorization before adopting.15 minutes is a proposal, not an approved numeric default. |
 | B-D2 — secret issue/exchange retry | Proposed intent registry stores canonical secret-free resource/outcome references; encrypted short-lived one-time delivery/share material at privileged boundary where necessary; UNKNOWN retains same intent/credential revision. Retries must not create a second token or put plaintext secrets into HTTP replay persistence. | Exact authorized share recovery/replay contract needs security review and conformance. Do not promise redisplay of a lost secret without an approved mechanism. |
 | B-D3 — PII retention/erasure | Use a field matrix for name/phone/email/note/images/design personal content; purpose/access/terminal trigger/holds/history/backup/export/deletion. Current-state operational contacts must not become permanent report copies; revoke/purge credentials by existing expiry/delivery rules. | Sources do not supply all Guest/media retention durations. No arbitrary duration is filled in; financial/print/attendance historical references and erasure must be reconciled before production readiness. |
-| B-D4 — unpublish/deadline events | Preserve frozen event fields and completed-fact meaning. Proposed unpublication-specific additive event after schema review, rather than making existing publishedRevisionId nullable silently; reviewed deadline policy change facts/reference revision for scheduler recheck. | New event payload/version and consumer impact must be reviewed; do not emit invented events from code first. |
+| B-D4 — unpublish events | Preserve frozen event fields and completed-fact meaning. Proposed unpublication-specific additive event after schema review, rather than making existing publishedRevisionId nullable silently; Response deadlines are retired; retain only publication removal compatibility. | New event payload/version and consumer impact must be reviewed; do not emit invented events from code first. |
 | B-D5 — export and template details | Publish exact column/PII allowlist, download authority, file/row limits, formula-safe encoding, export retention; define template DTO/version/history and Manager boundaries. | Product scope establishes workflows but not every numeric policy/DTO. Do not copy Analytics limits or invent destructive retention. |
 
-Business/security/history changes follow the approved source hierarchy and change-control process. Routine compatible transport details can be selected within scope and tested; no per-microtask approval ceremony is introduced. These proposals are separated from approved SPEC values such as upload25 MiB, cutoff−72h, quote7 days, import5 MiB/1.000 rows and RSVP−7 days.
+Business/security/history changes follow the approved source hierarchy and change-control process. Routine compatible transport details can be selected within scope and tested; no per-microtask approval ceremony is introduced. These proposals are separated from approved SPEC values such as upload25 MiB, cutoff−72h, quote7 days, import5 MiB/1.000 rows and read-only invitation expiry at event end +24h.
 
 ### 22.7 Verification, evidence and definition of ready
 
@@ -1209,8 +1213,8 @@ Focused checks inside waves; full backend quality/coverage/integration/contract/
 ### 22.8 Client audit and remaining implementation work
 
 - All3 clients pin backend commit `168f61dd16fa58760b0d6238b7ebfd73503471c7` / SHA-256 `cc57e41c60f5e8e4edf9c5c835f986a7e4b17bfd64bbb3853888b29a9968ff40`; current BE OpenAPI has digest `caad010d6008cbfc8fc0748f49abad0c651e85ccda5cf008b60ac3f4e6fa3dc5`. Their default local generator will reject this mismatch. Preserve immutable lock semantics; publish implemented contract, then update each lock and regenerate types. Do not bypass digest checking or hand-edit generated files.
-- Public Web currently has Identity/Booking feature code; Management Web additionally has Venue code; App has Identity/Booking API code. No Invitation Studio/Guest RSVP feature folder or generated05/06 path/schema was found. Existing account/workspace invitations are not household invitations.
-- Add reviewed feature slices under each client `src/features/invitation-studio/` and `src/features/guest-rsvp/`. Web routes live under `app/`; Android routes under `src/app/`. New route names remain proposals until contract/UX review. Guest capability and public invitation views belong to Public Web; App is Couple-only; management operations must enforce Manager scope in BE.
+- Public Web currently has Identity/Booking feature code; Management Web additionally has Venue code; App has Identity/Booking API code. No Invitation Studio/Guest Management feature folder or generated05/06 path/schema was found. Existing account/workspace invitations are not household invitations.
+- Add reviewed feature slices under each client `src/features/invitation-studio/` and `src/features/guest-management/`. Web routes live under `app/`; Android routes under `src/app/`. New route names remain proposals until contract/UX review. Guest capability and public invitation views belong to Public Web; App is Couple-only; management operations must enforce Manager scope in BE.
 - Keep Guest capability state separate from account sessions and workspace/reset credentials. Web command retry helpers currently include Authorization/body in an in-memory signature; design a secret-free05/06 intent registry rather than persist or copy this representation into durable storage. Existing generic client expects JSON except204/205: use a reviewed separate binary-transfer path for direct uploads/downloads/exports where required, preserving signed URL expiry and error handling.
 - Web checks: formatting/lint/typecheck/api:check/coverage/build/audit. Android adds Expo SDK health and local Android export; this export is not an APK or EAS release. Validate real Guest/Manager/Couple flows, accessibility, responsive sizes and Android behavior at the implementation checkpoint; no runtime checks were executed in this documentation audit.
 - Next.js AGENTS instructions require reading installed version documentation before client code. Client source now pins Next16.3.8 while historical baseline evidence names16.3.6; record reviewed dependency drift instead of silently changing versions. Local Node is25.2.1, whereas repositories require Node24.x (`.node-version`24.21.0); no client node_modules is present. Prepare the required runtime/locked install before execution gates.
@@ -1423,7 +1427,7 @@ lists use UUID cursors/default20/max100, writes use durable Idempotency-Key and 
 Additional public GET paths are `/public/invitations/{slug}/render`, `/{slug}/qr`
 and `/public/invitation-assets/{slug}`. All paths are under `/api/v1`.
 The generic QR points to the implemented public HTML endpoint under the configured
-`PUBLIC_INVITATION_ORIGIN`; it contains no personalized credential or RSVP/check-in
+`PUBLIC_INVITATION_ORIGIN`; it contains no personalized credential or attendance-write/check-in
 authority. Missing origin disables publication503; HTTPS is required except loopback
 development/test. Stored booking identity/url is stable across variants and re-publish.
 HTML escapes text and uses restrictive CSP; all public/authorized reads use no-store.
@@ -1557,4 +1561,16 @@ Comprehensive defect resolution across `wedding-be`, `wedding-web`, `wedding-man
    - Deterministic OpenAPI check passes byte-for-byte.
    - 100% test pass and 0 lint warnings across all 4 repositories.
    - Traceability matrix and evidence documented in `tasks/evidence/invitation-studio.md`.
+
+
+
+## Active Backend Revision — 2026-10-10
+
+The owner confirmed removal of guest responses, restaurant services, full commercial
+contracts/30% deposit, mutual post-deposit appendices, incidental/final invoicing,
+separate names and backend-only SPEC-06 onward. Use [active tasks](./backend-revision-todo.md)
+for BE-01–17 and GM/SEA/STF/NTF/ANL/REL waves. Old wave tables and uncompleted
+frontend acceptance items are historical scope, not current backend instructions.
+The former UI skill/installer has been removed. Existing frontend source is intact.
+Commercial/profile feature tasks remain unchecked until actual implementation/proof.
 

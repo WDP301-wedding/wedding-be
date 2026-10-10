@@ -1,15 +1,17 @@
 # Specification: Staff Operations
 
-- Status: **Approved specification — module plan and implementation acceptance pending**
+> Current scope (confirmed 2026-10-10): [backend amendment](./docs/backend-scope-2026-10-10.md) and [active tasks](./tasks/backend-revision-todo.md). SPEC-06 onward has backend acceptance only; client implementation and visual/native checks belong to the frontend team. Earlier conflicting outlines are superseded.
+
+- Status: **Business scope confirmed 2026-10-10 — backend implementation pending**
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
 - Module ID: `staff-operations` (`SPEC-08`)
-- Contract baseline: `WEDDING-CONTRACT-1@1.1.0`
+- Contract baseline: `WEDDING-CONTRACT-2@2.0.0`
 - Inherited baseline: `WEDDING-CONTRACT-1@1.0.0` (historical contract)
-- Accepted amendment: baseline Section 21
+- Accepted amendment: baseline Section 22 (2026-10-10); previous Section 21 retained as history
 - Initial owner role: C (member name to be assigned)
 - Team execution contract: [`docs/team-implementation.md`](./docs/team-implementation.md)
 - Requirement ownership: CHK-001 through CHK-008
-- Depends on: `identity-access`, `booking-lifecycle`, `guest-rsvp`, `seating-plan`
+- Depends on: `identity-access`, `booking-lifecycle`, `guest-management`, `seating-plan`
 - Consumers: `analytics-dashboard`
 
 ## 1. Purpose and boundaries
@@ -17,7 +19,7 @@
 This module owns event assignments and an append-only actual-attendance ledger. It lets
 assigned Staff search an invitation household by name, optionally disambiguate safely by
 phone, record several arrivals, and record auditable corrections. It does not own
-household/RSVP truth, expected counts, guest groups, seating selection, or payment.
+household/planned-attendance truth, expected counts, guest groups, seating selection, or payment.
 
 ## 2. Attendance and assignment contract
 
@@ -49,7 +51,7 @@ interface AttendanceReader {
 | ----------------- | ------------------------------- | ----------------------------------------------------------- |
 | identity-access   | current role/actor              | Require current Staff or Manager role, never a client role. |
 | booking-lifecycle | confirmed event context         | Validate assignment/event scope.                            |
-| guest-rsvp        | `requireHouseholdForOperations` | Minimum household/group/expected/note data only.            |
+| guest-management  | `requireHouseholdForOperations` | Minimum household/group/expected/note data only.            |
 | seating-plan      | current plan reader             | Group guidance only; never infer personal table/seat.       |
 
 It emits `attendance.arrival-recorded` and `attendance.correction-recorded` v1.
@@ -135,15 +137,15 @@ winner; an already committed arrival remains evidence.
 group ID at a source fence (baseline Section 21). Corrections update one authoritative
 ledger; analytics never sums event deltas without an idempotent source checkpoint.
 
-| Slice                               | Can overlap                                               | Requires real provider                                                |
-| ----------------------------------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
-| Assignment/arrival/correction rules | Seating and Notifications domain work                     | Frozen current-role/window/household/guidance DTOs.                   |
-| PostgreSQL ledger/repository        | Other modules in separate file lanes                      | Serialized migration order and concurrent append/correction tests.    |
-| Staff search and Web components     | Guest search/Seating implementation with conforming fakes | Real search scope + identity/assignment + guidance before acceptance. |
-| Provisioning disable/revocation     | Identity-owned adapter slice                              | Real identity role/session behavior, no fake-only security closure.   |
+| Slice                                | Can overlap                                               | Requires real provider                                                |
+| ------------------------------------ | --------------------------------------------------------- | --------------------------------------------------------------------- |
+| Assignment/arrival/correction rules  | Seating and Notifications domain work                     | Frozen current-role/window/household/guidance DTOs.                   |
+| PostgreSQL ledger/repository         | Other modules in separate file lanes                      | Serialized migration order and concurrent append/correction tests.    |
+| Backend search and guidance adapters | Guest search/Seating implementation with conforming fakes | Real search scope + identity/assignment + guidance before acceptance. |
+| Provisioning disable/revocation      | Identity-owned adapter slice                              | Real identity role/session behavior, no fake-only security closure.   |
 
 Proposed waves: provisioning/assignments; attendance ledger;
-search/guidance/reporting; HTTP/OpenAPI; Staff Web; acceptance.
+search/guidance/reporting; HTTP/OpenAPI; backend evidence and frontend hand-off.
 
 | Requirements    | Focused proof                                                                                               |
 | --------------- | ----------------------------------------------------------------------------------------------------------- |

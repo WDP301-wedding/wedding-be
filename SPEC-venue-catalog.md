@@ -1,5 +1,7 @@
 # Specification: Venue Catalog
 
+> Current amendment: [confirmed backend scope](./docs/backend-scope-2026-10-10.md) and [commercial extensions](./SPEC-commercial-contracts.md). Completed implementation evidence below is historical; new names/catalog/contract/invoice rules are separate backend extension tasks. The 2026-10-10 amendment governs conflicts with older access, pricing and client requirements.
+
 - Status: **Approved by project owner on 2026-10-05**
 - Module ID: `venue-catalog`
 - Requirement ownership: SEA-001 and SEA-002
@@ -633,3 +635,12 @@ their dependency order, checkpoints V1 through V4, and the bounded constants in
 `tasks/plan.md` Section 17.1. This completes SPEC-02 and Checkpoint V0 and authorizes
 implementation in the recorded order; no implementation task has started as part of
 the specification gate.
+
+## 2026-10-10 Backend Extension
+
+Add Manager-controlled versioned service catalogs and minimal print commercial offerings (SVC-001–004). Use current selection/historical-resolution ports, stable archived references and integer VND. The completed venue tasks remain historical; BE-03–05 are separate backend additions.
+
+Authority and validation: [commercial specification](./SPEC-commercial-contracts.md),
+[confirmed scope](./docs/backend-scope-2026-10-10.md) and
+[active backend tasks](./tasks/backend-revision-todo.md). These requirements do not
+claim that the pending extension is already mounted in the generated API.

@@ -18,27 +18,27 @@ thành nghiệm thu toàn dự án. Các tick phản ánh backend implementation
 Tất cả đường dẫn dưới đây có prefix `/api/v1`. Có 19 operation thuộc đợt 2–4,
 không tính 5 operation media đợt 1 hoặc print-order của đợt 5.
 
-| Method | Path                                                                               | Công việc                                           |
-| ------ | ---------------------------------------------------------------------------------- | --------------------------------------------------- |
-| GET    | `/invitation-templates`                                                            | Template active; Couple cần booking FULL/confirmed. |
-| GET    | `/management/invitation-templates`                                                 | Manager đọc thư viện, có tùy chọn archive.          |
-| POST   | `/management/invitation-templates`                                                 | Manager tạo template/version.                       |
-| GET    | `/management/invitation-templates/{templateId}`                                    | Manager đọc current hoặc version bất biến.          |
-| PATCH  | `/management/invitation-templates/{templateId}`                                    | Manager revise/archive với CAS.                     |
-| GET    | `/bookings/{bookingId}/invitations`                                                | Danh sách thiết kế riêng, phân trang.               |
-| POST   | `/bookings/{bookingId}/invitations`                                                | Couple Web tạo thiết kế có cấu trúc.                |
-| GET    | `/bookings/{bookingId}/invitations/{designId}`                                     | Đọc thiết kế thuộc booking được cấp quyền.          |
-| POST   | `/bookings/{bookingId}/invitations/{designId}/revisions`                           | Tạo revision; Android chỉ sửa textFields.           |
-| POST   | `/bookings/{bookingId}/invitations/{designId}/publication`                         | Publish exact design/publication revision.          |
-| DELETE | `/bookings/{bookingId}/invitations/{designId}/publication`                         | Unpublish; giữ lịch sử.                             |
-| POST   | `/bookings/{bookingId}/invitation-image-generations`                               | Sinh một ảnh PNG riêng; retry cùng intent.          |
-| GET    | `/bookings/{bookingId}/invitation-image-generations`                               | Manager đọc intent PENDING, cursor/limit 1–100.     |
-| POST   | `/bookings/{bookingId}/invitation-image-generations/{intentDigest}/reconciliation` | Manager kết thúc intent chưa xác định với evidence. |
-| POST   | `/bookings/{bookingId}/invitation-derived-assets`                                  | Tạo PNG dẫn xuất riêng, có giới hạn và bỏ metadata. |
-| GET    | `/public/invitations/{slug}`                                                       | Public DTO tối thiểu của revision đã publish.       |
-| GET    | `/public/invitations/{slug}/render`                                                | HTML escape với CSP.                                |
-| GET    | `/public/invitations/{slug}/qr`                                                    | PNG QR chung cho booking, không có RSVP authority.  |
-| GET    | `/public/invitation-assets/{slug}`                                                 | Chỉ ảnh dẫn xuất thuộc publication hiện tại.        |
+| Method | Path                                                                               | Công việc                                             |
+| ------ | ---------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| GET    | `/invitation-templates`                                                            | Template active; Couple cần booking FULL/confirmed.   |
+| GET    | `/management/invitation-templates`                                                 | Manager đọc thư viện, có tùy chọn archive.            |
+| POST   | `/management/invitation-templates`                                                 | Manager tạo template/version.                         |
+| GET    | `/management/invitation-templates/{templateId}`                                    | Manager đọc current hoặc version bất biến.            |
+| PATCH  | `/management/invitation-templates/{templateId}`                                    | Manager revise/archive với CAS.                       |
+| GET    | `/bookings/{bookingId}/invitations`                                                | Danh sách thiết kế riêng, phân trang.                 |
+| POST   | `/bookings/{bookingId}/invitations`                                                | Couple Web tạo thiết kế có cấu trúc.                  |
+| GET    | `/bookings/{bookingId}/invitations/{designId}`                                     | Đọc thiết kế thuộc booking được cấp quyền.            |
+| POST   | `/bookings/{bookingId}/invitations/{designId}/revisions`                           | Tạo revision; Android chỉ sửa textFields.             |
+| POST   | `/bookings/{bookingId}/invitations/{designId}/publication`                         | Publish exact design/publication revision.            |
+| DELETE | `/bookings/{bookingId}/invitations/{designId}/publication`                         | Unpublish; giữ lịch sử.                               |
+| POST   | `/bookings/{bookingId}/invitation-image-generations`                               | Sinh một ảnh PNG riêng; retry cùng intent.            |
+| GET    | `/bookings/{bookingId}/invitation-image-generations`                               | Manager đọc intent PENDING, cursor/limit 1–100.       |
+| POST   | `/bookings/{bookingId}/invitation-image-generations/{intentDigest}/reconciliation` | Manager kết thúc intent chưa xác định với evidence.   |
+| POST   | `/bookings/{bookingId}/invitation-derived-assets`                                  | Tạo PNG dẫn xuất riêng, có giới hạn và bỏ metadata.   |
+| GET    | `/public/invitations/{slug}`                                                       | Public DTO tối thiểu của revision đã publish.         |
+| GET    | `/public/invitations/{slug}/render`                                                | HTML escape với CSP.                                  |
+| GET    | `/public/invitations/{slug}/qr`                                                    | PNG QR chung cho booking, chỉ xem nội dung công khai. |
+| GET    | `/public/invitation-assets/{slug}`                                                 | Chỉ ảnh dẫn xuất thuộc publication hiện tại.          |
 
 Private routes kiểm tra Identity hiện tại; writes cần `Idempotency-Key`; mutation có
 strict body/query và CAS phù hợp. Public routes không cần Bearer và không cấp quyền

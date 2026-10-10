@@ -1,5 +1,7 @@
 # Task List: Wedding Management System
 
+> Active revision confirmed 2026-10-10: [backend scope](../docs/backend-scope-2026-10-10.md), [commercial specification](../SPEC-commercial-contracts.md) and [executable backend backlog](./backend-revision-todo.md). All older SPEC-06–11 mixed-client outlines below are superseded. SPEC-01–04 completion and SPEC-05 backend completion are retained; do not reopen frontend checklists as backend work.
+
 SPEC-03 through SPEC-11, active baseline 1.1.0 and the initial three-person hand-off
 are approved: see [team implementation](../docs/team-implementation.md) and Checkpoint
 CB2 below. Bounded module plans, executable waves, provider artifacts, integration and
@@ -2445,7 +2447,7 @@ complete and ACCEPTED at BK-C4 on 2026-10-08.
       approval/withdrawal, change, and cancellation request flows.
 - [x] Implement Android confirmed-booking planning summary and timeline view for FULL
       Couple access; do not expose pre-deposit restricted workspace behavior.
-- [x] Apply `wedding-design-system` and verify desktop/mobile accessibility, overflow,
+- [x] Apply the former frontend design policy (retired 2026-10-10) and verify desktop/mobile accessibility, overflow,
       focus, runtime console, and Android rendering.
 
 #### BK-W8 — Cross-repository acceptance and owner review
@@ -2819,7 +2821,7 @@ do not authorize merging or deployment.
 **Verification:**
 
 - [ ] Trace every owned MED, PRN, and QRC requirement to acceptance criteria and automated tests.
-- [ ] Prove the generic QR cannot reveal private media, personalized guest data, RSVP identity, or a check-in mutation.
+- [ ] Prove the generic QR cannot reveal private media, personalized guest data, guest identity, or a check-in mutation.
 - [ ] Run Prettier and `git diff --check` on the affected documentation.
 
 **Dependencies:** Drafting may overlap earlier work. Final approval requires the
@@ -2835,30 +2837,19 @@ and settlement reader.
 - [ ] Payment and invitation specs preserve one-way billing ownership and immutable approved print content.
 - [ ] Private media and public invitation assets have separate authorization and storage purposes.
 
-### SPEC-06: Specify `guest-rsvp`
+### SPEC-06: Specify `guest-management`
 
-**Description:** Specify invitation households, default/custom guest groups, personalized electronic invitations, delivery, RSVP, and expected headcount.
+**Current specification:** [SPEC-guest-management.md](../SPEC-guest-management.md).
+Business scope confirmed 2026-10-10; backend implementation remains pending.
 
-**Acceptance criteria:**
+- [x] Replace guest-response specification with household/group/import/read-only invitation and expected-count planning.
+- [x] Keep seating and Staff actual check-in independent of guest viewing.
+- [x] Define backend-only GM-W1–GM-W5 and provider/OpenAPI hand-off.
+- [ ] Implement and verify [active GM tasks](./backend-revision-todo.md#spec-06--guest-management).
 
-- [ ] `SPEC-guest-rsvp.md` covers GST-001 through GST-008 and QRC-005.
-- [ ] Household identity, optional disambiguating contact, companion counts, group lifecycle, token privacy, and personalized-link behavior are explicit.
-- [ ] A compact plan of four to six continuous implementation waves covers backend and
-      Guest/Couple Web import, normalization, authorization, delivery, and RSVP proof.
-
-**Verification:**
-
-- [ ] Trace GST-001 through GST-008 and QRC-005 to acceptance criteria and tests.
-- [ ] Confirm guest-group identifiers are stable provider-owned contracts for seating, staff operations, and analytics.
-- [ ] Run Prettier and `git diff --check` on the affected documentation.
-
-**Dependencies:** Drafting may overlap earlier work. Final approval requires the
-approved SPEC-05 publication contract; personalized-link acceptance requires the real
-invitation provider.
-
-**Files likely touched:** `wedding-be/SPEC-guest-rsvp.md`, `wedding-be/tasks/plan.md`, `wedding-be/tasks/todo.md`
-
-**Estimated scope:** Medium
+No guest response/deadline or frontend-client wave is authorized by this task.
+Earlier B-PREP/B-EXEC records below are implementation history; their future outlines
+are superseded by the active backlog.
 
 ### B-PREP: Prepare SPEC-05/06 implementation readiness
 
@@ -2881,7 +2872,7 @@ Detailed microchecks,28 requirements and19 related ports are in [`implementation
 - [ ] Resolve B-D2 secret-safe issue/exchange/share retry/recovery; no plaintext credential in durable HTTP replay/log/events.
 - [ ] Resolve B-D3 field-by-field PII purpose/retention/erasure/history/holds/backup/export; do not invent unspecified durations.
 - [x] B-D4 invitation implementation choice: separate `invitation.unpublished` v1 removal fact retains non-null last publishedRevisionId; existing publication-changed fields/meaning are unchanged. Transaction/outbox native proof at plan20.15.
-- [ ] Resolve B-D4 Guest deadline schema and formal downstream publication/removal consumer compatibility; retain frozen existing meanings.
+- [ ] B-D4 historical response-deadline task is retired. Resolve only formal publication/removal consumer compatibility under the active backend backlog.
 - [ ] Resolve B-D5 export/template DTOs, columns/limits/retention and remaining proposed HTTP schemas/errors/authorization.
 - [ ] Record named steward/owner reviewers/integration-test owner and reserve the single shared migration/wiring lane.
 - [ ] Receive exact owner contract paths/commits, schemas/failure fixtures and executable fake-real conformance packages.
@@ -2924,12 +2915,6 @@ The user authorized completing IS-W1 and subsequently all IS-W2/IS-W3/IS-W4 back
 | IS-W6 | HTTP/OpenAPI/automation/reporting | Guide05-W6 checks; exact DTO/event/error schemas and provider/API checkpoint. |
 | IS-W7 | Web/App/Manager/public UI | Guide05-W7 checks; actual client docs/locks/network/browser/device gates. |
 | IS-W8 | SPEC-05 acceptance/hand-off | Guide05-W8 checks; migrations/seed/real E2E/security/requirements/owner acceptance. |
-| GR-W1 | Groups/households/import | Guide06-W1 checks; stable IDs/normalization/atomic batch/history. |
-| GR-W2 | Personalized credentials/RSVP/deadline | Guide06-W2 checks; hash-only scope/revocation/expiry/rate/retry safety. |
-| GR-W3 | Ordered plan/search/due/report/delivery | Guide06-W3 checks; real atomic Booking headcount and credential adapter evidence. |
-| GR-W4 | Guest HTTP/OpenAPI/provider checkpoint | Guide06-W4 checks; exact runtime schema/fake-real conformance/API digest. |
-| GR-W5 | Couple/Guest/Manager client flows | Guide06-W5 checks; actual network/API locks/token/privacy/pending UX. |
-| GR-W6 | SPEC-06 acceptance/hand-off | Guide06-W6 checks; real headcount→seating→print, migrations/seed/security/owner acceptance. |
 
 - [x] IS-W1 implementation and native read-side integration checks complete; external API publication and whole-module acceptance remain IS-W6/IS-W8.
 
@@ -2982,12 +2967,6 @@ The user authorized completing IS-W1 and subsequently all IS-W2/IS-W3/IS-W4 back
 - [x] IS-W7 complete: UI and Client features for Invitation Studio (SPEC-05) implemented across all three client repositories (wedding-web, wedding-manage-web, wedding-app). Contract schema merged preserving existing booking-lifecycle models. All client quality gates pass: typecheck 0 errors, lint 0 warnings/errors, 100% tests pass.
 - [x] IS-W1..7 audit defect resolution verified: print-order idempotency action/resource binding, replacement proposal lifecycle & views, mandatory cancellation reason for approved orders, payments/billing credit vs refund separation (credit adjustments reduce accepted charges without being treated as refunds), credit replay match checks, reporting monotonic sequence/fence/tie-breaker with real approvedAt, SYSTEM purpose allowlists, client session/booking binding, real upload connection, template CRUD, AI 2k prompt bounds & mediaAssetId DTO, handover DTO fix, and Forest/Sage/Ivory/Champagne design system compliance. Full evidence recorded in `tasks/evidence/invitation-studio.md`.
 - [ ] IS-W8 accepted by the project owner.
-- [ ] GR-W1 complete.
-- [ ] GR-W2 complete.
-- [ ] GR-W3 complete.
-- [ ] GR-W4 complete.
-- [ ] GR-W5 complete.
-- [ ] GR-W6 accepted by the project owner.
 
 #### B-READY — Report when all implementation prerequisites are available
 
@@ -3055,7 +3034,7 @@ seating providers.
 
 ### SPEC-09: Specify `notifications-automation`
 
-**Description:** Specify safe delivery of workspace, timeline, payment, print, RSVP, reminder, and completion events plus bounded background-job behavior.
+**Description:** Specify safe delivery of workspace, timeline, payment, print, guest planning, reminder, and completion events plus bounded background-job behavior.
 
 **Acceptance criteria:**
 
@@ -3067,7 +3046,7 @@ seating providers.
 **Verification:**
 
 - [ ] Trace OPS-001 and OPS-002 to acceptance criteria and tests.
-- [ ] Confirm notifications consume provider events without becoming the source of booking, payment, print, or RSVP truth.
+- [ ] Confirm notifications consume provider events without becoming the source of booking, payment, print, or guest-plan truth.
 - [ ] Run Prettier and `git diff --check` on the affected documentation.
 
 **Dependencies:** The locked baseline authorizes channel/provider drafting. Final
@@ -3191,3 +3170,14 @@ consumer integration wave to the real provider evidence it requires. Checklist o
 does not override the dependency graph, serialized Prisma migration lane, or provider
 acceptance gates. Never mark a SPEC task complete merely because a draft exists;
 decision approval and wave insertion are required.
+
+
+## Active Backend Revision — 2026-10-10
+
+The owner confirmed removal of guest responses, restaurant services, full commercial
+contracts/30% deposit, mutual post-deposit appendices, incidental/final invoicing,
+separate names and backend-only SPEC-06 onward. Use [active tasks](./backend-revision-todo.md)
+for BE-01–17 and GM/SEA/STF/NTF/ANL/REL waves. Old wave tables and uncompleted
+frontend acceptance items are historical scope, not current backend instructions.
+The former UI skill/installer has been removed. Existing frontend source is intact.
+Commercial/profile feature tasks remain unchecked until actual implementation/proof.

@@ -1,5 +1,7 @@
 # Cross-repository development
 
+> Current team scope confirmed 2026-10-10: [backend amendment](./backend-scope-2026-10-10.md). SPEC-06 onward and commercial/profile extensions are backend-only. Earlier client requirements/three-person allocation describe historical work; the frontend team owns future UI. [Active tasks](../tasks/backend-revision-todo.md) govern execution.
+
 This guide is the onboarding source for the four independently versioned Wedding Management repositories. Keep the repositories as siblings because every client contract generator defaults to `../wedding-be/openapi/openapi.json`.
 
 ```text
@@ -33,29 +35,13 @@ Concurrent coding does not make shared migrations or final integrations concurre
 
 Client validation exists for user experience. The backend remains authoritative for state changes, authorization, booking, payment, refund, invitation delivery, seating, and check-in.
 
-## Shared Codex design skill
+## Frontend Ownership
 
-The canonical Wedding UI skill is committed at
-`.codex/skills/wedding-design-system/` in `wedding-be`. It applies to UI work in
-`wedding-web`, `wedding-manage-web`, and `wedding-app`; it does not apply to
-backend-only work.
-
-From `wedding-be`, install or refresh the user-scoped copy so Codex can discover
-the same skill while working from any of the four sibling repositories:
-
-```powershell
-.\scripts\install-codex-skills.ps1
-```
-
-Use `$wedding-design-system` explicitly when assigning a Wedding UI task. Commit
-changes to the canonical repository copy first, then rerun the installer to refresh
-the local copy. Do not maintain independent edited copies in the client repositories.
-
-The files in `assets/approved-samples/` are visual references only. They establish
-hierarchy, density, shape, color, and tone, but they contain known copy and
-typography defects. Never copy visible wording, spelling, line breaks, or glyph
-rendering from those screenshots; product requirements and reviewed Vietnamese
-copy are authoritative.
+The frontend team owns its UI redesign and client implementation. The former shared
+UI skill and its installer have been retired from the backend repository and local
+skill discovery. No replacement design system is prescribed by the backend team.
+Existing frontend source remains intact. Use exact backend API/provider hand-offs
+for integration, with frontend checks tracked independently.
 
 ## First local start
 
@@ -198,3 +184,16 @@ Public Web or Management Web dev terminal with `Ctrl+C`, then rerun `npm ci`. If
 obvious, use Process Explorer's **Find Handle** search for the SWC filename and stop only the process
 whose command line points at the affected repository. Never use a blanket `taskkill /IM node.exe`
 because it can terminate unrelated Node.js work.
+
+## Backend Acceptance From SPEC-06
+
+Do not assign frontend source changes, browser/typography checks, client generation,
+Android builds or new frontend design-system work to backend module waves. Preserve
+sibling repositories. Backend hand-off includes exact schemas/OpenAPI digest, fixtures,
+errors, authorization, migrations, money invariants and real provider evidence.
+PROVIDER_READY/INTEGRATION_READY retain their actual implementation requirements;
+backend ACCEPTED requires complete backend evidence, independent of frontend screens.
+Full product release additionally records frontend integration by the frontend team.
+Historical A/B/C assignments are not assignments to the newly separate frontend team.
+The owner has already confirmed the business scope; do not re-ask permission for
+routine backend preparation within these requirements.

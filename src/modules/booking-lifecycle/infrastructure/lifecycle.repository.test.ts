@@ -153,7 +153,7 @@ describe('PrismaBookingLifecycleRepository', () => {
       repository.synchronizeHeadcount(
         {
           bookingId: 'booking',
-          sourceRsvpRevisionId: 'revision',
+          sourceGuestPlanRevisionId: 'revision',
           sourceSequence: 1,
           expectedAttendees: 10,
         },
@@ -213,7 +213,7 @@ describe('PrismaBookingLifecycleRepository', () => {
       repository.synchronizeHeadcount(
         {
           bookingId: 'booking',
-          sourceRsvpRevisionId: 'revision',
+          sourceGuestPlanRevisionId: 'revision',
           sourceSequence: 1,
           expectedAttendees: 10,
         },
@@ -324,7 +324,7 @@ describe('PrismaBookingLifecycleRepository', () => {
       repository.synchronizeHeadcount(
         {
           bookingId: 'booking',
-          sourceRsvpRevisionId: '00000000-0000-4000-8000-000000000010',
+          sourceGuestPlanRevisionId: '00000000-0000-4000-8000-000000000010',
           sourceSequence: 10,
           expectedAttendees: 120,
         },
@@ -339,7 +339,7 @@ describe('PrismaBookingLifecycleRepository', () => {
     });
 
     transaction.bookingHeadcountEvidence.findUnique.mockResolvedValue({
-      sourceRsvpRevisionId: '00000000-0000-4000-8000-000000000010',
+      sourceGuestPlanRevisionId: '00000000-0000-4000-8000-000000000010',
       sourceSequence: 10,
       expectedAttendees: 120,
     });
@@ -347,7 +347,7 @@ describe('PrismaBookingLifecycleRepository', () => {
       repository.synchronizeHeadcount(
         {
           bookingId: 'booking',
-          sourceRsvpRevisionId: '00000000-0000-4000-8000-000000000009',
+          sourceGuestPlanRevisionId: '00000000-0000-4000-8000-000000000009',
           sourceSequence: 9,
           expectedAttendees: 110,
         },
