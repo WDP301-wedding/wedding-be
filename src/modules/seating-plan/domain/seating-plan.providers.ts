@@ -23,8 +23,10 @@ export interface LayoutEligibility {
   readonly hallId: string;
   readonly minGuests: number;
   readonly maxGuests: number;
+  readonly hallMaxGuests: number;
   readonly totalSeatCapacity: number;
   readonly tableIds: readonly string[];
+  readonly tables: readonly { readonly tableId: string; readonly label: string }[];
   readonly isRetired: boolean;
 }
 
@@ -128,15 +130,21 @@ const FAKE_LAYOUT: LayoutEligibility = Object.freeze({
   hallId: '00000000-0000-0000-0000-000000000003',
   minGuests: 50,
   maxGuests: 200,
+  hallMaxGuests: 250,
   totalSeatCapacity: 200,
   tableIds: Object.freeze(['00000000-0000-0000-0000-000000000030']),
+  tables: Object.freeze([{ tableId: '00000000-0000-0000-0000-000000000030', label: 'Bàn 1' }]),
   isRetired: false,
 });
 
 export class FakeVenueSelectionEligibilityReader implements VenueSelectionEligibilityReader {
   requireLayoutVersionEligible(layoutTemplateVersionId: string): Promise<LayoutEligibility> {
     if (layoutTemplateVersionId === FAKE_LAYOUT.layoutTemplateVersionId) {
-      return Promise.resolve({ ...FAKE_LAYOUT, tableIds: [...FAKE_LAYOUT.tableIds] });
+      return Promise.resolve({
+        ...FAKE_LAYOUT,
+        tableIds: [...FAKE_LAYOUT.tableIds],
+        tables: [...FAKE_LAYOUT.tables],
+      });
     }
     return Promise.reject(new NotFoundError());
   }
@@ -208,8 +216,10 @@ export class PrismaVenueSelectionEligibilityReader implements VenueSelectionElig
       hallId: version.layoutTemplate.hallId,
       minGuests: version.minGuests,
       maxGuests: version.maxGuests,
+      hallMaxGuests: version.layoutTemplate.hall.maxGuests,
       totalSeatCapacity,
       tableIds: Object.freeze(version.geometry.map((t) => t.tableId)),
+      tables: Object.freeze(version.geometry.map((t) => ({ tableId: t.tableId, label: t.label }))),
       isRetired,
     });
   }
@@ -231,21 +241,32 @@ export class PrismaVenueSelectionEligibilityReader implements VenueSelectionElig
       },
     });
 
-    return Object.freeze(
-      versions.map((v) => {
-        const totalSeatCapacity = v.geometry.reduce((sum, g) => sum + g.seatCapacity, 0);
-        return Object.freeze({
-          layoutTemplateVersionId: v.id,
-          name: v.name,
-          minGuests: v.minGuests,
-          maxGuests: v.maxGuests,
-          totalSeatCapacity,
-          isCompatible:
-            planningHeadcount >= v.minGuests &&
-            planningHeadcount <= v.maxGuests,
-        });
-      }),
-    );
+    const mapped = versions.map((v) => {
+      const totalSeatCapacity = v.geometry.reduce((sum, g) => sum + g.seatCapacity, 0);
+      const isCompatible =
+        planningHeadcount >= v.minGuests &&
+        planningHeadcount <= v.maxGuests;
+      return {
+        layoutTemplateVersionId: v.id,
+        name: v.name,
+        minGuests: v.minGuests,
+        maxGuests: v.maxGuests,
+        totalSeatCapacity,
+        isCompatible,
+      };
+    });
+
+    // Rank compatible options first, then sort by distance to planning headcount
+    mapped.sort((a, b) => {
+      if (a.isCompatible !== b.isCompatible) {
+        return a.isCompatible ? -1 : 1;
+      }
+      const midA = (a.minGuests + a.maxGuests) / 2;
+      const midB = (b.minGuests + b.maxGuests) / 2;
+      return Math.abs(midA - planningHeadcount) - Math.abs(midB - planningHeadcount);
+    });
+
+    return Object.freeze(mapped.map((m) => Object.freeze(m)));
   }
 }
 

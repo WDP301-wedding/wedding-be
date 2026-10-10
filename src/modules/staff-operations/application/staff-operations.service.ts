@@ -265,6 +265,8 @@ export function createStaffOperationsService(
     async searchHouseholds(bookingId, filter, actor) {
       if (actor.role === 'STAFF') {
         await repository.requireActiveAssignment(bookingId, actor.accountId);
+      } else {
+        await bookingReader.requireConfirmedEventContext(bookingId);
       }
 
       const [searchResult, guidance] = await Promise.all([
@@ -277,30 +279,28 @@ export function createStaffOperationsService(
         guidanceMap.set(group.guestGroupId, group.tableLabels);
       }
 
-      const items: HouseholdSearchResultItem[] = await Promise.all(
-        searchResult.items.map(async (household) => {
-          const ledger = await repository.findLedger(
-            bookingId,
-            household.invitationHouseholdId,
-          );
-          const actualAttendees = ledger?.actualAttendees ?? 0;
-          const tableLabels = guidanceMap.get(household.guestGroupId) ?? [];
+      const householdIds = searchResult.items.map((h) => h.invitationHouseholdId);
+      const ledgerMap = await repository.findLedgersByHouseholds(bookingId, householdIds);
 
-          return {
-            invitationHouseholdId: household.invitationHouseholdId,
-            representativeName: household.representativeName,
-            phoneLast4: household.phoneLast4,
-            expectedAttendees: household.expectedAttendees,
-            actualAttendees,
-            hasOverExpectedWarning: actualAttendees > household.expectedAttendees,
-            guestGroupId: household.guestGroupId,
-            guestGroupName: household.guestGroupName,
-            guestGroupColor: household.guestGroupColor,
-            tableLabels,
-            operationalNote: household.operationalNote,
-          };
-        }),
-      );
+      const items: HouseholdSearchResultItem[] = searchResult.items.map((household) => {
+        const ledger = ledgerMap.get(household.invitationHouseholdId);
+        const actualAttendees = ledger?.actualAttendees ?? 0;
+        const tableLabels = guidanceMap.get(household.guestGroupId) ?? [];
+
+        return {
+          invitationHouseholdId: household.invitationHouseholdId,
+          representativeName: household.representativeName,
+          phoneLast4: household.phoneLast4,
+          expectedAttendees: household.expectedAttendees,
+          actualAttendees,
+          hasOverExpectedWarning: actualAttendees > household.expectedAttendees,
+          guestGroupId: household.guestGroupId,
+          guestGroupName: household.guestGroupName,
+          guestGroupColor: household.guestGroupColor,
+          tableLabels,
+          operationalNote: household.operationalNote,
+        };
+      });
 
       return {
         items: Object.freeze(items),
@@ -382,7 +382,10 @@ export function createStaffOperationsService(
       const delta = validateCorrectionDelta(input.delta);
       const reason = validateReason(input.reason);
 
-      const household = await guestReader.requireHouseholdForOperations(bookingId, householdId);
+      const [household, existingLedger] = await Promise.all([
+        guestReader.requireHouseholdForOperations(bookingId, householdId),
+        repository.findLedger(bookingId, householdId),
+      ]);
 
       const correctionResult = await repository.recordCorrection({
         bookingId,
@@ -404,6 +407,16 @@ export function createStaffOperationsService(
         });
       }
 
+      if (
+        existingLedger !== null &&
+        existingLedger.guestGroupIdSnapshot !== household.guestGroupId
+      ) {
+        warnings.push({
+          code: 'GUEST_GROUP_CHANGED',
+          message: 'The current guest group differs from the snapshotted group of previous arrivals.',
+        });
+      }
+
       return {
         correctionId: correctionResult.correctionId,
         ledgerRevision: correctionResult.ledgerRevision,
@@ -415,6 +428,8 @@ export function createStaffOperationsService(
     async getHouseholdAttendance(bookingId, householdId, actor) {
       if (actor.role === 'STAFF') {
         await repository.requireActiveAssignment(bookingId, actor.accountId);
+      } else {
+        await bookingReader.requireConfirmedEventContext(bookingId);
       }
 
       const [household, history] = await Promise.all([

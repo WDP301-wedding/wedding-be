@@ -319,11 +319,18 @@ export class PrismaSeatingGuidanceProvider implements SeatingGuidanceProvider {
     }
 
     const latestRevision = plan.revisions[0]!;
+    const geometryRows = await this.prisma.layoutTableGeometry.findMany({
+      where: { layoutTemplateVersionId: latestRevision.layoutTemplateVersionId },
+      select: { tableId: true, label: true },
+    });
+    const labelLookup = new Map<string, string>(geometryRows.map((g) => [g.tableId, g.label]));
+
     const groupTableMap = new Map<string, string[]>();
 
     for (const label of latestRevision.labels) {
       const list = groupTableMap.get(label.guestGroupId) ?? [];
-      list.push(label.layoutTableId);
+      const displayLabel = labelLookup.get(label.layoutTableId) ?? label.layoutTableId;
+      list.push(displayLabel);
       groupTableMap.set(label.guestGroupId, list);
     }
 

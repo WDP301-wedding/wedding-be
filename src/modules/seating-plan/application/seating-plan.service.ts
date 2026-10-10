@@ -428,7 +428,7 @@ export function createSeatingPlanService(
         minGuests: layoutEligibility.minGuests,
         maxGuests: layoutEligibility.maxGuests,
         totalSeatCapacity: layoutEligibility.totalSeatCapacity,
-        hallMaxGuests: layoutEligibility.totalSeatCapacity,
+        hallMaxGuests: layoutEligibility.hallMaxGuests,
         bookingRevision: booking.bookingRevision,
         planningHeadcount: booking.planningHeadcount,
         managerExceptionGranted: hasValidException,
@@ -558,7 +558,10 @@ export function createSeatingPlanService(
         throw new SeatingRevisionStaleError();
       }
 
-      if (booking.planningHeadcount > layoutEligibility.totalSeatCapacity) {
+      if (
+        booking.planningHeadcount > layoutEligibility.totalSeatCapacity ||
+        booking.planningHeadcount > layoutEligibility.hallMaxGuests
+      ) {
         throw new ExceptionExceedsPhysicalCapacityError();
       }
 
@@ -572,7 +575,7 @@ export function createSeatingPlanService(
         minGuests: layoutEligibility.minGuests,
         maxGuests: layoutEligibility.maxGuests,
         totalSeatCapacity: layoutEligibility.totalSeatCapacity,
-        hallMaxGuests: layoutEligibility.totalSeatCapacity,
+        hallMaxGuests: layoutEligibility.hallMaxGuests,
         bookingRevision: booking.bookingRevision,
         planningHeadcount: booking.planningHeadcount,
         managerExceptionGranted: true,
@@ -730,11 +733,14 @@ export function createSeatingPlanService(
         });
       }
 
-      const [bookingResult, rev, exRec, activeGroups] = await Promise.all([
+      const [bookingResult, rev, exRec, activeGroups, layoutEligibility] = await Promise.all([
         bookingReader.requireConfirmedBookingContext(bookingId).catch(() => null),
         repository.getCurrentRevisionWithLabels(plan.currentRevisionId),
         repository.getExceptionRecord(plan.id),
         guestReader.listActiveGroups(bookingId),
+        venueReader.requireLayoutVersionEligible(
+          (await repository.getCurrentRevisionWithLabels(plan.currentRevisionId)).layoutTemplateVersionId,
+        ).catch(() => null),
       ]);
 
       let planStatus = plan.status;
@@ -742,12 +748,20 @@ export function createSeatingPlanService(
         planStatus = await revalidatePlanStatus(plan, rev, bookingResult, exRec);
       }
 
+      const tableLabelMap = new Map<string, string>();
+      if (layoutEligibility?.tables !== undefined) {
+        for (const t of layoutEligibility.tables) {
+          tableLabelMap.set(t.tableId, t.label);
+        }
+      }
+
       const groupLookup = new Map(activeGroups.map((g) => [g.guestGroupId, g]));
       const groupTableMap = new Map<string, string[]>();
 
       for (const label of rev.labels) {
         const list = groupTableMap.get(label.guestGroupId) ?? [];
-        list.push(label.layoutTableId);
+        const displayLabel = tableLabelMap.get(label.layoutTableId) ?? label.layoutTableId;
+        list.push(displayLabel);
         groupTableMap.set(label.guestGroupId, list);
       }
 

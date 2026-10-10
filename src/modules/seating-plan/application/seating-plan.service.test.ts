@@ -119,8 +119,10 @@ describe('Seating Plan Service', () => {
     hallId,
     minGuests: 50,
     maxGuests: 200,
+    hallMaxGuests: 250,
     totalSeatCapacity: 150,
     tableIds: [tableId],
+    tables: [{ tableId, label: 'Bàn 1' }],
     isRetired: false,
   };
 

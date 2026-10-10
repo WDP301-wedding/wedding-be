@@ -105,6 +105,10 @@ export interface StaffOperationsRepository {
     bookingId: string,
     householdId: string,
   ): Promise<HouseholdAttendanceSummaryRow | null>;
+  findLedgersByHouseholds(
+    bookingId: string,
+    householdIds: readonly string[],
+  ): Promise<ReadonlyMap<string, HouseholdAttendanceSummaryRow>>;
   recordArrival(input: RecordArrivalInput): Promise<{
     readonly arrivalId: string;
     readonly ledgerRevision: number;
@@ -260,6 +264,26 @@ export function createStaffOperationsRepository(prisma: PrismaClient): StaffOper
         },
       });
       return row ? mapLedger(row) : null;
+    },
+
+    async findLedgersByHouseholds(
+      bookingId: string,
+      householdIds: readonly string[],
+    ): Promise<ReadonlyMap<string, HouseholdAttendanceSummaryRow>> {
+      if (householdIds.length === 0) {
+        return new Map();
+      }
+      const rows = await prisma.householdAttendanceLedger.findMany({
+        where: {
+          bookingId,
+          invitationHouseholdId: { in: [...householdIds] },
+        },
+      });
+      const map = new Map<string, HouseholdAttendanceSummaryRow>();
+      for (const row of rows) {
+        map.set(row.invitationHouseholdId, mapLedger(row));
+      }
+      return map;
     },
 
     async recordArrival(input: RecordArrivalInput): Promise<{

@@ -19,6 +19,7 @@ type MockStaffPrisma = {
   };
   householdAttendanceLedger: {
     findUnique: ReturnType<typeof vi.fn>;
+    findMany: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
   };
   attendanceArrival: {
@@ -56,6 +57,7 @@ describe('Staff Operations Repository', () => {
       },
       householdAttendanceLedger: {
         findUnique: vi.fn(),
+        findMany: vi.fn(),
         update: vi.fn(),
       },
       attendanceArrival: {
