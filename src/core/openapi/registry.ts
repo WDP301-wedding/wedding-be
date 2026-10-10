@@ -1,5 +1,7 @@
 import type { ZodOpenApiObject, ZodOpenApiResponseObject } from 'zod-openapi';
 import type { z } from 'zod';
+import { commercialCatalogOpenApiPaths } from '../../modules/venue-catalog/http/commercial-catalog.openapi.js';
+import { coupleProfileOpenApiPaths } from '../../modules/booking-lifecycle/http/couple-profile.openapi.js';
 import {
   experienceOpenApiPaths,
   experienceOpenApiSchemas,
@@ -191,6 +193,8 @@ export const openApiRegistry = {
     ...invitationStudioOpenApiPaths,
     ...invitationPrintOrdersOpenApiPaths,
     ...experienceOpenApiPaths,
+    ...coupleProfileOpenApiPaths,
+    ...commercialCatalogOpenApiPaths,
     ...venueCatalogOpenApiPaths,
     ...bookingLifecycleOpenApiPaths,
     ...paymentsBillingOpenApiPaths,

@@ -1,6 +1,6 @@
 # Specification: Commercial Extensions to SPEC-02–05
 
-- Business scope confirmed: 2026-10-10; implementation pending.
+- Business scope confirmed: 2026-10-10; BE-01–05 implemented, subsequent extensions pending.
 - Baseline: `WEDDING-CONTRACT-3@3.0.0`; optional Guest amendment changes no money formulas.
 - Authoritative rules: [confirmed scope](./docs/backend-scope-2026-10-10.md).
 - Ownership: existing Venue, Booking, Payments and Invitation modules; no new module ID or SPEC number.
@@ -77,7 +77,10 @@ require deliberate conversion, re-selection where needed and real approvals.
 
 ## 4. Access and Proposed HTTP
 
-These are proposed paths, not implemented OpenAPI claims. Prefix uses existing
+BE-01–05 profile/service/print-offering routes are mounted and documented in the
+[commercial foundations handoff](./docs/be01-05-commercial-foundations.md).
+Remaining commercial contract/appendix/invoice paths below are proposals, not
+implemented OpenAPI claims. Prefix uses existing
 /api/v1 mounting. All writes use Idempotency-Key, expectedRevision, current actor
 authority, concealed cross-booking identity and atomic audit.
 
