@@ -22,9 +22,16 @@ operations during an audit; arrange an explicitly authorized test environment fi
 There is no mandatory frontend design skill. Backend hand-offs include strict
 schemas, OpenAPI, examples, errors, authorization, migrations and provider evidence.
 
-Keep guest lists, groups, planned headcount, seating and event check-in. Guests only
-view invitations; do not add guest response statuses, response endpoints, attendance
-confirmation forms, response deadlines, response reminders or response analytics.
+Use Group + optional Guest list, not Household/party identities. A named Guest may
+bring companions; removing Household does not prohibit them. Companion-count
+storage/check-in rules are not yet confirmed; do not implement or prohibit them
+by assumption.
+Group seating works without named guests. Planned headcount is separately entered
+by Couple/Manager, never derived from Guest count; an empty list cannot reset it.
+Name-based check-in is explicitly opt-in per booking and off by default. Disabled
+check-in is not recorded/unknown, never zero actual attendance. Enabled check-in
+counts listed guests only, not whole-event attendance. Guests only view invitations;
+do not add response statuses/endpoints/forms/deadlines/reminders/analytics.
 
 Money uses integer VND and server-calculated totals. Contract, appendix and finalized
 invoice history is immutable. Preserve payment idempotency and settlement evidence.

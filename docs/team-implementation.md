@@ -66,21 +66,23 @@ OpenAPI digest. TypeScript declarations in these Markdown files are not a substi
 
 ## 3. Parallel-work matrix
 
-All starts below assume the consuming SPEC and plan are approved and CONTRACT_READY.
+The matrix retains the original allocation. For the confirmed backend revision,
+use the active backlog directly without a separate per-task decision/plan approval;
+real provider integration still requires CONTRACT_READY.
 
 | SPEC             | Work that can overlap an unfinished provider                                                            | Needs real provider before integration                                          | Acceptance order                                               |
 | ---------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------------- |
 | 03 Booking       | Pure slot/timeline/policy rules, persistence port tests, timeline UI fixtures                           | Identity + venue; SPEC-02 V4 remains the implementation start gate              | Booking provider before deposit integration.                   |
 | 04 Payments      | Payment/refund domain, callback parser, VNPay adapter doubles, ledger repositories after migration lane | Booking deposit reservation/recording + identity promotion                      | Deposit money/access/slot evidence before acceptance.          |
 | 05 Invitation    | Media validation, design/editor, print arithmetic, registry implementation                              | Confirmed booking/timeline + billing charge/credit                              | Print approval after actual billing/timeline boundary.         |
-| 06 Guest         | Groups/households/import, read-only links and ordered planning rules                                    | Booking ordered headcount + invitation publication                              | Real publication and headcount proof.                          |
+| 06 Guest         | Groups, optional named Guests/import, explicit independent planning and optional read-only links        | Booking ordered headcount; publication only for personalized links              | Real no-list/partial-list/planning proof; optional link proof. |
 | 07 Seating       | Compatibility/remapping/label rules, plan repositories, UI fixtures                                     | Venue + booking + guest + invitation registry                                   | Confirm/invalidate/print races before Staff integration.       |
-| 08 Staff         | Assignment/arrival/correction domain, operational UI fixtures                                           | Identity provisioning + booking + guest search + seating guidance               | Real concurrent attendance before analytics acceptance.        |
+| 08 Staff         | Assignments, explicit opt-in mode, one-person check-in/undo journal                                     | Identity + booking + Guest search; Seating guidance optional                    | Mode-aware reporting and real concurrent check-in proof.       |
 | 09 Notifications | Intent/retry/scheduler/channel doubles, each handler with a frozen producer schema                      | Identity port + each producer/recipient/due-command port                        | May run alongside 07/08/10; complete after required producers. |
 | 10 Analytics     | Metric functions/fixtures and individual source projectors as sources become ready                      | Owner reporting pages; all guest/staff/billing/print sources for full dashboard | Does not wait for notification delivery.                       |
 | 11 Release       | Deployment validation code, seed orchestration interfaces, evidence/checklist scaffolding               | All accepted implementations and actual deployed environments                   | Release journey/seed/migration/go-live remains last.           |
 
-Principal integration spine:
+Original integration spine (the current amendment below overrides Guest prerequisites):
 
 ```text
 venue V4 -> booking providers -> payment deposit -> invitation print/publication -> guest
@@ -93,6 +95,13 @@ venue V4 -> booking providers -> payment deposit -> invitation print/publication
                                                                             |       |
                                                                             +--- release
 ```
+
+Current Group/list/planning work requires Booking access and ordered headcount,
+not invitation publication. Publication gates only optional personalized links.
+Seating works without Guest names; check-in is separately opt-in and missing Seating
+guidance is not a Staff write blocker. Disabled check-in reports not recorded,
+not zero wedding attendance. SPEC-06 onward execution is backend-only; UI fixtures
+and client integration in this historical allocation belong to the frontend team.
 
 This is integration readiness, not a blanket ban on overlapping isolated coding.
 Payments adapter can be built while Booking Web screens are still being finished.

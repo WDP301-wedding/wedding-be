@@ -1,7 +1,7 @@
 # Specification: Commercial Extensions to SPEC-02–05
 
 - Business scope confirmed: 2026-10-10; implementation pending.
-- Baseline: `WEDDING-CONTRACT-2@2.0.0`.
+- Baseline: `WEDDING-CONTRACT-3@3.0.0`; optional Guest amendment changes no money formulas.
 - Authoritative rules: [confirmed scope](./docs/backend-scope-2026-10-10.md).
 - Ownership: existing Venue, Booking, Payments and Invitation modules; no new module ID or SPEC number.
 - Requirements: CPL-001–003, SVC-001–004, CTR-001–007, FIN-001–006; amended ACC-003/004, TML-005 and PRN-006.

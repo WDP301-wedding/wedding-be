@@ -17,7 +17,7 @@ is retained and future client delivery belongs to the frontend team.
 ### Requirements and Contracts
 
 - [Product requirements](PRODUCT-REQUIREMENTS.md), [capability map](CAPABILITY-MAP.md)
-  and [contract baseline](CONTRACT-BASELINE.md#22-confirmed-backend-scope--2026-10-10).
+  and [contract baseline](CONTRACT-BASELINE.md#23-group-and-optional-guest-list--2026-10-10).
 - Foundation and completed modules: [Core](SPEC-core-platform.md),
   [Identity](SPEC-identity-access.md), [Venue](SPEC-venue-catalog.md),
   [Booking](SPEC-booking-lifecycle.md), [Payments](SPEC-payments-billing.md),

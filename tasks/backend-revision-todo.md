@@ -8,6 +8,17 @@ Sources: [confirmed scope](../docs/backend-scope-2026-10-10.md),
 [Guest specification](../SPEC-guest-management.md), and
 [SPEC-01–05 runtime/provider audit](./evidence/spec01-05-runtime-audit-2026-10-10.md).
 
+Owner-confirmed Group + optional Guest amendment: no Household/party model;
+Groups/Seating work without names, planning total is separately entered/preserved,
+and check-in is explicit per-booking opt-in (NONE by default). A partial named list
+is not whole-event attendance. Baseline Section 23 governs these pending tasks;
+old checklist/evidence records remain historical. No per-task decision-approval
+round is needed for this already confirmed scope.
+
+Companion clarification: a named Guest may bring other people. Planned/actual
+companion recording was proposed but not confirmed. Resolve this narrow point before
+implementing dependent GM/STF fields/counts; do not infer a ban from Household removal.
+
 ## Completed Scope Preparation
 
 - [x] Interview and record removal of guest response behavior while retaining guests/seating/check-in.
@@ -142,37 +153,38 @@ the frontend team owns its implementation separately.
 ### SPEC-06 — Guest Management
 
 Safe isolated work may start against accepted owner contracts; integrated acceptance
-requires actual publication, access and ordered headcount providers.
+requires real Booking access and ordered headcount providers. Invitation publication
+is required only for optional personalized-link integration, not Groups/list/planning.
 
-- [ ] GM-W1: Implement groups/households/import, checked planned totals and durable revisions; verify atomic imports, legacy history and normalization.
-- [ ] GM-W2: Implement read-only personalized credentials/exchange/view/reissue; verify privacy, scope, hash-only storage, rate limits and expiry; no guest attendance writes.
-- [ ] GM-W3: Implement ordered Booking headcount sync, Staff search and reporting/delivery ports; verify stale/replay/rollback and minimum-data conformance.
-- [ ] GM-W4: Mount strict HTTP/Zod/OpenAPI; verify actual routes/denials/errors and publish examples/digest for frontend.
-- [ ] GM-W5: Verify real headcount -> Seating -> print invalidation plus migrations, concurrency and requirement evidence; automated sending needs real Notifications adapter.
+- [ ] GM-W1: Implement Groups + optional one-person Guests/import and independent explicit planning revisions; initialize from existing Booking count, never derive/reset total from an empty/partial list; verify normalization, atomic imports and retained references.
+- [ ] GM-W2: Implement optional Guest-scoped read-only credentials/exchange/view/reissue; generic invitation/QR works with no Guest list; verify privacy, hash-only storage, expiry/rate/denials; no guest attendance writes.
+- [ ] GM-W3: Implement explicit-total ordered Booking sync and named Guest search/list/group reporting/delivery ports; distinguish planningHeadcount/listedGuestCount, verify stale/replay/rollback and minimum-data conformance; Guest changes never enable check-in.
+- [ ] GM-W4: Mount strict Groups/Guests/planning HTTP/Zod/OpenAPI with names-free/partial-list examples and denials; no Household identities; companion-dependent fields require the narrow clarification above; publish exact provider/API versions.
+- [ ] GM-W5: Verify no-list -> Group seating/printing/event/invoice path and explicit-count -> Seating/print invalidation with real owners; import/archive do not change planning; migrations/concurrency/history proof; automatic personalized sending needs explicit recipient and real Notifications adapter.
 
 ### SPEC-07–11 — Backend Only
 
-- [ ] SEA-W1: Compatibility/remapping rules and pure capacity tests.
+- [ ] SEA-W1: Compatibility/remapping and capacity tests use independent planningHeadcount, never Guest count; Groups/table labels work with no named list.
 - [ ] SEA-W2: Immutable plan persistence and migration/revision proof.
-- [ ] SEA-W3: Confirmation/exception/print registry/Staff guidance with real owner conformance and rollback/race tests.
+- [ ] SEA-W3: Confirmation/exception/print registry/optional Staff guidance with real owner conformance and rollback/race tests; no-list/NONE mode cannot block a compatible layout/print.
 - [ ] SEA-W4: HTTP/OpenAPI and authorization; no geometry/person-seat writes.
 - [ ] SEA-W5: Backend acceptance evidence and frontend hand-off.
-- [ ] STF-W1: Staff provisioning/assignments and authorization.
-- [ ] STF-W2: Append-only multi-arrival/correction ledger with real concurrent tests.
-- [ ] STF-W3: Guest search/Seating guidance/reporting providers; expected counts remain separate from actual arrivals.
-- [ ] STF-W4: HTTP/OpenAPI and assigned-scope denial/retry proof.
+- [ ] STF-W1: Staff provisioning/assignments plus NONE/BY_GUEST_NAME configuration; owning FULL Couple/Manager explicit enable requires active names; adding/importing names never enables; after first record mode cannot hide history.
+- [ ] STF-W2: Named Guest append-only CHECK_IN/UNDO journal; effective count 0/1 per Guest; real duplicate/replay/undo/archive/revocation/mode concurrency tests; settle companion recording separately before dependent implementation, without prohibiting accompanying people.
+- [ ] STF-W3: Named Guest search/Group guidance and mode-aware reporting providers; NONE -> null/not recorded, enabled -> listed-guests-only counts with retained Group history; no whole-event attendance inference.
+- [ ] STF-W4: Strict mode/Guest check-in/undo HTTP/OpenAPI, assigned-scope/disabled-mode denials and privacy/retry proof; no Household identities; companion payload/correction rules follow the narrow confirmed clarification, not an inferred ban.
 - [ ] STF-W5: Backend acceptance evidence and frontend hand-off.
 - [ ] NTF-W1: Durable intents/recipient/device/channel registry and migration proof.
-- [ ] NTF-W2: Credential delivery, encryption and safe template/provider handling.
+- [ ] NTF-W2: Optional explicit-recipient Guest credential delivery, encryption and safe template/provider handling; absent names/contacts do not block generic invitation or other wedding notifications.
 - [ ] NTF-W3: Contract/appendix/payment/invoice/print and guest-plan handlers; no response events/deadline jobs.
 - [ ] NTF-W4: Due scheduler/reconciliation, media/D-3/completion jobs, retry/unknown/dedup proof.
 - [ ] NTF-W5: Settings/inbox/operations HTTP, outbox/provider integration evidence and frontend hand-off.
-- [ ] ANL-W1: Source formulas include agreed services/appendices/expenses/final invoices; no guest response metrics.
+- [ ] ANL-W1: Source formulas include agreed services/appendices/expenses/final invoices; separate explicit planning, optional named-list count and nullable mode-aware check-ins; no response metrics, disabled zeros or partial-list whole-event turnout rates.
 - [ ] ANL-W2: Projection/checkpoint/rebuild with monotonic source ordering.
 - [ ] ANL-W3: Authorized analytics HTTP/OpenAPI and bounded query/freshness proof.
 - [ ] ANL-W4: Deterministic fixture/real-source backend acceptance and frontend hand-off.
 - [ ] REL-W1: Backend environment/auth/config/manifest validation.
-- [ ] REL-W2: Deterministic idempotent backend seeds and API journey including full contract -> deposit -> event -> final invoice.
+- [ ] REL-W2: Deterministic idempotent backend seeds/journeys: no names + Group seating + NONE through contract/deposit/print/event/final invoice, plus partial names + explicit check-in/undo; list changes never alter planning/money.
 - [ ] REL-W3: Empty/upgrade migrations, backend staging/runtime health/recovery evidence.
 - [ ] REL-W4: Immutable API/provider manifest and frontend release integration checklist; frontend delivery recorded separately.
 - [ ] REL-W5: Backend go/no-go evidence and recovery hand-off; full product release waits for frontend integration.

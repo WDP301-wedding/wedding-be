@@ -4,7 +4,7 @@
 
 - Status: Approved 2026-09-26; scope amendment confirmed 2026-10-10
 - Current scope: [confirmed backend revision](./docs/backend-scope-2026-10-10.md)
-- Specification baseline: `WEDDING-CONTRACT-2@2.0.0`
+- Specification baseline: `WEDDING-CONTRACT-3@3.0.0`; Group + optional Guest amendment confirmed 2026-10-10
 - SPEC-01–04 completed; SPEC-05 backend completed. New commercial/profile requirements are extensions.
 - Capability index: `CAPABILITY-MAP.md`
 - Platform baseline: `SPEC-core-platform.md`
@@ -14,7 +14,7 @@ This document is the cross-module product source of truth for the consultation, 
 
 ## 2. Objective
 
-Provide one continuous, auditable workflow in which a prospective couple collaborates with the restaurant before deposit, becomes a full Couple user after deposit, prepares event materials and guest-group seating, and supports practical name-based event check-in.
+Provide one continuous, auditable workflow in which a prospective couple collaborates with the restaurant before deposit, becomes a full Couple user after deposit, prepares event materials and guest-group seating, and can opt into name-based event check-in.
 
 The product succeeds when:
 
@@ -23,25 +23,26 @@ The product succeeds when:
 - a successful deposit promotes the existing workspace without duplicating identity or consultation data;
 - wedding photos remain private and unavailable before deposit;
 - seating communicates guest areas without assigning individual guests to exact tables or seats;
-- staff can check in invitation households even when members arrive separately or exceed the expected count;
+- named Guest lists are optional; group seating and separately entered planning totals work without names;
+- assigned staff can check in listed guests once when the booking explicitly enables name-based check-in;
 - a print request can contain multiple invitation variants and quantities, with an approved quotation and immutable print content;
 - the physical-invitation QR remains generic and cannot be mistaken for an attendance credential.
 
 ## 3. Actors and Terms
 
-| Term                 | Meaning                                                                                                                   |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Prospective Couple   | An authenticated user invited to a restricted consultation workspace before deposit                                       |
-| Couple               | The same identity after a successful deposit grants full wedding-management access                                        |
-| Manager              | Restaurant user who configures templates, approves timelines, quotes print orders, and controls operational exceptions    |
-| Staff                | Restaurant user assigned to event operations such as guest lookup and check-in                                            |
-| Consultation         | The pre-deposit business record that owns proposal and timeline collaboration state                                       |
-| Booking              | The wedding reservation that becomes confirmed according to the booking and payment policies                              |
-| Timeline revision    | An immutable version of the proposed wedding schedule; approvals bind to one exact revision                               |
-| Invitation household | One invitation record representing a person, couple, family, or party arriving under one representative name              |
-| Guest group          | A named, colored category shared by invitation households and seating-plan table labels                                   |
-| Layout template      | Restaurant-owned fixed geometry for a hall and supported guest-count range                                                |
-| Printable revision   | An immutable snapshot of invitation design, approved timeline, seating content, and public QR used for a print-order line |
+| Term               | Meaning                                                                                                                   |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| Prospective Couple | An authenticated user invited to a restricted consultation workspace before deposit                                       |
+| Couple             | The same identity after a successful deposit grants full wedding-management access                                        |
+| Manager            | Restaurant user who configures templates, approves timelines, quotes print orders, and controls operational exceptions    |
+| Staff              | Restaurant user assigned to event operations such as guest lookup and check-in                                            |
+| Consultation       | The pre-deposit business record that owns proposal and timeline collaboration state                                       |
+| Booking            | The wedding reservation that becomes confirmed according to the booking and payment policies                              |
+| Timeline revision  | An immutable version of the proposed wedding schedule; approvals bind to one exact revision                               |
+| Guest              | One named person in an optional private list; may bring companions without becoming a Household identity                  |
+| Guest group        | A named, colored category usable independently of the Guest list and shared by table labels/check-in guidance             |
+| Layout template    | Restaurant-owned fixed geometry for a hall and supported guest-count range                                                |
+| Printable revision | An immutable snapshot of invitation design, approved timeline, seating content, and public QR used for a print-order line |
 
 ## 4. End-to-End Lifecycle
 
@@ -62,7 +63,7 @@ Successful deposit promotes existing identity to full Couple access
         |
 Media, invitations, guest list, seating, and print ordering become available
         |
-Restaurant staff perform name-based, multi-arrival check-in on event day
+Optional named Guest list; explicit check-in opt-in -> Staff check in listed people on event day
         |
 Manager adds incidental expenses and finalizes the invoice; Couple pays the remaining balance
 ```
@@ -103,17 +104,17 @@ Hall allocation is exclusive per local event date and shift: one `hallId + event
 - **MED-005:** Uploads follow the platform file-validation rules for allowlisted type, verified content, bounded size and dimensions, generated object keys, and audit-safe metadata.
 - **MED-006:** In-system photo editing, public photo albums, and unrestricted post-cutoff mutation are outside the required scope.
 
-### 5.4 Invitation Households and Guest Groups
+### 5.4 Groups and Optional Named Guests
 
-- **GST-001:** One guest-list record represents one invitation household or party rather than requiring one record per attendee.
-- **GST-002:** An invitation household contains a representative name, optional phone or other approved disambiguating contact, guest-group assignment, expected attendee count, and optional operational note.
-- **GST-003:** Expected attendee count is a positive integer and does not require the names of companions.
+- **GST-001:** Group + optional Guest replaces Household/party. Each Guest is one named person; no list is required and a supplied list may be partial.
+- **GST-002:** Guest contains name, stable guest-group assignment, optional approved contact/note and revision/archive history. Duplicate names remain distinct IDs. Guests may bring companions; planned/actual companion recording is not yet confirmed and must not be prohibited by inference from removing Household.
+- **GST-003:** Couple/Manager enter planned headcount independently. Initialization preserves Booking's total; Guest CRUD/import/archive never recomputes it or resets an empty list to zero.
 - **GST-004:** Each wedding starts with the groups `Parents`, `Groom Side`, `Bride Side`, and `Friends`; the UI presents localized Vietnamese labels.
 - **GST-005:** The couple can add custom groups and select their display colors. Names must be unique within a wedding after normalization, and colors are presentation metadata rather than authorization or identity.
-- **GST-006:** The same guest-group identifier is used by invitation households, seating-plan table labels, staff guidance, and grouped attendance reporting.
-- **GST-007:** A group referenced by a household, confirmed seating plan, or attendance record cannot be destructively removed. Rename or archival behavior must preserve historical meaning.
+- **GST-006:** The same group ID is used by optional Guests, seating labels, staff guidance and reporting. A group can exist and label tables without any Guest records.
+- **GST-007:** Groups/Guests referenced by invitations, seating or check-in history cannot be destructively removed. Rename/archive preserves historical meaning.
 - **GST-008:** Personalized read-only electronic invitations and delivery are separate from the generic physical-invitation QR. Guest capabilities cannot change planning or actual attendance.
-- **GST-009:** Planned headcount is the sum of expected counts of active households entered by Couple/Manager; guest viewing has no effect. No response status/count/history, response mutation, deadline, reminder or response analytics is implemented.
+- **GST-009:** Explicit planning-total edits use immutable ordered plan revisions and atomic Booking synchronization. ListedGuestCount and measured check-ins are separate; guest viewing has no effect. No response behavior/history/deadline/reminder/analytics is implemented.
 
 ### 5.5 Fixed Layout Selection and Table-Level Group Labels
 
@@ -121,20 +122,20 @@ Hall allocation is exclusive per local event date and shift: one `hallId + event
 - **SEA-002:** A layout template owns fixed geometry and stable table identifiers. Couple users cannot move, add, or remove tables or alter the supported capacity range.
 - **SEA-003:** The system filters or ranks available layouts using the booking's expected headcount.
 - **SEA-004:** The couple can select one compatible layout and apply a guest-group label and its color to individual tables.
-- **SEA-005:** The system does not assign an invitation household or individual guest to a specific table or seat.
+- **SEA-005:** Groups label table areas without placing individual Guests. No named list is needed to select/confirm a layout from the independent planning headcount.
 - **SEA-006:** If expected headcount moves outside the selected layout's supported range, the existing selection and group definitions remain visible, but the plan cannot be confirmed until a compatible layout is selected or a Manager records an explicit exception.
 - **SEA-007:** Changing layout does not delete guest-group definitions. Table-label assignments may be remapped to the new template.
 - **SEA-008:** Any drag interaction is limited to applying a group label to a table; it must not imply movable restaurant geometry or individual guest placement.
 
-### 5.6 Manual, Multi-Arrival Event Check-In
+### 5.6 Optional Name-Based Event Check-In
 
-- **CHK-001:** Assigned Staff can search invitation households by representative name and optionally use phone data to disambiguate duplicate names.
-- **CHK-002:** Search results show the guest group, group color, expected attendee count, cumulative actual attendee count, and operational notes allowed for Staff.
-- **CHK-003:** One invitation household can receive multiple arrival records when its attendees arrive separately.
-- **CHK-004:** Each arrival records a positive attendee count, event time, acting Staff identity, and invitation-household identity. Actual attendance is the sum of valid arrivals and corrections.
-- **CHK-005:** When cumulative actual attendance exceeds the expected count, the UI and API return a warning but do not block the arrival.
+- **CHK-001:** Name-based check-in defaults to NONE. Owning FULL Couple/Manager explicitly enable BY_GUEST_NAME only with active named Guests; adding/importing names does not enable it.
+- **CHK-002:** When enabled, assigned Staff search Guest names, safely disambiguate duplicates and see group/color, check-in state and minimum authorized note/contact hints.
+- **CHK-003:** One Guest can have at most one effective check-in. Same intent replays; concurrent/different-key duplicates cannot increment named Guest counts. Counting companions is a separate unresolved requirement, not a claim that a Guest arrives alone.
+- **CHK-004:** A record binds Guest ID, event time, Staff actor and request identity; corrections/undo are appended. checkedInGuestCount counts distinct effective named Guest check-ins only.
+- **CHK-005:** NONE means not recorded, not zero actual attendance. Enabled list counts do not measure the whole wedding when names are partial; no forced walk-in/anonymous counting is required.
 - **CHK-006:** Corrections preserve an audit trail; a prior arrival must not disappear through an unaudited overwrite or hard delete.
-- **CHK-007:** After check-in, Staff guide the party to the area represented by its guest-group label and color, not to a reserved personal table or seat.
+- **CHK-007:** Group guidance identifies an area, not a reserved personal table/seat. No-list/no-check-in bookings still support group seating and normal event completion/billing; disabling cannot erase committed history.
 - **CHK-008:** QR scanning is not required for physical-invitation check-in and is not a fallback authorization mechanism.
 
 ### 5.7 Physical-Invitation Print Orders
@@ -153,7 +154,7 @@ Hall allocation is exclusive per local event date and shift: one `hallId + event
 
 - **QRC-001:** All physical invitation variants for one wedding use one generic wedding QR unless a future approved scope change states otherwise.
 - **QRC-002:** The QR opens a public electronic invitation containing only approved public event content.
-- **QRC-003:** Scanning the generic QR does not identify an invitation household, expose a guest group, change attendance, or submit event check-in.
+- **QRC-003:** Generic QR works without a named Guest list; it does not identify a Guest, expose groups, change attendance or authorize check-in.
 - **QRC-004:** The public identifier is an unguessable opaque value but is not treated as proof of guest identity or authorization.
 - **QRC-005:** Personalized direct electronic-invitation links remain a separate `guest-management` capability and must be visually and technically distinguishable from the generic QR destination.
 
@@ -161,7 +162,7 @@ Hall allocation is exclusive per local event date and shift: one `hallId + event
 
 - **OPS-001:** Notification events cover workspace invitation, timeline review requested, timeline approval or supersession, deposit eligibility, media cutoff, print quotation, print approval, and print handover readiness where the corresponding module enables notification delivery.
 - **OPS-002:** Operational notifications contain no private image attachment, raw access token, full guest list, or unnecessary PII.
-- **OPS-003:** Reporting can compare expected and actual attendance by invitation household and guest group without inventing per-seat occupancy.
+- **OPS-003:** Report independent planningHeadcount, listedGuestCount and optional checkedInGuestCount/status separately. NONE is null/not recorded, not zero; enabled counts are listed-guests-only, never inferred whole-event attendance, completeness or a turnout rate against the planning total. No per-seat occupancy inference.
 - **OPS-004:** Print reporting uses accepted commercial totals and current fulfillment state; draft quotations do not count as receivables.
 
 ### 5.10 Separate Couple Names
@@ -263,13 +264,13 @@ Each module specification must map automated tests to the requirement identifier
 3. Deposit eligibility is rechecked transactionally when payment starts.
 4. Successful deposit promotes access without duplicating the user or consultation.
 5. Private media cannot be read by a public invitation or another booking.
-6. A guest group remains stable across household, table label, check-in guidance, and reporting.
+6. A group remains stable across optional Guests, table labels, opt-in check-in guidance and reporting; no names are required for group seating.
 7. A headcount change outside the selected layout range blocks confirmation without deleting the prior draft.
-8. Separate arrivals accumulate attendance; an over-expected arrival succeeds with a warning; correction history remains auditable.
+8. Name-based check-in remains off unless explicitly enabled; duplicate check-in cannot count a Guest twice, and undo/recheck-in preserve history. No list or partial names do not alter the planning total or block the wedding.
 9. Print approval freezes design, timeline, seating content, QR, and price revisions.
 10. The generic QR never resolves to personalized guest data or a check-in mutation.
 
-Concurrency tests are required for timeline approvals versus edits, payment eligibility versus supersession, simultaneous household arrivals, and print quotation versus approval. Authorization tests must exercise backend endpoints directly, not only hidden UI controls.
+Concurrency tests are required for timeline approvals versus edits, payment eligibility versus supersession, duplicate Guest check-in/undo versus role/mode changes, explicit planning-total edits versus seating/print confirmation, and print quotation versus approval. Authorization tests must exercise backend endpoints directly, not only hidden UI controls.
 
 ## 10. Boundaries
 
@@ -279,7 +280,7 @@ Concurrency tests are required for timeline approvals versus edits, payment elig
 - Bind approvals to immutable revisions and preserve audit evidence.
 - Treat wedding photos, guest contacts, access tokens, and operational notes as private data.
 - Preserve existing identity and consultation data when access is promoted after deposit.
-- Represent actual attendance as auditable arrivals and corrections.
+- Represent optional named-list check-in as an auditable one-person journal; retain unknown attendance when check-in is off and never infer whole-event attendance from a partial list.
 - Freeze printable and commercial content when a print order is approved.
 
 ### Ask the project owner first
@@ -297,7 +298,7 @@ Concurrency tests are required for timeline approvals versus edits, payment elig
 - Enable wedding-media upload before successful deposit.
 - Create a second Couple identity when promoting a consultation.
 - Let Couple users edit restaurant layout geometry or assign individual guests to exact tables or seats.
-- Block a real arrival only because actual attendees exceed the expected count.
+- Infer planning totals or whole-event actual attendance from Guest count, check-in count or invitation views.
 - Mutate an approved printable revision in place.
 - Put recipient names or per-recipient QR credentials into the required physical-print workflow.
 - Expose private photos, guest data, phone numbers, or operational notes on the generic public invitation.
