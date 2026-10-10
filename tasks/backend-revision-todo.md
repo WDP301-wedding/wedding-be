@@ -86,8 +86,12 @@ authorized disposable/staging environment and bounded cost; CI remains offline.
   reached Google once, but JPEG output failed the deployed PNG adapter. Configuration
   and offline remediation do not close application/Storage acceptance.
 - [ ] RV-11
-- [ ] RV-12
-- [ ] RV-13
+- [x] RV-12
+- [x] RV-13 (baseline sandbox; rerun after BE-09)
+- Evidence: [2026-10-11 VNPay Railway rehearsal](evidence/rv12-13-vnpay-railway-2026-10-11.md)
+  completed genuine provider checkout/IPN, signed QueryDr, once-only ledger and
+  same-identity access promotion. Controlled prerequisites do not close RV-15;
+  Hobby egress is dynamic and production-money acceptance remains separate.
 - [ ] RV-14
 - [ ] RV-15
 - [ ] RV-16
