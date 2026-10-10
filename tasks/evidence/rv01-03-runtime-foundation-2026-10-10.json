@@ -242,7 +242,19 @@
         "lines": 80
       },
       "mutation": "inverted target comparison killed",
-      "windowsFullSuite": "native worker crashes; not a passing complete run"
+      "windowsFullSuite": "native worker crashes; not a passing complete run",
+      "retryCoverageFollowUp": {
+        "failedDocumentationCiRun": "38057538053",
+        "allTestsPassedInThatRun": 1482,
+        "failure": "existing workspace-invitation repository branches 78.26% below unchanged 80% per-file gate",
+        "diagnosis": "serialization retry coverage depended on database race scheduling",
+        "deterministicFailureTestsAdded": 15,
+        "combinedFocusedTestsPassed": 24,
+        "focusedRepositoryBranches": 86.95,
+        "focusedRepositoryLines": 92.98,
+        "repositoryRuntimeCodeChanged": false,
+        "independentTestReview": "passed"
+      }
     },
     "live": {
       "database": "verified below",

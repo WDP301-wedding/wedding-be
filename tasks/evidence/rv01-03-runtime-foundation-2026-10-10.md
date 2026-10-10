@@ -71,6 +71,17 @@ Windows full-suite attempts encountered native Node worker crashes and
 contention timeouts; focused checks passed. The complete authoritative run is the
 pinned Node 24.21 Linux CI above, not a claim that those Windows attempts passed.
 
+Coverage follow-up: documentation CI run `38057538053` passed all 1,482 tests but
+failed the unchanged workspace-invitation repository's per-file branch gate at
+78.26%. Retry coverage had depended on whether real DB races produced serialization
+conflicts. Fifteen deterministic transaction-failure tests now cover P2034
+recovery/exhaustion, fatal error propagation, P2002 denials and domain-error
+no-retry behavior. Existing real PostgreSQL race tests remain. Combined focused
+verification passed 24 tests, with repository branches 86.95% and lines 92.98% on
+the local runtime; typecheck and independent test review passed. Repository/runtime
+code and all coverage thresholds are unchanged. The PR checks record the complete
+CI rerun including these supplemental tests separately from the deployed source run.
+
 OpenAPI remains unchanged, artifact digest
 `6f92021e6c8fa7f4f094cc65b3bcf165adf82d819cf18bdf8ad8b70f8307297e`.
 No applied migrations or frontend source were changed.
