@@ -8,11 +8,11 @@ Phạm vi tạm thời: toàn bộ bề mặt sản phẩm được tài liệu 
 
 ## Sản phẩm phục vụ ai
 
-| Source | Vai trò và mục đích | Đặc điểm thiết kế |
-| --- | --- | --- |
-| wedding-web | Couple và khách truy cập; workspace hạn chế trước cọc; Couple đầy đủ sau cọc; website công khai và Guest RSVP qua link riêng | Editorial, ảnh ấm, khoảng thở; editor đầy đủ trên Web |
-| wedding-manage-web | Manager quản trị nhà hàng/nghiệp vụ; Staff tác nghiệp tiệc được phân công | Điều hướng và bảng dữ liệu rõ; mật độ cao nhưng dễ đọc; tách quyền Manager/Staff |
-| wedding-app | Expo/React Native Android, Couple đã có FULL access và booking xác nhận | Native, tác vụ nhanh; preview/chỉnh văn bản/chia sẻ; không thu nhỏ nguyên Web editor |
+| Source             | Vai trò và mục đích                                                                                                          | Đặc điểm thiết kế                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| wedding-web        | Couple và khách truy cập; workspace hạn chế trước cọc; Couple đầy đủ sau cọc; website công khai và Guest RSVP qua link riêng | Editorial, ảnh ấm, khoảng thở; editor đầy đủ trên Web                                |
+| wedding-manage-web | Manager quản trị nhà hàng/nghiệp vụ; Staff tác nghiệp tiệc được phân công                                                    | Điều hướng và bảng dữ liệu rõ; mật độ cao nhưng dễ đọc; tách quyền Manager/Staff     |
+| wedding-app        | Expo/React Native Android, Couple đã có FULL access và booking xác nhận                                                      | Native, tác vụ nhanh; preview/chỉnh văn bản/chia sẻ; không thu nhỏ nguyên Web editor |
 
 Các README xác nhận Web còn có bề mặt public/Guest và Manage Web còn có Staff. Chúng là các khu vực khác quyền, không đồng nhất với trang Couple hay quyền Manager.
 

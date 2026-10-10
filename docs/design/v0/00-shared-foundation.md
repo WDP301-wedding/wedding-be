@@ -10,18 +10,18 @@ Define reusable semantic tokens:
 
 ```css
 :root {
-  --canvas: #FAF8F5;
-  --surface: #FFFFFF;
-  --surface-muted: #F3EFEA;
+  --canvas: #faf8f5;
+  --surface: #ffffff;
+  --surface-muted: #f3efea;
   --primary: #334537;
-  --primary-pressed: #243B2A;
-  --brand-sage: #4A5D4E;
-  --champagne: #C5A880;
-  --earth: #8C6D62;
+  --primary-pressed: #243b2a;
+  --brand-sage: #4a5d4e;
+  --champagne: #c5a880;
+  --earth: #8c6d62;
   --text: #232321;
-  --text-muted: #62645F;
-  --rule: rgba(74, 93, 78, .12);
-  --rule-premium: rgba(197, 168, 128, .35);
+  --text-muted: #62645f;
+  --rule: rgba(74, 93, 78, 0.12);
+  --rule-premium: rgba(197, 168, 128, 0.35);
 }
 ```
 
