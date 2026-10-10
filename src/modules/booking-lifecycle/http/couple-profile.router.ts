@@ -41,6 +41,7 @@ export function createCoupleProfileRouter(
     authenticate,
     validateRequest({ params: consultationParamsSchema, body: profileWriteSchema }),
     async (_request, response, next) => {
+      response.set('Cache-Control', 'no-store');
       // Recheck scope before replaying a previously successful private response.
       const { params } = validatedRequest(response, { params: consultationParamsSchema });
       await service.read(params.consultationId, response.locals.actor as AuthenticatedActor);

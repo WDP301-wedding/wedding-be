@@ -151,7 +151,10 @@ describeDb('BE-01–05 disposable PostgreSQL profile/catalog foundations', () =>
     expect(saved.body).toMatchObject({
       data: { brideName: 'Ánh', groomName: 'Minh', revision: 2 },
     });
-    expect((await patch()).body).toEqual(saved.body);
+    const replayed = await patch();
+    expect(replayed.body).toEqual(saved.body);
+    expect(saved.headers['cache-control']).toBe('no-store');
+    expect(replayed.headers['cache-control']).toBe('no-store');
     expect(
       (
         await request(app)
@@ -310,7 +313,10 @@ describeDb('BE-01–05 disposable PostgreSQL profile/catalog foundations', () =>
         .send(input);
     const first = await post();
     expect(first.status).toBe(201);
-    expect((await post()).body).toEqual(first.body);
+    const replayed = await post();
+    expect(replayed.body).toEqual(first.body);
+    expect(first.headers['cache-control']).toBe('no-store');
+    expect(replayed.headers['cache-control']).toBe('no-store');
   });
 
   async function template(active = true) {
@@ -379,7 +385,10 @@ describeDb('BE-01–05 disposable PostgreSQL profile/catalog foundations', () =>
         .send(printInput(source));
     const result = await post();
     expect(result.status).toBe(201);
-    expect((await post()).body).toEqual(result.body);
+    const replayed = await post();
+    expect(replayed.body).toEqual(result.body);
+    expect(result.headers['cache-control']).toBe('no-store');
+    expect(replayed.headers['cache-control']).toBe('no-store');
     const row = await database.prisma.printOffering.findFirstOrThrow({
       where: { revisions: { some: { templateId: source.templateId } } },
       include: { revisions: true },

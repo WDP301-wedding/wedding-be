@@ -84,6 +84,12 @@ not counted as a pass; its forks rerun above is the successful final-source proo
 
 ## Implementation review
 
+Pre-merge independent review on 2026-10-11 found no required blockers and one
+cache-header gap on idempotency replay. Profile authorization and catalog Manager
+middleware now set `Cache-Control: no-store` before replay; all ten PostgreSQL
+commercial tests pass with explicit original/replay assertions for profile, service
+and print commands. Updated GitHub CI still must pass before merge.
+
 Authorization precedes private idempotency replay, and profile/catalog mutation,
 revision and audit commit together. Catalog edits serialize on stable head rows;
 readers pin exact source versions and checked totals. Historical revision writes

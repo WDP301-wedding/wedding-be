@@ -72,6 +72,7 @@ function createOfferingRouter(
   const router = Router();
   const auth = createAuthenticatedActorMiddleware(resolver);
   const manager: RequestHandler = (request, response, next) => {
+    response.set('Cache-Control', 'no-store');
     try {
       authorizeCatalogManager(response.locals.actor as AuthenticatedActor, request.requestId);
       next();
