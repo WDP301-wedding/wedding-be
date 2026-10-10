@@ -32,6 +32,22 @@ does not issue deployment or release approval.
 | INTEGRATION_READY | Consumer tests run against those real provider methods                                                     | Duplicate/stale/denial/failure/race tests and committed generated API digest.                   |
 | ACCEPTED          | Complete module passes owner-reviewed acceptance                                                           | Backend requirement matrix, migrations, quality gates, real integrations and frontend hand-off. |
 
+### Application Providers Versus External Services
+
+In historical checkpoints, a "real provider" may mean an actual Booking, Identity,
+Venue or Billing application implementation using disposable PostgreSQL, while its
+external network transport is controlled. This is not proof of a live VNPay, Gemini,
+Storage or email operation. Owner acceptance of that baseline is retained, but does
+not silently close live-service or deployment gates.
+
+Record code/test evidence, configuration, live external-provider evidence and target
+environment separately. A health response, bucket/sender read, credential presence,
+export/build or adapter test alone cannot close an end-to-end feature gate. Use the
+[SPEC-01–05 audit](../tasks/evidence/spec01-05-runtime-audit-2026-10-10.md) and
+[RV backlog](../tasks/backend-revision-todo.md#spec-01-05-runtime-and-provider-follow-ups).
+Missing evidence stays pending; intentionally disabled optional features are labelled
+disabled, not live-verified. Required disabled features still block their full journey.
+
 At contract hand-off, publish:
 
 - the provider application file path and exact version/commit;
