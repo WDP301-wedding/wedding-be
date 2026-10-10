@@ -277,6 +277,17 @@ describeWithDatabase('booking runtime with real identity, venue, and PostgreSQL'
       expect(printResult.status).toBe(201);
       const print = printOfferingViewSchema.parse((printResult.body as { data: unknown }).data);
       expect(
+        await invitation.providers.templateSelection.requireSelection({
+          templateId: print.templateId,
+          templateVersionId: print.templateVersionId,
+        }),
+      ).toEqual({
+        templateId: print.templateId,
+        templateVersionId: print.templateVersionId,
+        revision: head.revision,
+        title: templateContent.title,
+      });
+      expect(
         await venue.providers.printOfferings.requireSelection({
           offeringId: print.offeringId,
           sourceRevisionId: print.sourceRevisionId,

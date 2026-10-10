@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createInvitationTemplateSelectionReader } from './infrastructure/template-selection.reader.js';
+import { createInvitationTemplateSelectionProvider } from './infrastructure/template-selection.reader.js';
 import type { InvitationTemplateSelectionReader } from './application/template-selection.port.js';
 
 import type { Config } from '../../config/config.js';
@@ -51,7 +51,7 @@ export async function createInvitationStudioRuntime(
     return Object.freeze({
       router,
       providers: Object.freeze({
-        templateSelection: createInvitationTemplateSelectionReader(prisma),
+        templateSelection: createInvitationTemplateSelectionProvider(prisma),
       }),
       resource: Object.freeze({
         name: 'invitation-studio-database',

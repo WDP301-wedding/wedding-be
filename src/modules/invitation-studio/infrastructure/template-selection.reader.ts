@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { AppError, NotFoundError } from '../../../core/errors/app-error.js';
-import type { Prisma } from '../../../generated/prisma/client.js';
+import type { Prisma, PrismaClient } from '../../../generated/prisma/client.js';
 import type { InvitationTemplateSelectionReader } from '../application/template-selection.port.js';
 import { designContentSchema } from '../domain/studio-policy.js';
 
@@ -46,5 +46,21 @@ export function createInvitationTemplateSelectionReader(
         throw new NotFoundError();
       return facts;
     },
+  });
+}
+
+// Standalone callers get the same lock lifetime as Venue's enlisted transaction.
+export function createInvitationTemplateSelectionProvider(
+  prisma: PrismaClient,
+): InvitationTemplateSelectionReader {
+  const reader = createInvitationTemplateSelectionReader(prisma);
+  return Object.freeze({
+    resolveVersion: reader.resolveVersion,
+    requireSelection: (
+      input: Parameters<InvitationTemplateSelectionReader['requireSelection']>[0],
+    ) =>
+      prisma.$transaction((tx) =>
+        createInvitationTemplateSelectionReader(tx).requireSelection(input),
+      ),
   });
 }
