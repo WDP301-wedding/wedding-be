@@ -82,6 +82,9 @@ authorized disposable/staging environment and bounded cost; CI remains offline.
 - [ ] RV-08
 - [ ] RV-09
 - [ ] RV-10
+- Evidence: [2026-10-11 Railway Gemini test](evidence/rv10-gemini-railway-2026-10-11.md)
+  reached Google once, but JPEG output failed the deployed PNG adapter. Configuration
+  and offline remediation do not close application/Storage acceptance.
 - [ ] RV-11
 - [ ] RV-12
 - [ ] RV-13

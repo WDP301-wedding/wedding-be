@@ -1,4 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
+import sharp from 'sharp';
 
 import { AppError, ProviderError } from '../../core/errors/app-error.js';
 import {
@@ -14,6 +15,8 @@ import {
   geminiGenerateContentResponseSchema,
   geminiInlineImagePartSchema,
   MAX_AI_IMAGE_BYTES,
+  MAX_AI_IMAGE_DIMENSION,
+  MAX_AI_IMAGE_PIXELS,
   type AiImageAspectRatio,
 } from './ai-image.schemas.js';
 
@@ -136,7 +139,7 @@ export class GeminiAiImageProvider implements AiImageProvider {
     }
 
     const bytes = decodeBase64Image(imagePart.data.inlineData.data, this.#maxOutputBytes);
-    return createGeneratedAiImage(bytes, imagePart.data.inlineData.mimeType, this.#maxOutputBytes);
+    return normalizeGeneratedImage(bytes, imagePart.data.inlineData.mimeType, this.#maxOutputBytes);
   }
 
   async #invoke(command: GenerateAiImageCommand): Promise<unknown> {
@@ -200,6 +203,44 @@ export function createGeminiAiImageProvider(
       : { maxOutputBytes: configuration.maxOutputBytes }),
     ...(configuration.timeoutMs === undefined ? {} : { timeoutMs: configuration.timeoutMs }),
   });
+}
+
+async function normalizeGeneratedImage(
+  bytes: Uint8Array,
+  mimeType: string,
+  maxOutputBytes: number,
+): Promise<GeneratedAiImage> {
+  if (mimeType !== 'image/jpeg') {
+    return createGeneratedAiImage(bytes, mimeType, maxOutputBytes);
+  }
+
+  try {
+    const image = sharp(Buffer.from(bytes), {
+      failOn: 'warning',
+      limitInputPixels: MAX_AI_IMAGE_PIXELS,
+      limitInputChannels: 4,
+      pages: -1,
+    });
+    const metadata = await image.metadata();
+    if (
+      metadata.format !== 'jpeg' ||
+      !metadata.width ||
+      !metadata.height ||
+      metadata.width > MAX_AI_IMAGE_DIMENSION ||
+      metadata.height > MAX_AI_IMAGE_DIMENSION ||
+      (metadata.pages ?? 1) !== 1
+    ) {
+      throw new AiImageInvalidOutputError();
+    }
+
+    // Gemini may return JPEG. Decode all pixels and strip metadata while preserving
+    // the existing PNG-only application/storage contract and both byte caps.
+    const png = await image.timeout({ seconds: 10 }).png().toBuffer();
+    return createGeneratedAiImage(png, 'image/png', maxOutputBytes);
+  } catch {
+    // Native decoder errors may contain untrusted metadata; keep the stable error.
+    throw new AiImageInvalidOutputError();
+  }
 }
 
 function decodeBase64Image(value: string, maxOutputBytes: number): Uint8Array {
