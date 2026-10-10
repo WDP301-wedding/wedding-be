@@ -1005,7 +1005,7 @@ approval confirms all of the following:
 
 The approval is effective for `SPEC-03` through `SPEC-11`. `SPEC-02` continues under
 its previously approved plan and must still reach V4 before `SPEC-03` implementation
-is authorized. `CAPABILITY-MAP.md`, `tasks/plan.md`, and `tasks/todo.md` record the
+is authorized. `CAPABILITY-MAP.md`, `docs/archive/plan-2026-10-10.md`, and `docs/archive/todo-2026-10-10.md` record the
 accepted coordination model. Any later semantic change follows Section 14.3 and
 receives a new baseline version; it must not be edited into `1.0.0` silently.
 

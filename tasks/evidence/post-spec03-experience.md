@@ -2,7 +2,7 @@
 
 Date: 2026-10-08. Implementation owner: Codex, sequential work across four repositories.
 Scope authority: the project owner's request to implement the approved post-SPEC-03
-additions. Contract: [SPEC-post-booking-experience.md](../../SPEC-post-booking-experience.md).
+additions. Contract: [docs/archive/post-booking-experience-2026-10-08.md](../../docs/archive/post-booking-experience-2026-10-08.md).
 
 ## Delivered
 

@@ -599,6 +599,41 @@ Checkpoint H1 approved D1 through D7 as written on 2026-10-03:
 The approval authorizes the ordered IA-01 through IA-17 implementation plan. Any change
 to the approved decisions or stop conditions still requires project-owner review.
 
+## 23. Account Settings and Current Password OTP
+
+These existing backend requirements are consolidated from the archived
+[post-Booking scope](./docs/archive/post-booking-experience-2026-10-08.md) and the
+current runtime. Preserve [post-Booking evidence](./tasks/evidence/post-spec03-experience.md)
+and [OTP evidence](./tasks/evidence/password-otp-local-demo.md). This documentation
+change does not add endpoints or close live mailbox/transport gates RV-04/05.
+
+- `GET /auth/profile` returns the current actor's account label/email and profile
+  revision. `PATCH /auth/profile` changes only normalized displayName (1–120
+  characters) using expectedRevision, active-session recheck and an atomic audit.
+  Email/roles are not writable; stale revisions conflict. Account displayName is not
+  booking-owned brideName/groomName and cannot be split to infer either role.
+- Password recovery uses `POST /auth/password-otp-requests` and
+  `POST /auth/password-otp-completions`. Authenticated password change first uses
+  `POST /auth/password-change-otp-requests` with the current password, then
+  `POST /auth/password-changes` with its challenge/code/new password.
+- Current challenge delivery/expiry, attempts, hash-only storage, enumeration-safe
+  responses, actor binding, transactional revocation and password policy follow the
+  [OTP application](./src/modules/identity-access/password-otp/password-otp.service.ts)
+  and [strict schemas](./src/modules/identity-access/password-otp/password-otp.schemas.ts).
+  Successful completion clears the refresh cookie, revokes authentication material
+  as implemented and requires a fresh login. Never store/log raw passwords or OTPs.
+- Legacy `/auth/password-reset-requests` and `/auth/password-reset-completions`
+  return `410 PASSWORD_OTP_REQUIRED` in the mounted runtime. Older reset-link
+  descriptions/checkpoints are historical, not an active integration instruction.
+  Staging/production require stable AUTH_OTP_HASH_KEY; credential presence alone does
+  not prove real mailbox delivery or deployed recovery.
+- Account profile PII follows account erasure. Existing retention/holds and operator
+  rules remain unchanged. Client screens/credential transport are the frontend team's
+  responsibility; backend requirements here are authorization and HTTP contracts.
+
+All paths above are relative to `/api/v1`; consume the [committed OpenAPI](./openapi/openapi.json),
+not the retired mixed-client specification as a route authority.
+
 ## 2026-10-10 Backend Extension
 
 The restricted prospect guard must allow booking-owned profile and commercial selection/approval/PDF operations before deposit; still deny media/editor/send/guest/seating/print production. Full access remains based only on verified deposit. Update guard contract/conformance within BE-02/07/09 without changing account displayName semantics.

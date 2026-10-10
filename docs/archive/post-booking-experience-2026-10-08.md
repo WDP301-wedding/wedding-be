@@ -1,6 +1,8 @@
 # Post-SPEC-03 Product Experience
 
-> Current amendment: [confirmed backend scope](./docs/backend-scope-2026-10-10.md) and [commercial extensions](./SPEC-commercial-contracts.md). Completed implementation evidence below is historical; new names/catalog/contract/invoice rules are separate backend extension tasks. The 2026-10-10 amendment governs conflicts with older access, pricing and client requirements.
+> Archived on 2026-10-10. This preserves the original mixed-client scope and implementation history, including superseded reset-link instructions. Current backend intake/overview requirements are in [SPEC Booking](../../SPEC-booking-lifecycle.md#11-intake-and-couple-overview); account settings/current OTP are in [SPEC Identity](../../SPEC-identity-access.md#23-account-settings-and-current-password-otp). No new frontend work is authorized here.
+
+> Current amendment: [confirmed backend scope](../backend-scope-2026-10-10.md) and [commercial extensions](../../SPEC-commercial-contracts.md). Completed implementation evidence below is historical; new names/catalog/contract/invoice rules are separate backend extension tasks. The 2026-10-10 amendment governs conflicts with older access, pricing and client requirements.
 
 Status: Scope and implementation authorized by the project owner on 2026-10-08.
 Sequence: after completed SPEC-03; notifications stay entirely in SPEC-09.
@@ -67,7 +69,7 @@ request authorizes these bounded waves without a second scope confirmation.
 
 Intake/conversion must preserve separate nullable brideName/groomName and require both by contract approval. Prospect overview can expose commercial selections/contracts; existing frontend remains intact. The removed design skill is no longer a requirement; new client design belongs to the frontend team.
 
-Authority and validation: [commercial specification](./SPEC-commercial-contracts.md),
-[confirmed scope](./docs/backend-scope-2026-10-10.md) and
-[active backend tasks](./tasks/backend-revision-todo.md). These requirements do not
+Authority and validation: [commercial specification](../../SPEC-commercial-contracts.md),
+[confirmed scope](../backend-scope-2026-10-10.md) and
+[active backend tasks](../../tasks/backend-revision-todo.md). These requirements do not
 claim that the pending extension is already mounted in the generated API.

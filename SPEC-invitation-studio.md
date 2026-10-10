@@ -274,7 +274,7 @@ and QR readability with representative generated files.
 
 Output without seating can complete after SPEC-05. Seating-inclusive output requires
 real accepted SPEC-07 snapshot integration; conforming registry fakes cannot close it.
-See [plan Section 21](./tasks/plan.md#21-approved-product-completion-sequence-2026-10-08)
+See [archived plan Section 22](./docs/archive/plan-2026-10-10.md#22-approved-product-completion-sequence-2026-10-08)
 for the approved product completion sequence. Detailed output contracts and tasks
 remain follow-up work rather than a claim of implementation acceptance.
 
@@ -310,9 +310,9 @@ The Storage proof runs the production Supabase adapter against a controlled SDK,
 not live Supabase. Native owner facts in tests are fixtures, not payment acceptance
 or a production seed. The subsequent media HTTP wiring is recorded in Section12.
 
-Current tracking: [todo B-EXEC](./tasks/todo.md#b-exec--execution-waves-and-verified-implementation-status),
-[plan20.12/20.13](./tasks/plan.md#2013-spec-05-w1-closure-cross-check--2026-10-09),
-and [guide14.5/18.7](./docs/spec-05-06-implementation-guide.md).
+Historical checkpoint tracking: [todo B-EXEC](./docs/archive/todo-2026-10-10.md#b-exec--execution-waves-and-verified-implementation-status),
+[archived plan22.12/22.13](./docs/archive/plan-2026-10-10.md#2213-spec-05-w1-closure-cross-check--2026-10-09),
+and [current documentation index](./README.md#documentation).
 Earlier plan20.9–20.11/guide18.4–18.6 are historical checkpoints, superseded for
 current W1 status. W2–W8, formal PROVIDER_READY/INTEGRATION_READY/ACCEPTED,
 SPEC-06 and release remain separate gates.
@@ -344,8 +344,8 @@ checkpoint statements about an unmounted factory are historical after this wirin
 ## 14. W2–W4 backend implementation checkpoint — 2026-10-09
 
 The project owner authorized completing all three backend waves. Detailed
-implementation/evidence/path decisions are recorded in [plan20.15](./tasks/plan.md#2015-spec-05-w2w4-implementation-and-verification--2026-10-09)
-and checked in [todo B-EXEC](./tasks/todo.md#b-exec--execution-waves-and-verified-implementation-status).
+implementation/evidence/path decisions are recorded in [archived plan22.15](./docs/archive/plan-2026-10-10.md#2215-spec-05-w2w4-implementation-and-verification--2026-10-09)
+and checked in [todo B-EXEC](./docs/archive/todo-2026-10-10.md#b-exec--execution-waves-and-verified-implementation-status).
 
 - [x] W2: Manager immutable template versions/archive/CAS, own structured design
       revisions, bounded allowlists, authoritative Android session text-only edits and

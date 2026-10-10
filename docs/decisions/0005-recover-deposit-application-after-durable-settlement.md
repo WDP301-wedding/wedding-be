@@ -64,4 +64,4 @@ timeline supersession, concealed denial, late money and immutable completion.
 
 Authority: [ADR-004](0004-enlist-booking-owner-providers-and-retention-evidence.md),
 [SPEC-04](../../SPEC-payments-billing.md), and
-[the approved plan](../../tasks/plan.md#21-spec-04-payments-billing-bounded-implementation-plan).
+[the approved plan](../archive/plan-2026-10-10.md#21-spec-04-payments-billing-bounded-implementation-plan).
