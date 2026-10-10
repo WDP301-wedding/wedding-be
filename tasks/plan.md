@@ -1574,3 +1574,27 @@ frontend acceptance items are historical scope, not current backend instructions
 The former UI skill/installer has been removed. Existing frontend source is intact.
 Commercial/profile feature tasks remain unchecked until actual implementation/proof.
 
+## SPEC-01–05 Runtime and Provider Audit — 2026-10-10
+
+The owner requested a review of completed SPEC-01–05 for features whose code/tests
+exist but whose live service or operational acceptance has not been demonstrated.
+Core-platform is included because these modules share its external adapters/runtime.
+The [audit record](./evidence/spec01-05-runtime-audit-2026-10-10.md) maps source,
+available evidence, missing gates and configuration presence without exposing secrets.
+The [active RV tasks](./backend-revision-todo.md#spec-01-05-runtime-and-provider-follow-ups)
+are the single executable checklist; historical completion boxes remain unchanged.
+
+Order: RV-01 inventory -> database/readiness and safe Manager bootstrap -> live email,
+auth and Storage -> Gemini/public invitation and VNPay sandbox -> operational workers
+and retained-file recovery -> print-file output -> release evidence. Independent
+provider checks can proceed once their own prerequisites exist. RV-17 fixes the print
+output contract before RV-18 implementation; RV-19 waits for real SPEC-07 integration.
+The revised commercial journey reruns payment/printing proof after BE-09/12/15/16.
+
+Each task requires explicit environment/authorization, bounded tests, redacted evidence
+and a code/artifact revision. No live paid calls, real-money transfers, shared migrations
+or destructive retention runs were performed during this documentation audit. Future
+implementation slices stay within existing owners and the five-authored-file guideline;
+shared migration/API changes remain serialized. Optional telemetry stays disabled unless
+selected; production-money VNPay requires a separate approved scope/configuration change.
+

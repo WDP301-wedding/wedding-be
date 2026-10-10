@@ -11,6 +11,14 @@ older requirements, copied guides and task outlines. SPEC-01 through SPEC-04 are
 completed; SPEC-05 is completed for backend scope. Preserve their evidence and add
 the commercial/profile extensions as new work rather than reopening old checklists.
 
+Completed baseline code/tests do not prove live external integration or deployment
+readiness. Read tasks/evidence/spec01-05-runtime-audit-2026-10-10.md and track the
+RV tasks in tasks/backend-revision-todo.md. Keep configuration, offline tests,
+live sandbox/provider evidence and production readiness separate. Never mark a
+provider feature live because credentials exist, a mock passed or health returned 200.
+Do not execute paid generation, real-money payments or destructive/shared-data
+operations during an audit; arrange an explicitly authorized test environment first.
+
 There is no mandatory frontend design skill. Backend hand-offs include strict
 schemas, OpenAPI, examples, errors, authorization, migrations and provider evidence.
 
