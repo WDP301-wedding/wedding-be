@@ -1,9 +1,11 @@
 # Railway backend deployment
 
 The backend runs in the `production` environment of Railway project `wedđing`,
-service `wedding-be`. This is the shared early-deployment and production
-environment; it uses the existing Supabase PostgreSQL database, Supabase Storage
-bucket, and Brevo configuration. AI image generation is disabled.
+service `wedding-be`. On 2026-10-10 the owner confirmed this is a developer-only
+test environment and authorized migrations, mutations and recovery rehearsals.
+The Railway environment name is not production acceptance. It uses the existing
+Supabase PostgreSQL database, Supabase Storage bucket, and Brevo configuration.
+AI image generation is disabled.
 
 - API base URL: `https://wedding-be-production-e1dc.up.railway.app/api/v1`
 - Swagger UI: `https://wedding-be-production-e1dc.up.railway.app/docs`
@@ -47,6 +49,11 @@ including PostgreSQL migration/integration coverage. Keep these gates enabled.
 Redeploy the current release from the service's Deployments menu when needed;
 use a new reviewed `main` commit for source changes. Never apply unrelated
 project-wide staged changes while updating this service.
+
+An owner-authorized developer rehearsal may upload a reviewed feature branch
+after its CI gates pass. Record the exact source commit and deployment ID, retain
+the GitHub source and Wait for CI settings, and leave the PR open for team review.
+This test deployment does not waive the review requirement for merging `main`.
 
 `.railwayignore` excludes environment files, generated output, private local
 tooling and credentials from upload. `.dockerignore` also excludes them from
@@ -105,9 +112,11 @@ Invoke-RestMethod https://wedding-be-production-e1dc.up.railway.app/api/v1/catal
 Invoke-RestMethod https://wedding-be-production-e1dc.up.railway.app/api/v1/catalog/dishes
 ```
 
-Readiness currently checks application lifecycle readiness, so a successful
-health response alone does not prove a database query succeeds. Check release
-logs for successful migration completion and inspect API errors.
+After the RV-02 runtime revision is deployed, readiness checks lifecycle plus a
+bounded database query and shipped migration checksums. Earlier deployments check
+only lifecycle. Health success still does not prove delivery, storage, payment or
+a complete business workflow. See [RV-01–03 operations](runtime-foundation-operations.md)
+and exact runtime evidence before claiming the deployed revision is verified.
 
 The bucket and Brevo sender were verified with read-only provider requests.
 Email delivery must be tested separately through a real authorized workflow.
