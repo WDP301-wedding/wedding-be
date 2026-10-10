@@ -40,6 +40,12 @@ migrations are permitted. This checks migration compatibility, not arbitrary
 manual schema drift. Health requests perform no schema writes. The deployment
 pre-step remains `npm run db:migrate:deploy`.
 
+If a disconnected rehearsal leaves Prisma's migration advisory lock behind,
+inspect the holding session and correlate its PID, start time and migration query
+with the owned rehearsal before terminating that session. Reconnect to clean only
+owned temporary schemas. Retry deployment with advisory locking still enabled;
+never disable the migration lock or readiness gate to bypass a failed release.
+
 `/health/live` is independent of DB availability. `/health/ready` uses the existing
 concealed `503 SERVICE_UNAVAILABLE` envelope for timeout, outage or incompatible
 history and recovers after recovery. HTTP/OpenAPI schemas are unchanged.
