@@ -24,6 +24,8 @@ export async function createPayableBooking(prisma: PrismaClient) {
     },
   });
   await prisma.consultation.create({
+    // Upgrade rehearsals also run this fixture before the profile migration.
+    select: { id: true },
     data: {
       id: consultationId,
       managerAccountId: managerId,

@@ -28,6 +28,8 @@ databaseDescribe('PB-W2 forward migration over the current Booking baseline', ()
         try {
           await seedVenueCatalog(prisma);
           await prisma.consultation.create({
+            // This insert executes against the historical pre-profile schema.
+            select: { id: true },
             data: {
               id: randomUUID(),
               managerAccountId: managerId,

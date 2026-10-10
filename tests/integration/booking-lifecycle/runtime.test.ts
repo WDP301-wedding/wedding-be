@@ -5,6 +5,13 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { seedVenueCatalog, CATALOG_SEED_IDS } from '../../../scripts/catalog-seed.js';
 import { createApp } from '../../../src/app.js';
+import { createVenueCatalogRuntime } from '../../../src/modules/venue-catalog/venue-catalog.runtime.js';
+import { createInvitationStudioRuntime } from '../../../src/modules/invitation-studio/invitation-studio.runtime.js';
+import {
+  serviceViewSchema,
+  printOfferingViewSchema,
+} from '../../../src/modules/venue-catalog/domain/commercial-offering.js';
+import { coupleProfileResponseSchema } from '../../../src/modules/booking-lifecycle/application/couple-profile.service.js';
 import { parseEnvironment, type BackendConfig } from '../../../src/config/env.js';
 import { hashPassword } from '../../../src/modules/identity-access/crypto/password.js';
 import {
@@ -191,6 +198,135 @@ describeWithDatabase('booking runtime with real identity, venue, and PostgreSQL'
         workerContext,
       ),
     ).toEqual({ items: [], nextCursor: null });
+  });
+
+  it('mounts BE-01–05 against real authenticated owners, retaining pre-deposit editor denials', async () => {
+    const venue = await createVenueCatalogRuntime(runtimeConfig);
+    const invitation = await createInvitationStudioRuntime(runtimeConfig);
+    try {
+      const owners = createApp({
+        runtimeEnvironment: 'test',
+        registerRoutes(express) {
+          express.use('/api/v1', booking!.router);
+          express.use('/api/v1', venue.router);
+          express.use('/api/v1', invitation.router);
+        },
+      });
+      const command = (path: string, body: object) =>
+        request(owners)
+          .post('/api/v1' + path)
+          .set('Authorization', `Bearer ${managerToken}`)
+          .set('Idempotency-Key', randomUUID())
+          .send(body);
+      const createdResponse = await command('/management/consultations', {
+        intendedEmail: `${coupleId}@example.com`,
+        displayName: 'Legacy label',
+        brideName: 'Lan',
+        groomName: 'Minh',
+      });
+      expect(createdResponse.status).toBe(201);
+      const created = consultationResponseSchema.parse(createdResponse.body as unknown).data;
+      await database.prisma.consultationAccess.create({
+        data: { accountId: coupleId, consultationId: created.consultationId, level: 'RESTRICTED' },
+      });
+      const profilePath = `/api/v1/consultations/${created.consultationId}/couple-profile`;
+      const profile = await request(owners)
+        .get(profilePath)
+        .set('Authorization', `Bearer ${coupleToken}`);
+      expect(profile.status).toBe(200);
+      expect(coupleProfileResponseSchema.parse(profile.body as unknown).data).toMatchObject({
+        brideName: 'Lan',
+        groomName: 'Minh',
+      });
+      const saved = await request(owners)
+        .patch(profilePath)
+        .set('Authorization', `Bearer ${coupleToken}`)
+        .set('Idempotency-Key', randomUUID())
+        .send({ expectedRevision: 1, brideName: 'Lan Anh' });
+      expect(saved.status).toBe(200);
+      expect(
+        (await request(owners).get(profilePath).set('Authorization', `Bearer ${outsiderToken}`))
+          .status,
+      ).toBe(404);
+      const templateContent = {
+        title: 'Commercial style',
+        textFields: { message: 'Private template body' },
+        sections: [],
+        derivedAssetIds: [],
+        includesSeating: false,
+      };
+      const template = await command('/management/invitation-templates', {
+        expectedRevision: 0,
+        active: true,
+        content: templateContent,
+      });
+      expect(template.status).toBe(201);
+      const templateData = template.body as { data: { templateId: string } };
+      const head = await database.prisma.invitationTemplate.findUniqueOrThrow({
+        where: { id: templateData.data.templateId },
+      });
+      const printResult = await command('/management/print-offerings', {
+        name: 'Standard print',
+        printType: 'Two-sided',
+        material: 'Paper',
+        unitPriceVnd: 5000,
+        active: true,
+        templateId: head.id,
+        templateVersionId: head.currentVersionId,
+      });
+      expect(printResult.status).toBe(201);
+      const print = printOfferingViewSchema.parse((printResult.body as { data: unknown }).data);
+      expect(
+        await invitation.providers.templateSelection.requireSelection({
+          templateId: print.templateId,
+          templateVersionId: print.templateVersionId,
+        }),
+      ).toEqual({
+        templateId: print.templateId,
+        templateVersionId: print.templateVersionId,
+        revision: head.revision,
+        title: templateContent.title,
+      });
+      expect(
+        await invitation.providers.templateSelection.resolveVersion(print.templateVersionId),
+      ).toMatchObject({ templateId: print.templateId, title: templateContent.title });
+      expect(
+        await venue.providers.printOfferings.requireSelection({
+          offeringId: print.offeringId,
+          sourceRevisionId: print.sourceRevisionId,
+          quantity: 100,
+        }),
+      ).toMatchObject({ lineTotalVnd: 500000 });
+      const serviceResult = await command('/management/services', {
+        name: 'MC',
+        description: '',
+        unit: 'buổi',
+        unitPriceVnd: 2000000,
+        active: true,
+      });
+      expect(serviceResult.status).toBe(201);
+      const service = serviceViewSchema.parse((serviceResult.body as { data: unknown }).data);
+      expect(
+        await venue.providers.restaurantServices.resolveRevision(service.sourceRevisionId),
+      ).toEqual(service);
+      expect(
+        (
+          await request(owners)
+            .get('/api/v1/catalog/print-offerings')
+            .set('Authorization', `Bearer ${coupleToken}`)
+        ).status,
+      ).toBe(200);
+      expect(
+        (
+          await request(owners)
+            .get('/api/v1/invitation-templates')
+            .set('Authorization', `Bearer ${coupleToken}`)
+        ).status,
+      ).toBe(404);
+    } finally {
+      await invitation.resource.close();
+      await venue.resource.close();
+    }
   });
 
   it('delivers one consultation invitation through configured Brevo and replays its HTTP intent', async () => {

@@ -1,4 +1,6 @@
 import { Router } from 'express';
+import { createInvitationTemplateSelectionProvider } from './infrastructure/template-selection.reader.js';
+import type { InvitationTemplateSelectionReader } from './application/template-selection.port.js';
 
 import type { Config } from '../../config/config.js';
 import { createPrismaClient } from '../../core/database/prisma.js';
@@ -11,7 +13,11 @@ import { createInvitationStudioServices } from './infrastructure/studio.composit
 import { createStudioRouter } from './http/studio.router.js';
 import { createGeminiAiImageProvider } from '../../integrations/ai-image/gemini-ai-image-provider.js';
 
-export type InvitationStudioRuntime = Readonly<{ router: Router; resource: ShutdownResource }>;
+export type InvitationStudioRuntime = Readonly<{
+  router: Router;
+  resource: ShutdownResource;
+  providers: Readonly<{ templateSelection: InvitationTemplateSelectionReader }>;
+}>;
 
 /** Runtime never substitutes fake Storage or fake confirmed owner facts. */
 export async function createInvitationStudioRuntime(
@@ -44,6 +50,9 @@ export async function createInvitationStudioRuntime(
     router.use(createStudioRouter(composition, composition.identity.resolver));
     return Object.freeze({
       router,
+      providers: Object.freeze({
+        templateSelection: createInvitationTemplateSelectionProvider(prisma),
+      }),
       resource: Object.freeze({
         name: 'invitation-studio-database',
         close: () => prisma.$disconnect(),

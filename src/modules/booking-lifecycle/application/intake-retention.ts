@@ -27,6 +27,8 @@ export async function purgeConsultationIntake(prisma: PrismaClient, now = new Da
             },
             data: {
               displayName: '',
+              brideName: null,
+              groomName: null,
               email: '',
               phone: '',
               message: '',

@@ -63,6 +63,8 @@ export interface BookingLifecycleHttpServices {
     input: Readonly<{
       intendedEmail: string;
       displayName: string;
+      brideName?: string | undefined;
+      groomName?: string | undefined;
       note: string | null;
       managerAccountId: string;
       requestId: string;

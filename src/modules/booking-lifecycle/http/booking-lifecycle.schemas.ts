@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { coupleProfileFields } from '../domain/couple-profile.js';
 import { isBookableEventDate } from '../domain/event-date.js';
 
 const uuid = z.uuid();
@@ -21,6 +22,7 @@ export const cancellationDecisionBodySchema = z.strictObject({
 });
 
 export const createConsultationBodySchema = z.strictObject({
+  ...coupleProfileFields,
   intendedEmail: z.email(),
   displayName: z.string().trim().min(1).max(120),
   note: z.string().trim().max(2_000).optional(),

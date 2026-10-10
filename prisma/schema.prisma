@@ -399,6 +399,8 @@ model Consultation {
   intendedEmailNormalized String
   intendedEmail           String
   displayName             String
+  brideName               String?
+  groomName               String?
   note                    String?
   revision                Int                      @default(1)
   createdAt               DateTime                 @default(now()) @db.Timestamptz(6)
@@ -415,6 +417,8 @@ model ConsultationRequest {
   submissionId   String        @unique @db.Uuid
   payloadHash    String
   displayName    String
+  brideName      String?
+  groomName      String?
   email          String
   phone          String
   preferredDate  DateTime?     @db.Date
@@ -908,17 +912,73 @@ model BookingInvitationIntent {
 }
 
 model RestaurantProfile {
-  id                 String   @id @default(uuid()) @db.Uuid
-  singletonKey       String   @unique @default("RESTAURANT")
+  printOfferings     PrintOffering[]
+  services           RestaurantService[]
+  id                 String              @id @default(uuid()) @db.Uuid
+  singletonKey       String              @unique @default("RESTAURANT")
   displayName        String
   description        String
   address            String
   publicPhone        String?
   publicEmail        String?
-  revision           Int      @default(1)
-  updatedByAccountId String   @db.Uuid
-  createdAt          DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt          DateTime @updatedAt @db.Timestamptz(6)
+  revision           Int                 @default(1)
+  updatedByAccountId String              @db.Uuid
+  createdAt          DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime            @updatedAt @db.Timestamptz(6)
+}
+
+model PrintOffering {
+  id           String                  @id @db.Uuid
+  restaurantId String                  @db.Uuid
+  revision     Int
+  active       Boolean                 @default(true)
+  restaurant   RestaurantProfile       @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  revisions    PrintOfferingRevision[]
+}
+
+model PrintOfferingRevision {
+  id                String                    @id @db.Uuid
+  offeringId        String                    @db.Uuid
+  revision          Int
+  name              String
+  printType         String
+  material          String
+  templateId        String                    @db.Uuid
+  templateVersionId String                    @db.Uuid
+  templateVersion   InvitationTemplateVersion @relation(fields: [templateVersionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  templateTitle     String
+  unitPriceVnd      Decimal                   @db.Decimal(18, 0)
+  active            Boolean
+  actorId           String                    @db.Uuid
+  createdAt         DateTime                  @default(now()) @db.Timestamptz(6)
+  offering          PrintOffering             @relation(fields: [offeringId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@unique([offeringId, revision])
+}
+
+model RestaurantService {
+  id           String                      @id @db.Uuid
+  restaurantId String                      @db.Uuid
+  revision     Int
+  active       Boolean                     @default(true)
+  restaurant   RestaurantProfile           @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  revisions    RestaurantServiceRevision[]
+}
+
+model RestaurantServiceRevision {
+  id           String            @id @db.Uuid
+  serviceId    String            @db.Uuid
+  revision     Int
+  name         String
+  description  String
+  unit         String
+  unitPriceVnd Decimal           @db.Decimal(18, 0)
+  active       Boolean
+  actorId      String            @db.Uuid
+  createdAt    DateTime          @default(now()) @db.Timestamptz(6)
+  service      RestaurantService @relation(fields: [serviceId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@unique([serviceId, revision])
 }
 
 model RestaurantShift {
@@ -1331,11 +1391,12 @@ model InvitationTemplate {
 }
 
 model InvitationTemplateVersion {
-  id         String   @id @db.Uuid
-  templateId String   @db.Uuid
-  revision   Int
-  content    Json     @db.JsonB
-  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  printOfferings PrintOfferingRevision[]
+  id             String                  @id @db.Uuid
+  templateId     String                  @db.Uuid
+  revision       Int
+  content        Json                    @db.JsonB
+  createdAt      DateTime                @default(now()) @db.Timestamptz(6)
 
   @@unique([templateId, revision])
 }

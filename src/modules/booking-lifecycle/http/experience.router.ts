@@ -38,6 +38,8 @@ export function createBookingExperienceRouter(
         const created = await tx.consultationRequest.createMany({
           data: {
             ...fields,
+            brideName: fields.brideName ?? null,
+            groomName: fields.groomName ?? null,
             payloadHash,
             preferredDate: preferredDate === null ? null : new Date(`${preferredDate}T00:00:00Z`),
           },
@@ -88,6 +90,8 @@ export function createBookingExperienceRouter(
           data: items.map((item) => ({
             id: item.id,
             displayName: item.displayName,
+            brideName: item.brideName,
+            groomName: item.groomName,
             email: item.email,
             phone: item.phone,
             preferredDate: item.preferredDate?.toISOString().slice(0, 10) ?? null,
@@ -130,6 +134,8 @@ export function createBookingExperienceRouter(
             intendedEmail: item.email,
             intendedEmailNormalized: item.email,
             displayName: item.displayName,
+            brideName: item.brideName,
+            groomName: item.groomName,
             note: item.message || null,
           },
         });

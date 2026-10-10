@@ -126,11 +126,18 @@ needed; a dependency is not satisfied by documentation or a conforming fake alon
 | BE-16 Adjustments/balance | BE-15 | Immutable reasoned credit/debit/new invoice; net settled/refunded money; credit visible; unknown payment pinning | Adjustment/payment races; no duplicate charge/refund |
 | BE-17 Extension hand-off | BE-02 through BE-16 | Mounted real runtime, exact OpenAPI/provider versions, migration/evidence matrix, examples/errors | Backend lint/typecheck/test/build/coverage/integration/contract/API checks |
 
-- [ ] BE-01
-- [ ] BE-02
-- [ ] BE-03
-- [ ] BE-04
-- [ ] BE-05
+BE-01–05 completed 2026-10-11 for backend scope: scoped couple profiles,
+immutable service/print catalog history, Manager HTTP and safe template readers.
+[Acceptance evidence](./evidence/be01-05-commercial-foundations.md): 189 files /
+1,512 tests plus 33 contract tests, per-file coverage gates, migration/runtime
+proof and final adapter rerun. [API/provider hand-off](../docs/be01-05-commercial-foundations.md).
+This does not complete BE-06–17 or pending external-provider RV gates.
+
+- [x] BE-01
+- [x] BE-02
+- [x] BE-03
+- [x] BE-04
+- [x] BE-05
 - [ ] BE-06
 - [ ] BE-07
 - [ ] BE-08
