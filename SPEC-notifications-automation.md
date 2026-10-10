@@ -5,9 +5,9 @@
 - Status: **Business scope confirmed 2026-10-10 — backend implementation pending**
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
 - Module ID: `notifications-automation` (`SPEC-09`)
-- Contract baseline: `WEDDING-CONTRACT-2@2.0.0`
+- Contract baseline: `WEDDING-CONTRACT-3@3.0.0`
 - Inherited baseline: `WEDDING-CONTRACT-1@1.0.0` (historical contract)
-- Accepted amendment: baseline Section 22 (2026-10-10); previous Section 21 retained as history
+- Accepted amendment: baseline Sections 22/23 (2026-10-10); older conflicting contracts retained as history
 - Initial owner role: Unassigned (next allocation round)
 - Team execution contract: [`docs/team-implementation.md`](./docs/team-implementation.md)
 - Requirement ownership: OPS-001 and OPS-002
@@ -73,17 +73,17 @@ and one configured email/push test path without treating delivery as a business 
 
 ## 6. Trigger, recipient, channel, and scheduling contract
 
-| Trigger / source                                                   | Recipient                                                                        | Channel / exact schedule                                                                                   |
-| ------------------------------------------------------------------ | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| Workspace invitation/password reset via `IdentityNotificationPort` | Intended account email from identity                                             | Transactional email at issuance; privileged credential path below.                                         |
-| booking.timeline-review-requested                                  | Other approving party; current consultation Couple account or Manager recipients | Email; Android push only for FULL registered account.                                                      |
-| booking.timeline-approved/superseded/deposit-eligible              | Owning Couple + designated Manager operational recipients                        | Email and enabled Android push; dedup by source event/channel/template.                                    |
-| billing.payment-succeeded/refund-recorded                          | Owning Couple + Manager finance recipient                                        | Transactional email; payment settlement only, no raw provider payload.                                     |
-| invitation.print-quotation-issued/approved/ready                   | Owning Couple; Manager print recipient when action needs handling                | Email + enabled push with exact order/revision references.                                                 |
-| Personalized invitation via guest delivery port                    | Explicit household email, never inferred from phone                              | Transactional email; approved public content and scoped link only.                                         |
-| Media cutoff due read                                              | Owning Couple                                                                    | One reminder 24 hours before cutoff for policyRevision.                                                    |
-| D-3 due booking read                                               | Owning Couple + operational Manager recipient                                    | Event start − 72 hours using snapshotted local shift/time.                                                 |
-| Completion due booking read                                        | No external recipient needed for command                                         | Worker calls booking-owned completeDue at event end + 12 hours; consumes resulting event for notification. |
+| Trigger / source                                                   | Recipient                                                                        | Channel / exact schedule                                                                                         |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Workspace invitation/password reset via `IdentityNotificationPort` | Intended account email from identity                                             | Transactional email at issuance; privileged credential path below.                                               |
+| booking.timeline-review-requested                                  | Other approving party; current consultation Couple account or Manager recipients | Email; Android push only for FULL registered account.                                                            |
+| booking.timeline-approved/superseded/deposit-eligible              | Owning Couple + designated Manager operational recipients                        | Email and enabled Android push; dedup by source event/channel/template.                                          |
+| billing.payment-succeeded/refund-recorded                          | Owning Couple + Manager finance recipient                                        | Transactional email; payment settlement only, no raw provider payload.                                           |
+| invitation.print-quotation-issued/approved/ready                   | Owning Couple; Manager print recipient when action needs handling                | Email + enabled push with exact order/revision references.                                                       |
+| Optional personalized invitation via Guest delivery port           | Explicit authorized recipient email, never inferred from name/phone              | Transactional email; approved public content and Guest-scoped link only. Generic workflows need no list/contact. |
+| Media cutoff due read                                              | Owning Couple                                                                    | One reminder 24 hours before cutoff for policyRevision.                                                          |
+| D-3 due booking read                                               | Owning Couple + operational Manager recipient                                    | Event start − 72 hours using snapshotted local shift/time.                                                       |
+| Completion due booking read                                        | No external recipient needed for command                                         | Worker calls booking-owned completeDue at event end + 12 hours; consumes resulting event for notification.       |
 
 Manager recipients come from an explicitly configured approved operational recipient
 registry resolved through identity. No hard-coded developer email. Active account/

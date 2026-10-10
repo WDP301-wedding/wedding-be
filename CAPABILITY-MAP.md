@@ -6,7 +6,7 @@
 - Approved cross-module requirements: [`PRODUCT-REQUIREMENTS.md`](./PRODUCT-REQUIREMENTS.md)
 - Decision rationale: [`ADR-001`](./docs/decisions/0001-model-revised-wedding-operations-with-existing-capabilities.md)
 - Locked contract baseline:
-  [`WEDDING-CONTRACT-2@2.0.0`](./CONTRACT-BASELINE.md) (current specification; 1.x history and implemented compatibility retained)
+  [`WEDDING-CONTRACT-3@3.0.0`](./CONTRACT-BASELINE.md) (current specification; 2.0 scope history and 1.x implemented compatibility retained)
 - Parallel-specification decision:
   [`ADR-002`](./docs/decisions/0002-freeze-program-contracts-before-parallel-specification.md)
 - Accepted implementation hand-off decision:
@@ -33,11 +33,11 @@ Business rules are authoritative in the Express API. Web and App clients consume
 | `booking-lifecycle` | Separate bride/groom profiles, commercial contracts/appendices, consultation records, restricted pre-deposit workspaces, availability, temporary slot holds, online/counter bookings, versioned timeline proposals and mutual approval, deposit eligibility, policy snapshots, post-deposit change requests, cancellation, audit history, and booking states | `identity-access`, `venue-catalog` |
 | `payments-billing` | VNPay sandbox, manual payments, idempotent callbacks, deposit and remaining-balance accounting, agreed contract/appendix charges, incidental expenses, immutable final invoices/adjustments, and manual refunds | `booking-lifecycle` |
 | `invitation-studio` | Template library, Gemini-generated assets, post-deposit wedding-media library, full Web editor, quick App edits, generic public invitation QR, printable revision snapshots, multi-variant print orders, and print fulfillment status | `core-platform`, `identity-access`, `venue-catalog` (1.1.0 eligibility), `booking-lifecycle`, `payments-billing` |
-| `guest-management` | Invitation-household list/import, default and custom guest groups, personalized electronic invitation links, invitation delivery, Couple/Manager-entered expected counts and ordered guest plans | `booking-lifecycle`, `invitation-studio` |
+| `guest-management` | Groups usable without names, optional one-person Guest list/import, optional personalized links/delivery, separately entered planning totals and ordered revisions | `booking-lifecycle`; `invitation-studio` only for optional personalized links |
 | `seating-plan` | Capacity-compatible fixed-layout selection, guest-group colors, table-level group labeling, layout confirmation, and compatibility warnings when expected headcount changes | `venue-catalog`, `booking-lifecycle`, `guest-management`, `invitation-studio` (printable registry) |
-| `staff-operations` | Staff accounts, event assignments, invitation-household search, multi-arrival manual check-in, actual companion counts, guest-group guidance, and audited attendance corrections | `identity-access`, `booking-lifecycle`, `guest-management`, `seating-plan` |
+| `staff-operations` | Staff accounts/assignments, explicit optional name-based check-in mode, named Guest search, once-per-person check-in/undo, group guidance and retained history | `identity-access`, `booking-lifecycle`, `guest-management`; optional `seating-plan` guidance |
 | `notifications-automation` | Android push notifications, operational email, workspace invitations, timeline approval and change events, payment and print-order events, contract/appendix/final-invoice facts, D-3 reminders, and booking completion jobs | `identity-access`, `booking-lifecycle`, `payments-billing`, `invitation-studio`, `guest-management` |
-| `analytics-dashboard` | KPIs, revenue, receivables, booking status, hall utilization, menu popularity, print-order status, and expected-versus-actual attendance by invitation household and guest group | `venue-catalog`, `booking-lifecycle`, `payments-billing`, `invitation-studio`, `guest-management`, `seating-plan`, `staff-operations` |
+| `analytics-dashboard` | KPIs/money/booking/hall/menu/print facts, independent planning/list counts and optional measured Guest/Group check-ins; disabled is unknown, not zero event attendance | `venue-catalog`, `booking-lifecycle`, `payments-billing`, `invitation-studio`, `guest-management`, `seating-plan`, `staff-operations` |
 | `release-demo` | End-to-end verification, demo seed data, Web/API deployment, Android EAS build, logging, and the demo checklist | All preceding modules |
 
 Module IDs are stable. The owner explicitly approved replacing `guest-rsvp` with `guest-management` on 2026-10-10 because guests no longer respond; other IDs and SPEC numbers remain unchanged. Each module receives its own `SPEC-<module-id>.md` before planning or implementation begins for that module. Those module specs must trace applicable requirements from `PRODUCT-REQUIREMENTS.md`.
@@ -127,19 +127,19 @@ but a draft does not satisfy its contract, plan, implementation, or integration 
 `SPEC-03` received bounded-plan approval on 2026-10-07 and implementation acceptance
 at BK-C4 on 2026-10-08; see its [acceptance evidence](./tasks/evidence/booking-lifecycle.md#bk-c4-implementation-acceptance--2026-10-08).
 
-`guest-management` owns guest-group definitions because the same group identifies an invitation household before it labels any table. `seating-plan` consumes those stable group identifiers and the fixed layout templates owned by `venue-catalog`; this direction avoids a dependency cycle between the guest list and seating plan.
+`guest-management` owns stable Group definitions independently of optional named Guests. `seating-plan` consumes those Groups and Venue's fixed layout templates using the explicit Booking planning total; no named-list/publication/check-in prerequisite is introduced. Staff owns check-in mode/journal and consumes minimum Guest facts; Guest never writes attendance or depends on Staff repositories.
 
 ## Required Product Boundaries
 
 - Single restaurant only; no tenant boundary is required.
-- Guest uses a personalized Web link without an account.
+- Generic public invitation/QR needs no Guest list/account. Personalized Guest links/delivery are optional.
 - A prospective couple receives an expiring invitation to a restricted Web workspace after the restaurant creates a consultation record. Before deposit, that workspace exposes proposals, timelines, separate names and commercial menu/print/service selection and contract approval/PDF; editing media/invitations and print production remain post-deposit.
 - Deposit is unavailable until both parties approve the exact current timeline and commercial contract; deposit is 30% of the whole agreed contract. A successful deposit promotes the existing identity and consultation data to full Couple access instead of creating a second account.
 - Wedding-photo upload and access are available only after successful deposit. The shared media library supports upload, preview, replacement or deletion before the restaurant's cutoff, and restaurant download; image editing and a public album are not required.
 - The full AI invitation editor is on Web; App supports preview, quick text edits, sending, and sharing.
 - The restaurant owns immutable seating-layout geometry and capacity ranges. The couple may select a compatible layout and apply guest-group labels and colors to tables, but cannot move, add, or remove tables or assign an individual guest to a specific table.
-- One guest-list record represents an invitation household or party, not necessarily one person. It has a representative name, optional disambiguating contact data, a guest group, an expected attendee count, and optional notes.
-- Staff check in an invitation household by name, with optional phone lookup for disambiguation. Multiple arrivals may be recorded against one invitation; actual attendees accumulate, over-expected arrivals warn without blocking, and every correction remains auditable.
+- Group is a category/color; optional Guest is one named person with group and optional contact/note, not a Household identity. That Guest may bring companions; recording planned/actual companion quantities remains unconfirmed. Couple/Manager enter the planning total separately; no names/import/archive resets it.
+- Check-in defaults to NONE. Owning FULL Couple/Manager explicitly enable BY_GUEST_NAME when names exist; assigned Staff record one effective check-in per Guest with append-only undo/retry proof. NONE is null/not recorded; partial names measure listed Guests only, never whole-event turnout. No check-in is needed for seating, event completion or invoices.
 - A physical-invitation print order may contain multiple design variants and quantities. Restaurant quotation and couple approval precede production; each approved line captures an immutable printable revision. Contract-included print fulfillment is not charged twice; agreed commercial changes use approved appendix deltas.
 - Physical invitations omit the recipient name and use one generic QR for the wedding. The QR opens a public electronic invitation but does not identify a guest, select a guest group, submit a check-in, or serve as a staff credential.
 - The required mobile deliverable is an Android build through EAS; iOS is not an acceptance target.
@@ -160,9 +160,10 @@ The following do not receive required modules or acceptance criteria. They may b
 
 ## Approved Dependency and Execution Order
 
-This order governs provider integration and acceptance. Approved isolated implementation
-and release scaffolding may overlap after their own SPEC/plan/provider-contract approvals;
-each SPEC lists precise gates and [team implementation](./docs/team-implementation.md)
+This order governs provider integration and acceptance. For the confirmed backend
+backlog, isolated implementation and release scaffolding may overlap without another
+per-task decision/plan approval; provider-contract readiness still gates integration.
+Each SPEC lists precise gates and [team implementation](./docs/team-implementation.md)
 defines file/migration ownership.
 
 1. `core-platform`
@@ -180,11 +181,15 @@ defines file/migration ownership.
     notification work.
 11. `release-demo` final journey/deployment starts only after both
     `notifications-automation` and `analytics-dashboard` satisfy their acceptance gates;
-    approved isolated scaffolding may be implemented earlier after its own plan gate.
+    confirmed isolated scaffolding may be implemented earlier against ready contracts.
 
 The initial capability map was approved by the project owner on 2026-09-24.
 
 The revised responsibilities, dependency direction, and build order were approved by the project owner on 2026-09-26. The revision adds pre-deposit timeline collaboration, post-deposit wedding media, fixed-layout guest-group seating, invitation-household check-in, and physical-invitation print fulfillment while preserving the approved module IDs.
+
+That paragraph records the original approval. Baseline Section 23 supersedes its
+household/check-in assumptions with independent Groups, an optional named Guest
+list, explicit planning totals and opt-in one-person check-in.
 
 The contract-first coordination model and branched execution order for `SPEC-03`
 through `SPEC-11` were approved by the project owner through

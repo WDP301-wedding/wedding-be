@@ -3,13 +3,13 @@
 ## 1. Document Status
 
 - Status: **Locked and accepted**
-- Active specification identifier: `WEDDING-CONTRACT-2`
-- Active specification version: `2.0.0`
-- Scope confirmed: 2026-10-10; Section 22 governs the confirmed revision.
+- Active specification identifier: `WEDDING-CONTRACT-3`
+- Active specification version: `3.0.0`
+- Scope confirmed: 2026-10-10; Section 23 governs Group + optional named Guests/check-in and Section 22 retains unaffected commercial rules.
 - Implemented compatibility baseline: `WEDDING-CONTRACT-1@1.1.0` until each new extension is verified and published.
-- Previous accepted versions: `1.1.0`, `1.0.0` (historical approval retained)
+- Previous accepted versions: `2.0.0`, `1.1.0`, `1.0.0` (historical approval retained)
 - Previous 1.x baseline prepared and locked: 2026-10-06
-- Current 2.0.0 business scope confirmed: 2026-10-10 (Section 22)
+- Previous 2.0.0 business scope confirmed: 2026-10-10 (Section 22)
 - Previous amendment approval: project owner approved SPEC-03 through SPEC-11 and Section 21
   on 2026-10-06; module implementation plans and acceptance remain separate gates.
 - Capability index: [`CAPABILITY-MAP.md`](./CAPABILITY-MAP.md)
@@ -18,7 +18,8 @@
 - Governance rationale:
   [`ADR-002`](./docs/decisions/0002-freeze-program-contracts-before-parallel-specification.md)
 
-Current authority is [Section 22](#22-confirmed-backend-scope--2026-10-10) and the
+Current authority is [Section 23](#23-group-and-optional-guest-list--2026-10-10),
+[Section 22](#22-confirmed-backend-scope--2026-10-10) for unaffected rules, and the
 [confirmed amendment](./docs/backend-scope-2026-10-10.md). Older Sections 2–21 are
 compatibility/approval history where they conflict with the new scope: guest response
 behavior is removed, contract approval/whole-contract deposit replaces menu-only
@@ -1824,3 +1825,85 @@ a major specification revision. Publish actual transport changes only after sche
 runtime, consumer conformance, migration and exact OpenAPI evidence exist. Preserve
 legacy verified payments/print obligations and old source facts; never fake conversion,
 reapproval or settlement when transitioning an existing booking.
+
+## 23. Group and Optional Guest List — 2026-10-10
+
+The owner explicitly chose “giữ Group + danh sách Guest optional như đề xuất trên”.
+Specification baseline is `WEDDING-CONTRACT-3@3.0.0`. This section supersedes the
+Household/party identity model, automatic list-derived headcount and
+mandatory/multi-arrival check-in in Sections 6, 8, 21 and 22. Those sections remain
+historical compatibility/approval records, not new Guest/Staff integration contracts.
+Commercial/deposit/print money rules remain unchanged. Current sources are
+[Guest](./SPEC-guest-management.md), [Staff](./SPEC-staff-operations.md),
+[scope](./docs/backend-scope-2026-10-10.md) and [tasks](./tasks/backend-revision-todo.md).
+
+### 23.1 Identities and Ownership
+
+- Guest owns stable guestGroupId categories/colors and optional guestId records,
+  one named person per record with optional contact/note, not a representative party.
+  Groups work without names. Duplicate names stay distinct IDs. A Guest may bring
+  companions; recording planned/actual companion quantities is not yet confirmed.
+  Resolve that narrow requirement before implementing dependent schemas/counts,
+  rather than treating Household removal as a prohibition of companions.
+- Guest owns explicit immutable planning-total revisions. First access preserves
+  existing Booking planning facts. Guest count/CRUD/import/archive never alters total.
+- Staff owns checkInMode NONE/BY_GUEST_NAME, configuration revisions and one-person
+  CHECK_IN/UNDO journal. Owning FULL Couple/Manager explicitly configure it; Staff
+  cannot enable it. NONE is the default, not automatically changed by list creation.
+- Seating consumes Groups and Booking planning total, not a required named list.
+  Notifications consumes optional explicit-recipient delivery intents; missing names/
+  contacts are not a required-provider failure for generic sharing or wedding operation.
+- Analytics consumes planning/list counts and Staff measurement status separately;
+  Billing never takes a Guest/check-in count as a receivable source.
+
+### 23.2 Ordered Planning Compatibility
+
+BookingPlanningHeadcountSynchronizer and GuestAttendancePlanReader retain the
+implemented sourceGuestPlanRevisionId, sourceSequence and expectedAttendees wire
+fields. expectedAttendees means the explicitly entered wedding planning total,
+never number of Guests or party quantities. Initial source is pinned to current
+Booking context; only explicit total changes activate successor count revisions.
+Existing same-sequence conflict/stale acknowledgement, shared UoW, rollback and
+Seating/print invalidation rules remain. No names/import/archive can reset a total
+to zero or mutate agreed table quantities/charges. Zero requires an explicit edit;
+Seating still requires positive compatible count at confirmation.
+
+### 23.3 Guest and Staff Provider Changes
+
+GuestPlanningReader replaces requireHouseholdForOperations with
+requireGuestForOperations(guestId), returning bookingId, guestId, guestGroupId,
+name and nullable authorized contact/note. GuestOperationsSearchReader returns
+named Guests, not representative/expected/companion counts; list/group summaries
+carry their own owner sequence/fence, distinct from planning revision sequence.
+
+Staff rechecks mode/current role/assignment/active Guest/window under booking-bound
+serialization. Enable requires at least one active named Guest; partial lists are
+valid. First committed check-in locks mode so NONE cannot hide history, including
+after UNDO. CHECK_IN effect per Guest is 0 or 1; replay/duplicates/UNDO races never
+increase it above 1. Archived Guest references and first-check-in Group snapshots
+remain readable for historical correction/reporting. No anonymous/party counter.
+
+AttendanceReader/AttendanceReportingReader supply checkInMode, measurementStatus
+NOT_RECORDED or LISTED_GUESTS_ONLY, checkedInGuestCount nullable, historical Group
+totals and owner sequence/fence. NONE yields null/no measured Group rows; enabled
+known zero is valid before any check-in. Named-list coverage is not inferred complete;
+no result is labelled whole-wedding actual attendance or turnout against planning.
+New event names attendance.guest-checked-in and attendance.guest-check-in-undone
+v1 bind bookingId, guestId, checkInRecordId, ledgerRevision, recordedAt; UNDO also
+references its original record. Never change old household arrival/correction v1
+payload meanings in place or write historical records into the new identity scheme.
+
+### 23.4 Optional Workflow and Publication Gates
+
+No named list/check-in is a prerequisite for contract/deposit, generic invitation/QR,
+media, printing, Group seating, Booking completion or final invoice. No-list events
+still need safe independent planning/capacity validation; disabled check-in is not a
+fabricated zero attendance figure. Staff may have non-check-in duties. Generic QR
+remains public/read-only; Guest personalized greeting/delivery is optional and scoped.
+
+These are approved executable backlog amendments, not mounted runtime/API evidence.
+Do not add a per-task decision/plan approval round for already confirmed tasks.
+Actual implementation still publishes owner-local schemas, conformance, forward
+migrations, strict OpenAPI and required privacy/concurrency evidence. Preserve
+completed SPEC-01–05 evidence and old source facts; do not relabel old Household
+records as individual Guests or rewrite applied migrations to claim compatibility.

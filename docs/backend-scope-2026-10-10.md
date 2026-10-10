@@ -3,7 +3,8 @@
 Status: business scope confirmed by the project owner on 2026-10-10 after seven
 interview questions and the final response "đúng với ý tôi r". This confirmation
 approves requirements, not implementation or test evidence.
-Active specification baseline: `WEDDING-CONTRACT-2@2.0.0`; previous baseline
+Active specification baseline: `WEDDING-CONTRACT-3@3.0.0`; the Group + optional
+Guest amendment below was confirmed by the owner on 2026-10-10. Previous baseline
 `WEDDING-CONTRACT-1@1.1.0` remains the implemented compatibility baseline until
 each extension has its real-provider and OpenAPI hand-off.
 
@@ -30,17 +31,51 @@ response counts/history, mutations, deadlines, reminder jobs or related events/m
 SPEC-06 becomes `guest-management`; this explicit owner-approved rename replaces
 the old `guest-rsvp` ID wherever active. Old migration/evidence history is retained.
 
-Keep invitation households, default/custom groups, imports, personalized read-only
-invitations, delivery, expected counts, group seating and multi-arrival check-in.
+The owner chose Group + optional Guest list on 2026-10-10. Remove the Household/
+invitation-party identity model from new work; do not merely rename
+a party record to Guest. A Guest represents one named person and belongs to one
+stable Group. Contact data and operational notes are optional. Default/custom
+groups, colors and group table labels remain usable with no named guests at all.
+Duplicate names remain separate Guest IDs; do not infer families or merge by name.
+
+The owner clarified that a named Guest may bring other people. Removing Household
+does not prohibit companions. Recording planned/actual companion quantities was
+subsequently proposed but has not been confirmed. Settle that narrow requirement
+before implementing companion-dependent Guest/check-in schemas and counts; the
+named Guest identity/count is not the number of all people arriving with that Guest.
+
+Couple/Manager may supply no names, some names or a full list. No list is required
+for contract/deposit, media, generic invitation/QR, printing, layout confirmation,
+event completion or final invoice. Imports and personalized read-only invitations
+are optional named-Guest workflows; generic sharing works without a Guest record.
 A guest link grants only a minimal invitation view, never a guest list, contact data,
 notes, billing or attendance write. Generic QR remains public and cannot authorize
-check-in. Staff records actual arrivals independently.
+check-in. Automated personalized delivery needs an explicit authorized recipient;
+absence of recipient/contact data does not block the wedding.
 
-Planned attendance = sum of `expectedAttendees` for active households, entered by
-authorized Couple/Manager actors. Empty list = zero; archival removes contribution
-but preserves history. Immutable booking-wide guest-plan revisions and monotonic
-sourceSequence synchronize headcount and invalidate seating when necessary.
-No guest interaction changes planned or actual attendance.
+Planned attendance is a separately entered integer total from Couple/Manager, not
+Guest count, a sum of companion quantities or table capacity. Initial Guest workspace
+access preserves the existing Booking planning total; an empty/partial list, import,
+Guest archive or group display edit cannot reset or recalculate it. Explicit count
+changes create immutable booking-wide plan revisions and monotonic sourceSequence,
+atomically synchronize Booking and revalidate seating. Zero is only an explicit
+planning value; layout confirmation still requires a positive compatible count.
+
+Name-based check-in is opt-in per booking: checkInMode NONE (default) or BY_GUEST_NAME.
+Owning FULL Couple/Manager explicitly enable it with at least one active named Guest;
+adding/importing a Guest never enables it. Authorized assigned Staff check in one
+listed person once, with append-only corrections/undo and duplicate/retry protection.
+No Household identity or mandatory unlisted walk-in counter is added. Companion
+recording rules remain open as noted above. Staff may
+still perform other assigned duties when check-in is off. After the first check-in
+record, mode history cannot be switched to NONE to erase or hide attendance evidence.
+
+When check-in is NONE, actual attendance is not recorded/unknown (nullable), not 0.
+When enabled, checkedInGuestCount is only the measured named-list count; a partial
+list must never be reported as whole-event attendance or used as its rate denominator.
+Reports keep planningHeadcount, listedGuestCount and checkedInGuestCount distinct.
+Billing always uses contract/appendix/expense facts, never check-in totals. Viewing
+an invitation changes none of these counts and gives no attendance-write authority.
 
 ## 3. Bride and Groom Profile
 
@@ -173,13 +208,14 @@ monetary revisions until reconciliation.
 
 ## 8. Owners and Build Order
 
-| Owner            | Extension                                                                | Consumers                                                      |
-| ---------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------- |
-| Venue            | Service/print price offerings, exact facts and eligibility               | Booking                                                        |
-| Booking          | Names, multi-menu selections, contracts/appendices, deposit eligibility  | Payments, Invitation, Notifications, Analytics                 |
-| Payments         | Once-only agreed charges/deltas, expenses, final invoice and adjustments | Notifications, Analytics                                       |
-| Invitation       | Safe template selection facts; contract-linked print fulfillment         | Booking, Guest                                                 |
-| Guest Management | Groups/households, read-only links, planned headcount                    | Booking synchronizer, Seating, Staff, Notifications, Analytics |
+| Owner            | Extension                                                                     | Consumers                                                      |
+| ---------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Venue            | Service/print price offerings, exact facts and eligibility                    | Booking                                                        |
+| Booking          | Names, multi-menu selections, contracts/appendices, deposit eligibility       | Payments, Invitation, Notifications, Analytics                 |
+| Payments         | Once-only agreed charges/deltas, expenses, final invoice and adjustments      | Notifications, Analytics                                       |
+| Invitation       | Safe template selection facts; contract-linked print fulfillment              | Booking, Guest                                                 |
+| Guest Management | Groups, optional named Guests/read-only links and explicit planning total     | Booking synchronizer, Seating, Staff, Notifications, Analytics |
+| Staff Operations | Optional per-booking check-in mode, assigned one-person check-in/undo history | Analytics                                                      |
 
 Keep the existing architecture and owner ports. The template selection port reads
 catalog facts only; it cannot invoke Billing/Booking writers. Do not introduce a

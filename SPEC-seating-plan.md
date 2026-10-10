@@ -5,9 +5,9 @@
 - Status: **Business scope confirmed 2026-10-10 — backend implementation pending**
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
 - Module ID: `seating-plan` (`SPEC-07`)
-- Contract baseline: `WEDDING-CONTRACT-2@2.0.0`
+- Contract baseline: `WEDDING-CONTRACT-3@3.0.0`
 - Inherited baseline: `WEDDING-CONTRACT-1@1.0.0` (historical contract)
-- Accepted amendment: baseline Section 22 (2026-10-10); previous Section 21 retained as history
+- Accepted amendment: baseline Sections 22/23 (2026-10-10); older conflicting contracts retained as history
 - Initial owner role: C (member name to be assigned)
 - Team execution contract: [`docs/team-implementation.md`](./docs/team-implementation.md)
 - Requirement ownership: SEA-003 through SEA-008
@@ -18,8 +18,13 @@
 
 This module selects a capacity-compatible fixed catalog layout and applies guest-group
 labels/colors to its stable tables. It owns seating-plan revision/status and no geometry.
-It never assigns a household, person, or seat; creates/moves/resizes tables; changes a
+It never assigns a Guest/person or seat; creates/moves/resizes tables; changes a
 layout range; or changes guest-group definitions.
+
+Group-only planning with no named Guests is fully supported. Capacity/range checks
+use the independently entered Booking planningHeadcount, not list size or check-ins.
+No Guest record, published personalized link or enabled check-in is needed to label
+tables, confirm a compatible layout or capture retained printable seating content.
 
 ## 2. State and immutable reference contract
 
@@ -142,7 +147,7 @@ hold the owner shared lock until commit; retirement uses its exclusive lock, as 
 in baseline Section 21.10. Booking serialization alone is not a venue-retirement lock.
 
 Additive `SeatingGuidanceReader` returns group-labelled table labels and plan status for
-a booking only, with no person/household/seat mapping:
+a booking only, with no person/seat mapping:
 
 ```typescript
 interface SeatingGuidanceReader {
@@ -164,8 +169,9 @@ interface SeatingGuidanceReader {
 }
 ```
 
-No plan is a successful `ABSENT` response with an empty group list, so Staff can still
-check in arrivals. Unconfirmed/requires-review guidance is clearly labelled provisional;
+No plan is a successful `ABSENT` response with an empty guidance group list, so enabled
+assigned Staff can still check in listed Guests. Missing named-list/check-in data does
+not block independent Group seating. Unconfirmed/requires-review guidance is provisional;
 Staff must not present it as a reserved table.
 
 ## 8. HTTP schemas, errors, and independent slices
@@ -195,6 +201,9 @@ Proposed waves: compatibility/remapping; plan persistence/revisions;
 confirmation/exception/registry/guidance; HTTP/OpenAPI; backend integration/evidence and frontend hand-off.
 SEA-003/006 tests include boundary equality, zero count, retirement versus supersession,
 exception revalidation, concurrent headcount/confirm and invalidation/print approval.
+Also prove zero/partial named lists keep planningHeadcount unchanged, Groups can label
+tables without Guests, Guest import/archive never masquerades as a headcount edit,
+and checkInMode NONE never blocks layout/print confirmation.
 SEA-004/005/007/008 tests cover stable group IDs, no person/geometry writes, remap
 visibility and accessible keyboard alternatives to label drag.
 

@@ -2,12 +2,12 @@
 
 > Current execution scope: backend release verification and API hand-off only, under the [2026-10-10 amendment](./docs/backend-scope-2026-10-10.md). Web/Android builds, client screenshots and client deployment belong to the frontend team; full product release remains a separate joint gate.
 
-- Status: **Approved specification — module plan and implementation acceptance pending**
+- Status: **Business scope confirmed — backend implementation and acceptance pending**
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
 - Module ID: `release-demo` (`SPEC-11`)
-- Contract baseline: `WEDDING-CONTRACT-2@2.0.0`
+- Contract baseline: `WEDDING-CONTRACT-3@3.0.0`
 - Inherited baseline: `WEDDING-CONTRACT-1@1.0.0` (historical contract)
-- Accepted amendment: baseline Section 21
+- Accepted amendment: baseline Sections 22/23 (2026-10-10); historical approvals retained
 - Initial owner role: Unassigned (next allocation round)
 - Team execution contract: [`docs/team-implementation.md`](./docs/team-implementation.md)
 - Requirement ownership: release verification, deployment, demo evidence, and rollback readiness
@@ -34,8 +34,9 @@ A release candidate records:
 
 The end-to-end journey must demonstrate consultation invitation, restricted timeline
 collaboration, full menu/print/service contract and dual approval, proven 30%-total deposit/access promotion, media/invitation,
-households/planned headcount, seating invalidation/reconfirmation, print quote/charge, staff
-multi-arrival check-in, approved appendices, incidental expenses and locked final invoice,
+Groups/optional named Guests and independent planning headcount, seating
+invalidation/reconfirmation, print quote/charge, opt-in one-person Staff check-in/undo,
+approved appendices, incidental expenses and locked final invoice,
 notifications, and analytics. The generic QR must remain
 non-personalized and non-authorizing throughout.
 
@@ -93,18 +94,19 @@ on conflicting Manager-modified data rather than overwrite it. Provider-owned se
 adapters or approved command ports create each module's records; release does not
 invent cross-module SQL mutations.
 
-| Scenario                        | Required observation                                                                                                           |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Restricted consultation         | One invitation/account/access; restricted Web timeline works; media/guest/seating/print denied.                                |
-| Timeline/deposit                | Current mutual approval, stale revision rejected, verified sandbox/manual deposit confirms and promotes same identity.         |
-| Private media/public invitation | Original private, approved derived asset public, one generic QR without household/attendance-write/check-in scope.             |
-| Guests/headcount                | Default/custom stable groups, import/manager-or-couple count edits, higher then lower plan sequence; no headcount rollback.    |
-| Seating/print                   | Inclusive capacity, exception audit, invalidation blocks new print, exact printable/quote/charge snapshot, no recipient names. |
-| Attendance                      | Duplicate names disambiguated, separate arrivals accumulate, over-expected succeeds, correction history preserved.             |
-| Notifications                   | Real outbox, duplicate dedup, reminder revision/cancel behavior, credential-safe delivery, completion through booking port.    |
-| Analytics                       | Known expected/actual, payments/refunds/credit, quotes excluded, historical hall/menu facts and source freshness.              |
-| Frontend hand-off               | Publish exact API digest, DTOs/errors and denial examples; frontend verifies its clients separately.                           |
-| Recovery                        | Migration upgrade, health check, rollback-compatible deployment/restore drill with privacy controls.                           |
+| Scenario                        | Required observation                                                                                                                                                                     |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Restricted consultation         | One invitation/account/access; restricted Web timeline works; media/guest/seating/print denied.                                                                                          |
+| Timeline/deposit                | Current mutual approval, stale revision rejected, verified sandbox/manual deposit confirms and promotes same identity.                                                                   |
+| Private media/public invitation | Original private, approved derived asset public, generic QR without Guest/attendance-write/check-in authority; no names required.                                                        |
+| Groups/planning without names   | No Guest list; manual total preserved, Group labels/compatible layout/printing/event completion/final invoice still work. NONE reports not recorded/null.                                |
+| Optional Guests/headcount       | Partial named import/archive changes listedGuestCount only; explicit total edit uses ordered sync; no automatic count reset or check-in enable.                                          |
+| Seating/print                   | Inclusive capacity, exception audit, invalidation blocks new print, exact printable/quote/charge snapshot, no recipient names.                                                           |
+| Optional check-in               | Explicit enable, duplicate names disambiguated, one effective check-in per Guest under concurrent retries, undo/history and mode-lock proof. Partial list is not total event attendance. |
+| Notifications                   | Real outbox, duplicate dedup, reminder revision/cancel behavior, credential-safe delivery, completion through booking port.                                                              |
+| Analytics                       | Independent planning/list/check-in counts, disabled null versus enabled measured zero; no whole-event turnout inference; money/source/history/freshness proof.                           |
+| Frontend hand-off               | Publish exact API digest, DTOs/errors and denial examples; frontend verifies its clients separately.                                                                                     |
+| Recovery                        | Migration upgrade, health check, rollback-compatible deployment/restore drill with privacy controls.                                                                                     |
 
 Use fake provider journeys in routine CI; final sandbox/staging journey explicitly records
 which real services were used. Fake-only money/access/snapshot/provider checks never

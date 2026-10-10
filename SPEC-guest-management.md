@@ -1,55 +1,71 @@
 # Specification: Guest Management
 
 - Module ID: `guest-management` (`SPEC-06`).
-- Scope confirmed: 2026-10-10; backend implementation pending.
-- Baseline: `WEDDING-CONTRACT-2@2.0.0`.
+- Scope confirmed: 2026-10-10; Group + optional Guest amendment confirmed by owner.
+- Baseline: `WEDDING-CONTRACT-3@3.0.0`, [Section 23](./CONTRACT-BASELINE.md#23-group-and-optional-guest-list--2026-10-10).
 - Requirements: GST-001 through GST-009; QRC-005.
-- Replaces the former guest response specification under the confirmed product amendment.
-- Depends on: Booking access/headcount ports and Invitation publication reader.
-- Consumers: Seating, Staff, Notifications and Analytics.
-- Execution: backend only; client presentation belongs to the frontend team.
+- Backend implementation pending; no proposed route/provider below is a mounted API.
+- Depends on Booking access/ordered headcount; Invitation publication only for optional personalized links.
+- Consumers: Seating, Staff, Notifications and Analytics. Client presentation is frontend-owned.
 
 ## 1. Purpose
 
-Own invitation households/parties, stable groups, import, personalized read-only
-links, delivery intents and expected headcount. One household represents one person,
-couple, family or party; companion names are not required. Retain name-based Staff
-check-in and group-level seating through their respective owner ports.
+Own stable Groups, optional named Guests/import, explicit planning-total revisions
+and optional personalized read-only invitations. Group is a category/area label,
+not a person or invitation party; one Guest represents one named person. There is
+no Household identity model or representative party name. A named Guest may bring
+companions. Planned/actual companion quantity storage was proposed but not confirmed;
+settle that narrow requirement before implementing dependent schemas, import or
+check-in counts. Do not infer that removing Household prohibits accompanying people.
 
-Guests cannot respond with an attendance decision or count, alter plans or check in.
-There are no guest response states/history, deadline settings, response routes,
-response reminders or response events. Viewing/sharing an invitation has no effect
-on headcount, actual arrivals, billing or access.
+A couple can supply no names, a partial list or a full list. Groups and seating work
+independently of Guest records. No Guest list is required for contract/deposit,
+media, generic invitation/QR, printing, event completion or billing. Adding/importing
+a name never enables check-in. Staff owns the separate per-booking opt-in mode and
+check-in history; Guest owns only the named-list facts needed by Staff.
+
+Guests only view invitations. There are no response states/history, response writes,
+deadlines, reminders or analytics. Views never change planning/check-in/billing.
 
 ## 2. Models and Validation
 
-Group: stable guestGroupId, bookingId, normalized unique name (1–80), uppercase
+Group: guestGroupId, bookingId, normalized unique name (1–80), uppercase
 `#RRGGBB`, revision and ACTIVE/ARCHIVED status. Initialize Parents, Groom Side,
-Bride Side and Friends idempotently on first confirmed guest workspace access.
-Localized labels are frontend presentation; the backend returns stable identities.
-Referenced groups may be renamed/archived, never destructively removed.
+Bride Side and Friends idempotently on first confirmed group workspace access,
+even when no Guest exists. Labels are localized by clients. Referenced groups
+retain rename/archive history and cannot be destructively removed.
 
-Household: invitationHouseholdId, bookingId, representativeName (1–120), active
-group ID, expectedAttendees (positive integer 1–100), optional E.164 phone,
-operationalNote (0–500), revision and active/archive state. Preserve duplicate
-names as separate records. No individual seat assignment or companion identity.
+Guest: guestId, bookingId, name (1–120), active guestGroupId, optional E.164 phone,
+operationalNote (0–500), revision and ACTIVE/ARCHIVED status. Contacts are optional,
+not required for creation/check-in/seating. Duplicate names are separate identities;
+never deduplicate people by name/phone. No per-Guest expectedAttendees is approved;
+companion fields remain unresolved, not categorically forbidden.
 
-Names use trim/NFKC/case-fold for group uniqueness; retain authored display case.
-All resources use UUIDs, UTC timestamps, expected revisions and audit evidence.
-Max 10,000 active households; aggregate expected headcount cannot exceed 10,000.
+Group uniqueness uses trim/NFKC/case-fold; retain authored display case. UUIDs,
+UTC timestamps, expected revisions and audit apply throughout. Preserve retained
+invitation/check-in references under archive; no hard deletion of referenced Guests.
+Max 10,000 active named Guests. Planning total is an independent integer 0–10,000,
+subject to Booking/Venue capacity and Seating confirmation rules.
 
-## 3. Planned Headcount
+## 3. Independent Planned Headcount
 
-Sum expectedAttendees of active households only. Empty list has zero and an
-initialized immutable plan revision. Creating/updating count, archive/restore or
-atomic import produces a booking-wide sourceGuestPlanRevisionId and increasing
-sourceSequence. Group display edits do not change attendance, but advance reporting
-sequence. Actual arrivals remain Staff-owned and never change planned contribution.
+Couple/Manager explicitly enter the wedding planning total; it is not Guest count,
+a per-Guest expectation, group membership count or inferred table capacity.
+First initialization copies the existing Booking planning context under serialization;
+no names means no automatic zero. A missing/stale source cannot initialize a guessed
+value. Explicit zero is a planning value, not a statement about actual attendance.
 
-Guest plan activation, BookingPlanningHeadcountSynchronizer, reporting sequence,
-audit and outbox commit together under booking serialization. Provider failure
-rolls back the plan; a recovery intent is not success. A lower sequence is a stale
-acknowledgement, identical replay succeeds, changed same-sequence facts conflict.
+Only an explicit total change creates/activates a new immutable booking-wide
+sourceGuestPlanRevisionId and increasing sourceSequence for headcount synchronization.
+Initialization pins its exact source; idempotent replay cannot replace a later value.
+Guest CRUD/import/archive and group display edits advance their own reporting facts
+without changing the planning total or invalidating seating for a count change.
+
+Guest-plan activation, BookingPlanningHeadcountSynchronizer, audit and outbox
+commit together under booking serialization. Provider failure rolls back; a recovery
+intent is not success. Lower sequence acknowledges stale input; identical replay
+succeeds, changed same-sequence facts conflict. Named-list edits never rewrite
+contract quantities/prices, printed snapshots or Staff history.
 
 ## 4. Provider Contracts
 
@@ -58,7 +74,7 @@ interface GuestAttendancePlanReader {
   getPlan(bookingId: string): Promise<{
     sourceGuestPlanRevisionId: string;
     sourceSequence: number;
-    expectedAttendees: number;
+    expectedAttendees: number; // Explicit wedding planning total, not list size.
   }>;
 }
 
@@ -71,103 +87,112 @@ interface GuestPlanningReader {
       status: 'ACTIVE' | 'ARCHIVED';
     }[]
   >;
-  requireHouseholdForOperations(invitationHouseholdId: string): Promise<{
+  requireGuestForOperations(guestId: string): Promise<{
     bookingId: string;
-    invitationHouseholdId: string;
+    guestId: string;
     guestGroupId: string;
-    representativeName: string;
+    name: string;
     disambiguatingPhone: string | null;
-    expectedAttendees: number;
     operationalNote: string | null;
   }>;
-  getExpectedAttendance(bookingId: string): Promise<{
-    sourceGuestPlanRevisionId: string;
-    expectedAttendees: number;
+  getGuestListSummary(bookingId: string): Promise<{
+    listedGuestCount: number;
+    sourceSequence: number;
   }>;
 }
 ```
 
-GuestOperationsSearchReader supports assigned Staff through its authorization
-facade, booking-scoped active households, cursor paging 1–50 and phoneLast4 only.
-Normalize name/diacritics for lookup; minimum two characters; name or normalized
-phone required. Rank exact name, prefix, substring, then stable ID. Never auto-select
-or check in the first duplicate-name result. Exact internal operations reads remain
-minimum data and require the authorized Staff/Manager facade.
+The ordered headcount DTO retains existing Booking wire field names, but its source
+is the explicit plan total. Do not call the legacy household reader or report named
+Guests as its expected-attendee quantities. Publish actual provider schemas/versions
+and conformance before consumers integrate.
 
-GuestReportingReader supplies expected counts/groups and monotonic source sequence,
-not guest response statistics. GuestAutomationReader has no response deadline read.
-PersonalizedInvitationDeliveryPort accepts explicit intended email, publication and
-short-lived credential references; Notifications owns actual send/reconciliation.
+GuestOperationsSearchReader supports active booking-scoped Guests through assigned
+Staff/Manager authorization facade. Cursor limit 1–50, minimum two name characters,
+name/normalized phone required; rank exact, prefix, substring, stable ID. Return
+phoneLast4 only, never auto-select duplicate names. Staff rechecks its enabled mode,
+role, assignment and event window before operation; Guest cannot grant Staff access.
+
+GuestReportingReader separates explicit planning total, listedGuestCount and group
+membership with owner sequence/fence. It contains no per-person expected quantity,
+response statistics or Staff check-in truth. Optional invitation delivery takes an
+explicit intended email/publication and short-lived credential reference, never an
+email inferred from a name/phone. Notifications owns send/reconciliation.
 
 ## 5. Invitation Link Security
 
-Require a real published invitation. Tokens have >=32 random bytes, hash-only
-storage, booking/household scope, revision and expiry at event end + 24 hours.
-Reissue revokes the old token atomically. Invalid/revoked/expired links return generic
-INVITATION_LINK_UNAVAILABLE without household data. Use a URL fragment, exchange
-into a short-lived scoped capability and exclude raw credentials from durable logs,
-audit/outbox/reporting. API does not require any guest account.
+Generic public sharing/QR requires no Guest record. A personalized link optionally
+binds a real published invitation to one active Guest; no names means no personalized
+issuance, not failure of the generic invitation or wedding.
 
-Capability grants only the current published invitation plus minimal authorized
-recipient greeting. No contacts, operational notes, group list, media library,
-billing, other household, planning mutation or actual attendance mutation.
-Limit exchanges to 10 per 15 minutes per resolved IP plus token fingerprint;
-do not permanently lock a household. Generic public QR grants no household scope.
-Views end at expiry; no response deadline exists.
+Tokens use >=32 random bytes, hash-only storage, booking/guest scope, revision and
+expiry at event end + 24 hours. Reissue/archive revoke old authority atomically.
+Invalid/revoked/expired links return generic INVITATION_LINK_UNAVAILABLE without
+Guest data. Use a fragment and short-lived capability; raw credentials never enter
+durable replay, logs, audit/outbox or reporting. No guest account is required.
+
+Capability exposes current approved invitation and minimal recipient greeting only.
+No contacts, notes, group list, other Guest, private media, billing, planning or
+check-in writes. Exchange limit is 10 per 15 minutes per resolved IP plus token
+fingerprint; no permanent Guest lockout. Generic QR carries no personalized scope.
 
 ## 6. Authorization and Proposed HTTP
 
-Manager and own FULL Couple manage groups/households on their confirmed booking.
-Restricted prospects, public users, guest capabilities and unassigned Staff are
-denied. Staff obtains minimum operational information only through assigned facade.
-Conceal cross-booking resource identity. All writes use Idempotency-Key and
-expectedRevision; audit manager overrides and archival without deleting history.
+Manager and owning FULL Couple manage Groups, optional Guests and planning totals
+on confirmed bookings. Restricted/public/guest-link actors are denied; assigned
+Staff see minimum operational data only through their mode-aware facade.
+Cross-booking IDs are concealed. Writes require declared idempotency/revision
+checks, atomic audit and preserved historical references.
 
-| Method/path                                                           | Behavior                                           |
-| --------------------------------------------------------------------- | -------------------------------------------------- |
-| GET/POST /bookings/{id}/guest-groups                                  | List/create stable groups                          |
-| PATCH /bookings/{id}/guest-groups/{groupId}                           | Rename/color/archive, preserve identity            |
-| GET/POST /bookings/{id}/households                                    | Private list/create                                |
-| PATCH /bookings/{id}/households/{householdId}                         | Update/explicit archive or restore                 |
-| POST /bookings/{id}/households/import-previews                        | Normalize/validate rows and return digest          |
-| POST /bookings/{id}/households/imports                                | Commit exact validated digest atomically           |
-| POST /bookings/{id}/households/{householdId}/personalized-invitations | Issue/reissue authorized view-only link            |
-| POST /guest/invitation-sessions                                       | Strict token exchange, credential-redacted logging |
-| GET /guest/invitation                                                 | Minimal invitation read via capability             |
+| Method/path                                                   | Behavior                                                     |
+| ------------------------------------------------------------- | ------------------------------------------------------------ |
+| GET/POST /bookings/{id}/guest-groups                          | List/create groups, including a names-free workspace         |
+| PATCH /bookings/{id}/guest-groups/{groupId}                   | Rename/color/archive with retained identity                  |
+| GET/POST /bookings/{id}/guests                                | Optional private list/create one named person                |
+| PATCH /bookings/{id}/guests/{guestId}                         | Edit/explicit archive or restore                             |
+| POST /bookings/{id}/guests/import-previews                    | Validate rows, list delta and digest                         |
+| POST /bookings/{id}/guests/imports                            | Commit exact validated digest atomically; planning unchanged |
+| GET/PATCH /bookings/{id}/guest-plan                           | Read/explicitly revise independent planning total            |
+| POST /bookings/{id}/guests/{guestId}/personalized-invitations | Optional authorized view-only issue/reissue                  |
+| POST /guest/invitation-sessions                               | Credential-redacted strict exchange                          |
+| GET /guest/invitation                                         | Minimal capability read                                      |
 
-Routes are specification proposals until runtime and Zod/OpenAPI exist. Do not add
-any guest attendance-response or deadline-policy endpoint. Errors include
-GUEST_GROUP_NAME_CONFLICT, GUEST_GROUP_IN_USE, GUEST_PLAN_REVISION_STALE,
-HEADCOUNT_SOURCE_CONFLICT, HOUSEHOLD_NOT_FOUND and INVITATION_LINK_UNAVAILABLE.
+These are proposals until Zod/runtime/OpenAPI exist. No household aliases or response
+endpoints are added. Errors include GUEST_GROUP_NAME_CONFLICT, GUEST_GROUP_IN_USE,
+GUEST_PLAN_REVISION_STALE, HEADCOUNT_SOURCE_CONFLICT, GUEST_NOT_FOUND and
+INVITATION_LINK_UNAVAILABLE. Check-in settings/ledger belong to SPEC-08.
 
 ## 7. Import and Delivery
 
-JSON rows or parsed CSV: <=1,000 rows, <=5 MiB, stable externalRowKey. Preview
-validates every row, normalized safe error indexes and proposed aggregate count.
-Commit consumes its exact digest; reject changed payload or duplicate row key with
-different data unless an explicit update preview was approved. Reject unknown CSV
-headers/formula cells. Invalid row or aggregate overflow means zero partial writes.
+JSON/parsed CSV: <=1,000 rows, <=5 MiB, stable externalRowKey. Preview validates
+all rows, groups, safe error indexes and exact list delta; count/quota checks concern
+the named list, never an inferred wedding attendance total. Commit requires its
+digest and rejects changed row-key reuse unless an explicit update preview was
+selected. Unknown headers/formula cells or any invalid row cause zero partial writes.
+Same externalRowKey supports retry; identical names with distinct row keys are not
+merged. Import does not enable check-in or change planning.
 
-Manual authorized sharing is independently usable. Automated delivery requires the
-real Notifications adapter and encrypted transient credential handling. Unknown
-provider outcome preserves one intent; no blind second send. Do not mark automatic
-delivery accepted based on manual link proof.
+Manual sharing works independently. Automated delivery needs explicit recipient,
+real Notifications adapter and encrypted transient credential handling. Missing
+contact leaves delivery unavailable for that Guest only. Unknown send outcome
+retains one intent; manual link proof cannot establish automatic delivery acceptance.
 
 ## 8. Backend Waves and Acceptance
 
-1. GM-W1: groups/households, validation, import and serialized persistence.
-2. GM-W2: view-only link issue/exchange/read/reissue and privacy/rate/expiry proof.
-3. GM-W3: ordered planning sync, operational search, reporting and delivery ports.
-4. GM-W4: strict HTTP, runtime composition, OpenAPI and DTO examples.
-5. GM-W5: real-provider integration, migrations/races, evidence and frontend hand-off.
+1. GM-W1: Groups, optional Guests/import, independent planning revisions/persistence.
+2. GM-W2: optional personalized read-only links; generic sharing without Guest data.
+3. GM-W3: explicit ordered planning sync, Guest search/list/group reporting and delivery ports.
+4. GM-W4: strict HTTP/runtime/OpenAPI and examples for names-free/partial-list workflows.
+5. GM-W5: real providers, migrations/races, evidence and frontend hand-off.
 
-Prove GST-001–009/QRC-005: import atomicity; normalized defaults; history under
-archive; no guest writes; ordered sync 11 then 10; same-sequence conflict; empty/overflow
-plans; cross-booking denials; read capability isolation; public/private QR separation;
-real headcount -> seating invalidation -> printable snapshot behavior. Test existing
-check-in consumers still read active expected counts while preserving arrival history.
+Prove GST-001–009/QRC-005: groups with no names; manual total 300 with zero/20 Guests;
+initialization preserves Booking count; Guest archive/import do not alter 300; only
+explicit 300 -> 250 planning edit triggers ordered sync/Seating revalidation.
+Test sequence 11 then 10, conflicts/rollback, quotas, duplicate names, import atomicity,
+cross-booking/privacy, generic/public/private link separation and retained print history.
+Integrate real Staff mode/Guest readers without implying a full wedding attendance count.
 
-Run focused Vitest, required disposable PostgreSQL migrations/concurrency, contract
-tests, lint/typecheck/build/coverage and API generation/check. Publish exact API digest
-and provider versions. No client implementation, screenshots or Android runtime
-verification is required for backend acceptance. See tasks/backend-revision-todo.md.
+Run focused Vitest, disposable PostgreSQL migration/concurrency, contract,
+lint/typecheck/build/coverage and API generation/check. Publish exact provider/API
+versions; no client implementation or browser/native gate is required.
+Executable tasks: [backend backlog](./tasks/backend-revision-todo.md).
