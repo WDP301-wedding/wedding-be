@@ -3,6 +3,22 @@ import { createHash } from 'node:crypto';
 import type { Request, Router } from 'express';
 
 import type { Config } from '../../config/config.js';
+import {
+  createRestaurantServiceService,
+  createRestaurantServiceReader,
+  type RestaurantServiceReader,
+} from './application/restaurant-service.service.js';
+import {
+  createPrintOfferingService,
+  createPrintOfferingReader,
+  type PrintOfferingReader,
+} from './application/print-offering.service.js';
+import { createInvitationTemplateSelectionReader } from '../invitation-studio/infrastructure/template-selection.reader.js';
+import {
+  createCommercialCatalogRouter,
+  commercialActorScope,
+  createPrintCommercialCatalogRouter,
+} from './http/commercial-catalog.router.js';
 import { createPrismaClient } from '../../core/database/prisma.js';
 import type { ShutdownResource } from '../../core/http/lifecycle.js';
 import { createIdempotencyMiddleware } from '../../core/idempotency/idempotency.middleware.js';
@@ -26,6 +42,10 @@ import { catalogActorScope, createVenueCatalogRouter } from './http/venue-catalo
 export type VenueCatalogRuntime = Readonly<{
   router: Router;
   resource: ShutdownResource;
+  providers: Readonly<{
+    restaurantServices: RestaurantServiceReader;
+    printOfferings: PrintOfferingReader;
+  }>;
 }>;
 
 export async function createVenueCatalogRuntime(config: Config): Promise<VenueCatalogRuntime> {
@@ -58,8 +78,44 @@ export async function createVenueCatalogRuntime(config: Config): Promise<VenueCa
           }),
         }),
     });
+    router.use(
+      createCommercialCatalogRouter(
+        createRestaurantServiceService(prisma),
+        actorResolver,
+        (normalizedRoute) =>
+          createIdempotencyMiddleware({
+            service: idempotency,
+            policy: defineIdempotencyPolicy({
+              actorScope: commercialActorScope,
+              normalizedRoute,
+              operationVersion: 'v1',
+              payload: catalogIdempotencyPayload,
+            }),
+          }),
+      ),
+    );
+    router.use(
+      createPrintCommercialCatalogRouter(
+        createPrintOfferingService(prisma, createInvitationTemplateSelectionReader),
+        actorResolver,
+        (normalizedRoute) =>
+          createIdempotencyMiddleware({
+            service: idempotency,
+            policy: defineIdempotencyPolicy({
+              actorScope: commercialActorScope,
+              normalizedRoute,
+              operationVersion: 'v1',
+              payload: catalogIdempotencyPayload,
+            }),
+          }),
+      ),
+    );
     return Object.freeze({
       router,
+      providers: Object.freeze({
+        restaurantServices: createRestaurantServiceReader(prisma),
+        printOfferings: createPrintOfferingReader(prisma, createInvitationTemplateSelectionReader),
+      }),
       resource: Object.freeze({
         name: 'venue-catalog-database',
         close: () => prisma.$disconnect(),
