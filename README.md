@@ -4,6 +4,55 @@ Express REST API and the authoritative source for business rules, PostgreSQL sch
 
 The platform spans four sibling repositories. Start with the [cross-repository development guide](docs/cross-repo-development.md) when setting up the full system.
 
+## Documentation
+
+Read the [confirmed backend scope](docs/backend-scope-2026-10-10.md), then choose
+work from the [active backend backlog](tasks/backend-revision-todo.md). It is the
+only executable checklist for BE, RV and SPEC-06 onward. SPEC-01–04 and SPEC-05
+backend acceptance remain historical baselines, not proof of live external services;
+see the [runtime/provider audit](tasks/evidence/spec01-05-runtime-audit-2026-10-10.md).
+From SPEC-06 onward this repository owns backend work only; existing frontend code
+is retained and future client delivery belongs to the frontend team.
+
+### Requirements and Contracts
+
+- [Product requirements](PRODUCT-REQUIREMENTS.md), [capability map](CAPABILITY-MAP.md)
+  and [contract baseline](CONTRACT-BASELINE.md#22-confirmed-backend-scope--2026-10-10).
+- Foundation and completed modules: [Core](SPEC-core-platform.md),
+  [Identity](SPEC-identity-access.md), [Venue](SPEC-venue-catalog.md),
+  [Booking](SPEC-booking-lifecycle.md), [Payments](SPEC-payments-billing.md),
+  [Invitation](SPEC-invitation-studio.md).
+- Extensions and pending modules: [Commercial contracts](SPEC-commercial-contracts.md),
+  [Guest](SPEC-guest-management.md), [Seating](SPEC-seating-plan.md),
+  [Staff](SPEC-staff-operations.md), [Notifications](SPEC-notifications-automation.md),
+  [Analytics](SPEC-analytics-dashboard.md), [Release](SPEC-release-demo.md).
+- [Provider/ownership hand-off rules](docs/team-implementation.md) and
+  [current Invitation hand-off](docs/spec-05-w2-w4-handoff.md).
+
+### Development and Operations
+
+- [Git and CI policy](CONTRIBUTING.md), [cross-repository setup](docs/cross-repo-development.md)
+  and [local demo](docs/local-demo.md).
+- [Database migrations](docs/database-migrations.md), [Identity operations](docs/identity-access-operations.md),
+  [Brevo email](docs/brevo-email.md), [Railway deployment](docs/railway-deployment.md)
+  and [dependency audit policy](docs/dependency-audit.md).
+
+### History and Evidence
+
+`tasks/evidence/` retains module verification and audit records; `docs/decisions/`
+retains architectural decisions. Preserve both. Archived documents below are not
+active task lists, current API contracts or fresh release/provider acceptance:
+
+- [Historical implementation plan](docs/archive/plan-2026-10-10.md).
+- [Historical task checklist](docs/archive/todo-2026-10-10.md).
+- [Original post-Booking mixed-client scope](docs/archive/post-booking-experience-2026-10-08.md).
+- [SPEC-05 W2–W4 checkpoint](tasks/evidence/spec05-w2-w4-handoff-2026-10-09.md).
+
+Current intake/overview requirements now live in [Booking](SPEC-booking-lifecycle.md#11-intake-and-couple-overview);
+account settings and current password OTP in [Identity](SPEC-identity-access.md#23-account-settings-and-current-password-otp).
+The redundant SPEC-05/06 implementation guide has been removed; this index links
+directly to its authoritative sources. Archival does not close any pending task.
+
 ## Prerequisites
 
 - Node.js 24.21.0 (see `.node-version`)

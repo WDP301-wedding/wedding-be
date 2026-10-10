@@ -619,9 +619,10 @@ The project owner approved VC-D1 through VC-D9 as written on 2026-10-05. This ap
 authorizes creation of the detailed backend and Management Web implementation plan and
 task list; it does not authorize implementation by itself.
 
-SPEC-02 planning must:
+The original SPEC-02 planning gate required:
 
-1. append ordered vertical slices to `tasks/plan.md` and `tasks/todo.md`;
+1. append ordered vertical slices to the original plan/task files, now retained in
+   `docs/archive/plan-2026-10-10.md` and `docs/archive/todo-2026-10-10.md`;
 2. include forward migration, provider/domain rules, HTTP/OpenAPI, deterministic seed,
    Management Web, and final acceptance-audit tasks;
 3. keep every implementation task within five human-authored files or split it;
@@ -632,9 +633,10 @@ SPEC-02 planning must:
 
 The project owner gave that second approval on 2026-10-05 for VC-01 through VC-23,
 their dependency order, checkpoints V1 through V4, and the bounded constants in
-`tasks/plan.md` Section 17.1. This completes SPEC-02 and Checkpoint V0 and authorizes
-implementation in the recorded order; no implementation task has started as part of
-the specification gate.
+`docs/archive/plan-2026-10-10.md` Section 17.1. This completes SPEC-02 and Checkpoint V0 and authorizes
+implementation in the recorded order; no implementation task had started as part of
+that specification gate. This is approval history, not an instruction to append new
+work to the archive. Current extensions use `tasks/backend-revision-todo.md`.
 
 ## 2026-10-10 Backend Extension
 

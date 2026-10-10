@@ -254,7 +254,7 @@ deferred**. No feature branch was pushed, no pull request was created, and no
 SPEC-03 change was merged into `main` during this review. The backend had already
 integrated upstream `dc633a6` (Brevo email support) into the feature branch at
 `2ca905a` before that instruction. The remaining three upstream branches had no
-new commits to integrate. `tasks/todo.md` remains unchanged in this review.
+new commits to integrate. `docs/archive/todo-2026-10-10.md` remains unchanged in this review.
 
 Two functional gaps and one related access-denial path were closed:
 

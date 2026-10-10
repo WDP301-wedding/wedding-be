@@ -182,7 +182,7 @@ Reading a notification does not approve, pay, or authorize any domain action. Th
 SPEC-09 plan must define inbox DTOs/routes, recipient and booking scope, content privacy,
 retention, deduplication/read semantics, and backend API acceptance, then integrate real
 producer events and settings/email/push/reminders. This scope approval does not mark
-the new contracts or implementation ready. See [plan Section 21](./tasks/plan.md#21-approved-product-completion-sequence-2026-10-08).
+the new contracts or implementation ready. See [archived plan Section 22](./docs/archive/plan-2026-10-10.md#22-approved-product-completion-sequence-2026-10-08).
 
 ## 11. Commercial Amendment Events
 

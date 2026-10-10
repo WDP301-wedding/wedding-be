@@ -3,7 +3,7 @@
 Status: **W1-W6 verified; W7 implemented; W8 real-owner backend and browser
 acceptance recorded. Android runtime remains unverified; module ACCEPTED pending.**
 Authority: approved `SPEC-payments-billing.md`, `WEDDING-CONTRACT-1@1.1.0`,
-and the eight-wave plan in `tasks/plan.md` Section 21.
+and the eight-wave plan in `docs/archive/plan-2026-10-10.md` Section 21.
 
 ## Branch and scope
 
@@ -94,7 +94,7 @@ locally for subsequent module waves.
 | Test sensitivity | Inverting the new source replay guard makes its concurrent replay test fail; the original source is restored |
 
 Verification commands and final commit references are recorded in the W2 checkpoint
-in `tasks/todo.md`. An initial legacy idempotency check read an unintended environment
+in `docs/archive/todo-2026-10-10.md`. An initial legacy idempotency check read an unintended environment
 URL and failed on a missing TLS CA file; both database URLs were then explicitly
 pinned to the temporary database. A Windows fork-worker invocation crashed; the
 unchanged idempotency tests both pass in a single-thread rerun. A combined thread
@@ -212,7 +212,7 @@ process-scoped to that database. The previous Booking container is untouched.
   were fixed; no test or gate was skipped, removed or weakened.
 
 The full unit result and final cleanup are recorded in the W3 checkpoint in
-`tasks/todo.md`. Provider IPN verification/reconciliation stays with W4, Manager
+`docs/archive/todo-2026-10-10.md`. Provider IPN verification/reconciliation stays with W4, Manager
 manual/balance/refund flows with W5, and route/API publication with W6.
 
 ## W4 VNPay verification and reconciliation

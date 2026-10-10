@@ -3,7 +3,7 @@
 > Current amendment: [confirmed backend scope](./docs/backend-scope-2026-10-10.md) and [commercial extensions](./SPEC-commercial-contracts.md). Completed implementation evidence below is historical; new names/catalog/contract/invoice rules are separate backend extension tasks. The 2026-10-10 amendment governs conflicts with older access, pricing and client requirements.
 
 - Status: **ACCEPTED by the project owner (2026-10-09) — Android native runtime verification remains open**
-- Module plan: approved 2026-10-08; [`tasks/plan.md` Section 21](./tasks/plan.md#21-spec-04-payments-billing-bounded-implementation-plan)
+- Module plan: approved 2026-10-08; [`docs/archive/plan-2026-10-10.md` Section 21](./docs/archive/plan-2026-10-10.md#21-spec-04-payments-billing-bounded-implementation-plan)
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
 - Module ID: `payments-billing` (`SPEC-04`)
 - Contract baseline: `WEDDING-CONTRACT-1@1.1.0`

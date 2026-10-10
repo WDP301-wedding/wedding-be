@@ -73,13 +73,13 @@ in dependency order; real-provider and module acceptance gates remain unchanged.
 | `analytics-dashboard` | [`SPEC-analytics-dashboard.md`](./SPEC-analytics-dashboard.md) | Approved SPEC; owner/plan/implementation pending |
 | `release-demo` | [`SPEC-release-demo.md`](./SPEC-release-demo.md) | Approved SPEC; owner/plan/implementation pending |
 
-W1 progress is tracked in [SPEC-05 Section11](./SPEC-invitation-studio.md#11-w1-backend-implementation-checkpoint--2026-10-09)
-and [todo B-EXEC](./tasks/todo.md#b-exec--execution-waves-and-verified-implementation-status).
-The subsequent [SPEC-05 Section12](./SPEC-invitation-studio.md#12-media-http-server-checkpoint--2026-10-09)
+W1 progress is tracked in [SPEC-05 Section12](./SPEC-invitation-studio.md#12-w1-backend-implementation-checkpoint--2026-10-09)
+and [todo B-EXEC](./docs/archive/todo-2026-10-10.md#b-exec--execution-waves-and-verified-implementation-status).
+The subsequent [SPEC-05 Section13](./SPEC-invitation-studio.md#13-media-http-server-checkpoint--2026-10-09)
 records five media HTTP operations mounted in the server and documented in OpenAPI.
-The subsequent [SPEC-05 Section13](./SPEC-invitation-studio.md#13-w2w4-backend-implementation-checkpoint--2026-10-09)
+The subsequent [SPEC-05 Section14](./SPEC-invitation-studio.md#14-w2w4-backend-implementation-checkpoint--2026-10-09)
 records verified template/design/AI, publication/public/generic QR and printable
-registry/proof/owner-lock implementation; detailed closure is at plan20.15.
+registry/proof/owner-lock implementation; detailed closure is at archived plan22.15.
 Other W6 APIs, complete Booking/Payments implementation, reviewed committed API/client
 pins, whole-module acceptance and release retain their own gates.
 

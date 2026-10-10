@@ -283,6 +283,41 @@ is sliced into at most five human-authored files per task and is planned after S
 | TML-007/008      | Effective content retained, mutually approved replacement, immutable audit history.              |
 | Shared contracts | Headcount sequence 10 then 9; duplicate settlement; due completion replays; report-page rebuild. |
 
+## 11. Intake and Couple Overview
+
+These existing backend requirements are consolidated from the archived
+[post-Booking scope](./docs/archive/post-booking-experience-2026-10-08.md), not new
+API implementation. Preserve [implementation evidence](./tasks/evidence/post-spec03-experience.md).
+The current strict schemas and mounted runtime remain authoritative; pending
+commercial/profile extensions follow the active backend backlog.
+
+- Public intake accepts contact name/email, optional phone/preferred date/expected
+  guests and message under the current schema. A stable submission UUID and canonical
+  payload hash make retry repeat-safe; changed reuse returns `SUBMISSION_KEY_REUSED`.
+  The public response is acknowledgement only, never an intake/contact lookup.
+- Requests start NEW. Manager conversion atomically creates one consultation and
+  retains its reference; same-owner replay returns that consultation, another owner
+  cannot retrieve it. Closure is explicit and conversion of a closed request fails.
+  Intake alone never creates an account, workspace invitation, booking or slot hold.
+- `GET /couple/bookings` lists only bookings linked to the authenticated actor's
+  consultation grants, with proposal/date/hall/access/timeline-approval metadata and
+  bounded pagination. Android requires FULL access and CONFIRMED/COMPLETED bookings;
+  a client flag is not an authorization grant.
+- Unconverted intake is deleted after 180 days; converted intake contact fields are
+  scrubbed after 180 days while its consultation follows the existing lifecycle.
+  Actual scheduled/manual operation and safe rehearsal remain RV-06, not a claim that
+  the retention executor is running automatically.
+- Existing routes (under `/api/v1`): `POST /consultation-requests`,
+  `GET /management/consultation-requests`,
+  `POST /management/consultation-requests/{id}/conversion`,
+  `POST /management/consultation-requests/{id}/closure`, `GET /couple/bookings`.
+  Contracts are the [committed OpenAPI](./openapi/openapi.json) and
+  [experience schemas](./src/modules/booking-lifecycle/http/experience.schemas.ts).
+- Separate bride/groom intake/conversion fields and commercial overview are BE-01/02
+  and the relevant contract hand-off tasks. Do not infer roles from a legacy label or
+  expose unfinished payment/invitation/guest/seating workflows as complete. Frontend
+  presentation is owned separately; this consolidation authorizes no client changes.
+
 ## 2026-10-10 Backend Extension
 
 Add separate brideName/groomName, multi-menu commercial lines, exact dual contract approval/PDF and appendices (CPL-001–003, CTR-001–006). Deposit eligibility now includes exact current commercial/timeline revisions and ceil(30% entire contract), plus existing slot/payment locks. Follow BE-01/02/06–09/11; do not silently convert legacy settled bookings.

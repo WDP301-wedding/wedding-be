@@ -15,4 +15,8 @@ CAPABILITY-MAP.md
 SPEC-core-platform.md
 tasks/
 
+# Historical plans retain their manually authored checkpoint formatting.
+docs/archive/plan-2026-10-10.md
+docs/archive/todo-2026-10-10.md
+
 .local-demo/
