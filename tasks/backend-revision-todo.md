@@ -32,8 +32,9 @@ implementing dependent GM/STF fields/counts; do not infer a ban from Household r
 
 Added after the owner's 2026-10-10 request. Historical SPEC-01–05 implementation
 acceptance is preserved; it does not mean live external integrations or every
-operational follow-up has passed. All RV tasks below are unchecked. Current audit
-findings are in the linked report, not new test/deployment evidence.
+operational follow-up has passed. The original audit findings remain historical.
+RV-01–03 now have separate [target-specific implementation, CI and live evidence](./evidence/rv01-03-runtime-foundation-2026-10-10.md);
+other RV tasks remain pending unless checked below.
 
 Use four separate evidence fields: implemented code, offline tests, configuration,
 and live/runtime verification. Adapter code executed with a controlled transport is
@@ -71,9 +72,9 @@ authorized disposable/staging environment and bounded cost; CI remains offline.
 | RV-20 Operational observability | Core + deployment; RV-02 | Verify real request/error/audit correlation and secret-safe logs on target runtime. If metrics/OTLP are selected, verify protected scrape/collector ingestion and operational visibility; otherwise record optional disabled status. | Authorized deployed request/failure and redacted logs; unauthorized metrics denial, real scrape/collector evidence only when enabled. No mandatory new paid monitoring vendor. |
 | RV-21 Runtime hand-off checkpoint | Integration steward; relevant RV tasks + BE-17/REL-W3 for revised release | Publish exact commit/API digest, tested target, provider mode/model, enabled-feature list, evidence and unresolved gates. Disabled required features cannot be claimed complete. Production-money VNPay needs separate owner-approved scope/adapter/merchant review. | Owner-reviewed feature/evidence manifest feeding REL-W4/5; backend verification gates and release recovery proof. Attach FE/native integration dependencies separately; do not mark them as completed backend tests. |
 
-- [ ] RV-01
-- [ ] RV-02
-- [ ] RV-03
+- [x] RV-01
+- [x] RV-02
+- [x] RV-03
 - [ ] RV-04
 - [ ] RV-05
 - [ ] RV-06

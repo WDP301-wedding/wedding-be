@@ -1,0 +1,437 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "2407683acf51cc76e3ae7fe5706a3eee1927be6f",
+  "target": "https://wedding-be-production-e1dc.up.railway.app/",
+  "targetUse": "owner-authorized developer-only",
+  "platformEnvironment": "production",
+  "productionReadiness": "not-established",
+  "deploymentId": "2d9d1f7b-0007-48ac-8085-392a4c181a86",
+  "sourceAttribution": {
+    "method": "CLI upload message plus matching compiled artifacts",
+    "startupRevision": null,
+    "compiledArtifactsMatched": 6,
+    "hashes": {
+      "dist/config/runtime-manifest.js": "a29b4d04921360d111272df0cf030f76e9ac77a6eb5e39846ca6ba2084336dad",
+      "dist/core/database/database-readiness.js": "3ad7fe4136041abe591fbad2264c929048721d8820fa61af01c6a12c69a70061",
+      "dist/server.js": "150444570417f3cd55e65c604135950099913ff4b83f4a8cf3177a196ea45cba",
+      "dist/modules/identity-access/account/bootstrap-secret.js": "2f2d12ddb005f7224bb32d34d990920ce06f828a9f26c4697dcacfc6c6ff5066",
+      "dist/modules/identity-access/account/manager-bootstrap.js": "d960a081fea6eef5deac3e38d3e7a11e146871a36bdc49999c7edf3b1b0f4198",
+      "dist/modules/identity-access/account/manager-bootstrap.cli.js": "e2065542ce5c34940c3d3eeaada6f494c147311eb34510305ba6e3d9e4ef6b6b"
+    }
+  },
+  "configuration": {
+    "deployed": {
+      "schemaVersion": 1,
+      "environment": "production",
+      "revision": null,
+      "evidencePolicy": "Attach target-specific evidence separately; configuration is not verification.",
+      "features": {
+        "database": {
+          "configuration": "configured",
+          "mode": "postgresql",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "emailDelivery": {
+          "configuration": "configured",
+          "mode": "brevo",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "passwordOtpKey": {
+          "configuration": "configured",
+          "mode": "stable-configured",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "catalogStorage": {
+          "configuration": "configured",
+          "mode": "supabase-private",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "invitationStorage": {
+          "configuration": "configured",
+          "mode": "supabase-private",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "gemini": {
+          "configuration": "unconfigured",
+          "mode": "disabled",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "publicInvitation": {
+          "configuration": "unconfigured",
+          "mode": "disabled",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "vnpay": {
+          "configuration": "unconfigured",
+          "mode": "disabled",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "retention": {
+          "configuration": "configured",
+          "mode": "operator-cli-unscheduled",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "workers": {
+          "configuration": "unconfigured",
+          "mode": "outbox-and-due-ports-only",
+          "implementation": "downstream-pending",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "printFiles": {
+          "configuration": "unconfigured",
+          "mode": "renderer-pending",
+          "implementation": "missing",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "metrics": {
+          "configuration": "unconfigured",
+          "mode": "disabled",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "optional-disabled"
+        },
+        "tracing": {
+          "configuration": "unconfigured",
+          "mode": "disabled",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "optional-disabled"
+        }
+      }
+    },
+    "disposable": {
+      "schemaVersion": 1,
+      "environment": "test",
+      "revision": "2407683acf51cc76e3ae7fe5706a3eee1927be6f",
+      "evidencePolicy": "Attach target-specific evidence separately; configuration is not verification.",
+      "features": {
+        "database": {
+          "configuration": "configured",
+          "mode": "postgresql",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "emailDelivery": {
+          "configuration": "unconfigured",
+          "mode": "development-fake",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "passwordOtpKey": {
+          "configuration": "configured",
+          "mode": "stable-configured",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "catalogStorage": {
+          "configuration": "unconfigured",
+          "mode": "development-fake",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "invitationStorage": {
+          "configuration": "unconfigured",
+          "mode": "unavailable",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "gemini": {
+          "configuration": "unconfigured",
+          "mode": "disabled",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "publicInvitation": {
+          "configuration": "unconfigured",
+          "mode": "disabled",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "vnpay": {
+          "configuration": "unconfigured",
+          "mode": "disabled",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "retention": {
+          "configuration": "configured",
+          "mode": "operator-cli-unscheduled",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "workers": {
+          "configuration": "unconfigured",
+          "mode": "outbox-and-due-ports-only",
+          "implementation": "downstream-pending",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "printFiles": {
+          "configuration": "unconfigured",
+          "mode": "renderer-pending",
+          "implementation": "missing",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "metrics": {
+          "configuration": "unconfigured",
+          "mode": "disabled",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "optional-disabled"
+        },
+        "tracing": {
+          "configuration": "unconfigured",
+          "mode": "disabled",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "optional-disabled"
+        }
+      }
+    }
+  },
+  "verification": {
+    "implemented": "RV-01/02/03 code supplied",
+    "offline": {
+      "ciRun": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38056043843",
+      "integration": {
+        "files": 62,
+        "tests": 332
+      },
+      "fullSuite": {
+        "files": 185,
+        "tests": 1482
+      },
+      "coverage": {
+        "statements": 96.36,
+        "branches": 93.25,
+        "functions": 98.17,
+        "lines": 97.16
+      },
+      "perFileThresholds": {
+        "branches": 80,
+        "lines": 80
+      },
+      "mutation": "inverted target comparison killed",
+      "windowsFullSuite": "native worker crashes; not a passing complete run",
+      "retryCoverageFollowUp": {
+        "failedDocumentationCiRun": "38057538053",
+        "allTestsPassedInThatRun": 1482,
+        "failure": "existing workspace-invitation repository branches 78.26% below unchanged 80% per-file gate",
+        "diagnosis": "serialization retry coverage depended on database race scheduling",
+        "deterministicFailureTestsAdded": 15,
+        "combinedFocusedTestsPassed": 24,
+        "focusedRepositoryBranches": 86.95,
+        "focusedRepositoryLines": 92.98,
+        "repositoryRuntimeCodeChanged": false,
+        "independentTestReview": "passed"
+      }
+    },
+    "live": {
+      "database": "verified below",
+      "managerBootstrap": "verified on owned schema below",
+      "emailDelivery": "pending RV-04",
+      "passwordOtpWorkflow": "pending RV-05",
+      "catalogStorage": "pending RV-07",
+      "invitationStorage": "pending RV-08",
+      "gemini": "unconfigured; pending RV-10/11",
+      "publicInvitation": "unconfigured; pending RV-09",
+      "vnpay": "unconfigured; sandbox proof pending RV-12/13/14",
+      "retention": "unscheduled; pending RV-06",
+      "workers": "downstream pending",
+      "printFiles": "implementation missing",
+      "metrics": "optional disabled",
+      "tracing": "optional disabled"
+    }
+  },
+  "database": {
+    "tlsEncrypted": true,
+    "tlsAuthorized": true,
+    "requiredMigrations": 26,
+    "matchingMigrations": 26,
+    "compatibilityLimit": "checks required shipped migration history only; extra forward migrations require separate application compatibility review; arbitrary manual schema drift is not detected",
+    "deployedFault": {
+      "event": "deployed_database_fault_rehearsal",
+      "at": "2026-10-10T13:42:43.234Z",
+      "deploymentId": "2d9d1f7b-0007-48ac-8085-392a4c181a86",
+      "revision": null,
+      "fault": "bounded migration-ledger query unavailability plus readiness connection termination",
+      "terminatedReadinessConnections": 1,
+      "tlsEncrypted": true,
+      "tlsAuthorized": true,
+      "baseline": {
+        "ready": {
+          "status": 200,
+          "elapsedMs": 1391,
+          "requestId": "c6cb21ef-0c9b-47be-8224-1f1b59d90967",
+          "code": null
+        },
+        "live": {
+          "status": 200,
+          "elapsedMs": 81,
+          "requestId": "fc50ffda-cb7d-4da3-ac36-aec619e75c0f",
+          "code": null
+        }
+      },
+      "outage": {
+        "ready": {
+          "status": 503,
+          "elapsedMs": 1856,
+          "requestId": "745246e1-7a0f-4184-98c1-2bb745c63e90",
+          "code": "SERVICE_UNAVAILABLE"
+        },
+        "live": {
+          "status": 200,
+          "elapsedMs": 49,
+          "requestId": "9ef61675-78f6-40a2-9067-ab0e678e8d80",
+          "code": null
+        }
+      },
+      "recovered": {
+        "status": 200,
+        "elapsedMs": 1308,
+        "requestId": "1096c9c7-795d-4394-b970-7a25eaa54c59",
+        "code": null
+      },
+      "applicationDataMutated": false
+    },
+    "isolatedProcessOutage": {
+      "at": "2026-10-10T13:25:28.600Z",
+      "kind": "actual-process-stop-and-restart",
+      "target": "isolated-loopback-PostgreSQL18",
+      "baseline": {
+        "status": 200,
+        "elapsedMs": 88
+      },
+      "outage": {
+        "ready": {
+          "status": 503,
+          "elapsedMs": 5
+        },
+        "live": {
+          "status": 200,
+          "elapsedMs": 3
+        }
+      },
+      "recovered": {
+        "status": 200,
+        "elapsedMs": 98
+      }
+    },
+    "restart": {
+      "before": {
+        "at": "2026-10-10T13:43:26.228Z",
+        "readyStatus": 200,
+        "readinessSessions": [
+          {
+            "pid": 1262714,
+            "backend_start": "2026-10-10T13:43:24.597Z"
+          }
+        ]
+      },
+      "after": {
+        "at": "2026-10-10T13:44:03.706Z",
+        "readyStatus": 200,
+        "readinessSessions": [
+          {
+            "pid": 1262737,
+            "backend_start": "2026-10-10T13:44:02.082Z"
+          }
+        ]
+      },
+      "startupEvents": [
+        {
+          "at": "2026-10-10T13:41:38.454Z",
+          "event": "runtime_feature_manifest"
+        },
+        {
+          "at": "2026-10-10T13:43:29.761Z",
+          "event": "runtime_feature_manifest"
+        }
+      ],
+      "startupFailureEvents": 0,
+      "shutdownFailureEvents": 0,
+      "resourceCheck": {
+        "event": "restart_resource_check",
+        "at": "2026-10-10T13:45:12.351Z",
+        "oldReadinessPidPresent": false
+      }
+    },
+    "failedRelease": {
+      "deploymentId": "d8370b52-0589-4de8-bbce-cc187447df0d",
+      "code": "P1002",
+      "cause": "owned disconnected rehearsal held Prisma migration advisory lock",
+      "resolution": "correlated idle migration session terminated; owned schema cleaned; retry passed",
+      "gatesBypassed": false
+    }
+  },
+  "managerBootstrap": {
+    "rehearsal": {
+      "event": "hosted_operator_bootstrap_rehearsal",
+      "at": "2026-10-10T13:45:41.938Z",
+      "execution": "Railway-deployed-container",
+      "deploymentId": "2d9d1f7b-0007-48ac-8085-392a4c181a86",
+      "revision": null,
+      "schema": "rv_hosted_bootstrap_bc8b005989b24b9c95d1f56ed908204a",
+      "firstExitCode": 0,
+      "repeatExitCode": 1,
+      "accounts": 1,
+      "managers": 1,
+      "credentials": 1,
+      "audits": 1,
+      "requestId": "a1178911-fc41-41ba-8606-d995ce1c97db",
+      "accountId": "55c98ffa-f93b-4fba-bc5e-b3c5565e72a3",
+      "target": "c2f275b34bca2a5a1219d95706e6935e42828f8c7cc59652b40d978825fa8e9e",
+      "auditMetadata": {
+        "environment": "production",
+        "operatorReference": "codex-rv-2026-10-10"
+      },
+      "tlsEncrypted": true,
+      "tlsAuthorized": true,
+      "secretLeakDetected": false,
+      "publicSchemaMutated": false
+    },
+    "cleanup": {
+      "event": "owned_rehearsal_schema_removed",
+      "schema": "rv_hosted_bootstrap_bc8b005989b24b9c95d1f56ed908204a"
+    },
+    "finalOwnedSchemaCount": 0,
+    "finalPublicManagerCount": 0
+  },
+  "cleanup": {
+    "ephemeralRailwaySshKeyRevoked": true,
+    "disposablePostgresqlStopped": true,
+    "finalMigrationAdvisoryLocks": 0,
+    "localPrivateArtifactDeletion": "blocked by automatic approval review; private files retained under ignored tooling or outside checkout",
+    "deletionRejectionReason": "blocked by policy"
+  }
+}

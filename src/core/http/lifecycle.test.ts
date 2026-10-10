@@ -15,6 +15,7 @@ import { createInvitationStudioRuntime } from '../../modules/invitation-studio/i
 import request from 'supertest';
 import { createPaymentsBillingRuntime } from '../../modules/payments-billing/payments-billing.runtime.js';
 import { createLogger } from '../logging/logger.js';
+import { createDatabaseReadiness } from '../database/database-readiness.js';
 import {
   createHttpLifecycle,
   createReadinessState,
@@ -32,6 +33,14 @@ vi.mock('../../modules/identity-access/identity.runtime.js', async () => {
     })),
   };
 });
+
+vi.mock('../database/database-readiness.js', () => ({
+  DATABASE_READINESS_TIMEOUT_MS: 5_000,
+  createDatabaseReadiness: vi.fn(() => ({
+    probe: vi.fn().mockResolvedValue(undefined),
+    resource: { name: 'database-readiness', close: vi.fn() },
+  })),
+}));
 
 vi.mock('../../modules/payments-billing/payments-billing.runtime.js', async () => {
   const { Router } = await import('express');
@@ -210,6 +219,19 @@ describe('HTTP lifecycle', () => {
 });
 
 describe('server startup and process signals', () => {
+  it('closes supplied resources if application construction fails before listening', async () => {
+    const close = vi.fn().mockResolvedValue(undefined);
+    await expect(
+      startServer({
+        port: 0,
+        resources: [{ name: 'database-readiness', close }],
+        createApplication: () => {
+          throw new Error('route registration failed');
+        },
+      }),
+    ).rejects.toThrow('route registration failed');
+    expect(close).toHaveBeenCalledOnce();
+  });
   it('listens, becomes ready, and removes signal listeners during clean shutdown', async () => {
     const signalTarget = new TestSignalTarget();
     const closeResource = vi.fn();
@@ -322,6 +344,28 @@ describe('server startup and process signals', () => {
       .value as ReturnType<typeof createInvitationStudioRuntime>);
     await running.shutdown();
     expect(vi.mocked(runtime.resource).close.mock.calls).toHaveLength(1);
+  });
+
+  it('wires deployed database readiness, keeps liveness independent, and releases the probe', async () => {
+    const config = parseEnvironment({
+      DATABASE_URL: 'postgresql://local:test@localhost/test',
+      LOG_LEVEL: 'silent',
+    });
+    const running = await bootstrap({
+      loadConfig: () => Promise.resolve({ ...config, runtime: { ...config.runtime, port: 0 } }),
+    });
+    runningServers.push(running);
+    const database = vi.mocked(createDatabaseReadiness).mock.results.at(-1)!.value as ReturnType<
+      typeof createDatabaseReadiness
+    >;
+    expect(createDatabaseReadiness).toHaveBeenCalledWith(config.database.url);
+    expect((await request(running.app).get('/health/ready')).status).toBe(200);
+    vi.mocked(database.probe).mockRejectedValueOnce(new Error('database outage'));
+    expect((await request(running.app).get('/health/ready')).status).toBe(503);
+    expect((await request(running.app).get('/health/live')).status).toBe(200);
+    expect((await request(running.app).get('/health/ready')).status).toBe(200);
+    await running.shutdown();
+    expect(vi.mocked(database.resource).close.mock.calls).toHaveLength(1);
   });
 
   it('closes earlier owner resources when invitation composition fails', async () => {
