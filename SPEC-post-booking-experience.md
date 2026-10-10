@@ -1,5 +1,7 @@
 # Post-SPEC-03 Product Experience
 
+> Current amendment: [confirmed backend scope](./docs/backend-scope-2026-10-10.md) and [commercial extensions](./SPEC-commercial-contracts.md). Completed implementation evidence below is historical; new names/catalog/contract/invoice rules are separate backend extension tasks. The 2026-10-10 amendment governs conflicts with older access, pricing and client requirements.
+
 Status: Scope and implementation authorized by the project owner on 2026-10-08.
 Sequence: after completed SPEC-03; notifications stay entirely in SPEC-09.
 Baseline: WEDDING-CONTRACT-1@1.1.0; additive APIs only.
@@ -57,6 +59,15 @@ Android: existing home and planning plus account settings, using the existing na
 4. Affected repository lint/typecheck/test/build/API checks, browser desktop/mobile
    inspection, Android export, retention verification, and evidence/checklist update.
 
-Follow the approved wedding-design-system and preserve existing completed module history.
+Frontend design is owned by the frontend team. Preserve existing completed module history.
 Use the normal serialized migration and OpenAPI publication lane. The owner's current
 request authorizes these bounded waves without a second scope confirmation.
+
+## 2026-10-10 Backend Extension
+
+Intake/conversion must preserve separate nullable brideName/groomName and require both by contract approval. Prospect overview can expose commercial selections/contracts; existing frontend remains intact. The removed design skill is no longer a requirement; new client design belongs to the frontend team.
+
+Authority and validation: [commercial specification](./SPEC-commercial-contracts.md),
+[confirmed scope](./docs/backend-scope-2026-10-10.md) and
+[active backend tasks](./tasks/backend-revision-todo.md). These requirements do not
+claim that the pending extension is already mounted in the generated API.

@@ -1,7 +1,7 @@
 import type { BookingPhase } from './booking-policy.js';
 
 export type HeadcountEvidence = Readonly<{
-  sourceRsvpRevisionId: string;
+  sourceGuestPlanRevisionId: string;
   sourceSequence: number;
   expectedAttendees: number;
 }>;
@@ -35,7 +35,7 @@ export function applyHeadcountEvidence(
     return Object.freeze({ outcome: 'IGNORED_STALE', evidence: current });
   }
   if (
-    next.sourceRsvpRevisionId === current.sourceRsvpRevisionId &&
+    next.sourceGuestPlanRevisionId === current.sourceGuestPlanRevisionId &&
     next.expectedAttendees === current.expectedAttendees
   ) {
     return Object.freeze({ outcome: 'REPLAYED', evidence: current });

@@ -1,9 +1,11 @@
 # Specification: Release Demo
 
+> Current execution scope: backend release verification and API hand-off only, under the [2026-10-10 amendment](./docs/backend-scope-2026-10-10.md). Web/Android builds, client screenshots and client deployment belong to the frontend team; full product release remains a separate joint gate.
+
 - Status: **Approved specification — module plan and implementation acceptance pending**
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
 - Module ID: `release-demo` (`SPEC-11`)
-- Contract baseline: `WEDDING-CONTRACT-1@1.1.0`
+- Contract baseline: `WEDDING-CONTRACT-2@2.0.0`
 - Inherited baseline: `WEDDING-CONTRACT-1@1.0.0` (historical contract)
 - Accepted amendment: baseline Section 21
 - Initial owner role: Unassigned (next allocation round)
@@ -31,9 +33,10 @@ A release candidate records:
 - named owner, timestamp, result, and redacted evidence for each acceptance scenario.
 
 The end-to-end journey must demonstrate consultation invitation, restricted timeline
-collaboration, mutual approval, proven deposit/access promotion, media/invitation,
-households/RSVP, seating invalidation/reconfirmation, print quote/charge, staff
-multi-arrival check-in, notifications, and analytics. The generic QR must remain
+collaboration, full menu/print/service contract and dual approval, proven 30%-total deposit/access promotion, media/invitation,
+households/planned headcount, seating invalidation/reconfirmation, print quote/charge, staff
+multi-arrival check-in, approved appendices, incidental expenses and locked final invoice,
+notifications, and analytics. The generic QR must remain
 non-personalized and non-authorizing throughout.
 
 ## 3. Deployment, verification, and rollback
@@ -94,13 +97,13 @@ invent cross-module SQL mutations.
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | Restricted consultation         | One invitation/account/access; restricted Web timeline works; media/guest/seating/print denied.                                |
 | Timeline/deposit                | Current mutual approval, stale revision rejected, verified sandbox/manual deposit confirms and promotes same identity.         |
-| Private media/public invitation | Original private, approved derived asset public, one generic QR without household/RSVP/check-in scope.                         |
-| Guests/headcount                | Default/custom stable groups, import/RSVP, higher then lower plan sequence; no headcount rollback.                             |
+| Private media/public invitation | Original private, approved derived asset public, one generic QR without household/attendance-write/check-in scope.             |
+| Guests/headcount                | Default/custom stable groups, import/manager-or-couple count edits, higher then lower plan sequence; no headcount rollback.    |
 | Seating/print                   | Inclusive capacity, exception audit, invalidation blocks new print, exact printable/quote/charge snapshot, no recipient names. |
 | Attendance                      | Duplicate names disambiguated, separate arrivals accumulate, over-expected succeeds, correction history preserved.             |
-| Notifications                   | Real outbox, duplicate dedup, deadline revision/cancel behavior, credential-safe delivery, completion through booking port.    |
+| Notifications                   | Real outbox, duplicate dedup, reminder revision/cancel behavior, credential-safe delivery, completion through booking port.    |
 | Analytics                       | Known expected/actual, payments/refunds/credit, quotes excluded, historical hall/menu facts and source freshness.              |
-| Cross-client                    | Couple Web/App and Manager/Staff Web use the same implemented API digest and backend denial semantics.                         |
+| Frontend hand-off               | Publish exact API digest, DTOs/errors and denial examples; frontend verifies its clients separately.                           |
 | Recovery                        | Migration upgrade, health check, rollback-compatible deployment/restore drill with privacy controls.                           |
 
 Use fake provider journeys in routine CI; final sandbox/staging journey explicitly records
@@ -123,15 +126,15 @@ reopen writes. Never edit applied migrations or blindly replay payment callbacks
 intents. Database restoration requires controlled downtime, privacy tombstone replay and
 dedup evidence reconciliation before reopening.
 
-| Slice                                                  | Can overlap                                          | Hard prerequisite                                                              |
-| ------------------------------------------------------ | ---------------------------------------------------- | ------------------------------------------------------------------------------ |
-| Deployment config validators/checklists/manifest tools | All module isolated implementation                   | Stable platform/auth contract.                                                 |
-| Seed scenario adapters and CI fake journey             | Each source module becomes PROVIDER_READY            | No seed overwrite/direct cross-module repository bypass.                       |
-| Staging migration and actual end-to-end seed           | Limited deployment checks may run per ready provider | Accepted migration sequence and real provider wiring.                          |
-| Complete Android/demo release/go-live                  | Runs last                                            | Accepted 03–10, actual cookies/health/recovery, approved artifact/environment. |
+| Slice                                                  | Can overlap                                          | Hard prerequisite                                                                     |
+| ------------------------------------------------------ | ---------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Deployment config validators/checklists/manifest tools | All module isolated implementation                   | Stable platform/auth contract.                                                        |
+| Seed scenario adapters and CI fake journey             | Each source module becomes PROVIDER_READY            | No seed overwrite/direct cross-module repository bypass.                              |
+| Staging migration and actual end-to-end seed           | Limited deployment checks may run per ready provider | Accepted migration sequence and real provider wiring.                                 |
+| Backend release hand-off                               | Runs after backend integration                       | Accepted backend 03–10/extensions; exact API, migration and health/recovery evidence. |
 
 Proposed waves: deployment/auth/config validation; deterministic seed/journey;
-staging migration/monitoring; Android artifact/cross-client checks; recovery/evidence/
+staging migration/monitoring; backend API/manifest and frontend hand-off; recovery/evidence/
 owner go-no-go (five). Independent scaffolding does not declare an unfinished provider
 accepted. SPEC/plan approval order remains after approved 09/10 contracts; release
 execution waits accepted implementations.
@@ -143,3 +146,13 @@ redacted output location, and responsible owner. Quality gates are the exact exi
 scripts in the team/cross-repository guides; include browser runtime evidence for
 deployed cookies/refresh/CORS and Android install/session restoration. A skipped check
 is marked incomplete, with the dependent release step blocked.
+
+## 9. Separate Backend and Product Release Gates
+
+Backend acceptance runs backend tests/migrations/real API scenarios only. Preserve
+client/Web/Android requirements above as the joint frontend product-release checklist,
+not tasks assigned to this backend team. The manifest records backendStatus and
+frontendIntegrationStatus separately. A pending frontend cannot make a tested API
+fail backend acceptance, and backend acceptance cannot imply completed Android/Web
+release. Extend deterministic backend fixtures with services, several menu combos,
+30% whole-contract deposit, appendix delta and zero/nonzero-expense final invoices.

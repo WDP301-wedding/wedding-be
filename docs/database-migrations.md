@@ -1,6 +1,12 @@
 # Database migrations
 
 `wedding-be` is the only repository allowed to change the PostgreSQL schema.
+The 2026-10-10 guest-plan terminology change renames the Prisma/application property
+to `sourceGuestPlanRevisionId` and explicitly maps it to the existing physical
+column/unique constraint. This is a code-only rename with no data rewrite or DDL.
+Historical applied SQL and persisted event/audit payloads retain their original
+field spelling; new headcount metadata uses the guest-plan spelling. Any future
+event consumer must use the approved guest-plan contract, not parse old audit rows.
 Prisma migration files in `prisma/migrations/` are immutable after they have been
 shared or applied outside a developer's disposable database.
 

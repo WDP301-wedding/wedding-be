@@ -1,5 +1,7 @@
 # Spec: `core-platform`
 
+> Current amendment: [confirmed backend scope](./docs/backend-scope-2026-10-10.md) and [commercial extensions](./SPEC-commercial-contracts.md). Completed implementation evidence below is historical; new names/catalog/contract/invoice rules are separate backend extension tasks. The 2026-10-10 amendment governs conflicts with older access, pricing and client requirements.
+
 Status: Approved by project owner on 2026-09-24  
 Capability: `core-platform`  
 Capability Map: [`CAPABILITY-MAP.md`](./CAPABILITY-MAP.md)  
@@ -13,7 +15,7 @@ Establish the shared technical foundation for the single-restaurant wedding mana
 | Repository | Runtime responsibility |
 |---|---|
 | `wedding-be` | Express REST API, all authoritative business rules, PostgreSQL access, integrations, audit records, and API contract generation |
-| `wedding-web` | Next.js public website, Guest invitation/RSVP flows, and Couple Web flows |
+| `wedding-web` | Next.js public website, read-only Guest invitation views, and Couple Web flows |
 | `wedding-manage-web` | Next.js Manager and Staff administration flows |
 | `wedding-app` | Expo/React Native Android app for Couple workflows |
 
@@ -56,7 +58,7 @@ These assumptions are part of this draft and should be corrected before approval
 ### 3.2 Explicitly out of scope
 
 - Accounts, JWT issuance, refresh rotation, password hashing, RBAC policy, and account activation; these belong to `identity-access`.
-- Restaurant, hall, shift, menu, booking, payment, invitation, RSVP, seating, staff, notification, and dashboard business behavior.
+- Restaurant, hall, shift, menu, booking, payment, invitation, guest planning, seating, staff, notification, and dashboard business behavior.
 - VNPay routes or callbacks.
 - Email templates and scheduled email/push workflows.
 - AI prompt design, invitation editing, or selection of a fixed Gemini model identifier; those belong to `invitation-studio`.
@@ -753,3 +755,13 @@ These inputs do not change the architecture and may remain placeholders during l
 - OpenAPI 3.1 specification: https://spec.openapis.org/oas/v3.1.0
 - Zod 4/OpenAPI generator: https://www.npmjs.com/package/zod-openapi
 - Resend idempotency behavior: https://resend.com/changelog/idempotency-keys
+
+
+## 2026-10-10 Backend Extension
+
+Preserve the completed Core stack, audit/idempotency/UoW rules and applied migrations. Future modules use guest-plan vocabulary and publish backend contracts independently of frontend UI/build gates. Catalog/profile/contract/invoice migrations remain serialized forward changes.
+
+Authority and validation: [commercial specification](./SPEC-commercial-contracts.md),
+[confirmed scope](./docs/backend-scope-2026-10-10.md) and
+[active backend tasks](./tasks/backend-revision-todo.md). These requirements do not
+claim that the pending extension is already mounted in the generated API.

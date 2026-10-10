@@ -450,7 +450,7 @@ describeWithDatabase('booking runtime with real identity, venue, and PostgreSQL'
         await booking!.providers.headcount.synchronize(
           {
             bookingId: result.bookingId,
-            sourceRsvpRevisionId: randomUUID(),
+            sourceGuestPlanRevisionId: randomUUID(),
             sourceSequence: 1,
             expectedAttendees: 120,
           },

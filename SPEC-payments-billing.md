@@ -1,5 +1,7 @@
 # Specification: Payments and Billing
 
+> Current amendment: [confirmed backend scope](./docs/backend-scope-2026-10-10.md) and [commercial extensions](./SPEC-commercial-contracts.md). Completed implementation evidence below is historical; new names/catalog/contract/invoice rules are separate backend extension tasks. The 2026-10-10 amendment governs conflicts with older access, pricing and client requirements.
+
 - Status: **ACCEPTED by the project owner (2026-10-09) — Android native runtime verification remains open**
 - Module plan: approved 2026-10-08; [`tasks/plan.md` Section 21](./tasks/plan.md#21-spec-04-payments-billing-bounded-implementation-plan)
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
@@ -276,3 +278,12 @@ Expiry is not failure evidence. ReturnURL remains display-only.
 Source: [official querydr documentation](https://sandbox.vnpayment.vn/apis/docs/truy-van-hoan-tien/querydr%26refund.html).
 The transport uses a fixed sandbox URL, bounded response and timeout. Controlled
 tests verify request/response checksum order independently and never call VNPay.
+
+## 2026-10-10 Backend Extension
+
+Extend PRN-006/CTR-007 and FIN-001–006: register contract obligations/appendix deltas once, preserve contracted print linkage, support post-event Manager incidental drafts, immutable final invoice/adjustments and net-paid/credit accounting. Use BE-10/12–16. Existing BASE/PRINT settlements are preserved, never charged twice.
+
+Authority and validation: [commercial specification](./SPEC-commercial-contracts.md),
+[confirmed scope](./docs/backend-scope-2026-10-10.md) and
+[active backend tasks](./tasks/backend-revision-todo.md). These requirements do not
+claim that the pending extension is already mounted in the generated API.

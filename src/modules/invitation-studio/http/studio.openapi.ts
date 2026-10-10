@@ -178,7 +178,7 @@ export const invitationStudioOpenApiPaths = {
   '/public/invitations/{slug}': {
     get: operation(
       'getPublicInvitation',
-      'Minimal explicitly published invitation; no RSVP authority',
+      'Minimal explicitly published invitation; read-only public content',
       s.publicResponse,
       ['slug'],
       undefined,

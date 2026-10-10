@@ -3,12 +3,14 @@
 ## 1. Document Status
 
 - Status: **Locked and accepted**
-- Baseline identifier: `WEDDING-CONTRACT-1`
-- Baseline version: `1.1.0`
-- Previous accepted version: `1.0.0` (historical approval retained)
-- Prepared: 2026-10-06
-- Approved and locked: 2026-10-06
-- Amendment approval: project owner approved SPEC-03 through SPEC-11 and Section 21
+- Active specification identifier: `WEDDING-CONTRACT-2`
+- Active specification version: `2.0.0`
+- Scope confirmed: 2026-10-10; Section 22 governs the confirmed revision.
+- Implemented compatibility baseline: `WEDDING-CONTRACT-1@1.1.0` until each new extension is verified and published.
+- Previous accepted versions: `1.1.0`, `1.0.0` (historical approval retained)
+- Previous 1.x baseline prepared and locked: 2026-10-06
+- Current 2.0.0 business scope confirmed: 2026-10-10 (Section 22)
+- Previous amendment approval: project owner approved SPEC-03 through SPEC-11 and Section 21
   on 2026-10-06; module implementation plans and acceptance remain separate gates.
 - Capability index: [`CAPABILITY-MAP.md`](./CAPABILITY-MAP.md)
 - Product requirements: [`PRODUCT-REQUIREMENTS.md`](./PRODUCT-REQUIREMENTS.md)
@@ -16,7 +18,15 @@
 - Governance rationale:
   [`ADR-002`](./docs/decisions/0002-freeze-program-contracts-before-parallel-specification.md)
 
-This document is the accepted cross-module contract freeze for `SPEC-03` through
+Current authority is [Section 22](#22-confirmed-backend-scope--2026-10-10) and the
+[confirmed amendment](./docs/backend-scope-2026-10-10.md). Older Sections 2–21 are
+compatibility/approval history where they conflict with the new scope: guest response
+behavior is removed, contract approval/whole-contract deposit replaces menu-only
+eligibility, and backend acceptance is separated from frontend implementation.
+The major identifier reflects changed domain/provider meanings, not an already
+published API deployment. Do not claim generated routes implement the revision.
+
+The following records the previous cross-module contract freeze for `SPEC-03` through
 `SPEC-11`. Version `1.1.0` includes the accepted implementation hand-offs in Section 21;
 Sections 2–20 retain the inherited 1.0.0 contract and historical approval evidence;
 the accepted Section 21 governs the active version and additive hand-off changes.
@@ -1780,3 +1790,37 @@ baseline version, notification-dispatch readiness or consumer integration accept
 
 Formal hand-off retains exact reviewed provider commit/artifact/digest, conforming
 consumer pins and actual Seating confirm/invalidate/UoW rollback/race evidence.
+
+## 22. Confirmed Backend Scope — 2026-10-10
+
+The owner confirmed the seven interview decisions and full scope with “đúng với ý tôi r”.
+Authoritative requirements are in [the confirmed amendment](./docs/backend-scope-2026-10-10.md),
+[PRODUCT-REQUIREMENTS.md](./PRODUCT-REQUIREMENTS.md),
+[SPEC-commercial-contracts.md](./SPEC-commercial-contracts.md) and
+[SPEC-guest-management.md](./SPEC-guest-management.md).
+
+- `guest-management` explicitly replaces the former guest-response module ID;
+  guests only read invitations. Planned headcount derives from active household
+  expectations entered by Couple/Manager; Staff actual arrivals remain separate.
+- Venue supplies versioned service and commercial print offerings; Booking owns
+  distinct couple names, multi-menu/itemized contracts, exact dual approvals/PDF
+  and post-deposit mutual appendices. Historical agreed prices remain fixed.
+- Deposit is ceil(30% of total approved menu/print/service contract), pinned to the
+  current approved commercial and timeline revisions under existing payment locks.
+- Payments posts each source once, prevents duplicate contracted print charges,
+  supports post-event Manager incidental drafts, locked final invoices and audited
+  corrections. Final balance uses settled money net of refunds and exposes credit.
+- SPEC-01–04 completed and SPEC-05 backend completed per owner; additions are new
+  tasks, not erased/reopened acceptance history. No new database migration or API
+  provider is implied by business-scope confirmation.
+- From SPEC-06 all execution/acceptance tasks are backend-only. Frontend source
+  remains intact; its team handles redesign and integration independently.
+- [Active tasks](./tasks/backend-revision-todo.md) supersede old response/deadline
+  and mixed backend/frontend outlines. Provider readiness, serialized migrations,
+  real conformance, audit, privacy and financial idempotency remain required.
+
+Renaming/removing response contracts and extending deposit/commercial providers is
+a major specification revision. Publish actual transport changes only after schemas,
+runtime, consumer conformance, migration and exact OpenAPI evidence exist. Preserve
+legacy verified payments/print obligations and old source facts; never fake conversion,
+reapproval or settlement when transitioning an existing booking.

@@ -1,15 +1,17 @@
 # Specification: Analytics Dashboard
 
-- Status: **Approved specification — module plan and implementation acceptance pending**
+> Current scope (confirmed 2026-10-10): [backend amendment](./docs/backend-scope-2026-10-10.md) and [active tasks](./tasks/backend-revision-todo.md). SPEC-06 onward has backend acceptance only; client implementation and visual/native checks belong to the frontend team. Earlier conflicting outlines are superseded.
+
+- Status: **Business scope confirmed 2026-10-10 — backend implementation pending**
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
 - Module ID: `analytics-dashboard` (`SPEC-10`)
-- Contract baseline: `WEDDING-CONTRACT-1@1.1.0`
+- Contract baseline: `WEDDING-CONTRACT-2@2.0.0`
 - Inherited baseline: `WEDDING-CONTRACT-1@1.0.0` (historical contract)
-- Accepted amendment: baseline Section 21
+- Accepted amendment: baseline Section 22 (2026-10-10); previous Section 21 retained as history
 - Initial owner role: Unassigned (next allocation round)
 - Team execution contract: [`docs/team-implementation.md`](./docs/team-implementation.md)
 - Requirement ownership: OPS-003 and OPS-004
-- Depends on: `venue-catalog`, `booking-lifecycle`, `payments-billing`, `invitation-studio`, `guest-rsvp`, `seating-plan`, `staff-operations`
+- Depends on: `venue-catalog`, `booking-lifecycle`, `payments-billing`, `invitation-studio`, `guest-management`, `seating-plan`, `staff-operations`
 - Consumers: Management Web
 
 ## 1. Purpose and read-only boundary
@@ -57,7 +59,7 @@ row content. Dashboard cache keys must include Manager scope and query filters.
 Acceptance proves each OPS-003/004 metric against known ledger/snapshot fixtures,
 historical catalog changes, duplicate/out-of-order source events, source rebuild,
 time-zone boundaries, Manager denial, PII minimization, and parity between API and
-Management Web presentation. It completes only after real staff-attendance source data
+Backend API and frontend hand-off. It completes only after real staff-attendance source data
 exists.
 
 ## 5. Exact KPI definitions and source hand-off
@@ -82,8 +84,8 @@ active availability for each historical date/shift. The accepted
 current catalog names/active flags are not a substitute. If that source is unavailable,
 return metric status `SOURCE_NOT_READY`, not a fabricated zero or current-state ratio.
 
-Expected invited counts and RSVP planning contributions are displayed separately so a
-declined invitation contributes zero to planning while its original household expectation
+Expected counts from active households and Staff actual arrivals are compared so a
+archived household contributes zero to planning while its original expectation
 remains auditable. Actual attendance uses Staff's historical first-arrival group snapshot;
 a later guest-group change is flagged and does not rewrite actual group history.
 Household drill-down uses opaque household ID and approved display label only when
@@ -155,10 +157,22 @@ is emitted into spreadsheet cells without safe escaping.
 Proposed waves: formulas/source contracts; projection/checkpoint/rebuild;
 Manager API/OpenAPI; dashboard/export presentation; acceptance (five).
 
-OPS-003 tests cover decline/pending/accepted planning, two arrivals/correction, group
+OPS-003 tests cover active/archived household planning, two arrivals/correction, group
 rename/change history, and household totals. OPS-004 tests include quoted amount excluded,
 accepted print charge, cancellation credit, replacement charge, and fulfillment state.
 Source tests include midnight boundaries, same record newer sequence then older,
 duplicate refresh, paged fence concurrency, source failure, and atomic rebuild switch.
 Revenue/receivable examples are checked against the payment SPEC's ledger fixtures,
 not an independent dashboard calculation of billing obligations.
+
+## 10. Commercial and Final-Invoice Reporting
+
+Read contract/appendix/expense/final-invoice facts through Booking/Billing ports.
+Report agreed contract amounts, approved appendix deltas and incidental totals
+separately, with final receivable, net settled/refunded amount, outstanding and credit.
+Service popularity uses immutable contracted service versions/quantities. No draft
+expense or unapproved appendix counts as receivable. Do not count contract-included
+print charges twice. Guest reports use active planned counts versus actual arrivals;
+no guest-response status, conversion, deadline or response-rate metric exists.
+Backend acceptance uses real-source projection/query evidence and DTO/OpenAPI hand-off;
+frontend dashboard implementation is a separate frontend deliverable.

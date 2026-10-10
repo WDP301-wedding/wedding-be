@@ -483,14 +483,14 @@ model BookingCancellationRequest {
 }
 
 model BookingHeadcountEvidence {
-  bookingId            String   @id @db.Uuid
-  sourceRsvpRevisionId String   @db.Uuid
-  sourceSequence       Int
-  expectedAttendees    Int
-  appliedAt            DateTime @db.Timestamptz(6)
-  booking              Booking  @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  bookingId                 String   @id @db.Uuid
+  sourceGuestPlanRevisionId String   @map("sourceRsvpRevisionId") @db.Uuid
+  sourceSequence            Int
+  expectedAttendees         Int
+  appliedAt                 DateTime @db.Timestamptz(6)
+  booking                   Booking  @relation(fields: [bookingId], references: [id], onDelete: Restrict)
 
-  @@unique([sourceRsvpRevisionId])
+  @@unique([sourceGuestPlanRevisionId], map: "BookingHeadcountEvidence_sourceRsvpRevisionId_key")
   @@index([sourceSequence])
 }
 

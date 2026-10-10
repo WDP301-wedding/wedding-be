@@ -2,7 +2,10 @@
 
 ## 1. Document Status
 
-- Status: Approved by project owner on 2026-09-26
+- Status: Approved 2026-09-26; scope amendment confirmed 2026-10-10
+- Current scope: [confirmed backend revision](./docs/backend-scope-2026-10-10.md)
+- Specification baseline: `WEDDING-CONTRACT-2@2.0.0`
+- SPEC-01–04 completed; SPEC-05 backend completed. New commercial/profile requirements are extensions.
 - Capability index: `CAPABILITY-MAP.md`
 - Platform baseline: `SPEC-core-platform.md`
 - Decision rationale: `docs/decisions/0001-model-revised-wedding-operations-with-existing-capabilities.md`
@@ -15,7 +18,8 @@ Provide one continuous, auditable workflow in which a prospective couple collabo
 
 The product succeeds when:
 
-- the restaurant and couple approve the same timeline revision before deposit;
+- the restaurant and couple approve the same commercial contract and applicable timeline before deposit;
+- contracts freeze all selected menu, print and service lines; final invoices add audited incidental expenses;
 - a successful deposit promotes the existing workspace without duplicating identity or consultation data;
 - wedding photos remain private and unavailable before deposit;
 - seating communicates guest areas without assigning individual guests to exact tables or seats;
@@ -48,7 +52,9 @@ Prospective Couple accepts restricted workspace invitation
         |
 Restaurant proposes timeline <-> Couple edits and reviews revisions
         |
-Both parties approve the same timeline revision
+Select menu combos/table quantities, print template/type/quantity and add-on services
+        |
+Both parties approve the same timeline and itemized commercial contract
         |
 Deposit becomes eligible
         |
@@ -57,6 +63,8 @@ Successful deposit promotes existing identity to full Couple access
 Media, invitations, guest list, seating, and print ordering become available
         |
 Restaurant staff perform name-based, multi-arrival check-in on event day
+        |
+Manager adds incidental expenses and finalizes the invoice; Couple pays the remaining balance
 ```
 
 Editing an approved timeline creates a new revision and invalidates approval only for the new revision. Before deposit, payment eligibility follows the newest mutually approved revision. After deposit, the previously approved timeline remains effective until a replacement revision completes the change-approval workflow.
@@ -67,8 +75,8 @@ Editing an approved timeline creates a new revision and invalidates approval onl
 
 - **ACC-001:** A restaurant Manager can create a consultation and request a restricted Web-workspace invitation for the prospective couple.
 - **ACC-002:** The invitation is an expiring bootstrap credential. Accepting it establishes an authenticated session; the raw invitation token is not used as a permanent bearer credential.
-- **ACC-003:** Before deposit, the prospective couple can access only proposal information and the timeline collaboration actions authorized by the consultation.
-- **ACC-004:** Before deposit, the prospective couple cannot access wedding-media upload, invitation editing or delivery, guest management, seating, print ordering, or event operations.
+- **ACC-003:** Before deposit, authorized prospects can access proposal/timeline collaboration, couple-name editing, active menu/service/print offerings, commercial selection and exact contract approval/PDF. They cannot access post-deposit design/media/production capabilities.
+- **ACC-004:** Before deposit, the prospective couple cannot access wedding-media upload, invitation editing/delivery, guest management, seating, print production ordering or event operations. Commercial selection of print template/type/quantity is allowed.
 - **ACC-005:** A successful deposit promotes the existing identity and consultation data to full Couple access. The system must not create a duplicate account or require the couple to re-enter the agreed timeline.
 - **ACC-006:** Revoked or expired workspace invitations cannot establish new sessions. Revoking an invitation does not silently delete the consultation or its audit history.
 - **ACC-007:** Authorization is enforced by the backend from current consultation, booking, payment, and account state; hiding a client control is not authorization.
@@ -79,7 +87,7 @@ Editing an approved timeline creates a new revision and invalidates approval onl
 - **TML-002:** A timeline contains ordered items with a start time, title, and optional description. Authorized editors can add, edit, remove, and reorder items while the revision is editable.
 - **TML-003:** Saving a substantive change creates a new immutable revision identity. The system records the author, timestamp, and relationship to the preceding revision.
 - **TML-004:** Restaurant approval and Couple approval each bind to an exact revision. Editing that revision produces a successor without carrying either approval forward.
-- **TML-005:** Deposit is unavailable until the same timeline revision has both active approvals.
+- **TML-005:** Deposit requires both parties' active approvals on the current timeline and the current commercial contract bound to that timeline, complete bride/groom names and valid slot reservation.
 - **TML-006:** The deposit attempt rechecks approval eligibility on the backend so a stale client cannot pay against a superseded revision.
 - **TML-007:** After deposit, the effective timeline is locked. A proposed change creates a replacement revision and follows a restaurant-and-Couple approval workflow while the previous effective revision remains valid.
 - **TML-008:** Timeline approval, withdrawal, supersession, and post-deposit replacement are audited.
@@ -102,7 +110,8 @@ Editing an approved timeline creates a new revision and invalidates approval onl
 - **GST-005:** The couple can add custom groups and select their display colors. Names must be unique within a wedding after normalization, and colors are presentation metadata rather than authorization or identity.
 - **GST-006:** The same guest-group identifier is used by invitation households, seating-plan table labels, staff guidance, and grouped attendance reporting.
 - **GST-007:** A group referenced by a household, confirmed seating plan, or attendance record cannot be destructively removed. Rename or archival behavior must preserve historical meaning.
-- **GST-008:** Personalized electronic invitation links and RSVP may exist independently of the generic physical-invitation QR.
+- **GST-008:** Personalized read-only electronic invitations and delivery are separate from the generic physical-invitation QR. Guest capabilities cannot change planning or actual attendance.
+- **GST-009:** Planned headcount is the sum of expected counts of active households entered by Couple/Manager; guest viewing has no effect. No response status/count/history, response mutation, deadline, reminder or response analytics is implemented.
 
 ### 5.5 Fixed Layout Selection and Table-Level Group Labels
 
@@ -133,7 +142,7 @@ Editing an approved timeline creates a new revision and invalidates approval onl
 - **PRN-003:** The restaurant supplies a unit price, line total, order total, and estimated completion or handover date before Couple approval.
 - **PRN-004:** Couple approval captures an immutable printable revision for every line. The snapshot includes the chosen design, required event information, approved timeline content, selected seating-plan content, and generic public QR applicable at approval time.
 - **PRN-005:** Later edits to the live invitation, timeline, or seating plan do not mutate an approved printable revision. A corrected print run requires a new revision or order action with an explicit cost consequence.
-- **PRN-006:** The accepted print charge is registered with `payments-billing` as part of booking receivables and appears on the relevant billing view or invoice.
+- **PRN-006:** Accepted print amounts appear in Billing exactly once. Fulfillment of contract-included print lines does not create another receivable; price/quantity changes require an approved appendix and once-only delta. Preserve legacy accepted print charges.
 - **PRN-007:** Required print states are `REQUESTED`, `QUOTED`, `APPROVED`, `IN_PRODUCTION`, `READY_FOR_HANDOVER`, `HANDED_OVER`, and `CANCELLED`; module specifications must define authorized transitions and cancellation limits.
 - **PRN-008:** Printed invitations contain no recipient name. Handwritten recipient names remain an offline activity.
 - **PRN-009:** Quotation changes after Couple approval require renewed approval and a new immutable commercial revision.
@@ -142,9 +151,9 @@ Editing an approved timeline creates a new revision and invalidates approval onl
 
 - **QRC-001:** All physical invitation variants for one wedding use one generic wedding QR unless a future approved scope change states otherwise.
 - **QRC-002:** The QR opens a public electronic invitation containing only approved public event content.
-- **QRC-003:** Scanning the generic QR does not identify an invitation household, expose a guest group, perform RSVP on behalf of a guest, or submit event check-in.
+- **QRC-003:** Scanning the generic QR does not identify an invitation household, expose a guest group, change attendance, or submit event check-in.
 - **QRC-004:** The public identifier is an unguessable opaque value but is not treated as proof of guest identity or authorization.
-- **QRC-005:** Personalized direct electronic-invitation links remain a separate `guest-rsvp` capability and must be visually and technically distinguishable from the generic QR destination.
+- **QRC-005:** Personalized direct electronic-invitation links remain a separate `guest-management` capability and must be visually and technically distinguishable from the generic QR destination.
 
 ### 5.9 Notifications and Reporting
 
@@ -153,18 +162,50 @@ Editing an approved timeline creates a new revision and invalidates approval onl
 - **OPS-003:** Reporting can compare expected and actual attendance by invitation household and guest group without inventing per-seat occupancy.
 - **OPS-004:** Print reporting uses accepted commercial totals and current fulfillment state; draft quotations do not count as receivables.
 
-### 5.10 Requirement Ownership
+### 5.10 Separate Couple Names
+
+- **CPL-001:** Consultation/request APIs store brideName and groomName separately; account displayName is not couple identity.
+- **CPL-002:** Both names are required before contract approval. Preserve legacy labels/null names until an authorized actor fills them; never guess by splitting text.
+- **CPL-003:** Contract/PDF names are snapshots; subsequent profile/design edits cannot rewrite agreed identity.
+
+### 5.11 Restaurant Add-On Services
+
+- **SVC-001:** Manager creates, edits, prices and archives restaurant services with name, description, unit and nonnegative integer unitPriceVnd.
+- **SVC-002:** Couple selects positive integer quantities; server calculates line totals and validates active source revisions.
+- **SVC-003:** Contract lines freeze names, units, quantities, versions and prices. Catalog changes cannot reprice agreed services or erase references.
+- **SVC-004:** Minimal print offerings support pre-deposit template/type/quantity selection and Manager-owned prices; content editing/production remains post-deposit.
+
+### 5.12 Commercial Contract and Appendices
+
+- **CTR-001:** Contract supports multiple menu combos/table quantities plus selected print and service lines, venue/date/shift and separate couple names.
+- **CTR-002:** Server owns item totals and contractTotalVnd; immutable revisions contain exact source versions and the clause “Các chi phí phát sinh sẽ được tính sau”.
+- **CTR-003:** Manager and Couple approve the same commercial revision; record actor/time/digest and provide a private PDF. Digital signatures/scanned-signature uploads are outside scope.
+- **CTR-004:** Deposit is ceil(30% of total contract), including menus, print and services, excluding unknown expenses. Recheck exact contract/timeline approvals and payment locks at reservation/settlement.
+- **CTR-005:** Material pre-deposit edits invalidate approvals. Preserve legacy verified commercial/payment evidence and require explicit draft conversion.
+- **CTR-006:** Post-deposit changes use immutable appendices with reasons, predecessor, before/after lines, signed delta and both approvals. Preserve original deposit; delta affects balance.
+- **CTR-007:** Contracted print production cannot charge the same item twice; an approved appendix registers only its once-only monetary delta.
+
+### 5.13 Incidental Expenses and Final Invoices
+
+- **FIN-001:** After event end, Manager manages draft incidental lines with name, unit, positive integer quantity, unit price and server total; Couple/Staff cannot write.
+- **FIN-002:** Manager finalizes without Couple approval, freezes itemized content and atomically posts outstanding receivable sources once.
+- **FIN-003:** Final total = original contract + approved appendix deltas + incidental lines; subtract settled payments net of refunds. Show outstanding and overpayment credit separately.
+- **FIN-004:** Finalized invoices are immutable. Corrections create reasoned, audited debit/credit facts and a new invoice revision; preserve old invoice/ledger.
+- **FIN-005:** Finalization and adjustments serialize with commercial changes and payment intents; reject stale revisions and duplicate sources. No automatic refund.
+- **FIN-006:** Expense entry uses authoritative event end, independent of booking completion's +12h job; zero-expense finalization is supported.
+
+### 5.14 Requirement Ownership
 
 Every requirement has one authoritative provider. A provider may call another module through its published contract, but consumers do not reimplement the rule.
 
 | Provider module            | Requirements owned                                                                                 |
 | -------------------------- | -------------------------------------------------------------------------------------------------- |
 | `identity-access`          | ACC-002 through ACC-007                                                                            |
-| `venue-catalog`            | SEA-001, SEA-002                                                                                   |
-| `booking-lifecycle`        | ACC-001, TML-001 through TML-008                                                                   |
-| `payments-billing`         | PRN-006                                                                                            |
+| `venue-catalog`            | SEA-001, SEA-002; SVC-001 through SVC-004                                                          |
+| `booking-lifecycle`        | ACC-001, TML-001 through TML-008; CPL-001 through CPL-003; CTR-001 through CTR-006                 |
+| `payments-billing`         | PRN-006; CTR-007; FIN-001 through FIN-006                                                          |
 | `invitation-studio`        | MED-001 through MED-006; PRN-001 through PRN-005; PRN-007 through PRN-009; QRC-001 through QRC-004 |
-| `guest-rsvp`               | GST-001 through GST-008; QRC-005                                                                   |
+| `guest-management`         | GST-001 through GST-009; QRC-005                                                                   |
 | `seating-plan`             | SEA-003 through SEA-008                                                                            |
 | `staff-operations`         | CHK-001 through CHK-008                                                                            |
 | `notifications-automation` | OPS-001, OPS-002                                                                                   |
@@ -191,7 +232,7 @@ npm run api:generate
 npm run api:check
 ```
 
-The Expo application additionally requires `npx expo-doctor`. A module plan must use commands that actually exist at implementation time and must add missing platform-required scripts before claiming completion.
+From SPEC-06 onward backend acceptance runs backend commands only. Frontend-owned client checks, typography/browser tests and Expo checks are separate. Full product release still requires a frontend hand-off; preserve existing frontend source.
 
 ## 7. Project Structure and Ownership
 
@@ -215,8 +256,8 @@ Stable API and domain names should use the requirement vocabulary in this docume
 
 Each module specification must map automated tests to the requirement identifiers it owns. Required cross-module scenarios include:
 
-1. A pre-deposit user is allowed to edit timeline content and denied media, guests, seating, and print endpoints.
-2. An edit after one or both timeline approvals produces a new revision and deposit remains unavailable until both parties approve that revision.
+1. A pre-deposit user can edit timeline/contract selections and names, but is denied media, guests, seating, invitation editing/delivery and print production.
+2. Material timeline/contract edits produce new revisions; deposit remains unavailable until both parties approve the exact current timeline and commercial contract.
 3. Deposit eligibility is rechecked transactionally when payment starts.
 4. Successful deposit promotes access without duplicating the user or consultation.
 5. Private media cannot be read by a public invitation or another booking.
@@ -246,7 +287,7 @@ Concurrency tests are required for timeline approvals versus edits, payment elig
 - Allow layout confirmation outside the configured capacity range without Manager approval.
 - Send private wedding media to a third-party processor or printing provider.
 - Add automatic printer/vendor integration, shipment tracking, or a new payment collection step.
-- Change the public QR into a personalized, RSVP, or check-in credential.
+- Change the public QR into a personalized or check-in credential.
 
 ### Never do
 
@@ -262,6 +303,9 @@ Concurrency tests are required for timeline approvals versus edits, payment elig
 ## 11. Acceptance Criteria
 
 This product revision is specified when:
+
+- CPL/SVC/CTR/FIN requirements trace to the [commercial extension](./SPEC-commercial-contracts.md), and backend task/evidence gates are separate from frontend delivery;
+- the complete [confirmed scope](./docs/backend-scope-2026-10-10.md) overrides earlier incompatible access, print charging and deposit rules;
 
 - every functional requirement is allocated to exactly one provider module and any consumers depend in the direction recorded by `CAPABILITY-MAP.md`;
 - affected module specs cite the requirement identifiers they implement;

@@ -11,23 +11,27 @@ describe('post-deposit lifecycle policy', () => {
   it('applies, replays, ignores stale, and rejects conflicting headcount evidence', () => {
     expect(
       applyHeadcountEvidence(null, {
-        sourceRsvpRevisionId: 'r10',
+        sourceGuestPlanRevisionId: 'r10',
         sourceSequence: 10,
         expectedAttendees: 120,
       }),
     ).toMatchObject({ outcome: 'APPLIED' });
-    const current = { sourceRsvpRevisionId: 'r10', sourceSequence: 10, expectedAttendees: 120 };
+    const current = {
+      sourceGuestPlanRevisionId: 'r10',
+      sourceSequence: 10,
+      expectedAttendees: 120,
+    };
     expect(applyHeadcountEvidence(current, current).outcome).toBe('REPLAYED');
     expect(
       applyHeadcountEvidence(current, {
-        sourceRsvpRevisionId: 'r9',
+        sourceGuestPlanRevisionId: 'r9',
         sourceSequence: 9,
         expectedAttendees: 100,
       }).outcome,
     ).toBe('IGNORED_STALE');
     expect(() =>
       applyHeadcountEvidence(current, {
-        sourceRsvpRevisionId: 'other',
+        sourceGuestPlanRevisionId: 'other',
         sourceSequence: 10,
         expectedAttendees: 121,
       }),
