@@ -1,3 +1,6 @@
+import { randomBytes } from 'node:crypto';
+
+import sharp from 'sharp';
 import { describe, expect, it, vi } from 'vitest';
 
 import { ProviderError, ValidationError } from '../../core/errors/app-error.js';
@@ -120,6 +123,77 @@ describe('FakeAiImageProvider', () => {
 });
 
 describe('GeminiAiImageProvider', () => {
+  it('normalizes a real JPEG response to a fully decodable PNG without another provider call', async () => {
+    const jpeg = await sharp({
+      create: { width: 24, height: 32, channels: 3, background: '#eedddd' },
+    })
+      .jpeg()
+      .toBuffer();
+    const { client, generateContentMock } = createClient(() =>
+      Promise.resolve(successResponse(jpeg.toString('base64'), 'image/jpeg')),
+    );
+
+    const result = await createAdapter(client).generate(validCommand());
+
+    expect(result).toMatchObject({ contentType: 'image/png', width: 24, height: 32 });
+    const decoded = await sharp(result.bytes).raw().toBuffer({ resolveWithObject: true });
+    expect(decoded.info).toMatchObject({ width: 24, height: 32 });
+    expect((await sharp(result.bytes).metadata()).format).toBe('png');
+    expect(generateContentMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects a JPEG with truncated compressed pixels even when its headers are readable', async () => {
+    const jpeg = await sharp(randomBytes(128 * 128 * 3), {
+      raw: { width: 128, height: 128, channels: 3 },
+    })
+      .jpeg()
+      .toBuffer();
+    const truncated = jpeg.subarray(0, jpeg.length - 20);
+    expect((await sharp(truncated).metadata()).format).toBe('jpeg');
+    const { client } = createClient(() =>
+      Promise.resolve(successResponse(truncated.toString('base64'), 'image/jpeg')),
+    );
+
+    await expect(createAdapter(client).generate(validCommand())).rejects.toMatchObject({
+      code: 'AI_IMAGE_INVALID_OUTPUT',
+    });
+  });
+
+  it.each([
+    { width: 4097, height: 1 },
+    { width: 1, height: 4097 },
+    { width: 4097, height: 4097 },
+  ])('rejects JPEG dimension/pixel overflow: %j', async (dimensions) => {
+    const jpeg = await sharp({
+      create: { ...dimensions, channels: 3, background: '#eedddd' },
+    })
+      .jpeg()
+      .toBuffer();
+    const { client } = createClient(() =>
+      Promise.resolve(successResponse(jpeg.toString('base64'), 'image/jpeg')),
+    );
+
+    await expect(createAdapter(client).generate(validCommand())).rejects.toBeInstanceOf(
+      AiImageInvalidOutputError,
+    );
+  });
+
+  it('enforces the byte cap again after JPEG expands to PNG', async () => {
+    const jpeg = await sharp(randomBytes(64 * 64 * 3), {
+      raw: { width: 64, height: 64, channels: 3 },
+    })
+      .jpeg({ quality: 40 })
+      .toBuffer();
+    expect((await sharp(jpeg).png().toBuffer()).length).toBeGreaterThan(jpeg.length);
+    const { client } = createClient(() =>
+      Promise.resolve(successResponse(jpeg.toString('base64'), 'image/jpeg')),
+    );
+
+    await expect(
+      createAdapter(client, { maxOutputBytes: jpeg.length }).generate(validCommand()),
+    ).rejects.toBeInstanceOf(AiImageInvalidOutputError);
+  });
+
   it('requests one image with no tools and accepts a validated PNG response', async () => {
     const { client, generateContentMock } = createClient(() => Promise.resolve(successResponse()));
     const provider = createAdapter(client);
@@ -184,7 +258,12 @@ describe('GeminiAiImageProvider', () => {
         ],
       },
     ],
-    ['unsupported MIME', successResponse(pngBase64, 'image/jpeg')],
+    ['unsupported MIME', successResponse(pngBase64, 'image/webp')],
+    ['JPEG MIME-signature mismatch', successResponse(pngBase64, 'image/jpeg')],
+    [
+      'malformed JPEG',
+      successResponse(Buffer.from('invalid jpeg').toString('base64'), 'image/jpeg'),
+    ],
     ['invalid base64', successResponse('not-base64!')],
     ['MIME-signature mismatch', successResponse(Buffer.from('not a png').toString('base64'))],
   ])('rejects %s as untrusted provider output', async (_caseName, response) => {

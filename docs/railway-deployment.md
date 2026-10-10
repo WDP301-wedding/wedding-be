@@ -5,7 +5,10 @@ service `wedding-be`. On 2026-10-10 the owner confirmed this is a developer-only
 test environment and authorized migrations, mutations and recovery rehearsals.
 The Railway environment name is not production acceptance. It uses the existing
 Supabase PostgreSQL database, Supabase Storage bucket, and Brevo configuration.
-AI image generation is disabled.
+Gemini configuration was enabled on 2026-10-11 for an owner-authorized bounded
+provider test. That test reached Google but exposed a JPEG/PNG adapter mismatch;
+the complete generation/Storage/application flow remains unverified. See
+[the Gemini runtime evidence](../tasks/evidence/rv10-gemini-railway-2026-10-11.md).
 
 - API base URL: `https://wedding-be-production-e1dc.up.railway.app/api/v1`
 - Swagger UI: `https://wedding-be-production-e1dc.up.railway.app/docs`
@@ -76,7 +79,10 @@ Brevo, with these deployment-specific settings:
 | `CORS_ALLOWED_ORIGINS`  | Exact HTTPS browser origins; public web first     |
 
 Do not configure `TEST_MIGRATION_DATABASE_URL` in the deployed service. Keep
-the AI and legacy Resend groups blank when using Brevo with AI disabled.
+the legacy Resend group blank when using Brevo. When AI is disabled, also keep
+the Gemini group blank. The bounded Gemini test uses `AI_IMAGE_PROVIDER=gemini`,
+`GEMINI_API_KEY` and `GEMINI_IMAGE_MODEL=gemini-3.1-flash-lite-image`; store the key
+only in Railway's secret variables. Configuration presence is not live acceptance.
 
 Swagger UI's **Try it out** targets this production service and executes real
 requests, including writes. Normal API authentication and role checks still
