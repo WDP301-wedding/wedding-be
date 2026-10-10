@@ -7,11 +7,17 @@ import type { Logger } from 'pino';
 
 import { createApp, type CreateAppOptions } from './app.js';
 import type { Config } from './config/config.js';
+import { createRuntimeFeatureManifest } from './config/runtime-manifest.js';
+import {
+  createDatabaseReadiness,
+  DATABASE_READINESS_TIMEOUT_MS,
+} from './core/database/database-readiness.js';
 import {
   createHttpLifecycle,
   createReadinessState,
   type ReadinessState,
   type ShutdownResource,
+  type HttpLifecycle,
 } from './core/http/lifecycle.js';
 import type { ReadinessProbe } from './core/http/readiness.js';
 import { createLogger } from './core/logging/logger.js';
@@ -67,41 +73,56 @@ export interface BootstrapDependencies {
 
 export async function startServer(options: StartServerOptions): Promise<RunningServer> {
   const readiness = createReadinessState();
-  const app = (options.createApplication ?? createApp)({
-    ...(options.corsConfig === undefined ? {} : { corsConfig: options.corsConfig }),
-    ...(options.enableOpenApiInProduction === undefined
-      ? {}
-      : { enableOpenApiInProduction: options.enableOpenApiInProduction }),
-    readinessProbe: createServerReadinessProbe(readiness, options.readinessProbe),
-    ...(options.readinessTimeoutMs === undefined
-      ? {}
-      : { readinessTimeoutMs: options.readinessTimeoutMs }),
-    ...(options.runtimeEnvironment === undefined
-      ? {}
-      : { runtimeEnvironment: options.runtimeEnvironment }),
-    ...(options.securityConfig === undefined ? {} : { securityConfig: options.securityConfig }),
-    ...(options.logger === undefined ? {} : { logger: options.logger }),
-    ...(options.metricsConfig === undefined ? {} : { metricsConfig: options.metricsConfig }),
-    ...(options.registerRoutes === undefined ? {} : { registerRoutes: options.registerRoutes }),
-    ...(options.trustedProxyHops === undefined
-      ? {}
-      : { trustedProxyHops: options.trustedProxyHops }),
-  });
-  const httpServer = (options.createHttpServer ?? createServer)(app as RequestListener);
-  const lifecycle = createHttpLifecycle({
-    httpServer,
-    readiness,
-    ...(options.resources === undefined ? {} : { resources: options.resources }),
-    ...(options.shutdownTimeoutMs === undefined
-      ? {}
-      : { shutdownTimeoutMs: options.shutdownTimeoutMs }),
-  });
-
+  let app: Express;
+  let httpServer: Server;
+  let lifecycle: HttpLifecycle | undefined;
   try {
+    app = (options.createApplication ?? createApp)({
+      ...(options.corsConfig === undefined ? {} : { corsConfig: options.corsConfig }),
+      ...(options.enableOpenApiInProduction === undefined
+        ? {}
+        : { enableOpenApiInProduction: options.enableOpenApiInProduction }),
+      readinessProbe: createServerReadinessProbe(readiness, options.readinessProbe),
+      ...(options.readinessTimeoutMs === undefined
+        ? {}
+        : { readinessTimeoutMs: options.readinessTimeoutMs }),
+      ...(options.runtimeEnvironment === undefined
+        ? {}
+        : { runtimeEnvironment: options.runtimeEnvironment }),
+      ...(options.securityConfig === undefined ? {} : { securityConfig: options.securityConfig }),
+      ...(options.logger === undefined ? {} : { logger: options.logger }),
+      ...(options.metricsConfig === undefined ? {} : { metricsConfig: options.metricsConfig }),
+      ...(options.registerRoutes === undefined ? {} : { registerRoutes: options.registerRoutes }),
+      ...(options.trustedProxyHops === undefined
+        ? {}
+        : { trustedProxyHops: options.trustedProxyHops }),
+    });
+    httpServer = (options.createHttpServer ?? createServer)(app as RequestListener);
+    lifecycle = createHttpLifecycle({
+      httpServer,
+      readiness,
+      ...(options.resources === undefined ? {} : { resources: options.resources }),
+      ...(options.shutdownTimeoutMs === undefined
+        ? {}
+        : { shutdownTimeoutMs: options.shutdownTimeoutMs }),
+    });
+
     await listen(httpServer, options.port, options.host);
   } catch (startupError: unknown) {
     try {
-      await lifecycle.shutdown();
+      if (lifecycle) await lifecycle.shutdown();
+      else {
+        const results = await Promise.allSettled(
+          (options.resources ?? []).map(async (resource) => resource.close()),
+        );
+        const failures = results
+          .filter((result) => result.status === 'rejected')
+          .map((result) => result.reason as unknown);
+        if (failures.length)
+          throw new AggregateError(failures, 'Startup resource cleanup failed.', {
+            cause: startupError,
+          });
+      }
     } catch (cleanupError: unknown) {
       throw new AggregateError(
         [startupError, cleanupError],
@@ -276,6 +297,13 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
   });
 
   const tracingResource = getActiveTracingResource();
+  logger.info(
+    {
+      event: 'runtime_feature_manifest',
+      manifest: createRuntimeFeatureManifest(config, process.env.RAILWAY_GIT_COMMIT_SHA),
+    },
+    'runtime feature configuration; verification requires separate evidence',
+  );
   const identityRuntime = await createIdentityRuntime(config);
   let venueCatalogRuntime: Awaited<ReturnType<typeof createVenueCatalogRuntime>>;
   try {
@@ -320,15 +348,31 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     throw error;
   }
 
+  let databaseReadiness: ReturnType<typeof createDatabaseReadiness>;
+  try {
+    databaseReadiness = createDatabaseReadiness(config.database.url);
+  } catch (error: unknown) {
+    await Promise.allSettled([
+      identityRuntime.resource.close(),
+      venueCatalogRuntime.resource.close(),
+      bookingLifecycleRuntime.resource.close(),
+      paymentsBillingRuntime.resource.close(),
+      invitationStudioRuntime.resource.close(),
+    ]);
+    throw error;
+  }
   return startServer({
     corsConfig: config.cors,
     enableOpenApiInProduction: config.openApi.enabledInProduction,
     logger,
     metricsConfig: config.metrics,
     port: config.runtime.port,
+    readinessProbe: databaseReadiness.probe,
+    readinessTimeoutMs: DATABASE_READINESS_TIMEOUT_MS,
     resources:
       tracingResource === undefined
         ? [
+            databaseReadiness.resource,
             identityRuntime.resource,
             venueCatalogRuntime.resource,
             bookingLifecycleRuntime.resource,
@@ -336,6 +380,7 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
             paymentsBillingRuntime.resource,
           ]
         : [
+            databaseReadiness.resource,
             tracingResource,
             identityRuntime.resource,
             venueCatalogRuntime.resource,

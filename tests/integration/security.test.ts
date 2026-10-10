@@ -18,6 +18,24 @@ vi.mock('../../src/modules/identity-access/identity.runtime.js', async () => {
   };
 });
 
+vi.mock('../../src/core/database/database-readiness.js', () => ({
+  DATABASE_READINESS_TIMEOUT_MS: 5_000,
+  createDatabaseReadiness: vi.fn(() => ({
+    probe: () => Promise.resolve(),
+    resource: { name: 'database-readiness', close: () => Promise.resolve() },
+  })),
+}));
+
+vi.mock('../../src/modules/invitation-studio/invitation-studio.runtime.js', async () => {
+  const { Router } = await import('express');
+  return {
+    createInvitationStudioRuntime: vi.fn(() => ({
+      router: Router(),
+      resource: { name: 'invitation-studio-database', close: vi.fn() },
+    })),
+  };
+});
+
 vi.mock('../../src/modules/venue-catalog/venue-catalog.runtime.js', async () => {
   const { Router } = await import('express');
 
