@@ -8,6 +8,7 @@ import type {
   DepositEligibility,
 } from '../application/deposit.service.js';
 import { evaluateDepositEligibility } from '../domain/deposit.policy.js';
+import { contractDocumentSchema, documentDigest } from '../domain/commercial-contract.js';
 import { BookingLifecycleNotFoundError } from './consultation.repository.js';
 
 type DepositConflictCode =
@@ -15,6 +16,7 @@ type DepositConflictCode =
   | 'REVISION_SUPERSEDED'
   | 'SLOT_NOT_AVAILABLE'
   | 'BOOKING_NOT_PAYABLE'
+  | 'CONTRACT_APPROVAL_REQUIRED'
   | 'STALE_BOOKING_REVISION'
   | 'DEPOSIT_INTENT_ACTIVE'
   | 'PAYMENT_EVIDENCE_CONFLICT';
@@ -34,6 +36,7 @@ const depositMessages: Readonly<Record<DepositConflictCode, string>> = {
   REVISION_SUPERSEDED: 'The requested timeline revision is no longer current.',
   SLOT_NOT_AVAILABLE: 'The booking slot is not available.',
   BOOKING_NOT_PAYABLE: 'The booking cannot accept a deposit.',
+  CONTRACT_APPROVAL_REQUIRED: 'The current commercial contract is not mutually approved.',
   STALE_BOOKING_REVISION: 'The booking changed after it was loaded.',
   DEPOSIT_INTENT_ACTIVE: 'An unresolved deposit attempt already pins this booking.',
   PAYMENT_EVIDENCE_CONFLICT: 'The payment evidence conflicts with an existing settlement.',
@@ -80,6 +83,8 @@ export function createPrismaBookingDepositRepository(
             if (
               existing.bookingId !== input.bookingId ||
               existing.timelineRevisionId !== input.timelineRevisionId ||
+              existing.contractRevisionId !== (input.contractRevisionId ?? null) ||
+              existing.documentDigest !== (input.documentDigest ?? null) ||
               (reservationAccountId !== null &&
                 existing.coupleAccountId !== reservationAccountId) ||
               decimalNumber(existing.amountVnd) !== input.amountVnd ||
@@ -120,6 +125,11 @@ export function createPrismaBookingDepositRepository(
             throw new BookingDepositConflictError('PAYMENT_EVIDENCE_CONFLICT');
           }
           const expiresAt = new Date(input.expiresAt);
+          if (
+            (eligibility.contractRevisionId ?? null) !== (input.contractRevisionId ?? null) ||
+            (eligibility.documentDigest ?? null) !== (input.documentDigest ?? null)
+          )
+            throw new BookingDepositConflictError('PAYMENT_EVIDENCE_CONFLICT');
           if (!Number.isFinite(expiresAt.getTime()) || expiresAt.getTime() <= now().getTime()) {
             throw new BookingDepositConflictError('BOOKING_NOT_PAYABLE');
           }
@@ -129,6 +139,8 @@ export function createPrismaBookingDepositRepository(
               id: input.paymentAttemptId,
               bookingId: input.bookingId,
               timelineRevisionId: input.timelineRevisionId,
+              contractRevisionId: input.contractRevisionId ?? null,
+              documentDigest: input.documentDigest ?? null,
               amountVnd: input.amountVnd,
               status: 'ACTIVE',
               bookingRevisionReserved: bookingRevision,
@@ -238,6 +250,8 @@ export function createPrismaBookingDepositRepository(
             if (
               existing.bookingId !== input.bookingId ||
               existing.timelineRevisionId !== input.timelineRevisionId ||
+              existing.contractRevisionId !== (input.contractRevisionId ?? null) ||
+              existing.documentDigest !== (input.documentDigest ?? null) ||
               decimalNumber(existing.amountVnd) !== input.amountVnd ||
               existing.settledAt.getTime() !== input.settledAt.getTime()
             ) {
@@ -283,15 +297,32 @@ export function createPrismaBookingDepositRepository(
             booking.phase !== 'AWAITING_DEPOSIT' ||
             booking.currentTimelineRevisionId !== input.timelineRevisionId ||
             intent.timelineRevisionId !== input.timelineRevisionId ||
+            intent.contractRevisionId !== (input.contractRevisionId ?? null) ||
+            intent.documentDigest !== (input.documentDigest ?? null) ||
             decimalNumber(intent.amountVnd) !== input.amountVnd
           ) {
             throw new BookingDepositConflictError('PAYMENT_EVIDENCE_CONFLICT');
           }
+          const eligibility = await readEligibility(
+            transaction,
+            input,
+            now(),
+            intent.coupleAccountId,
+          );
+          if (
+            !eligibility.eligible ||
+            eligibility.depositAmountVnd !== input.amountVnd ||
+            (eligibility.contractRevisionId ?? null) !== intent.contractRevisionId ||
+            (eligibility.documentDigest ?? null) !== intent.documentDigest
+          )
+            throw new BookingDepositConflictError('PAYMENT_EVIDENCE_CONFLICT');
           await transaction.bookingDepositSettlement.create({
             data: {
               paymentId: input.paymentId,
               bookingId: input.bookingId,
               timelineRevisionId: input.timelineRevisionId,
+              contractRevisionId: input.contractRevisionId ?? null,
+              documentDigest: input.documentDigest ?? null,
               amountVnd: input.amountVnd,
               settledAt: input.settledAt,
               promotionStatus: 'PENDING',
@@ -385,6 +416,7 @@ async function readEligibility(
         select: { id: true, managerApprovedAt: true, coupleApprovedAt: true },
       },
       proposalSnapshot: { select: { depositAmountVnd: true } },
+      commercialContract: { include: { currentRevision: { include: { approvals: true } } } },
       slotHolds: {
         where: { status: 'ACTIVE' },
         select: { expiresAt: true, depositIntentPin: true },
@@ -416,7 +448,7 @@ async function readEligibility(
     (hold.expiresAt.getTime() > databaseNow.getTime() ||
       hold.depositIntentPin === 'ACTIVE' ||
       hold.depositIntentPin === 'UNKNOWN');
-  const reasonCode = evaluateDepositEligibility({
+  let reasonCode = evaluateDepositEligibility({
     bookingPhase: booking.phase,
     requestedTimelineRevisionId: input.timelineRevisionId,
     currentTimelineRevisionId: booking.currentTimelineRevisionId,
@@ -424,13 +456,33 @@ async function readEligibility(
     coupleApproved: booking.currentTimelineRevision?.coupleApprovedAt != null,
     hasActiveSlotHold,
   });
+  const contract = booking.commercialContract?.currentRevision;
+  if (booking.commercialContract !== null) {
+    const document = contract == null ? null : contractDocumentSchema.parse(contract.document);
+    if (
+      contract?.state !== 'APPROVED' ||
+      contract.timelineRevisionId !== input.timelineRevisionId ||
+      contract.approvals.length !== 2 ||
+      document?.brideName == null ||
+      document.groomName === null ||
+      documentDigest(document) !== contract.documentDigest ||
+      contract.approvals.some((approval) => approval.documentDigest !== contract.documentDigest)
+    ) {
+      if (reasonCode === 'ELIGIBLE') reasonCode = 'CONTRACT_APPROVAL_REQUIRED';
+    }
+  }
   return Object.freeze({
     eligible: reasonCode === 'ELIGIBLE',
     reasonCode,
     consultationId: booking.consultationId,
     coupleAccountId: access.accountId,
     bookingRevision: booking.revision,
-    depositAmountVnd: decimalNumber(booking.proposalSnapshot.depositAmountVnd),
+    depositAmountVnd: decimalNumber(
+      contract?.depositAmountVnd ?? booking.proposalSnapshot.depositAmountVnd,
+    ),
+    contractRevisionId: contract?.id ?? null,
+    documentDigest: contract?.documentDigest ?? null,
+    ...(contract == null ? {} : { contractTotalVnd: decimalNumber(contract.contractTotalVnd) }),
   });
 }
 

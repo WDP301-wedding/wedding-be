@@ -24,6 +24,7 @@ function fixture() {
     prisma: {
       booking: { findUnique: booking },
       bookingTimelineRevision: { findUnique: timeline },
+      commercialContract: { findUnique: vi.fn().mockResolvedValue(null) },
     } as never,
   };
 }
@@ -203,6 +204,9 @@ describe('booking provider snapshot repositories', () => {
       menuPackageVersionId: 'menu-v1',
       tableCount: 2,
       acceptedAt: approvedAt.toISOString(),
+      modelVersion: 'LEGACY_PROPOSAL_V1',
+      contractRevisionId: null,
+      documentDigest: null,
     });
     f.booking.mockResolvedValue({
       ...value,

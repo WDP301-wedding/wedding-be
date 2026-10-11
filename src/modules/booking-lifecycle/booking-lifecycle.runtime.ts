@@ -1,4 +1,9 @@
 import type { Request, Router } from 'express';
+import { createBookingBoundaryUnitOfWork } from '../../core/database/booking-unit-of-work.js';
+import { createCommercialContractService } from './application/commercial-contract.service.js';
+import { createCommercialSelectionReader } from '../venue-catalog/application/commercial-selection.reader.js';
+import { createCommercialConversionGuard } from '../payments-billing/application/commercial-conversion.guard.js';
+import { createCommercialContractRouter } from './http/commercial-contract.router.js';
 import { createCoupleProfileRouter } from './http/couple-profile.router.js';
 import { createCoupleProfileService } from './application/couple-profile.service.js';
 
@@ -126,6 +131,12 @@ export async function createBookingLifecycleRuntime(
     const proposalQueries = createProposalQueryService(prisma, access);
     const actorResolver = createAuthenticatedActorResolver(createPrismaSessionRepository(prisma));
     const idempotency = createIdempotencyService(createPrismaIdempotencyRepository(prisma));
+    const scope = createBookingBoundaryUnitOfWork(prisma);
+    const contracts = createCommercialContractService({
+      scope,
+      catalog: createCommercialSelectionReader,
+      conversion: createCommercialConversionGuard,
+    });
 
     const router = createBookingLifecycleRouter({
       async auditProtectedDenial(input) {
@@ -194,6 +205,19 @@ export async function createBookingLifecycleRuntime(
     });
     router.use(createBookingExperienceRouter(prisma, actorResolver));
     router.use(
+      createCommercialContractRouter(contracts, actorResolver, (normalizedRoute) =>
+        createIdempotencyMiddleware({
+          service: idempotency,
+          policy: defineIdempotencyPolicy({
+            actorScope: (request) => (request.res!.locals.actor as { accountId: string }).accountId,
+            normalizedRoute,
+            operationVersion: 'v1',
+            payload: bookingIdempotencyPayload,
+          }),
+        }),
+      ),
+    );
+    router.use(
       createCoupleProfileRouter(
         createCoupleProfileService(prisma),
         actorResolver,
@@ -213,7 +237,7 @@ export async function createBookingLifecycleRuntime(
       providers: createBookingLifecycleProviders(
         prisma,
         access,
-        undefined,
+        scope,
         config.identityAccess.retentionDays.disabledAccountPii,
       ),
       resource: Object.freeze({

@@ -21,6 +21,7 @@ import {
   type InvoiceRecord,
 } from '../application/billing-ledger.port.js';
 import type { ContractContext } from '../application/payments-billing.providers.js';
+import { createContractFinancialReader } from '../../booking-lifecycle/infrastructure/contract-financial.reader.js';
 import {
   calculateBillingTotals,
   transitionPaymentAttempt,
@@ -173,6 +174,8 @@ export function createPrismaBillingPersistence(
       const parsed = newPaymentAttemptSchema.parse(input);
       const snapshot = {
         ...parsed,
+        contractRevisionId: parsed.contractRevisionId ?? null,
+        documentDigest: parsed.documentDigest ?? null,
         createdAt: new Date(parsed.createdAt).toISOString(),
         expiresAt: new Date(parsed.expiresAt).toISOString(),
       };
@@ -346,6 +349,8 @@ function toAttempt(row: StoredAttempt): PaymentAttempt {
     provider: row.provider,
     amountVnd: safeNumber(row.amountVnd),
     timelineRevisionId: row.timelineRevisionId,
+    contractRevisionId: row.contractRevisionId,
+    documentDigest: row.documentDigest,
     createdAt: row.createdAt.toISOString(),
     expiresAt: row.expiresAt.toISOString(),
     state: row.state,
@@ -394,7 +399,7 @@ function totalsFrom(entries: readonly LedgerEntry[]) {
       )
       .map((entry) => entry.amountVnd);
   return calculateBillingTotals({
-    baseChargesVnd: amounts('CHARGE', 'BASE_BOOKING'),
+    baseChargesVnd: [...amounts('CHARGE', 'BASE_BOOKING'), ...amounts('CHARGE', 'CONTRACT')],
     printChargesVnd: amounts('CHARGE', 'PRINT_ORDER'),
     creditAdjustmentsVnd: amounts('CREDIT_ADJUSTMENT'),
     settledPaymentsVnd: amounts('PAYMENT'),
@@ -403,6 +408,26 @@ function totalsFrom(entries: readonly LedgerEntry[]) {
 }
 
 async function validateSource(tx: Transaction, fact: NewLedgerFact) {
+  if (
+    ['BASE_BOOKING', 'PRINT_ORDER'].includes(fact.sourceType) &&
+    (await createContractFinancialReader(tx).getModel(fact.bookingId)) === 'FULL_CONTRACT_V1'
+  )
+    throw new BillingPersistenceConflict('CONTRACT_FULFILLMENT_REQUIRED');
+  if (fact.sourceType === 'CONTRACT') {
+    const snapshot = await createContractFinancialReader(tx).resolveApproved(
+      fact.bookingId,
+      fact.sourceRevisionId,
+    );
+    if (snapshot.contractTotalVnd !== fact.amountVnd || snapshot.approvedAt !== fact.occurredAt)
+      throw new BillingPersistenceConflict('FINANCIAL_SOURCE_CONFLICT');
+    const incompatible = await tx.billingLedgerEntry.findFirst({
+      where: {
+        bookingId: fact.bookingId,
+        sourceType: { in: ['BASE_BOOKING', 'PRINT_ORDER', 'CONTRACT'] },
+      },
+    });
+    if (incompatible !== null) throw new BillingPersistenceConflict('FINANCIAL_SOURCE_CONFLICT');
+  }
   if (fact.kind === 'PAYMENT') {
     const attempt = await tx.billingPaymentAttempt.findUnique({
       where: { id: fact.paymentAttemptId! },

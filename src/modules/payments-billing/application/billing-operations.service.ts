@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { z } from 'zod';
+import { registerContractCharge } from './contract-charge.service.js';
 import type { BookingBoundaryUnitOfWork } from '../../../core/database/booking-unit-of-work.js';
 import { AppError } from '../../../core/errors/app-error.js';
 import type {
@@ -98,6 +99,8 @@ export function createBillingOperationsService(
     amountVnd: number,
     timelineRevisionId: string | null,
     scoped: ContractContext,
+    contractRevisionId: string | null = null,
+    documentDigest: string | null = null,
   ) {
     const createdAt = now();
     return options.ledger.createAttempt(
@@ -109,6 +112,8 @@ export function createBillingOperationsService(
         provider,
         amountVnd,
         timelineRevisionId,
+        contractRevisionId,
+        documentDigest,
         createdAt: createdAt.toISOString(),
         expiresAt: new Date(createdAt.getTime() + 15 * 60_000).toISOString(),
       },
@@ -160,6 +165,21 @@ export function createBillingOperationsService(
             throw error('DEPOSIT_NOT_ELIGIBLE');
           const commercial = await options.commercial.getAccepted(command, scoped);
           if (
+            (commercial.contractRevisionId ?? null) !== (command.contractRevisionId ?? null) ||
+            (commercial.documentDigest ?? null) !== (command.documentDigest ?? null)
+          )
+            throw error('CONTRACT_REVISION_STALE');
+          if (commercial.contractRevisionId != null) {
+            if (options.commercial.resolveApprovedContract === undefined)
+              throw error('PAYMENT_EVIDENCE_CONFLICT');
+            const snapshot = await options.commercial.resolveApprovedContract(
+              command.bookingId,
+              commercial.contractRevisionId,
+              scoped,
+            );
+            await registerContractCharge(options.ledger, snapshot, scoped);
+          }
+          if (
             commercial.bookingId !== command.bookingId ||
             commercial.bookingRevision !== eligibility.bookingRevision ||
             commercial.depositAmountVnd !== command.amountVnd
@@ -172,7 +192,7 @@ export function createBillingOperationsService(
           );
           if (previous !== undefined && previous.amountVnd !== commercial.baseChargeVnd)
             throw error('PAYMENT_EVIDENCE_CONFLICT');
-          if (previous === undefined)
+          if (previous === undefined && commercial.modelVersion !== 'FULL_CONTRACT_V1')
             await options.ledger.append(
               fact({
                 bookingId: command.bookingId,
@@ -192,6 +212,8 @@ export function createBillingOperationsService(
           command.amountVnd,
           timelineRevisionId,
           scoped,
+          eligibility?.contractRevisionId ?? null,
+          eligibility?.documentDigest ?? null,
         );
         if (eligibility !== null)
           await options.coordinator.reserve(
@@ -199,6 +221,8 @@ export function createBillingOperationsService(
               bookingId: command.bookingId,
               timelineRevisionId: timelineRevisionId!,
               paymentAttemptId: attempt.id,
+              contractRevisionId: attempt.contractRevisionId ?? null,
+              documentDigest: attempt.documentDigest ?? null,
               expectedBookingRevision: eligibility.bookingRevision,
               amountVnd: attempt.amountVnd,
               expiresAt: attempt.expiresAt,
@@ -250,6 +274,8 @@ export function createBillingOperationsService(
           await options.recorder.recordSuccessfulDeposit({
             bookingId: command.bookingId,
             timelineRevisionId,
+            contractRevisionId: attempt.contractRevisionId ?? null,
+            documentDigest: attempt.documentDigest ?? null,
             paymentId: payment.entry.id,
             amountVnd: payment.entry.amountVnd,
             settledAt: new Date(payment.entry.occurredAt),

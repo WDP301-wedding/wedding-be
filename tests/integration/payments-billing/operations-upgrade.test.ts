@@ -1,14 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { createPrismaClient } from '../../../src/core/database/prisma.js';
 import { seedVenueCatalog } from '../../../scripts/catalog-seed.js';
-import { createPaymentsBillingProviders } from '../../../src/modules/payments-billing/payments-billing.providers.js';
 import { billingReportRowSchema } from '../../../src/modules/payments-billing/application/payments-billing.providers.js';
 import {
   CatalogTestDatabase,
   catalogMigrationDatabaseUrl,
 } from '../venue-catalog/catalog-test-database.js';
 import { createPayableBooking } from './deposit-fixture.js';
-import { controlledVnpay, ipnFixture } from './vnpay-fixture.js';
+import { legacyAttemptSelect, seedLegacyBillingHistory } from './upgrade-fixture.js';
 
 const databaseDescribe = catalogMigrationDatabaseUrl ? describe : describe.skip;
 databaseDescribe('W5 forward operations/reporting migration from W4', () => {
@@ -19,7 +18,10 @@ databaseDescribe('W5 forward operations/reporting migration from W4', () => {
     async function read(prisma: ReturnType<typeof createPrismaClient>) {
       return {
         ledger: await prisma.billingLedgerEntry.findMany({ orderBy: { id: 'asc' } }),
-        attempts: await prisma.billingPaymentAttempt.findMany({ orderBy: { id: 'asc' } }),
+        attempts: await prisma.billingPaymentAttempt.findMany({
+          orderBy: { id: 'asc' },
+          select: legacyAttemptSelect,
+        }),
         invoices: await prisma.billingInvoice.findMany({ orderBy: { id: 'asc' } }),
         applications: await prisma.billingDepositApplication.findMany(),
         checkouts: await prisma.billingVnpayCheckout.findMany(),
@@ -41,21 +43,18 @@ databaseDescribe('W5 forward operations/reporting migration from W4', () => {
           await seedVenueCatalog(prisma);
           const f = await createPayableBooking(prisma);
           bookingId = f.bookingId;
-          const providers = createPaymentsBillingProviders(prisma, {
-            vnpay: controlledVnpay,
-            gateway: { query: () => Promise.reject(new Error('No live calls')) },
-          });
-          const checkout = await providers.vnpay!.startCheckout(f.command, '127.0.0.1', f.context);
-          expect(await providers.vnpay!.processIpn(ipnFixture(checkout.attempt.id))).toMatchObject({
-            RspCode: '00',
-          });
-          expect((await providers.ledger.getLedger(bookingId)).totals.paidVnd).toBe(15_000_000);
+          await seedLegacyBillingHistory(prisma, f, 'W4');
           historic = JSON.stringify(await read(prisma));
         } finally {
           await prisma.$disconnect();
         }
       });
       expect(JSON.stringify(await read(database.prisma))).toBe(historic);
+      expect(await database.prisma.billingPaymentAttempt.findFirstOrThrow()).toMatchObject({
+        contractRevisionId: null,
+        documentDigest: null,
+      });
+      expect(await database.prisma.commercialContract.count()).toBe(0);
       expect(await database.prisma.billingOperationCommand.count()).toBe(0);
       expect(await database.prisma.billingRefundApproval.count()).toBe(0);
       const snapshots = await database.prisma.billingReportingSnapshot.findMany();

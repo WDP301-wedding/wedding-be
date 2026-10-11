@@ -11,6 +11,7 @@ import {
 } from '../venue-catalog/catalog-test-database.js';
 import { createPayableBooking } from './deposit-fixture.js';
 import { controlledVnpay } from './vnpay-fixture.js';
+import { legacyAttemptSelect, seedLegacyBillingHistory } from './upgrade-fixture.js';
 
 const databaseDescribe = catalogMigrationDatabaseUrl ? describe : describe.skip;
 databaseDescribe('PB-W4 forward evidence upgrade', () => {
@@ -22,7 +23,7 @@ databaseDescribe('PB-W4 forward evidence upgrade', () => {
     async function read(prisma: ReturnType<typeof createPrismaClient>) {
       return {
         ledger: await prisma.billingLedgerEntry.findMany(),
-        attempts: await prisma.billingPaymentAttempt.findMany(),
+        attempts: await prisma.billingPaymentAttempt.findMany({ select: legacyAttemptSelect }),
         applications: await prisma.billingDepositApplication.findMany(),
         audit: await prisma.auditLog.findMany({ orderBy: { id: 'asc' } }),
         outbox: await prisma.billingOutboxEvent.findMany({ orderBy: { id: 'asc' } }),
@@ -37,31 +38,20 @@ databaseDescribe('PB-W4 forward evidence upgrade', () => {
         try {
           await seedVenueCatalog(prisma);
           const f = await createPayableBooking(prisma);
-          const providers = createPaymentsBillingProviders(prisma);
-          const { attempt } = await providers.deposits.createDeposit(f.command, f.context);
-          const input = { bookingId: f.bookingId, paymentAttemptId: attempt.id };
+          const seeded = await seedLegacyBillingHistory(prisma, f, 'W3');
           oldBookingId = f.bookingId;
-          oldAttemptId = attempt.id;
-          await providers.ledger.transitionAttempt(
-            { ...input, evidence: 'PROVIDER_REQUESTED', providerEvidenceId: null },
-            f.system,
-          );
-          await providers.ledger.transitionAttempt(
-            { ...input, evidence: 'VERIFIED_SUCCESS', providerEvidenceId: randomUUID() },
-            f.system,
-          );
-          expect(
-            await providers.deposits.applySettledDeposit(
-              { ...input, settledAt: new Date().toISOString() },
-              f.system,
-            ),
-          ).toMatchObject({ applicationStatus: 'SUCCEEDED' });
+          oldAttemptId = seeded.attemptId;
           historical = JSON.stringify(await read(prisma));
         } finally {
           await prisma.$disconnect();
         }
       });
       expect(JSON.stringify(await read(database.prisma))).toBe(historical);
+      expect(await database.prisma.billingPaymentAttempt.findFirstOrThrow()).toMatchObject({
+        contractRevisionId: null,
+        documentDigest: null,
+      });
+      expect(await database.prisma.commercialContract.count()).toBe(0);
       expect(await database.prisma.billingDepositApplication.count()).toBe(1);
       expect(await database.prisma.billingVnpayCheckout.count()).toBe(0);
       expect(await database.prisma.billingProviderEvidence.count()).toBe(0);

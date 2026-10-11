@@ -16,11 +16,16 @@ export type DepositEligibility = Readonly<{
   coupleAccountId: string;
   bookingRevision: number;
   depositAmountVnd: number;
+  contractRevisionId?: string | null;
+  documentDigest?: string | null;
+  contractTotalVnd?: number;
 }>;
 
 export type ReserveDepositInput = Readonly<{
   bookingId: string;
   timelineRevisionId: string;
+  contractRevisionId?: string | null;
+  documentDigest?: string | null;
   paymentAttemptId: string;
   expectedBookingRevision: number;
   amountVnd: number;
@@ -33,6 +38,8 @@ export type ReserveDepositInput = Readonly<{
 export type RecordSuccessfulDepositInput = Readonly<{
   bookingId: string;
   timelineRevisionId: string;
+  contractRevisionId?: string | null;
+  documentDigest?: string | null;
   paymentId: string;
   amountVnd: number;
   settledAt: Date;

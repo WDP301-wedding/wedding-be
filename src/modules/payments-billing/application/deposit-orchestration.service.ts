@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 import { z } from 'zod';
+import { registerContractCharge } from './contract-charge.service.js';
 
 import type { BookingBoundaryUnitOfWork } from '../../../core/database/booking-unit-of-work.js';
 import { AppError } from '../../../core/errors/app-error.js';
@@ -16,6 +17,11 @@ import type {
 const createDepositSchema = z.strictObject({
   bookingId: z.uuid(),
   timelineRevisionId: z.uuid(),
+  contractRevisionId: z.uuid().optional(),
+  documentDigest: z
+    .string()
+    .regex(/^[a-f0-9]{64}$/)
+    .optional(),
   commandId: z.uuid(),
 });
 const applyDepositSchema = z.strictObject({
@@ -79,6 +85,8 @@ export function createDepositOrchestrationService(
         if (existing !== null) {
           if (
             existing.timelineRevisionId !== command.timelineRevisionId ||
+            (existing.contractRevisionId ?? null) !== (command.contractRevisionId ?? null) ||
+            (existing.documentDigest ?? null) !== (command.documentDigest ?? null) ||
             existing.purpose !== 'DEPOSIT' ||
             existing.provider !== 'VNPAY'
           )
@@ -93,6 +101,11 @@ export function createDepositOrchestrationService(
         if (!eligibility.eligible) throw conflict('DEPOSIT_NOT_ELIGIBLE');
         if (eligibility.coupleAccountId !== accountId) throw conflict('DEPOSIT_NOT_ELIGIBLE');
         const commercial = await options.commercial.getAccepted(command, scoped);
+        if (
+          (commercial.contractRevisionId ?? null) !== (command.contractRevisionId ?? null) ||
+          (commercial.documentDigest ?? null) !== (command.documentDigest ?? null)
+        )
+          throw conflict('CONTRACT_REVISION_STALE');
         if (
           commercial.bookingId !== command.bookingId ||
           commercial.bookingRevision !== eligibility.bookingRevision ||
@@ -116,6 +129,8 @@ export function createDepositOrchestrationService(
             provider: 'VNPAY',
             amountVnd: eligibility.depositAmountVnd,
             timelineRevisionId: command.timelineRevisionId,
+            contractRevisionId: commercial.contractRevisionId ?? null,
+            documentDigest: commercial.documentDigest ?? null,
             createdAt: createdAt.toISOString(),
             expiresAt: new Date(createdAt.getTime() + 15 * 60_000).toISOString(),
           },
@@ -126,6 +141,8 @@ export function createDepositOrchestrationService(
             bookingId: command.bookingId,
             timelineRevisionId: command.timelineRevisionId,
             paymentAttemptId: result.attempt.id,
+            contractRevisionId: result.attempt.contractRevisionId ?? null,
+            documentDigest: result.attempt.documentDigest ?? null,
             expectedBookingRevision: eligibility.bookingRevision,
             amountVnd: result.attempt.amountVnd,
             expiresAt: result.attempt.expiresAt,
@@ -141,7 +158,7 @@ export function createDepositOrchestrationService(
           throw conflict();
         // A newly approved timeline may retain the same immutable commercial
         // revision. Preserve the first acceptance date of that base charge.
-        if (priorBase === undefined)
+        if (priorBase === undefined && commercial.modelVersion !== 'FULL_CONTRACT_V1')
           await options.ledger.append(
             fact({
               bookingId: command.bookingId,
@@ -193,13 +210,23 @@ export function createDepositOrchestrationService(
             previous.occurredAt !== new Date(command.settledAt).toISOString()
           )
             throw conflict();
-          // Recheck before the money effect; retain proven late money even if the
-          // current booking cannot apply it. No provider dependency erases settlement.
-          if (previous === undefined)
-            await options.booking.requireDepositEligibility({
-              bookingId: command.bookingId,
-              timelineRevisionId: attempt.timelineRevisionId,
-            });
+          // Money follows durable verified evidence, including revoked access or
+          // a changed Booking. Current eligibility belongs to recoverable application below.
+          if (attempt.contractRevisionId != null) {
+            if (options.commercial.resolveApprovedContract === undefined) throw conflict();
+            const snapshot = await options.commercial.resolveApprovedContract(
+              command.bookingId,
+              attempt.contractRevisionId,
+              scoped,
+            );
+            if (
+              snapshot.documentDigest !== attempt.documentDigest ||
+              snapshot.timelineRevisionId !== attempt.timelineRevisionId ||
+              snapshot.depositAmountVnd !== attempt.amountVnd
+            )
+              throw conflict();
+            await registerContractCharge(options.ledger, snapshot, scoped);
+          }
           const result = await options.ledger.append(
             fact({
               bookingId: command.bookingId,
@@ -212,7 +239,12 @@ export function createDepositOrchestrationService(
             }),
             scoped,
           );
-          return { ...result, timelineRevisionId: attempt.timelineRevisionId };
+          return {
+            ...result,
+            timelineRevisionId: attempt.timelineRevisionId,
+            contractRevisionId: attempt.contractRevisionId ?? null,
+            documentDigest: attempt.documentDigest ?? null,
+          };
         },
       );
       try {
@@ -223,13 +255,20 @@ export function createDepositOrchestrationService(
             bookingId: command.bookingId,
             timelineRevisionId: money.timelineRevisionId,
           });
-          if (!eligibility.eligible || eligibility.depositAmountVnd !== money.entry.amountVnd)
+          if (
+            !eligibility.eligible ||
+            eligibility.depositAmountVnd !== money.entry.amountVnd ||
+            (eligibility.contractRevisionId ?? null) !== money.contractRevisionId ||
+            (eligibility.documentDigest ?? null) !== money.documentDigest
+          )
             throw conflict('DEPOSIT_NOT_ELIGIBLE');
           // The Booking recorder promotes the reserved account through Identity.
           // All owner writes and this completion marker commit or roll back together.
           await options.recorder.recordSuccessfulDeposit({
             bookingId: command.bookingId,
             timelineRevisionId: money.timelineRevisionId,
+            contractRevisionId: money.contractRevisionId,
+            documentDigest: money.documentDigest,
             paymentId: money.entry.id,
             amountVnd: money.entry.amountVnd,
             settledAt: new Date(money.entry.occurredAt),
