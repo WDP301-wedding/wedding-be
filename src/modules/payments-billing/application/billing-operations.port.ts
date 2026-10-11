@@ -23,6 +23,11 @@ export const manualPaymentSchema = z.discriminatedUnion('purpose', [
     amountVnd: vnd,
     settledAt: instant,
     timelineRevisionId: z.uuid(),
+    contractRevisionId: z.uuid().optional(),
+    documentDigest: z
+      .string()
+      .regex(/^[a-f0-9]{64}$/)
+      .optional(),
   }),
   z.strictObject({
     ...identity,

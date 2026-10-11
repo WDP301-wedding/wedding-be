@@ -104,6 +104,10 @@ The values in `.env.example` are placeholders. For offline development, clear bo
 
 ## Database and API ownership
 
+Full commercial contract extension BE-06–10: [backend handoff](./docs/be06-10-commercial-contracts.md)
+and [ADR-010](./docs/decisions/0010-freeze-full-commercial-contracts-before-deposit.md).
+Implementation and pending acceptance evidence are tracked separately.
+
 Only this repository changes `prisma/schema.prisma`, migration history, Zod API schemas, `openapi/openapi.json`, or its generated `openapi/openapi.sha256` digest. Applied migrations are immutable; corrections are new forward migrations. Client repositories consume the OpenAPI artifact pinned to an exact backend commit and the published digest, then generate their own `schema.d.ts` files. Do not hand-edit generated artifacts.
 
 ## Offline provider tests

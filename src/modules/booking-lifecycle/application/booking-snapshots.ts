@@ -1,4 +1,5 @@
 import type { ContractContext } from './deposit.service.js';
+import type { CommercialContractReader } from './commercial-contract.port.js';
 
 export type TimelineSnapshot = Readonly<{
   bookingId: string;
@@ -29,6 +30,7 @@ export interface BookingTimelineSnapshotReader {
 }
 
 export interface BookingCommercialSnapshotReader {
+  resolveApprovedContract?: CommercialContractReader['resolveApproved'];
   getAccepted(
     input: Readonly<{ bookingId: string; timelineRevisionId: string }>,
     context: ContractContext,
@@ -42,6 +44,9 @@ export interface BookingCommercialSnapshotReader {
       menuPackageVersionId: string;
       tableCount: number;
       acceptedAt: string;
+      modelVersion?: 'LEGACY_PROPOSAL_V1' | 'FULL_CONTRACT_V1';
+      contractRevisionId?: string | null;
+      documentDigest?: string | null;
     }>
   >;
 }

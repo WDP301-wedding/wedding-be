@@ -1,5 +1,6 @@
 import type { PrismaClient } from '../../generated/prisma/client.js';
 import { createCoupleProfileService } from './application/couple-profile.service.js';
+import { createContractFinancialReader } from './infrastructure/contract-financial.reader.js';
 import { createPrismaConsultationRetentionRecorder } from '../identity-access/account/retention-eligibility.port.js';
 import { createBookingBoundaryUnitOfWork } from '../../core/database/booking-unit-of-work.js';
 import {
@@ -129,6 +130,11 @@ export function createBookingLifecycleProviders(
       },
     }),
     commercial: Object.freeze({
+      resolveApprovedContract(bookingId: string, revisionId: string, context?: ContractContext) {
+        return scope.withClient(bookingId, context, (client) =>
+          createContractFinancialReader(client).resolveApproved(bookingId, revisionId, context),
+        );
+      },
       getAccepted(
         input: Parameters<
           ReturnType<typeof createPrismaBookingCommercialSnapshotReader>['getAccepted']

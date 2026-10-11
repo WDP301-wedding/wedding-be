@@ -25,5 +25,6 @@ COPY --from=build --chown=node:node /app/prisma.config.ts ./prisma.config.ts
 COPY --from=build --chown=node:node /app/package.json /app/package-lock.json ./
 COPY --chown=node:node openapi ./openapi
 COPY --chown=node:node certs ./certs
+COPY --chown=node:node assets ./assets
 USER node
 CMD ["node", "--enable-source-maps", "--import", "./dist/instrumentation.js", "dist/server.js"]

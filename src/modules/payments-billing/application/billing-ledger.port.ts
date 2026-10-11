@@ -17,6 +17,7 @@ export const ledgerFactSchema = z
     kind: z.enum(['CHARGE', 'PAYMENT', 'REFUND', 'CREDIT_ADJUSTMENT']),
     sourceType: z.enum([
       'BASE_BOOKING',
+      'CONTRACT',
       'PRINT_ORDER',
       'PAYMENT_ATTEMPT',
       'PRINT_CREDIT',
@@ -36,7 +37,7 @@ export const ledgerFactSchema = z
     const noDecision = fact.decisionId === null && fact.approvedRefundableVnd === null;
     const valid =
       (fact.kind === 'CHARGE' &&
-        ['BASE_BOOKING', 'PRINT_ORDER'].includes(fact.sourceType) &&
+        ['BASE_BOOKING', 'PRINT_ORDER', 'CONTRACT'].includes(fact.sourceType) &&
         fact.sourceEntryId === null &&
         fact.paymentAttemptId === null &&
         noDecision) ||
@@ -74,12 +75,21 @@ export const newPaymentAttemptSchema = z
     provider: z.enum(['VNPAY', 'MANUAL']),
     amountVnd: positiveVnd,
     timelineRevisionId: z.uuid().nullable(),
+    contractRevisionId: z.uuid().nullable().optional(),
+    documentDigest: z
+      .string()
+      .regex(/^[a-f0-9]{64}$/)
+      .nullable()
+      .optional(),
     createdAt: instant,
     expiresAt: instant,
   })
   .refine(
     (value) =>
       new Date(value.expiresAt).getTime() > new Date(value.createdAt).getTime() &&
+      ((value.contractRevisionId ?? null) === null
+        ? (value.documentDigest ?? null) === null
+        : value.purpose === 'DEPOSIT' && value.documentDigest != null) &&
       ((value.purpose === 'DEPOSIT' && value.timelineRevisionId !== null) ||
         (value.purpose === 'BALANCE' && value.timelineRevisionId === null)),
     { message: 'Attempt expiry and timeline snapshot must agree with its purpose.' },

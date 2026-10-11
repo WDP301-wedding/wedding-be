@@ -10,11 +10,23 @@ const evidence = {
 };
 export const bookingParamsSchema = z.strictObject({ bookingId: uuid });
 export const attemptParamsSchema = z.strictObject({ bookingId: uuid, attemptId: uuid });
-export const depositBodySchema = z.strictObject({ timelineRevisionId: uuid });
+export const depositBodySchema = z.strictObject({
+  timelineRevisionId: uuid,
+  contractRevisionId: uuid.optional(),
+  documentDigest: z
+    .string()
+    .regex(/^[a-f0-9]{64}$/)
+    .optional(),
+});
 export const balanceBodySchema = z.strictObject({ expectedBillingRevision: revision });
 export const manualBodySchema = z.strictObject({
   bookingId: uuid,
   purpose: z.enum(['DEPOSIT', 'BALANCE']),
+  contractRevisionId: uuid.optional(),
+  documentDigest: z
+    .string()
+    .regex(/^[a-f0-9]{64}$/)
+    .optional(),
   amountVnd: vnd.positive(),
   settledAt: instant,
   ...evidence,
@@ -84,6 +96,7 @@ export const historyEntrySchema = z.strictObject({
   occurredAt: instant,
   sourceType: z.enum([
     'BASE_BOOKING',
+    'CONTRACT',
     'PRINT_ORDER',
     'PAYMENT_ATTEMPT',
     'PRINT_CREDIT',

@@ -6,6 +6,8 @@ import type {
   BookingTimelineSnapshotReader,
 } from '../application/booking-snapshots.js';
 import { BookingLifecycleNotFoundError } from './consultation.repository.js';
+import { createContractFinancialReader } from './contract-financial.reader.js';
+import { commercialConflict } from '../domain/commercial-contract.js';
 
 export function createPrismaBookingAccessContextRepository(
   prisma: PrismaClient,
@@ -134,7 +136,46 @@ export function createPrismaBookingCommercialSnapshotReader(
   prisma: PrismaClient,
 ): BookingCommercialSnapshotReader {
   return Object.freeze({
+    resolveApprovedContract: (bookingId: string, revisionId: string) =>
+      createContractFinancialReader(prisma).resolveApproved(bookingId, revisionId),
     async getAccepted(input: Parameters<BookingCommercialSnapshotReader['getAccepted']>[0]) {
+      const head = await prisma.commercialContract.findUnique({
+        where: { bookingId: input.bookingId },
+        include: { currentRevision: true },
+      });
+      if (head !== null) {
+        const row = head.currentRevision;
+        const booking = await prisma.booking.findUniqueOrThrow({
+          where: { id: input.bookingId },
+          include: { currentTimelineRevision: true },
+        });
+        if (
+          row?.state !== 'APPROVED' ||
+          row.timelineRevisionId !== input.timelineRevisionId ||
+          booking.currentTimelineRevisionId !== input.timelineRevisionId ||
+          booking.currentTimelineRevision?.managerApprovedAt == null ||
+          booking.currentTimelineRevision.coupleApprovedAt === null
+        )
+          throw commercialConflict('CONTRACT_APPROVAL_REQUIRED');
+        const snapshot = await createContractFinancialReader(prisma).resolveApproved(
+          input.bookingId,
+          row.id,
+        );
+        return Object.freeze({
+          bookingId: input.bookingId,
+          bookingRevision: booking.revision,
+          commercialRevisionId: snapshot.contractRevisionId,
+          baseChargeVnd: snapshot.contractTotalVnd,
+          depositAmountVnd: snapshot.depositAmountVnd,
+          menuPackageVersionId: snapshot.document.lines.find((line) => line.category === 'MENU')!
+            .sourceRevisionId,
+          tableCount: snapshot.document.tableCount,
+          acceptedAt: snapshot.approvedAt,
+          modelVersion: 'FULL_CONTRACT_V1' as const,
+          contractRevisionId: snapshot.contractRevisionId,
+          documentDigest: snapshot.documentDigest,
+        });
+      }
       const booking = await prisma.booking.findUnique({
         where: { id: input.bookingId },
         select: {
@@ -179,6 +220,9 @@ export function createPrismaBookingCommercialSnapshotReader(
         menuPackageVersionId: booking.proposalSnapshot.menuPackageVersionId,
         tableCount: booking.proposalSnapshot.tableCount,
         acceptedAt: booking.proposalSnapshot.commercialAcceptedAt.toISOString(),
+        modelVersion: 'LEGACY_PROPOSAL_V1' as const,
+        contractRevisionId: null,
+        documentDigest: null,
       });
     },
   });

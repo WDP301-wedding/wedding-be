@@ -70,6 +70,8 @@ describe('PrismaBookingDepositRepository', () => {
     };
     const stored = {
       ...input,
+      contractRevisionId: null,
+      documentDigest: null,
       coupleAccountId: input.actorAccountId,
       id: input.paymentAttemptId,
       expiresAt: new Date(input.expiresAt),
@@ -223,7 +225,12 @@ describe('PrismaBookingDepositRepository', () => {
       amountVnd: 3_000_001,
       settledAt: now,
     };
-    const stored = { ...input, promotionStatus: 'PENDING' };
+    const stored = {
+      ...input,
+      contractRevisionId: null,
+      documentDigest: null,
+      promotionStatus: 'PENDING',
+    };
     for (const patch of [{ timelineRevisionId: 'other' }, { amountVnd: 1 }]) {
       transaction.bookingDepositSettlement.findUnique.mockResolvedValue({ ...stored, ...patch });
       await expect(repository.settle(input)).rejects.toMatchObject({
@@ -270,6 +277,8 @@ describe('PrismaBookingDepositRepository', () => {
       coupleAccountId: 'couple',
       bookingRevision: 4,
       depositAmountVnd: 3_000_001,
+      contractRevisionId: null,
+      documentDigest: null,
     });
   });
 
@@ -311,10 +320,13 @@ describe('PrismaBookingDepositRepository', () => {
       timelineRevisionId: 'timeline',
       amountVnd: 3_000_001,
       status: 'ACTIVE',
+      contractRevisionId: null,
+      documentDigest: null,
       coupleAccountId: 'couple',
       requestId: 'request',
     });
     transaction.booking.findUnique.mockResolvedValue({
+      ...(await transaction.booking.findUnique()),
       id: 'booking',
       consultationId: 'consultation',
       phase: 'AWAITING_DEPOSIT',
@@ -430,6 +442,7 @@ function fixture() {
       coupleApprovedAt: new Date('2026-10-07T09:05:00.000Z'),
     },
     proposalSnapshot: { depositAmountVnd: 3_000_001 },
+    commercialContract: null,
     slotHolds: [
       {
         id: 'hold',

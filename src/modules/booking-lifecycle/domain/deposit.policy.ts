@@ -5,7 +5,8 @@ export type DepositEligibilityReason =
   | 'TIMELINE_NOT_MUTUALLY_APPROVED'
   | 'REVISION_SUPERSEDED'
   | 'SLOT_NOT_AVAILABLE'
-  | 'BOOKING_NOT_PAYABLE';
+  | 'BOOKING_NOT_PAYABLE'
+  | 'CONTRACT_APPROVAL_REQUIRED';
 
 export function evaluateDepositEligibility(
   input: Readonly<{

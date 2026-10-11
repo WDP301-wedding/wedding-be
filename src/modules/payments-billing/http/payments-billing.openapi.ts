@@ -86,7 +86,7 @@ export const paymentsBillingOpenApiPaths: NonNullable<ZodOpenApiObject['paths']>
   '/bookings/{bookingId}/payments/deposit': {
     post: mutation(
       'createDepositPayment',
-      'Start VNPay deposit for an owned eligible RESTRICTED or FULL booking. Amount is server-owned.',
+      'Start VNPay deposit for an owned eligible RESTRICTED or FULL booking. FULL_CONTRACT_V1 requires exact contractRevisionId and documentDigest, dual commercial/timeline approvals and ceil(30% full total). Legacy bodies and settlements retain original semantics. Amount is server-owned.',
       depositBodySchema,
       checkoutResponseSchema,
       booking,

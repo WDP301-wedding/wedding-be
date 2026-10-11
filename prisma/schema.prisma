@@ -464,10 +464,98 @@ model Booking {
   billingInvoices             BillingInvoice[]
   billingCommands             BillingOperationCommand[]
   billingRefundApprovals      BillingRefundApproval[]
+  commercialContract          CommercialContract?
 
   @@unique([hallId, eventDate, shiftCode], map: "Booking_one_confirmed_slot_key", where: raw("\"phase\" IN ('CONFIRMED', 'COMPLETED')"))
   @@index([hallId, eventDate, shiftCode])
   @@index([phase, eventDate])
+}
+
+enum CommercialContractState {
+  DRAFT
+  AWAITING_APPROVAL
+  APPROVED
+  SUPERSEDED
+}
+
+enum CommercialLineCategory {
+  MENU
+  PRINT
+  SERVICE
+}
+
+model CommercialContract {
+  bookingId         String                       @id @db.Uuid
+  modelVersion      String                       @default("FULL_CONTRACT_V1")
+  currentRevisionId String?                      @unique @db.Uuid
+  booking           Booking                      @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  currentRevision   CommercialContractRevision?  @relation("CurrentCommercialRevision", fields: [currentRevisionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  revisions         CommercialContractRevision[] @relation("CommercialHistory")
+}
+
+model CommercialContractRevision {
+  id                    String                       @id @db.Uuid
+  bookingId             String                       @db.Uuid
+  revisionNumber        Int
+  predecessorRevisionId String?                      @db.Uuid
+  timelineRevisionId    String                       @db.Uuid
+  state                 CommercialContractState      @default(DRAFT)
+  document              Json                         @db.JsonB
+  documentDigest        String
+  contractTotalVnd      Decimal                      @db.Decimal(18, 0)
+  depositAmountVnd      Decimal                      @db.Decimal(18, 0)
+  createdByAccountId    String                       @db.Uuid
+  createdAt             DateTime                     @db.Timestamptz(6)
+  submittedAt           DateTime?                    @db.Timestamptz(6)
+  approvedAt            DateTime?                    @db.Timestamptz(6)
+  contract              CommercialContract           @relation("CommercialHistory", fields: [bookingId], references: [bookingId], onDelete: Restrict)
+  currentFor            CommercialContract?          @relation("CurrentCommercialRevision")
+  lines                 CommercialContractLine[]
+  approvals             CommercialContractApproval[]
+  pdf                   CommercialContractPdf?
+
+  @@unique([bookingId, revisionNumber])
+  @@unique([id, bookingId])
+}
+
+model CommercialContractLine {
+  id               String                     @id @db.Uuid
+  revisionId       String                     @db.Uuid
+  displayOrder     Int
+  category         CommercialLineCategory
+  sourceId         String                     @db.Uuid
+  sourceRevisionId String                     @db.Uuid
+  name             String
+  description      String
+  unit             String
+  quantity         Int
+  unitPriceVnd     Decimal                    @db.Decimal(18, 0)
+  lineTotalVnd     Decimal                    @db.Decimal(18, 0)
+  revision         CommercialContractRevision @relation(fields: [revisionId], references: [id], onDelete: Restrict)
+
+  @@unique([revisionId, displayOrder])
+  @@unique([revisionId, category, sourceId])
+}
+
+model CommercialContractApproval {
+  id             String                     @id @db.Uuid
+  revisionId     String                     @db.Uuid
+  party          BookingTimelineParty
+  actorAccountId String                     @db.Uuid
+  documentDigest String
+  requestId      String                     @db.Uuid
+  occurredAt     DateTime                   @db.Timestamptz(6)
+  revision       CommercialContractRevision @relation(fields: [revisionId], references: [id], onDelete: Restrict)
+
+  @@unique([revisionId, party])
+}
+
+model CommercialContractPdf {
+  revisionId String                     @id @db.Uuid
+  bytes      Bytes                      @db.ByteA
+  sha256     String
+  createdAt  DateTime                   @db.Timestamptz(6)
+  revision   CommercialContractRevision @relation(fields: [revisionId], references: [id], onDelete: Restrict)
 }
 
 model BookingCancellationRequest {
@@ -527,6 +615,8 @@ model BookingDepositIntent {
   id                      String                     @id @db.Uuid
   bookingId               String                     @db.Uuid
   timelineRevisionId      String                     @db.Uuid
+  contractRevisionId      String?                    @db.Uuid
+  documentDigest          String?
   amountVnd               Decimal                    @db.Decimal(18, 0)
   status                  BookingDepositIntentStatus @default(ACTIVE)
   bookingRevisionReserved Int
@@ -550,6 +640,8 @@ model BookingDepositSettlement {
   paymentId          String                 @id @db.Uuid
   bookingId          String                 @unique @db.Uuid
   timelineRevisionId String                 @db.Uuid
+  contractRevisionId String?                @db.Uuid
+  documentDigest     String?
   amountVnd          Decimal                @db.Decimal(18, 0)
   settledAt          DateTime               @db.Timestamptz(6)
   promotionStatus    BookingPromotionStatus @default(PENDING)
@@ -639,6 +731,7 @@ enum BillingLedgerKind {
 
 enum BillingSourceType {
   BASE_BOOKING
+  CONTRACT
   PRINT_ORDER
   PAYMENT_ATTEMPT
   PRINT_CREDIT
@@ -677,6 +770,8 @@ model BillingPaymentAttempt {
   provider             BillingPaymentProvider
   amountVnd            Decimal                      @db.Decimal(18, 0)
   timelineRevisionId   String?                      @db.Uuid
+  contractRevisionId   String?                      @db.Uuid
+  documentDigest       String?
   state                BillingAttemptState          @default(CREATED)
   terminalEvidenceId   String?                      @db.Uuid
   expiresAt            DateTime                     @db.Timestamptz(6)
@@ -719,6 +814,7 @@ model BillingLedgerEntry {
 
   @@unique([id, bookingId])
   @@unique([sourceType, sourceRevisionId])
+  @@unique([bookingId], map: "BillingLedgerEntry_one_contract_obligation_key", where: raw("\"sourceType\" = 'CONTRACT'"))
   @@unique([bookingId, revision])
   @@index([bookingId, occurredAt])
   @@index([sourceEntryId])
