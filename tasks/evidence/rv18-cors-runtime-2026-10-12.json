@@ -1,0 +1,147 @@
+{
+  "date": "2026-10-12",
+  "sourceRevision": "7a39a7ec398801b68b33edf228680ba729e17ffa",
+  "deploymentId": "8ca52ed5-afef-4bc3-88cf-db91a1d50752",
+  "openapiSha256": "55c15733cdc25a9151c724e311cb5753f9b41124a15c879cf73cc3c90c108b9e",
+  "ci": {
+    "id": 38169417246,
+    "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38169417246",
+    "conclusion": "success",
+    "integrationTests": 382,
+    "fullSuiteTests": 1652,
+    "fullSuiteFiles": 214,
+    "coverage": {
+      "statements": 96.51,
+      "branches": 93.56,
+      "functions": 98.48,
+      "lines": 97.33,
+      "perFileBranchesAndLinesThreshold": 80
+    }
+  },
+  "kind": "backend CORS file-metadata handoff follow-up; no frontend code/browser acceptance claim",
+  "allowedOrigin": "https://wedding-web-silk.vercel.app",
+  "checks": [
+    {
+      "label": "inline",
+      "status": 200,
+      "requestId": "fd4caf0e-4650-419b-8854-1b5544e33a5d",
+      "headers": {
+        "access-control-allow-origin": "https://wedding-web-silk.vercel.app",
+        "access-control-allow-credentials": "true",
+        "access-control-expose-headers": "Retry-After, X-Request-Id, Content-Disposition, X-Content-SHA256, X-Printable-Content-Digest, X-Renderer-Version",
+        "content-disposition": "inline; filename=\"invitation-a627d17b-6c8e-4d4b-a900-0a99b7ed404f.pdf\"",
+        "x-content-sha256": "96ca898707e8992738a2a7af10961f1c9119a82af4ab07265696fcd37743b5da",
+        "x-printable-content-digest": "a0bb37537dcc0c68e440f52baa242d02b40f3318d814459bda1c80461f34a566",
+        "x-renderer-version": "invitation-a5-v1"
+      },
+      "sha256": "96ca898707e8992738a2a7af10961f1c9119a82af4ab07265696fcd37743b5da",
+      "bytes": 27401
+    },
+    {
+      "label": "attachment",
+      "status": 200,
+      "requestId": "ef15815b-dcf9-4776-ba31-7d9b1d928ce4",
+      "headers": {
+        "access-control-allow-origin": "https://wedding-web-silk.vercel.app",
+        "access-control-allow-credentials": "true",
+        "access-control-expose-headers": "Retry-After, X-Request-Id, Content-Disposition, X-Content-SHA256, X-Printable-Content-Digest, X-Renderer-Version",
+        "content-disposition": "attachment; filename=\"invitation-a627d17b-6c8e-4d4b-a900-0a99b7ed404f.pdf\"",
+        "x-content-sha256": "96ca898707e8992738a2a7af10961f1c9119a82af4ab07265696fcd37743b5da",
+        "x-printable-content-digest": "a0bb37537dcc0c68e440f52baa242d02b40f3318d814459bda1c80461f34a566",
+        "x-renderer-version": "invitation-a5-v1"
+      },
+      "sha256": "96ca898707e8992738a2a7af10961f1c9119a82af4ab07265696fcd37743b5da",
+      "bytes": 27401
+    },
+    {
+      "label": "unapproved-origin",
+      "status": 403,
+      "requestId": "fd0ad467-cdad-407e-9e20-f23107b5808a",
+      "headers": {
+        "access-control-allow-origin": null,
+        "access-control-allow-credentials": null,
+        "access-control-expose-headers": null,
+        "content-disposition": null,
+        "x-content-sha256": null,
+        "x-printable-content-digest": null,
+        "x-renderer-version": null
+      },
+      "code": "CORS_ORIGIN_DENIED"
+    }
+  ],
+  "requestEvents": [
+    {
+      "statusClass": "2xx",
+      "entryPoint": "http",
+      "level": "info",
+      "event": "http_request_completed",
+      "req": {
+        "method": "GET"
+      },
+      "method": "GET",
+      "service": "wedding-be",
+      "timestamp": "2026-10-11T19:57:59.954Z",
+      "message": "request completed",
+      "environment": "production",
+      "requestId": "fd4caf0e-4650-419b-8854-1b5544e33a5d",
+      "module": "http",
+      "durationMs": 8924.43,
+      "route": "/api/v1/bookings/:bookingId/printable-revisions/:printableRevisionId/file"
+    },
+    {
+      "route": "/api/v1/bookings/:bookingId/printable-revisions/:printableRevisionId/file",
+      "requestId": "ef15815b-dcf9-4776-ba31-7d9b1d928ce4",
+      "level": "info",
+      "environment": "production",
+      "statusClass": "2xx",
+      "durationMs": 7620.213,
+      "req": {
+        "method": "GET"
+      },
+      "message": "request completed",
+      "service": "wedding-be",
+      "event": "http_request_completed",
+      "entryPoint": "http",
+      "method": "GET",
+      "module": "http",
+      "timestamp": "2026-10-11T19:58:08.063Z"
+    },
+    {
+      "level": "warn",
+      "entryPoint": "http",
+      "message": "request completed",
+      "req": {
+        "method": "GET"
+      },
+      "errorCode": "CORS_ORIGIN_DENIED",
+      "event": "http_request_completed",
+      "method": "GET",
+      "environment": "production",
+      "timestamp": "2026-10-11T19:58:08.612Z",
+      "module": "http",
+      "requestId": "fd0ad467-cdad-407e-9e20-f23107b5808a",
+      "durationMs": 1.615,
+      "statusClass": "4xx",
+      "route": "<unmatched>",
+      "service": "wedding-be"
+    }
+  ],
+  "pdfHashUnchanged": true,
+  "billingRevision": 6,
+  "totals": {
+    "acceptedChargesVnd": 8122002,
+    "paidVnd": 8122002,
+    "refundedVnd": 0,
+    "netPaidVnd": 8122002,
+    "outstandingVnd": 0,
+    "creditVnd": 0
+  },
+  "metricsEnabled": false,
+  "tracingEnabled": false,
+  "scope": {
+    "newPayments": 0,
+    "paidGeneration": 0,
+    "existingApprovedImageRevision": "a627d17b-6c8e-4d4b-a900-0a99b7ed404f",
+    "productionReadiness": "not-established"
+  }
+}

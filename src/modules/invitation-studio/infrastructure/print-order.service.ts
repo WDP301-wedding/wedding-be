@@ -954,7 +954,8 @@ export class PrintOrderService {
           }
 
           const adjustmentId = randomUUID();
-          if (!lines.some((l) => l.commercialSource !== null))
+          const contracted = lines.some((l) => l.commercialSource !== null);
+          if (!contracted)
             await this.billing.registerCredit(
               {
                 bookingId: resolvedBookingId,
@@ -987,7 +988,7 @@ export class PrintOrderService {
               toStatus: 'CANCELLED',
               metadata: asJson({
                 adjustmentId,
-                creditedAmountVnd: currentRev.orderTotalVnd.toNumber(),
+                creditedAmountVnd: contracted ? 0 : currentRev.orderTotalVnd.toNumber(),
                 reason: input.reason ?? null,
               }),
             },

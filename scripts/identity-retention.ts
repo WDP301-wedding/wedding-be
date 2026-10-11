@@ -1,56 +1,43 @@
 import 'dotenv/config';
-
 import { config } from '../src/config/config.js';
 import { createPrismaClient } from '../src/core/database/prisma.js';
 import {
   createIdentityRetentionService,
   createPrismaIdentityRetentionRepository,
 } from '../src/modules/identity-access/account/identity-retention.js';
-
-const confirmationFlag = '--confirm-retention';
-
-async function main(arguments_: readonly string[]): Promise<void> {
-  if (!arguments_.includes(confirmationFlag)) {
-    throw new Error(
-      `Identity retention changes persisted data. Re-run with ${confirmationFlag} after confirming the target database.`,
-    );
-  }
-
-  const databaseUrl = config.database.url;
-  if (databaseUrl === undefined) {
-    throw new Error('DATABASE_URL is required for identity retention.');
-  }
-  const batchSize = parseBatchSize(arguments_);
-  const schema = new URL(databaseUrl).searchParams.get('schema')?.trim() || 'public';
-  const prisma = createPrismaClient(databaseUrl);
-
-  try {
-    const service = createIdentityRetentionService({
-      repository: createPrismaIdentityRetentionRepository(prisma, { schema }),
-      retentionDays: config.identityAccess.retentionDays,
-    });
-    const result = await service.run({ batchSize });
-    console.log(JSON.stringify({ event: 'identity_retention_completed', ...result }));
-  } finally {
-    await prisma.$disconnect();
-  }
-}
-
-function parseBatchSize(arguments_: readonly string[]): number {
-  const argument = arguments_.find((value) => value.startsWith('--batch-size='));
-  if (argument === undefined) {
-    return 100;
-  }
-  const parsed = Number(argument.slice('--batch-size='.length));
-  if (!Number.isSafeInteger(parsed) || parsed < 1 || parsed > 1_000) {
-    throw new RangeError('Identity retention batch size must be an integer from 1 to 1000.');
-  }
-  return parsed;
-}
-
+import { retentionOptions } from './retention-options.js';
 try {
-  await main(process.argv.slice(2));
+  const options = retentionOptions(process.argv.slice(2), config.database.url);
+  if (options.inspect) console.log(JSON.stringify({ event: 'retention_target', ...options }));
+  else {
+    const prisma = createPrismaClient(config.database.url);
+    try {
+      const service = createIdentityRetentionService({
+        repository: createPrismaIdentityRetentionRepository(prisma, {
+          schema: options.target.schema,
+        }),
+        retentionDays: config.identityAccess.retentionDays,
+        operatorId: options.operatorId,
+        requestId: () => options.requestId,
+      });
+      const result = await service.run({ batchSize: options.batchSize });
+      console.log(
+        JSON.stringify({
+          event: 'identity_retention_completed',
+          requestId: options.requestId,
+          operatorId: options.operatorId,
+          targetFingerprint: options.fingerprint,
+          batchSize: options.batchSize,
+          ...result,
+        }),
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
 } catch {
-  console.error('Identity retention failed. No retention changes should be assumed.');
+  console.error(
+    'Identity retention failed. No completion should be assumed; inspect the target and confirm operator, fingerprint and batch arguments.',
+  );
   process.exitCode = 1;
 }

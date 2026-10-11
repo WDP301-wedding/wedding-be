@@ -144,6 +144,67 @@ export function registerContractedPrintPriceApiCases(harness: StepSixApiHarness)
       );
       expect(accepted.status, JSON.stringify(accepted.body)).toBe(200);
       order = printOrderResponseSchema.parse(accepted.body as unknown).data;
+      if (unitPriceVnd !== 0) {
+        expect(
+          (
+            await post(
+              `/bookings/${f.id}/print-orders/${order.orderId}/cancellation-intents`,
+              {
+                expectedRevision: order.revision,
+                reason: 'Replace accepted content before production',
+              },
+              'own',
+            )
+          ).status,
+        ).toBe(200);
+        expect(
+          (
+            await post(`/management/print-orders/${order.orderId}/cancellation`, {
+              expectedRevision: order.revision,
+            })
+          ).status,
+        ).toBe(200);
+        const audit = await database.prisma.invitationPrintAudit.findFirstOrThrow({
+          where: { orderId: order.orderId, action: 'invitation.print-order-cancelled' },
+        });
+        expect(audit.metadata).toMatchObject({ creditedAmountVnd: 0 });
+        const replacement = await post(
+          `/bookings/${f.id}/print-orders`,
+          {
+            lines: [
+              {
+                designId: design.designId,
+                quantity: 60,
+                commercialSource: {
+                  agreementRevisionId: d.contract.revisionId,
+                  offeringId: offering.offeringId,
+                  sourceRevisionId: offering.sourceRevisionId,
+                },
+              },
+            ],
+          },
+          'own',
+        );
+        expect(replacement.status).toBe(201);
+        order = printOrderResponseSchema.parse(replacement.body as unknown).data;
+        const quote = await post(`/management/print-orders/${order.orderId}/quotations`, {
+          expectedRevision: order.revision,
+          lines: [{ lineId: order.lines[0]!.lineId, unitPriceVnd }],
+          estimatedHandoverAt: new Date(Date.now() + 86400000).toISOString(),
+        });
+        expect(quote.status).toBe(200);
+        order = printOrderResponseSchema.parse(quote.body as unknown).data;
+        const approval = await post(
+          `/bookings/${f.id}/print-orders/${order.orderId}/approval`,
+          {
+            expectedRevision: order.revision,
+            commercialRevisionId: order.currentCommercialRevisionId,
+          },
+          'own',
+        );
+        expect(approval.status).toBe(200);
+        order = printOrderResponseSchema.parse(approval.body as unknown).data;
+      }
       for (const transition of ['production', 'ready', 'handover']) {
         const response = await post(`/management/print-orders/${order.orderId}/${transition}`, {
           expectedRevision: order.revision,
@@ -163,6 +224,6 @@ export function registerContractedPrintPriceApiCases(harness: StepSixApiHarness)
         bill.history.find((l) => l.sourceType === 'CONTRACT')!.ledgerEntryId,
       );
     },
-    45_000,
+    60_000,
   );
 }

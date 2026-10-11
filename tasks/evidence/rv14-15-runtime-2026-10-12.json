@@ -1,0 +1,960 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-12",
+  "target": "https://wedding-be-production-e1dc.up.railway.app",
+  "targetUse": "owner-authorized developer-only staging; Railway label production",
+  "provider": "VNPay 2.1.0 sandbox",
+  "observedDeploymentId": "261f6e53-91d0-4473-b28f-d3e9dd107a20",
+  "observedSourceRevision": "2fcae5e5be2acdcd55a99df77036f8d34157b383",
+  "observedOpenApiSha256": "bd2f087e274524a967850334a106d51fa566669a823f2aa51fff427104905747",
+  "productionReadiness": "not-established",
+  "authorization": {
+    "stagingAndSandbox": true,
+    "testAccountsAndBookingsOnly": true,
+    "realMoney": false,
+    "paidGeneration": false,
+    "fixtureOnlyClockSimulation": true
+  },
+  "baseline": {
+    "bookingId": "091ac91e-126e-4f41-ae1d-83ce651318b7",
+    "paymentAttemptId": "3f0c624b-95de-4f8a-86fa-2efaea2f1239",
+    "amountVnd": 35000000,
+    "ipn": [
+      {
+        "id": "b25773ae-ace8-4723-9a67-5446326ed2a5",
+        "channel": "IPN",
+        "decision": "ACCEPTED",
+        "outcome": "SUCCEEDED",
+        "amountVnd": "35000000",
+        "transactionId": "15701565",
+        "payloadHash": "b9b5b48a60b0cdd528103538741e35d46004bf12239c5120ef1b28973d5f2182"
+      }
+    ],
+    "queryDr": {
+      "event": "live_sandbox_querydr",
+      "checkedAt": "2026-10-11T17:53:51.200Z",
+      "deploymentId": "261f6e53-91d0-4473-b28f-d3e9dd107a20",
+      "configuredQueryIp": "152.55.176.237",
+      "paymentAttemptId": "3f0c624b-95de-4f8a-86fa-2efaea2f1239",
+      "responseCode": "94",
+      "verified": false,
+      "correlated": false,
+      "verificationError": {
+        "name": "Error",
+        "reason": "SIGNATURE"
+      },
+      "writes": 0
+    },
+    "attempt": {
+      "paymentAttemptId": "3f0c624b-95de-4f8a-86fa-2efaea2f1239",
+      "status": "SUCCEEDED",
+      "purpose": "BALANCE",
+      "amountVnd": 35000000,
+      "applicationStatus": "SUCCEEDED",
+      "expiresAt": "2026-10-11T18:04:33.289Z"
+    },
+    "totals": {
+      "acceptedChargesVnd": 50000000,
+      "paidVnd": 50000000,
+      "refundedVnd": 0,
+      "netPaidVnd": 50000000,
+      "outstandingVnd": 0,
+      "creditVnd": 0
+    },
+    "duplicateCallback": {
+      "status": 200,
+      "body": {
+        "RspCode": "02",
+        "Message": "Order already confirmed"
+      }
+    },
+    "invalidSignature": {
+      "status": 200,
+      "body": {
+        "RspCode": "97",
+        "Message": "Invalid signature"
+      }
+    },
+    "counts": [
+      {
+        "kind": "PAYMENT",
+        "count": 2,
+        "total": "50000000"
+      },
+      {
+        "kind": "CHARGE",
+        "count": 1,
+        "total": "50000000"
+      }
+    ]
+  },
+  "revised": {
+    "bookingId": "cd0b75ab-6256-427e-9b37-777f8b9c2822",
+    "consultationId": "e9d9beaf-7f49-4648-a603-c26efc4ddd87",
+    "accountId": "f3e421c8-b8dd-4aa1-a815-1c49ce032b99",
+    "acceptedInvitationPrerequisiteId": "98e3002f-9475-4380-ad80-f3725379dfaa",
+    "deposit": {
+      "attemptId": "ac886b84-0247-4324-94a4-e43cbedd43d5",
+      "amountVnd": 2433001,
+      "ipn": [
+        {
+          "id": "677d7632-fe62-432a-b780-d248c0c35102",
+          "channel": "IPN",
+          "decision": "ACCEPTED",
+          "outcome": "SUCCEEDED",
+          "amountVnd": "2433001",
+          "transactionId": "15701568",
+          "payloadHash": "d88993732260ec51ea44dcf49fe8664e8703ebe59f62c0b16b71386810058352"
+        }
+      ]
+    },
+    "access": [
+      {
+        "accountId": "f3e421c8-b8dd-4aa1-a815-1c49ce032b99",
+        "level": "FULL",
+        "sourcePaymentId": "5b8dc5e5-d1e9-4454-93e3-1a0285a4c855"
+      }
+    ],
+    "contract": {
+      "revisionId": "8d38e9e9-6fbc-48dc-8806-f2777dfcd608",
+      "totalVnd": 8110001,
+      "depositVnd": 2433001
+    },
+    "appendices": [
+      {
+        "revisionId": "f92a012d-b87e-49c6-b6f9-317e546eadc5",
+        "deltaVnd": 20002
+      },
+      {
+        "revisionId": "8c0fbd92-7794-496f-9dec-81cd054a6262",
+        "deltaVnd": -10001
+      }
+    ],
+    "invoice": {
+      "revisionId": "d84f8448-d0ed-443d-b9dc-cca67093b30f",
+      "totalVnd": 8122002,
+      "incidentalVnd": 2000,
+      "digest": "e8d183e693a288a0cf4a1431ca82d1f561861f00f6c55263be5f5ed87c0bedab",
+      "clock": "2027-01-06T17:00:00Z",
+      "clockType": "authorized isolated native harness, not service/event wall clock"
+    },
+    "balance": {
+      "attempt": {
+        "paymentAttemptId": "fdfa49a5-e68f-4a71-8a21-1861aa73d816",
+        "status": "SUCCEEDED",
+        "purpose": "BALANCE",
+        "amountVnd": 5689001,
+        "invoiceRevisionId": "d84f8448-d0ed-443d-b9dc-cca67093b30f",
+        "invoiceDigest": "e8d183e693a288a0cf4a1431ca82d1f561861f00f6c55263be5f5ed87c0bedab",
+        "sourceBillingRevision": 5,
+        "applicationStatus": "SUCCEEDED",
+        "expiresAt": "2026-10-11T18:24:28.808Z"
+      },
+      "pin": {
+        "paymentAttemptId": "fdfa49a5-e68f-4a71-8a21-1861aa73d816",
+        "status": "UNKNOWN",
+        "purpose": "BALANCE",
+        "amountVnd": 5689001,
+        "invoiceRevisionId": "d84f8448-d0ed-443d-b9dc-cca67093b30f",
+        "invoiceDigest": "e8d183e693a288a0cf4a1431ca82d1f561861f00f6c55263be5f5ed87c0bedab",
+        "sourceBillingRevision": 5,
+        "applicationStatus": null,
+        "expiresAt": "2026-10-11T18:24:28.808Z"
+      },
+      "ipn": [
+        {
+          "id": "1ca3a349-1671-4971-a218-3e5c1476dfc0",
+          "channel": "IPN",
+          "decision": "ACCEPTED",
+          "outcome": "SUCCEEDED",
+          "amountVnd": "5689001",
+          "transactionId": "15701577",
+          "payloadHash": "3de46c793e29111f8b195d47fb4d7e5bad3062d0828bf3bca494f98868c542e3"
+        }
+      ],
+      "queryDr": {
+        "event": "live_sandbox_querydr",
+        "checkedAt": "2026-10-11T18:16:42.274Z",
+        "deploymentId": "261f6e53-91d0-4473-b28f-d3e9dd107a20",
+        "configuredQueryIp": "152.55.176.237",
+        "paymentAttemptId": "fdfa49a5-e68f-4a71-8a21-1861aa73d816",
+        "responseCode": "00",
+        "transactionStatus": "00",
+        "verified": true,
+        "correlated": true,
+        "amountVnd": 5689001,
+        "outcome": "SUCCEEDED",
+        "payloadHash": "a98b188eba73b5e1564118041a5a2cf4087d10a3f0bfcfdeb5a084f84c6d4dff",
+        "transactionId": "15701577",
+        "verificationError": null,
+        "writes": 0
+      }
+    },
+    "totals": {
+      "acceptedChargesVnd": 8122002,
+      "paidVnd": 8122002,
+      "refundedVnd": 0,
+      "netPaidVnd": 8122002,
+      "outstandingVnd": 0,
+      "creditVnd": 0
+    },
+    "manualAccountingGuards": {
+      "refundExecuted": false,
+      "manualPaymentExecuted": false,
+      "unchangedBillingRevision": 6,
+      "totals": {
+        "acceptedChargesVnd": 8122002,
+        "paidVnd": 8122002,
+        "refundedVnd": 0,
+        "netPaidVnd": 8122002,
+        "outstandingVnd": 0,
+        "creditVnd": 0
+      }
+    },
+    "persistedInvoice": [
+      {
+        "id": "d84f8448-d0ed-443d-b9dc-cca67093b30f",
+        "revisionNumber": 1,
+        "documentDigest": "e8d183e693a288a0cf4a1431ca82d1f561861f00f6c55263be5f5ed87c0bedab",
+        "totalVnd": "8122002",
+        "deltaVnd": "2000",
+        "sourceBillingRevision": 5,
+        "issuedAt": "2027-01-06T17:00:00.000Z"
+      }
+    ],
+    "persistedAttempts": [
+      {
+        "id": "ac886b84-0247-4324-94a4-e43cbedd43d5",
+        "purpose": "DEPOSIT",
+        "provider": "VNPAY",
+        "state": "SUCCEEDED",
+        "amountVnd": "2433001",
+        "invoiceRevisionId": null,
+        "invoiceDigest": null,
+        "sourceBillingRevision": null,
+        "terminalEvidenceId": "677d7632-fe62-432a-b780-d248c0c35102"
+      },
+      {
+        "id": "fdfa49a5-e68f-4a71-8a21-1861aa73d816",
+        "purpose": "BALANCE",
+        "provider": "VNPAY",
+        "state": "SUCCEEDED",
+        "amountVnd": "5689001",
+        "invoiceRevisionId": "d84f8448-d0ed-443d-b9dc-cca67093b30f",
+        "invoiceDigest": "e8d183e693a288a0cf4a1431ca82d1f561861f00f6c55263be5f5ed87c0bedab",
+        "sourceBillingRevision": 5,
+        "terminalEvidenceId": "1ca3a349-1671-4971-a218-3e5c1476dfc0"
+      }
+    ],
+    "persistedLedger": [
+      {
+        "id": "7358f682-41fc-4bd4-b34b-7f557cfacf50",
+        "revision": 1,
+        "kind": "CHARGE",
+        "sourceType": "CONTRACT",
+        "sourceRevisionId": "8d38e9e9-6fbc-48dc-8806-f2777dfcd608",
+        "amountVnd": "8110001",
+        "paymentAttemptId": null
+      },
+      {
+        "id": "5b8dc5e5-d1e9-4454-93e3-1a0285a4c855",
+        "revision": 2,
+        "kind": "PAYMENT",
+        "sourceType": "PAYMENT_ATTEMPT",
+        "sourceRevisionId": "ac886b84-0247-4324-94a4-e43cbedd43d5",
+        "amountVnd": "2433001",
+        "paymentAttemptId": "ac886b84-0247-4324-94a4-e43cbedd43d5"
+      },
+      {
+        "id": "78a436b5-5aec-4295-9843-d82462b4500a",
+        "revision": 3,
+        "kind": "CHARGE",
+        "sourceType": "CONTRACT_APPENDIX",
+        "sourceRevisionId": "f92a012d-b87e-49c6-b6f9-317e546eadc5",
+        "amountVnd": "20002",
+        "paymentAttemptId": null
+      },
+      {
+        "id": "514713a1-c0dc-41e8-b2cf-18bbf3bf989e",
+        "revision": 4,
+        "kind": "CREDIT_ADJUSTMENT",
+        "sourceType": "CONTRACT_APPENDIX",
+        "sourceRevisionId": "8c0fbd92-7794-496f-9dec-81cd054a6262",
+        "amountVnd": "10001",
+        "paymentAttemptId": null
+      },
+      {
+        "id": "0677f516-eb5a-403a-9d74-e61e618d4f90",
+        "revision": 5,
+        "kind": "CHARGE",
+        "sourceType": "INCIDENTAL_FINALIZATION",
+        "sourceRevisionId": "d84f8448-d0ed-443d-b9dc-cca67093b30f",
+        "amountVnd": "2000",
+        "paymentAttemptId": null
+      },
+      {
+        "id": "1227259b-56d3-4513-8a76-e0c1a223af55",
+        "revision": 6,
+        "kind": "PAYMENT",
+        "sourceType": "PAYMENT_ATTEMPT",
+        "sourceRevisionId": "fdfa49a5-e68f-4a71-8a21-1861aa73d816",
+        "amountVnd": "5689001",
+        "paymentAttemptId": "fdfa49a5-e68f-4a71-8a21-1861aa73d816"
+      }
+    ],
+    "publicClockAndCleanup": {
+      "serverNow": "2026-10-11T19:18:34.405Z",
+      "eventDate": "2027-01-06T00:00:00.000Z",
+      "remainingClockSchemas": 0
+    },
+    "audit": [
+      {
+        "requestId": "89d12f36-5869-4cf8-8763-3302910b8db9",
+        "action": "booking.proposal-created",
+        "entityId": "cd0b75ab-6256-427e-9b37-777f8b9c2822",
+        "occurredAt": "2026-10-11T17:55:45.325Z"
+      },
+      {
+        "requestId": "28a036a5-b4f0-49f3-8d21-db014421935d",
+        "action": "booking.contract-draft-created",
+        "entityId": "8d38e9e9-6fbc-48dc-8806-f2777dfcd608",
+        "occurredAt": "2026-10-11T17:56:12.896Z"
+      },
+      {
+        "requestId": "a3d59e9a-cba3-4277-a2b3-cb98965c0d08",
+        "action": "booking.contract-submitted",
+        "entityId": "8d38e9e9-6fbc-48dc-8806-f2777dfcd608",
+        "occurredAt": "2026-10-11T17:56:25.810Z"
+      },
+      {
+        "requestId": "4b06214b-faae-46c0-b435-36e2ab3b92bb",
+        "action": "booking.contract-approved",
+        "entityId": "8d38e9e9-6fbc-48dc-8806-f2777dfcd608",
+        "occurredAt": "2026-10-11T17:56:36.469Z"
+      },
+      {
+        "requestId": "b1a904c4-5413-415e-8b5d-c15274ed0049",
+        "action": "booking.contract-approved",
+        "entityId": "8d38e9e9-6fbc-48dc-8806-f2777dfcd608",
+        "occurredAt": "2026-10-11T17:56:47.931Z"
+      },
+      {
+        "requestId": "d452147c-281d-4e05-b7a5-6637abd91522",
+        "action": "booking.slot-held",
+        "entityId": "cd0b75ab-6256-427e-9b37-777f8b9c2822",
+        "occurredAt": "2026-10-11T17:56:53.112Z"
+      },
+      {
+        "requestId": "1cd03523-131f-4f19-9474-cd4a5c44f0f5",
+        "action": "booking.deposit-intent-reserved",
+        "entityId": "cd0b75ab-6256-427e-9b37-777f8b9c2822",
+        "occurredAt": "2026-10-11T17:57:05.211Z"
+      },
+      {
+        "requestId": "1cd03523-131f-4f19-9474-cd4a5c44f0f5",
+        "action": "booking.deposit-recorded",
+        "entityId": "cd0b75ab-6256-427e-9b37-777f8b9c2822",
+        "occurredAt": "2026-10-11T17:57:47.000Z"
+      },
+      {
+        "requestId": "677262ff-17de-4f7b-8920-c2fde836a395",
+        "action": "booking.appendix-created",
+        "entityId": "f92a012d-b87e-49c6-b6f9-317e546eadc5",
+        "occurredAt": "2026-10-11T17:59:45.316Z"
+      },
+      {
+        "requestId": "c92765db-5173-4982-80ed-cd08134ad910",
+        "action": "booking.appendix-submitted",
+        "entityId": "f92a012d-b87e-49c6-b6f9-317e546eadc5",
+        "occurredAt": "2026-10-11T17:59:51.651Z"
+      },
+      {
+        "requestId": "97f60e5a-a29c-4828-9090-36656d17c805",
+        "action": "booking.appendix-approved",
+        "entityId": "f92a012d-b87e-49c6-b6f9-317e546eadc5",
+        "occurredAt": "2026-10-11T17:59:56.390Z"
+      },
+      {
+        "requestId": "43ba3438-85c0-464b-bd62-56b34b7e2c18",
+        "action": "booking.appendix-approved",
+        "entityId": "f92a012d-b87e-49c6-b6f9-317e546eadc5",
+        "occurredAt": "2026-10-11T18:00:03.882Z"
+      },
+      {
+        "requestId": "53670c3f-e3a1-448f-8657-fc5603c0f6cb",
+        "action": "booking.appendix-created",
+        "entityId": "8c0fbd92-7794-496f-9dec-81cd054a6262",
+        "occurredAt": "2026-10-11T18:00:13.968Z"
+      },
+      {
+        "requestId": "a02850df-de1b-4470-86e2-6f1181e01ada",
+        "action": "booking.appendix-submitted",
+        "entityId": "8c0fbd92-7794-496f-9dec-81cd054a6262",
+        "occurredAt": "2026-10-11T18:00:20.832Z"
+      },
+      {
+        "requestId": "c954ae2a-ca0b-44f8-8137-8482db2e1207",
+        "action": "booking.appendix-approved",
+        "entityId": "8c0fbd92-7794-496f-9dec-81cd054a6262",
+        "occurredAt": "2026-10-11T18:00:25.719Z"
+      },
+      {
+        "requestId": "c4a1d9f9-3568-4bd3-8d7d-16cd0b24dafa",
+        "action": "booking.appendix-approved",
+        "entityId": "8c0fbd92-7794-496f-9dec-81cd054a6262",
+        "occurredAt": "2026-10-11T18:00:33.176Z"
+      },
+      {
+        "requestId": "bfa450cb-9028-42c7-8adf-5c90a4b87f52",
+        "action": "booking.cancellation-requested",
+        "entityId": "cd0b75ab-6256-427e-9b37-777f8b9c2822",
+        "occurredAt": "2026-10-11T18:00:53.448Z"
+      },
+      {
+        "requestId": "49aed7f5-dff4-444c-9c29-62c31593e615",
+        "action": "booking.cancellation-rejected",
+        "entityId": "cd0b75ab-6256-427e-9b37-777f8b9c2822",
+        "occurredAt": "2026-10-11T18:01:45.987Z"
+      },
+      {
+        "requestId": "43c1a396-4abe-4700-859b-dc7d49077dce",
+        "action": "billing.final-invoice-issued",
+        "entityId": "d84f8448-d0ed-443d-b9dc-cca67093b30f",
+        "occurredAt": "2026-10-11T18:08:03.107Z"
+      }
+    ]
+  },
+  "httpChecks": [
+    {
+      "label": "rv14-billing-before",
+      "status": 200,
+      "code": null,
+      "requestId": "ec8b42c5-c8f7-4c65-8514-c55b6334da8b",
+      "at": "2026-10-11T17:47:35.641Z"
+    },
+    {
+      "label": "rv14-billing-current",
+      "status": 200,
+      "code": null,
+      "requestId": "176d26ec-2074-4a81-b3fa-dabb8d87b216",
+      "at": "2026-10-11T17:49:20.472Z"
+    },
+    {
+      "label": "rv14-stale-billing-revision",
+      "status": 409,
+      "code": "STALE_BILLING_REVISION",
+      "requestId": "e630d6b9-65a2-4db2-a095-a826b1d38d9d",
+      "at": "2026-10-11T17:49:26.046Z"
+    },
+    {
+      "label": "rv14-balance-checkout",
+      "status": 201,
+      "code": null,
+      "requestId": "e08231c6-6b43-404c-a3e1-480d22b2b0ec",
+      "at": "2026-10-11T17:49:35.109Z"
+    },
+    {
+      "label": "rv14-checkout-replay",
+      "status": 201,
+      "code": null,
+      "requestId": "67b55306-94de-46c1-8b24-8d62ec219468",
+      "at": "2026-10-11T17:49:38.630Z"
+    },
+    {
+      "label": "rv14-pinned-attempt",
+      "status": 200,
+      "code": null,
+      "requestId": "0773736c-085b-44d5-990e-3870eb4545eb",
+      "at": "2026-10-11T17:49:45.227Z"
+    },
+    {
+      "label": "rv14-parallel-intent-denial",
+      "status": 409,
+      "code": "PAYMENT_ATTEMPT_ACTIVE",
+      "requestId": "d02ff4ad-8bb0-43cd-a20e-b7ab5e95b8e8",
+      "at": "2026-10-11T17:49:50.299Z"
+    },
+    {
+      "label": "rv14-settlement-read",
+      "status": 200,
+      "code": null,
+      "requestId": "527ed7e3-74e4-4e68-b820-9b81f26f6c8d",
+      "at": "2026-10-11T17:52:30.792Z"
+    },
+    {
+      "label": "rv14-ledger-after",
+      "status": 200,
+      "code": null,
+      "requestId": "e433ba59-f00b-42db-82a0-2783b4bea021",
+      "at": "2026-10-11T17:52:33.717Z"
+    },
+    {
+      "label": "rv15-profile-before",
+      "status": 200,
+      "code": null,
+      "requestId": "d3da0fc5-256c-45b7-a41b-8a91ef8f7e25",
+      "at": "2026-10-11T17:55:00.857Z"
+    },
+    {
+      "label": "rv15-complete-synthetic-names",
+      "status": 200,
+      "code": null,
+      "requestId": "04f1f029-7b31-4ca9-accc-ebe5123d2e1f",
+      "at": "2026-10-11T17:55:03.397Z"
+    },
+    {
+      "label": "rv15-create-booking-from-accepted-consultation",
+      "status": 201,
+      "code": null,
+      "requestId": "89d12f36-5869-4cf8-8763-3302910b8db9",
+      "at": "2026-10-11T17:55:43.127Z"
+    },
+    {
+      "label": "rv15-proposal-before",
+      "status": 200,
+      "code": null,
+      "requestId": "814c0a43-19ed-4a31-95cb-c582344ed397",
+      "at": "2026-10-11T17:55:45.681Z"
+    },
+    {
+      "label": "rv15-create-timeline",
+      "status": 201,
+      "code": null,
+      "requestId": "74e5fdf3-9d5a-404a-895f-a7f1258cb784",
+      "at": "2026-10-11T17:55:49.047Z"
+    },
+    {
+      "label": "rv15-timeline-read-manager",
+      "status": 200,
+      "code": null,
+      "requestId": "0daedade-def8-40b7-bfac-0de9cf08e800",
+      "at": "2026-10-11T17:55:50.389Z"
+    },
+    {
+      "label": "rv15-timeline-approve-manager",
+      "status": 200,
+      "code": null,
+      "requestId": "0b0a4e74-15a4-422c-8c8d-09d3af8c36b2",
+      "at": "2026-10-11T17:55:53.615Z"
+    },
+    {
+      "label": "rv15-timeline-read-journeyCouple",
+      "status": 200,
+      "code": null,
+      "requestId": "00bd346b-0081-465b-aea4-04b0eec2c70f",
+      "at": "2026-10-11T17:55:54.950Z"
+    },
+    {
+      "label": "rv15-timeline-approve-journeyCouple",
+      "status": 200,
+      "code": null,
+      "requestId": "5d0ef4a0-6838-484a-9128-2c2568fcc050",
+      "at": "2026-10-11T17:55:58.479Z"
+    },
+    {
+      "label": "rv15-contract-head",
+      "status": 200,
+      "code": null,
+      "requestId": "5a4a502d-aa94-4c0a-9d93-eb0900f6d688",
+      "at": "2026-10-11T17:56:01.885Z"
+    },
+    {
+      "label": "rv15-create-contract",
+      "status": 201,
+      "code": null,
+      "requestId": "28a036a5-b4f0-49f3-8d21-db014421935d",
+      "at": "2026-10-11T17:56:10.847Z"
+    },
+    {
+      "label": "rv15-contract-read-submissions",
+      "status": 200,
+      "code": null,
+      "requestId": "bd789daa-605d-4acf-99c7-881524e89d3a",
+      "at": "2026-10-11T17:56:14.384Z"
+    },
+    {
+      "label": "rv15-contract-submissions",
+      "status": 200,
+      "code": null,
+      "requestId": "a3d59e9a-cba3-4277-a2b3-cb98965c0d08",
+      "at": "2026-10-11T17:56:23.757Z"
+    },
+    {
+      "label": "rv15-contract-read-manager",
+      "status": 200,
+      "code": null,
+      "requestId": "c565ab98-936f-47b8-b88e-7308bbbd0659",
+      "at": "2026-10-11T17:56:27.294Z"
+    },
+    {
+      "label": "rv15-contract-manager",
+      "status": 200,
+      "code": null,
+      "requestId": "4b06214b-faae-46c0-b435-36e2ab3b92bb",
+      "at": "2026-10-11T17:56:34.425Z"
+    },
+    {
+      "label": "rv15-contract-read-journeyCouple",
+      "status": 200,
+      "code": null,
+      "requestId": "96da4a46-e6e3-417b-a369-0b8d45b45a3b",
+      "at": "2026-10-11T17:56:37.973Z"
+    },
+    {
+      "label": "rv15-contract-journeyCouple",
+      "status": 200,
+      "code": null,
+      "requestId": "b1a904c4-5413-415e-8b5d-c15274ed0049",
+      "at": "2026-10-11T17:56:45.845Z"
+    },
+    {
+      "label": "rv15-hold-revision",
+      "status": 200,
+      "code": null,
+      "requestId": "df84cd73-6d9a-45fd-bbf2-bccf25fe2d4d",
+      "at": "2026-10-11T17:56:48.422Z"
+    },
+    {
+      "label": "rv15-slot-hold",
+      "status": 201,
+      "code": null,
+      "requestId": "d452147c-281d-4e05-b7a5-6637abd91522",
+      "at": "2026-10-11T17:56:52.048Z"
+    },
+    {
+      "label": "rv15-deposit-checkout",
+      "status": 201,
+      "code": null,
+      "requestId": "1cd03523-131f-4f19-9474-cd4a5c44f0f5",
+      "at": "2026-10-11T17:57:05.959Z"
+    },
+    {
+      "label": "rv15-deposit-settlement-read",
+      "status": 200,
+      "code": null,
+      "requestId": "9c6eaff0-631d-4e15-a776-923ff086a62c",
+      "at": "2026-10-11T17:58:43.617Z"
+    },
+    {
+      "label": "rv15-confirmed-proposal",
+      "status": 200,
+      "code": null,
+      "requestId": "70fde13b-2e43-4d26-a224-b772bb2bcc65",
+      "at": "2026-10-11T17:58:47.449Z"
+    },
+    {
+      "label": "rv15-appendix-head",
+      "status": 200,
+      "code": null,
+      "requestId": "b87111c8-2cd4-4553-af5b-765ca630d9e1",
+      "at": "2026-10-11T17:59:36.224Z"
+    },
+    {
+      "label": "rv15-appendix-create-3",
+      "status": 201,
+      "code": null,
+      "requestId": "677262ff-17de-4f7b-8920-c2fde836a395",
+      "at": "2026-10-11T17:59:43.251Z"
+    },
+    {
+      "label": "rv15-appendix-3-submissions",
+      "status": 200,
+      "code": null,
+      "requestId": "c92765db-5173-4982-80ed-cd08134ad910",
+      "at": "2026-10-11T17:59:49.583Z"
+    },
+    {
+      "label": "rv15-appendix-3-manager",
+      "status": 200,
+      "code": null,
+      "requestId": "97f60e5a-a29c-4828-9090-36656d17c805",
+      "at": "2026-10-11T17:59:54.332Z"
+    },
+    {
+      "label": "rv15-appendix-3-journeyCouple",
+      "status": 200,
+      "code": null,
+      "requestId": "43ba3438-85c0-464b-bd62-56b34b7e2c18",
+      "at": "2026-10-11T18:00:01.827Z"
+    },
+    {
+      "label": "rv15-appendix-head",
+      "status": 200,
+      "code": null,
+      "requestId": "315209e6-7cb3-45e5-a227-a3238f6ca753",
+      "at": "2026-10-11T18:00:04.800Z"
+    },
+    {
+      "label": "rv15-appendix-create-2",
+      "status": 201,
+      "code": null,
+      "requestId": "53670c3f-e3a1-448f-8657-fc5603c0f6cb",
+      "at": "2026-10-11T18:00:11.913Z"
+    },
+    {
+      "label": "rv15-appendix-2-submissions",
+      "status": 200,
+      "code": null,
+      "requestId": "a02850df-de1b-4470-86e2-6f1181e01ada",
+      "at": "2026-10-11T18:00:18.764Z"
+    },
+    {
+      "label": "rv15-appendix-2-manager",
+      "status": 200,
+      "code": null,
+      "requestId": "c954ae2a-ca0b-44f8-8137-8482db2e1207",
+      "at": "2026-10-11T18:00:23.660Z"
+    },
+    {
+      "label": "rv15-appendix-2-journeyCouple",
+      "status": 200,
+      "code": null,
+      "requestId": "c4a1d9f9-3568-4bd3-8d7d-16cd0b24dafa",
+      "at": "2026-10-11T18:00:31.113Z"
+    },
+    {
+      "label": "rv15-change-head",
+      "status": 200,
+      "code": null,
+      "requestId": "00d52a62-44d2-4fd7-974e-57107a023ece",
+      "at": "2026-10-11T18:00:33.708Z"
+    },
+    {
+      "label": "rv15-request-timeline-change",
+      "status": 201,
+      "code": null,
+      "requestId": "631bf376-e3e9-4940-a045-0c2374b0fcde",
+      "at": "2026-10-11T18:00:37.339Z"
+    },
+    {
+      "label": "rv15-changed-timeline-head",
+      "status": 200,
+      "code": null,
+      "requestId": "45f6dff1-a50a-4875-8b44-acdc779bc8ca",
+      "at": "2026-10-11T18:00:38.664Z"
+    },
+    {
+      "label": "rv15-approve-changed-timeline-manager",
+      "status": 200,
+      "code": null,
+      "requestId": "c77a0574-d0a7-4cb9-8536-e76918e30beb",
+      "at": "2026-10-11T18:00:41.863Z"
+    },
+    {
+      "label": "rv15-changed-timeline-head",
+      "status": 200,
+      "code": null,
+      "requestId": "dd479af4-9046-4865-a313-6d7e56c0eb10",
+      "at": "2026-10-11T18:00:43.172Z"
+    },
+    {
+      "label": "rv15-approve-changed-timeline-journeyCouple",
+      "status": 200,
+      "code": null,
+      "requestId": "48410433-a6e6-4e77-b705-5a91cd3a3af5",
+      "at": "2026-10-11T18:00:47.153Z"
+    },
+    {
+      "label": "rv15-cancellation-head",
+      "status": 200,
+      "code": null,
+      "requestId": "09ab8c6d-8186-4b29-9024-cb099d33b1ce",
+      "at": "2026-10-11T18:00:48.478Z"
+    },
+    {
+      "label": "rv15-cancellation-request",
+      "status": 202,
+      "code": null,
+      "requestId": "bfa450cb-9028-42c7-8adf-5c90a4b87f52",
+      "at": "2026-10-11T18:00:51.386Z"
+    },
+    {
+      "label": "rv15-recover-cancellation-response",
+      "status": 200,
+      "code": null,
+      "requestId": "9c7e896a-05c8-4239-a393-3328d7593122",
+      "at": "2026-10-11T18:01:39.179Z"
+    },
+    {
+      "label": "rv15-cancel-decision-head",
+      "status": 200,
+      "code": null,
+      "requestId": "aba78bf8-c425-4dd1-8f73-55616de919b3",
+      "at": "2026-10-11T18:01:41.117Z"
+    },
+    {
+      "label": "rv15-reject-cancellation",
+      "status": 200,
+      "code": null,
+      "requestId": "49aed7f5-dff4-444c-9c29-62c31593e615",
+      "at": "2026-10-11T18:01:44.205Z"
+    },
+    {
+      "label": "rv15-invitation-design",
+      "status": 201,
+      "code": null,
+      "requestId": "1af2a95e-42c7-40ff-a0df-641a304b4769",
+      "at": "2026-10-11T18:02:00.158Z"
+    },
+    {
+      "label": "rv15-publish-generic-invitation",
+      "status": 200,
+      "code": null,
+      "requestId": "caeaf969-a489-4c8b-a6cf-de0892b426a5",
+      "at": "2026-10-11T18:02:15.466Z"
+    },
+    {
+      "label": "rv15-request-contracted-print",
+      "status": 201,
+      "code": null,
+      "requestId": "2f6fc0bb-0c71-4656-9464-a65c30bdc361",
+      "at": "2026-10-11T18:02:31.999Z"
+    },
+    {
+      "label": "rv15-real-clock-billing",
+      "status": 200,
+      "code": null,
+      "requestId": "a63b2e3c-7993-4604-ac46-ebd9d59011ea",
+      "at": "2026-10-11T18:02:50.203Z"
+    },
+    {
+      "label": "rv15-final-invoice-required",
+      "status": 409,
+      "code": "INVOICE_FINALIZATION_REQUIRED",
+      "requestId": "b937f75a-c63d-4c57-9255-fa3fcad04796",
+      "at": "2026-10-11T18:03:09.973Z"
+    },
+    {
+      "label": "rv15-event-not-ended",
+      "status": 409,
+      "code": "EVENT_NOT_ENDED",
+      "requestId": "c865c830-3097-48e8-aacf-ee8438d4ccc0",
+      "at": "2026-10-11T18:03:14.099Z"
+    },
+    {
+      "label": "rv15-conflict-consultation",
+      "status": 201,
+      "code": null,
+      "requestId": "7f525a1c-f82b-4fab-b832-ce7a7a7d330b",
+      "at": "2026-10-11T18:03:17.012Z"
+    },
+    {
+      "label": "rv15-competing-booking",
+      "status": 201,
+      "code": null,
+      "requestId": "42adcb04-409e-4d7c-83aa-afb22e9d1e97",
+      "at": "2026-10-11T18:03:21.281Z"
+    },
+    {
+      "label": "rv15-confirmed-slot-exclusivity",
+      "status": 409,
+      "code": "SLOT_NOT_AVAILABLE",
+      "requestId": "059578f2-db9d-496c-8b29-eeb63f7004e1",
+      "at": "2026-10-11T18:03:24.418Z"
+    },
+    {
+      "label": "rv15-unowned-private-billing",
+      "status": 404,
+      "code": "NOT_FOUND",
+      "requestId": "473c14d8-9cf2-4db3-afc1-df47a4d11a75",
+      "at": "2026-10-11T18:03:27.174Z"
+    },
+    {
+      "label": "rv15-cancel-competing-head",
+      "status": 200,
+      "code": null,
+      "requestId": "a7d29898-7873-4aa9-99b1-66d237b6b2a9",
+      "at": "2026-10-11T18:03:29.574Z"
+    },
+    {
+      "label": "rv15-cancel-isolated-draft",
+      "status": 200,
+      "code": null,
+      "requestId": "367dfe71-75f1-4edb-8fb1-a1aa3936fcd3",
+      "at": "2026-10-11T18:03:32.862Z"
+    },
+    {
+      "label": "rv15-canonical-invoice-history",
+      "status": 200,
+      "code": null,
+      "requestId": "cdbdba38-2b60-4cc0-b2a7-2d8e37edbf6f",
+      "at": "2026-10-11T18:09:17.696Z"
+    },
+    {
+      "label": "rv15-revised-ledger",
+      "status": 200,
+      "code": null,
+      "requestId": "500e6288-9e53-4a23-9a46-289babc3e389",
+      "at": "2026-10-11T18:09:20.310Z"
+    },
+    {
+      "label": "rv14-revised-invoice-balance",
+      "status": 201,
+      "code": null,
+      "requestId": "15716cdf-3e13-452d-b003-6b3f70dd90a4",
+      "at": "2026-10-11T18:09:30.797Z"
+    },
+    {
+      "label": "rv14-invoice-version-pinned",
+      "status": 200,
+      "code": null,
+      "requestId": "9402355b-b99e-45c5-8823-e642b2e73d9b",
+      "at": "2026-10-11T18:09:38.044Z"
+    },
+    {
+      "label": "rv14-revised-balance-settled",
+      "status": 200,
+      "code": null,
+      "requestId": "303400b6-651b-4123-b91c-bccd8b3daabb",
+      "at": "2026-10-11T18:15:54.147Z"
+    },
+    {
+      "label": "rv15-closed-ledger",
+      "status": 200,
+      "code": null,
+      "requestId": "b45bb787-ad77-40e0-a546-23b1cd6eb6e7",
+      "at": "2026-10-11T18:15:57.082Z"
+    },
+    {
+      "label": "rv15-couple-manual-payment-denied",
+      "status": 403,
+      "code": "FORBIDDEN",
+      "requestId": "3458d4d3-f0af-41f4-afb1-033256b6d2ad",
+      "at": "2026-10-11T18:38:13.132Z"
+    },
+    {
+      "label": "rv15-manager-manual-overpayment-denied",
+      "status": 409,
+      "code": "BILLING_BALANCE_LIMIT_EXCEEDED",
+      "requestId": "f49fa832-6d2a-41b2-aca7-2da3202c670f",
+      "at": "2026-10-11T18:38:19.943Z"
+    },
+    {
+      "label": "rv15-refund-guard-ledger",
+      "status": 200,
+      "code": null,
+      "requestId": "30806c0c-2bb7-4f0e-8044-eb425362b3a3",
+      "at": "2026-10-11T18:38:22.835Z"
+    },
+    {
+      "label": "rv15-refund-without-approval-denied",
+      "status": 409,
+      "code": "BILLING_REFUND_APPROVAL_REQUIRED",
+      "requestId": "f2ca7729-eaee-4d1f-af84-41e265217b6b",
+      "at": "2026-10-11T18:38:26.469Z"
+    },
+    {
+      "label": "rv15-manual-guards-unchanged-ledger",
+      "status": 200,
+      "code": null,
+      "requestId": "1ea9d646-7bd9-4b92-8fa4-a17c420c5f3d",
+      "at": "2026-10-11T18:38:29.194Z"
+    }
+  ],
+  "limitations": [
+    "Prior accepted email invitation is a real historical prerequisite; no new email delivery claimed.",
+    "Controlled future-event clock is used only for the isolated final-invoice harness and its exact test booking; public event dates and service clock stay unchanged.",
+    "Manual-payment/refund success remains controlled offline accounting proof; live guards make no fictional cash payment/refund.",
+    "Early QueryDr response 94 was not verified success; a later appropriately spaced request returned signed correlated success."
+  ]
+}

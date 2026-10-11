@@ -77,7 +77,7 @@ authorized disposable/staging environment and bounded cost; CI remains offline.
 - [x] RV-03
 - [ ] RV-04
 - [ ] RV-05
-- [ ] RV-06
+- [x] RV-06 (bounded disposable CLI rehearsal and manual operator schedule)
 - [ ] RV-07
 - [x] RV-08
 - [x] RV-09
@@ -100,14 +100,31 @@ authorized disposable/staging environment and bounded cost; CI remains offline.
   The one new Gemini authorization was consumed exactly once; conservative
   observed token-cost estimate 0.043957 USD. Fix source passed all 1587 CI tests;
   PR #28 remains draft for review. Developer verification is separate from production readiness.
-- [ ] RV-14
-- [ ] RV-15
+- [x] RV-14 (legacy and revised invoice-linked sandbox BALANCE)
+- [x] RV-15 (native multi-actor journey; authorized isolated future-event invoice clock)
 - [ ] RV-16
-- [ ] RV-17
-- [ ] RV-18
+- [x] RV-17 (owner-approved two-sided A5 PDF contract)
+- [x] RV-18 (deployed immutable PDF, retained images/QR and unchanged billing)
 - [ ] RV-19
-- [ ] RV-20
+- [x] RV-20 (target request/error/audit correlation; metrics/OTLP optional disabled)
 - [ ] RV-21
+
+2026-10-12 RV-14 → RV-15 → RV-17 → RV-18 → RV-06 → RV-20 closure:
+[implementation, offline gates, configuration and runtime evidence](evidence/rv14-20-runtime-2026-10-12.md).
+Final [CORS file-metadata hand-off](evidence/rv18-cors-followup-2026-10-12.md)
+passed permitted/forbidden-origin HTTP checks on the final deployed source;
+the accepted PDF hash and settled billing remain unchanged.
+VNPay sandbox settled both legacy BALANCE and the revised immutable invoice exactly
+once. The future-event invoice gate used only the owner-authorized isolated test
+clock; no public event date/service clock or settlement success was seeded.
+The accepted A5 renderer was deployed from CI-passing source, downloaded through
+native authorization, visually inspected and QR-decoded; later design edits did
+not change either file hash or the settled ledger. Retention ran only on populated
+disposable PostgreSQL; the daily operator procedure is manual, with no installed
+automatic job or shared-data execution. Main runtime logs and native isolated
+500 proof matched request/audit IDs without leaking secret canaries. This closes
+developer verification for these six tasks, not production readiness or the
+separate RV-16/19/21 dependencies. Older evidence/pending notes below stay historical.
 
 Checkpoints: RV-01–03 establish a safe environment/operator boundary; RV-04–11
 close selected email/auth/Storage/AI/public-link proof; RV-12–15 close sandbox

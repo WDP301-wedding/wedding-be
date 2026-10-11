@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-12",
+  "kind": "CORS follow-up temporary access cleanup",
+  "session": {
+    "sessionId": "76a4c751-c61e-4bf4-b167-1de8ff179ae5",
+    "status": 204,
+    "requestId": "a330ce2a-5834-466e-81e2-e436f8690be9",
+    "afterStatus": 401,
+    "afterRequestId": "29d39702-cfd7-41c9-87a5-46c8270c01df",
+    "persisted": [
+      {
+        "id": "76a4c751-c61e-4bf4-b167-1de8ff179ae5",
+        "status": "REVOKED",
+        "revokedAt": "2026-10-11T19:59:51.355Z"
+      }
+    ]
+  },
+  "taskSshKeyId": "dd40ab8b-36cc-4ba7-9764-33f6bb3988da",
+  "taskSshKeyRevoked": true,
+  "taskLocalKeyFilesRemoved": true,
+  "otherSessionsPreserved": true,
+  "financialHistoryPreserved": true
+}

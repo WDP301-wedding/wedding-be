@@ -56,9 +56,14 @@ export function createRuntimeFeatureManifest(config: BackendConfig, revision?: s
         config.invitationStudio.publicOrigin ? 'configured-origin' : 'disabled',
       ),
       vnpay: feature(config.vnpay.enabled, config.vnpay.enabled ? 'sandbox-only' : 'disabled'),
-      retention: feature(Boolean(config.database.url), 'operator-cli-unscheduled'),
+      retention: feature(Boolean(config.database.url), 'operator-cli-manual-procedure'),
       workers: feature(false, 'outbox-and-due-ports-only', 'downstream-pending'),
-      printFiles: feature(false, 'renderer-pending', 'missing'),
+      printFiles: feature(
+        Boolean(config.database.url) &&
+          config.storage.enabled &&
+          Boolean(config.invitationStudio.publicOrigin),
+        'invitation-a5-v1',
+      ),
       metrics: feature(
         config.metrics.enabled,
         config.metrics.enabled ? 'protected-prometheus' : 'disabled',

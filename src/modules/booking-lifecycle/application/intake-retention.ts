@@ -1,7 +1,19 @@
 import type { PrismaClient } from '../../../generated/prisma/client.js';
 import { randomUUID } from 'node:crypto';
 
-export async function purgeConsultationIntake(prisma: PrismaClient, now = new Date()) {
+export async function purgeConsultationIntake(
+  prisma: PrismaClient,
+  now = new Date(),
+  options: { batchSize?: number; requestId?: string; operatorId?: string } = {},
+) {
+  const batchSize = options.batchSize ?? 100;
+  if (
+    !Number.isSafeInteger(batchSize) ||
+    batchSize < 1 ||
+    batchSize > 1000 ||
+    !Number.isFinite(now.getTime())
+  )
+    throw new RangeError('Invalid retention batch.');
   const cutoff = new Date(now.getTime() - 180 * 86400_000);
   return prisma.$transaction(async (tx) => {
     const rows = await tx.consultationRequest.findMany({
@@ -10,7 +22,7 @@ export async function purgeConsultationIntake(prisma: PrismaClient, now = new Da
         OR: [{ status: { not: 'CONVERTED' } }, { email: { not: '' } }],
       },
       orderBy: { id: 'asc' },
-      take: 100,
+      take: batchSize,
       select: { id: true, status: true },
     });
     let deleted = 0,
@@ -46,14 +58,20 @@ export async function purgeConsultationIntake(prisma: PrismaClient, now = new Da
         ).count;
       }
     }
-    if (deleted || scrubbed)
+    if (deleted || scrubbed || options.operatorId !== undefined)
       await tx.auditLog.create({
         data: {
-          requestId: randomUUID(),
+          requestId: options.requestId ?? randomUUID(),
           actorType: 'SYSTEM',
           action: 'booking.intake-retention',
           entityType: 'consultation-request',
-          metadata: { deleted, scrubbed },
+          metadata: {
+            deleted,
+            scrubbed,
+            ...(options.operatorId === undefined
+              ? {}
+              : { operatorId: options.operatorId, batchSize }),
+          },
         },
       });
     return { deleted, scrubbed };

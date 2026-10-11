@@ -17232,6 +17232,136 @@
         ]
       }
     },
+    "/bookings/{bookingId}/printable-revisions/{printableRevisionId}/file": {
+      "get": {
+        "description": "Two pages, 148x210 mm trim, 3 mm bleed, embedded Vietnamese fonts, raster placement at least 300 dpi, 30 mm vector generic QR with quiet zone. invitation-a5-v1 standard layout. No seating, current-design fallback or extra charge. 8 PNG assets/16 MiB images/12 MiB PDF; oversized content fails 422. Retained checksum failures fail 502/503. Existing confirmed-booking Invitation access policy applies.",
+        "operationId": "getPrintableInvitationFile",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "disposition",
+            "schema": {
+              "default": "inline",
+              "enum": [
+                "inline",
+                "attachment"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "bookingId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "printableRevisionId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Immutable printable PDF bytes. Inline and attachment have identical content.",
+            "headers": {
+              "Access-Control-Expose-Headers": {
+                "schema": {
+                  "const": "Retry-After, X-Request-Id, Content-Disposition, X-Content-SHA256, X-Printable-Content-Digest, X-Renderer-Version",
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "const": "private, no-store",
+                  "type": "string"
+                }
+              },
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Content-SHA256": {
+                "schema": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                }
+              },
+              "X-Printable-Content-Digest": {
+                "schema": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                }
+              },
+              "X-Renderer-Version": {
+                "schema": {
+                  "const": "invitation-a5-v1",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          },
+          "504": {
+            "$ref": "#/components/responses/GatewayTimeout"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Manager or owning FULL Couple previews/downloads the exact accepted A5 revision",
+        "tags": [
+          "Invitation Studio"
+        ]
+      }
+    },
     "/bookings/{bookingId}/proposal": {
       "get": {
         "operationId": "getBookingProposal",
