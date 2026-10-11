@@ -28,6 +28,25 @@ function captureLogs(): {
 }
 
 describe('structured logger', () => {
+  it('redacts Guest capabilities, link fragments, greetings and private notes', () => {
+    expect(
+      redactLogRecord({
+        credential: 'wgc_secret',
+        capability: 'wgs_secret',
+        fragment: '#credential=wgc_secret',
+        recipientGreeting: 'An',
+        operationalNote: 'private',
+        credentialId: 'safe-id',
+      }),
+    ).toEqual({
+      credential: REDACTED_VALUE,
+      capability: REDACTED_VALUE,
+      fragment: REDACTED_VALUE,
+      recipientGreeting: REDACTED_VALUE,
+      operationalNote: REDACTED_VALUE,
+      credentialId: 'safe-id',
+    });
+  });
   afterEach(() => {
     vi.useRealTimers();
   });

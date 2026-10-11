@@ -1709,6 +1709,138 @@ model InvitationPrintableRevision {
   @@index([bookingId, id])
 }
 
+model GuestWorkspace {
+  bookingId                  String @id @db.Uuid
+  planRevisionId             String @unique @db.Uuid
+  planRevision               Int    @default(1)
+  planSequence               Int
+  listSequence               Int    @default(1)
+  initializedBookingRevision Int
+}
+
+model GuestPlanRevision {
+  id                    String   @id @db.Uuid
+  bookingId             String   @db.Uuid
+  revision              Int
+  sourceSequence        Int
+  planningHeadcount     Int
+  sourceBookingRevision Int
+  actorAccountId        String   @db.Uuid
+  createdAt             DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([bookingId, revision])
+  @@unique([bookingId, sourceSequence])
+  @@unique([bookingId, id])
+}
+
+model GuestGroup {
+  id             String   @id @db.Uuid
+  bookingId      String   @db.Uuid
+  name           String   @db.VarChar(80)
+  normalizedName String
+  color          String   @db.Char(7)
+  status         String   @default("ACTIVE")
+  revision       Int      @default(1)
+  createdAt      DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([bookingId, normalizedName])
+  @@unique([bookingId, id])
+}
+
+model Guest {
+  id              String   @id @db.Uuid
+  bookingId       String   @db.Uuid
+  guestGroupId    String   @db.Uuid
+  name            String   @db.VarChar(120)
+  normalizedName  String
+  phone           String?  @db.VarChar(16)
+  operationalNote String?  @db.VarChar(500)
+  externalRowKey  String?  @db.VarChar(120)
+  status          String   @default("ACTIVE")
+  revision        Int      @default(1)
+  createdAt       DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([bookingId, externalRowKey])
+  @@unique([bookingId, id])
+  @@index([bookingId, status, normalizedName, id])
+  @@index([bookingId, guestGroupId])
+}
+
+model GuestHistory {
+  id         String   @id @db.Uuid
+  bookingId  String   @db.Uuid
+  entityId   String   @db.Uuid
+  entityType String
+  revision   Int
+  snapshot   Json     @db.JsonB
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([entityId, entityType, revision])
+}
+
+model GuestCommand {
+  bookingId     String @db.Uuid
+  intentDigest  String @db.Char(64)
+  commandDigest String @db.Char(64)
+  result        Json   @db.JsonB
+
+  @@id([bookingId, intentDigest])
+}
+
+model GuestImportPreview {
+  id             String   @id @db.Uuid
+  bookingId      String   @db.Uuid
+  actorAccountId String   @db.Uuid
+  listSequence   Int
+  digest         String   @db.Char(64)
+  rows           Json     @db.JsonB
+  allowUpdates   Boolean
+  createdCount   Int
+  updatedCount   Int
+  unchangedCount Int
+  expiresAt      DateTime @db.Timestamptz(6)
+}
+
+model GuestInvitationCredential {
+  id                 String    @id @db.Uuid
+  bookingId          String    @db.Uuid
+  guestId            String    @db.Uuid
+  tokenHash          String    @unique @db.Char(64)
+  publicInvitationId String    @db.Uuid
+  revision           Int
+  expiresAt          DateTime  @db.Timestamptz(6)
+  revokedAt          DateTime? @db.Timestamptz(6)
+  createdAt          DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@unique([guestId, revision])
+  @@index([bookingId, guestId])
+}
+
+model GuestInvitationSession {
+  tokenHash    String   @id @db.Char(64)
+  credentialId String   @db.Uuid
+  expiresAt    DateTime @db.Timestamptz(6)
+}
+
+model GuestExchangeLimit {
+  key       String   @id @db.Char(64)
+  attempts  Int
+  expiresAt DateTime @db.Timestamptz(6)
+
+  @@index([expiresAt])
+}
+
+model GuestOutbox {
+  eventId        String   @id @db.Uuid
+  bookingId      String   @db.Uuid
+  eventType      String
+  sourceSequence Int
+  payload        Json     @db.JsonB
+  createdAt      DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([bookingId, eventType, sourceSequence])
+}
+
 model InvitationStudioCommand {
   bookingId     String @db.Uuid
   intentDigest  String @db.Char(64)

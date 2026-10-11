@@ -5,6 +5,7 @@ import { coupleProfileOpenApiPaths } from '../../modules/booking-lifecycle/http/
 import { commercialContractOpenApiPaths } from '../../modules/booking-lifecycle/http/commercial-contract.openapi.js';
 import { commercialAppendixOpenApiPaths } from '../../modules/booking-lifecycle/http/commercial-appendix.openapi.js';
 import { finalInvoiceOpenApiPaths } from '../../modules/payments-billing/http/final-invoice.openapi.js';
+import { guestOpenApiPaths } from '../../modules/guest-management/http/guest.openapi.js';
 import {
   experienceOpenApiPaths,
   experienceOpenApiSchemas,
@@ -192,6 +193,7 @@ export const openApiRegistry = {
     },
   ],
   paths: {
+    ...guestOpenApiPaths,
     ...invitationMediaOpenApiPaths,
     ...invitationStudioOpenApiPaths,
     ...invitationPrintOrdersOpenApiPaths,
@@ -583,6 +585,7 @@ export const openApiRegistry = {
     },
     responses: { ...commonResponses, ...idempotencyResponses },
     securitySchemes: {
+      guestInvitationCapability: { type: 'http', scheme: 'bearer', bearerFormat: 'wgs_opaque' },
       bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'opaque' },
     },
   },

@@ -1,0 +1,63 @@
+{
+  "handoffVersion": "SPEC-06-GM-W1-W4@2026-10-12",
+  "providerVersion": "guest-management@1.0.0",
+  "sourceCommit": "a6e79d73c55ba58a49876f8b0440c29ae74b75cf",
+  "timezone": "Asia/Saigon",
+  "scope": "Backend GM-W1 through GM-W4 only",
+  "openApi": {
+    "prefix": "/api/v1",
+    "version": "3.1.0",
+    "sha256": "4d162cdb766164e240a16c8bc53770a481cfa521491dae313f2971beba0cd63f",
+    "guestPaths": [
+      "/bookings/{bookingId}/guest-groups",
+      "/bookings/{bookingId}/guest-groups/{groupId}",
+      "/bookings/{bookingId}/guest-plan",
+      "/bookings/{bookingId}/guests",
+      "/bookings/{bookingId}/guests/import-previews",
+      "/bookings/{bookingId}/guests/imports",
+      "/bookings/{bookingId}/guests/{guestId}",
+      "/bookings/{bookingId}/guests/{guestId}/personalized-invitations",
+      "/guest/invitation",
+      "/guest/invitation-sessions"
+    ],
+    "guestOperations": 13
+  },
+  "migration": {
+    "id": "20261012010000_guest_management",
+    "sha256": "1eefac415e6418e5fdf2ce2b005b7755bc6b305310b182d1c1dfbe2e692bae9f",
+    "newOnly": true
+  },
+  "packageLockSha256": "b660aa9e1db7a369e36b5ffdccee8b8f86a4665a8f4be3f242ac1d5ff0283a32",
+  "sources": {
+    "src/app.ts": "0b56fe0eb08ae3df4ab85b8bd4e68616aaa0ae3db8d6e485c5f858c11bb2a513",
+    "src/core/database/booking-boundary.ts": "7272265d7e82aa2703ec90d1c1fbc2dfa4c8c4a87d478f92b104386e0e9f945b",
+    "src/core/logging/redaction.ts": "4b2000f0c23af1a3a2c360ab8a95ba652a55d47f7497ce7a371df7876cf2be1d",
+    "src/modules/booking-lifecycle/infrastructure/guest-planning.providers.ts": "50e8800ebb946ae4df8768f72b4b84a4046466f8c3c6389c56c2ed58fb9e71d9",
+    "src/modules/booking-lifecycle/infrastructure/lifecycle.repository.ts": "837c8ff30632572b5510521e6e1f5c06a99019631b0ffc705ebdf47205f753aa",
+    "src/modules/guest-management/application/guest-links.service.ts": "07737509cabca583d9f7948df5ecae47b3da0b2bdc61c9d08bf7223a83d0addf",
+    "src/modules/guest-management/application/guest-readers.ts": "06721424070ec1fbe5ef33d661aa31282aa29513130e6d881ebf04190a8edacf",
+    "src/modules/guest-management/application/guest.contracts.ts": "608ff7d29850785d73f443b063bdf75e98cad5c5f881bff19fbd932316d49a55",
+    "src/modules/guest-management/application/guest.service.ts": "bc0d1a51f7e34429b096ad347cc8d3fbbc84e692242386e058cf011ab7dfce8f",
+    "src/modules/guest-management/domain/guest-policy.ts": "f7dd0ffb137454e69c7ae358889b9e0d48b02df5047aa5a8faded50b50b9e8fe",
+    "src/modules/guest-management/domain/unicode-case-fold.ts": "a9ea1e31b559a400a71f01be5723d0581f65319bd380cc3016e0c7daad96b84d",
+    "src/modules/guest-management/guest-management.runtime.ts": "65ee441faa0cb559bed19a51d5bf7a185e52ccfe2279987bd89cfcd005bede76",
+    "src/modules/guest-management/http/guest-import.parser.ts": "bd06b2f1f6615b1f0f6715c77fdee63241ecbe563a22ba6a08f70e5150bbb896",
+    "src/modules/guest-management/http/guest.openapi.ts": "80f8fbd223aef35aa7d93c184f66c80d132a16e5fc4b5b5b156df92e52e534b5",
+    "src/modules/guest-management/http/guest.router.ts": "8d14af6e14024c1c11dfce37e37c7ebe9e255eb8835c1aff73ad95bf98969304",
+    "src/modules/guest-management/http/guest.schemas.ts": "ce329a2d49bd882cecd0d5b0ddd48492c66d2e64aaa08f285d458ad3e8ffd790",
+    "src/modules/guest-management/infrastructure/guest.composition.ts": "8f8204920d689909ff1120e41faa48835f2ac7a077a8ed76aa57704e9416a49a",
+    "src/modules/guest-management/infrastructure/guest.repository.ts": "18d9310912c0bcf189b83d00374c33e2135520b8554b97969ef47c52a6f10451",
+    "src/modules/invitation-studio/infrastructure/guest-publication.reader.ts": "377674a194a97633c88976eb8e0f428cd88930370206bcbb8cad1aa7dfde880b",
+    "src/modules/venue-catalog/infrastructure/guest-planning-capacity.reader.ts": "4878ac8bbb795cbecc1f8f0724ccc6bedd62401bafb9171527f121a8af56fe5b",
+    "src/server.ts": "4dc40c07936265ea154fcef1c8d0f18b4013ef2c4ba5f0ac35e6835b81bc411c"
+  },
+  "evidenceBoundary": {
+    "localNativeOwnerIntegration": true,
+    "controlledSettlementAndStorage": true,
+    "liveEmail": false,
+    "paidGeneration": false,
+    "realMoney": false,
+    "deployed": false,
+    "seatingStaffNotificationsEndToEnd": "GM-W5-and-downstream-pending"
+  }
+}
