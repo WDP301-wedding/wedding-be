@@ -21,6 +21,20 @@ export const legacyAttemptSelect = {
   createdAt: true,
   updatedAt: true,
 } as const;
+export const legacyOutboxSelect = {
+  id: true,
+  ledgerEntryId: true,
+  eventType: true,
+  eventVersion: true,
+  correlationId: true,
+  causationId: true,
+  aggregateId: true,
+  aggregateRevision: true,
+  occurredAt: true,
+  payload: true,
+  publishedAt: true,
+  attemptCount: true,
+} as const;
 
 // Seed the historical schema directly, without running today's application on
 // yesterday's schema. Actual PostgreSQL constraints/triggers remain enabled.
@@ -113,6 +127,7 @@ export async function seedLegacyBillingHistory(
         },
       });
       await tx.billingOutboxEvent.create({
+        select: { id: true },
         data: {
           id: randomUUID(),
           ledgerEntryId: entry.id,
@@ -186,9 +201,13 @@ export function mainBeforeBillingMigrations(paths: readonly string[]): readonly 
     /_(?:invitation_design_publication_printable|invitation_print_order_and_billing|invitation_reporting_snapshots|print_commercial_offerings|billing_contract_source|commercial_contracts)$/u.test(
       basename(dirname(path)),
     );
+  // Commercial extensions and all later migrations build on the Billing/print
+  // schema; they cannot be moved into this synthetic pre-Billing checkpoint.
+  const afterBilling = (path: string) =>
+    invitationPrint(path) || basename(dirname(path)) >= '20261011019000';
   return [
-    ...paths.filter((path) => !billing(path) && !invitationPrint(path)),
+    ...paths.filter((path) => !billing(path) && !afterBilling(path)),
     ...paths.filter(billing),
-    ...paths.filter(invitationPrint),
+    ...paths.filter(afterBilling),
   ];
 }

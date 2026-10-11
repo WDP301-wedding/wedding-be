@@ -11,6 +11,7 @@ import { createPayableBooking } from './deposit-fixture.js';
 import {
   mainBeforeBillingMigrations,
   legacyAttemptSelect,
+  legacyOutboxSelect,
   seedLegacyBillingHistory,
 } from './upgrade-fixture.js';
 
@@ -29,7 +30,10 @@ databaseDescribe('PB-W3 forward application-state upgrade', () => {
           select: legacyAttemptSelect,
         }),
         audit: await prisma.auditLog.findMany({ orderBy: { id: 'asc' } }),
-        outbox: await prisma.billingOutboxEvent.findMany({ orderBy: { id: 'asc' } }),
+        outbox: await prisma.billingOutboxEvent.findMany({
+          orderBy: { id: 'asc' },
+          select: legacyOutboxSelect,
+        }),
       };
     }
     try {

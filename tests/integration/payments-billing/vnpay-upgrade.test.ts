@@ -11,7 +11,11 @@ import {
 } from '../venue-catalog/catalog-test-database.js';
 import { createPayableBooking } from './deposit-fixture.js';
 import { controlledVnpay } from './vnpay-fixture.js';
-import { legacyAttemptSelect, seedLegacyBillingHistory } from './upgrade-fixture.js';
+import {
+  legacyAttemptSelect,
+  legacyOutboxSelect,
+  seedLegacyBillingHistory,
+} from './upgrade-fixture.js';
 
 const databaseDescribe = catalogMigrationDatabaseUrl ? describe : describe.skip;
 databaseDescribe('PB-W4 forward evidence upgrade', () => {
@@ -26,7 +30,10 @@ databaseDescribe('PB-W4 forward evidence upgrade', () => {
         attempts: await prisma.billingPaymentAttempt.findMany({ select: legacyAttemptSelect }),
         applications: await prisma.billingDepositApplication.findMany(),
         audit: await prisma.auditLog.findMany({ orderBy: { id: 'asc' } }),
-        outbox: await prisma.billingOutboxEvent.findMany({ orderBy: { id: 'asc' } }),
+        outbox: await prisma.billingOutboxEvent.findMany({
+          orderBy: { id: 'asc' },
+          select: legacyOutboxSelect,
+        }),
         bookings: await prisma.booking.findMany(),
         grants: await prisma.consultationAccess.findMany(),
       };

@@ -7,7 +7,11 @@ import {
   catalogMigrationDatabaseUrl,
 } from '../venue-catalog/catalog-test-database.js';
 import { createPayableBooking } from './deposit-fixture.js';
-import { legacyAttemptSelect, seedLegacyBillingHistory } from './upgrade-fixture.js';
+import {
+  legacyAttemptSelect,
+  legacyOutboxSelect,
+  seedLegacyBillingHistory,
+} from './upgrade-fixture.js';
 
 const databaseDescribe = catalogMigrationDatabaseUrl ? describe : describe.skip;
 databaseDescribe('W5 forward operations/reporting migration from W4', () => {
@@ -28,7 +32,10 @@ databaseDescribe('W5 forward operations/reporting migration from W4', () => {
         evidence: await prisma.billingProviderEvidence.findMany(),
         claims: await prisma.billingProviderTransaction.findMany(),
         audit: await prisma.auditLog.findMany({ orderBy: { id: 'asc' } }),
-        outbox: await prisma.billingOutboxEvent.findMany({ orderBy: { id: 'asc' } }),
+        outbox: await prisma.billingOutboxEvent.findMany({
+          orderBy: { id: 'asc' },
+          select: legacyOutboxSelect,
+        }),
         bookingOutbox: await prisma.bookingOutboxEvent.findMany({ orderBy: { id: 'asc' } }),
         bookings: await prisma.booking.findMany(),
         grants: await prisma.consultationAccess.findMany(),
