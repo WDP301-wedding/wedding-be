@@ -26,6 +26,8 @@ import { designResponse } from '../../src/modules/invitation-studio/http/studio.
 import { designContentSchema } from '../../src/modules/invitation-studio/domain/studio-policy.js';
 import { printOrderResponseSchema } from '../../src/modules/invitation-studio/http/print-orders.schemas.js';
 import { ipnFixture } from './payments-billing/vnpay-fixture.js';
+import { registerContractedPrintPriceApiCases } from './contracted-print-price-api-cases.js';
+import { registerCommercialSettlementJourney } from './commercial-settlement-journey.js';
 export type CommercialApiFixture = {
   id: string;
   consultationId: string;
@@ -67,6 +69,8 @@ export type StepSixApiHarness = {
   deposit: number;
 };
 export function registerStepSixApiCases(harness: StepSixApiHarness) {
+  registerContractedPrintPriceApiCases(harness);
+  registerCommercialSettlementJourney(harness);
   const {
     database,
     post,
@@ -922,6 +926,76 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
     );
     expect(blocked.status, JSON.stringify(blocked.body)).toBe(409);
     expect(blocked.body).toMatchObject({ error: { code: 'CONTRACT_PRINT_QUANTITY_ALLOCATED' } });
+    const revisedOffering = await expenseMutation(
+      'patch',
+      `/management/print-offerings/${offering.offeringId}`,
+      {
+        expectedRevision: 1,
+        templateId: offering.templateId,
+        templateVersionId: offering.templateVersionId,
+        name: offering.name,
+        material: 'Giấy mới cho lô chưa được phân bổ',
+        printType: offering.printType,
+        unitPriceVnd: 6000,
+        active: true,
+      },
+    );
+    expect(revisedOffering.status, JSON.stringify(revisedOffering.body)).toBe(200);
+    const successorOffering = printOfferingViewSchema.parse(
+      (revisedOffering.body as { data: unknown }).data,
+    );
+    const changedSource = await appendixDraft(
+      f,
+      d.contract.revisionId,
+      lines.map((l) =>
+        l.category === 'PRINT' ? { ...l, sourceRevisionId: successorOffering.sourceRevisionId } : l,
+      ),
+    );
+    const sourceFirstApproval = await post(
+      `${changedSource.path}/${changedSource.data.appendix.revisionId}/approvals`,
+      { expectedRevision: changedSource.data.bookingRevision },
+    );
+    expect(sourceFirstApproval.status).toBe(200);
+    const sourceFirst = appendixResponseSchema.parse(sourceFirstApproval.body as unknown).data;
+    async function rejectAllocatedSource() {
+      const response = await post(
+        `${changedSource.path}/${sourceFirst.appendix.revisionId}/approvals`,
+        { expectedRevision: sourceFirst.bookingRevision },
+        'own',
+      );
+      expect(response.status, JSON.stringify(response.body)).toBe(409);
+      expect(response.body).toMatchObject({ error: { code: 'CONTRACT_PRINT_SOURCE_ALLOCATED' } });
+      expect(
+        await database.prisma.commercialAppendixRevision.findUniqueOrThrow({
+          where: { id: sourceFirst.appendix.revisionId },
+          include: { approvals: true },
+        }),
+      ).toMatchObject({ state: 'AWAITING_APPROVAL', approvals: [{ party: 'MANAGER' }] });
+      expect(await database.prisma.billingLedgerEntry.count({ where: { bookingId: f.id } })).toBe(
+        2,
+      );
+    }
+    await rejectAllocatedSource();
+    await expect(
+      database.prisma
+        .$executeRaw`UPDATE "CommercialAppendixRevision" SET "state"='APPROVED', "approvedAt"=CURRENT_TIMESTAMP WHERE "id"=${sourceFirst.appendix.revisionId}::uuid`,
+    ).rejects.toThrow('appendix cannot replace allocated print commercial sources');
+    let produced = printOrderResponseSchema.parse(started.body as unknown).data;
+    const ready = await post(`/management/print-orders/${order.orderId}/ready`, {
+      expectedRevision: produced.revision,
+    });
+    expect(ready.status, JSON.stringify(ready.body)).toBe(200);
+    produced = printOrderResponseSchema.parse(ready.body as unknown).data;
+    await rejectAllocatedSource();
+    const handedOver = await post(`/management/print-orders/${order.orderId}/handover`, {
+      expectedRevision: produced.revision,
+      evidenceReference: 'LOCAL-ALLOCATED-PRINT-HANDOVER',
+    });
+    expect(handedOver.status, JSON.stringify(handedOver.body)).toBe(200);
+    await rejectAllocatedSource();
+    expect(
+      printOrderResponseSchema.parse(handedOver.body as unknown).data.lines[0]!.commercialSource,
+    ).toEqual(order.lines[0]!.commercialSource);
     // Archive through a new catalog version; the contracted version stays immutable.
     const retainedTemplate = await database.prisma.invitationTemplateVersion.findUniqueOrThrow({
       where: { id: offering.templateVersionId },
