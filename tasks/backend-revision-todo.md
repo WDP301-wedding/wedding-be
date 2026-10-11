@@ -153,19 +153,21 @@ This does not complete BE-06–17 or pending external-provider RV gates.
 - [x] BE-03
 - [x] BE-04
 - [x] BE-05
-- [ ] BE-06
-- [ ] BE-07
-- [ ] BE-08
-- [ ] BE-09
-- [ ] BE-10
-- BE-06–10 implementation is present on `codex/commercial-contracts-step-4`
-  (2026-10-11), with [API/deployment handoff](../docs/be06-10-commercial-contracts.md).
-  Acceptance remains open: automated regression/coverage, real migration/concurrency,
-  rendered PDF and full-total sandbox evidence have not been established in this turn.
+- [x] BE-06
+- [x] BE-07
+- [x] BE-08
+- [x] BE-09
+- [x] BE-10
+- BE-06–10 accepted 2026-10-11 for backend scope:
+  [acceptance matrix and evidence](./evidence/be06-10-acceptance-2026-10-11.md).
+  Includes current main CI/coverage, PostgreSQL contract/deposit races and rollback,
+  immutable Vietnamese PDF, genuine full-total VNPay sandbox RV-13, and exact deployed
+  OpenAPI. [API/deployment handoff](../docs/be06-10-commercial-contracts.md).
 - Follow-up API verification: [2026-10-11 actual responses](./evidence/be06-10-api-results-2026-10-11.md).
   Six contract routes plus related payment APIs were exercised against disposable
-  PostgreSQL, with migration and rendered Vietnamese PDF proof. Controlled VNPay
-  evidence does not close the genuine full-total sandbox recheck or all acceptance gates.
+  PostgreSQL, with migration and rendered Vietnamese PDF proof. This historical
+  controlled-provider run is supplemented by the genuine full-total RV-13 proof
+  linked in the final acceptance report; production-money readiness remains separate.
 - [ ] BE-11
 - [ ] BE-12
 - [ ] BE-13
