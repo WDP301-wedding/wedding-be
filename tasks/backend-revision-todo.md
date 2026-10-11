@@ -192,15 +192,23 @@ This does not complete BE-06–17 or pending external-provider RV gates.
   PostgreSQL, with migration and rendered Vietnamese PDF proof. This historical
   controlled-provider run is supplemented by the genuine full-total RV-13 proof
   linked in the final acceptance report; production-money readiness remains separate.
-- [ ] BE-11
-- [ ] BE-12
-- [ ] BE-13
-- [ ] BE-14
-- [ ] BE-15
-- [ ] BE-16
-- [x] BE-17 (exact runtime/API/provider/migration/evidence hand-off delivered; predecessor review gates retained)
+- [x] BE-11
+- [x] BE-12
+- [x] BE-13
+- [x] BE-14
+- [x] BE-15
+- [x] BE-16
+- [x] BE-17 (exact runtime/API/provider/migration/evidence hand-off delivered)
 
-2026-10-12 BE-17 delivery and acceptance reconciliation:
+Current acceptance, 2026-10-12: the owner explicitly waived independent
+team-member review/approval for this closure and merge. [Owner instruction,
+exception and acceptance evidence](evidence/be11-17-owner-acceptance-2026-10-12.md)
+records the authorization without inventing a reviewer approval or changing
+the general CONTRIBUTING policy. **BE-01–17 are complete for backend developer
+scope**; RV remains **18/21**, with RV-16/19/21 open. The pre-waiver checkpoint
+below is retained as history and no longer blocks these BE checkboxes.
+
+Historical pre-waiver BE-17 delivery and acceptance reconciliation, 2026-10-12:
 [exact API/provider/migration hand-off](../docs/be17-extension-handoff.md),
 [machine-readable source manifest](evidence/be17-extension-manifest-2026-10-12.json)
 and [per-BE/RV matrix](evidence/be17-extension-handoff-2026-10-12.md).

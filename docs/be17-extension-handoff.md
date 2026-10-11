@@ -7,6 +7,10 @@ release. [Acceptance and remaining gates](../tasks/evidence/be17-extension-hando
 and the [active backlog](../tasks/backend-revision-todo.md) distinguish delivered
 code, offline verification, configuration and live developer verification.
 
+Current acceptance: [the owner's explicit review exception](../tasks/evidence/be11-17-owner-acceptance-2026-10-12.md)
+closes the BE-11–16 review-only gate; **BE-01–17 are complete for backend developer
+scope**. No independent team-member approval or production release is claimed.
+
 ## Exact artifacts and runtime
 
 The [machine-readable manifest](../tasks/evidence/be17-extension-manifest-2026-10-12.json)
@@ -265,9 +269,10 @@ acceptance and frontend deployment are separate deliverables. Groups, optional
 named Guests, independent planning and opt-in check-in remain SPEC-06 onward;
 no companion-count assumption or response workflow is added by this extension.
 
-BE-11–16 technical and authorized developer-runtime evidence is complete, while
-the previously recorded independent team-member approval gate is still unrecorded.
-BE-17 delivers the evidence package without representing that approval as present.
+BE-11–16 technical and authorized developer-runtime evidence is complete. The
+owner explicitly waived their independent team-member approval condition for
+this acceptance/merge; that exception is recorded separately from reviewer approval.
+BE-17 delivers the complete evidence package with that acceptance distinction.
 RV-16, RV-19 and RV-21 remain open for real workers, real Seating print integration
 and owner-reviewed release/recovery checkpoint. Production-money VNPay/merchant
 acceptance remains separately authorized work.

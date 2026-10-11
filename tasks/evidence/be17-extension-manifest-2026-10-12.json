@@ -1382,11 +1382,18 @@
     "record": "tasks/evidence/rv14-20-pr32-merge-swagger-2026-10-12.md"
   },
   "unresolved": {
-    "BE11Through16": "Independent team-member approval remains unrecorded; implementation/offline and authorized live developer journey complete",
     "RV16": "SPEC-09 NTF-W1/3/4 workers and recovery",
     "RV19": "SPEC-07 SEA-W3/5 real seating print output",
     "RV21": "Owner-reviewed runtime/recovery release checkpoint including REL-W3",
     "productionMoney": "Separate merchant/endpoint/adapter/owner review",
     "frontend": "Frontend team integration and browser/native release acceptance"
+  },
+  "ownerAcceptance": {
+    "date": "2026-10-12",
+    "completedBackendTasks": "BE-01 through BE-17",
+    "teamMemberApprovalPresent": false,
+    "reviewConditionWaived": true,
+    "evidence": "tasks/evidence/be11-17-owner-acceptance-2026-10-12.md",
+    "note": "Closed by explicit owner waiver of independent team-member approval on 2026-10-12; implementation/offline and authorized live developer journey complete. No team-member approval claimed. See tasks/evidence/be11-17-owner-acceptance-2026-10-12.md"
   }
 }

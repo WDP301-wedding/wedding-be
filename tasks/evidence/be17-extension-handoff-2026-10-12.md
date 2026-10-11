@@ -1,5 +1,12 @@
 # BE-17 delivery and BE/RV completion reconciliation
 
+Current acceptance supersedes this historical pre-waiver checkpoint:
+[owner instruction and exception](be11-17-owner-acceptance-2026-10-12.md).
+The owner waived the independent team-member approval condition and authorized
+merge/Swagger verification. **BE-01–17 are now complete** for backend developer
+scope; **RV remains 18/21**. No team-member approval or production release is claimed.
+The report below preserves the original evidence and status before that instruction.
+
 Date: 2026-10-12, Asia/Saigon. Source audited:
 `054d670d6a7edd4d8028004271b02fab5c60973f` (main, PR #32).
 Documentation branch: `codex/be17-extension-handoff`. Existing untracked merge

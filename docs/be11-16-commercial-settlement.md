@@ -3,8 +3,11 @@
 Current status, 2026-10-12: implementation and repaired offline/CI/deployed
 developer verification are complete on `054d670`, including the authorized
 isolated future-event invoice and genuine invoice-linked VNPay sandbox BALANCE.
-Independent team-member approval remains unrecorded. The pending-online paragraphs
-below describe earlier checkpoints. Use the [BE-17 acceptance matrix](../tasks/evidence/be17-extension-handoff-2026-10-12.md)
+The owner has now explicitly waived independent team-member approval for this
+acceptance and merge; [the exception](../tasks/evidence/be11-17-owner-acceptance-2026-10-12.md)
+closes the remaining review condition. No team-member approval is claimed.
+The pending-online/review paragraphs below describe earlier checkpoints.
+Use the [BE-17 acceptance matrix](../tasks/evidence/be17-extension-handoff-2026-10-12.md)
 and [consolidated hand-off](be17-extension-handoff.md) for current source/API/evidence
 and remaining acceptance/release gates.
 
