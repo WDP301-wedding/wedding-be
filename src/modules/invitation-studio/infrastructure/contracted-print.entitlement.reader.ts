@@ -25,6 +25,15 @@ export function createContractedPrintEntitlementReader(client: PrismaClient) {
       for (const line of lines) {
         if (!line.commercialSource) continue;
         const binding = commercialPrintSnapshotSchema.parse(line.commercialSource);
+        const agreed = afterLines.find(
+          (l) => l.category === 'PRINT' && l.sourceId === binding.offeringId,
+        );
+        if (!agreed) throw printOrderConflict('CONTRACT_PRINT_QUANTITY_ALLOCATED');
+        if (
+          agreed.sourceRevisionId !== binding.sourceRevisionId ||
+          agreed.unitPriceVnd !== binding.unitPriceVnd
+        )
+          throw printOrderConflict('CONTRACT_PRINT_SOURCE_ALLOCATED');
         quantities.set(
           binding.offeringId,
           (quantities.get(binding.offeringId) ?? 0) + line.quantity,
