@@ -4,7 +4,7 @@
 - Scope confirmed: 2026-10-10; Group + optional Guest amendment confirmed by owner.
 - Baseline: `WEDDING-CONTRACT-3@3.0.0`, [Section 23](./CONTRACT-BASELINE.md#23-group-and-optional-guest-list--2026-10-10).
 - Requirements: GST-001 through GST-009; QRC-005.
-- Backend implementation pending; no proposed route/provider below is a mounted API.
+- GM-W1–GM-W4 implemented (2026-10-12); mounted contracts and validation are recorded in [the backend hand-off](./docs/guest-management-w1-w4.md). GM-W5/downstream and production readiness remain separate.
 - Depends on Booking access/ordered headcount; Invitation publication only for optional personalized links.
 - Consumers: Seating, Staff, Notifications and Analytics. Client presentation is frontend-owned.
 
@@ -136,7 +136,7 @@ No contacts, notes, group list, other Guest, private media, billing, planning or
 check-in writes. Exchange limit is 10 per 15 minutes per resolved IP plus token
 fingerprint; no permanent Guest lockout. Generic QR carries no personalized scope.
 
-## 6. Authorization and Proposed HTTP
+## 6. Authorization and Mounted HTTP
 
 Manager and owning FULL Couple manage Groups, optional Guests and planning totals
 on confirmed bookings. Restricted/public/guest-link actors are denied; assigned
@@ -157,7 +157,7 @@ checks, atomic audit and preserved historical references.
 | POST /guest/invitation-sessions                               | Credential-redacted strict exchange                          |
 | GET /guest/invitation                                         | Minimal capability read                                      |
 
-These are proposals until Zod/runtime/OpenAPI exist. No household aliases or response
+These routes are mounted with strict Zod/runtime/OpenAPI contracts. No household aliases or response
 endpoints are added. Errors include GUEST_GROUP_NAME_CONFLICT, GUEST_GROUP_IN_USE,
 GUEST_PLAN_REVISION_STALE, HEADCOUNT_SOURCE_CONFLICT, GUEST_NOT_FOUND and
 INVITATION_LINK_UNAVAILABLE. Check-in settings/ledger belong to SPEC-08.

@@ -269,10 +269,16 @@ Safe isolated work may start against accepted owner contracts; integrated accept
 requires real Booking access and ordered headcount providers. Invitation publication
 is required only for optional personalized-link integration, not Groups/list/planning.
 
-- [ ] GM-W1: Implement Groups + optional one-person Guests/import and independent explicit planning revisions; initialize from existing Booking count, never derive/reset total from an empty/partial list; verify normalization, atomic imports and retained references.
-- [ ] GM-W2: Implement optional Guest-scoped read-only credentials/exchange/view/reissue; generic invitation/QR works with no Guest list; verify privacy, hash-only storage, expiry/rate/denials; no guest attendance writes.
-- [ ] GM-W3: Implement explicit-total ordered Booking sync and named Guest search/list/group reporting/delivery ports; distinguish planningHeadcount/listedGuestCount, verify stale/replay/rollback and minimum-data conformance; Guest changes never enable check-in.
-- [ ] GM-W4: Mount strict Groups/Guests/planning HTTP/Zod/OpenAPI with names-free/partial-list examples and denials; no Household identities; companion-dependent fields require the narrow clarification above; publish exact provider/API versions.
+- [x] GM-W1: Implement Groups + optional one-person Guests/import and independent explicit planning revisions; initialize from existing Booking count, never derive/reset total from an empty/partial list; verify normalization, atomic imports and retained references.
+- [x] GM-W2: Implement optional Guest-scoped read-only credentials/exchange/view/reissue; generic invitation/QR works with no Guest list; verify privacy, hash-only storage, expiry/rate/denials; no guest attendance writes.
+- [x] GM-W3: Implement explicit-total ordered Booking sync and named Guest search/list/group reporting/delivery ports; distinguish planningHeadcount/listedGuestCount, verify stale/replay/rollback and minimum-data conformance; Guest changes never enable check-in.
+- [x] GM-W4: Mount strict Groups/Guests/planning HTTP/Zod/OpenAPI with names-free/partial-list examples and denials; no Household identities; companion-dependent fields require the narrow clarification above; publish exact provider/API versions.
+
+GM-W1–GM-W4 evidence: [backend acceptance](./evidence/guest-management-w1-w4-2026-10-12.md),
+[provider manifest](./evidence/guest-management-provider-manifest-2026-10-12.json) and
+[frontend hand-off](../docs/guest-management-w1-w4.md). Local native tests and exact-source
+Linux CI pass; live providers/deployment and the downstream GM-W5 gate remain separate.
+
 - [ ] GM-W5: Verify no-list -> Group seating/printing/event/invoice path and explicit-count -> Seating/print invalidation with real owners; import/archive do not change planning; migrations/concurrency/history proof; automatic personalized sending needs explicit recipient and real Notifications adapter.
 
 ### SPEC-07–11 — Backend Only
