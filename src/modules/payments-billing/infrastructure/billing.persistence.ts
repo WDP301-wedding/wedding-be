@@ -22,6 +22,7 @@ import {
 } from '../application/billing-ledger.port.js';
 import type { ContractContext } from '../application/payments-billing.providers.js';
 import { createContractFinancialReader } from '../../booking-lifecycle/infrastructure/contract-financial.reader.js';
+import { createEffectiveCommercialReader } from '../../booking-lifecycle/infrastructure/effective-commercial.reader.js';
 import {
   calculateBillingTotals,
   transitionPaymentAttempt,
@@ -399,7 +400,9 @@ function totalsFrom(entries: readonly LedgerEntry[]) {
       )
       .map((entry) => entry.amountVnd);
   return calculateBillingTotals({
-    baseChargesVnd: [...amounts('CHARGE', 'BASE_BOOKING'), ...amounts('CHARGE', 'CONTRACT')],
+    baseChargesVnd: entries
+      .filter((e) => e.kind === 'CHARGE' && e.sourceType !== 'PRINT_ORDER')
+      .map((e) => e.amountVnd),
     printChargesVnd: amounts('CHARGE', 'PRINT_ORDER'),
     creditAdjustmentsVnd: amounts('CREDIT_ADJUSTMENT'),
     settledPaymentsVnd: amounts('PAYMENT'),
@@ -408,6 +411,20 @@ function totalsFrom(entries: readonly LedgerEntry[]) {
 }
 
 async function validateSource(tx: Transaction, fact: NewLedgerFact) {
+  if (fact.sourceType === 'CONTRACT_APPENDIX') {
+    const source = await createEffectiveCommercialReader(tx).resolveAppendix(
+      fact.bookingId,
+      fact.sourceRevisionId,
+    );
+    if (
+      Math.abs(source.document.deltaVnd) !== fact.amountVnd ||
+      source.approvedAt !== fact.occurredAt ||
+      source.document.reason !== fact.reason ||
+      fact.kind !== (source.document.deltaVnd > 0 ? 'CHARGE' : 'CREDIT_ADJUSTMENT')
+    )
+      throw new BillingPersistenceConflict('FINANCIAL_SOURCE_CONFLICT');
+    return;
+  }
   if (
     ['BASE_BOOKING', 'PRINT_ORDER'].includes(fact.sourceType) &&
     (await createContractFinancialReader(tx).getModel(fact.bookingId)) === 'FULL_CONTRACT_V1'
@@ -517,6 +534,21 @@ async function appendOutbox(tx: Transaction, entry: LedgerEntry, context: Contra
       sourceRevisionId: entry.sourceRevisionId,
       amountVnd: entry.amountVnd,
       acceptedAt: entry.occurredAt,
+    };
+  } else if (
+    ['CONTRACT_APPENDIX', 'INCIDENTAL_FINALIZATION', 'INVOICE_ADJUSTMENT'].includes(
+      entry.sourceType,
+    )
+  ) {
+    eventType = 'billing.commercial-obligation-recorded';
+    payload = {
+      bookingId: entry.bookingId,
+      ledgerEntryId: entry.id,
+      sourceType: entry.sourceType,
+      sourceRevisionId: entry.sourceRevisionId,
+      kind: entry.kind,
+      amountVnd: entry.amountVnd,
+      occurredAt: entry.occurredAt,
     };
   } else if (entry.kind === 'PAYMENT') {
     const attempt = await tx.billingPaymentAttempt.findUniqueOrThrow({
