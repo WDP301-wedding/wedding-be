@@ -1,0 +1,140 @@
+{
+  "date": "2026-10-12",
+  "sourceRevision": "efb0dd9974de47b194bdb9ddec0f3bf605db757b",
+  "target": "populated task-owned disposable PostgreSQL on 127.0.0.1:55435",
+  "environment": "local disposable; no shared customer data",
+  "procedure": "manual daily02:00 Asia/Ho_Chi_Minh; at most10 batches of100; zero endscommand; operator reviews holds/missingfacts and recordsrequestIDs",
+  "automaticJobInstalled": false,
+  "sharedOrProductionExecution": false,
+  "actualCurrentScripts": true,
+  "verification": {
+    "tests": 2,
+    "passed": 2,
+    "batchSize": 1,
+    "targetMismatchDeniedBeforeWrites": true,
+    "identity": {
+      "dueAccountsAnonymized": 1,
+      "oldRevokedSessionsDeleted": 2,
+      "recentRevokedSessionsRetained": 1,
+      "legalHeldAccountRetained": true,
+      "missingFactsAccountRetained": true,
+      "futureFinancialEligibilityAccountRetained": true,
+      "concurrentAndReplaySafe": true
+    },
+    "intake": {
+      "oldUnconvertedDeleted": 1,
+      "oldConvertedScrubbed": 1,
+      "recentRetained": 1,
+      "consultationReferenceRetained": true,
+      "brideGroomNamesScrubbed": true,
+      "replayZero": true
+    },
+    "auditRequestIdAndOperatorMatched": true
+  },
+  "runs": [
+    {
+      "kind": "cli",
+      "event": "identity_retention_completed",
+      "requestId": "bc5d0aa0-742e-4c9f-b78d-f0dcc48d57ef",
+      "operatorId": "rv06-disposable-rehearsal",
+      "targetFingerprint": "959e7ed59286221eb9ac35ebbcc7f41126bd050f68c0b0f81ea37247f3f91e08",
+      "batchSize": 1,
+      "anonymizedAccounts": 1,
+      "deletedInvitations": 0,
+      "deletedPasswordResets": 0,
+      "deletedSessions": 1
+    },
+    {
+      "kind": "cli",
+      "event": "identity_retention_completed",
+      "requestId": "4fb420f2-7d9d-41fa-af08-3f9f40c16a19",
+      "operatorId": "rv06-disposable-rehearsal",
+      "targetFingerprint": "959e7ed59286221eb9ac35ebbcc7f41126bd050f68c0b0f81ea37247f3f91e08",
+      "batchSize": 1,
+      "anonymizedAccounts": 0,
+      "deletedInvitations": 0,
+      "deletedPasswordResets": 0,
+      "deletedSessions": 0
+    },
+    {
+      "kind": "cli",
+      "event": "identity_retention_completed",
+      "requestId": "52bd9e51-d0e1-4737-a38b-b73b6e9daa5d",
+      "operatorId": "rv06-disposable-rehearsal",
+      "targetFingerprint": "959e7ed59286221eb9ac35ebbcc7f41126bd050f68c0b0f81ea37247f3f91e08",
+      "batchSize": 1,
+      "anonymizedAccounts": 0,
+      "deletedInvitations": 0,
+      "deletedPasswordResets": 0,
+      "deletedSessions": 1
+    },
+    {
+      "kind": "cli",
+      "event": "identity_retention_completed",
+      "requestId": "61d363b9-da02-4d20-b0cc-70e01fb2cae7",
+      "operatorId": "rv06-disposable-rehearsal",
+      "targetFingerprint": "959e7ed59286221eb9ac35ebbcc7f41126bd050f68c0b0f81ea37247f3f91e08",
+      "batchSize": 1,
+      "anonymizedAccounts": 0,
+      "deletedInvitations": 0,
+      "deletedPasswordResets": 0,
+      "deletedSessions": 0
+    },
+    {
+      "kind": "audit",
+      "requestId": "bc5d0aa0-742e-4c9f-b78d-f0dcc48d57ef",
+      "action": "identity.retention-batch.completed",
+      "metadata": {
+        "batchSize": 1,
+        "operatorId": "rv06-disposable-rehearsal",
+        "deletedSessions": 1,
+        "anonymizedAccounts": 1,
+        "deletedInvitations": 0,
+        "deletedPasswordResets": 0
+      }
+    },
+    {
+      "kind": "cli",
+      "event": "intake_retention_completed",
+      "requestId": "7c9b82ab-18b7-4205-8e37-2d75408db15b",
+      "operatorId": "rv06-disposable-rehearsal",
+      "targetFingerprint": "959e7ed59286221eb9ac35ebbcc7f41126bd050f68c0b0f81ea37247f3f91e08",
+      "batchSize": 1,
+      "deleted": 1,
+      "scrubbed": 0
+    },
+    {
+      "kind": "cli",
+      "event": "intake_retention_completed",
+      "requestId": "8b578001-cc8e-4aa5-826f-082ba45566fd",
+      "operatorId": "rv06-disposable-rehearsal",
+      "targetFingerprint": "959e7ed59286221eb9ac35ebbcc7f41126bd050f68c0b0f81ea37247f3f91e08",
+      "batchSize": 1,
+      "deleted": 0,
+      "scrubbed": 1
+    },
+    {
+      "kind": "cli",
+      "event": "intake_retention_completed",
+      "requestId": "7b9fa055-c87c-45b4-9c15-c9103441f13d",
+      "operatorId": "rv06-disposable-rehearsal",
+      "targetFingerprint": "959e7ed59286221eb9ac35ebbcc7f41126bd050f68c0b0f81ea37247f3f91e08",
+      "batchSize": 1,
+      "deleted": 0,
+      "scrubbed": 0
+    },
+    {
+      "kind": "audit",
+      "requestId": "7c9b82ab-18b7-4205-8e37-2d75408db15b",
+      "action": "booking.intake-retention",
+      "metadata": {
+        "deleted": 1,
+        "scrubbed": 0,
+        "batchSize": 1,
+        "operatorId": "rv06-disposable-rehearsal"
+      }
+    }
+  ],
+  "fixtureDatabaseDroppedAfterRehearsal": true,
+  "productionReadiness": "not-established"
+}

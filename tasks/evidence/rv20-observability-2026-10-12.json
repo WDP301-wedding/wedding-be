@@ -1,0 +1,796 @@
+{
+  "date": "2026-10-12",
+  "target": "https://wedding-be-production-e1dc.up.railway.app",
+  "targetUse": "owner-authorized developer-only staging",
+  "config": {
+    "deploymentId": "ee35e81a-4e6e-474b-9475-6316bb1c8c33",
+    "serviceId": "0f70d648-8c59-48bd-84f3-29a86d2e2d38",
+    "environmentId": "08a2899c-b0d6-4200-a505-604965a4b3fc",
+    "metricsEnabled": false,
+    "tracingEnabled": false,
+    "storageEnabled": true,
+    "publicOriginConfigured": true
+  },
+  "productionReadiness": "not-established",
+  "optional": {
+    "metrics": "optional-disabled; actual unauthenticated and invalid-token reads return404",
+    "tracing": "optional-disabled; no collector ingestion claimed"
+  },
+  "checks": [
+    {
+      "label": "rv18-original-live",
+      "status": 200,
+      "requestId": "bf83291c-a9cf-4fbe-9100-3367d0b88181",
+      "at": "2026-10-11T19:28:18.940Z",
+      "headers": {
+        "content-type": "application/pdf",
+        "content-disposition": "inline; filename=\"invitation-8057ef94-b4e7-44ad-a652-5521f598bdee.pdf\"",
+        "cache-control": "private, no-store",
+        "x-content-sha256": "acb944aaeeeb8e67d777413deb0b9c509b25208de92820f028e251b8988afc79",
+        "x-printable-content-digest": "da039cdd5e8fb9b83104c43fa22bfd2ddbb6ba9ba68fa81c06b561bdfbfc6c1e",
+        "x-renderer-version": "invitation-a5-v1"
+      },
+      "sha256": "acb944aaeeeb8e67d777413deb0b9c509b25208de92820f028e251b8988afc79",
+      "sizeBytes": 20414,
+      "logFound": true
+    },
+    {
+      "label": "rv18-old-order-before-cancel",
+      "status": 200,
+      "code": null,
+      "requestId": "b31cb568-d07f-4cca-8e9a-93f40e3e56c0",
+      "at": "2026-10-11T19:28:21.181Z",
+      "logFound": true
+    },
+    {
+      "label": "rv18-couple-cancellation-intent",
+      "status": 200,
+      "code": null,
+      "requestId": "c619ec51-0664-4e20-a3aa-61043496955c",
+      "at": "2026-10-11T19:28:32.578Z",
+      "logFound": true
+    },
+    {
+      "label": "rv18-manager-contract-print-cancel",
+      "status": 200,
+      "code": null,
+      "requestId": "ee2fcc3f-b158-41b4-848f-1a6724ba454f",
+      "at": "2026-10-11T19:28:39.602Z",
+      "logFound": true
+    },
+    {
+      "label": "rv18-request-current-image-order",
+      "status": 201,
+      "code": null,
+      "requestId": "f84feb11-9325-4b80-b45a-b121dccc5456",
+      "at": "2026-10-11T19:28:54.711Z",
+      "logFound": true
+    },
+    {
+      "label": "rv18-new-order-head",
+      "status": 200,
+      "code": null,
+      "requestId": "2f31f532-2f49-4651-9168-d7f2540fd792",
+      "at": "2026-10-11T19:28:56.675Z",
+      "logFound": true
+    },
+    {
+      "label": "rv18-current-image-quote",
+      "status": 200,
+      "code": null,
+      "requestId": "08b9d4e3-a368-4bb2-baa8-66282b8bb1e8",
+      "at": "2026-10-11T19:29:07.919Z",
+      "logFound": true
+    },
+    {
+      "label": "rv18-current-image-approval",
+      "status": 200,
+      "code": null,
+      "requestId": "89a3e528-a0d7-41f1-8c4a-f7df221e2763",
+      "at": "2026-10-11T19:29:27.906Z",
+      "logFound": true
+    },
+    {
+      "label": "rv18-image-live",
+      "status": 200,
+      "requestId": "6c1baca6-a97d-4293-9182-3ba20fa14a1b",
+      "at": "2026-10-11T19:29:38.756Z",
+      "headers": {
+        "content-type": "application/pdf",
+        "content-disposition": "inline; filename=\"invitation-a627d17b-6c8e-4d4b-a900-0a99b7ed404f.pdf\"",
+        "cache-control": "private, no-store",
+        "x-content-sha256": "96ca898707e8992738a2a7af10961f1c9119a82af4ab07265696fcd37743b5da",
+        "x-printable-content-digest": "a0bb37537dcc0c68e440f52baa242d02b40f3318d814459bda1c80461f34a566",
+        "x-renderer-version": "invitation-a5-v1"
+      },
+      "sha256": "96ca898707e8992738a2a7af10961f1c9119a82af4ab07265696fcd37743b5da",
+      "sizeBytes": 27401,
+      "logFound": true
+    },
+    {
+      "label": "rv18-image-attachment",
+      "status": 200,
+      "requestId": "b777daf3-07f9-4b2d-b94b-5d44ea6d23d4",
+      "at": "2026-10-11T19:29:46.935Z",
+      "headers": {
+        "content-type": "application/pdf",
+        "content-disposition": "attachment; filename=\"invitation-a627d17b-6c8e-4d4b-a900-0a99b7ed404f.pdf\"",
+        "cache-control": "private, no-store",
+        "x-content-sha256": "96ca898707e8992738a2a7af10961f1c9119a82af4ab07265696fcd37743b5da",
+        "x-printable-content-digest": "a0bb37537dcc0c68e440f52baa242d02b40f3318d814459bda1c80461f34a566",
+        "x-renderer-version": "invitation-a5-v1"
+      },
+      "sha256": "96ca898707e8992738a2a7af10961f1c9119a82af4ab07265696fcd37743b5da",
+      "sizeBytes": 27401,
+      "logFound": true
+    },
+    {
+      "label": "rv18-missing-auth",
+      "status": 401,
+      "requestId": "7d28d66e-cb56-48f4-af8b-60420e602849",
+      "at": "2026-10-11T19:29:47.597Z",
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "content-disposition": null,
+        "cache-control": null,
+        "x-content-sha256": null,
+        "x-printable-content-digest": null,
+        "x-renderer-version": null
+      },
+      "code": "AUTHENTICATION_REQUIRED",
+      "logFound": true
+    },
+    {
+      "label": "rv18-other-couple-denied",
+      "status": 404,
+      "requestId": "222c443f-e00e-4a3e-b407-591939adfcf5",
+      "at": "2026-10-11T19:29:52.086Z",
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "content-disposition": null,
+        "cache-control": "no-store",
+        "x-content-sha256": null,
+        "x-printable-content-digest": null,
+        "x-renderer-version": null
+      },
+      "code": "NOT_FOUND",
+      "logFound": true
+    },
+    {
+      "label": "rv18-cross-booking-denied",
+      "status": 404,
+      "requestId": "40ab2072-20f4-402c-83cc-b1900bf60c5b",
+      "at": "2026-10-11T19:29:56.425Z",
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "content-disposition": null,
+        "cache-control": "no-store",
+        "x-content-sha256": null,
+        "x-printable-content-digest": null,
+        "x-renderer-version": null
+      },
+      "code": "NOT_FOUND",
+      "logFound": true
+    },
+    {
+      "label": "rv18-unknown-revision",
+      "status": 404,
+      "requestId": "eeb5fabb-faec-4e9f-be4f-e4aed17801e7",
+      "at": "2026-10-11T19:30:00.749Z",
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "content-disposition": null,
+        "cache-control": "no-store",
+        "x-content-sha256": null,
+        "x-printable-content-digest": null,
+        "x-renderer-version": null
+      },
+      "code": "NOT_FOUND",
+      "logFound": true
+    },
+    {
+      "label": "rv18-image-design-head",
+      "status": 200,
+      "code": null,
+      "requestId": "659429e2-44cf-4dad-b5c6-81965844e623",
+      "at": "2026-10-11T19:30:05.655Z",
+      "logFound": true
+    },
+    {
+      "label": "rv18-later-design-edit",
+      "status": 201,
+      "code": null,
+      "requestId": "233cbe95-86fd-47fe-a430-8208096db0c4",
+      "at": "2026-10-11T19:30:18.157Z",
+      "logFound": true
+    },
+    {
+      "label": "rv18-original-after-edit",
+      "status": 200,
+      "requestId": "568968b1-60f5-42c4-b5ba-71b7ccc1ee8f",
+      "at": "2026-10-11T19:30:26.210Z",
+      "headers": {
+        "content-type": "application/pdf",
+        "content-disposition": "inline; filename=\"invitation-8057ef94-b4e7-44ad-a652-5521f598bdee.pdf\"",
+        "cache-control": "private, no-store",
+        "x-content-sha256": "acb944aaeeeb8e67d777413deb0b9c509b25208de92820f028e251b8988afc79",
+        "x-printable-content-digest": "da039cdd5e8fb9b83104c43fa22bfd2ddbb6ba9ba68fa81c06b561bdfbfc6c1e",
+        "x-renderer-version": "invitation-a5-v1"
+      },
+      "sha256": "acb944aaeeeb8e67d777413deb0b9c509b25208de92820f028e251b8988afc79",
+      "sizeBytes": 20414,
+      "logFound": true
+    },
+    {
+      "label": "rv18-image-after-edit",
+      "status": 200,
+      "requestId": "07cdbb51-5740-46d9-a918-61bdd3589af2",
+      "at": "2026-10-11T19:30:35.469Z",
+      "headers": {
+        "content-type": "application/pdf",
+        "content-disposition": "inline; filename=\"invitation-a627d17b-6c8e-4d4b-a900-0a99b7ed404f.pdf\"",
+        "cache-control": "private, no-store",
+        "x-content-sha256": "96ca898707e8992738a2a7af10961f1c9119a82af4ab07265696fcd37743b5da",
+        "x-printable-content-digest": "a0bb37537dcc0c68e440f52baa242d02b40f3318d814459bda1c80461f34a566",
+        "x-renderer-version": "invitation-a5-v1"
+      },
+      "sha256": "96ca898707e8992738a2a7af10961f1c9119a82af4ab07265696fcd37743b5da",
+      "sizeBytes": 27401,
+      "logFound": true
+    },
+    {
+      "label": "rv18-no-financial-change",
+      "status": 200,
+      "code": null,
+      "requestId": "0f0a2a1a-2f4a-4817-bbcc-d25c3ad26d48",
+      "at": "2026-10-11T19:30:39.145Z",
+      "logFound": true
+    },
+    {
+      "label": "invalid-login",
+      "status": 401,
+      "code": "INVALID_CREDENTIALS",
+      "requestId": "2d616913-cbe5-4e68-b1a4-44e183a33a43",
+      "logFound": true
+    },
+    {
+      "label": "disabled-metrics",
+      "status": 404,
+      "code": "NOT_FOUND",
+      "requestId": "4b4b7d71-4fae-4853-8b89-5bb0abcd5254",
+      "logFound": true
+    },
+    {
+      "label": "disabled-metrics-invalid-token",
+      "status": 404,
+      "code": "NOT_FOUND",
+      "requestId": "d787e1a7-ede0-4b4b-aefc-1e41702a744c",
+      "logFound": true
+    },
+    {
+      "label": "strict-pdf-query",
+      "status": 422,
+      "code": "VALIDATION_ERROR",
+      "requestId": "c655ef72-909a-4ed6-a4d3-7311a61f10d2",
+      "logFound": true
+    }
+  ],
+  "requestEvents": [
+    {
+      "method": "GET",
+      "environment": "production",
+      "service": "wedding-be",
+      "durationMs": 9828.481,
+      "level": "info",
+      "module": "http",
+      "route": "/api/v1/bookings/:bookingId/printable-revisions/:printableRevisionId/file",
+      "req": {
+        "method": "GET"
+      },
+      "statusClass": "2xx",
+      "message": "request completed",
+      "timestamp": "2026-10-11T19:28:21.637Z",
+      "entryPoint": "http",
+      "requestId": "bf83291c-a9cf-4fbe-9100-3367d0b88181",
+      "event": "http_request_completed"
+    },
+    {
+      "environment": "production",
+      "timestamp": "2026-10-11T19:28:23.944Z",
+      "entryPoint": "http",
+      "level": "info",
+      "durationMs": 1860.665,
+      "event": "http_request_completed",
+      "method": "GET",
+      "module": "http",
+      "message": "request completed",
+      "route": "/api/v1/management/print-orders/:orderId",
+      "service": "wedding-be",
+      "req": {
+        "method": "GET"
+      },
+      "statusClass": "2xx",
+      "requestId": "b31cb568-d07f-4cca-8e9a-93f40e3e56c0"
+    },
+    {
+      "durationMs": 11115.235,
+      "statusClass": "2xx",
+      "event": "http_request_completed",
+      "message": "request completed",
+      "req": {
+        "method": "POST"
+      },
+      "timestamp": "2026-10-11T19:28:35.343Z",
+      "module": "http",
+      "service": "wedding-be",
+      "environment": "production",
+      "level": "info",
+      "entryPoint": "http",
+      "method": "POST",
+      "route": "/api/v1/bookings/:bookingId/print-orders/:orderId/cancellation-intents",
+      "requestId": "c619ec51-0664-4e20-a3aa-61043496955c"
+    },
+    {
+      "req": {
+        "method": "POST"
+      },
+      "level": "info",
+      "timestamp": "2026-10-11T19:28:42.366Z",
+      "route": "/api/v1/management/print-orders/:orderId/cancellation",
+      "message": "request completed",
+      "statusClass": "2xx",
+      "environment": "production",
+      "requestId": "ee2fcc3f-b158-41b4-848f-1a6724ba454f",
+      "service": "wedding-be",
+      "durationMs": 6585.267,
+      "entryPoint": "http",
+      "event": "http_request_completed",
+      "method": "POST",
+      "module": "http"
+    },
+    {
+      "message": "request completed",
+      "timestamp": "2026-10-11T19:28:57.472Z",
+      "service": "wedding-be",
+      "req": {
+        "method": "POST"
+      },
+      "requestId": "f84feb11-9325-4b80-b45a-b121dccc5456",
+      "method": "POST",
+      "module": "http",
+      "durationMs": 14625.212,
+      "environment": "production",
+      "level": "info",
+      "entryPoint": "http",
+      "event": "http_request_completed",
+      "route": "/api/v1/bookings/:bookingId/print-orders",
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "2f31f532-2f49-4651-9168-d7f2540fd792",
+      "durationMs": 1540.575,
+      "event": "http_request_completed",
+      "method": "GET",
+      "route": "/api/v1/management/print-orders/:orderId",
+      "module": "http",
+      "statusClass": "2xx",
+      "message": "request completed",
+      "timestamp": "2026-10-11T19:28:59.437Z",
+      "req": {
+        "method": "GET"
+      },
+      "environment": "production",
+      "entryPoint": "http",
+      "level": "info",
+      "service": "wedding-be"
+    },
+    {
+      "module": "http",
+      "route": "/api/v1/management/print-orders/:orderId/quotations",
+      "timestamp": "2026-10-11T19:29:10.680Z",
+      "level": "info",
+      "event": "http_request_completed",
+      "durationMs": 10972.884,
+      "statusClass": "2xx",
+      "req": {
+        "method": "POST"
+      },
+      "environment": "production",
+      "service": "wedding-be",
+      "message": "request completed",
+      "entryPoint": "http",
+      "requestId": "08b9d4e3-a368-4bb2-baa8-66282b8bb1e8",
+      "method": "POST"
+    },
+    {
+      "message": "request completed",
+      "timestamp": "2026-10-11T19:29:30.663Z",
+      "level": "info",
+      "module": "http",
+      "entryPoint": "http",
+      "service": "wedding-be",
+      "method": "POST",
+      "requestId": "89a3e528-a0d7-41f1-8c4a-f7df221e2763",
+      "route": "/api/v1/bookings/:bookingId/print-orders/:orderId/approval",
+      "req": {
+        "method": "POST"
+      },
+      "statusClass": "2xx",
+      "environment": "production",
+      "durationMs": 19550.748,
+      "event": "http_request_completed"
+    },
+    {
+      "timestamp": "2026-10-11T19:29:41.427Z",
+      "route": "/api/v1/bookings/:bookingId/printable-revisions/:printableRevisionId/file",
+      "req": {
+        "method": "GET"
+      },
+      "level": "info",
+      "entryPoint": "http",
+      "requestId": "6c1baca6-a97d-4293-9182-3ba20fa14a1b",
+      "method": "GET",
+      "module": "http",
+      "environment": "production",
+      "service": "wedding-be",
+      "durationMs": 10359.623,
+      "event": "http_request_completed",
+      "statusClass": "2xx",
+      "message": "request completed"
+    },
+    {
+      "event": "http_request_completed",
+      "message": "request completed",
+      "service": "wedding-be",
+      "method": "GET",
+      "module": "http",
+      "route": "/api/v1/bookings/:bookingId/printable-revisions/:printableRevisionId/file",
+      "statusClass": "2xx",
+      "timestamp": "2026-10-11T19:29:49.621Z",
+      "requestId": "b777daf3-07f9-4b2d-b94b-5d44ea6d23d4",
+      "durationMs": 7695.785,
+      "level": "info",
+      "entryPoint": "http",
+      "req": {
+        "method": "GET"
+      },
+      "environment": "production"
+    },
+    {
+      "message": "request completed",
+      "statusClass": "4xx",
+      "method": "GET",
+      "environment": "production",
+      "event": "http_request_completed",
+      "service": "wedding-be",
+      "timestamp": "2026-10-11T19:29:50.357Z",
+      "level": "warn",
+      "errorCode": "AUTHENTICATION_REQUIRED",
+      "durationMs": 148.183,
+      "module": "http",
+      "route": "<unmatched>",
+      "req": {
+        "method": "GET"
+      },
+      "entryPoint": "http",
+      "requestId": "7d28d66e-cb56-48f4-af8b-60420e602849"
+    },
+    {
+      "timestamp": "2026-10-11T19:29:54.851Z",
+      "durationMs": 4227.439,
+      "message": "request completed",
+      "req": {
+        "method": "GET"
+      },
+      "module": "http",
+      "service": "wedding-be",
+      "requestId": "222c443f-e00e-4a3e-b407-591939adfcf5",
+      "route": "/bookings/:bookingId/printable-revisions/:printableRevisionId/file",
+      "entryPoint": "http",
+      "method": "GET",
+      "errorCode": "NOT_FOUND",
+      "environment": "production",
+      "level": "warn",
+      "event": "http_request_completed",
+      "statusClass": "4xx"
+    },
+    {
+      "level": "warn",
+      "route": "/bookings/:bookingId/printable-revisions/:printableRevisionId/file",
+      "timestamp": "2026-10-11T19:29:59.185Z",
+      "durationMs": 3916.199,
+      "message": "request completed",
+      "entryPoint": "http",
+      "event": "http_request_completed",
+      "method": "GET",
+      "statusClass": "4xx",
+      "requestId": "40ab2072-20f4-402c-83cc-b1900bf60c5b",
+      "service": "wedding-be",
+      "module": "http",
+      "environment": "production",
+      "req": {
+        "method": "GET"
+      },
+      "errorCode": "NOT_FOUND"
+    },
+    {
+      "durationMs": 3922.216,
+      "event": "http_request_completed",
+      "statusClass": "4xx",
+      "requestId": "eeb5fabb-faec-4e9f-be4f-e4aed17801e7",
+      "module": "http",
+      "route": "/bookings/:bookingId/printable-revisions/:printableRevisionId/file",
+      "entryPoint": "http",
+      "method": "GET",
+      "message": "request completed",
+      "timestamp": "2026-10-11T19:30:03.513Z",
+      "environment": "production",
+      "level": "warn",
+      "req": {
+        "method": "GET"
+      },
+      "errorCode": "NOT_FOUND",
+      "service": "wedding-be"
+    },
+    {
+      "timestamp": "2026-10-11T19:30:08.418Z",
+      "level": "info",
+      "event": "http_request_completed",
+      "module": "http",
+      "method": "GET",
+      "route": "/api/v1/bookings/:bookingId/invitations/:designId",
+      "durationMs": 4488.948,
+      "entryPoint": "http",
+      "requestId": "659429e2-44cf-4dad-b5c6-81965844e623",
+      "message": "request completed",
+      "statusClass": "2xx",
+      "req": {
+        "method": "GET"
+      },
+      "environment": "production",
+      "service": "wedding-be"
+    },
+    {
+      "statusClass": "2xx",
+      "timestamp": "2026-10-11T19:30:20.921Z",
+      "requestId": "233cbe95-86fd-47fe-a430-8208096db0c4",
+      "environment": "production",
+      "entryPoint": "http",
+      "event": "http_request_completed",
+      "method": "POST",
+      "durationMs": 12120.643,
+      "route": "/api/v1/bookings/:bookingId/invitations/:designId/revisions",
+      "service": "wedding-be",
+      "level": "info",
+      "module": "http",
+      "message": "request completed",
+      "req": {
+        "method": "POST"
+      }
+    },
+    {
+      "req": {
+        "method": "GET"
+      },
+      "message": "request completed",
+      "entryPoint": "http",
+      "level": "info",
+      "requestId": "568968b1-60f5-42c4-b5ba-71b7ccc1ee8f",
+      "method": "GET",
+      "module": "http",
+      "route": "/api/v1/bookings/:bookingId/printable-revisions/:printableRevisionId/file",
+      "statusClass": "2xx",
+      "timestamp": "2026-10-11T19:30:28.910Z",
+      "environment": "production",
+      "durationMs": 7554.345,
+      "event": "http_request_completed",
+      "service": "wedding-be"
+    },
+    {
+      "entryPoint": "http",
+      "message": "request completed",
+      "level": "info",
+      "timestamp": "2026-10-11T19:30:38.123Z",
+      "requestId": "07cdbb51-5740-46d9-a918-61bdd3589af2",
+      "event": "http_request_completed",
+      "method": "GET",
+      "module": "http",
+      "route": "/api/v1/bookings/:bookingId/printable-revisions/:printableRevisionId/file",
+      "statusClass": "2xx",
+      "durationMs": 8736.838,
+      "service": "wedding-be",
+      "req": {
+        "method": "GET"
+      },
+      "environment": "production"
+    },
+    {
+      "req": {
+        "method": "GET"
+      },
+      "statusClass": "2xx",
+      "method": "GET",
+      "level": "info",
+      "requestId": "0f0a2a1a-2f4a-4817-bbcc-d25c3ad26d48",
+      "service": "wedding-be",
+      "durationMs": 3286.61,
+      "event": "http_request_completed",
+      "entryPoint": "http",
+      "environment": "production",
+      "timestamp": "2026-10-11T19:30:41.910Z",
+      "route": "/api/v1/bookings/:bookingId/billing",
+      "message": "request completed",
+      "module": "http"
+    },
+    {
+      "level": "warn",
+      "environment": "production",
+      "durationMs": 1578.214,
+      "message": "request completed",
+      "method": "POST",
+      "statusClass": "4xx",
+      "event": "http_request_completed",
+      "entryPoint": "http",
+      "requestId": "2d616913-cbe5-4e68-b1a4-44e183a33a43",
+      "req": {
+        "method": "POST"
+      },
+      "module": "http",
+      "service": "wedding-be",
+      "timestamp": "2026-10-11T19:31:18.594Z",
+      "route": "/auth/web-sessions",
+      "errorCode": "INVALID_CREDENTIALS"
+    },
+    {
+      "environment": "production",
+      "durationMs": 1.379,
+      "route": "<unmatched>",
+      "message": "request completed",
+      "level": "warn",
+      "service": "wedding-be",
+      "module": "http",
+      "statusClass": "4xx",
+      "entryPoint": "http",
+      "timestamp": "2026-10-11T19:31:19.024Z",
+      "requestId": "4b4b7d71-4fae-4853-8b89-5bb0abcd5254",
+      "method": "GET",
+      "event": "http_request_completed",
+      "req": {
+        "method": "GET"
+      },
+      "errorCode": "NOT_FOUND"
+    },
+    {
+      "errorCode": "NOT_FOUND",
+      "req": {
+        "method": "GET"
+      },
+      "requestId": "d787e1a7-ede0-4b4b-aefc-1e41702a744c",
+      "statusClass": "4xx",
+      "service": "wedding-be",
+      "environment": "production",
+      "entryPoint": "http",
+      "durationMs": 0.878,
+      "message": "request completed",
+      "event": "http_request_completed",
+      "method": "GET",
+      "route": "<unmatched>",
+      "timestamp": "2026-10-11T19:31:19.253Z",
+      "module": "http",
+      "level": "warn"
+    },
+    {
+      "entryPoint": "http",
+      "message": "request completed",
+      "timestamp": "2026-10-11T19:31:21.056Z",
+      "req": {
+        "method": "GET"
+      },
+      "errorCode": "VALIDATION_ERROR",
+      "environment": "production",
+      "level": "warn",
+      "event": "http_request_completed",
+      "service": "wedding-be",
+      "module": "http",
+      "route": "/bookings/:bookingId/printable-revisions/:printableRevisionId/file",
+      "statusClass": "4xx",
+      "durationMs": 1547.507,
+      "method": "GET",
+      "requestId": "c655ef72-909a-4ed6-a4d3-7311a61f10d2"
+    }
+  ],
+  "audit": [
+    {
+      "requestId": "89a3e528-a0d7-41f1-8c4a-f7df221e2763",
+      "action": "invitation.printable-captured",
+      "entityId": "a627d17b-6c8e-4d4b-a900-0a99b7ed404f",
+      "occurredAt": "2026-10-11T19:29:22.360Z",
+      "metadata": {
+        "revision": 1
+      }
+    },
+    {
+      "requestId": "7d28d66e-cb56-48f4-af8b-60420e602849",
+      "action": "invitation.private-access-denied",
+      "entityId": null,
+      "occurredAt": "2026-10-11T19:29:50.210Z",
+      "metadata": {}
+    },
+    {
+      "requestId": "233cbe95-86fd-47fe-a430-8208096db0c4",
+      "action": "invitation.design-revised",
+      "entityId": "859352ef-da0d-4f2c-ab7d-12cdcc19eff4",
+      "occurredAt": "2026-10-11T19:30:17.305Z",
+      "metadata": {
+        "revision": 3
+      }
+    },
+    {
+      "requestId": "2d616913-cbe5-4e68-b1a4-44e183a33a43",
+      "action": "session.login-failed",
+      "entityId": null,
+      "occurredAt": "2026-10-11T19:31:18.450Z",
+      "metadata": {
+        "reasonCode": "unknown-account"
+      }
+    }
+  ],
+  "isolatedNativeError": {
+    "kind": "isolated loopback native runtime error; no main-service fault/no database writes",
+    "deploymentId": "ee35e81a-4e6e-474b-9475-6316bb1c8c33",
+    "status": 500,
+    "code": "INTERNAL_ERROR",
+    "requestId": "c60f261f-cf1a-42da-87c3-78f7332fd582",
+    "canaryAbsentFromLogsAndResponse": true,
+    "events": [
+      {
+        "level": "error",
+        "timestamp": "2026-10-11T19:31:24.207Z",
+        "environment": "production",
+        "service": "wedding-be",
+        "req": {
+          "method": "POST"
+        },
+        "entryPoint": "http",
+        "requestId": "c60f261f-cf1a-42da-87c3-78f7332fd582",
+        "errorName": "Error",
+        "event": "http_request_error",
+        "module": "http",
+        "msg": "unexpected request error"
+      },
+      {
+        "level": "error",
+        "timestamp": "2026-10-11T19:31:24.212Z",
+        "environment": "production",
+        "service": "wedding-be",
+        "req": {
+          "method": "POST"
+        },
+        "entryPoint": "http",
+        "requestId": "c60f261f-cf1a-42da-87c3-78f7332fd582",
+        "durationMs": 18.414,
+        "event": "http_request_completed",
+        "method": "POST",
+        "module": "http",
+        "route": "/rv20-isolated-fault",
+        "statusClass": "5xx",
+        "errorCode": "INTERNAL_ERROR",
+        "msg": "request completed"
+      }
+    ]
+  },
+  "secretSafe": {
+    "syntheticCanaryAbsentFromMainLogs": true,
+    "syntheticCanaryAbsentFromResponses": true,
+    "syntheticCanaryAbsentFromIsolatedErrorLogs": true,
+    "rawLogsKeptPrivate": true
+  },
+  "invitationMediaDeniedAudit": [
+    {
+      "requestId": "222c443f-e00e-4a3e-b407-591939adfcf5",
+      "action": "media.access-denied",
+      "bookingId": "cd0b75ab-6256-427e-9b37-777f8b9c2822",
+      "occurredAt": "2026-10-11T19:29:53.561Z"
+    }
+  ]
+}

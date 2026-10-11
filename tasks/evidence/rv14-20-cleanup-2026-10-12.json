@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-12",
+  "sessions": [
+    {
+      "actor": "manager",
+      "sessionId": "6a7b9ab6-aa5d-4069-9fa3-a79da4a234ee",
+      "revokeStatus": 204,
+      "requestId": "2b15e8de-a6e3-409e-aeb1-354fa0370d3d",
+      "afterStatus": 401,
+      "afterRequestId": "2ead4a91-f7cf-44a4-b1db-d721e447f977"
+    },
+    {
+      "actor": "couple",
+      "sessionId": "6716b367-f858-4a5c-b0af-32f2b6868c6f",
+      "revokeStatus": 204,
+      "requestId": "cf930c07-2c8e-406e-8f19-d2e32653eb61",
+      "afterStatus": 401,
+      "afterRequestId": "652dd96f-3647-4b26-a317-f05bbc606abc"
+    },
+    {
+      "actor": "journeyCouple",
+      "sessionId": "cdb5eca7-1200-46bb-b0ea-5c85965925fa",
+      "revokeStatus": 204,
+      "requestId": "7da999d3-a246-40e8-8415-7d24cb0f4410",
+      "afterStatus": 401,
+      "afterRequestId": "6a4d3b5a-d56a-41e2-a091-1f38ce96756e"
+    }
+  ],
+  "states": [
+    {
+      "id": "6a7b9ab6-aa5d-4069-9fa3-a79da4a234ee",
+      "status": "REVOKED",
+      "revokedAt": "2026-10-11T19:35:51.728Z"
+    },
+    {
+      "id": "6716b367-f858-4a5c-b0af-32f2b6868c6f",
+      "status": "REVOKED",
+      "revokedAt": "2026-10-11T19:35:54.518Z"
+    },
+    {
+      "id": "cdb5eca7-1200-46bb-b0ea-5c85965925fa",
+      "status": "REVOKED",
+      "revokedAt": "2026-10-11T19:35:57.128Z"
+    }
+  ],
+  "taskSshKeyId": "d3a5bb3a-bec8-49d3-a942-8de4cbc60ee5",
+  "taskSshKeyRevoked": true,
+  "taskLocalKeyFilesRemoved": true,
+  "clockSchemaPreviouslyRemoved": true,
+  "financialAndPrintHistoryPreserved": true,
+  "unrelatedSessionsNotRevoked": true,
+  "sharedDataRetentionNotExecuted": true
+}

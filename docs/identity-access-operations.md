@@ -68,7 +68,12 @@ automatic job. Production/shared-data execution still needs explicit environment
 authorization; RV-06 rehearsal uses only populated disposable local PostgreSQL.
 
 Before every execution, inspect `DATABASE_URL` through the read-only command.
-It prints host/port/database/schema and their SHA-256 fingerprint without username,
+Run these source CLIs from an approved operator checkout matching the deployed
+release, with locked dependencies and the generated Prisma client (`npm ci`,
+`npm run db:generate`). Supply its explicitly authorized database connection through
+the operator's protected environment. The current HTTP Docker image does not
+package these source scripts; this procedure does not claim a container scheduler.
+Inspection prints host/port/database/schema and their SHA-256 fingerprint without username,
 password or connection options, and opens no database connection. Then supply that
 exact fingerprint and an opaque operator identifier (no personal contact data):
 
