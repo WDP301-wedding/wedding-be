@@ -110,6 +110,12 @@ sourceRevisionId,quantity})` and `resolveRevision(sourceRevisionId)`.
 templateVersionId})` and `resolveVersion(templateVersionId)`, returning only
   templateId/templateVersionId/revision/title. It performs catalog reads only and
   never calls Booking, Billing, Storage, media or design writers.
+- Its additive `findSelectableSelections(references)` operation accepts at most
+  50 exact template/version references and returns frozen selectable facts, with
+  duplicate references collapsed. Missing, inactive and superseded selections are
+  omitted. Invitation locks distinct template heads in UUID order and reads only
+  scalar metadata in two database queries. Venue uses this operation once per
+  selectable print page; it preserves offering order and candidate pagination.
 
 All returned fact objects are frozen scalar snapshots. Current selection checks
 active exact versions; historical readers retain original facts after edit/archive.
@@ -119,7 +125,7 @@ template content remains protected by Invitation's existing immutable history.
 Venue composes Invitation's reader inside its own database transaction; no runtime
 dependency through Invitation -> Payments -> Booking is introduced.
 Invitation's standalone provider opens its own transaction so the template lock
-is retained until its exact-version facts have been read.
+is retained until its exact-version facts have been read, including batch reads.
 
 Selection readers serialize their own read against catalog edits. BE-06–09 must
 enlist exact profile/catalog versions in commercial submission/approval/deposit

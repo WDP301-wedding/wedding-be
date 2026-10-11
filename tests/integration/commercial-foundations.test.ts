@@ -638,6 +638,7 @@ describeDb('BE-01–05 disposable PostgreSQL profile/catalog foundations', () =>
     const failure = new Error('controlled template reader outage');
     const failing = createPrintOfferingService(database.prisma, () => ({
       requireSelection: () => Promise.reject(failure),
+      findSelectableSelections: () => Promise.reject(failure),
       resolveVersion: () => Promise.reject(failure),
     }));
     await expect(failing.list()).rejects.toThrow(failure);
@@ -646,5 +647,82 @@ describeDb('BE-01–05 disposable PostgreSQL profile/catalog foundations', () =>
       prints.create(printInput(source), { ...ctx(), requestId: 'invalid-uuid' }),
     ).rejects.toThrow();
     expect(await database.prisma.printOffering.count()).toBe(count);
+  });
+  it('filters a bounded template batch to safe active exact-version facts', async () => {
+    const active = await template();
+    const inactive = await template(false);
+    const superseded = await template();
+    await reviseTemplate(superseded.templateId, true);
+    const reader = createInvitationTemplateSelectionReader(database.prisma);
+    const facts = await reader.findSelectableSelections([
+      active,
+      active,
+      inactive,
+      superseded,
+      { templateId: randomUUID(), templateVersionId: randomUUID() },
+    ]);
+    expect(facts).toEqual([{ ...active, revision: 1, title: 'Thiệp truyền thống' }]);
+    expect(Object.isFrozen(facts)).toBe(true);
+    expect(Object.isFrozen(facts[0])).toBe(true);
+    expect(await reader.findSelectableSelections([])).toEqual([]);
+    await expect(
+      reader.findSelectableSelections(Array.from({ length: 51 }, () => active)),
+    ).rejects.toThrow();
+    await expect(
+      reader.findSelectableSelections([{ ...active, templateId: 'invalid' }]),
+    ).rejects.toThrow();
+  });
+  it('pins template heads throughout an enlisted batch transaction and observes later archive', async () => {
+    const source = await template();
+    let locked!: () => void;
+    let release!: () => void;
+    const ready = new Promise<void>((resolve) => {
+      locked = resolve;
+    });
+    const finish = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const pinned = database.prisma.$transaction(async (tx) => {
+      const facts = await createInvitationTemplateSelectionReader(tx).findSelectableSelections([
+        source,
+      ]);
+      locked();
+      await finish;
+      return facts;
+    });
+    await ready;
+    try {
+      await expect(
+        database.prisma.$transaction(async (tx) => {
+          await tx.$executeRaw`SET LOCAL lock_timeout = '100ms'`;
+          const versionId = randomUUID();
+          await tx.invitationTemplateVersion.create({
+            data: {
+              id: versionId,
+              templateId: source.templateId,
+              revision: 2,
+              content: { title: 'Archive' },
+            },
+          });
+          await tx.invitationTemplate.update({
+            where: { id: source.templateId },
+            data: {
+              active: false,
+              revision: 2,
+              currentVersionId: versionId,
+            },
+          });
+        }),
+      ).rejects.toThrow(/lock timeout/);
+    } finally {
+      release();
+    }
+    expect(await pinned).toEqual([{ ...source, revision: 1, title: 'Thiệp truyền thống' }]);
+    await reviseTemplate(source.templateId, false);
+    const reader = createInvitationTemplateSelectionReader(database.prisma);
+    expect(await reader.findSelectableSelections([source])).toEqual([]);
+    expect(await reader.resolveVersion(source.templateVersionId)).toMatchObject({
+      title: 'Thiệp truyền thống',
+    });
   });
 });
