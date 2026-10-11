@@ -174,6 +174,10 @@ This does not complete BE-06–17 or pending external-provider RV gates.
 - [ ] BE-16
 - [ ] BE-17
 
+Kế hoạch bước 6 (BE-11–16): [phụ lục, fulfillment thiệp, phát sinh, hóa đơn cuối và điều chỉnh](plan.md).
+Kế hoạch chia nhỏ theo owner, có checkpoint PostgreSQL/ledger/payment và giữ các task
+ở trạng thái chưa hoàn tất cho đến khi code được wired, verified và có bằng chứng.
+
 ## SPEC-06–11 — Backend Only
 
 Every task in this section, including SPEC-06, is backend-only. No frontend task,
