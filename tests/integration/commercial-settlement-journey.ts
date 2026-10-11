@@ -21,6 +21,9 @@ export function registerCommercialSettlementJourney(harness: StepSixApiHarness) 
   const { database, paidFixture, getLines, post, get, total, deposit } = harness;
   it('settles the complete appendix, print, expense, invoice, balance and refund journey without rewriting history', async () => {
     const { f, d } = await paidFixture(true);
+    const servicePrice = d.contract.document.lines.find(
+      (l) => l.category === 'SERVICE',
+    )!.unitPriceVnd;
     const appendixPath = `/bookings/${f.id}/contract-appendices`;
     let predecessor = d.contract.revisionId;
     for (const quantity of [3, 2]) {
@@ -39,7 +42,9 @@ export function registerCommercialSettlementJourney(harness: StepSixApiHarness) 
       );
       expect(created.status, JSON.stringify(created.body)).toBe(201);
       let appendix = appendixResponseSchema.parse(created.body as unknown).data;
-      expect(appendix.appendix.document.deltaVnd).toBe(quantity === 3 ? 3_000_000 : -1_500_000);
+      expect(appendix.appendix.document.deltaVnd).toBe(
+        quantity === 3 ? 2 * servicePrice : -servicePrice,
+      );
       for (const [action, who] of [
         ['submissions', 'own'],
         ['approvals', 'manager'],
@@ -140,9 +145,9 @@ export function registerCommercialSettlementJourney(harness: StepSixApiHarness) 
     expect(finalized.status, JSON.stringify(finalized.body)).toBe(201);
     const original = finalInvoiceResponseSchema.parse(finalized.body as unknown).data;
     expect(original.document).toMatchObject({
-      commercialTotalVnd: total + 1_500_000,
+      commercialTotalVnd: total + servicePrice,
       incidentalTotalVnd: 2_000_000,
-      totalVnd: total + 3_500_000,
+      totalVnd: total + servicePrice + 2_000_000,
     });
     expect(original.document.appendices).toHaveLength(2);
     const checkout = await post(
@@ -185,8 +190,8 @@ export function registerCommercialSettlementJourney(harness: StepSixApiHarness) 
       (await get(`/bookings/${f.id}/billing`, 'own')).body as unknown,
     ).data;
     expect(bill.totals).toMatchObject({
-      acceptedChargesVnd: total + 2_500_000,
-      paidVnd: total + 3_500_000,
+      acceptedChargesVnd: total + servicePrice + 1_000_000,
+      paidVnd: total + servicePrice + 2_000_000,
       refundedVnd: 0,
       creditVnd: 1_000_000,
       outstandingVnd: 0,
