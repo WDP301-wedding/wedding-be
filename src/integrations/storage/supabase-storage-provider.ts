@@ -311,7 +311,8 @@ function providerStatus(error: unknown): number | undefined {
     return undefined;
   }
   const candidate = error as { readonly status?: unknown; readonly statusCode?: unknown };
-  const rawStatus = candidate.status ?? candidate.statusCode;
+  // Storage SDK errors can carry HTTP 400 alongside the semantic code 409.
+  const rawStatus = candidate.statusCode ?? candidate.status;
   if (typeof rawStatus === 'number' && Number.isInteger(rawStatus)) {
     return rawStatus;
   }
