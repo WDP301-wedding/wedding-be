@@ -1,6 +1,8 @@
 import type { z } from 'zod';
 import { AppError, NotFoundError } from '../../../core/errors/app-error.js';
 import type { AuthenticatedActor } from '../../identity-access/authorization/authenticated-actor.middleware.js';
+import type { AuthenticatedActorResolver } from '../../identity-access/authorization/authenticated-actor.middleware.js';
+import { createFinalInvoiceRouter } from './final-invoice.router.js';
 import type { PrismaClient } from '../../../generated/prisma/client.js';
 import type { createPaymentsBillingProviders } from '../payments-billing.providers.js';
 import type { ContractContext } from '../application/payments-billing.providers.js';
@@ -112,6 +114,12 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
     return source.bookingId;
   }
   return Object.freeze({
+    commercialRouter: (resolver: AuthenticatedActorResolver) =>
+      createFinalInvoiceRouter(
+        prisma,
+        { expenses: providers.expenses, invoices: providers.finalInvoices },
+        resolver,
+      ),
     async mutate(
       input: Readonly<{
         operation: BillingHttpOperation;
@@ -357,6 +365,13 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
           status,
           purpose: attempt.purpose,
           amountVnd: attempt.amountVnd,
+          ...(attempt.invoiceRevisionId
+            ? {
+                invoiceRevisionId: attempt.invoiceRevisionId,
+                invoiceDigest: attempt.invoiceDigest,
+                sourceBillingRevision: attempt.sourceBillingRevision,
+              }
+            : {}),
           applicationStatus,
           expiresAt: attempt.expiresAt,
         },

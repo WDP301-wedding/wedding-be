@@ -26,6 +26,12 @@ import { createBillingOperationsService } from './application/billing-operations
 import type { ContractContext } from './application/payments-billing.providers.js';
 import { createBillingViewsService } from './application/billing-views.service.js';
 import { createBillingReportingReader } from './infrastructure/billing-reporting.repository.js';
+import { createIncidentalExpenseService } from './application/incidental-expense.service.js';
+import { createFinalInvoiceService } from './application/final-invoice.service.js';
+import { createCommercialFinancialService } from './application/commercial-financial.service.js';
+import { createEffectiveCommercialReader } from '../booking-lifecycle/infrastructure/effective-commercial.reader.js';
+import { createEventEndReader } from '../booking-lifecycle/infrastructure/event-end.reader.js';
+import { createInvoiceBalanceReader } from './infrastructure/invoice-balance.reader.js';
 
 // Real owner/provider composition. HTTP/OpenAPI publication remains the W6 lane.
 export function createPaymentsBillingProviders(
@@ -73,6 +79,7 @@ export function createPaymentsBillingProviders(
   const operations = createBillingOperationsService({
     ledger: billing.repository,
     operations: operationsRepository,
+    invoice: createInvoiceBalanceReader(prisma, scope),
     boundary,
     booking: booking.lifecycleReader,
     commercial: booking.commercial,
@@ -81,6 +88,21 @@ export function createPaymentsBillingProviders(
     recorder: booking.deposits,
   });
   return Object.freeze({
+    expenses: createIncidentalExpenseService({
+      scope,
+      boundary,
+      operations: operationsRepository,
+      event: createEventEndReader,
+    }),
+    finalInvoices: createFinalInvoiceService({
+      scope,
+      boundary,
+      operations: operationsRepository,
+      ledger: billing.repository,
+      financial: createCommercialFinancialService(prisma, scope),
+      commercial: createEffectiveCommercialReader,
+      event: createEventEndReader,
+    }),
     operations,
     views: createBillingViewsService({
       ledger: billing.repository,

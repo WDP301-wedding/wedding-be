@@ -128,6 +128,7 @@ export function createPaymentsBillingRouter(
       );
     }),
   );
+  router.use(services.commercialRouter(options.resolveActor));
   const denialAudit: ErrorRequestHandler = (error: unknown, request, response, next) => {
     if (!(error instanceof AppError) || ![401, 403, 404].includes(error.status)) return next(error);
     const actor = response.locals.actor as AuthenticatedActor | undefined;
