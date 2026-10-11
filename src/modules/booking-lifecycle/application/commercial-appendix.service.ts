@@ -53,6 +53,12 @@ type Options = {
       context: ContractContext,
     ): Promise<void>;
   };
+  fulfillment: (client: PrismaClient) => {
+    requirePreserved(
+      bookingId: string,
+      lines: z.infer<typeof appendixDocumentSchema>['afterLines'],
+    ): Promise<void>;
+  };
   now?: () => Date;
 };
 export function createCommercialAppendixService(options: Options) {
@@ -369,6 +375,9 @@ export function createCommercialAppendixService(options: Options) {
               where: { id: revisionId },
               include,
             });
+          await options
+            .fulfillment(client)
+            .requirePreserved(bookingId, appendixDocumentSchema.parse(row.document).afterLines);
           const approved = await client.commercialAppendixRevision.update({
             where: { id: revisionId },
             data: { state: 'APPROVED', approvedAt: now() },

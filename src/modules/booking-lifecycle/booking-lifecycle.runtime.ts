@@ -2,6 +2,7 @@ import type { Request, Router } from 'express';
 import { createBookingBoundaryUnitOfWork } from '../../core/database/booking-unit-of-work.js';
 import { createCommercialContractService } from './application/commercial-contract.service.js';
 import { createCommercialAppendixService } from './application/commercial-appendix.service.js';
+import { createContractedPrintEntitlementReader } from '../invitation-studio/infrastructure/contracted-print.entitlement.reader.js';
 import { createCommercialAppendixRouter } from './http/commercial-appendix.router.js';
 import { createCommercialFinancialService } from '../payments-billing/application/commercial-financial.service.js';
 import { createCommercialSelectionReader } from '../venue-catalog/application/commercial-selection.reader.js';
@@ -213,6 +214,7 @@ export async function createBookingLifecycleRuntime(
           scope,
           catalog: createCommercialSelectionReader,
           financial: createCommercialFinancialService(prisma, scope),
+          fulfillment: createContractedPrintEntitlementReader,
         }),
         actorResolver,
         (normalizedRoute) =>
