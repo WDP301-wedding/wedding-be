@@ -322,6 +322,43 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     };
   }
   type Fixture = Awaited<ReturnType<typeof fixture>>;
+  async function race(f: Fixture, commands: readonly (() => Promise<Response>)[]) {
+    let unlock!: () => void;
+    let locked!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      unlock = resolve;
+    });
+    const ready = new Promise<void>((resolve) => {
+      locked = resolve;
+    });
+    const blocker = database.prisma.$transaction(
+      async (tx) => {
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${f.id}))`;
+        locked();
+        await gate;
+      },
+      { timeout: 30_000 },
+    );
+    await ready;
+    const responses = Promise.all(commands.map((command) => command()));
+    let waiters = 0;
+    try {
+      for (let i = 0; i < 100 && waiters < 2; i++) {
+        const rows = await database.prisma.$queryRaw<{ count: bigint }[]>`
+          SELECT count(*) FROM pg_stat_activity
+          WHERE datname=current_database() AND wait_event='advisory'
+        `;
+        waiters = Number(rows[0]!.count);
+        if (waiters < 2) await new Promise((resolve) => setTimeout(resolve, 20));
+      }
+    } finally {
+      unlock();
+      await blocker;
+    }
+    const resolved = await responses;
+    expect(waiters).toBe(2);
+    return resolved;
+  }
   const draftBody = (f: Fixture) => ({
     expectedRevision: f.revision,
     predecessorRevisionId: null,
@@ -420,6 +457,143 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     );
     expect(missing.status).toBe(409);
     expect(missing.body).toMatchObject({ error: { code: 'COUPLE_NAMES_INCOMPLETE' } });
+  }, 30_000);
+  it('serializes concurrent draft conversion and approvals into one write and a replayable stale conflict', async () => {
+    const f = await fixture();
+    const keys = [randomUUID(), randomUUID()];
+    const converted = await race(
+      f,
+      keys.map((key) => () => post(f.path, draftBody(f), 'own', key)),
+    );
+    expect(converted.map((r) => r.status).sort()).toEqual([201, 409]);
+    const winner = converted.find((r) => r.status === 201)!;
+    const d = contractResponseSchema.parse(winner.body as unknown).data;
+    const submitted = await post(
+      `${f.path}/${d.contract.revisionId}/submissions`,
+      { expectedRevision: d.bookingRevision },
+      'own',
+    );
+    expect(submitted.status).toBe(200);
+    const pending = contractResponseSchema.parse(submitted.body as unknown).data;
+    const path = `${f.path}/${d.contract.revisionId}/approvals`;
+    const body = { expectedRevision: pending.bookingRevision };
+    const approvalKeys = [randomUUID(), randomUUID()];
+    const approvals = await race(
+      f,
+      ['manager', 'own'].map((who, i) => () => post(path, body, who, approvalKeys[i])),
+    );
+    expect(approvals.map((r) => r.status).sort()).toEqual([200, 409]);
+    const loser = approvals.findIndex((r) => r.status === 409);
+    expect(approvals[loser]!.body).toMatchObject({ error: { code: 'CONTRACT_REVISION_STALE' } });
+    const replay = await post(path, body, ['manager', 'own'][loser], approvalKeys[loser]);
+    expect(replay.status).toBe(409);
+    expect(replay.body).toMatchObject({ error: { code: 'CONTRACT_REVISION_STALE' } });
+    expect(
+      await database.prisma.commercialContractRevision.count({ where: { bookingId: f.id } }),
+    ).toBe(1);
+    expect(
+      await database.prisma.commercialContractApproval.count({
+        where: { revisionId: d.contract.revisionId },
+      }),
+    ).toBe(1);
+  }, 30_000);
+  it('rejects invalid capacity, catalog/timeline/predecessor and lifecycle transitions while retaining draft previews', async () => {
+    const f = await fixture();
+    for (const [body, code] of [
+      [
+        {
+          ...draftBody(f),
+          lines: lines.map((line, i) => (i === 0 ? { ...line, quantity: 501 } : line)),
+        },
+        'CONTRACT_CAPACITY_EXCEEDED',
+      ],
+      [{ ...draftBody(f), timelineRevisionId: randomUUID() }, 'COMMERCIAL_PREDECESSOR_STALE'],
+      [{ ...draftBody(f), predecessorRevisionId: randomUUID() }, 'COMMERCIAL_PREDECESSOR_STALE'],
+      [
+        {
+          ...draftBody(f),
+          lines: lines.map((line, i) =>
+            i === 0 ? { ...line, sourceRevisionId: randomUUID() } : line,
+          ),
+        },
+        'COMMERCIAL_PRICE_REVISION_STALE',
+      ],
+    ] as const) {
+      const r = await post(f.path, body, 'own');
+      expect(r.status).toBe(409);
+      expect(r.body).toMatchObject({ error: { code } });
+    }
+    const d = await draft(f),
+      path = `${f.path}/${d.contract.revisionId}`;
+    const preview = await get(path + '/pdf', 'own');
+    expect(preview.status).toBe(200);
+    expect((preview.body as Buffer).subarray(0, 5).toString()).toBe('%PDF-');
+    expect(
+      (await post(path + '/approvals', { expectedRevision: d.bookingRevision }, 'own')).status,
+    ).toBe(409);
+    const withdrawn = await post(
+      path + '/withdrawals',
+      { expectedRevision: d.bookingRevision, reason: 'Chưa duyệt' },
+      'own',
+    );
+    expect(withdrawn.body).toMatchObject({ error: { code: 'CONTRACT_APPROVAL_REQUIRED' } });
+    const badCursor = await get(f.path + '?cursor=' + randomUUID(), 'own');
+    expect(badCursor.status).toBe(404);
+    const paged = await get(f.path + '?cursor=' + d.contract.revisionId, 'own');
+    expect(paged.status).toBe(200);
+    expect(contractsResponseSchema.parse(paged.body as unknown).data).toMatchObject({
+      revisions: [],
+      nextCursor: null,
+    });
+    await database.prisma.consultation.update({
+      where: { id: f.consultationId },
+      data: { groomName: 'Tên mới' },
+    });
+    try {
+      const changed = await post(
+        path + '/submissions',
+        { expectedRevision: d.bookingRevision },
+        'own',
+      );
+      expect(changed.status).toBe(409);
+      expect(changed.body).toMatchObject({ error: { code: 'COMMERCIAL_PRICE_REVISION_STALE' } });
+    } finally {
+      await database.prisma.consultation.update({
+        where: { id: f.consultationId },
+        data: { groomName: 'Trần Minh' },
+      });
+    }
+    const submitted = await post(
+      path + '/submissions',
+      { expectedRevision: d.bookingRevision },
+      'own',
+    );
+    const pending = contractResponseSchema.parse(submitted.body as unknown).data;
+    expect(
+      (await post(path + '/submissions', { expectedRevision: pending.bookingRevision }, 'own'))
+        .status,
+    ).toBe(409);
+    const first = await post(
+      path + '/approvals',
+      { expectedRevision: pending.bookingRevision },
+      'manager',
+    );
+    const partial = contractResponseSchema.parse(first.body as unknown).data;
+    const duplicate = await post(
+      path + '/approvals',
+      { expectedRevision: partial.bookingRevision },
+      'manager',
+    );
+    expect(duplicate.status).toBe(200);
+    expect(contractResponseSchema.parse(duplicate.body as unknown).data).toEqual(partial);
+    const completed = await post(
+      path + '/approvals',
+      { expectedRevision: partial.bookingRevision },
+      'own',
+    );
+    expect(completed.status).toBe(200);
+    const list = await get(f.path, 'own');
+    expect(contractsResponseSchema.parse(list.body as unknown).data.eligibleForDeposit).toBe(true);
   }, 30_000);
   it('enforces authentication, Staff/outsider concealment and authorized idempotent replay on every contract route', async () => {
     const f = await fixture(),

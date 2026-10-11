@@ -204,3 +204,27 @@ The initial regression failures were repaired in test setup/legacy mocks and
 historical-schema upgrade fixtures without changing production behavior. See
 `test-results/step4-full-suite-final.log` for the final run. Coverage and complete
 concurrency/live-provider acceptance remain pending.
+
+## Merge preparation review follow-up
+
+The final review reproduced a concurrent conversion race returning HTTP 201/500
+before correction. Commercial writes now retry the entire rolled-back transaction
+on Prisma serialization conflicts, with at most three attempts and a terminal
+CONTRACT_REVISION_STALE (409) after exhaustion. Each fresh transaction rechecks
+authorization, Booking revision and monetary pins; no enlisted callback is retried
+independently. Real PostgreSQL tests block two commands on the booking advisory
+lock, verify conversion yields 201/409 and dual approval yields 200/409, verify
+the rejected request key replays 409, and verify only one revision/approval exists.
+
+Additional tests cover integer arithmetic/overflow, historical financial identity,
+conversion/charge denial, stale/cross-owner catalog selections, lifecycle/cursor/
+capacity guards, duplicate party approvals and draft/long/oversized PDF rendering.
+The first PR CI passed all tests but failed per-file coverage on four new files;
+thresholds remain unchanged and the additional tests address those omissions.
+
+The focused merge-preparation run passed 70 tests in nine files. Coverage across
+the ten new implementation files was 97.09% statements, 93.65% branches,
+100% functions and 98.08% lines; each file met the existing line/branch threshold.
+This focused run supplements, rather than replaces, full PostgreSQL CI coverage.
+Independent read-only re-review confirmed the retry correction and its test
+coverage with no remaining required finding.

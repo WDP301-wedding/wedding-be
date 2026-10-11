@@ -54,3 +54,16 @@ regression failures; production code was unchanged in this verification turn.
 VNPay evidence remains controlled signed test data, not a genuine sandbox
 payment. Coverage, complete concurrency/rollback proof and full-total live
 sandbox evidence remain pending; BE-06–10 acceptance boxes remain open.
+
+## Merge preparation review correction
+
+PR #27 initially passed its 192-file full regression, but its coverage gate
+reported four new files below the existing 80% per-file branch threshold.
+Thresholds were retained and tests were added for the omitted behavior.
+
+A separate final review found normal concurrent commercial writes could return
+500 after a Serializable conflict and leave the HTTP intent pending. The real
+PostgreSQL race test reproduced 201/500 before the fix. Bounded whole-transaction
+retry now produces one successful write and one terminal/replayable 409; direct
+tests cover retry success, exhaustion and propagation of unrelated errors.
+See the handoff follow-up and the latest PR CI for merge verification.

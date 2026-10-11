@@ -24,6 +24,7 @@ import {
   type ContractDocument,
 } from '../domain/commercial-contract.js';
 import { renderContractPdf } from '../infrastructure/contract-pdf.renderer.js';
+import { retryCommercialWrite } from '../infrastructure/commercial-write.retry.js';
 
 const include = {
   approvals: { orderBy: { party: 'asc' as const } },
@@ -114,14 +115,16 @@ export function createCommercialContractService(options: Options) {
     expectedRevision: number,
     work: (client: PrismaClient, access: Authorized) => Promise<T>,
   ) {
-    return options.scope.boundary.run({ bookingId, context: context(actor, requestId) }, (scoped) =>
-      options.scope.withClient(bookingId, scoped, async (client) => {
-        const access = await authorized(client, bookingId, actor);
-        if (access.booking.revision !== expectedRevision)
-          throw commercialConflict('CONTRACT_REVISION_STALE');
-        await unpinned(client, bookingId, access);
-        return work(client, access);
-      }),
+    return retryCommercialWrite(() =>
+      options.scope.boundary.run({ bookingId, context: context(actor, requestId) }, (scoped) =>
+        options.scope.withClient(bookingId, scoped, async (client) => {
+          const access = await authorized(client, bookingId, actor);
+          if (access.booking.revision !== expectedRevision)
+            throw commercialConflict('CONTRACT_REVISION_STALE');
+          await unpinned(client, bookingId, access);
+          return work(client, access);
+        }),
+      ),
     );
   }
   async function evidence(
