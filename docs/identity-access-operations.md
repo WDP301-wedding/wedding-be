@@ -84,6 +84,11 @@ npm run retention:consultation -- --inspect-target
 npm run retention:consultation -- --confirm-retention --target-fingerprint=<sha256> --operator=<operator-id> --batch-size=100
 ```
 
+The URL must specify its host, port and database explicitly. Destination overrides
+in query parameters (including `host` and `port`) and socket-host encodings are
+rejected before inspection or execution; driver/environment defaults cannot choose
+a different destination from the confirmed target.
+
 Commands refuse mismatched/missing fingerprints, missing operators, unknown or
 duplicate arguments and invalid batches before connecting. Batch sizes are 1–1,000.
 Successful completion emits an audit-correlated request ID, operator and counts;

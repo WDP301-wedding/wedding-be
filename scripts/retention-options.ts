@@ -6,12 +6,24 @@ export function retentionOptions(args: readonly string[], databaseUrl: string | 
   const url = new URL(databaseUrl);
   if (!['postgres:', 'postgresql:'].includes(url.protocol))
     throw new Error('Invalid retention target.');
+  // pg accepts destination overrides in query parameters and environment defaults.
+  // Require the complete destination in the authority/path before any connection.
+  if (
+    !url.hostname ||
+    url.hostname.includes('%') ||
+    !url.port ||
+    url.pathname.length < 2 ||
+    [...url.searchParams.keys()].some((key) =>
+      ['host', 'hostaddr', 'port', 'database', 'db', 'dbname', 'connectionString'].includes(key),
+    )
+  )
+    throw new Error('Retention requires an explicit destination without query overrides.');
   const schema = url.searchParams.get('schema')?.trim() || 'public';
   if (!/^[a-z_][a-z0-9_]*$/u.test(schema)) throw new Error('Invalid retention schema.');
   const target = {
     host: url.hostname.toLowerCase(),
-    port: url.port || '5432',
-    database: decodeURIComponent(url.pathname.slice(1)),
+    port: url.port,
+    database: decodeURI(url.pathname.slice(1)),
     schema,
   };
   const fingerprint = createHash('sha256').update(JSON.stringify(target)).digest('hex');

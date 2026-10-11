@@ -43,4 +43,31 @@ describe('operator retention target confirmation', () => {
       retentionOptions(good, url.replace('schema=public', 'schema=invalid%22')),
     ).toThrow();
   });
+  it('refuses driver destination overrides and environment-dependent destinations', () => {
+    const fingerprint = retentionOptions(['--inspect-target'], url).fingerprint;
+    const execution = [
+      '--confirm-retention',
+      `--target-fingerprint=${fingerprint}`,
+      '--operator=rv06-test',
+    ];
+    for (const unsafe of [
+      ...['host', 'hostaddr', 'port', 'database', 'db', 'dbname', 'connectionString'].map(
+        (key) => `${url}&${key}=different-target`,
+      ),
+      `${url}&h%6fst=other.example.test&port=5433`,
+      url.replace(':55435', ''),
+      url.replace('/fixture', '/'),
+      'postgresql://user:do-not-log@:55435/fixture',
+      'postgresql://user:do-not-log@%2Ftmp:55435/fixture',
+    ]) {
+      expect(() => retentionOptions(['--inspect-target'], unsafe)).toThrow();
+      expect(() => retentionOptions(execution, unsafe)).toThrow();
+    }
+    expect(
+      retentionOptions(
+        ['--inspect-target'],
+        `${url}&sslmode=verify-full&application_name=retention`,
+      ).fingerprint,
+    ).toBe(fingerprint);
+  });
 });
