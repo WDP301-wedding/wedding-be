@@ -52,11 +52,9 @@ batches, inactive/missing/superseded sources, safe frozen metadata, and blocking
 template archive while the caller's batch transaction retains its locks. The
 mounted owner test also exercises the standalone batch provider.
 
-Full quality gates and post-deployment verification are recorded below after they
-complete. Private raw HTTP fixture/session state and Railway logs remain in
-gitignored `.local-demo/`; committed evidence contains no credentials or private
-template content. The synthetic records will be archived through owner commands,
-retaining immutable history.
+Private raw HTTP fixture/session state and Railway logs remain in gitignored
+`.local-demo/`; committed evidence contains no credentials or private template
+content. The deployed correction and cleanup evidence follow below.
 
 ## Local verification checkpoint
 
@@ -70,6 +68,72 @@ retaining immutable history.
 - The attempted full Windows threads/coverage run terminated natively with code
   `3221226505` while starting the commercial suite, without a failing assertion.
   It is not counted as a full-suite or coverage pass. This failure class was already
-  recorded in the original BE-01–05 evidence. Full Linux CI integration and coverage
-  remain required before the feature-branch developer deployment; thresholds and
-  test inventory are not relaxed.
+  recorded in the original BE-01–05 evidence. The full Linux CI run below provides
+  the required integration and coverage gate; thresholds and test inventory were
+  not relaxed.
+
+## Full Linux CI and developer deployment
+
+[GitHub Actions run 38098194493](https://github.com/WDP301-wedding/wedding-be/actions/runs/38098194493)
+passes both required jobs at source commit
+`8f65affed4abcc2b19ccdee2c0b8b6d0265840c5`: formatting, lint, typecheck,
+unit/contract tests, OpenAPI generation consistency, build, dependency audit,
+migrations against empty PostgreSQL, integration and full-suite coverage.
+Integration: **65 files / 348 tests**; full suite: **191 files / 1,525 tests**.
+Full-suite coverage is **96.55% statements, 93.45% branches, 98.29% functions,
+97.31% lines**, with the existing per-file thresholds enforced. Supplemental
+local coverage on the two changed implementations passed 18 tests across three
+files, with 98.91% combined lines and 97.67% branches; it was not substituted for
+the full CI gate.
+
+After both CI jobs passed, the clean feature-branch checkout at that source commit
+was uploaded through the native Railway CLI under the existing developer rehearsal
+authorization in `docs/railway-deployment.md`. Deployment
+`d6e8690f-fb48-4439-8d60-3d88e012f6a4` reached **SUCCESS**. CLI-uploaded deployment
+metadata does not include GitHub commit/branch fields; the source above is the
+verified clean checkout uploaded, not an inferred metadata value.
+
+Read-only inspection after upload confirms automatic deployments remain enabled
+from `WDP301-wedding/wedding-be`, branch `main`, with `checkSuites: true` (Wait for
+CI). [PR #26](https://github.com/WDP301-wedding/wedding-be/pull/26) remains open for
+the required team review. This developer deployment does not merge or waive review
+on `main`, and is not production readiness evidence.
+
+## Same-fixture deployed verification
+
+These requests used the same 50 active synthetic offerings and template as the
+failing requests, without latency injection:
+
+| Request | Result after correction | Client elapsed | Request ID |
+| --- | --- | --- | --- |
+| GET /catalog/print-offerings?limit=1 | 200, one item | 1,908 ms | 33fd15db-dd6f-4ba8-be21-4afc9039561b |
+| GET /catalog/print-offerings?limit=20 | 200, 20 items | 1,749 ms | 8aeed53a-0ad0-4dfd-99a8-ad4ea9cb6180 |
+| GET /catalog/print-offerings?limit=50 | 200, 50 exact fixture IDs | 1,927 ms | cd88fb57-2df0-468b-91be-1e9cff96ff19 |
+| GET /catalog/print-offerings?limit=50, repeat | 200, 50 exact fixture IDs | 1,948 ms | a9a90e6f-b7d5-45e5-935e-0c2df72ac496 |
+
+Railway application logs correlate all four request IDs with `2xx` completion and
+server durations of 1,494–1,641 ms, without an application error event. The live
+canonical OpenAPI matches local bytes and the unchanged digest above; all seven
+BE-01–05 path groups remain present, browser OpenAPI and Swagger load successfully,
+and liveness/readiness and the public hall catalog return 200. The positive
+catalog result above, rather than health alone, is the behavior acceptance proof.
+
+## Cleanup and outcome
+
+The owned test Manager successfully archived all **50 offerings and the one
+template** through their owner HTTP commands, retaining immutable revisions. A
+subsequent authenticated `limit=50` request returned **200 with zero items**
+(request `5277b6d7-4477-4b55-8666-898cb603b8c5`, at 00:39:13 UTC). The account's
+session inventory identified four active rehearsal sessions; all four were revoked
+through the owner session APIs, including the current session, by 00:39:24 UTC.
+No other account or existing catalog record was modified.
+
+An optional direct SQL cleanup cross-check could not connect from this Windows
+host: Node DNS returned ENOENT and verified Windows AAAA resolution then reached
+ENETUNREACH. TLS verification was retained. No SQL cleanup success is claimed;
+the successful archive commands and empty HTTP catalog above are the cleanup
+evidence.
+
+The original BE-05 P2 finding is resolved on the developer Railway deployment,
+with regression tests and full CI passed for its source commit. The reviewed
+feature branch remains pending team approval before merge into `main`.
