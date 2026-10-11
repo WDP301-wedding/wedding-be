@@ -1,10 +1,13 @@
 import type { PrintOrderStatus } from '../domain/print-policy.js';
+import type { z } from 'zod';
+import type { commercialPrintSnapshotSchema } from '../domain/contracted-print.js';
 
 export interface PrintLineView {
   lineId: string;
   designId: string;
   quantity: number;
   printableRevisionId: string | null;
+  commercialSource?: z.infer<typeof commercialPrintSnapshotSchema>;
 }
 
 export interface QuotedLineView {
