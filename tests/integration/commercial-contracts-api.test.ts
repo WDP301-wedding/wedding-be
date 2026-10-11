@@ -18,6 +18,10 @@ import {
   contractsResponseSchema,
 } from '../../src/modules/booking-lifecycle/domain/commercial-contract.js';
 import {
+  appendixResponseSchema,
+  appendicesResponseSchema,
+} from '../../src/modules/booking-lifecycle/domain/commercial-appendix.js';
+import {
   consultationResponseSchema,
   bookingResponseSchema,
 } from '../../src/modules/booking-lifecycle/http/booking-lifecycle.schemas.js';
@@ -798,5 +802,79 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
       paidVnd: deposit,
       outstandingVnd: total - deposit,
     });
+  }, 30_000);
+  it('applies an appendix only on the second distinct approval and retains the original deposit and history', async () => {
+    const f = await fixture(),
+      d = await approved(f);
+    const paid = await post('/management/billing/payments/manual', {
+      bookingId: f.id,
+      purpose: 'DEPOSIT',
+      contractRevisionId: d.contract.revisionId,
+      documentDigest: d.contract.documentDigest,
+      amountVnd: deposit,
+      settledAt: new Date().toISOString(),
+      reason: 'Cọc kiểm thử phụ lục',
+      evidenceReference: 'LOCAL-STEP6',
+    });
+    expect(paid.status).toBe(201);
+    const path = `/bookings/${f.id}/contract-appendices`;
+    let state = appendicesResponseSchema.parse((await get(path, 'own')).body as unknown).data;
+    const body = {
+      expectedRevision: state.bookingRevision,
+      predecessorRevisionId: d.contract.revisionId,
+      reason: 'Giảm một bàn menu',
+      lines: lines.map((l, i) => (i === 0 ? { ...l, quantity: l.quantity - 1 } : l)),
+    };
+    expect((await post(path, body, 'staff')).status).toBe(404);
+    expect((await post(path, { ...body, deltaVnd: -1 }, 'own')).status).toBe(422);
+    const created = await post(path, body, 'own');
+    expect(created.status, JSON.stringify(created.body)).toBe(201);
+    let a = appendixResponseSchema.parse(created.body as unknown).data;
+    expect(a.appendix.document.deltaVnd).toBe(-3_500_000);
+    for (const [action, who] of [
+      ['submissions', 'own'],
+      ['approvals', 'manager'],
+    ] as const) {
+      const r = await post(
+        `${path}/${a.appendix.revisionId}/${action}`,
+        { expectedRevision: a.bookingRevision },
+        who,
+      );
+      expect(r.status, JSON.stringify(r.body)).toBe(200);
+      a = appendixResponseSchema.parse(r.body as unknown).data;
+    }
+    state = appendicesResponseSchema.parse((await get(path, 'own')).body as unknown).data;
+    expect(state.effectiveTotalVnd).toBe(total);
+    const route = `${path}/${a.appendix.revisionId}/approvals`,
+      approval = { expectedRevision: a.bookingRevision },
+      key = randomUUID();
+    const applied = await post(route, approval, 'own', key);
+    expect(applied.status, JSON.stringify(applied.body)).toBe(200);
+    expect((await post(route, approval, 'own', key)).body).toEqual(applied.body);
+    state = appendicesResponseSchema.parse((await get(path, 'own')).body as unknown).data;
+    expect(state.effectiveTotalVnd).toBe(total - 3_500_000);
+    const entries = await database.prisma.billingLedgerEntry.findMany({
+      where: { bookingId: f.id },
+    });
+    expect(entries).toHaveLength(3);
+    expect(entries.find((e) => e.sourceType === 'CONTRACT_APPENDIX')).toMatchObject({
+      kind: 'CREDIT_ADJUSTMENT',
+    });
+    expect(
+      (
+        await database.prisma.bookingDepositSettlement.findUniqueOrThrow({
+          where: { bookingId: f.id },
+        })
+      ).amountVnd.toNumber(),
+    ).toBe(deposit);
+    expect(
+      (await post(path, { ...body, expectedRevision: state.bookingRevision }, 'own')).status,
+    ).toBe(409);
+    await expect(
+      database.prisma.commercialAppendixRevision.update({
+        where: { id: state.effectiveRevisionId },
+        data: { deltaVnd: 1 },
+      }),
+    ).rejects.toThrow();
   }, 30_000);
 });

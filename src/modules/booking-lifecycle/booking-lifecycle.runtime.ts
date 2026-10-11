@@ -1,6 +1,9 @@
 import type { Request, Router } from 'express';
 import { createBookingBoundaryUnitOfWork } from '../../core/database/booking-unit-of-work.js';
 import { createCommercialContractService } from './application/commercial-contract.service.js';
+import { createCommercialAppendixService } from './application/commercial-appendix.service.js';
+import { createCommercialAppendixRouter } from './http/commercial-appendix.router.js';
+import { createCommercialFinancialService } from '../payments-billing/application/commercial-financial.service.js';
 import { createCommercialSelectionReader } from '../venue-catalog/application/commercial-selection.reader.js';
 import { createCommercialConversionGuard } from '../payments-billing/application/commercial-conversion.guard.js';
 import { createCommercialContractRouter } from './http/commercial-contract.router.js';
@@ -204,6 +207,27 @@ export async function createBookingLifecycleRuntime(
         }),
     });
     router.use(createBookingExperienceRouter(prisma, actorResolver));
+    router.use(
+      createCommercialAppendixRouter(
+        createCommercialAppendixService({
+          scope,
+          catalog: createCommercialSelectionReader,
+          financial: createCommercialFinancialService(prisma, scope),
+        }),
+        actorResolver,
+        (normalizedRoute) =>
+          createIdempotencyMiddleware({
+            service: idempotency,
+            policy: defineIdempotencyPolicy({
+              actorScope: (request) =>
+                (request.res!.locals.actor as { accountId: string }).accountId,
+              normalizedRoute,
+              operationVersion: 'v1',
+              payload: bookingIdempotencyPayload,
+            }),
+          }),
+      ),
+    );
     router.use(
       createCommercialContractRouter(contracts, actorResolver, (normalizedRoute) =>
         createIdempotencyMiddleware({

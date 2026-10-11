@@ -97,6 +97,9 @@ export const historyEntrySchema = z.strictObject({
   sourceType: z.enum([
     'BASE_BOOKING',
     'CONTRACT',
+    'CONTRACT_APPENDIX',
+    'INCIDENTAL_FINALIZATION',
+    'INVOICE_ADJUSTMENT',
     'PRINT_ORDER',
     'PAYMENT_ATTEMPT',
     'PRINT_CREDIT',
