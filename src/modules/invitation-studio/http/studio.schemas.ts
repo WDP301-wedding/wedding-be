@@ -16,8 +16,16 @@ export {
   generationReconcileResponse,
 } from '../domain/generation-recovery.js';
 export const createDesignBody = z
-  .strictObject({ templateId: id.optional(), content: designContentSchema.optional() })
-  .refine((v) => (v.templateId === undefined) !== (v.content === undefined));
+  .strictObject({
+    templateId: id.optional(),
+    templateVersionId: id.optional(),
+    content: designContentSchema.optional(),
+  })
+  .refine(
+    (v) =>
+      (v.templateId === undefined) !== (v.content === undefined) &&
+      (v.templateVersionId === undefined || v.templateId !== undefined),
+  );
 export const editDesignBody = z
   .strictObject({
     expectedRevision: revision,

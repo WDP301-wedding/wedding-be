@@ -20,10 +20,15 @@ const createSchema = z
   .strictObject({
     bookingId: id,
     templateId: id.optional(),
+    templateVersionId: id.optional(),
     content: designContentSchema.optional(),
     idempotencyKey: z.string(),
   })
-  .refine((value) => (value.templateId === undefined) !== (value.content === undefined));
+  .refine(
+    (value) =>
+      (value.templateId === undefined) !== (value.content === undefined) &&
+      (value.templateVersionId === undefined || value.templateId !== undefined),
+  );
 const editSchema = z
   .strictObject({
     bookingId: id,
@@ -53,6 +58,13 @@ export class DesignService {
     readonly repository: StudioRepository,
     readonly access: StudioAuthorization,
     readonly now: () => Date = () => new Date(),
+    readonly contractedTemplate?: {
+      requireTemplate(
+        client: Prisma.TransactionClient,
+        bookingId: string,
+        templateVersionId: string,
+      ): Promise<void>;
+    },
   ) {}
   async saveTemplate(value: unknown, context: MediaRequestContext) {
     const input = parseStudio(templateSchema, value);
@@ -179,16 +191,31 @@ export class DesignService {
       async (tx, scoped) => {
         if ((await this.access.actor(scoped)).clientKind === 'ANDROID') throw new ValidationError();
         let content = input.content;
+        let sourceTemplateVersionId: string | null = null;
         if (input.templateId !== undefined) {
           await tx.$queryRaw`SELECT id FROM "InvitationTemplate" WHERE id=${input.templateId}::uuid FOR SHARE`;
           const template = await tx.invitationTemplate.findUnique({
             where: { id: input.templateId },
           });
-          if (template === null || !template.active) throw new NotFoundError();
-          const source = await tx.invitationTemplateVersion.findUniqueOrThrow({
-            where: { id: template.currentVersionId },
+          if (template === null || (!template.active && input.templateVersionId === undefined))
+            throw new NotFoundError();
+          if (input.templateVersionId !== undefined) {
+            if (!this.contractedTemplate) throw new ValidationError();
+            await this.contractedTemplate.requireTemplate(
+              tx,
+              input.bookingId,
+              input.templateVersionId,
+            );
+          }
+          const source = await tx.invitationTemplateVersion.findFirst({
+            where: {
+              id: input.templateVersionId ?? template.currentVersionId,
+              templateId: template.id,
+            },
           });
+          if (!source) throw new NotFoundError();
           content = parseStudio(designContentSchema, source.content);
+          sourceTemplateVersionId = source.id;
         }
         if (content === undefined) throw new ValidationError();
         await this.requireAssets(tx, input.bookingId, content);
@@ -202,6 +229,7 @@ export class DesignService {
             bookingId: input.bookingId,
             revision: 1,
             content: asJson(content),
+            sourceTemplateVersionId,
             createdAt: new Date(updatedAt),
           },
         });
@@ -264,6 +292,7 @@ export class DesignService {
             bookingId: input.bookingId,
             revision: number,
             content: asJson(content),
+            sourceTemplateVersionId: prior.sourceTemplateVersionId,
             createdAt: new Date(updatedAt),
           },
         });

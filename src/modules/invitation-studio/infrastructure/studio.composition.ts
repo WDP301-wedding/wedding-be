@@ -15,6 +15,7 @@ import { PublicationService } from './publication.service.js';
 import { createPrismaBillingAdapter } from '../../payments-billing/infrastructure/prisma-billing.adapter.js';
 import { PrintableService } from './printable.service.js';
 import { PrintOrderService } from './print-order.service.js';
+import { createContractedPrintFulfillment } from './contracted-print.providers.js';
 import { PrismaInvitationAutomationReader } from './prisma-automation.reader.js';
 import { PrismaInvitationReportingReader } from './prisma-reporting.reader.js';
 
@@ -34,7 +35,8 @@ export function createInvitationStudioServices(
     (bookingId, context) => media.repository.recordDeniedAccess(bookingId, context),
     (context) => repository.recordTemplateDeniedAccess(context),
   );
-  const designs = new DesignService(repository, authorization, now);
+  const fulfillment = createContractedPrintFulfillment();
+  const designs = new DesignService(repository, authorization, now, fulfillment);
   const derivedAssets = new DerivedAssetsService(repository, authorization, storage);
   const generation = new GenerationService(repository, authorization, media.service, ai);
   const publication = new PublicationService(
@@ -67,6 +69,7 @@ export function createInvitationStudioServices(
     media.booking,
     media.timeline,
     now,
+    fulfillment,
   );
   const automation = new PrismaInvitationAutomationReader(prisma);
   const reporting = new PrismaInvitationReportingReader(prisma);
