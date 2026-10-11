@@ -1,0 +1,177 @@
+{
+  "date": "2026-10-12",
+  "target": "https://wedding-be-production-e1dc.up.railway.app",
+  "targetUse": "authorized developer-only staging; Railway labelproduction",
+  "sourceRevision": "7a39a7ec398801b68b33edf228680ba729e17ffa",
+  "deployMethod": "CLI upload of immutable git archive; not GitHub autodeploy",
+  "ci": {
+    "id": 38169417246,
+    "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38169417246",
+    "conclusion": "success",
+    "integrationTests": 382,
+    "fullSuiteTests": 1652,
+    "fullSuiteFiles": 214,
+    "coverage": {
+      "statements": 96.51,
+      "branches": 93.56,
+      "functions": 98.48,
+      "lines": 97.33,
+      "perFileBranchesAndLinesThreshold": 80
+    }
+  },
+  "observed": {
+    "deploymentId": "8ca52ed5-afef-4bc3-88cf-db91a1d50752",
+    "platformRevision": null,
+    "hashes": {
+      "dist/modules/invitation-studio/http/studio.schemas.js": "a3a3e3d8e6ef83963c1bd9f30783e5ef075d83ea625338b967fb4ae9fede7d16",
+      "dist/core/logging/logger.js": "afd4f993e4b9002e4e8b4a4c76c5452eaeef2d614aee44cef50249d0363ca0c5",
+      "dist/core/errors/error-handler.js": "76168e5562043762b42451c5c1dec6b320735fe68a45257e9794e7c918159482",
+      "dist/core/http/security.js": "c969b77a55836bbb20aa979fc3930b4ec526f355e4be8354f57591a8d5ae079c",
+      "dist/modules/invitation-studio/infrastructure/print-file.renderer.js": "b11c3be56ae74b264752040b9de980804f0b0051d7b6a65b878fa53942c61606",
+      "dist/modules/invitation-studio/infrastructure/print-file.service.js": "f365b3088839a1a60a2c664503dc87caa759489520ec6563c7c6004fc8e475e0",
+      "dist/modules/invitation-studio/infrastructure/print-order.service.js": "ed2ed9e338e895e423b975669bcc397ea41f013fee006b18832c1cb57acb4755",
+      "dist/modules/invitation-studio/http/studio.router.js": "059fa180e6f2915fd38730a1c7393997b3cb655b59a77f02e34f7dcb8120a383",
+      "dist/config/runtime-manifest.js": "a4b59c6ac41c492e0a523ca038d56321fd10d4f2115a65f71a4ea43b9e81cfbf",
+      "dist/modules/identity-access/account/identity-retention.js": "8a107860376ec010295c4b2d9affcb69275be001fba41f23be96ead38445aa0b",
+      "dist/modules/booking-lifecycle/application/intake-retention.js": "bc5cdfc8b213040b0a2028c040b11d81b2a31df5d0f269cb8cc4a6d2d08ff53a",
+      "assets/fonts/BeVietnamPro-Regular.ttf": "cd1ef6e9d7db28ad5cdb88a65ccbe693870e60d340b791f349d248342b4fe4c3",
+      "assets/fonts/BeVietnamPro-SemiBold.ttf": "bd8e27eb02720b9d91e59e4f10a90878643219f25ce6a8d9a4f06a8a88d3bb71"
+    },
+    "manifest": {
+      "schemaVersion": 1,
+      "environment": "production",
+      "revision": null,
+      "evidencePolicy": "Attach target-specific evidence separately; configuration is not verification.",
+      "features": {
+        "database": {
+          "configuration": "configured",
+          "mode": "postgresql",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "emailDelivery": {
+          "configuration": "configured",
+          "mode": "brevo",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "passwordOtpKey": {
+          "configuration": "configured",
+          "mode": "stable-configured",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "catalogStorage": {
+          "configuration": "configured",
+          "mode": "supabase-private",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "invitationStorage": {
+          "configuration": "configured",
+          "mode": "supabase-private",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "gemini": {
+          "configuration": "configured",
+          "mode": "gemini",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "publicInvitation": {
+          "configuration": "configured",
+          "mode": "configured-origin",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "vnpay": {
+          "configuration": "configured",
+          "mode": "sandbox-only",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "retention": {
+          "configuration": "configured",
+          "mode": "operator-cli-manual-procedure",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "workers": {
+          "configuration": "unconfigured",
+          "mode": "outbox-and-due-ports-only",
+          "implementation": "downstream-pending",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "printFiles": {
+          "configuration": "configured",
+          "mode": "invitation-a5-v1",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "pending"
+        },
+        "metrics": {
+          "configuration": "unconfigured",
+          "mode": "disabled",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "optional-disabled"
+        },
+        "tracing": {
+          "configuration": "unconfigured",
+          "mode": "disabled",
+          "implementation": "implemented",
+          "offlineVerification": "not-evaluated",
+          "liveVerification": "optional-disabled"
+        }
+      }
+    },
+    "migrations": [
+      {
+        "applied": 44
+      }
+    ],
+    "tls": [
+      {
+        "ssl": true,
+        "version": "TLSv1.3"
+      }
+    ]
+  },
+  "openapi": {
+    "status": 200,
+    "sha256": "55c15733cdc25a9151c724e311cb5753f9b41124a15c879cf73cc3c90c108b9e",
+    "paths": 144
+  },
+  "health": {
+    "live": {
+      "status": 200,
+      "body": {
+        "data": {
+          "status": "live",
+          "requestId": "802b91b1-bf59-40f2-b9bc-8e548f077c2c"
+        }
+      }
+    },
+    "ready": {
+      "status": 200,
+      "body": {
+        "data": {
+          "status": "ready",
+          "requestId": "bfec6e13-853d-4917-93ef-8e86c1add15e"
+        }
+      }
+    }
+  },
+  "productionReadiness": "not-established"
+}

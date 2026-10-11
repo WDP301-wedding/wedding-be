@@ -111,6 +111,9 @@ authorized disposable/staging environment and bounded cost; CI remains offline.
 
 2026-10-12 RV-14 → RV-15 → RV-17 → RV-18 → RV-06 → RV-20 closure:
 [implementation, offline gates, configuration and runtime evidence](evidence/rv14-20-runtime-2026-10-12.md).
+Final [CORS file-metadata hand-off](evidence/rv18-cors-followup-2026-10-12.md)
+passed permitted/forbidden-origin HTTP checks on the final deployed source;
+the accepted PDF hash and settled billing remain unchanged.
 VNPay sandbox settled both legacy BALANCE and the revised immutable invoice exactly
 once. The future-event invoice gate used only the owner-authorized isolated test
 clock; no public event date/service clock or settlement success was seeded.
