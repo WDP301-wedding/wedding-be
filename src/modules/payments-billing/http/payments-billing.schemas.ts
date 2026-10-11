@@ -70,6 +70,12 @@ export const attemptResponseSchema = z.strictObject({
     status: z.enum(['CREATED', 'PENDING', 'SUCCEEDED', 'FAILED', 'UNKNOWN']),
     purpose: z.enum(['DEPOSIT', 'BALANCE']),
     amountVnd: vnd.positive(),
+    invoiceRevisionId: uuid.optional(),
+    invoiceDigest: z
+      .string()
+      .regex(/^[a-f0-9]{64}$/)
+      .optional(),
+    sourceBillingRevision: revision.optional(),
     applicationStatus: z.enum(['PENDING', 'SUCCEEDED']).nullable(),
     expiresAt: instant,
   }),

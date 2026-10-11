@@ -46,17 +46,15 @@ export function createCommercialAppendixRouter(
         params: paramsSchema,
         query: querySchema,
       });
-      response
-        .set('Cache-Control', 'no-store')
-        .json(
-          appendicesResponseSchema.parse({
-            data: await service.list(
-              params.bookingId,
-              response.locals.actor as AuthenticatedActor,
-              query.cursor,
-            ),
-          }),
-        );
+      response.set('Cache-Control', 'no-store').json(
+        appendicesResponseSchema.parse({
+          data: await service.list(
+            params.bookingId,
+            response.locals.actor as AuthenticatedActor,
+            query.cursor,
+          ),
+        }),
+      );
     },
   );
   router.post(
@@ -70,18 +68,16 @@ export function createCommercialAppendixRouter(
         params: paramsSchema,
         body: appendixDraftSchema,
       });
-      response
-        .status(201)
-        .json(
-          appendixResponseSchema.parse({
-            data: await service.create(
-              params.bookingId,
-              body,
-              response.locals.actor as AuthenticatedActor,
-              request.requestId,
-            ),
-          }),
-        );
+      response.status(201).json(
+        appendixResponseSchema.parse({
+          data: await service.create(
+            params.bookingId,
+            body,
+            response.locals.actor as AuthenticatedActor,
+            request.requestId,
+          ),
+        }),
+      );
     },
   );
   for (const [action, operation] of [
