@@ -33,6 +33,8 @@ import {
 import { contractContext, asJson, type StudioRepository } from './studio.repository.js';
 import type { StudioAuthorization } from './studio-authorization.js';
 import type { PrintableService } from './printable.service.js';
+import type { ContractedPrintFulfillment } from './contracted-print.fulfillment.js';
+import { commercialPrintSnapshotSchema } from '../domain/contracted-print.js';
 
 export class PrintOrderService {
   constructor(
@@ -43,6 +45,7 @@ export class PrintOrderService {
     readonly booking: BookingMediaPrerequisiteReader,
     readonly timeline: BookingTimelineSnapshotReader,
     readonly now: () => Date = () => new Date(),
+    readonly fulfillment?: ContractedPrintFulfillment,
   ) {}
 
   private mapOrderView(
@@ -64,6 +67,7 @@ export class PrintOrderService {
       designId: string;
       quantity: number;
       printableRevisionId: string | null;
+      commercialSource?: Prisma.JsonValue;
     }>,
     currentCommercialRevision: {
       id: string;
@@ -94,6 +98,9 @@ export class PrintOrderService {
         designId: l.designId,
         quantity: l.quantity,
         printableRevisionId: l.printableRevisionId,
+        ...(l.commercialSource == null
+          ? {}
+          : { commercialSource: commercialPrintSnapshotSchema.parse(l.commercialSource) }),
       })),
       currentCommercialRevisionId: order.currentCommercialRevisionId,
       currentCommercialRevision: currentCommercialRevision
@@ -174,6 +181,13 @@ export class PrintOrderService {
 
         for (const line of input.lines) {
           const lineId = randomUUID();
+          const commercialSource = await this.fulfillment?.snapshot(
+            tx,
+            parsedBookingId,
+            line.designId,
+            line.quantity,
+            line.commercialSource,
+          );
           const createdLine = await tx.invitationPrintLine.create({
             data: {
               id: lineId,
@@ -182,6 +196,7 @@ export class PrintOrderService {
               designId: line.designId,
               quantity: line.quantity,
               printableRevisionId: null,
+              ...(commercialSource == null ? {} : { commercialSource: asJson(commercialSource) }),
             },
           });
           createdLines.push(createdLine);
@@ -262,6 +277,12 @@ export class PrintOrderService {
           lineId: l.lineId,
           unitPriceVnd: l.unitPriceVnd,
         }));
+        await this.fulfillment?.validateOrder(
+          tx,
+          bookingId,
+          parsedOrderId,
+          new Map(quoteInputs.map((l) => [l.lineId, l.unitPriceVnd])),
+        );
 
         const { quotedLines, orderTotalVnd } = computeCommercialTotal(
           linesWithQuantity,
@@ -429,16 +450,25 @@ export class PrintOrderService {
             designId: line.designId,
             quantity: line.quantity,
             printableRevisionId: captureResult.printableRevisionId,
+            ...(line.commercialSource == null ? {} : { commercialSource: line.commercialSource }),
           });
         }
 
-        const chargeResult = await this.billing.registerAcceptedCharge({
-          bookingId: parsedBookingId,
-          sourceType: 'PRINT_ORDER',
-          sourceRevisionId: commercialRevision.id,
-          amountVnd: commercialRevision.orderTotalVnd.toNumber(),
-          acceptedAt: currentTime,
-        });
+        const obligation = await this.fulfillment?.validateOrder(
+          tx,
+          parsedBookingId,
+          parsedOrderId,
+          new Map(quotedLines.map((l) => [l.lineId, l.unitPriceVnd])),
+        );
+        const chargeResult = obligation
+          ? { receivableChargeId: obligation, replayed: false }
+          : await this.billing.registerAcceptedCharge({
+              bookingId: parsedBookingId,
+              sourceType: 'PRINT_ORDER',
+              sourceRevisionId: commercialRevision.id,
+              amountVnd: commercialRevision.orderTotalVnd.toNumber(),
+              acceptedAt: currentTime,
+            });
 
         const nextRevision = order.revision + 1;
         const updatedOrder = await tx.invitationPrintOrder.update({
@@ -517,6 +547,8 @@ export class PrintOrderService {
         if (order.status !== 'APPROVED') {
           throw printOrderConflict('PRINT_ORDER_STATE_INVALID');
         }
+
+        await this.fulfillment?.validateOrder(tx, bookingId, parsedOrderId, undefined, false);
 
         const approvedRevision = await tx.invitationCommercialRevision.findUniqueOrThrow({
           where: { id: order.currentCommercialRevisionId! },
@@ -921,17 +953,18 @@ export class PrintOrderService {
           }
 
           const adjustmentId = randomUUID();
-          await this.billing.registerCredit(
-            {
-              bookingId: resolvedBookingId,
-              receivableChargeId: order.receivableChargeId,
-              sourceAdjustmentId: adjustmentId,
-              amountVnd: currentRev.orderTotalVnd.toNumber(),
-              reason: 'PRINT_CANCELLED',
-              acceptedAt: this.now().toISOString(),
-            },
-            contractContext(scoped),
-          );
+          if (!lines.some((l) => l.commercialSource !== null))
+            await this.billing.registerCredit(
+              {
+                bookingId: resolvedBookingId,
+                receivableChargeId: order.receivableChargeId,
+                sourceAdjustmentId: adjustmentId,
+                amountVnd: currentRev.orderTotalVnd.toNumber(),
+                reason: 'PRINT_CANCELLED',
+                acceptedAt: this.now().toISOString(),
+              },
+              contractContext(scoped),
+            );
 
           const nextRevision = order.revision + 1;
           const updatedOrder = await tx.invitationPrintOrder.update({
@@ -1009,6 +1042,9 @@ export class PrintOrderService {
         const lines = await tx.invitationPrintLine.findMany({
           where: { orderId: parsedOrderId },
         });
+
+        if (lines.some((l) => l.commercialSource !== null))
+          throw printOrderConflict('CONTRACT_PRINT_REPLACEMENT_REQUIRES_NEW_ORDER');
 
         if (lines.length !== input.lines.length) {
           throw new ValidationError();

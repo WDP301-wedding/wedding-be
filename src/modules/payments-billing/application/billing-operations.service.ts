@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { registerContractCharge } from './contract-charge.service.js';
+import type { InvoiceBalancePin } from '../infrastructure/invoice-balance.reader.js';
 import type { BookingBoundaryUnitOfWork } from '../../../core/database/booking-unit-of-work.js';
 import { AppError } from '../../../core/errors/app-error.js';
 import type {
@@ -36,6 +37,9 @@ export function createBillingOperationsService(
     reporting: BookingReportingReader;
     coordinator: BookingDepositIntentCoordinator;
     recorder: BookingDepositRecorder;
+    invoice?: {
+      getApplicable(bookingId: string, context: ContractContext): Promise<InvoiceBalancePin | null>;
+    };
     now?: () => Date;
   }>,
 ) {
@@ -88,9 +92,12 @@ export function createBillingOperationsService(
     if (!['CONFIRMED', 'COMPLETED'].includes(access.phase)) throw error('BALANCE_NOT_ELIGIBLE');
     const ledger = await options.ledger.getLedger(command.bookingId, context);
     if (ledger.revision !== command.expectedBillingRevision) throw error('STALE_BILLING_REVISION');
+    const invoicePin = (await options.invoice?.getApplicable(command.bookingId, context)) ?? null;
+    if (invoicePin && invoicePin.totalVnd !== ledger.totals.acceptedChargesVnd)
+      throw error('FINANCIAL_SOURCE_CONFLICT');
     await options.operations.requireBalanceAvailable(command.bookingId, context);
     if (ledger.totals.outstandingVnd === 0) throw error('BILLING_BALANCE_LIMIT_EXCEEDED');
-    return ledger.totals.outstandingVnd;
+    return { amountVnd: ledger.totals.outstandingVnd, invoicePin };
   }
   async function createAttempt(
     command: { bookingId: string; commandId: string },
@@ -101,6 +108,7 @@ export function createBillingOperationsService(
     scoped: ContractContext,
     contractRevisionId: string | null = null,
     documentDigest: string | null = null,
+    balancePin: (InvoiceBalancePin & { sourceBillingRevision: number }) | null = null,
   ) {
     const createdAt = now();
     return options.ledger.createAttempt(
@@ -114,6 +122,9 @@ export function createBillingOperationsService(
         timelineRevisionId,
         contractRevisionId,
         documentDigest,
+        invoiceRevisionId: balancePin?.invoiceRevisionId ?? null,
+        invoiceDigest: balancePin?.invoiceDigest ?? null,
+        sourceBillingRevision: balancePin?.sourceBillingRevision ?? null,
         createdAt: createdAt.toISOString(),
         expiresAt: new Date(createdAt.getTime() + 15 * 60_000).toISOString(),
       },
@@ -128,7 +139,7 @@ export function createBillingOperationsService(
         'BALANCE_INTENT',
         context,
         async (scoped) => {
-          const amountVnd = await balance(command, scoped);
+          const { amountVnd, invoicePin } = await balance(command, scoped);
           if (amountVnd > 9_999_999_999) throw error('PAYMENT_PROVIDER_AMOUNT_UNSUPPORTED', 422);
           const { attempt } = await createAttempt(
             command,
@@ -137,6 +148,11 @@ export function createBillingOperationsService(
             amountVnd,
             null,
             scoped,
+            null,
+            null,
+            invoicePin
+              ? { ...invoicePin, sourceBillingRevision: command.expectedBillingRevision }
+              : null,
           );
           return { resourceId: attempt.id };
         },
@@ -152,12 +168,16 @@ export function createBillingOperationsService(
       const command = manualPaymentSchema.parse(input);
       return execute(command, 'MANUAL_PAYMENT', context, async (scoped) => {
         let timelineRevisionId: string | null = null;
+        let balancePin: (InvoiceBalancePin & { sourceBillingRevision: number }) | null = null;
         let eligibility: Awaited<
           ReturnType<BookingLifecycleReader['requireDepositEligibility']>
         > | null = null;
         if (command.purpose === 'BALANCE') {
-          if (command.amountVnd > (await balance(command, scoped)))
-            throw error('BILLING_BALANCE_LIMIT_EXCEEDED');
+          const due = await balance(command, scoped);
+          balancePin = due.invoicePin
+            ? { ...due.invoicePin, sourceBillingRevision: command.expectedBillingRevision }
+            : null;
+          if (command.amountVnd > due.amountVnd) throw error('BILLING_BALANCE_LIMIT_EXCEEDED');
         } else {
           timelineRevisionId = command.timelineRevisionId;
           eligibility = await options.booking.requireDepositEligibility(command);
@@ -214,6 +234,7 @@ export function createBillingOperationsService(
           scoped,
           eligibility?.contractRevisionId ?? null,
           eligibility?.documentDigest ?? null,
+          balancePin,
         );
         if (eligibility !== null)
           await options.coordinator.reserve(

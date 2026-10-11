@@ -1,0 +1,815 @@
+{
+  "target": "Express HTTP + real PostgreSQL 17; controlled VNPay, no provider network",
+  "syntheticDataOnly": true,
+  "rawCapturePath": "test-results/step6-api/responses.json",
+  "rawCaptureSha256": "31ed55d5966034ea9deaffff383c6de58003f2fc5c2364de1a0fc567f71d919f",
+  "totalCapturedRequests": 415,
+  "routes": [
+    {
+      "request": "GET /bookings/{id}/contract-appendices 404 NOT_FOUND",
+      "count": 3
+    },
+    {
+      "request": "GET /bookings/{id}/contract-appendices 200 ",
+      "count": 10
+    },
+    {
+      "request": "POST /bookings/{id}/contract-appendices 201 ",
+      "count": 6
+    },
+    {
+      "request": "POST /bookings/{id}/contract-appendices/{id}/submissions 200 ",
+      "count": 6
+    },
+    {
+      "request": "POST /bookings/{id}/contract-appendices/{id}/approvals 404 NOT_FOUND",
+      "count": 1
+    },
+    {
+      "request": "POST /bookings/{id}/contract-appendices/{id}/submissions 409 APPENDIX_NOT_EDITABLE",
+      "count": 1
+    },
+    {
+      "request": "POST /bookings/{id}/contract-appendices/{id}/approvals 409 COMMERCIAL_PREDECESSOR_STALE",
+      "count": 1
+    },
+    {
+      "request": "POST /management/bookings/{id}/incidental-expenses 401 AUTHENTICATION_REQUIRED",
+      "count": 1
+    },
+    {
+      "request": "POST /management/bookings/{id}/incidental-expenses 400 IDEMPOTENCY_KEY_REQUIRED",
+      "count": 1
+    },
+    {
+      "request": "POST /management/bookings/{id}/incidental-expenses 201 ",
+      "count": 6
+    },
+    {
+      "request": "GET /bookings/{id}/incidental-expenses 404 NOT_FOUND",
+      "count": 2
+    },
+    {
+      "request": "GET /bookings/{id}/final-invoices 404 NOT_FOUND",
+      "count": 3
+    },
+    {
+      "request": "GET /bookings/{id}/final-invoices/{id} 404 NOT_FOUND",
+      "count": 1
+    },
+    {
+      "request": "POST /management/bookings/{id}/incidental-expenses 403 FORBIDDEN",
+      "count": 3
+    },
+    {
+      "request": "POST /management/bookings/{id}/incidental-expenses 422 VALIDATION_ERROR",
+      "count": 2
+    },
+    {
+      "request": "POST /management/bookings/{id}/final-invoices 409 EXPENSE_REVISION_STALE",
+      "count": 1
+    },
+    {
+      "request": "POST /management/bookings/{id}/final-invoices 409 COMMERCIAL_PREDECESSOR_STALE",
+      "count": 1
+    },
+    {
+      "request": "POST /management/bookings/{id}/final-invoices 409 STALE_BILLING_REVISION",
+      "count": 1
+    },
+    {
+      "request": "POST /management/bookings/{id}/final-invoices 201 ",
+      "count": 8
+    },
+    {
+      "request": "POST /management/bookings/{id}/final-invoices 409 INVOICE_FINALIZED",
+      "count": 1
+    },
+    {
+      "request": "GET /bookings/{id}/final-invoices 200 ",
+      "count": 2
+    },
+    {
+      "request": "POST /management/bookings/{id}/invoice-adjustments 409 FINANCIAL_SOURCE_CONFLICT",
+      "count": 1
+    },
+    {
+      "request": "POST /management/bookings/{id}/invoice-adjustments 201 ",
+      "count": 5
+    },
+    {
+      "request": "POST /bookings/{id}/payments/balance 201 ",
+      "count": 3
+    },
+    {
+      "request": "PATCH /management/bookings/{id}/incidental-expenses/{id} 200 ",
+      "count": 2
+    },
+    {
+      "request": "PATCH /management/bookings/{id}/incidental-expenses/{id} 409 EXPENSE_REVISION_STALE",
+      "count": 2
+    },
+    {
+      "request": "GET /bookings/{id}/incidental-expenses 200 ",
+      "count": 2
+    },
+    {
+      "request": "POST /management/bookings/{id}/invoice-adjustments 409 PAYMENT_ATTEMPT_ACTIVE",
+      "count": 2
+    },
+    {
+      "request": "POST /bookings/{id}/contract-appendices/{id}/approvals 200 ",
+      "count": 8
+    },
+    {
+      "request": "POST /bookings/{id}/contract-appendices/{id}/approvals 500 INTERNAL_ERROR",
+      "count": 1
+    },
+    {
+      "request": "POST /management/bookings/{id}/final-invoices 500 INTERNAL_ERROR",
+      "count": 1
+    },
+    {
+      "request": "POST /bookings/{id}/contract-appendices/{id}/approvals 409 CONTRACT_REVISION_STALE",
+      "count": 1
+    },
+    {
+      "request": "POST /bookings/{id}/contract-appendices/{id}/approvals 409 COMMERCIAL_APPROVAL_CONFLICT",
+      "count": 1
+    },
+    {
+      "request": "POST /management/bookings/{id}/incidental-expenses 409 EVENT_NOT_ENDED",
+      "count": 1
+    },
+    {
+      "request": "POST /management/bookings/{id}/incidental-expenses 422 IDEMPOTENCY_KEY_REUSED",
+      "count": 1
+    },
+    {
+      "request": "PATCH /management/bookings/{id}/incidental-expenses/{id} 404 NOT_FOUND",
+      "count": 1
+    },
+    {
+      "request": "DELETE /management/bookings/{id}/incidental-expenses/{id} 200 ",
+      "count": 1
+    },
+    {
+      "request": "POST /management/bookings/{id}/final-invoices 403 FORBIDDEN",
+      "count": 1
+    },
+    {
+      "request": "POST /management/bookings/{id}/incidental-expenses 409 INVOICE_FINALIZED",
+      "count": 1
+    },
+    {
+      "request": "GET /bookings/{id}/final-invoices/{id} 200 ",
+      "count": 2
+    },
+    {
+      "request": "GET /bookings/{id}/billing 200 ",
+      "count": 6
+    },
+    {
+      "request": "POST /bookings/{id}/print-orders 201 ",
+      "count": 3
+    },
+    {
+      "request": "POST /management/print-orders/{id}/quotations 409 CONTRACT_PRINT_SOURCE_CONFLICT",
+      "count": 2
+    },
+    {
+      "request": "POST /management/print-orders/{id}/quotations 200 ",
+      "count": 2
+    },
+    {
+      "request": "POST /bookings/{id}/print-orders/{id}/approval 200 ",
+      "count": 2
+    },
+    {
+      "request": "POST /management/print-orders/{id}/replacement-proposals 409 CONTRACT_PRINT_REPLACEMENT_REQUIRES_NEW_ORDER",
+      "count": 1
+    },
+    {
+      "request": "POST /bookings/{id}/print-orders/{id}/cancellation-intents 200 ",
+      "count": 1
+    },
+    {
+      "request": "POST /management/print-orders/{id}/cancellation 200 ",
+      "count": 1
+    },
+    {
+      "request": "POST /management/print-orders/{id}/production 200 ",
+      "count": 1
+    },
+    {
+      "request": "POST /bookings/{id}/contract-appendices/{id}/approvals 409 CONTRACT_PRINT_QUANTITY_ALLOCATED",
+      "count": 1
+    },
+    {
+      "request": "POST /bookings/{id}/contract-appendices 404 NOT_FOUND",
+      "count": 1
+    },
+    {
+      "request": "POST /bookings/{id}/contract-appendices 422 VALIDATION_ERROR",
+      "count": 1
+    },
+    {
+      "request": "POST /bookings/{id}/contract-appendices 409 COMMERCIAL_PREDECESSOR_STALE",
+      "count": 1
+    }
+  ],
+  "examples": [
+    {
+      "method": "GET",
+      "path": "/bookings/75fbdac4-e711-4c3e-8f98-df434c2b8773/contract-appendices",
+      "status": 404,
+      "cacheControl": "no-store",
+      "errorCode": "NOT_FOUND"
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/75fbdac4-e711-4c3e-8f98-df434c2b8773/contract-appendices",
+      "status": 200,
+      "cacheControl": "no-store",
+      "errorCode": null
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/75fbdac4-e711-4c3e-8f98-df434c2b8773/contract-appendices",
+      "status": 201,
+      "cacheControl": "no-store",
+      "errorCode": null,
+      "appendix": {
+        "revisionId": "96d08026-da56-41ba-aa80-520e41b2425f",
+        "state": "DRAFT",
+        "documentDigest": "ec849c3667ee1dd3d121612b3e6de33310050aff17f90b165305196be5714a55",
+        "approvals": [],
+        "predecessorRevisionId": "a94490d2-9ae9-426e-80ce-fb551231853d",
+        "beforeTotalVnd": 47000000,
+        "afterTotalVnd": 47000000,
+        "deltaVnd": 0
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/75fbdac4-e711-4c3e-8f98-df434c2b8773/contract-appendices/96d08026-da56-41ba-aa80-520e41b2425f/submissions",
+      "status": 200,
+      "cacheControl": "no-store",
+      "errorCode": null,
+      "appendix": {
+        "revisionId": "96d08026-da56-41ba-aa80-520e41b2425f",
+        "state": "AWAITING_APPROVAL",
+        "documentDigest": "ec849c3667ee1dd3d121612b3e6de33310050aff17f90b165305196be5714a55",
+        "approvals": [],
+        "predecessorRevisionId": "a94490d2-9ae9-426e-80ce-fb551231853d",
+        "beforeTotalVnd": 47000000,
+        "afterTotalVnd": 47000000,
+        "deltaVnd": 0
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/75fbdac4-e711-4c3e-8f98-df434c2b8773/contract-appendices/56d6aaf2-daaa-4ae4-9a41-ca9aa72154df/approvals",
+      "status": 404,
+      "cacheControl": null,
+      "errorCode": "NOT_FOUND"
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/75fbdac4-e711-4c3e-8f98-df434c2b8773/contract-appendices/96d08026-da56-41ba-aa80-520e41b2425f/submissions",
+      "status": 409,
+      "cacheControl": "no-store",
+      "errorCode": "APPENDIX_NOT_EDITABLE"
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/75fbdac4-e711-4c3e-8f98-df434c2b8773/contract-appendices/96d08026-da56-41ba-aa80-520e41b2425f/approvals",
+      "status": 409,
+      "cacheControl": "no-store",
+      "errorCode": "COMMERCIAL_PREDECESSOR_STALE"
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/62904fd8-1735-4dff-835a-e609cee8c9a3/incidental-expenses",
+      "status": 401,
+      "cacheControl": "no-store",
+      "errorCode": "AUTHENTICATION_REQUIRED"
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/62904fd8-1735-4dff-835a-e609cee8c9a3/incidental-expenses",
+      "status": 400,
+      "cacheControl": "no-store",
+      "errorCode": "IDEMPOTENCY_KEY_REQUIRED"
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/62904fd8-1735-4dff-835a-e609cee8c9a3/incidental-expenses",
+      "status": 201,
+      "cacheControl": "no-store",
+      "errorCode": null
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/62904fd8-1735-4dff-835a-e609cee8c9a3/incidental-expenses",
+      "status": 404,
+      "cacheControl": "no-store",
+      "errorCode": "NOT_FOUND"
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/62904fd8-1735-4dff-835a-e609cee8c9a3/final-invoices",
+      "status": 404,
+      "cacheControl": "no-store",
+      "errorCode": "NOT_FOUND"
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/62904fd8-1735-4dff-835a-e609cee8c9a3/final-invoices/c4b5e54c-dabc-4fed-91d9-dfa144f15724",
+      "status": 404,
+      "cacheControl": "no-store",
+      "errorCode": "NOT_FOUND"
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/62904fd8-1735-4dff-835a-e609cee8c9a3/incidental-expenses",
+      "status": 403,
+      "cacheControl": "no-store",
+      "errorCode": "FORBIDDEN"
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/62904fd8-1735-4dff-835a-e609cee8c9a3/incidental-expenses",
+      "status": 422,
+      "cacheControl": "no-store",
+      "errorCode": "VALIDATION_ERROR"
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/62904fd8-1735-4dff-835a-e609cee8c9a3/final-invoices",
+      "status": 409,
+      "cacheControl": "no-store",
+      "errorCode": "EXPENSE_REVISION_STALE"
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/62904fd8-1735-4dff-835a-e609cee8c9a3/final-invoices",
+      "status": 409,
+      "cacheControl": "no-store",
+      "errorCode": "COMMERCIAL_PREDECESSOR_STALE"
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/62904fd8-1735-4dff-835a-e609cee8c9a3/final-invoices",
+      "status": 409,
+      "cacheControl": "no-store",
+      "errorCode": "STALE_BILLING_REVISION"
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/62904fd8-1735-4dff-835a-e609cee8c9a3/final-invoices",
+      "status": 201,
+      "cacheControl": "no-store",
+      "errorCode": null,
+      "invoice": {
+        "invoiceRevisionId": "e1401fbf-e629-4460-a765-4b9fde9e055b",
+        "predecessorRevisionId": null,
+        "documentDigest": "177f146b2adf542dad061ab28bf74c051a44c6165070b61d5151fea9cd3e0d63",
+        "sourceBillingRevision": 3,
+        "contractRevisionId": "73dbd907-824a-47bb-b5ff-5473ed927838",
+        "appendices": [],
+        "commercialTotalVnd": 47000000,
+        "incidentalLines": [
+          {
+            "name": "Nước",
+            "quantity": 1,
+            "unit": "chai",
+            "unitPriceVnd": 10000,
+            "note": null,
+            "id": "11206eac-006a-4828-9e4c-dcaeafe5d5a7",
+            "totalVnd": 10000
+          }
+        ],
+        "incidentalTotalVnd": 10000,
+        "adjustments": [],
+        "totalVnd": 47010000
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/62904fd8-1735-4dff-835a-e609cee8c9a3/final-invoices",
+      "status": 409,
+      "cacheControl": "no-store",
+      "errorCode": "INVOICE_FINALIZED"
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/62904fd8-1735-4dff-835a-e609cee8c9a3/final-invoices",
+      "status": 200,
+      "cacheControl": "no-store",
+      "errorCode": null
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/506cafa3-8cec-4508-8b86-218026256ebb/invoice-adjustments",
+      "status": 409,
+      "cacheControl": "no-store",
+      "errorCode": "FINANCIAL_SOURCE_CONFLICT"
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/506cafa3-8cec-4508-8b86-218026256ebb/invoice-adjustments",
+      "status": 201,
+      "cacheControl": "no-store",
+      "errorCode": null,
+      "invoice": {
+        "invoiceRevisionId": "9802a5ec-4b4c-40d9-a75b-72395a6e69f6",
+        "predecessorRevisionId": "e0d2a366-6fab-44bf-a873-a9e3bedb5f09",
+        "documentDigest": "5ea45677b81a3ff298319f16e85f8f764877565c1d702471e39302af2658ded6",
+        "sourceBillingRevision": 3,
+        "contractRevisionId": "8447b549-9dac-4a13-98eb-fa9c49c84ede",
+        "appendices": [],
+        "commercialTotalVnd": 47000000,
+        "incidentalLines": [],
+        "incidentalTotalVnd": 0,
+        "adjustments": [
+          {
+            "id": "9802a5ec-4b4c-40d9-a75b-72395a6e69f6",
+            "predecessorRevisionId": "e0d2a366-6fab-44bf-a873-a9e3bedb5f09",
+            "reason": "Điều chỉnh đã xác minh",
+            "actorAccountId": "846b9577-0813-4716-ad12-230f70fc7db7",
+            "occurredAt": "2026-10-11T10:59:33.769Z",
+            "lines": [
+              {
+                "name": "Phụ phí",
+                "quantity": 1,
+                "unit": "lần",
+                "unitPriceVnd": 10000,
+                "note": null,
+                "id": "e500f4ab-fa42-4905-8811-6cf568861cc7",
+                "totalVnd": 10000,
+                "kind": "DEBIT"
+              }
+            ],
+            "deltaVnd": 10000
+          }
+        ],
+        "totalVnd": 47010000
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/506cafa3-8cec-4508-8b86-218026256ebb/payments/balance",
+      "status": 201,
+      "cacheControl": "no-store",
+      "errorCode": null,
+      "paymentAttemptId": "66cb43e4-26e4-4499-a905-39f14314baef"
+    },
+    {
+      "method": "PATCH",
+      "path": "/management/bookings/88838516-3f59-4892-8b68-8baf08491e5d/incidental-expenses/2e162a98-c39e-423b-8c43-64d90ea76203",
+      "status": 200,
+      "cacheControl": "no-store",
+      "errorCode": null
+    },
+    {
+      "method": "PATCH",
+      "path": "/management/bookings/88838516-3f59-4892-8b68-8baf08491e5d/incidental-expenses/2e162a98-c39e-423b-8c43-64d90ea76203",
+      "status": 409,
+      "cacheControl": "no-store",
+      "errorCode": "EXPENSE_REVISION_STALE"
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/88838516-3f59-4892-8b68-8baf08491e5d/incidental-expenses",
+      "status": 200,
+      "cacheControl": "no-store",
+      "errorCode": null
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/88838516-3f59-4892-8b68-8baf08491e5d/invoice-adjustments",
+      "status": 409,
+      "cacheControl": "no-store",
+      "errorCode": "PAYMENT_ATTEMPT_ACTIVE"
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/5fd5a761-6f24-4ba3-9436-9ce82418b904/contract-appendices/9da7cfca-bb18-429a-8bfd-13829242b8d9/approvals",
+      "status": 200,
+      "cacheControl": "no-store",
+      "errorCode": null,
+      "appendix": {
+        "revisionId": "9da7cfca-bb18-429a-8bfd-13829242b8d9",
+        "state": "AWAITING_APPROVAL",
+        "documentDigest": "b77cc633e44d04bbde386d715d16fecd115eb9b48eae3a4d2e8cc14a8cdd46d0",
+        "approvals": [
+          {
+            "party": "MANAGER",
+            "actorAccountId": "846b9577-0813-4716-ad12-230f70fc7db7",
+            "documentDigest": "b77cc633e44d04bbde386d715d16fecd115eb9b48eae3a4d2e8cc14a8cdd46d0",
+            "occurredAt": "2026-10-11T10:59:38.314Z"
+          }
+        ],
+        "predecessorRevisionId": "10883672-116c-449a-a726-e95ebd86e4ef",
+        "beforeTotalVnd": 47000000,
+        "afterTotalVnd": 50500000,
+        "deltaVnd": 3500000
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/5fd5a761-6f24-4ba3-9436-9ce82418b904/contract-appendices/9da7cfca-bb18-429a-8bfd-13829242b8d9/approvals",
+      "status": 500,
+      "cacheControl": "no-store",
+      "errorCode": "INTERNAL_ERROR"
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/5fd5a761-6f24-4ba3-9436-9ce82418b904/final-invoices",
+      "status": 500,
+      "cacheControl": "no-store",
+      "errorCode": "INTERNAL_ERROR"
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/63768b20-89e1-48fa-800e-64a995031542/contract-appendices/6eec085e-2aea-44b5-8792-4260f7743361/approvals",
+      "status": 409,
+      "cacheControl": "no-store",
+      "errorCode": "CONTRACT_REVISION_STALE"
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/63768b20-89e1-48fa-800e-64a995031542/contract-appendices/6eec085e-2aea-44b5-8792-4260f7743361/approvals",
+      "status": 409,
+      "cacheControl": "no-store",
+      "errorCode": "COMMERCIAL_APPROVAL_CONFLICT"
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/94a46e41-ffd7-44ec-82fb-7cd1781f8e98/incidental-expenses",
+      "status": 409,
+      "cacheControl": "no-store",
+      "errorCode": "EVENT_NOT_ENDED"
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/08e3e959-d4ff-4e14-a0ee-1fdcf6c5e26f/incidental-expenses",
+      "status": 422,
+      "cacheControl": "no-store",
+      "errorCode": "IDEMPOTENCY_KEY_REUSED"
+    },
+    {
+      "method": "PATCH",
+      "path": "/management/bookings/08e3e959-d4ff-4e14-a0ee-1fdcf6c5e26f/incidental-expenses/a5db7974-99ca-4060-9453-fb7eefa46ac3",
+      "status": 404,
+      "cacheControl": "no-store",
+      "errorCode": "NOT_FOUND"
+    },
+    {
+      "method": "DELETE",
+      "path": "/management/bookings/08e3e959-d4ff-4e14-a0ee-1fdcf6c5e26f/incidental-expenses/eabb8f48-8916-4750-9661-b1b87e90ae6b",
+      "status": 200,
+      "cacheControl": "no-store",
+      "errorCode": null
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/08e3e959-d4ff-4e14-a0ee-1fdcf6c5e26f/final-invoices",
+      "status": 403,
+      "cacheControl": "no-store",
+      "errorCode": "FORBIDDEN"
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/08e3e959-d4ff-4e14-a0ee-1fdcf6c5e26f/incidental-expenses",
+      "status": 409,
+      "cacheControl": "no-store",
+      "errorCode": "INVOICE_FINALIZED"
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/08e3e959-d4ff-4e14-a0ee-1fdcf6c5e26f/final-invoices/e0957dbe-31a4-47b9-973c-8d0e06b586fe",
+      "status": 200,
+      "cacheControl": "no-store",
+      "errorCode": null,
+      "invoice": {
+        "invoiceRevisionId": "e0957dbe-31a4-47b9-973c-8d0e06b586fe",
+        "predecessorRevisionId": null,
+        "documentDigest": "d35c0b37748d0e9ad8d0cf7711a58460fa92bcac39a5d5b1db8605e523dccd82",
+        "sourceBillingRevision": 3,
+        "contractRevisionId": "ec544c58-09ec-46e3-a9b3-94a2af764c52",
+        "appendices": [],
+        "commercialTotalVnd": 47000000,
+        "incidentalLines": [
+          {
+            "name": "Bia thêm",
+            "quantity": 3,
+            "unit": "thùng",
+            "unitPriceVnd": 350000,
+            "note": "Cuối tiệc",
+            "id": "568c53d9-5f3c-47f2-855b-86b262d63759",
+            "totalVnd": 1050000
+          }
+        ],
+        "incidentalTotalVnd": 1050000,
+        "adjustments": [],
+        "totalVnd": 48050000
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/08e3e959-d4ff-4e14-a0ee-1fdcf6c5e26f/billing",
+      "status": 200,
+      "cacheControl": "no-store",
+      "errorCode": null,
+      "totals": {
+        "acceptedChargesVnd": 47700000,
+        "paidVnd": 14100000,
+        "refundedVnd": 0,
+        "netPaidVnd": 14100000,
+        "outstandingVnd": 33600000,
+        "creditVnd": 0
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/fdef7bb7-a1de-4e6b-b90d-25d6f9cc19c1/print-orders",
+      "status": 201,
+      "cacheControl": "no-store",
+      "errorCode": null,
+      "printOrder": {
+        "orderId": "d37e3301-656f-4e0c-89bd-6474a4a0c6a3",
+        "status": "REQUESTED",
+        "receivableChargeId": null,
+        "lines": [
+          {
+            "quantity": 60,
+            "commercialSource": {
+              "agreementRevisionId": "f1852316-90ca-4a67-bc45-c184f1dbd894",
+              "offeringId": "9a1ad7b2-eb74-4fe2-8b54-95c446a6f32b",
+              "sourceRevisionId": "67101c35-320b-4127-8adb-88d06a4d0028",
+              "templateVersionId": "c09a2442-fe91-495b-9173-83d6cd03f4bc",
+              "material": "Giấy mỹ thuật",
+              "printType": "Hai mặt",
+              "unitPriceVnd": 5000
+            }
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/management/print-orders/d37e3301-656f-4e0c-89bd-6474a4a0c6a3/quotations",
+      "status": 409,
+      "cacheControl": "no-store",
+      "errorCode": "CONTRACT_PRINT_SOURCE_CONFLICT"
+    },
+    {
+      "method": "POST",
+      "path": "/management/print-orders/d37e3301-656f-4e0c-89bd-6474a4a0c6a3/quotations",
+      "status": 200,
+      "cacheControl": "no-store",
+      "errorCode": null,
+      "printOrder": {
+        "orderId": "d37e3301-656f-4e0c-89bd-6474a4a0c6a3",
+        "status": "QUOTED",
+        "receivableChargeId": null,
+        "lines": [
+          {
+            "quantity": 60,
+            "commercialSource": {
+              "agreementRevisionId": "f1852316-90ca-4a67-bc45-c184f1dbd894",
+              "offeringId": "9a1ad7b2-eb74-4fe2-8b54-95c446a6f32b",
+              "sourceRevisionId": "67101c35-320b-4127-8adb-88d06a4d0028",
+              "templateVersionId": "c09a2442-fe91-495b-9173-83d6cd03f4bc",
+              "material": "Giấy mỹ thuật",
+              "printType": "Hai mặt",
+              "unitPriceVnd": 5000
+            }
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/fdef7bb7-a1de-4e6b-b90d-25d6f9cc19c1/print-orders/d37e3301-656f-4e0c-89bd-6474a4a0c6a3/approval",
+      "status": 200,
+      "cacheControl": "no-store",
+      "errorCode": null,
+      "printOrder": {
+        "orderId": "d37e3301-656f-4e0c-89bd-6474a4a0c6a3",
+        "status": "APPROVED",
+        "receivableChargeId": "41218547-35e1-4ac2-bafe-231ad0786fbe",
+        "lines": [
+          {
+            "quantity": 60,
+            "commercialSource": {
+              "agreementRevisionId": "f1852316-90ca-4a67-bc45-c184f1dbd894",
+              "offeringId": "9a1ad7b2-eb74-4fe2-8b54-95c446a6f32b",
+              "sourceRevisionId": "67101c35-320b-4127-8adb-88d06a4d0028",
+              "templateVersionId": "c09a2442-fe91-495b-9173-83d6cd03f4bc",
+              "material": "Giấy mỹ thuật",
+              "printType": "Hai mặt",
+              "unitPriceVnd": 5000
+            }
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/management/print-orders/d37e3301-656f-4e0c-89bd-6474a4a0c6a3/replacement-proposals",
+      "status": 409,
+      "cacheControl": "no-store",
+      "errorCode": "CONTRACT_PRINT_REPLACEMENT_REQUIRES_NEW_ORDER"
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/fdef7bb7-a1de-4e6b-b90d-25d6f9cc19c1/print-orders/ffd088fa-716e-42a2-b052-38bfaca38a05/cancellation-intents",
+      "status": 200,
+      "cacheControl": "no-store",
+      "errorCode": null
+    },
+    {
+      "method": "POST",
+      "path": "/management/print-orders/ffd088fa-716e-42a2-b052-38bfaca38a05/cancellation",
+      "status": 200,
+      "cacheControl": "no-store",
+      "errorCode": null,
+      "printOrder": {
+        "orderId": "ffd088fa-716e-42a2-b052-38bfaca38a05",
+        "status": "CANCELLED",
+        "receivableChargeId": "41218547-35e1-4ac2-bafe-231ad0786fbe",
+        "lines": [
+          {
+            "quantity": 10,
+            "commercialSource": {
+              "agreementRevisionId": "f1852316-90ca-4a67-bc45-c184f1dbd894",
+              "offeringId": "9a1ad7b2-eb74-4fe2-8b54-95c446a6f32b",
+              "sourceRevisionId": "67101c35-320b-4127-8adb-88d06a4d0028",
+              "templateVersionId": "c09a2442-fe91-495b-9173-83d6cd03f4bc",
+              "material": "Giấy mỹ thuật",
+              "printType": "Hai mặt",
+              "unitPriceVnd": 5000
+            }
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/management/print-orders/d37e3301-656f-4e0c-89bd-6474a4a0c6a3/production",
+      "status": 200,
+      "cacheControl": "no-store",
+      "errorCode": null,
+      "printOrder": {
+        "orderId": "d37e3301-656f-4e0c-89bd-6474a4a0c6a3",
+        "status": "IN_PRODUCTION",
+        "receivableChargeId": "41218547-35e1-4ac2-bafe-231ad0786fbe",
+        "lines": [
+          {
+            "quantity": 60,
+            "commercialSource": {
+              "agreementRevisionId": "f1852316-90ca-4a67-bc45-c184f1dbd894",
+              "offeringId": "9a1ad7b2-eb74-4fe2-8b54-95c446a6f32b",
+              "sourceRevisionId": "67101c35-320b-4127-8adb-88d06a4d0028",
+              "templateVersionId": "c09a2442-fe91-495b-9173-83d6cd03f4bc",
+              "material": "Giấy mỹ thuật",
+              "printType": "Hai mặt",
+              "unitPriceVnd": 5000
+            }
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/fdef7bb7-a1de-4e6b-b90d-25d6f9cc19c1/contract-appendices/1c09dd2a-f7a1-4a5d-a4ea-df90f00816fe/approvals",
+      "status": 409,
+      "cacheControl": "no-store",
+      "errorCode": "CONTRACT_PRINT_QUANTITY_ALLOCATED"
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/cb368060-9a77-4f9a-92c5-fc27518c16c5/contract-appendices",
+      "status": 404,
+      "cacheControl": null,
+      "errorCode": "NOT_FOUND"
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/cb368060-9a77-4f9a-92c5-fc27518c16c5/contract-appendices",
+      "status": 422,
+      "cacheControl": null,
+      "errorCode": "VALIDATION_ERROR"
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/cb368060-9a77-4f9a-92c5-fc27518c16c5/contract-appendices",
+      "status": 409,
+      "cacheControl": "no-store",
+      "errorCode": "COMMERCIAL_PREDECESSOR_STALE"
+    }
+  ]
+}

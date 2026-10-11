@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { AppError, ValidationError } from '../../../core/errors/app-error.js';
 import { id, revision, studioConflict } from './studio-policy.js';
+import { commercialPrintSourceSchema } from './contracted-print.js';
 
 export const PRINT_ORDER_STATUSES = [
   'REQUESTED',
@@ -30,6 +31,7 @@ const safeText = (max: number, min = 0) =>
 export const printLineRequestSchema = z.strictObject({
   designId: id,
   quantity: z.int().min(1).max(10000),
+  commercialSource: commercialPrintSourceSchema.optional(),
 });
 
 export const requestPrintOrderBodySchema = z.strictObject({

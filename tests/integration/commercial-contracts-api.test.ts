@@ -1,8 +1,12 @@
+import { registerStepSixApiCases } from './commercial-step6-api-cases.js';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import request, { type Response } from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createApp } from '../../src/app.js';
+import { createInvitationStudioServices } from '../../src/modules/invitation-studio/infrastructure/studio.composition.js';
+import { createStudioRouter } from '../../src/modules/invitation-studio/http/studio.router.js';
+import { controlledStorage } from './invitation-studio/controlled-storage.js';
 import { parseEnvironment } from '../../src/config/env.js';
 import { CATALOG_SEED_IDS, seedVenueCatalog } from '../../scripts/catalog-seed.js';
 import { createBookingLifecycleRuntime } from '../../src/modules/booking-lifecycle/booking-lifecycle.runtime.js';
@@ -44,7 +48,7 @@ import {
 
 const describeDb = catalogMigrationDatabaseUrl ? describe : describe.skip;
 const records: object[] = [];
-const directory = 'test-results/step4-api';
+const directory = 'test-results/step6-api';
 describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', () => {
   const database = new CatalogTestDatabase('commercial_contract_api');
   let app: ReturnType<typeof createApp>;
@@ -162,6 +166,16 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
         rateLimit: { ...config.security.rateLimit, maxRequests: 1000 },
       },
       registerRoutes(express) {
+        const studio = createInvitationStudioServices(
+          database.prisma,
+          controlledStorage().provider,
+          null,
+          'https://wedding.example.com',
+        );
+        express.use(
+          '/api/v1',
+          createStudioRouter(studio, createAuthenticatedActorResolver(sessions)),
+        );
         express.use('/api/v1', booking!.router);
         express.use('/api/v1', venue!.router);
         express.use(
@@ -388,6 +402,62 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     expect(d.contract.state).toBe('APPROVED');
     return d;
   }
+  async function paidFixture(past = false) {
+    const f = await fixture();
+    if (past) {
+      // Synthetic historical fixture, seeded BEFORE any commercial document or payment.
+      // Production APIs never rewrite a signed event date to bypass the event-end gate.
+      const eventDate = new Date(Date.UTC(2026, 0, day));
+      await database.prisma.$transaction(async (tx) => {
+        await tx.booking.update({ where: { id: f.id }, data: { eventDate } });
+        await tx.bookingSlotHold.updateMany({
+          where: { bookingId: f.id, status: 'ACTIVE' },
+          data: { eventDate },
+        });
+      });
+    }
+    const d = await approved(f);
+    const payment = await post('/management/billing/payments/manual', {
+      bookingId: f.id,
+      purpose: 'DEPOSIT',
+      contractRevisionId: d.contract.revisionId,
+      documentDigest: d.contract.documentDigest,
+      amountVnd: deposit,
+      settledAt: new Date().toISOString(),
+      reason: 'Cọc kiểm thử quyết toán',
+      evidenceReference: 'LOCAL-INVOICE',
+    });
+    expect(payment.status, JSON.stringify(payment.body)).toBe(201);
+    return { f, d };
+  }
+  async function expenseMutation(
+    method: 'patch' | 'delete',
+    path: string,
+    body: object,
+    who = 'manager',
+    key = randomUUID(),
+  ) {
+    const result = await request(app)
+      [method]('/api/v1' + path)
+      .auth(tokens[who]!, { type: 'bearer' })
+      .set('Idempotency-Key', key)
+      .send(body);
+    return capture(path, method.toUpperCase(), path, result, body);
+  }
+  registerStepSixApiCases({
+    database,
+    post,
+    get,
+    expenseMutation,
+    fixture,
+    approved,
+    paidFixture,
+    race,
+    getLines: () => lines,
+    accounts,
+    total,
+    deposit,
+  });
   it('lists, creates, submits, approves, downloads and withdraws the exact contract with retained PDF history', async () => {
     const f = await fixture();
     const empty = await get(f.path, 'own', 'List before conversion');

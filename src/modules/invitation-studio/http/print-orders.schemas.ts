@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { id, revision } from '../domain/studio-policy.js';
+import { commercialPrintSnapshotSchema } from '../domain/contracted-print.js';
 import {
   PRINT_ORDER_STATUSES,
   MAX_ORDER_TOTAL_VND,
@@ -32,6 +33,7 @@ export const printLineViewSchema = z.strictObject({
   designId: id,
   quantity: z.int().min(1).max(10000),
   printableRevisionId: id.nullable(),
+  commercialSource: commercialPrintSnapshotSchema.optional(),
 });
 
 export const quotedLineViewSchema = z.strictObject({

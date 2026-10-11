@@ -18,6 +18,9 @@ export const ledgerFactSchema = z
     sourceType: z.enum([
       'BASE_BOOKING',
       'CONTRACT',
+      'CONTRACT_APPENDIX',
+      'INCIDENTAL_FINALIZATION',
+      'INVOICE_ADJUSTMENT',
       'PRINT_ORDER',
       'PAYMENT_ATTEMPT',
       'PRINT_CREDIT',
@@ -37,10 +40,25 @@ export const ledgerFactSchema = z
     const noDecision = fact.decisionId === null && fact.approvedRefundableVnd === null;
     const valid =
       (fact.kind === 'CHARGE' &&
-        ['BASE_BOOKING', 'PRINT_ORDER', 'CONTRACT'].includes(fact.sourceType) &&
+        [
+          'BASE_BOOKING',
+          'PRINT_ORDER',
+          'CONTRACT',
+          'CONTRACT_APPENDIX',
+          'INCIDENTAL_FINALIZATION',
+          'INVOICE_ADJUSTMENT',
+        ].includes(fact.sourceType) &&
+        (!['CONTRACT_APPENDIX', 'INVOICE_ADJUSTMENT'].includes(fact.sourceType) ||
+          fact.reason !== null) &&
         fact.sourceEntryId === null &&
         fact.paymentAttemptId === null &&
         noDecision) ||
+      (fact.kind === 'CREDIT_ADJUSTMENT' &&
+        ['CONTRACT_APPENDIX', 'INVOICE_ADJUSTMENT'].includes(fact.sourceType) &&
+        fact.sourceEntryId === null &&
+        fact.paymentAttemptId === null &&
+        noDecision &&
+        fact.reason !== null) ||
       (fact.kind === 'PAYMENT' &&
         fact.sourceType === 'PAYMENT_ATTEMPT' &&
         fact.paymentAttemptId !== null &&
@@ -76,6 +94,13 @@ export const newPaymentAttemptSchema = z
     amountVnd: positiveVnd,
     timelineRevisionId: z.uuid().nullable(),
     contractRevisionId: z.uuid().nullable().optional(),
+    invoiceRevisionId: z.uuid().nullable().optional(),
+    invoiceDigest: z
+      .string()
+      .regex(/^[a-f0-9]{64}$/)
+      .nullable()
+      .optional(),
+    sourceBillingRevision: z.int().positive().nullable().optional(),
     documentDigest: z
       .string()
       .regex(/^[a-f0-9]{64}$/)
@@ -90,6 +115,11 @@ export const newPaymentAttemptSchema = z
       ((value.contractRevisionId ?? null) === null
         ? (value.documentDigest ?? null) === null
         : value.purpose === 'DEPOSIT' && value.documentDigest != null) &&
+      ((value.invoiceRevisionId ?? null) === null
+        ? (value.invoiceDigest ?? null) === null && (value.sourceBillingRevision ?? null) === null
+        : value.purpose === 'BALANCE' &&
+          value.invoiceDigest != null &&
+          value.sourceBillingRevision != null) &&
       ((value.purpose === 'DEPOSIT' && value.timelineRevisionId !== null) ||
         (value.purpose === 'BALANCE' && value.timelineRevisionId === null)),
     { message: 'Attempt expiry and timeline snapshot must agree with its purpose.' },

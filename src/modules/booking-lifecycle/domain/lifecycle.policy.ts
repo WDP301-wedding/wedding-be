@@ -101,7 +101,7 @@ function requireHeadcount(value: HeadcountEvidence): void {
   }
 }
 
-function localVietnamTime(eventDate: string, time: string): Date {
+export function localVietnamTime(eventDate: string, time: string): Date {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/u.exec(eventDate);
   const clock = /^(\d{2}):(\d{2})$/u.exec(time);
   if (match === null || clock === null) throw new RangeError('Invalid local event timestamp.');

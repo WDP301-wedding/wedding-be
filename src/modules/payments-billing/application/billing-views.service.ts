@@ -165,7 +165,9 @@ function totals(entries: readonly LedgerEntry[]) {
       )
       .map((entry) => entry.amountVnd);
   return calculateBillingTotals({
-    baseChargesVnd: [...amounts('CHARGE', 'BASE_BOOKING'), ...amounts('CHARGE', 'CONTRACT')],
+    baseChargesVnd: entries
+      .filter((entry) => entry.kind === 'CHARGE' && entry.sourceType !== 'PRINT_ORDER')
+      .map((entry) => entry.amountVnd),
     printChargesVnd: amounts('CHARGE', 'PRINT_ORDER'),
     creditAdjustmentsVnd: amounts('CREDIT_ADJUSTMENT'),
     settledPaymentsVnd: amounts('PAYMENT'),

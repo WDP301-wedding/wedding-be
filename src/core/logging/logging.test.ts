@@ -1,6 +1,6 @@
 import { Writable } from 'node:stream';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createLogger, createProviderLogger } from './logger.js';
 import { resolveNormalizedRoute } from './request-logger.js';
@@ -28,6 +28,10 @@ function captureLogs(): {
 }
 
 describe('structured logger', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('writes newline-delimited production JSON with stable base fields and no debug output', () => {
     const capture = captureLogs();
     const logger = createLogger({
@@ -51,62 +55,79 @@ describe('structured logger', () => {
     expect(capture.records[0]).not.toHaveProperty('time');
   });
 
-  it('redacts credentials, contact data, payment fields, errors, and bodies at any nesting depth', () => {
-    const capture = captureLogs();
-    const logger = createLogger({
-      destination: capture.destination,
-      level: 'info',
-      runtimeEnvironment: 'test',
-    });
-    const secrets = [
-      'Bearer auth-secret',
-      'session=cookie-secret',
-      'access-token-secret',
-      'couple@example.com',
-      '+84-900-000-000',
-      '4111111111111111',
-      '123',
-      'body-password-secret',
-      'provider-error-secret',
-    ];
+  it.each(['2026-10-11T11:17:40.000Z', '2026-10-11T11:17:40.123Z'])(
+    'redacts credentials, contact data, payment fields, errors, and bodies at any nesting depth at %s',
+    (timestamp) => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(new Date(timestamp));
+      const capture = captureLogs();
+      const logger = createLogger({
+        destination: capture.destination,
+        level: 'info',
+        runtimeEnvironment: 'test',
+      });
+      const secrets = [
+        'Bearer auth-secret',
+        'session=cookie-secret',
+        'access-token-secret',
+        'couple@example.com',
+        '+84-900-000-000',
+        '4111111111111111',
+        '123',
+        'body-password-secret',
+        'provider-error-secret',
+      ];
 
-    logger.info(
-      {
+      logger.info(
+        {
+          event: 'redaction_probe',
+          request: {
+            headers: {
+              authorization: secrets[0],
+              cookie: secrets[1],
+            },
+            body: { password: secrets[7] },
+          },
+          provider: {
+            accessToken: secrets[2],
+            contact: {
+              email: secrets[3],
+              phone: secrets[4],
+            },
+            payment: {
+              cardNumber: secrets[5],
+              cvv: secrets[6],
+            },
+            safeCode: 'PROVIDER_TIMEOUT',
+          },
+          err: new Error(secrets[8]),
+        },
+        'redaction probe',
+      );
+
+      expect(capture.records).toHaveLength(1);
+      const { timestamp: loggedTimestamp, ...payload } = capture.records[0] ?? {};
+      expect(loggedTimestamp).toBe(timestamp);
+      const serialized = JSON.stringify(payload);
+      for (const secret of secrets) {
+        expect(serialized).not.toContain(secret);
+      }
+      expect(serialized).toContain(REDACTED_VALUE);
+      expect(capture.records[0]).toMatchObject({
         event: 'redaction_probe',
         request: {
-          headers: {
-            authorization: secrets[0],
-            cookie: secrets[1],
-          },
-          body: { password: secrets[7] },
+          headers: { authorization: REDACTED_VALUE, cookie: REDACTED_VALUE },
+          body: REDACTED_VALUE,
         },
         provider: {
-          accessToken: secrets[2],
-          contact: {
-            email: secrets[3],
-            phone: secrets[4],
-          },
-          payment: {
-            cardNumber: secrets[5],
-            cvv: secrets[6],
-          },
+          accessToken: REDACTED_VALUE,
+          contact: REDACTED_VALUE,
+          payment: REDACTED_VALUE,
           safeCode: 'PROVIDER_TIMEOUT',
         },
-        err: new Error(secrets[8]),
-      },
-      'redaction probe',
-    );
-
-    const serialized = JSON.stringify(capture.records);
-    for (const secret of secrets) {
-      expect(serialized).not.toContain(secret);
-    }
-    expect(serialized).toContain(REDACTED_VALUE);
-    expect(capture.records[0]).toMatchObject({
-      event: 'redaction_probe',
-      provider: { safeCode: 'PROVIDER_TIMEOUT' },
-    });
-  });
+      });
+    },
+  );
 
   it('adds correlation and entry-point fields to provider child loggers', () => {
     const capture = captureLogs();

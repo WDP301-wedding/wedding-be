@@ -3,6 +3,8 @@ import type { z } from 'zod';
 import { commercialCatalogOpenApiPaths } from '../../modules/venue-catalog/http/commercial-catalog.openapi.js';
 import { coupleProfileOpenApiPaths } from '../../modules/booking-lifecycle/http/couple-profile.openapi.js';
 import { commercialContractOpenApiPaths } from '../../modules/booking-lifecycle/http/commercial-contract.openapi.js';
+import { commercialAppendixOpenApiPaths } from '../../modules/booking-lifecycle/http/commercial-appendix.openapi.js';
+import { finalInvoiceOpenApiPaths } from '../../modules/payments-billing/http/final-invoice.openapi.js';
 import {
   experienceOpenApiPaths,
   experienceOpenApiSchemas,
@@ -196,6 +198,8 @@ export const openApiRegistry = {
     ...experienceOpenApiPaths,
     ...coupleProfileOpenApiPaths,
     ...commercialContractOpenApiPaths,
+    ...commercialAppendixOpenApiPaths,
+    ...finalInvoiceOpenApiPaths,
     ...commercialCatalogOpenApiPaths,
     ...venueCatalogOpenApiPaths,
     ...bookingLifecycleOpenApiPaths,
