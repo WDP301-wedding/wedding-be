@@ -1,5 +1,16 @@
 # BE-11–16: commercial settlement backend
 
+Current status, 2026-10-12: implementation and repaired offline/CI/deployed
+developer verification are complete on `054d670`, including the authorized
+isolated future-event invoice and genuine invoice-linked VNPay sandbox BALANCE.
+The owner has now explicitly waived independent team-member approval for this
+acceptance and merge; [the exception](../tasks/evidence/be11-17-owner-acceptance-2026-10-12.md)
+closes the remaining review condition. No team-member approval is claimed.
+The pending-online/review paragraphs below describe earlier checkpoints.
+Use the [BE-17 acceptance matrix](../tasks/evidence/be17-extension-handoff-2026-10-12.md)
+and [consolidated hand-off](be17-extension-handoff.md) for current source/API/evidence
+and remaining acceptance/release gates.
+
 Baseline: `main@07afed1`. Integrated source: `main@0d3a7fa`, PR #29.
 Acceptance evidence and final gate results are tracked in
 [the step-six evidence](../tasks/evidence/be11-16-step6-results-2026-10-11.md).
