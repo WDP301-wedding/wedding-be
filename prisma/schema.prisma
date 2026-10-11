@@ -1559,12 +1559,13 @@ model InvitationDesign {
 }
 
 model InvitationDesignRevision {
-  id        String   @id @db.Uuid
-  designId  String   @db.Uuid
-  bookingId String   @db.Uuid
-  revision  Int
-  content   Json     @db.JsonB
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  id                      String   @id @db.Uuid
+  designId                String   @db.Uuid
+  bookingId               String   @db.Uuid
+  revision                Int
+  content                 Json     @db.JsonB
+  sourceTemplateVersionId String?  @db.Uuid
+  createdAt               DateTime @default(now()) @db.Timestamptz(6)
 
   @@unique([designId, revision])
   @@index([bookingId, id])
@@ -1722,6 +1723,7 @@ model InvitationPrintLine {
   designId            String   @db.Uuid
   quantity            Int
   printableRevisionId String?  @db.Uuid
+  commercialSource    Json?    @db.JsonB
   createdAt           DateTime @default(now()) @db.Timestamptz(6)
 
   @@index([orderId, id])
