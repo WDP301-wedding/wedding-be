@@ -17280,6 +17280,12 @@
             },
             "description": "Immutable printable PDF bytes. Inline and attachment have identical content.",
             "headers": {
+              "Access-Control-Expose-Headers": {
+                "schema": {
+                  "const": "Retry-After, X-Request-Id, Content-Disposition, X-Content-SHA256, X-Printable-Content-Digest, X-Renderer-Version",
+                  "type": "string"
+                }
+              },
               "Cache-Control": {
                 "schema": {
                   "const": "private, no-store",

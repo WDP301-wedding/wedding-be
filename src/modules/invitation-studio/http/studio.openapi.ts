@@ -79,6 +79,9 @@ export const invitationStudioOpenApiPaths = {
           description:
             'Immutable printable PDF bytes. Inline and attachment have identical content.',
           headers: {
+            'Access-Control-Expose-Headers': {
+              schema: { type: 'string', const: s.PRINT_FILE_EXPOSED_HEADERS },
+            },
             'X-Content-SHA256': { schema: { type: 'string', pattern: '^[a-f0-9]{64}$' } },
             'X-Printable-Content-Digest': { schema: { type: 'string', pattern: '^[a-f0-9]{64}$' } },
             'X-Renderer-Version': { schema: { type: 'string', const: 'invitation-a5-v1' } },

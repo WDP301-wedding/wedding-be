@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import {
   id,
   revision,
@@ -8,6 +9,9 @@ import {
 } from '../domain/studio-policy.js';
 import { generateAiImageCommandSchema } from '../../../integrations/ai-image/ai-image.schemas.js';
 import { publicInvitationSchema } from '../domain/public-invitation.js';
+
+export const PRINT_FILE_EXPOSED_HEADERS =
+  'Retry-After, X-Request-Id, Content-Disposition, X-Content-SHA256, X-Printable-Content-Digest, X-Renderer-Version';
 export {
   generationIntentDigest,
   generationRecoveryQuery,

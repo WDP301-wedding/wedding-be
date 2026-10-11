@@ -29,6 +29,11 @@ revision creation time for PDF metadata. Headers identify file SHA-256, printabl
 content digest and renderer version. Cache-Control is private/no-store. A renderer
 upgrade must introduce a new version and preserve reproducibility expectations.
 No signed object URL, original upload, private guest token or new charge is created.
+Allowed CORS origins can read Content-Disposition, file/content digests and renderer
+version through the explicit Access-Control-Expose-Headers response. This preserves
+the existing origin allowlist and request-ID/Retry-After exposure; unapproved origins
+are still rejected. Frontend owners can fetch the authenticated blob and inspect
+these metadata headers without any frontend source changes in this repository.
 
 Limits: eight retained PNG assets, 16 MiB total image bytes, 40 million pixels
 per image, 12 MiB PDF, maximum generic QR payload 512 characters. Images use their

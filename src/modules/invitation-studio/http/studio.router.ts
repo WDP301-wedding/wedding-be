@@ -102,6 +102,7 @@ export function createStudioRouter(
         );
         res
           .set('Cache-Control', 'private, no-store')
+          .set('Access-Control-Expose-Headers', schemas.PRINT_FILE_EXPOSED_HEADERS)
           .set(
             'Content-Disposition',
             `${q.disposition}; filename="invitation-${p.printableRevisionId}.pdf"`,

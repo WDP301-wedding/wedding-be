@@ -10,6 +10,7 @@ import { studioFixture } from './studio-fixture.js';
 import { insertDatabaseMedia } from './media-database-fixtures.js';
 import { createStudioRouter } from '../../../src/modules/invitation-studio/http/studio.router.js';
 import { createErrorHandler } from '../../../src/core/errors/error-handler.js';
+import { createCorsMiddleware } from '../../../src/core/http/security.js';
 import { PrintFileService } from '../../../src/modules/invitation-studio/infrastructure/print-file.service.js';
 
 const database = new CatalogTestDatabase('printfile');
@@ -181,6 +182,7 @@ const database = new CatalogTestDatabase('printfile');
         req.requestId = randomUUID();
         next();
       });
+      app.use(createCorsMiddleware({ allowedOrigins: ['https://client.example.test'] }));
       app.use(createStudioRouter(f.services, f.services.identity.resolver));
       app.use(createErrorHandler());
       const path = `/bookings/${f.bookingId}/printable-revisions/${captured.printableRevisionId}/file`;
@@ -191,6 +193,7 @@ const database = new CatalogTestDatabase('printfile');
         .expect(422);
       const preview = await request(app)
         .get(path)
+        .set('Origin', 'https://client.example.test')
         .auth(f.couple.accessToken, { type: 'bearer' })
         .expect(200);
       const download = await request(app)
@@ -202,6 +205,23 @@ const database = new CatalogTestDatabase('printfile');
       expect(preview.headers['x-printable-content-digest']).toBe(captured.contentDigest);
       expect(download.headers['content-disposition']).toContain('attachment');
       expect(download.headers['cache-control']).toBe('private, no-store');
+      expect(preview.headers['access-control-allow-origin']).toBe('https://client.example.test');
+      expect(
+        String(preview.headers['access-control-expose-headers']).toLowerCase().split(', '),
+      ).toEqual(
+        expect.arrayContaining([
+          'content-disposition',
+          'x-content-sha256',
+          'x-printable-content-digest',
+          'x-renderer-version',
+          'x-request-id',
+        ]),
+      );
+      await request(app)
+        .get(path)
+        .set('Origin', 'https://unapproved.example.test')
+        .auth(f.couple.accessToken, { type: 'bearer' })
+        .expect(403);
     }, 30000);
   },
 );
