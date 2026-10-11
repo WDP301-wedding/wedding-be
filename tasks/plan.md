@@ -1,7 +1,9 @@
 # Kế hoạch bước 6: BE-11–16
 
 Ngày lập: 2026-10-11, Asia/Saigon. Baseline đọc: `main@07afed1`.
-Trạng thái: kế hoạch triển khai; chưa thay đổi code/schema/runtime.
+Trạng thái: BE-11–16 đã triển khai và đạt các quality gate local; chờ CI và
+reviewer của đội trước nghiệm thu/merge. Code giữ trên `codex/commercial-step-6`.
+Kết quả: [bằng chứng bước 6](evidence/be11-16-step6-results-2026-10-11.md).
 Checklist thực thi duy nhất: [backend-revision-todo.md](backend-revision-todo.md).
 Các phần nhỏ bên dưới thuộc sáu task hiện có, không phải một backlog thứ hai.
 
@@ -41,11 +43,11 @@ Không cần hỏi lại các quy tắc kinh doanh đã được chủ dự án 
   Không đánh dấu hoàn tất chỉ vì có code hoặc một happy path đạt.
 - RV-04/05/07 còn mở; theo dõi riêng. Chúng không ngăn chuẩn bị phần nghiệp vụ
   BE-11–16 trên PostgreSQL dùng riêng, nhưng phải được đóng ở checkpoint liên quan.
-- Chưa có model phụ lục/phát sinh/hóa đơn cuối mới. `BillingInvoice` hiện là snapshot
+- Tại baseline chưa có model phụ lục/phát sinh/hóa đơn cuối mới. `BillingInvoice` là snapshot
   ledger; không được coi nó đã đáp ứng bản quyết toán thương mại có item lines.
-- Print approval hiện đăng ký `PRINT_ORDER`; BE-12 cần nhánh fulfillment theo hợp
+- Print approval tại baseline đăng ký `PRINT_ORDER`; BE-12 thêm nhánh fulfillment theo hợp
   đồng đã trả nghĩa vụ, giữ nguyên đường legacy và guard ngăn thu trùng.
-- Ledger schema hiện chưa có các nguồn `CONTRACT_APPENDIX`,
+- Ledger schema tại baseline chưa có các nguồn `CONTRACT_APPENDIX`,
   `INCIDENTAL_FINALIZATION`, `INVOICE_ADJUSTMENT`. Đây là prerequisite có migration
   và kiểm tra riêng, không chỉ thêm hằng số ở consumer.
 
