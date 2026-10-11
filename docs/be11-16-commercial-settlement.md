@@ -1,10 +1,12 @@
 # BE-11–16: commercial settlement backend
 
-Baseline: `main@07afed1`. Implementation branch: `codex/commercial-step-6`.
+Baseline: `main@07afed1`. Integrated source: `main@0d3a7fa`, PR #29.
 Acceptance evidence and final gate results are tracked in
 [the step-six evidence](../tasks/evidence/be11-16-step6-results-2026-10-11.md).
-This document describes implemented contracts; acceptance requires that evidence,
-CI and a different team member's review before merging.
+CI passed and the owner explicitly authorized merge and deployment. No independent
+team-member approval was recorded; do not equate owner authorization with that
+review. The full deployed business journey remains unverified. See
+[the current verification status](../tasks/evidence/be11-16-merge-deploy-local-recheck-2026-10-11.md).
 
 ## Owners and persisted sources
 

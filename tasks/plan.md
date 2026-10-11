@@ -1,8 +1,14 @@
 # Kế hoạch bước 6: BE-11–16
 
 Ngày lập: 2026-10-11, Asia/Saigon. Baseline đọc: `main@07afed1`.
-Trạng thái: BE-11–16 đã triển khai và đạt các quality gate local; chờ CI và
-reviewer của đội trước nghiệm thu/merge. Code giữ trên `codex/commercial-step-6`.
+Trạng thái: BE-11–16 đã đạt local/CI, merge qua PR #29 vào `main@0d3a7fa`
+và deploy Railway theo chấp thuận của chủ dự án. Chưa nghiệm thu đầy đủ hành trình
+nghiệp vụ online; chưa có approval độc lập của thành viên khác trong đội.
+Lần kiểm thử lại local trên code đã merge: 36 tests / 11 files đạt; xem
+[báo cáo CI, deploy và kiểm thử lại](evidence/be11-16-merge-deploy-local-recheck-2026-10-11.md).
+Quyết định của chủ dự án ngày 2026-10-11: giữ nguyên code đã merge, chỉ cập nhật
+tài liệu và dừng chuẩn bị test sandbox trong lần làm việc này. Không tạo booking
+thử quá khứ; nghiệm thu online/RV-14 vẫn chưa có bằng chứng, không ghi pass.
 Kết quả: [bằng chứng bước 6](evidence/be11-16-step6-results-2026-10-11.md).
 Checklist thực thi duy nhất: [backend-revision-todo.md](backend-revision-todo.md).
 Các phần nhỏ bên dưới thuộc sáu task hiện có, không phải một backlog thứ hai.
