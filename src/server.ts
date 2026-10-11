@@ -25,6 +25,8 @@ import { getActiveTracingResource } from './core/observability/tracing.js';
 import { createIdentityRuntime } from './modules/identity-access/identity.runtime.js';
 import { createVenueCatalogRuntime } from './modules/venue-catalog/venue-catalog.runtime.js';
 import { createInvitationStudioRuntime } from './modules/invitation-studio/invitation-studio.runtime.js';
+import { createGuestManagementRuntime } from './modules/guest-management/guest-management.runtime.js';
+import { createGuestImportBodyParser } from './modules/guest-management/http/guest-import.parser.js';
 import { createBookingLifecycleRuntime } from './modules/booking-lifecycle/booking-lifecycle.runtime.js';
 import { createPaymentsBillingRuntime } from './modules/payments-billing/payments-billing.runtime.js';
 
@@ -63,6 +65,7 @@ export interface StartServerOptions {
   readonly createHttpServer?: (requestListener: RequestListener) => Server;
   readonly reportShutdownError?: (error: unknown) => void;
   readonly registerRoutes?: CreateAppOptions['registerRoutes'];
+  readonly registerBodyParsers?: CreateAppOptions['registerBodyParsers'];
   readonly trustedProxyHops?: 0 | 1;
 }
 
@@ -93,6 +96,9 @@ export async function startServer(options: StartServerOptions): Promise<RunningS
       ...(options.logger === undefined ? {} : { logger: options.logger }),
       ...(options.metricsConfig === undefined ? {} : { metricsConfig: options.metricsConfig }),
       ...(options.registerRoutes === undefined ? {} : { registerRoutes: options.registerRoutes }),
+      ...(options.registerBodyParsers === undefined
+        ? {}
+        : { registerBodyParsers: options.registerBodyParsers }),
       ...(options.trustedProxyHops === undefined
         ? {}
         : { trustedProxyHops: options.trustedProxyHops }),
@@ -348,6 +354,20 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     throw error;
   }
 
+  let guestManagementRuntime: Awaited<ReturnType<typeof createGuestManagementRuntime>>;
+  try {
+    guestManagementRuntime = await createGuestManagementRuntime(config);
+  } catch (error: unknown) {
+    await Promise.allSettled([
+      identityRuntime.resource.close(),
+      venueCatalogRuntime.resource.close(),
+      bookingLifecycleRuntime.resource.close(),
+      paymentsBillingRuntime.resource.close(),
+      invitationStudioRuntime.resource.close(),
+    ]);
+    throw error;
+  }
+
   let databaseReadiness: ReturnType<typeof createDatabaseReadiness>;
   try {
     databaseReadiness = createDatabaseReadiness(config.database.url);
@@ -358,6 +378,7 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
       bookingLifecycleRuntime.resource.close(),
       paymentsBillingRuntime.resource.close(),
       invitationStudioRuntime.resource.close(),
+      guestManagementRuntime.resource.close(),
     ]);
     throw error;
   }
@@ -373,6 +394,7 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
       tracingResource === undefined
         ? [
             databaseReadiness.resource,
+            guestManagementRuntime.resource,
             identityRuntime.resource,
             venueCatalogRuntime.resource,
             bookingLifecycleRuntime.resource,
@@ -382,16 +404,21 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
         : [
             databaseReadiness.resource,
             tracingResource,
+            guestManagementRuntime.resource,
             identityRuntime.resource,
             venueCatalogRuntime.resource,
             invitationStudioRuntime.resource,
             bookingLifecycleRuntime.resource,
             paymentsBillingRuntime.resource,
           ],
+    registerBodyParsers: (app) => {
+      app.use(createGuestImportBodyParser());
+    },
     registerRoutes: (app) => {
       app.use('/api/v1', identityRuntime.router);
       app.use('/api/v1', venueCatalogRuntime.router);
       app.use('/api/v1', invitationStudioRuntime.router);
+      app.use('/api/v1', guestManagementRuntime.router);
       app.use('/api/v1', bookingLifecycleRuntime.router);
       app.use('/api/v1', paymentsBillingRuntime.router);
     },

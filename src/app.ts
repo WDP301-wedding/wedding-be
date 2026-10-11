@@ -39,6 +39,7 @@ export interface CreateAppOptions {
   readonly readinessProbe?: ReadinessProbe;
   readonly readinessTimeoutMs?: number;
   readonly registerRoutes?: (app: Express) => void;
+  readonly registerBodyParsers?: (app: Express) => void;
   readonly reportUnexpectedError?: UnexpectedErrorReporter;
   readonly runtimeEnvironment?: RuntimeEnvironment;
   readonly securityConfig?: BackendConfig['security'];
@@ -67,6 +68,7 @@ export function createApp(options: CreateAppOptions = {}): Express {
   app.use(createCorsMiddleware(options.corsConfig ?? { allowedOrigins: [] }));
   app.use(createRequestDeadline(securityConfig.requestTimeoutMs));
   app.use(createGeneralRateLimit(securityConfig.rateLimit));
+  options.registerBodyParsers?.(app);
   app.use(express.json({ limit: securityConfig.bodyLimitBytes }));
   app.use('/health', createHealthRouter(options));
   if (options.metricsConfig?.enabled === true) {
