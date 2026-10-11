@@ -9,9 +9,13 @@ records transaction, receivable and PDF decisions.
 
 ## Implementation and acceptance status
 
-The following matrix records the initial implementation checkpoint. See the API
-verification follow-up below for the subsequently completed HTTP, migration and
-sample PDF checks; unchecked acceptance items require the remaining broader proof.
+**BE-06–10 accepted for backend scope on 2026-10-11.** The
+[final acceptance matrix](../tasks/evidence/be06-10-acceptance-2026-10-11.md)
+records CI/coverage, migrations, real database races/rollback, retained Vietnamese
+PDF and genuine full-contract VNPay sandbox proof. Deployed Swagger/OpenAPI matches
+the current `191116b` artifact. Production readiness and downstream RV gates remain
+separate. The matrix and follow-ups below preserve the initial implementation history;
+their pending gates are superseded by the final acceptance report.
 
 | Task  | Code implemented                                                                                                       | Acceptance still required                                                                       |
 | ----- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |

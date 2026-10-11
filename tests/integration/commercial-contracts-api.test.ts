@@ -1,4 +1,5 @@
 import { registerStepSixApiCases } from './commercial-step6-api-cases.js';
+import { registerCommercialAcceptanceCases } from './commercial-acceptance-api-cases.js';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import request, { type Response } from 'supertest';
@@ -289,7 +290,7 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     const b = await post('/bookings', {
       consultationId: consultation.consultationId,
       hallId: CATALOG_SEED_IDS.lotusHall,
-      eventDate: `2027-02-${String(day++).padStart(2, '0')}`,
+      eventDate: new Date(Date.UTC(2027, 1, day++)).toISOString().slice(0, 10),
       shiftCode: 'DINNER',
       menuPackageVersionId: CATALOG_SEED_IDS.classicMenuVersion,
       tableCount: 10,
@@ -348,6 +349,7 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     const blocker = database.prisma.$transaction(
       async (tx) => {
         await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${f.id}))`;
+        await tx.$queryRaw`SELECT id FROM "Booking" WHERE id=${f.id}::uuid FOR UPDATE`;
         locked();
         await gate;
       },
@@ -360,7 +362,7 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
       for (let i = 0; i < 100 && waiters < 2; i++) {
         const rows = await database.prisma.$queryRaw<{ count: bigint }[]>`
           SELECT count(*) FROM pg_stat_activity
-          WHERE datname=current_database() AND wait_event='advisory'
+          WHERE datname=current_database() AND wait_event_type='Lock'
         `;
         waiters = Number(rows[0]!.count);
         if (waiters < 2) await new Promise((resolve) => setTimeout(resolve, 20));
@@ -444,7 +446,7 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
       .send(body);
     return capture(path, method.toUpperCase(), path, result, body);
   }
-  registerStepSixApiCases({
+  const harness = {
     database,
     post,
     get,
@@ -457,7 +459,9 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     accounts,
     total,
     deposit,
-  });
+  };
+  registerCommercialAcceptanceCases(harness);
+  registerStepSixApiCases(harness);
   it('lists, creates, submits, approves, downloads and withdraws the exact contract with retained PDF history', async () => {
     const f = await fixture();
     const empty = await get(f.path, 'own', 'List before conversion');
