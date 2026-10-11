@@ -79,23 +79,27 @@ authorized disposable/staging environment and bounded cost; CI remains offline.
 - [ ] RV-05
 - [ ] RV-06
 - [ ] RV-07
-- [ ] RV-08
-- [ ] RV-09
-- [ ] RV-10
+- [x] RV-08
+- [x] RV-09
+- [x] RV-10
 - Evidence: [2026-10-11 Railway Gemini test](evidence/rv10-gemini-railway-2026-10-11.md)
-  reached Google once, but JPEG output failed the deployed PNG adapter. Configuration
-  and offline remediation do not close application/Storage acceptance.
-- [ ] RV-11
+  records the historical JPEG/PNG failure. The separately authorized live rerun in
+  [the current evidence](evidence/rv13-media-ai-runtime-2026-10-11.md) passed one
+  Gemini generation, private Storage validation and a usable design revision.
+- [x] RV-11
 - [x] RV-12
-- [x] RV-13 (baseline sandbox; rerun after BE-09)
+- [x] RV-13 (baseline sandbox preserved; full-contract rerun after BE-09 passed)
 - Evidence: [2026-10-11 VNPay Railway rehearsal](evidence/rv12-13-vnpay-railway-2026-10-11.md)
   completed genuine provider checkout/IPN, signed QueryDr, once-only ledger and
   same-identity access promotion. Controlled prerequisites do not close RV-15;
   Hobby egress is dynamic and production-money acceptance remains separate.
-- Revised BE-09 rehearsal: [RV-13 → media/AI runtime checkpoint](evidence/rv13-media-ai-runtime-2026-10-11.md).
-  New full-contract sandbox checkout is prepared; provider terms approval and
-  genuine settlement are still pending. RV-08–11 remain open; the new one-call
-  Gemini authorization has not been consumed.
+- Revised BE-09 rehearsal: [RV-13 → media/AI runtime evidence](evidence/rv13-media-ai-runtime-2026-10-11.md).
+  Full-contract sandbox deposit 2,433,001 VND passed genuine IPN/QueryDr and
+  once-only settlement/FULL promotion. RV-08–11 passed sequential runtime gates,
+  including the Supabase duplicate-status fix and audited Manager recovery.
+  The one new Gemini authorization was consumed exactly once; conservative
+  observed token-cost estimate 0.043957 USD. Fix source passed all 1587 CI tests;
+  PR #28 remains draft for review. Developer verification is separate from production readiness.
 - [ ] RV-14
 - [ ] RV-15
 - [ ] RV-16
