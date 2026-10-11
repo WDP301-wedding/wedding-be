@@ -81,3 +81,21 @@ the current locked pg@8 suite passed. No dependency or CI policy was changed.
 - No new live payment, email, Storage or paid generation was performed here.
 - No code failure was found in this run, so there is no business-code correction
   to commit. Documentation corrections record the actual acceptance boundaries.
+
+## Owner decision: retain code and stop sandbox preparation
+
+On 2026-10-11, the owner instructed: "Thôi giữ nguyên, cập nhật tài liệu nãy bạn
+sửa, không cần test sandbox". The current continuation therefore retains the
+merged application and limits further work to documentation. No revert or new
+sandbox checkout is performed.
+
+The proposed separate historical booking and manual test deposit were not created.
+Preparation stopped after reading existing documents and code; no new accounts,
+sessions, access grants, booking, expense, invoice or payment records were written
+to Supabase for that proposed test. Existing step-five evidence remains intact.
+
+Local/CI results remain passed within their recorded boundaries. Full deployed
+business verification and RV-14 remain unverified, deferred from this continuation
+at the owner's request; they are not marked passed or removed from the backlog.
+Documentation updates are committed locally and require publication before they
+appear in the GitHub handoff.

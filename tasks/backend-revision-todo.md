@@ -188,6 +188,9 @@ approval độc lập của thành viên khác trong đội. Chấp thuận củ
 ghi riêng, không được trình bày thành approval của reviewer.
 Database/provider dùng trong test là local PostgreSQL + controlled transports;
 không phải bằng chứng live Supabase/VNPay balance sandbox (RV-14).
+Chủ dự án yêu cầu giữ nguyên code và không chạy sandbox trong lần làm việc này
+(2026-10-11). Đã dừng ở bước đọc tài liệu/code, chưa tạo fixture online hay giao
+dịch mới. Phần online và RV-14 giữ trạng thái chưa nghiệm thu; không đánh dấu pass.
 Kế hoạch chia nhỏ theo owner, có checkpoint PostgreSQL/ledger/payment và giữ các task
 ở trạng thái chưa hoàn tất cho đến khi code được wired, verified và có bằng chứng.
 
