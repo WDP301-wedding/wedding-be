@@ -176,10 +176,16 @@ This does not complete BE-06–17 or pending external-provider RV gates.
 
 Kế hoạch bước 6 (BE-11–16): [phụ lục, fulfillment thiệp, phát sinh, hóa đơn cuối và điều chỉnh](plan.md).
 
-Developer checkpoint 2026-10-11: BE-11–16 đã được triển khai trên nhánh
-`codex/commercial-step-6`, 1.616 tests local đạt, per-file lines/branches >=80%.
-[Bằng chứng và các gate](evidence/be11-16-step6-results-2026-10-11.md).
-Các checkbox vẫn mở đến khi CI và reviewer của đội chấp thuận; chưa merge main.
+Developer checkpoint 2026-10-11: kết quả lịch sử trước merge là 1.616 tests local
+đạt, per-file lines/branches >=80%.
+[Bằng chứng lịch sử và các gate](evidence/be11-16-step6-results-2026-10-11.md).
+Sau sửa test logging, CI đạt 1.617 tests; PR #29 đã merge vào `main@0d3a7fa`
+và deploy theo chấp thuận của chủ dự án. Lần kiểm thử lại local trên code đã merge
+đạt 36 tests / 11 files, 415 HTTP requests; chưa phát hiện lỗi nghiệp vụ cần sửa.
+[Bằng chứng CI, deploy và kiểm thử lại](evidence/be11-16-merge-deploy-local-recheck-2026-10-11.md).
+Các checkbox nghiệm thu vẫn mở: chưa chạy đầy đủ hành trình online và chưa có
+approval độc lập của thành viên khác trong đội. Chấp thuận của chủ dự án đã được
+ghi riêng, không được trình bày thành approval của reviewer.
 Database/provider dùng trong test là local PostgreSQL + controlled transports;
 không phải bằng chứng live Supabase/VNPay balance sandbox (RV-14).
 Kế hoạch chia nhỏ theo owner, có checkpoint PostgreSQL/ledger/payment và giữ các task
