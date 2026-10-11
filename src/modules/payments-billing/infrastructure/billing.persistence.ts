@@ -23,6 +23,7 @@ import {
 import type { ContractContext } from '../application/payments-billing.providers.js';
 import { createContractFinancialReader } from '../../booking-lifecycle/infrastructure/contract-financial.reader.js';
 import { createEffectiveCommercialReader } from '../../booking-lifecycle/infrastructure/effective-commercial.reader.js';
+import { finalInvoiceDocumentSchema, finalInvoiceDigest } from '../domain/final-invoice.js';
 import {
   calculateBillingTotals,
   transitionPaymentAttempt,
@@ -177,6 +178,9 @@ export function createPrismaBillingPersistence(
         ...parsed,
         contractRevisionId: parsed.contractRevisionId ?? null,
         documentDigest: parsed.documentDigest ?? null,
+        invoiceRevisionId: parsed.invoiceRevisionId ?? null,
+        invoiceDigest: parsed.invoiceDigest ?? null,
+        sourceBillingRevision: parsed.sourceBillingRevision ?? null,
         createdAt: new Date(parsed.createdAt).toISOString(),
         expiresAt: new Date(parsed.expiresAt).toISOString(),
       };
@@ -352,6 +356,9 @@ function toAttempt(row: StoredAttempt): PaymentAttempt {
     timelineRevisionId: row.timelineRevisionId,
     contractRevisionId: row.contractRevisionId,
     documentDigest: row.documentDigest,
+    invoiceRevisionId: row.invoiceRevisionId,
+    invoiceDigest: row.invoiceDigest,
+    sourceBillingRevision: row.sourceBillingRevision,
     createdAt: row.createdAt.toISOString(),
     expiresAt: row.expiresAt.toISOString(),
     state: row.state,
@@ -411,6 +418,25 @@ function totalsFrom(entries: readonly LedgerEntry[]) {
 }
 
 async function validateSource(tx: Transaction, fact: NewLedgerFact) {
+  if (fact.sourceType === 'INCIDENTAL_FINALIZATION' || fact.sourceType === 'INVOICE_ADJUSTMENT') {
+    const source = await tx.finalInvoiceRevision.findFirst({
+      where: { id: fact.sourceRevisionId, bookingId: fact.bookingId },
+    });
+    if (!source) throw new BillingPersistenceConflict('FINANCIAL_SOURCE_CONFLICT');
+    const document = finalInvoiceDocumentSchema.parse(source.document),
+      delta = source.deltaVnd.toNumber();
+    if (
+      finalInvoiceDigest(document) !== source.documentDigest ||
+      fact.amountVnd !== Math.abs(delta) ||
+      fact.occurredAt !== source.issuedAt.toISOString() ||
+      fact.kind !== (delta > 0 ? 'CHARGE' : 'CREDIT_ADJUSTMENT') ||
+      (fact.sourceType === 'INCIDENTAL_FINALIZATION') !== (source.predecessorRevisionId === null) ||
+      fact.reason !==
+        (source.predecessorRevisionId === null ? null : document.adjustments.at(-1)?.reason)
+    )
+      throw new BillingPersistenceConflict('FINANCIAL_SOURCE_CONFLICT');
+    return;
+  }
   if (fact.sourceType === 'CONTRACT_APPENDIX') {
     const source = await createEffectiveCommercialReader(tx).resolveAppendix(
       fact.bookingId,

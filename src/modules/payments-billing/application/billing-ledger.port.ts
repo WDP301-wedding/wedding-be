@@ -94,6 +94,13 @@ export const newPaymentAttemptSchema = z
     amountVnd: positiveVnd,
     timelineRevisionId: z.uuid().nullable(),
     contractRevisionId: z.uuid().nullable().optional(),
+    invoiceRevisionId: z.uuid().nullable().optional(),
+    invoiceDigest: z
+      .string()
+      .regex(/^[a-f0-9]{64}$/)
+      .nullable()
+      .optional(),
+    sourceBillingRevision: z.int().positive().nullable().optional(),
     documentDigest: z
       .string()
       .regex(/^[a-f0-9]{64}$/)
@@ -108,6 +115,11 @@ export const newPaymentAttemptSchema = z
       ((value.contractRevisionId ?? null) === null
         ? (value.documentDigest ?? null) === null
         : value.purpose === 'DEPOSIT' && value.documentDigest != null) &&
+      ((value.invoiceRevisionId ?? null) === null
+        ? (value.invoiceDigest ?? null) === null && (value.sourceBillingRevision ?? null) === null
+        : value.purpose === 'BALANCE' &&
+          value.invoiceDigest != null &&
+          value.sourceBillingRevision != null) &&
       ((value.purpose === 'DEPOSIT' && value.timelineRevisionId !== null) ||
         (value.purpose === 'BALANCE' && value.timelineRevisionId === null)),
     { message: 'Attempt expiry and timeline snapshot must agree with its purpose.' },
