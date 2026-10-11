@@ -4429,7 +4429,7 @@
                             },
                             "lineTotalVnd": {
                               "maximum": 9007199254740991,
-                              "minimum": 1,
+                              "minimum": 0,
                               "type": "integer"
                             },
                             "quantity": {
@@ -4438,8 +4438,8 @@
                               "type": "integer"
                             },
                             "unitPriceVnd": {
-                              "maximum": 1000000,
-                              "minimum": 1,
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
                               "type": "integer"
                             }
                           },
@@ -4455,8 +4455,8 @@
                         "type": "array"
                       },
                       "orderTotalVnd": {
-                        "maximum": 1000000000000,
-                        "minimum": 1,
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
                         "type": "integer"
                       },
                       "revisionNumber": {
@@ -4650,7 +4650,7 @@
                             },
                             "lineTotalVnd": {
                               "maximum": 9007199254740991,
-                              "minimum": 1,
+                              "minimum": 0,
                               "type": "integer"
                             },
                             "quantity": {
@@ -4659,8 +4659,8 @@
                               "type": "integer"
                             },
                             "unitPriceVnd": {
-                              "maximum": 1000000,
-                              "minimum": 1,
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
                               "type": "integer"
                             }
                           },
@@ -4676,8 +4676,8 @@
                         "type": "array"
                       },
                       "orderTotalVnd": {
-                        "maximum": 1000000000000,
-                        "minimum": 1,
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
                         "type": "integer"
                       },
                       "revisionNumber": {
@@ -4867,7 +4867,7 @@
                                   },
                                   "lineTotalVnd": {
                                     "maximum": 9007199254740991,
-                                    "minimum": 1,
+                                    "minimum": 0,
                                     "type": "integer"
                                   },
                                   "quantity": {
@@ -4876,8 +4876,8 @@
                                     "type": "integer"
                                   },
                                   "unitPriceVnd": {
-                                    "maximum": 1000000,
-                                    "minimum": 1,
+                                    "maximum": 9007199254740991,
+                                    "minimum": 0,
                                     "type": "integer"
                                   }
                                 },
@@ -4893,8 +4893,8 @@
                               "type": "array"
                             },
                             "orderTotalVnd": {
-                              "maximum": 1000000000000,
-                              "minimum": 1,
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
                               "type": "integer"
                             },
                             "revisionNumber": {
@@ -5088,7 +5088,7 @@
                                   },
                                   "lineTotalVnd": {
                                     "maximum": 9007199254740991,
-                                    "minimum": 1,
+                                    "minimum": 0,
                                     "type": "integer"
                                   },
                                   "quantity": {
@@ -5097,8 +5097,8 @@
                                     "type": "integer"
                                   },
                                   "unitPriceVnd": {
-                                    "maximum": 1000000,
-                                    "minimum": 1,
+                                    "maximum": 9007199254740991,
+                                    "minimum": 0,
                                     "type": "integer"
                                   }
                                 },
@@ -5114,8 +5114,8 @@
                               "type": "array"
                             },
                             "orderTotalVnd": {
-                              "maximum": 1000000000000,
-                              "minimum": 1,
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
                               "type": "integer"
                             },
                             "revisionNumber": {
@@ -8644,7 +8644,7 @@
         }
       ],
       "post": {
-        "description": "Two distinct own Manager/Couple actors approve one digest. Second approval atomically activates revision and posts signed delta once. Allocated production quantities cannot be removed.",
+        "description": "Two distinct own Manager/Couple actors approve one digest. Second approval atomically activates revision and posts signed delta once. Active print allocations retain their source revision, unit price and minimum allocated quantity; conflicting changes return 409 CONTRACT_PRINT_SOURCE_ALLOCATED or CONTRACT_PRINT_QUANTITY_ALLOCATED.",
         "operationId": "approveCommercialAppendix",
         "parameters": [
           {
@@ -16900,7 +16900,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Couple approves active quotation and registers billing charge",
+        "summary": "Couple approves active quotation; contracted print references the existing contract obligation, legacy print registers a charge",
         "tags": [
           "Invitation Print Orders"
         ]
@@ -31027,8 +31027,8 @@
                           "type": "string"
                         },
                         "unitPriceVnd": {
-                          "maximum": 1000000,
-                          "minimum": 1,
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
                           "type": "integer"
                         }
                       },
@@ -31104,7 +31104,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Manager supplies unit prices, estimated completion date, and creates commercial revision",
+        "summary": "Manager quotes exact frozen contract prices (including zero) with safe integer VND totals; legacy quotes retain unit price 1–1000000 and total 1–1000000000000 VND",
         "tags": [
           "Invitation Print Orders"
         ]
@@ -31247,8 +31247,8 @@
                           "type": "string"
                         },
                         "unitPriceVnd": {
-                          "maximum": 1000000,
-                          "minimum": 1,
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
                           "type": "integer"
                         }
                       },

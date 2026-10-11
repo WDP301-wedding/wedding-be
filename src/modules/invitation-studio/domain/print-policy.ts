@@ -40,7 +40,7 @@ export const requestPrintOrderBodySchema = z.strictObject({
 
 export const quoteLineInputSchema = z.strictObject({
   lineId: id,
-  unitPriceVnd: z.int().min(1).max(MAX_LINE_UNIT_PRICE_VND),
+  unitPriceVnd: z.int().nonnegative().max(Number.MAX_SAFE_INTEGER),
 });
 
 export const quotePrintOrderBodySchema = z.strictObject({
@@ -102,6 +102,7 @@ export interface QuotedLineComputation {
 export function computeCommercialTotal(
   linesWithQuantity: { lineId: string; designId: string; quantity: number }[],
   quotes: { lineId: string; unitPriceVnd: number }[],
+  contracted = false,
 ): { quotedLines: QuotedLineComputation[]; orderTotalVnd: number } {
   if (linesWithQuantity.length !== quotes.length) {
     throw new ValidationError();
@@ -112,11 +113,16 @@ export function computeCommercialTotal(
 
   for (const line of linesWithQuantity) {
     const unitPriceVnd = quoteMap.get(line.lineId);
-    if (unitPriceVnd === undefined) {
+    if (
+      unitPriceVnd === undefined ||
+      !Number.isSafeInteger(unitPriceVnd) ||
+      unitPriceVnd < (contracted ? 0 : 1) ||
+      (!contracted && unitPriceVnd > MAX_LINE_UNIT_PRICE_VND)
+    ) {
       throw new ValidationError();
     }
     const lineTotalVnd = line.quantity * unitPriceVnd;
-    if (!Number.isSafeInteger(lineTotalVnd) || lineTotalVnd <= 0) {
+    if (!Number.isSafeInteger(lineTotalVnd) || lineTotalVnd < (contracted ? 0 : 1)) {
       throw new ValidationError();
     }
     orderTotalVnd += lineTotalVnd;
@@ -131,8 +137,8 @@ export function computeCommercialTotal(
 
   if (
     !Number.isSafeInteger(orderTotalVnd) ||
-    orderTotalVnd <= 0 ||
-    orderTotalVnd > MAX_ORDER_TOTAL_VND
+    orderTotalVnd < (contracted ? 0 : 1) ||
+    (!contracted && orderTotalVnd > MAX_ORDER_TOTAL_VND)
   ) {
     throw new ValidationError();
   }

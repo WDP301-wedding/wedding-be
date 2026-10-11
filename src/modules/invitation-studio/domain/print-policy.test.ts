@@ -18,6 +18,40 @@ describe('Print Policy Domain', () => {
   const designId2 = randomUUID();
 
   describe('computeCommercialTotal', () => {
+    it('fulfills zero-priced and large frozen contract lines while retaining legacy quote limits', () => {
+      const lines = [{ lineId: lineId1, designId: designId1, quantity: 60 }];
+      for (const price of [0, 20_000_000_000]) {
+        const quotes = [{ lineId: lineId1, unitPriceVnd: price }];
+        expect(computeCommercialTotal(lines, quotes, true).orderTotalVnd).toBe(60 * price);
+        expect(() => computeCommercialTotal(lines, quotes)).toThrow(ValidationError);
+      }
+      expect(() =>
+        computeCommercialTotal(
+          lines,
+          [{ lineId: lineId1, unitPriceVnd: Number.MAX_SAFE_INTEGER }],
+          true,
+        ),
+      ).toThrow(ValidationError);
+    });
+    it('rejects invalid VND unit prices and overflow when combining safe contract lines', () => {
+      const lines = [{ lineId: lineId1, designId: designId1, quantity: 1 }];
+      for (const contracted of [false, true]) {
+        for (const unitPriceVnd of [-1, 1.5, Number.MAX_SAFE_INTEGER + 1])
+          expect(() =>
+            computeCommercialTotal(lines, [{ lineId: lineId1, unitPriceVnd }], contracted),
+          ).toThrow(ValidationError);
+      }
+      expect(() =>
+        computeCommercialTotal(
+          [...lines, { lineId: lineId2, designId: designId2, quantity: 1 }],
+          [
+            { lineId: lineId1, unitPriceVnd: Number.MAX_SAFE_INTEGER },
+            { lineId: lineId2, unitPriceVnd: 1 },
+          ],
+          true,
+        ),
+      ).toThrow(ValidationError);
+    });
     it('calculates correct line and order totals for valid inputs', () => {
       const lines = [
         { lineId: lineId1, designId: designId1, quantity: 50 },
@@ -157,21 +191,21 @@ describe('Print Policy Domain', () => {
       };
       expect(quotePrintOrderBodySchema.safeParse(valid).success).toBe(true);
 
-      // Unit price 0
+      // Contract fulfillment permits zero; legacy policy is checked by the service.
       expect(
         quotePrintOrderBodySchema.safeParse({
           ...valid,
           lines: [{ lineId: randomUUID(), unitPriceVnd: 0 }],
         }).success,
-      ).toBe(false);
+      ).toBe(true);
 
-      // Unit price > 1.000.000
+      // Contract fulfillment uses the frozen catalog price beyond the legacy cap.
       expect(
         quotePrintOrderBodySchema.safeParse({
           ...valid,
           lines: [{ lineId: randomUUID(), unitPriceVnd: 1000001 }],
         }).success,
-      ).toBe(false);
+      ).toBe(true);
     });
 
     it('validates handoverOrderBodySchema evidence bounds', () => {

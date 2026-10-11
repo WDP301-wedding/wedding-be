@@ -32,6 +32,13 @@ it('preserves active quantities per offering and ignores unrelated legacy lines'
     await expect(reader.requirePreserved(id, lines)).rejects.toMatchObject({
       code: 'CONTRACT_PRINT_QUANTITY_ALLOCATED',
     });
+  for (const changed of [
+    { ...line, sourceRevisionId: randomUUID() },
+    { ...line, unitPriceVnd: line.unitPriceVnd + 1 },
+  ])
+    await expect(reader.requirePreserved(id, [changed])).rejects.toMatchObject({
+      code: 'CONTRACT_PRINT_SOURCE_ALLOCATED',
+    });
   expect(findOrders).toHaveBeenCalledWith(
     expect.objectContaining({
       where: {

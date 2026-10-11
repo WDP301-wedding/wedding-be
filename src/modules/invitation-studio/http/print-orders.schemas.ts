@@ -3,8 +3,6 @@ import { id, revision } from '../domain/studio-policy.js';
 import { commercialPrintSnapshotSchema } from '../domain/contracted-print.js';
 import {
   PRINT_ORDER_STATUSES,
-  MAX_ORDER_TOTAL_VND,
-  MAX_LINE_UNIT_PRICE_VND,
   requestPrintOrderBodySchema,
   quotePrintOrderBodySchema,
   approvePrintOrderBodySchema,
@@ -40,8 +38,8 @@ export const quotedLineViewSchema = z.strictObject({
   lineId: id,
   designId: id,
   quantity: z.int().min(1).max(10000),
-  unitPriceVnd: z.int().min(1).max(MAX_LINE_UNIT_PRICE_VND),
-  lineTotalVnd: z.int().min(1),
+  unitPriceVnd: z.int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+  lineTotalVnd: z.int().nonnegative().max(Number.MAX_SAFE_INTEGER),
   designRevisionId: id.optional(),
 });
 
@@ -49,7 +47,7 @@ export const commercialRevisionViewSchema = z.strictObject({
   commercialRevisionId: id,
   revisionNumber: revision,
   lines: z.array(quotedLineViewSchema),
-  orderTotalVnd: z.number().int().min(1).max(MAX_ORDER_TOTAL_VND),
+  orderTotalVnd: z.int().nonnegative().max(Number.MAX_SAFE_INTEGER),
   estimatedHandoverAt: z.iso.datetime(),
   expiresAt: z.iso.datetime(),
   createdAt: z.iso.datetime(),

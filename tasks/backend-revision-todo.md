@@ -194,6 +194,20 @@ dịch mới. Phần online và RV-14 giữ trạng thái chưa nghiệm thu; kh
 Kế hoạch chia nhỏ theo owner, có checkpoint PostgreSQL/ledger/payment và giữ các task
 ở trạng thái chưa hoàn tất cho đến khi code được wired, verified và có bằng chứng.
 
+Checkpoint sửa lỗi tiếp theo (2026-10-11): chủ dự án yêu cầu hoàn thiện và sửa
+BE-11–16, thay thế yêu cầu chỉ đọc/giữ nguyên code ở checkpoint trước. Nhánh
+`codex/fix-be11-16-settlement` bổ sung guard giữ nguồn thiệp đã phân bổ,
+quotation theo giá contract 0/giá lớn với checked integer totals, hai forward
+migrations và ca HTTP xuyên suốt sáu BE trên cùng booking.
+[Bằng chứng sửa lỗi và kết quả gate](evidence/be11-16-repairs-2026-10-11.md).
+Code của [PR #30](https://github.com/WDP301-wedding/wedding-be/pull/30) đã pass
+22 HTTP tests local / 511 requests; CI pass 44 migrations, 370 integration tests
+và 1.622 full-suite tests với per-file coverage >=80%. Checkpoint A/B/C backend
+đạt trên local/controlled transports; checkbox release giữ mở chờ independent
+team review và nghiệm thu hành trình đã deploy.
+Live balance sandbox/RV-14 và independent review vẫn tách riêng; không chạy
+provider thật hoặc deploy trong checkpoint sửa này.
+
 ## SPEC-06–11 — Backend Only
 
 Every task in this section, including SPEC-06, is backend-only. No frontend task,

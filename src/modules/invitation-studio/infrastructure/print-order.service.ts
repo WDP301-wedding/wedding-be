@@ -277,7 +277,7 @@ export class PrintOrderService {
           lineId: l.lineId,
           unitPriceVnd: l.unitPriceVnd,
         }));
-        await this.fulfillment?.validateOrder(
+        const contractObligation = await this.fulfillment?.validateOrder(
           tx,
           bookingId,
           parsedOrderId,
@@ -287,6 +287,7 @@ export class PrintOrderService {
         const { quotedLines, orderTotalVnd } = computeCommercialTotal(
           linesWithQuantity,
           quoteInputs,
+          contractObligation != null,
         );
 
         const currentTime = this.now();
