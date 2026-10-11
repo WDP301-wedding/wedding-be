@@ -465,6 +465,7 @@ model Booking {
   billingCommands             BillingOperationCommand[]
   billingRefundApprovals      BillingRefundApproval[]
   commercialContract          CommercialContract?
+  commercialAppendices        CommercialAppendixHead?
 
   @@unique([hallId, eventDate, shiftCode], map: "Booking_one_confirmed_slot_key", where: raw("\"phase\" IN ('CONFIRMED', 'COMPLETED')"))
   @@index([hallId, eventDate, shiftCode])
@@ -556,6 +557,54 @@ model CommercialContractPdf {
   sha256     String
   createdAt  DateTime                   @db.Timestamptz(6)
   revision   CommercialContractRevision @relation(fields: [revisionId], references: [id], onDelete: Restrict)
+}
+
+model CommercialAppendixHead {
+  bookingId           String                       @id @db.Uuid
+  currentRevisionId   String?                      @unique @db.Uuid
+  effectiveRevisionId String?                      @unique @db.Uuid
+  booking             Booking                      @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  currentRevision     CommercialAppendixRevision?  @relation("CurrentAppendix", fields: [currentRevisionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  effectiveRevision   CommercialAppendixRevision?  @relation("EffectiveAppendix", fields: [effectiveRevisionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  revisions           CommercialAppendixRevision[] @relation("AppendixHistory")
+}
+
+model CommercialAppendixRevision {
+  id                    String                       @id @db.Uuid
+  bookingId             String                       @db.Uuid
+  revisionNumber        Int
+  predecessorRevisionId String                       @db.Uuid
+  contractRevisionId    String                       @db.Uuid
+  state                 CommercialContractState      @default(DRAFT)
+  document              Json                         @db.JsonB
+  documentDigest        String
+  deltaVnd              Decimal                      @db.Decimal(18, 0)
+  effectiveTotalVnd     Decimal                      @db.Decimal(18, 0)
+  createdByAccountId    String                       @db.Uuid
+  createdAt             DateTime                     @db.Timestamptz(6)
+  submittedAt           DateTime?                    @db.Timestamptz(6)
+  approvedAt            DateTime?                    @db.Timestamptz(6)
+  head                  CommercialAppendixHead       @relation("AppendixHistory", fields: [bookingId], references: [bookingId], onDelete: Restrict)
+  currentFor            CommercialAppendixHead?      @relation("CurrentAppendix")
+  effectiveFor          CommercialAppendixHead?      @relation("EffectiveAppendix")
+  approvals             CommercialAppendixApproval[]
+
+  @@unique([bookingId, revisionNumber])
+  @@unique([id, bookingId])
+}
+
+model CommercialAppendixApproval {
+  id             String                     @id @db.Uuid
+  revisionId     String                     @db.Uuid
+  party          BookingTimelineParty
+  actorAccountId String                     @db.Uuid
+  documentDigest String
+  requestId      String                     @db.Uuid
+  occurredAt     DateTime                   @db.Timestamptz(6)
+  revision       CommercialAppendixRevision @relation(fields: [revisionId], references: [id], onDelete: Restrict)
+
+  @@unique([revisionId, party])
+  @@unique([revisionId, actorAccountId])
 }
 
 model BookingCancellationRequest {
@@ -736,6 +785,9 @@ enum BillingSourceType {
   PAYMENT_ATTEMPT
   PRINT_CREDIT
   MANUAL_REFUND
+  CONTRACT_APPENDIX
+  INCIDENTAL_FINALIZATION
+  INVOICE_ADJUSTMENT
 }
 
 enum BillingPaymentPurpose {
