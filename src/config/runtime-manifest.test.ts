@@ -15,7 +15,13 @@ describe('runtime feature manifest', () => {
     expect(manifest.features.gemini.mode).toBe('disabled');
     expect(manifest.features.vnpay.mode).toBe('disabled');
     expect(manifest.features.workers.implementation).toBe('downstream-pending');
-    expect(manifest.features.printFiles.implementation).toBe('missing');
+    expect(manifest.features.printFiles).toMatchObject({
+      implementation: 'implemented',
+      configuration: 'unconfigured',
+      mode: 'invitation-a5-v1',
+      liveVerification: 'pending',
+    });
+    expect(manifest.features.retention.mode).toBe('operator-cli-manual-procedure');
     expect(manifest.features.metrics.liveVerification).toBe('optional-disabled');
   });
 

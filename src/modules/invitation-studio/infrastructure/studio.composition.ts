@@ -14,6 +14,7 @@ import { GenerationService } from './generation.service.js';
 import { PublicationService } from './publication.service.js';
 import { createPrismaBillingAdapter } from '../../payments-billing/infrastructure/prisma-billing.adapter.js';
 import { PrintableService } from './printable.service.js';
+import { PrintFileService } from './print-file.service.js';
 import { PrintOrderService } from './print-order.service.js';
 import { createContractedPrintFulfillment } from './contracted-print.providers.js';
 import { PrismaInvitationAutomationReader } from './prisma-automation.reader.js';
@@ -76,6 +77,7 @@ export function createInvitationStudioServices(
   return {
     ...media,
     studioRepository: repository,
+    printFiles: new PrintFileService(repository, authorization, storage),
     designs,
     derivedAssets,
     generation,

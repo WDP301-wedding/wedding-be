@@ -59,16 +59,33 @@ batch, rechecks D6 eligibility in PostgreSQL, anonymizes due disabled-account PI
 authentication material, and deletes terminal invitation, password-reset, and session metadata
 after 180, 30, and 90 days respectively.
 
-Before every run, confirm `DATABASE_URL` names the intended database and, when applicable, schema.
-Then run:
+Both retention commands are operator-only. The project deployment operator owns
+the daily 02:00 Asia/Ho_Chi_Minh review window: inspect the approved target, review
+legal/financial holds and missing terminal facts, run at most ten batches of 100,
+record the run IDs/counts, and defer remaining work to the next window. A zero
+batch ends that command's run. This is an operator procedure, not an installed
+automatic job. Production/shared-data execution still needs explicit environment
+authorization; RV-06 rehearsal uses only populated disposable local PostgreSQL.
+
+Before every execution, inspect `DATABASE_URL` through the read-only command.
+It prints host/port/database/schema and their SHA-256 fingerprint without username,
+password or connection options, and opens no database connection. Then supply that
+exact fingerprint and an opaque operator identifier (no personal contact data):
 
 ```powershell
-npm run retention:identity -- --confirm-retention --batch-size=100
+npm run retention:identity -- --inspect-target
+npm run retention:identity -- --confirm-retention --target-fingerprint=<sha256> --operator=<operator-id> --batch-size=100
+npm run retention:consultation -- --inspect-target
+npm run retention:consultation -- --confirm-retention --target-fingerprint=<sha256> --operator=<operator-id> --batch-size=100
 ```
 
-The command refuses to run without `--confirm-retention`, accepts only batch sizes from 1 to 1,000,
-and emits counts without account identifiers, email addresses, or credentials. Re-run until all
-counts are zero. The operation is idempotent and concurrent workers use PostgreSQL row locks with
+Commands refuse mismatched/missing fingerprints, missing operators, unknown or
+duplicate arguments and invalid batches before connecting. Batch sizes are 1–1,000.
+Successful completion emits an audit-correlated request ID, operator and counts;
+the owner transaction records completion including zero batches. A crash/nonzero
+exit is not completion: inspect the audit by run ID before retrying with the same
+target. These commands are retry-safe. Never relax holds or manufacture missing
+terminal facts to make a batch pass. Identity concurrent workers use PostgreSQL row locks with
 `SKIP LOCKED`, so one account is anonymized at most once. Never point a development retention run
 at the shared Supabase `public` schema.
 
@@ -77,6 +94,13 @@ and display emails move to the reserved `identity.invalid` domain, its password 
 active sessions and one-time credentials are revoked, invitation recipient email is scrubbed, and
 `piiAnonymizedAt` records completion. Legal/financial holds and missing terminality facts fail
 closed.
+
+Intake keeps the existing 180-day policy: delete old unconverted requests; scrub
+PII (including separate bride/groom names) on converted requests and preserve their
+consultation reference. Converted business/audit/financial records are retained.
+Intake does not invent an account hold policy for its separate lead records.
+Its conditional updates/deletes make retries/concurrent batches safe. No deployed
+shared-data cleanup or paid provider operation is part of the RV-06 audit.
 
 ## Scrypt benchmark evidence
 

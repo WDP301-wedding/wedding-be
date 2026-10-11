@@ -15,6 +15,7 @@ import type { MediaRequestContext } from '../application/media.contracts.js';
 import { mediaAssetResponseSchema } from './media.schemas.js';
 import * as schemas from './studio.schemas.js';
 import { createPrintOrdersRouter } from './print-orders.router.js';
+import { PRINT_RENDERER_VERSION } from '../infrastructure/print-file.renderer.js';
 
 type Services = ReturnType<typeof createInvitationStudioServices>;
 const empty = z.strictObject({});
@@ -64,6 +65,7 @@ export function createStudioRouter(
       '/bookings/:bookingId/invitations',
       '/bookings/:bookingId/invitation-image-generations',
       '/bookings/:bookingId/invitation-derived-assets',
+      '/bookings/:bookingId/printable-revisions',
     ],
     auth,
   );
@@ -81,6 +83,37 @@ export function createStudioRouter(
     });
   }
   const noQuery = (req: Request) => parseStudio(empty, req.query);
+  router.get(
+    '/bookings/:bookingId/printable-revisions/:printableRevisionId/file',
+    (req, res, next) => {
+      void (async () => {
+        const p = parseStudio(
+          z.strictObject({ bookingId: id, printableRevisionId: id }),
+          req.params,
+        );
+        const q = parseStudio(
+          z.strictObject({ disposition: z.enum(['inline', 'attachment']).default('inline') }),
+          req.query,
+        );
+        const file = await services.printFiles.read(
+          p.bookingId,
+          p.printableRevisionId,
+          context(res),
+        );
+        res
+          .set('Cache-Control', 'private, no-store')
+          .set(
+            'Content-Disposition',
+            `${q.disposition}; filename="invitation-${p.printableRevisionId}.pdf"`,
+          )
+          .set('X-Content-SHA256', file.sha256)
+          .set('X-Printable-Content-Digest', file.contentDigest)
+          .set('X-Renderer-Version', PRINT_RENDERER_VERSION)
+          .type('application/pdf')
+          .send(file.bytes);
+      })().catch(next);
+    },
+  );
   route('get', '/invitation-templates', schemas.templateListResponse, (req, res) =>
     services.designs.listTemplates(parseStudio(schemas.templateQuery, req.query), context(res)),
   );

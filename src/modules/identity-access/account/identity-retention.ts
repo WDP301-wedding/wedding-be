@@ -14,6 +14,7 @@ export type IdentityRetentionBatchInput = Readonly<{
   now: Date;
   requestId: string;
   retentionDays: IdentityRetentionDays;
+  operatorId?: string;
 }>;
 
 export type IdentityRetentionBatchResult = Readonly<{
@@ -40,6 +41,7 @@ export function createIdentityRetentionService(
     retentionDays: IdentityRetentionDays;
     now?: () => Date;
     requestId?: () => string;
+    operatorId?: string;
   }>,
 ) {
   const retentionDays = validateRetentionDays(options.retentionDays);
@@ -63,6 +65,7 @@ export function createIdentityRetentionService(
         now: runAt,
         requestId: requestId(),
         retentionDays,
+        ...(options.operatorId === undefined ? {} : { operatorId: options.operatorId }),
       });
     },
   });
@@ -109,7 +112,7 @@ export function createPrismaIdentityRetentionRepository(
                   ON fact."accountId" = access."accountId"
                  AND fact."consultationId" = access."consultationId"
                 WHERE access."accountId" = account."id"
-                  AND fact."id" IS NULL
+                  AND (fact."id" IS NULL OR fact."eligibleAfter" > ${input.now})
               )
             ORDER BY account."piiRetentionEligibleAt", account."id"
             FOR UPDATE SKIP LOCKED
@@ -191,6 +194,16 @@ export function createPrismaIdentityRetentionRepository(
             },
           });
         }
+        if (input.operatorId !== undefined)
+          await transaction.auditLog.create({
+            data: {
+              requestId: input.requestId,
+              actorType: 'SYSTEM',
+              action: 'identity.retention-batch.completed',
+              entityType: 'identity-retention',
+              metadata: { operatorId: input.operatorId, batchSize: input.batchSize, ...result },
+            },
+          });
         return result;
       });
     },
@@ -234,6 +247,7 @@ async function anonymizeAccount(
       status: 'DISABLED',
       piiRetentionEligibleAt: { lte: input.now },
       piiAnonymizedAt: null,
+      retentionFacts: { every: { eligibleAfter: { lte: input.now } } },
       OR: [{ legalHoldUntil: null }, { legalHoldUntil: { lte: input.now } }],
     },
     data: {
