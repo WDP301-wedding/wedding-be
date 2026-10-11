@@ -92,6 +92,10 @@ authorized disposable/staging environment and bounded cost; CI remains offline.
   completed genuine provider checkout/IPN, signed QueryDr, once-only ledger and
   same-identity access promotion. Controlled prerequisites do not close RV-15;
   Hobby egress is dynamic and production-money acceptance remains separate.
+- Revised BE-09 rehearsal: [RV-13 → media/AI runtime checkpoint](evidence/rv13-media-ai-runtime-2026-10-11.md).
+  New full-contract sandbox checkout is prepared; provider terms approval and
+  genuine settlement are still pending. RV-08–11 remain open; the new one-call
+  Gemini authorization has not been consumed.
 - [ ] RV-14
 - [ ] RV-15
 - [ ] RV-16
