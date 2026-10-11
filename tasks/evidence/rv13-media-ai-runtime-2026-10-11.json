@@ -1,0 +1,791 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-10-11T08:08:14.834Z",
+  "scope": "owner-authorized developer-only Railway/Supabase; VNPay sandbox; one bounded Gemini generation",
+  "source": {
+    "commit": "afedb12a10f1b1d7d196fc8bb97b97e56138efe1",
+    "deploymentId": "2ede59de-f5f5-4ea7-bb7a-a05a81078ea9",
+    "archiveSha256": "bb1b266ce26828a032a477f75e860e4565470201278ee7c4991b9e3784087bd8",
+    "uploadedSnapshotOnly": true,
+    "runtimeGitRevision": null,
+    "sourceSettingsPreserved": true
+  },
+  "runtime": {
+    "event": "rv-chain-runtime-preflight",
+    "deploymentId": "2ede59de-f5f5-4ea7-bb7a-a05a81078ea9",
+    "sourceRevision": null,
+    "publicOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+    "aiProvider": "gemini",
+    "aiModel": "gemini-3.1-flash-lite-image",
+    "aiConfigured": true,
+    "storageConfigured": true,
+    "hashes": {
+      "dist/integrations/storage/supabase-storage-provider.js": "3360bf212c5ad67bb0367c4ad8a8d17e32c48f781fc2374e40d850bacba524de",
+      "dist/integrations/ai-image/gemini-ai-image-provider.js": "2e30d224b09c5cb816a68813f677ebcf28a2b29510679f695dc8ddc5f10c94b7",
+      "dist/modules/invitation-studio/infrastructure/generation.service.js": "ba0c661ad0cb79d0723113bea24b35eae3344a10a3231309835268499f6ed2c5",
+      "dist/modules/booking-lifecycle/application/commercial-contract.service.js": "f1392f62e00e0b2b84e40bce1e1bd35a70a87aab1643c0d7f11a49d8c3c046a8"
+    }
+  },
+  "openApiSha256": "b82ecfbb8995125178d5676347917aeaf232c48a231be9ef929e71a9c564a8df",
+  "bookingId": "28014903-2a3e-4738-bdb8-7a1146b8ebbb",
+  "rv13": {
+    "passed": true,
+    "attemptId": "56966cdd-c997-4106-a404-351226378a0e",
+    "totalVnd": 8110001,
+    "depositVnd": 2433001,
+    "receipts": [
+      {
+        "id": "78fb6471-843d-496c-aa9e-a9d47bfc3de1",
+        "channel": "IPN",
+        "decision": "ACCEPTED",
+        "outcome": "SUCCEEDED",
+        "payloadHash": "e02e91a101f729ae9e40260f190f404716dbc3097824ab0f7815429044d149b6",
+        "amountVnd": "2433001",
+        "transactionId": "15701311"
+      }
+    ],
+    "status": {
+      "paymentAttemptId": "56966cdd-c997-4106-a404-351226378a0e",
+      "status": "SUCCEEDED",
+      "purpose": "DEPOSIT",
+      "amountVnd": 2433001,
+      "applicationStatus": "SUCCEEDED",
+      "expiresAt": "2026-10-11T07:45:08.042Z"
+    },
+    "entries": [
+      {
+        "id": "04a73009-c8d8-4d2d-a8c9-8c4b1806467a",
+        "kind": "CHARGE",
+        "amountVnd": "8110001",
+        "sourceType": "CONTRACT",
+        "sourceRevisionId": "d0f57cda-6c7f-4148-bde5-be0ed42b9347",
+        "paymentAttemptId": null
+      },
+      {
+        "id": "a67f8b8a-63d5-44b6-aa7c-3158abccf1f5",
+        "kind": "PAYMENT",
+        "amountVnd": "2433001",
+        "sourceType": "PAYMENT_ATTEMPT",
+        "sourceRevisionId": "56966cdd-c997-4106-a404-351226378a0e",
+        "paymentAttemptId": "56966cdd-c997-4106-a404-351226378a0e"
+      }
+    ],
+    "applications": [
+      {
+        "paymentId": "a67f8b8a-63d5-44b6-aa7c-3158abccf1f5",
+        "appliedAt": "2026-10-11T07:31:14.125Z"
+      }
+    ],
+    "sameIdentityAccess": [
+      {
+        "accountId": "639e7861-0f9d-4585-831c-7c4974191a3b",
+        "level": "FULL",
+        "sourcePaymentId": "a67f8b8a-63d5-44b6-aa7c-3158abccf1f5"
+      }
+    ],
+    "queryDr": {
+      "event": "live_sandbox_querydr",
+      "checkedAt": "2026-10-11T07:32:58.313Z",
+      "deploymentId": "6f92c2b5-aca7-4da8-b4b8-27b1ab999a2b",
+      "configuredQueryIp": "152.55.176.237",
+      "paymentAttemptId": "56966cdd-c997-4106-a404-351226378a0e",
+      "responseCode": "00",
+      "transactionStatus": "00",
+      "verified": true,
+      "correlated": true,
+      "amountVnd": 2433001,
+      "outcome": "SUCCEEDED",
+      "payloadHash": "e6922ac1486f8b08cc565d3978ba24b5c8d578d9aeca2327837fffd822fb17c2",
+      "transactionId": "15701311",
+      "verificationError": null,
+      "providerRequests": 1,
+      "writes": 0
+    },
+    "duplicate": {
+      "status": 200,
+      "ack": {
+        "RspCode": "02",
+        "Message": "Order already confirmed"
+      }
+    },
+    "preservedPaymentHistory": [
+      {
+        "id": "091ac91e-126e-4f41-ae1d-83ce651318b7",
+        "phase": "CONFIRMED",
+        "kind": "CHARGE",
+        "amountVnd": "50000000"
+      },
+      {
+        "id": "091ac91e-126e-4f41-ae1d-83ce651318b7",
+        "phase": "CONFIRMED",
+        "kind": "PAYMENT",
+        "amountVnd": "15000000"
+      },
+      {
+        "id": "28014903-2a3e-4738-bdb8-7a1146b8ebbb",
+        "phase": "CONFIRMED",
+        "kind": "CHARGE",
+        "amountVnd": "8110001"
+      },
+      {
+        "id": "28014903-2a3e-4738-bdb8-7a1146b8ebbb",
+        "phase": "CONFIRMED",
+        "kind": "PAYMENT",
+        "amountVnd": "2433001"
+      }
+    ]
+  },
+  "rv08": {
+    "passed": true,
+    "assetId": "afd3b2b3-e4ec-49e2-aa99-b592bb531a90",
+    "revision": 3,
+    "originalFileId": "b5ffc6d7-2987-44f9-83a4-5110f6238dd8",
+    "originalSha256": "cfe1d82b3b58b0c2a413d76f6cb2fff9057c084cb510c85cf549bd9e02881ce1",
+    "privateUnsignedStatus": 400,
+    "retainedOriginalRead": true,
+    "retainedDesignRevisionId": "173d9ba4-b04d-4d7e-8a16-0ed97079d8a2",
+    "recovery": {
+      "event": "rv-staged-recovery",
+      "mode": "media",
+      "bookingId": "28014903-2a3e-4738-bdb8-7a1146b8ebbb",
+      "deploymentId": "2ede59de-f5f5-4ea7-bb7a-a05a81078ea9",
+      "providerNetworkGenerations": 0,
+      "storageDeletes": 0,
+      "checks": [
+        {
+          "phase": "interrupted-effect",
+          "code": "PROVIDER_UNAVAILABLE",
+          "status": 503
+        },
+        {
+          "phase": "recovered-with-new-composition",
+          "signedStorageContentMatches": true,
+          "sameIntentReplay": true
+        }
+      ],
+      "journal": [
+        {
+          "id": "a48c6309-545e-44b5-993c-b708bd7ba206",
+          "sequence": "7",
+          "checksumSha256": "ecd6212405eb80ede6525f93e02ea4c7c7ac634739a799b4fe9b119b97570e72"
+        }
+      ],
+      "asset": {
+        "id": "fbd8555e-5954-4900-bbee-13516791eeb0",
+        "revision": 1
+      },
+      "syntheticProviderCalls": 0,
+      "initialStoragePutCalls": 1,
+      "passed": true
+    }
+  },
+  "rv09": {
+    "passed": true,
+    "publicInvitationId": "164adfbe-bf89-4db3-a1d3-23ac4692706e",
+    "publishedRevisionId": "e042f426-db70-4da3-a74e-7b280587cf69",
+    "publicRead": {
+      "jsonStatus": 200,
+      "htmlStatus": 200,
+      "assetStatus": 200,
+      "assetSha256": "cfe1d82b3b58b0c2a413d76f6cb2fff9057c084cb510c85cf549bd9e02881ce1",
+      "qrStatus": 200,
+      "qrDecodedMatches": true,
+      "qrScanStatus": 200,
+      "publicShapeContainsNoPrivateFields": true
+    },
+    "frozenPublicationVerified": true,
+    "unpublishedReadStatus": 404
+  },
+  "rv10": {
+    "passed": true,
+    "testId": "9c7726d1-b023-4c8b-bcec-2c9ce222c55c",
+    "providerCalls": 1,
+    "automaticRetries": 0,
+    "model": "gemini-3.1-flash-lite-image",
+    "providerResponseId": "KEHLaqj_AfP6-8YPrqCDqA8",
+    "finishReasons": ["STOP"],
+    "mimeTypes": ["image/jpeg"],
+    "usage": {
+      "promptTokenCount": 28,
+      "candidatesTokenCount": 1465,
+      "totalTokenCount": 1493,
+      "promptTokensDetails": [
+        {
+          "modality": "TEXT",
+          "tokenCount": 28
+        }
+      ],
+      "candidatesTokensDetails": [
+        {
+          "modality": "IMAGE",
+          "tokenCount": 1120
+        }
+      ],
+      "serviceTier": "standard"
+    },
+    "budgetUsd": 0.1,
+    "worstCaseEstimateUsd": 0.090007,
+    "observedConservativeEstimateUsd": 0.043957,
+    "stored": {
+      "assetId": "8f633f59-ba83-4d5b-8697-6f0b921aee75",
+      "fileId": "4b31655a-7a9c-4025-a223-bb98e780ba37",
+      "checksumSha256": "85fd14af6029595e8f5d54374a2de85e142c95da473267c7f82fb10a9202db6f",
+      "sizeBytes": 1758416,
+      "width": 896,
+      "height": 1200,
+      "contentType": "image/png"
+    },
+    "intent": {
+      "intentDigest": "bb8e715c8ee5ab57f686177a5df13b28eb813fe25e3eee539a2c98deccaea08f",
+      "status": "ACCEPTED",
+      "mediaAssetId": "8f633f59-ba83-4d5b-8697-6f0b921aee75"
+    },
+    "designRevisionId": "7df12d1c-1e47-4942-bc61-78923e855dc9",
+    "fullPixelDecode": true,
+    "generationTransport": "guarded compiled router on runtime loopback; canonical HTTPS media/derived/design acceptance"
+  },
+  "rv11": {
+    "passed": true,
+    "unknown": {
+      "event": "rv-staged-recovery",
+      "mode": "unknown",
+      "bookingId": "28014903-2a3e-4738-bdb8-7a1146b8ebbb",
+      "deploymentId": "2ede59de-f5f5-4ea7-bb7a-a05a81078ea9",
+      "providerNetworkGenerations": 0,
+      "storageDeletes": 0,
+      "checks": [
+        {
+          "phase": "interrupted-effect",
+          "code": "PROVIDER_TIMEOUT",
+          "status": 504
+        },
+        {
+          "phase": "same-intent-retry",
+          "code": "AI_GENERATION_PENDING",
+          "status": 503
+        }
+      ],
+      "journal": [],
+      "intentDigest": "37cdde9bb5750e99bccf8e4e9d356416ba951ac440bd5b6f71d4170839e6d0e9",
+      "syntheticProviderCalls": 1,
+      "initialStoragePutCalls": 0,
+      "passed": true,
+      "journalScope": "matched intent, read-only database verification"
+    },
+    "aiStorage": {
+      "event": "rv-staged-recovery",
+      "mode": "ai-storage",
+      "bookingId": "28014903-2a3e-4738-bdb8-7a1146b8ebbb",
+      "deploymentId": "2ede59de-f5f5-4ea7-bb7a-a05a81078ea9",
+      "providerNetworkGenerations": 0,
+      "storageDeletes": 0,
+      "checks": [
+        {
+          "phase": "interrupted-effect",
+          "code": "PROVIDER_UNAVAILABLE",
+          "status": 503
+        },
+        {
+          "phase": "recovered-with-new-composition",
+          "signedStorageContentMatches": true,
+          "sameIntentReplay": true
+        }
+      ],
+      "syntheticProviderCalls": 1,
+      "initialStoragePutCalls": 1,
+      "journal": [
+        {
+          "id": "8bb58c09-1d38-48e7-a879-44c19a52c377",
+          "sequence": "12",
+          "checksumSha256": "308223d4e67e2175292e4e3123ff859c157f0504120c6b3505a2032773279b47"
+        }
+      ],
+      "asset": {
+        "id": "db682099-6f4f-4585-bad4-62ba5c49c080",
+        "revision": 1
+      },
+      "passed": true
+    },
+    "managerResult": {
+      "intentDigest": "37cdde9bb5750e99bccf8e4e9d356416ba951ac440bd5b6f71d4170839e6d0e9",
+      "status": "FAILED",
+      "outcome": "ABANDONED"
+    },
+    "intent": [
+      {
+        "status": "FAILED",
+        "errorCode": "AI_GENERATION_ABANDONED",
+        "errorStatus": 502
+      }
+    ],
+    "audit": [
+      {
+        "action": "invitation.image-generation-abandoned",
+        "actorId": "10000000-0000-4000-8000-000000000001",
+        "metadata": {
+          "outcome": "ABANDONED",
+          "intentDigest": "37cdde9bb5750e99bccf8e4e9d356416ba951ac440bd5b6f71d4170839e6d0e9",
+          "evidenceReference": "rv11_20261011_controlled_timeout"
+        }
+      }
+    ],
+    "abandonedRetry": {
+      "event": "rv11-abandoned-retry",
+      "code": "AI_GENERATION_ABANDONED",
+      "status": 502,
+      "syntheticProviderCalls": 0,
+      "providerNetworkGenerations": 0,
+      "passed": true
+    }
+  },
+  "validation": {
+    "ciRun": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38122240243",
+    "sourceCommit": "afedb12a10f1b1d7d196fc8bb97b97e56138efe1",
+    "ciTests": 1587,
+    "ciFailures": 0,
+    "ciIntegrationTests": 355,
+    "storageFocusedTests": 40,
+    "legacyLocalRecheckTests": 18,
+    "initialLocalFullRun": {
+      "passed": 1573,
+      "failed": 14,
+      "reason": "DATABASE_URL inherited by legacy tests; corrected disposable wrapper and reran affected files"
+    },
+    "coverage": {
+      "statements": 96.5,
+      "branches": 93.52,
+      "functions": 98.36,
+      "lines": 97.28
+    }
+  },
+  "checks": [
+    {
+      "label": "create-synthetic-consultation",
+      "status": 201,
+      "errorCode": null,
+      "requestId": "4cfd6171-b8a7-47aa-9dd4-3a49a8cfacbe",
+      "at": "2026-10-11T07:08:28.111Z"
+    },
+    {
+      "label": "create-test-booking",
+      "status": 201,
+      "errorCode": null,
+      "requestId": "df81669c-74f1-4dc1-9ef8-8d3e7110576a",
+      "at": "2026-10-11T07:08:32.421Z"
+    },
+    {
+      "label": "read-proposal",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "acad8c78-39b6-457e-914b-60dbb5c14543",
+      "at": "2026-10-11T07:09:06.871Z"
+    },
+    {
+      "label": "create-timeline",
+      "status": 201,
+      "errorCode": null,
+      "requestId": "93fc383b-75ab-47e5-8236-f9734d79ec9c",
+      "at": "2026-10-11T07:09:10.454Z"
+    },
+    {
+      "label": "read-timeline-for-manager",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "90fd5b9b-9abb-4d53-a961-1f8e4798400b",
+      "at": "2026-10-11T07:09:11.775Z"
+    },
+    {
+      "label": "manager-timeline-approval",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "5ca3af1f-7fe9-4fd6-8f74-c3500eb04a96",
+      "at": "2026-10-11T07:09:15.005Z"
+    },
+    {
+      "label": "read-timeline-for-couple",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "5e71f810-490b-4344-ae4b-ef2c8e50dbf7",
+      "at": "2026-10-11T07:09:16.371Z"
+    },
+    {
+      "label": "couple-timeline-approval",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "ed4f1aba-1c6a-4e53-b3c7-2d5925f7e7c4",
+      "at": "2026-10-11T07:09:19.891Z"
+    },
+    {
+      "label": "create-test-template",
+      "status": 201,
+      "errorCode": null,
+      "requestId": "98e121f8-ba26-4c1a-b8d2-16d9524e702e",
+      "at": "2026-10-11T07:09:28.314Z"
+    },
+    {
+      "label": "create-test-service",
+      "status": 201,
+      "errorCode": null,
+      "requestId": "f4a40398-e1e6-45c4-bd39-d8a37f366e2d",
+      "at": "2026-10-11T07:09:31.764Z"
+    },
+    {
+      "label": "create-test-print-offering",
+      "status": 201,
+      "errorCode": null,
+      "requestId": "2bcbd99c-48bc-4ad6-ba9f-dbbaa7d3e82c",
+      "at": "2026-10-11T07:09:34.408Z"
+    },
+    {
+      "label": "read-contract-predecessor",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "b034b2cd-e8ec-478a-b68a-4a76ef90c4e5",
+      "at": "2026-10-11T07:09:38.814Z"
+    },
+    {
+      "label": "create-full-contract",
+      "status": 201,
+      "errorCode": null,
+      "requestId": "6497f622-09ae-4ae0-a92a-ad7b9bf511ab",
+      "at": "2026-10-11T07:09:48.637Z"
+    },
+    {
+      "label": "read-contract-for-submissions",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "1e208126-84a8-4df9-a013-27abbd522fae",
+      "at": "2026-10-11T07:09:52.031Z"
+    },
+    {
+      "label": "contract-submissions",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "01abb924-246b-450a-b67c-79e22904daf0",
+      "at": "2026-10-11T07:10:01.013Z"
+    },
+    {
+      "label": "read-contract-for-manager",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "100c4c36-ae31-4fc4-89ff-dbfa77dfc408",
+      "at": "2026-10-11T07:10:04.531Z"
+    },
+    {
+      "label": "contract-manager",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "7df1a989-d483-4188-b344-e6f736925a90",
+      "at": "2026-10-11T07:10:11.683Z"
+    },
+    {
+      "label": "read-contract-for-couple",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "16333a42-9355-4805-81bf-64d230301ce9",
+      "at": "2026-10-11T07:10:15.441Z"
+    },
+    {
+      "label": "contract-couple",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "9af0c158-5ba9-4064-9a2a-90ebfdc6ccdd",
+      "at": "2026-10-11T07:10:23.467Z"
+    },
+    {
+      "label": "read-hold-revision",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "b0c0c4d4-965e-4ec4-a6c7-4fa92d93fd9f",
+      "at": "2026-10-11T07:10:26.031Z"
+    },
+    {
+      "label": "acquire-test-slot",
+      "status": 201,
+      "errorCode": null,
+      "requestId": "b20ca05c-ac40-49ee-9656-54e50895d1ca",
+      "at": "2026-10-11T07:10:29.702Z"
+    },
+    {
+      "label": "create-full-contract-deposit",
+      "status": 201,
+      "errorCode": null,
+      "requestId": "3efdf412-701c-4221-90d6-5a07725c5e09",
+      "at": "2026-10-11T07:10:43.513Z"
+    },
+    {
+      "label": "rv13-expired-checkout-reconcile",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "fcfe1f9a-5206-49b7-a815-e0cec103f98f",
+      "at": "2026-10-11T07:28:55.562Z"
+    },
+    {
+      "label": "rv13-expired-signed-failure-verified",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "7b9ad1e3-efd8-4ab5-9b5e-75f441b07e55",
+      "at": "2026-10-11T07:29:52.158Z"
+    },
+    {
+      "label": "rv13-reacquire-proposal",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "7544cc30-e152-407f-9bf1-964eca568ef6",
+      "at": "2026-10-11T07:29:55.750Z"
+    },
+    {
+      "label": "rv13-reacquire-after-verified-failure",
+      "status": 201,
+      "errorCode": null,
+      "requestId": "11cc418c-1333-419d-8da8-cbfd4b329354",
+      "at": "2026-10-11T07:29:59.587Z"
+    },
+    {
+      "label": "rv13-replacement-sandbox-checkout",
+      "status": 201,
+      "errorCode": null,
+      "requestId": "29202380-06fa-40c4-b31a-966a858eb129",
+      "at": "2026-10-11T07:30:11.965Z"
+    },
+    {
+      "label": "rv13-authorized-status-and-owner-recovery",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "fd41c147-b948-42d4-83eb-4e2e01ff0955",
+      "at": "2026-10-11T07:32:39.066Z"
+    },
+    {
+      "label": "rv08-confirmed-prerequisite",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "3f123c30-f9bb-4591-850e-66dab7bbd2c6",
+      "at": "2026-10-11T07:33:25.145Z"
+    },
+    {
+      "label": "rv08-unauthenticated-upload-denied",
+      "status": 401,
+      "errorCode": "AUTHENTICATION_REQUIRED",
+      "requestId": "71485e2f-f1fa-4c3a-9cbb-cd64a05ab834",
+      "at": "2026-10-11T07:33:25.517Z"
+    },
+    {
+      "label": "rv08-live-upload",
+      "status": 201,
+      "errorCode": null,
+      "requestId": "554b0fff-d6aa-42fd-b935-41f96642d63d",
+      "at": "2026-10-11T07:33:43.229Z"
+    },
+    {
+      "label": "rv08-signed-preview",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "06e97913-c356-492a-aac1-62857074e7a3",
+      "at": "2026-10-11T07:33:52.737Z"
+    },
+    {
+      "label": "rv08-private-preview-denied",
+      "status": 401,
+      "errorCode": "AUTHENTICATION_REQUIRED",
+      "requestId": "40b90126-336d-4bff-bc5b-c6412252a35b",
+      "at": "2026-10-11T07:33:54.245Z"
+    },
+    {
+      "label": "rv08-derive-retained-source",
+      "status": 201,
+      "errorCode": null,
+      "requestId": "7f8de0f2-83fc-4b28-ad67-3ca9ea399f58",
+      "at": "2026-10-11T07:34:15.441Z"
+    },
+    {
+      "label": "rv08-create-retained-design",
+      "status": 201,
+      "errorCode": null,
+      "requestId": "0f10ea36-0445-48b7-b501-ebb676116fe9",
+      "at": "2026-10-11T07:34:29.005Z"
+    },
+    {
+      "label": "rv08-replace",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "76f08ae0-9a47-4025-87e0-4f8929e95424",
+      "at": "2026-10-11T07:34:45.306Z"
+    },
+    {
+      "label": "rv08-replacement-preview",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "75316b04-477f-4f43-ada9-dff68a3b9d88",
+      "at": "2026-10-11T07:34:54.838Z"
+    },
+    {
+      "label": "rv08-stale-replacement-denied",
+      "status": 409,
+      "errorCode": "MEDIA_REVISION_STALE",
+      "requestId": "13d25793-fdfe-4493-829d-5697ffff4889",
+      "at": "2026-10-11T07:35:06.620Z"
+    },
+    {
+      "label": "rv08-detach",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "fe2412db-60d6-4289-a362-949925ee8125",
+      "at": "2026-10-11T07:35:14.873Z"
+    },
+    {
+      "label": "rv09-publish-retained-revision",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "c71410c9-ee25-4716-9461-d8ad19f4210d",
+      "at": "2026-10-11T07:54:20.140Z"
+    },
+    {
+      "label": "rv09-public-json",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "90ae7b04-82fa-449f-9684-4813a6c7d7df",
+      "at": "2026-10-11T07:54:21.054Z"
+    },
+    {
+      "label": "rv09-edit-current-design",
+      "status": 201,
+      "errorCode": null,
+      "requestId": "5ac2bc93-ae80-4248-bfd6-da7c4ebe68ed",
+      "at": "2026-10-11T07:54:40.189Z"
+    },
+    {
+      "label": "rv09-public-snapshot-immutable",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "5f64778c-6e76-49d2-a447-9349c53c9e50",
+      "at": "2026-10-11T07:54:41.610Z"
+    },
+    {
+      "label": "rv09-public-qr-has-no-private-authority",
+      "status": 401,
+      "errorCode": "AUTHENTICATION_REQUIRED",
+      "requestId": "5b308df3-016e-4c75-9e3e-91f2d49fd82b",
+      "at": "2026-10-11T07:54:41.994Z"
+    },
+    {
+      "label": "rv09-unpublish",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "f3a4b22f-9d37-4339-848c-8fc2ba1deeab",
+      "at": "2026-10-11T07:54:54.680Z"
+    },
+    {
+      "label": "rv09-unpublished-404",
+      "status": 404,
+      "requestId": "c1aad50e-4b83-4695-8f36-4795acea5663"
+    },
+    {
+      "label": "rv09-unpublished-404",
+      "status": 404,
+      "requestId": "a314e448-0210-493a-85e9-4c2926e0701d"
+    },
+    {
+      "label": "rv09-unpublished-404",
+      "status": 404,
+      "requestId": "2f92daae-2cda-4e89-b1c2-36c426c1f431"
+    },
+    {
+      "label": "rv09-unpublished-404",
+      "status": 404,
+      "requestId": "61bf0c5a-5929-457c-b0dc-c37950717156"
+    },
+    {
+      "label": "rv10-canonical-private-preview",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "943ceadf-3253-463b-8107-57fd0ca54367",
+      "at": "2026-10-11T07:57:24.135Z"
+    },
+    {
+      "label": "rv10-unauthenticated-original-denied",
+      "status": 401,
+      "errorCode": "AUTHENTICATION_REQUIRED",
+      "requestId": "42e6be23-f0c7-43cb-817c-0324a7f9936b",
+      "at": "2026-10-11T07:57:26.806Z"
+    },
+    {
+      "label": "rv10-canonical-derive",
+      "status": 201,
+      "errorCode": null,
+      "requestId": "0f1ad97a-5733-4955-9e28-3b22468a4114",
+      "at": "2026-10-11T07:57:45.890Z"
+    },
+    {
+      "label": "rv10-canonical-usable-design",
+      "status": 201,
+      "errorCode": null,
+      "requestId": "fb02ecbe-6d26-471d-81c6-d911c48e98ff",
+      "at": "2026-10-11T07:57:59.294Z"
+    },
+    {
+      "label": "rv10-canonical-exact-revision",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "2495270b-29ab-45a5-9161-7a6d116ad406",
+      "at": "2026-10-11T07:58:05.079Z"
+    },
+    {
+      "label": "rv11-couple-pending-denied",
+      "status": 404,
+      "errorCode": "NOT_FOUND",
+      "requestId": "8ef6482f-776a-4a04-a07c-4ff7ec685038",
+      "at": "2026-10-11T08:04:55.735Z"
+    },
+    {
+      "label": "rv11-manager-pending-read",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "e8b1ddba-fec5-4233-ad9f-49b5c7dc6fc4",
+      "at": "2026-10-11T08:04:59.932Z"
+    },
+    {
+      "label": "rv11-couple-reconciliation-denied",
+      "status": 404,
+      "errorCode": "NOT_FOUND",
+      "requestId": "2c92afde-6698-4c96-83aa-408e5f080291",
+      "at": "2026-10-11T08:05:02.931Z"
+    },
+    {
+      "label": "rv11-unsafe-force-retry-denied",
+      "status": 422,
+      "errorCode": "VALIDATION_ERROR",
+      "requestId": "4fa1f516-4781-4251-937f-33c6175ede9a",
+      "at": "2026-10-11T08:05:03.782Z"
+    },
+    {
+      "label": "rv11-manager-abandon",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "b370f831-e57d-45e1-9bd7-4461a22095dc",
+      "at": "2026-10-11T08:05:13.630Z"
+    },
+    {
+      "label": "rv11-manager-abandon-replay",
+      "status": 200,
+      "errorCode": null,
+      "requestId": "6e8a2670-fd9a-4745-9b3c-b29a0a5ddd72",
+      "at": "2026-10-11T08:05:20.220Z"
+    },
+    {
+      "label": "rv11-stale-reconciliation-denied",
+      "status": 409,
+      "errorCode": "AI_GENERATION_RECONCILIATION_STALE",
+      "requestId": "71168dcb-cc74-49c3-9c2b-952940e1e2f3",
+      "at": "2026-10-11T08:05:26.926Z"
+    }
+  ],
+  "cleanup": {
+    "at": "2026-10-11T08:08:49.533Z",
+    "keyRevoked": true,
+    "keyFilesRemoved": true,
+    "currentKnownTaskSessionsRevoked": 2,
+    "cleanupSessionsRevoked": true,
+    "publicPublicationUnpublished": true,
+    "approvedHistoryPreserved": true
+  }
+}

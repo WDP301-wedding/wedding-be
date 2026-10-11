@@ -356,6 +356,43 @@ describe('SupabaseStorageProvider', () => {
     expect(stored.objectKey).toContain(pngChecksum);
   });
 
+  it.each([409, '409'])('recovers SDK HTTP 400 with storage statusCode %s', async (statusCode) => {
+    const client = createClient({
+      upload: vi.fn(() => Promise.resolve({ data: null, error: { status: 400, statusCode } })),
+    });
+
+    await expect(createAdapter(client).put(validPutCommand())).resolves.toMatchObject({
+      checksumSha256: pngChecksum,
+    });
+  });
+
+  it('rejects SDK duplicate recovery when retained metadata differs', async () => {
+    const client = createClient({
+      upload: vi.fn(() =>
+        Promise.resolve({ data: null, error: { status: 400, statusCode: '409' } }),
+      ),
+      info: vi.fn(() =>
+        Promise.resolve({
+          data: {
+            contentType: 'image/png',
+            size: pngBytes.byteLength,
+            metadata: {
+              checksumSha256: 'a'.repeat(64),
+              purpose: 'PRIVATE_WEDDING_MEDIA',
+              resourceId,
+              sizeBytes: pngBytes.byteLength,
+            },
+          },
+          error: null,
+        }),
+      ),
+    });
+
+    await expect(createAdapter(client).put(validPutCommand())).rejects.toMatchObject({
+      code: 'PROVIDER_ERROR',
+    });
+  });
+
   it('rejects a signed URL for another object or provider origin', async () => {
     const client = createClient({
       createSignedUrl: vi.fn(() =>

@@ -6,9 +6,14 @@ test environment and authorized migrations, mutations and recovery rehearsals.
 The Railway environment name is not production acceptance. It uses the existing
 Supabase PostgreSQL database, Supabase Storage bucket, and Brevo configuration.
 Gemini configuration was enabled on 2026-10-11 for an owner-authorized bounded
-provider test. That test reached Google but exposed a JPEG/PNG adapter mismatch;
-the complete generation/Storage/application flow remains unverified. See
-[the Gemini runtime evidence](../tasks/evidence/rv10-gemini-railway-2026-10-11.md).
+provider test. The first test exposed a JPEG/PNG adapter mismatch; preserve its
+[historical evidence](../tasks/evidence/rv10-gemini-railway-2026-10-11.md).
+A separately approved one-call test subsequently passed real Gemini generation,
+private Storage validation and a usable design revision. The revised full-contract
+VNPay deposit, media recovery, public invitation/QR and Manager AI recovery also
+passed. See [the current runtime evidence](../tasks/evidence/rv13-media-ai-runtime-2026-10-11.md)
+for exact source/deployments, bounded cost and test-composition limits. This remains
+developer verification, not production-money or whole-release acceptance.
 
 - API base URL: `https://wedding-be-production-e1dc.up.railway.app/api/v1`
 - Swagger UI: `https://wedding-be-production-e1dc.up.railway.app/docs`
@@ -68,15 +73,16 @@ Copy the backend variables from `.env.example` into Railway's variables UI or
 a secret-safe import process. Use the existing `.env` values for Supabase and
 Brevo, with these deployment-specific settings:
 
-| Variable                | Deployment value                                  |
-| ----------------------- | ------------------------------------------------- |
-| `NODE_ENV`              | `production`                                      |
-| `PORT`                  | `3001` (the generated domain targets this port)   |
-| `AUTH_TRUST_PROXY_HOPS` | `1`                                               |
-| `BACKEND_REPLICA_COUNT` | `1`                                               |
-| `OPENAPI_ENABLED`       | `true` (Swagger UI and OpenAPI exposed)           |
-| `AUTH_OTP_HASH_KEY`     | Independent random secret, stable across restarts |
-| `CORS_ALLOWED_ORIGINS`  | Exact HTTPS browser origins; public web first     |
+| Variable                   | Deployment value                                    |
+| -------------------------- | --------------------------------------------------- |
+| `NODE_ENV`                 | `production`                                        |
+| `PORT`                     | `3001` (the generated domain targets this port)     |
+| `AUTH_TRUST_PROXY_HOPS`    | `1`                                                 |
+| `BACKEND_REPLICA_COUNT`    | `1`                                                 |
+| `OPENAPI_ENABLED`          | `true` (Swagger UI and OpenAPI exposed)             |
+| `PUBLIC_INVITATION_ORIGIN` | `https://wedding-be-production-e1dc.up.railway.app` |
+| `AUTH_OTP_HASH_KEY`        | Independent random secret, stable across restarts   |
+| `CORS_ALLOWED_ORIGINS`     | Exact HTTPS browser origins; public web first       |
 
 Do not configure `TEST_MIGRATION_DATABASE_URL` in the deployed service. Keep
 the legacy Resend group blank when using Brevo. When AI is disabled, also keep
