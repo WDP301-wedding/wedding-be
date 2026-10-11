@@ -7,6 +7,8 @@ CI passed and the owner explicitly authorized merge and deployment. No independe
 team-member approval was recorded; do not equate owner authorization with that
 review. The full deployed business journey remains unverified. See
 [the current verification status](../tasks/evidence/be11-16-merge-deploy-local-recheck-2026-10-11.md).
+Follow-up fixes and their verification are recorded in
+[the repair evidence](../tasks/evidence/be11-16-repairs-2026-10-11.md).
 
 ## Owners and persisted sources
 
@@ -28,10 +30,23 @@ Contracted print requests carry `commercialSource` with `agreementRevisionId`,
 `offeringId` and `sourceRevisionId`. The server retains the selected material,
 print type, template version and agreed unit price. Approval references the
 original CONTRACT obligation, without a PRINT_ORDER charge. Active allocations
-cannot exceed agreed quantity; an appendix cannot reduce below allocated
-production quantities. Cancelling fulfillment does not credit the entire contract.
+cannot exceed agreed quantity. An appendix cannot remove an allocated line,
+reduce below its allocated quantity, or replace its frozen source revision or
+unit price while a batch is APPROVED, IN_PRODUCTION, READY_FOR_HANDOVER or
+HANDED_OVER. This preserves the material/template/price facts needed to finish
+the original batch. Before production, a mutually confirmed cancellation frees
+the allocation; after production starts, retain the original commercial line and
+select a separate offering for additional work. Cancelling fulfillment does not
+credit the entire contract.
 Replacement of contracted commercial content requires an approved appendix and
 a new order; existing production history stays intact.
+
+Contracted quotations use the exact frozen nonnegative integer VND price,
+including free items, and reject unsafe integer line/order totals. The legacy
+unit-price range remains 1–1,000,000 VND and its order total remains
+1–1,000,000,000,000 VND. The contract model is determined by the server's
+obligation reader, never a client flag. Forward migrations enforce allocated
+source preservation and quote bounds without rewriting historical rows.
 
 New design revisions record their real source template version. The optional
 `templateVersionId` on design creation permits a retained template version only
@@ -101,7 +116,8 @@ attempts retain their recorded sources, without an inferred invoice backfill.
 
 Representative conflicts: `COMMERCIAL_PREDECESSOR_STALE`,
 `CONTRACT_REVISION_STALE`, `CONTRACT_PRINT_SOURCE_CONFLICT`,
-`CONTRACT_PRINT_QUANTITY_ALLOCATED`, `EVENT_NOT_ENDED`, `EXPENSE_REVISION_STALE`,
+`CONTRACT_PRINT_QUANTITY_ALLOCATED`, `CONTRACT_PRINT_SOURCE_ALLOCATED`,
+`EVENT_NOT_ENDED`, `EXPENSE_REVISION_STALE`,
 `INVOICE_FINALIZED`, `INVOICE_REVISION_STALE`, `INVOICE_FINALIZATION_REQUIRED`,
 `STALE_BILLING_REVISION`, `PAYMENT_ATTEMPT_ACTIVE`, `FINANCIAL_SOURCE_CONFLICT`.
 Strict schema failures use 422; authorization uses 401/403/404; business conflicts

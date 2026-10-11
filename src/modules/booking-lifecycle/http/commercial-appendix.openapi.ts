@@ -76,7 +76,7 @@ export const commercialAppendixOpenApiPaths = {
     parameters: [booking, revision],
     post: write(
       'approveCommercialAppendix',
-      'Two distinct own Manager/Couple actors approve one digest. Second approval atomically activates revision and posts signed delta once. Allocated production quantities cannot be removed.',
+      'Two distinct own Manager/Couple actors approve one digest. Second approval atomically activates revision and posts signed delta once. Active print allocations retain their source revision, unit price and minimum allocated quantity; conflicting changes return 409 CONTRACT_PRINT_SOURCE_ALLOCATED or CONTRACT_PRINT_QUANTITY_ALLOCATED.',
       appendixDecisionSchema,
       '200',
     ),

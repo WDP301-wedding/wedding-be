@@ -78,7 +78,7 @@ export const invitationPrintOrdersOpenApiPaths = {
   '/bookings/{bookingId}/print-orders/{orderId}/approval': {
     post: operation(
       'approvePrintOrder',
-      'Couple approves active quotation and registers billing charge',
+      'Couple approves active quotation; contracted print references the existing contract obligation, legacy print registers a charge',
       s.printOrderResponseSchema,
       ['bookingId', 'orderId'],
       s.approvePrintOrderBodySchema,
@@ -133,7 +133,7 @@ export const invitationPrintOrdersOpenApiPaths = {
   '/management/print-orders/{orderId}/quotations': {
     post: operation(
       'quotePrintOrder',
-      'Manager supplies unit prices, estimated completion date, and creates commercial revision',
+      'Manager quotes exact frozen contract prices (including zero) with safe integer VND totals; legacy quotes retain unit price 1–1000000 and total 1–1000000000000 VND',
       s.printOrderResponseSchema,
       ['orderId'],
       s.quotePrintOrderBodySchema,
