@@ -13,21 +13,29 @@ export function createCommercialFinancialService(
   scope: ReturnType<typeof createBookingBoundaryUnitOfWork>,
 ) {
   const ledger = createPrismaBillingPersistence(prisma, scope).repository;
-  return Object.freeze({
-    async requireMutable(bookingId: string, context: ContractContext) {
-      await scope.withClient(bookingId, context, async (client) => {
-        const attempts = await client.billingPaymentAttempt.findMany({
-          where: { bookingId },
-          include: { paymentEntries: { select: { id: true } } },
-        });
-        if (
-          attempts.some(
-            (a) =>
-              ['CREATED', 'PENDING', 'UNKNOWN'].includes(a.state) ||
-              (a.state === 'SUCCEEDED' && a.paymentEntries.length === 0),
-          )
+  async function requireUnpinned(bookingId: string, context: ContractContext) {
+    await scope.withClient(bookingId, context, async (client) => {
+      const attempts = await client.billingPaymentAttempt.findMany({
+        where: { bookingId },
+        include: { paymentEntries: { select: { id: true } } },
+      });
+      if (
+        attempts.some(
+          (a) =>
+            ['CREATED', 'PENDING', 'UNKNOWN'].includes(a.state) ||
+            (a.state === 'SUCCEEDED' && a.paymentEntries.length === 0),
         )
-          throw new BillingPersistenceConflict('PAYMENT_ATTEMPT_ACTIVE');
+      )
+        throw new BillingPersistenceConflict('PAYMENT_ATTEMPT_ACTIVE');
+    });
+  }
+  return Object.freeze({
+    requireUnpinned,
+    async requireMutable(bookingId: string, context: ContractContext) {
+      await requireUnpinned(bookingId, context);
+      await scope.withClient(bookingId, context, async (client) => {
+        const invoice = await client.finalInvoiceHead.findUnique({ where: { bookingId } });
+        if (invoice?.currentRevisionId) throw new BillingPersistenceConflict('INVOICE_FINALIZED');
       });
     },
     async registerAppendix(bookingId: string, revisionId: string, context: ContractContext) {
