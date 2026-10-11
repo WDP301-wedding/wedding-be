@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { AppError, NotFoundError } from '../../../core/errors/app-error.js';
+import { NotFoundError } from '../../../core/errors/app-error.js';
 import type {
   Prisma,
   PrismaClient,
@@ -131,21 +131,29 @@ export function createPrintOfferingService(prisma: PrismaClient, templates: Temp
           take: limit + 1,
           include: { revisions: { orderBy: { revision: 'desc' }, take: 1 } },
         });
-        const items = [];
-        for (const head of rows.slice(0, limit)) {
-          const row = head.revisions[0]!;
-          if (!includeArchived) {
-            // A revision fetch may observe an archive committed after the head query.
-            if (!row.active) continue;
-            try {
-              await templates(tx).requireSelection(row);
-            } catch (error) {
-              if (error instanceof AppError && [404, 409].includes(error.status)) continue;
-              throw error;
-            }
-          }
-          items.push(view(row, head.restaurantId));
-        }
+        const page = rows.slice(0, limit);
+        const eligible = includeArchived
+          ? []
+          : await templates(tx).findSelectableSelections(
+              page
+                .filter((head) => head.revisions[0]!.active)
+                .map((head) => ({
+                  templateId: head.revisions[0]!.templateId,
+                  templateVersionId: head.revisions[0]!.templateVersionId,
+                })),
+            );
+        const selectable = new Set(
+          eligible.map((row) => `${row.templateId}/${row.templateVersionId}`),
+        );
+        const items = page
+          .filter((head) => {
+            const row = head.revisions[0]!;
+            return (
+              includeArchived ||
+              (row.active && selectable.has(`${row.templateId}/${row.templateVersionId}`))
+            );
+          })
+          .map((head) => view(head.revisions[0]!, head.restaurantId));
         return { items, nextCursor: rows.length > limit ? rows[limit - 1]!.id : null };
       });
     },

@@ -291,6 +291,21 @@ describeWithDatabase('booking runtime with real identity, venue, and PostgreSQL'
         await invitation.providers.templateSelection.resolveVersion(print.templateVersionId),
       ).toMatchObject({ templateId: print.templateId, title: templateContent.title });
       expect(
+        await invitation.providers.templateSelection.findSelectableSelections([
+          {
+            templateId: print.templateId,
+            templateVersionId: print.templateVersionId,
+          },
+        ]),
+      ).toEqual([
+        {
+          templateId: print.templateId,
+          templateVersionId: print.templateVersionId,
+          revision: head.revision,
+          title: templateContent.title,
+        },
+      ]);
+      expect(
         await venue.providers.printOfferings.requireSelection({
           offeringId: print.offeringId,
           sourceRevisionId: print.sourceRevisionId,
