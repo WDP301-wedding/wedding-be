@@ -1,0 +1,1392 @@
+{
+  "handoffVersion": "BE-17@2026-10-12",
+  "createdAt": "2026-10-11T20:47:34.066Z",
+  "timezone": "Asia/Saigon",
+  "sourceCommit": "054d670d6a7edd4d8028004271b02fab5c60973f",
+  "scope": "Backend extension hand-off; acceptance and release gates are separately recorded in the Markdown evidence",
+  "models": [
+    "FULL_CONTRACT_V1",
+    "FINAL_INVOICE_V1"
+  ],
+  "providerVersionPolicy": "Existing v1 owner ports pinned by exact source commit and file SHA-256; no new runtime version constant invented",
+  "openApi": {
+    "path": "openapi/openapi.json",
+    "sha256": "55c15733cdc25a9151c724e311cb5753f9b41124a15c879cf73cc3c90c108b9e",
+    "version": "3.1.0",
+    "paths": 144,
+    "operations": 166,
+    "schemas": 73,
+    "localReferences": 1525
+  },
+  "packageLockSha256": "b660aa9e1db7a369e36b5ffdccee8b8f86a4665a8f4be3f242ac1d5ff0283a32",
+  "dependencies": {
+    "@fontsource/be-vietnam-pro": "5.3.0",
+    "@google/genai": "2.24.0",
+    "@opentelemetry/api": "1.9.1",
+    "@opentelemetry/exporter-trace-otlp-http": "0.222.0",
+    "@opentelemetry/instrumentation": "0.222.0",
+    "@opentelemetry/instrumentation-express": "0.70.0",
+    "@opentelemetry/instrumentation-http": "0.222.0",
+    "@opentelemetry/sdk-node": "0.222.0",
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0",
+    "@supabase/storage-js": "2.116.0",
+    "cors": "2.8.6",
+    "dotenv": "18.0.3",
+    "express": "5.2.1",
+    "express-rate-limit": "8.7.0",
+    "helmet": "8.3.0",
+    "multer": "2.4.0",
+    "pdfkit": "0.20.2",
+    "pg": "8.23.0",
+    "pino": "10.3.1",
+    "pino-http": "11.0.0",
+    "prom-client": "15.1.3",
+    "qrcode": "1.5.4",
+    "resend": "6.31.0",
+    "sharp": "0.35.5",
+    "swagger-ui-dist": "5.33.1",
+    "zod": "4.6.5",
+    "zod-openapi": "6.0.2"
+  },
+  "providerSources": [
+    {
+      "path": "src/server.ts",
+      "sha256": "8d57198e2991d6c9a5792efa02a6f1856c4be259c2d609a86c5ce66897d485d4"
+    },
+    {
+      "path": "src/app.ts",
+      "sha256": "029d3aead8206a2dc4b46d5840a37e49502dc897f999d2589570cf858d488b96"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/booking-lifecycle.runtime.ts",
+      "sha256": "460c4f9b9bcf6d3bcadd54a7c2d5da9208460a70fa33a80d5560b5bbb6be6759"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/booking-lifecycle.providers.ts",
+      "sha256": "e4fb5d9e7dba812a9ac75cbbf235e694ec8999af7e2579e83d5838adae29acf2"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/contract-financial.reader.ts",
+      "sha256": "f6bf1f28d137f7a6f00ce1e17c6aadd127b4b99a6a46c607c8d363442a5df7f6"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/effective-commercial.reader.ts",
+      "sha256": "91d4c7601fb95b889c619f45ddce02cd8a964f895b2398691f6b189eef149262"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/event-end.reader.ts",
+      "sha256": "677d3156c3817186d0d86f68474674ee468aee4fbc3218f09e5d9f81f8c3bd10"
+    },
+    {
+      "path": "src/modules/venue-catalog/venue-catalog.runtime.ts",
+      "sha256": "6acbe1de5ea62d7eed4eb189863e4d6ffba4eb1fa7753620d8c0b6dd09d6edef"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/commercial-selection.reader.ts",
+      "sha256": "be2eee8364fb74e213d63797cc9f8c98393e3de8308456b42c9d29450601eeaf"
+    },
+    {
+      "path": "src/modules/invitation-studio/invitation-studio.runtime.ts",
+      "sha256": "ba248f6d3b0b21b9eaaabd289e41783a1ac8e52a2891b6394fa6ea7df6748f15"
+    },
+    {
+      "path": "src/modules/invitation-studio/application/template-selection.port.ts",
+      "sha256": "ee6dc99950ce0eac311a521321a8d66846d08ab60e396d7e4d4987196725282f"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/template-selection.reader.ts",
+      "sha256": "d0612250a8ce0a5a7bdc845cb177898eb5d238e96753d619898c376dc29ea061"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/contracted-print.providers.ts",
+      "sha256": "3472ee8da333359b5eb924dada7515d419548c4a394d1967b8a94b582c26bb7c"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/contracted-print.entitlement.reader.ts",
+      "sha256": "cbf32a15bd13fc4ac036a9d8b9ddb27f84dc0f497e05ff4b8334999a6a757d9b"
+    },
+    {
+      "path": "src/modules/payments-billing/payments-billing.runtime.ts",
+      "sha256": "be50d329db8fee1a1fedb86d85d1e0f54b12f00db0b83e77e4b8304e842580de"
+    },
+    {
+      "path": "src/modules/payments-billing/payments-billing.providers.ts",
+      "sha256": "8138ef9f8ce317ec5f9305720973b154bf06cb5ecf2979f25c63b78703889361"
+    },
+    {
+      "path": "src/modules/payments-billing/application/commercial-financial.service.ts",
+      "sha256": "e845d7f307b4ae2cb81b3085a5a76029fd1ab761647bd47245b9b10238d41c25"
+    },
+    {
+      "path": "src/modules/payments-billing/infrastructure/invoice-balance.reader.ts",
+      "sha256": "04be60e1b82a30e0df4ad18a4af19ad77092438decf97e5af95dc780d843b9ca"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/commercial-contract.ts",
+      "sha256": "65d818107115b49373a8d7afa836469099ff100c851a7c639b1e25d204c9514a"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/commercial-appendix.ts",
+      "sha256": "a972998a12be0b7245860edcacd476521884db91952f2f149d2dd9beaf4432ca"
+    },
+    {
+      "path": "src/modules/payments-billing/domain/final-invoice.ts",
+      "sha256": "df5fae3736ac120fa985c6599758ad2892e3e1146de0814d722cf900b4c3097e"
+    }
+  ],
+  "migrations": [
+    {
+      "name": "20260928000000_core_platform",
+      "sha256": "fdf48b9ad5baf3074bf3d310b90d945d66625131cc4f133e209fc6a4061f3902"
+    },
+    {
+      "name": "20261003000000_identity_access_persistence",
+      "sha256": "e68ae6978036b27180c0042ab6d74c7adf570b0fc8bb9f9b1a63864a5b0b268b"
+    },
+    {
+      "name": "20261005000000_venue_catalog_core",
+      "sha256": "e171ab99fecb2d735f2946548056a129157a7b625a4a095c2a2a562c0878c79b"
+    },
+    {
+      "name": "20261007000000_booking_lifecycle_foundation",
+      "sha256": "83eb52cf51cf428d058a69173542d263f5cac9457d6312a72d9f08400e91ab61"
+    },
+    {
+      "name": "20261007001000_booking_slot_holds",
+      "sha256": "bdd8f5891b87bcc6fafad084fc5261ce5313f84c7921d4ae0c64d09f3e02ab46"
+    },
+    {
+      "name": "20261007002000_booking_timelines",
+      "sha256": "b7a575364d75815e404dfdf65f73ef5d3bdcd8fe933c25a1aec649fbd4110041"
+    },
+    {
+      "name": "20261007003000_booking_deposit_intents",
+      "sha256": "3b3fccc1befe22e25d3d1a3284e2e76633f1c114a9d2de8d7c52485ecb5c69fb"
+    },
+    {
+      "name": "20261007004000_booking_post_deposit_lifecycle",
+      "sha256": "18e63d96c5c533cd5106bf3c1f0ce353879df406dd20e56fc4bedd3ac8820981"
+    },
+    {
+      "name": "20261008000000_invitation_delivery_intent",
+      "sha256": "12e32edcc98066031bfd4adc95d19a9c0f713bca425dbf487fb1781c999bea8e"
+    },
+    {
+      "name": "20261008000000_invitation_media",
+      "sha256": "9cf4f65369164c26b0861cf0184fc211df35e9b2e2362a8950efabc1fc2300d4"
+    },
+    {
+      "name": "20261008001000_booking_reporting",
+      "sha256": "a965b577973b1fbe3d8b1766ef980470dc65795bf530bfdd626b68855c264619"
+    },
+    {
+      "name": "20261008002000_booking_automation_command",
+      "sha256": "cbdbafac3282581f73e3b225f9eeff54c4b14c0dc7bb81f845c2791802ab2887"
+    },
+    {
+      "name": "20261008003000_confirmed_booking_slot",
+      "sha256": "31ec540b7d615e9488a63a64a8fb831eea4cd4d56ac20996cb371b0e436b1a22"
+    },
+    {
+      "name": "20261008004000_booking_event_envelope",
+      "sha256": "81c61924b14832e2e7eb567327537ff3e44a21c714251dee09e3596d97152a35"
+    },
+    {
+      "name": "20261008005000_retention_evidence_account_scope",
+      "sha256": "29344f1b7466ce2726b0c756c45e7d6c581affb04cb113059df160697e15e903"
+    },
+    {
+      "name": "20261008006000_payments_billing_ledger",
+      "sha256": "f83d49615742a4e32f3813e6c90bd84c5b01e4ed018cd4e559fc6a27dd4023c9"
+    },
+    {
+      "name": "20261008007000_billing_deposit_application",
+      "sha256": "14b34800d83772ebc3e138a0285e47194ebf0fd308a876e099b703ee03ab8859"
+    },
+    {
+      "name": "20261008007000_booking_commercial_acceptance",
+      "sha256": "487917d3482512b9107074d358c5758abde651965469f031b0b9e4009661d59f"
+    },
+    {
+      "name": "20261008008000_post_booking_experience",
+      "sha256": "b26e8a6e8b0c1c01d7d20b1dabb910c81ba17414f9cb2dc84e2b5b81b4c0f9ef"
+    },
+    {
+      "name": "20261008008000_vnpay_provider_evidence",
+      "sha256": "8afb100e53bda406b9a89257398ecc4f6fe6ffaa2cd98c2c4f430bfcdef6b10c"
+    },
+    {
+      "name": "20261008230000_password_email_otp",
+      "sha256": "0f6b8b9bfc1df18e2527ba7e187a74de0808edb903e969ee7c334860837a586e"
+    },
+    {
+      "name": "20261009000000_invitation_media_command_recovery",
+      "sha256": "3efb5e033b23ed9744248ba2f9b5a0c547f6ed3802714da5417bb57c2384ffa8"
+    },
+    {
+      "name": "20261009001000_billing_operations_reporting",
+      "sha256": "b4618f53fc5400595abf4ba9c684d6eb95d8e651141d900ce65a69ce56d70232"
+    },
+    {
+      "name": "20261009020000_invitation_design_publication_printable",
+      "sha256": "d7382834ec5de4c4810779a63b29f6f91e2381d96a756b440849d81b69f8a688"
+    },
+    {
+      "name": "20261009030000_invitation_print_order_and_billing",
+      "sha256": "92389959e42c72f7d83c953ecdea466f84656208f84540d7e2b3d9a9b1b0ec06"
+    },
+    {
+      "name": "20261009040000_invitation_reporting_snapshots",
+      "sha256": "6987ca2d0de50b54a5704de592999ad0426779767bb7e1e6746595559254accf"
+    },
+    {
+      "name": "20261010010000_couple_profile",
+      "sha256": "e0221a09fe53ee743a01e090944fa4cc145ccf4aa0eeedc638ce9232a47bc447"
+    },
+    {
+      "name": "20261010020000_restaurant_services",
+      "sha256": "cc036e694f881c0dc0878fc5fe8dd11bcb8482f485bed5cbebfef7ca888e40d5"
+    },
+    {
+      "name": "20261010030000_print_commercial_offerings",
+      "sha256": "01e86401787ef7d9ec0a472893cdfee86012b5fa06cbfd42bed5a9f7605eba52"
+    },
+    {
+      "name": "20261011009000_billing_contract_source",
+      "sha256": "2a33869b5c55cffcb61d3a8a923b9fa85f8d7583ee1c3fd54fd5bd03bc871b6a"
+    },
+    {
+      "name": "20261011010000_commercial_contracts",
+      "sha256": "deda31129f4a3d255a0fa68cb0ce29ed1abb88c4f47225251b07a7478baccfa4"
+    },
+    {
+      "name": "20261011019000_billing_extension_sources",
+      "sha256": "7e209e9a50916048338fd338d606b334313b0d8283f26dad972efa47cb7729b0"
+    },
+    {
+      "name": "20261011020000_commercial_appendices",
+      "sha256": "d5130faa50e1e8cf2681084550584808171ab96761d167c185af3cc53e2058fc"
+    },
+    {
+      "name": "20261011021000_appendix_ledger_guards",
+      "sha256": "8ed9c3e9ed72c154c85952fa5e7a289792a285855efa47fb3599d0f0145d1d9c"
+    },
+    {
+      "name": "20261011022000_commercial_billing_outbox",
+      "sha256": "f6001872bcbf62396aca5ebf4c3df1de210a774455e87596a8a02ab22ba31904"
+    },
+    {
+      "name": "20261011023000_contract_print_fulfillment",
+      "sha256": "5bae57ec05bae44c39d1de0e4bf270fe6513b5a490bef57e1d7a7bbb5110a2a1"
+    },
+    {
+      "name": "20261011024000_print_template_provenance",
+      "sha256": "a0c4a986c568f44e5ec5bf4e78b6bcbcb261a7739a817bb35a4943ea79d53bec"
+    },
+    {
+      "name": "20261011025000_final_commercial_invoices",
+      "sha256": "03ce34bd80bd596980dcb6ffa097735050de629843ff5a53fc7b48d29b978409"
+    },
+    {
+      "name": "20261011026000_invoice_adjustment_prefix_guard",
+      "sha256": "ba79cbd15dc4c52c39a598ebf1743029065d7c3e541ef002bbfd0f3f00ebdc1e"
+    },
+    {
+      "name": "20261011027000_invoice_balance_pins",
+      "sha256": "d3eca34ef4a30c32352b858e669f446f27a5e6e239697687e6555ffdfffec563"
+    },
+    {
+      "name": "20261011028000_invoice_document_integrity",
+      "sha256": "c1a1bb2d0d84aa545636aaeb9db798c567e7fdafda296a2f9f1e71638df41a79"
+    },
+    {
+      "name": "20261011029000_invoice_outbox_identity",
+      "sha256": "e2a2fb1d90d6620f097078b0ab15a3efe987288fe9334befac16fc2a060e2b20"
+    },
+    {
+      "name": "20261011030000_preserve_allocated_print_sources",
+      "sha256": "7b956219f2c082dd90d71aa4ad38105b5cc4749903b0387ecd475f8a6f24ecd4"
+    },
+    {
+      "name": "20261011031000_contracted_print_quote_bounds",
+      "sha256": "cef89fd72e9c3a77996b1d89488714235d0bdd59497c69c0d1dfed8b88ce4da5"
+    }
+  ],
+  "extensionOperations": [
+    {
+      "method": "GET",
+      "path": "/bookings/{bookingId}/contract-appendices",
+      "operationId": "listCommercialAppendices",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/{bookingId}/contract-appendices",
+      "operationId": "createCommercialAppendix",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "201",
+        "400",
+        "401",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/{bookingId}/contract-appendices/{revisionId}/approvals",
+      "operationId": "approveCommercialAppendix",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/{bookingId}/contract-appendices/{revisionId}/submissions",
+      "operationId": "submitCommercialAppendix",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/{bookingId}/contracts",
+      "operationId": "listCommercialContracts",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/{bookingId}/contracts",
+      "operationId": "createCommercialContractRevision",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "201",
+        "400",
+        "401",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/{bookingId}/contracts/{revisionId}/approvals",
+      "operationId": "approveCommercialContract",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/{bookingId}/contracts/{revisionId}/pdf",
+      "operationId": "downloadCommercialContractPdf",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/{bookingId}/contracts/{revisionId}/submissions",
+      "operationId": "submitCommercialContract",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/{bookingId}/contracts/{revisionId}/withdrawals",
+      "operationId": "withdrawCommercialContractApproval",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/{bookingId}/final-invoices",
+      "operationId": "listCommercialInvoices",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/{bookingId}/final-invoices/{invoiceRevisionId}",
+      "operationId": "getCommercialInvoice",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/{bookingId}/incidental-expenses",
+      "operationId": "getIncidentalExpenses",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/{bookingId}/payments/balance",
+      "operationId": "createBalancePayment",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "201",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "500",
+        "503"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/{bookingId}/payments/deposit",
+      "operationId": "createDepositPayment",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "201",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "500",
+        "503"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/{bookingId}/payments/{attemptId}",
+      "operationId": "getPaymentAttempt",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "500",
+        "503"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/{bookingId}/print-orders",
+      "operationId": "listPrintOrders",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/{bookingId}/print-orders",
+      "operationId": "requestPrintOrder",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "201",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/{bookingId}/print-orders/{orderId}",
+      "operationId": "getPrintOrder",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/{bookingId}/print-orders/{orderId}/approval",
+      "operationId": "approvePrintOrder",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/{bookingId}/print-orders/{orderId}/cancellation",
+      "operationId": "cancelPrintOrderCouple",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/{bookingId}/print-orders/{orderId}/cancellation-intents",
+      "operationId": "recordPrintOrderCancellationIntent",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/{bookingId}/print-orders/{orderId}/replacement-approvals",
+      "operationId": "approvePrintOrderReplacement",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/{bookingId}/printable-revisions/{printableRevisionId}/file",
+      "operationId": "getPrintableInvitationFile",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/catalog/print-offerings",
+      "operationId": "listSelectablePrintOfferings",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/catalog/services",
+      "operationId": "listSelectableRestaurantServices",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/consultations/{consultationId}/couple-profile",
+      "operationId": "readCoupleProfile",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "401",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/consultations/{consultationId}/couple-profile",
+      "operationId": "updateCoupleProfile",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "401",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/management/billing/payments/manual",
+      "operationId": "recordManualPayment",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "201",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "500",
+        "503"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/{bookingId}/final-invoices",
+      "operationId": "finalizeCommercialInvoice",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "201",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/management/bookings/{bookingId}/incidental-expenses",
+      "operationId": "getManagementIncidentalExpenses",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/{bookingId}/incidental-expenses",
+      "operationId": "createIncidentalExpense",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "201",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/management/bookings/{bookingId}/incidental-expenses/{lineId}",
+      "operationId": "updateIncidentalExpense",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/management/bookings/{bookingId}/incidental-expenses/{lineId}",
+      "operationId": "deleteIncidentalExpense",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/management/bookings/{bookingId}/invoice-adjustments",
+      "operationId": "adjustCommercialInvoice",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "201",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/management/print-offerings",
+      "operationId": "listManagedPrintOfferings",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/management/print-offerings",
+      "operationId": "createPrintOfferings",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "201",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/management/print-offerings/{id}",
+      "operationId": "revisePrintOfferings",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/management/print-orders",
+      "operationId": "listManagementPrintOrders",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/management/print-orders/{orderId}",
+      "operationId": "getManagementPrintOrder",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/management/print-orders/{orderId}/cancellation",
+      "operationId": "cancelPrintOrderManagement",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/management/print-orders/{orderId}/handover",
+      "operationId": "markPrintOrderHandedOver",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/management/print-orders/{orderId}/production",
+      "operationId": "startPrintOrderProduction",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/management/print-orders/{orderId}/quotations",
+      "operationId": "quotePrintOrder",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/management/print-orders/{orderId}/ready",
+      "operationId": "markPrintOrderReady",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/management/print-orders/{orderId}/replacement-proposals",
+      "operationId": "proposePrintOrderReplacement",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/management/services",
+      "operationId": "listManagedRestaurantServices",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/management/services",
+      "operationId": "createRestaurantServices",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "201",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/management/services/{id}",
+      "operationId": "reviseRestaurantServices",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responseStatuses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "409",
+        "422"
+      ]
+    }
+  ],
+  "runtime": {
+    "target": "https://wedding-be-production-e1dc.up.railway.app",
+    "classification": "Owner-authorized developer staging; Railway environment label production is not production acceptance",
+    "lastRecordedDeployment": "2fd330bc-cc72-43f3-9506-90bf5fd62c2b",
+    "freshReadOnlyChecks": [
+      {
+        "path": "/api/v1/openapi.json",
+        "status": 200,
+        "requestId": "7e269979-8d16-4d05-a066-603e99f16565",
+        "sha256": "55c15733cdc25a9151c724e311cb5753f9b41124a15c879cf73cc3c90c108b9e"
+      },
+      {
+        "path": "/health/live",
+        "status": 200,
+        "requestId": "dec3cfac-f244-4782-b289-d27081dd41ea"
+      },
+      {
+        "path": "/health/ready",
+        "status": 200,
+        "requestId": "7c1e45e1-a4fa-45e1-a3a8-4375cbccab08"
+      },
+      {
+        "path": "/api/v1/bookings/00000000-0000-4000-8000-000000000017/contracts",
+        "status": 401,
+        "requestId": "5731dcee-9b53-495a-b00b-6400cc062291",
+        "errorCode": "AUTHENTICATION_REQUIRED"
+      },
+      {
+        "path": "/api/v1/bookings/00000000-0000-4000-8000-000000000017/final-invoices",
+        "status": 401,
+        "requestId": "c25a268a-61d6-4f70-8eeb-42b4a730a5cf",
+        "errorCode": "AUTHENTICATION_REQUIRED"
+      },
+      {
+        "path": "/api/v1/management/bookings/00000000-0000-4000-8000-000000000017/incidental-expenses",
+        "status": 401,
+        "requestId": "261268ff-3cbb-4e5b-96e5-36884cd3c067",
+        "errorCode": "AUTHENTICATION_REQUIRED"
+      }
+    ],
+    "verifiedAt": "2026-10-11T20:47:34.073Z",
+    "featureJourneyRerun": false
+  },
+  "qualityEvidence": {
+    "sourceCommit": "054d670d6a7edd4d8028004271b02fab5c60973f",
+    "ciRun": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38172405227",
+    "unitTests": 1234,
+    "contractTests": 37,
+    "integrationTests": 382,
+    "fullSuiteTests": 1653,
+    "testFiles": 214,
+    "perFileLinesBranchesMinimum": 80,
+    "coverage": {
+      "statements": 96.51,
+      "branches": 93.56,
+      "functions": 98.48,
+      "lines": 97.33
+    },
+    "migrationCount": 44,
+    "record": "tasks/evidence/rv14-20-pr32-merge-swagger-2026-10-12.md"
+  },
+  "unresolved": {
+    "BE11Through16": "Independent team-member approval remains unrecorded; implementation/offline and authorized live developer journey complete",
+    "RV16": "SPEC-09 NTF-W1/3/4 workers and recovery",
+    "RV19": "SPEC-07 SEA-W3/5 real seating print output",
+    "RV21": "Owner-reviewed runtime/recovery release checkpoint including REL-W3",
+    "productionMoney": "Separate merchant/endpoint/adapter/owner review",
+    "frontend": "Frontend team integration and browser/native release acceptance"
+  }
+}

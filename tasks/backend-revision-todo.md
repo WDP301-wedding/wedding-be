@@ -75,10 +75,10 @@ authorized disposable/staging environment and bounded cost; CI remains offline.
 - [x] RV-01
 - [x] RV-02
 - [x] RV-03
-- [ ] RV-04
-- [ ] RV-05
+- [x] RV-04 (real authorized mailbox invitation and current reset/change OTP)
+- [x] RV-05 (deployed backend proxy/session/cookie/restart proof; browser/native separate)
 - [x] RV-06 (bounded disposable CLI rehearsal and manual operator schedule)
-- [ ] RV-07
+- [x] RV-07 (real private catalog Storage round-trip and retained published references)
 - [x] RV-08
 - [x] RV-09
 - [x] RV-10
@@ -108,6 +108,13 @@ authorized disposable/staging environment and bounded cost; CI remains offline.
 - [ ] RV-19
 - [x] RV-20 (target request/error/audit correlation; metrics/OTLP optional disabled)
 - [ ] RV-21
+
+2026-10-12 evidence reconciliation: RV-04/05/07 had completed receipts in ignored
+local files but no published evidence/todo ticks. [Recovered sanitized bundle and
+scope](evidence/rv04-05-07-12-runtime-2026-10-11.md) closes these three backend
+developer gates without another provider run. **18/21 RV tasks are complete**;
+RV-16 (actual Notifications workers), RV-19 (real Seating print integration) and
+RV-21 (owner-reviewed release/recovery checkpoint including REL-W3) remain open.
 
 2026-10-12 RV-14 → RV-15 → RV-17 → RV-18 → RV-06 → RV-20 closure:
 [implementation, offline gates, configuration and runtime evidence](evidence/rv14-20-runtime-2026-10-12.md).
@@ -191,7 +198,21 @@ This does not complete BE-06–17 or pending external-provider RV gates.
 - [ ] BE-14
 - [ ] BE-15
 - [ ] BE-16
-- [ ] BE-17
+- [x] BE-17 (exact runtime/API/provider/migration/evidence hand-off delivered; predecessor review gates retained)
+
+2026-10-12 BE-17 delivery and acceptance reconciliation:
+[exact API/provider/migration hand-off](../docs/be17-extension-handoff.md),
+[machine-readable source manifest](evidence/be17-extension-manifest-2026-10-12.json)
+and [per-BE/RV matrix](evidence/be17-extension-handoff-2026-10-12.md).
+BE-11–16 implementation, repaired PostgreSQL/HTTP/race tests, CI/deployment and
+authorized developer runtime journey are now verified, including genuine
+invoice-linked BALANCE and retained print files. The older pending-online notes
+below are historical and superseded for those tested gates. Independent
+team-member approval remains unrecorded; agent review and owner-authorized merges
+are not that approval. Preserve the acceptance checkboxes BE-11–16 until that
+specific gate closes. BE-17's hand-off package is complete and records these
+remaining predecessor acceptance gates rather than waiving them. **11/17 BE tasks
+are checked**, not a claim that six implementations are missing.
 
 Kế hoạch bước 6 (BE-11–16): [phụ lục, fulfillment thiệp, phát sinh, hóa đơn cuối và điều chỉnh](plan.md).
 

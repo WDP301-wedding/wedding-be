@@ -1,0 +1,948 @@
+{
+  "date": "2026-10-11",
+  "timezone": "Asia/Saigon",
+  "sourceRevision": "3f7842097977e8c931edfe1cfdd176c2d2006a58",
+  "deploymentId": "4c50c25f-c83c-4a75-bcc8-349d6b4949bc",
+  "target": "https://wedding-be-production-e1dc.up.railway.app",
+  "openApiSha256": "fcc54f3a842836e17ca056ca2ec81cec6172c28f79c3831477418c721e273184",
+  "authorization": {
+    "environment": "Previously owner-authorized developer-only Railway/Supabase target",
+    "mailbox": "Owner explicitly authorized a mailbox in the historical rehearsal chat and supplied invitation/OTP receipts",
+    "realMoney": false,
+    "paidGeneration": false
+  },
+  "providers": {
+    "email": "Brevo REST v3",
+    "storage": "@supabase/storage-js 2.116.0, private bucket",
+    "payments": "VNPay 2.1.0 sandbox"
+  },
+  "rv04": {
+    "acceptance": {
+      "at": "2026-10-10T23:04:42.115Z",
+      "acceptance": {
+        "status": 201,
+        "requestId": "d65f5922-16a6-49a9-9218-a6db1ff4a1bd",
+        "sessionId": "be5b3306-3a15-4813-856a-cfea1c2b2181"
+      },
+      "replay": {
+        "status": 401,
+        "requestId": "cb382ffc-f6d4-449a-b7c1-82a485afd4ea"
+      },
+      "reset": {
+        "status": 202,
+        "requestId": "1f80f981-adad-4678-b5f7-110e70668fdb",
+        "challengeId": "a79afc8b-badd-4ccf-92ec-10eb3f708a8f"
+      },
+      "cooldown": {
+        "status": 429,
+        "requestId": "aca24898-92cb-4ddb-bd50-5f134b453fd9"
+      }
+    },
+    "reset": {
+      "at": "2026-10-10T23:06:12.108Z",
+      "challengeId": "a79afc8b-badd-4ccf-92ec-10eb3f708a8f",
+      "checks": {
+        "wrong": {
+          "status": 422,
+          "requestId": "f7292a9c-0453-4da1-be68-0f59d9643aa3",
+          "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+          "allowCredentials": "true",
+          "location": null
+        },
+        "completed": {
+          "status": 200,
+          "requestId": "91cc12c1-a8ad-4355-a69f-54a5188ad4ff",
+          "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+          "allowCredentials": "true",
+          "location": null
+        },
+        "replay": {
+          "status": 422,
+          "requestId": "7bcbc7db-8743-4f02-b3af-6eda509fded0",
+          "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+          "allowCredentials": "true",
+          "location": null
+        },
+        "revoked": {
+          "status": 401,
+          "requestId": "72f7fc2f-7a98-49a9-ac97-f7f5718ea256",
+          "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+          "allowCredentials": "true",
+          "location": null
+        },
+        "oldPassword": {
+          "status": 401,
+          "requestId": "d8a57648-9c3c-4cec-8596-04c79eb62696",
+          "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+          "allowCredentials": "true",
+          "location": null
+        },
+        "newLogin": {
+          "status": 201,
+          "requestId": "0e757aa9-e41e-4a8c-bdc5-45583d4ef3aa"
+        },
+        "badCurrent": {
+          "status": 422,
+          "requestId": "07c71ee0-cdce-4a78-9844-49f164b5b58d",
+          "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+          "allowCredentials": "true",
+          "location": null
+        }
+      }
+    },
+    "change": {
+      "completedRequestId": "37c3e03e-81d1-42d5-973e-3992fe4c2af8",
+      "crossAccountDeniedRequestId": "97bfd143-78a4-43cc-84f7-2b78cb140f58",
+      "oldSessionDeniedRequestId": "fbc6d912-5bd8-4787-8230-671439e6b71b",
+      "newPasswordLoginAfterRestartRequestId": "8d60898d-8823-4bd8-abcf-17b32c366aff"
+    },
+    "reissue": {
+      "at": "2026-10-10T23:13:08.671Z",
+      "recipientCodesMatchedBothChallenges": true,
+      "first": {
+        "id": "5a017569-673a-476c-ac4e-3fddeef5df0f",
+        "status": "REVOKED"
+      },
+      "last": {
+        "id": "65a767a6-2524-4e71-992d-cc17290f572d",
+        "originalExpiresAt": "2026-10-10T23:21:34.528Z",
+        "expiryControlled": true
+      },
+      "checks": {
+        "revoked": {
+          "status": 422,
+          "requestId": "e2776214-6b55-470d-bec0-423ded963721",
+          "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+          "allowCredentials": "true",
+          "location": null
+        },
+        "expiry": {
+          "status": 422,
+          "requestId": "4a0a43fd-880e-4d09-8fe4-06a244537362",
+          "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+          "allowCredentials": "true",
+          "location": null
+        }
+      },
+      "passwordUnchanged": true
+    },
+    "providerDelivery": {
+      "at": "2026-10-10T23:13:29.485Z",
+      "status": 200,
+      "events": [
+        {
+          "event": "opened",
+          "date": "2026-10-11T06:11:52.814+07:00",
+          "subject": "Mã OTP đặt lại mật khẩu — Wedding Estate",
+          "messageIdSha256": "69811190b441d158eddf3656bd7193ba28d9f195d3c9daf2d9d8c2d35cba34c4"
+        },
+        {
+          "event": "opened",
+          "date": "2026-10-11T06:11:51.594+07:00",
+          "subject": "Mã OTP đặt lại mật khẩu — Wedding Estate",
+          "messageIdSha256": "21d9687e24d77f054d24a72357d48f7490e89d380cf7920429eb794431bd733f"
+        },
+        {
+          "event": "delivered",
+          "date": "2026-10-11T06:11:41.000+07:00",
+          "subject": "Mã OTP đặt lại mật khẩu — Wedding Estate",
+          "messageIdSha256": "69811190b441d158eddf3656bd7193ba28d9f195d3c9daf2d9d8c2d35cba34c4"
+        },
+        {
+          "event": "requests",
+          "date": "2026-10-11T06:11:37.291+07:00",
+          "subject": "Mã OTP đặt lại mật khẩu — Wedding Estate",
+          "messageIdSha256": "69811190b441d158eddf3656bd7193ba28d9f195d3c9daf2d9d8c2d35cba34c4"
+        },
+        {
+          "event": "opened",
+          "date": "2026-10-11T06:10:40.309+07:00",
+          "subject": "Mã OTP đặt lại mật khẩu — Wedding Estate",
+          "messageIdSha256": "21d9687e24d77f054d24a72357d48f7490e89d380cf7920429eb794431bd733f"
+        },
+        {
+          "event": "opened",
+          "date": "2026-10-11T06:10:37.771+07:00",
+          "subject": "Mã OTP đặt lại mật khẩu — Wedding Estate",
+          "messageIdSha256": "525608ba36f4130b045109bc8acf0f1c30f46b980ba5d22698817773e856d971"
+        },
+        {
+          "event": "delivered",
+          "date": "2026-10-11T06:10:31.000+07:00",
+          "subject": "Mã OTP đặt lại mật khẩu — Wedding Estate",
+          "messageIdSha256": "21d9687e24d77f054d24a72357d48f7490e89d380cf7920429eb794431bd733f"
+        },
+        {
+          "event": "requests",
+          "date": "2026-10-11T06:10:01.115+07:00",
+          "subject": "Mã OTP đặt lại mật khẩu — Wedding Estate",
+          "messageIdSha256": "21d9687e24d77f054d24a72357d48f7490e89d380cf7920429eb794431bd733f"
+        },
+        {
+          "event": "opened",
+          "date": "2026-10-11T06:07:58.652+07:00",
+          "subject": "Mã OTP đổi mật khẩu — Wedding Estate",
+          "messageIdSha256": "102fbe38f8017d701cbf53fba608da590a474ca8d3996c9362f88a595e1cf738"
+        },
+        {
+          "event": "delivered",
+          "date": "2026-10-11T06:07:38.000+07:00",
+          "subject": "Mã OTP đổi mật khẩu — Wedding Estate",
+          "messageIdSha256": "102fbe38f8017d701cbf53fba608da590a474ca8d3996c9362f88a595e1cf738"
+        },
+        {
+          "event": "requests",
+          "date": "2026-10-11T06:07:28.162+07:00",
+          "subject": "Mã OTP đổi mật khẩu — Wedding Estate",
+          "messageIdSha256": "102fbe38f8017d701cbf53fba608da590a474ca8d3996c9362f88a595e1cf738"
+        },
+        {
+          "event": "opened",
+          "date": "2026-10-11T06:04:57.002+07:00",
+          "subject": "Mã OTP đặt lại mật khẩu — Wedding Estate",
+          "messageIdSha256": "525608ba36f4130b045109bc8acf0f1c30f46b980ba5d22698817773e856d971"
+        },
+        {
+          "event": "delivered",
+          "date": "2026-10-11T06:04:45.000+07:00",
+          "subject": "Mã OTP đặt lại mật khẩu — Wedding Estate",
+          "messageIdSha256": "525608ba36f4130b045109bc8acf0f1c30f46b980ba5d22698817773e856d971"
+        },
+        {
+          "event": "requests",
+          "date": "2026-10-11T06:04:44.204+07:00",
+          "subject": "Mã OTP đặt lại mật khẩu — Wedding Estate",
+          "messageIdSha256": "525608ba36f4130b045109bc8acf0f1c30f46b980ba5d22698817773e856d971"
+        },
+        {
+          "event": "opened",
+          "date": "2026-10-11T06:03:31.593+07:00",
+          "subject": "Your wedding workspace invitation",
+          "messageIdSha256": "6e00258243193fe2f9882579266a1fc58fc6cfbaa7a76d50b37e3b9290ea58a9"
+        },
+        {
+          "event": "opened",
+          "date": "2026-10-11T06:03:05.259+07:00",
+          "subject": "Your wedding workspace invitation",
+          "messageIdSha256": "6e00258243193fe2f9882579266a1fc58fc6cfbaa7a76d50b37e3b9290ea58a9"
+        },
+        {
+          "event": "delivered",
+          "date": "2026-10-11T06:02:43.000+07:00",
+          "subject": "Your wedding workspace invitation",
+          "messageIdSha256": "6e00258243193fe2f9882579266a1fc58fc6cfbaa7a76d50b37e3b9290ea58a9"
+        },
+        {
+          "event": "requests",
+          "date": "2026-10-11T06:02:42.190+07:00",
+          "subject": "Your wedding workspace invitation",
+          "messageIdSha256": "6e00258243193fe2f9882579266a1fc58fc6cfbaa7a76d50b37e3b9290ea58a9"
+        }
+      ]
+    },
+    "persistence": {
+      "at": "2026-10-10T23:15:45.270Z",
+      "invitation": {
+        "id": "98e3002f-9475-4380-ad80-f3725379dfaa",
+        "status": "ACCEPTED",
+        "resolvedAccountId": "f3e421c8-b8dd-4aa1-a815-1c49ce032b99",
+        "acceptedAt": "2026-10-10T23:04:36.284Z"
+      },
+      "access": [
+        {
+          "level": "RESTRICTED",
+          "consultationId": "e9d9beaf-7f49-4648-a603-c26efc4ddd87",
+          "bookingId": null
+        }
+      ],
+      "otp": [
+        {
+          "id": "a79afc8b-badd-4ccf-92ec-10eb3f708a8f",
+          "purpose": "RESET",
+          "status": "CONSUMED",
+          "attempts": 1,
+          "consumedAt": "2026-10-10T23:06:03.194Z",
+          "expiresAt": "2026-10-10T23:14:42.379Z"
+        },
+        {
+          "id": "986aac5c-891a-4664-a016-84478133f28f",
+          "purpose": "CHANGE",
+          "status": "CONSUMED",
+          "attempts": 0,
+          "consumedAt": "2026-10-10T23:08:27.791Z",
+          "expiresAt": "2026-10-10T23:17:25.304Z"
+        },
+        {
+          "id": "5a017569-673a-476c-ac4e-3fddeef5df0f",
+          "purpose": "RESET",
+          "status": "REVOKED",
+          "attempts": 0,
+          "consumedAt": null,
+          "expiresAt": "2026-10-10T23:19:59.353Z"
+        },
+        {
+          "id": "65a767a6-2524-4e71-992d-cc17290f572d",
+          "purpose": "RESET",
+          "status": "ACTIVE",
+          "attempts": 0,
+          "consumedAt": null,
+          "expiresAt": "2026-10-10T23:13:07.570Z"
+        }
+      ],
+      "audits": [
+        {
+          "action": "password-reset.completed",
+          "requestId": "91cc12c1-a8ad-4355-a69f-54a5188ad4ff",
+          "occurredAt": "2026-10-10T23:06:05.483Z",
+          "metadata": {
+            "otpVerified": true,
+            "allSessionsRevoked": true
+          }
+        },
+        {
+          "action": "account.password-changed",
+          "requestId": "37c3e03e-81d1-42d5-973e-3992fe4c2af8",
+          "occurredAt": "2026-10-10T23:08:30.319Z",
+          "metadata": {
+            "otpVerified": true,
+            "allSessionsRevoked": true
+          }
+        }
+      ],
+      "sessions": [
+        {
+          "status": "ACTIVE",
+          "revocationReason": null,
+          "count": 1
+        },
+        {
+          "status": "REVOKED",
+          "revocationReason": "logout",
+          "count": 3
+        },
+        {
+          "status": "REVOKED",
+          "revocationReason": "password-change",
+          "count": 2
+        },
+        {
+          "status": "REVOKED",
+          "revocationReason": "password-reset",
+          "count": 1
+        },
+        {
+          "status": "COMPROMISED",
+          "revocationReason": "refresh-reuse",
+          "count": 3
+        }
+      ],
+      "retiredResetRoute": {
+        "status": 410,
+        "requestId": "ef6a695a-77d2-4e13-ae8a-4aecc0988d0d",
+        "error": "PASSWORD_OTP_REQUIRED"
+      },
+      "invitationReplay": {
+        "status": 202,
+        "requestId": "e7c6e210-ce7c-4514-9a12-39aeda1a48c6",
+        "replayed": true
+      }
+    }
+  },
+  "rv05": {
+    "at": "2026-10-10T23:07:54.970Z",
+    "checks": [
+      {
+        "label": "https://wedding-be-production-e1dc.up.railway.app login",
+        "status": 201,
+        "requestId": "9dbd20b4-6912-4ea2-8e25-767efec0e7c2",
+        "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-be-production-e1dc.up.railway.app manager-login",
+        "status": 201,
+        "requestId": "d8aa909e-da4c-4453-8e08-bf9207ae3810",
+        "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-be-production-e1dc.up.railway.app cross-account-revoke",
+        "status": 404,
+        "requestId": "e061084f-d919-43fa-8d65-47be6ec05bb9",
+        "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-be-production-e1dc.up.railway.app manager-resource-denial",
+        "status": 403,
+        "requestId": "b13b4c7b-c232-4a25-b9a4-7fba09d922f0",
+        "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-be-production-e1dc.up.railway.app forbidden-origin",
+        "status": 403,
+        "requestId": "b91c4a34-d51b-4402-890b-cbe4c5211021",
+        "allowOrigin": null,
+        "allowCredentials": null
+      },
+      {
+        "label": "https://wedding-be-production-e1dc.up.railway.app rotate",
+        "status": 200,
+        "requestId": "bf912a77-611b-436c-af35-fb9373ef027b",
+        "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-be-production-e1dc.up.railway.app old-cookie-replay",
+        "status": 401,
+        "requestId": "4d070ab3-7667-4a59-a551-aac35c6a87b4",
+        "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-be-production-e1dc.up.railway.app replay-revokes-session",
+        "status": 401,
+        "requestId": "016713ca-6a98-4123-a1fb-ed951b5cc46d",
+        "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-be-production-e1dc.up.railway.app login-for-logout",
+        "status": 201,
+        "requestId": "11128f22-5e0a-4cc9-8153-8e54859e1586",
+        "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-be-production-e1dc.up.railway.app logout",
+        "status": 204,
+        "requestId": "98b085b1-f224-40ba-a268-3faa7e167ba9",
+        "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-be-production-e1dc.up.railway.app logout-access-denial",
+        "status": 401,
+        "requestId": "b9db49cc-9ad0-42f4-aeff-321c0fce89bd",
+        "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-be-production-e1dc.up.railway.app logout-refresh-denial",
+        "status": 401,
+        "requestId": "d08e9248-d99f-4e58-bcc2-5da04f1b6398",
+        "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-be-production-e1dc.up.railway.app cleanup-manager-session",
+        "status": 204,
+        "requestId": "449435c8-aa8a-4c50-8986-01b84f8294e1",
+        "allowOrigin": "https://wedding-be-production-e1dc.up.railway.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-web-silk.vercel.app login",
+        "status": 201,
+        "requestId": "f75934ff-ae41-44d3-8dc7-beea9d3e79c4",
+        "allowOrigin": "https://wedding-web-silk.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-web-silk.vercel.app manager-login",
+        "status": 201,
+        "requestId": "5318c73d-8a00-4f49-92e6-716b3d90ff44",
+        "allowOrigin": "https://wedding-web-silk.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-web-silk.vercel.app cross-account-revoke",
+        "status": 404,
+        "requestId": "d658c0aa-8125-4d03-8567-1e837d91a76f",
+        "allowOrigin": "https://wedding-web-silk.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-web-silk.vercel.app manager-resource-denial",
+        "status": 403,
+        "requestId": "1924649a-be6a-4dff-b34d-d6d30f38d051",
+        "allowOrigin": "https://wedding-web-silk.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-web-silk.vercel.app forbidden-origin",
+        "status": 403,
+        "requestId": "b13ed9b6-9164-4d80-9931-4459e1ac6015",
+        "allowOrigin": null,
+        "allowCredentials": null
+      },
+      {
+        "label": "https://wedding-web-silk.vercel.app rotate",
+        "status": 200,
+        "requestId": "4f6e110b-84d1-46b5-b8c8-87cb076e35f9",
+        "allowOrigin": "https://wedding-web-silk.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-web-silk.vercel.app old-cookie-replay",
+        "status": 401,
+        "requestId": "6d1052ce-2f2f-440d-9a8b-6fa666dd098d",
+        "allowOrigin": "https://wedding-web-silk.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-web-silk.vercel.app replay-revokes-session",
+        "status": 401,
+        "requestId": "44989098-0fb8-4bc7-8bd2-8a0db4dcba1e",
+        "allowOrigin": "https://wedding-web-silk.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-web-silk.vercel.app login-for-logout",
+        "status": 201,
+        "requestId": "7e366219-7705-4718-ae70-175300e4ca5a",
+        "allowOrigin": "https://wedding-web-silk.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-web-silk.vercel.app logout",
+        "status": 204,
+        "requestId": "d7dfa5a0-5b2c-416c-bf7e-2c37d97ee87f",
+        "allowOrigin": "https://wedding-web-silk.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-web-silk.vercel.app logout-access-denial",
+        "status": 401,
+        "requestId": "32730246-e7fe-42ae-bde8-d6d94df537c5",
+        "allowOrigin": "https://wedding-web-silk.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-web-silk.vercel.app logout-refresh-denial",
+        "status": 401,
+        "requestId": "0d5255a1-dd0c-42bd-bb91-6ff56e6a7e1a",
+        "allowOrigin": "https://wedding-web-silk.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-web-silk.vercel.app cleanup-manager-session",
+        "status": 204,
+        "requestId": "7a475fd1-d94a-40d1-9373-87786a33952e",
+        "allowOrigin": "https://wedding-web-silk.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-manage-web.vercel.app login",
+        "status": 201,
+        "requestId": "7c85131e-7f0f-4e9a-895e-3d642e20204e",
+        "allowOrigin": "https://wedding-manage-web.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-manage-web.vercel.app manager-login",
+        "status": 201,
+        "requestId": "42ce904e-7af6-411e-941e-fef4ef3407bc",
+        "allowOrigin": "https://wedding-manage-web.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-manage-web.vercel.app cross-account-revoke",
+        "status": 404,
+        "requestId": "2ceb3a7e-70e9-40ef-a60b-e2c8eaeb077c",
+        "allowOrigin": "https://wedding-manage-web.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-manage-web.vercel.app manager-resource-denial",
+        "status": 403,
+        "requestId": "fb5d51d5-d3c6-44ea-a13e-3b1dd4671ccb",
+        "allowOrigin": "https://wedding-manage-web.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-manage-web.vercel.app forbidden-origin",
+        "status": 403,
+        "requestId": "e1736765-4c69-471a-a13f-81ca0f235d0c",
+        "allowOrigin": null,
+        "allowCredentials": null
+      },
+      {
+        "label": "https://wedding-manage-web.vercel.app rotate",
+        "status": 200,
+        "requestId": "e81a217e-e1f0-47e0-8bb0-6814cba31323",
+        "allowOrigin": "https://wedding-manage-web.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-manage-web.vercel.app old-cookie-replay",
+        "status": 401,
+        "requestId": "5a5e9afe-ac58-434d-b7c7-4df4eb10c38b",
+        "allowOrigin": "https://wedding-manage-web.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-manage-web.vercel.app replay-revokes-session",
+        "status": 401,
+        "requestId": "6e5eb42a-b152-4b72-bb45-a15bbea895bf",
+        "allowOrigin": "https://wedding-manage-web.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-manage-web.vercel.app login-for-logout",
+        "status": 201,
+        "requestId": "12232a31-72dc-4f75-bd45-e8654a640c44",
+        "allowOrigin": "https://wedding-manage-web.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-manage-web.vercel.app logout",
+        "status": 204,
+        "requestId": "981056b3-6b9e-426a-b664-cead11d300d0",
+        "allowOrigin": "https://wedding-manage-web.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-manage-web.vercel.app logout-access-denial",
+        "status": 401,
+        "requestId": "10e4480d-c061-4422-b4c9-b26512d5b55b",
+        "allowOrigin": "https://wedding-manage-web.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-manage-web.vercel.app logout-refresh-denial",
+        "status": 401,
+        "requestId": "592131ac-093f-467d-b8e8-a69a99022bdb",
+        "allowOrigin": "https://wedding-manage-web.vercel.app",
+        "allowCredentials": "true"
+      },
+      {
+        "label": "https://wedding-manage-web.vercel.app cleanup-manager-session",
+        "status": 204,
+        "requestId": "c62771bf-2965-4acd-9a92-4c3339ce2f65",
+        "allowOrigin": "https://wedding-manage-web.vercel.app",
+        "allowCredentials": "true"
+      }
+    ],
+    "cookie": {
+      "name": "__Host-wedding-refresh",
+      "secure": true,
+      "httpOnly": true,
+      "sameSite": "Lax",
+      "path": "/",
+      "domainAbsent": true,
+      "rotated": true
+    },
+    "browserAcceptance": false,
+    "preflights": [
+      {
+        "host": "https://wedding-be-production-e1dc.up.railway.app",
+        "status": 204,
+        "origin": "https://wedding-be-production-e1dc.up.railway.app",
+        "credentials": true
+      },
+      {
+        "host": "https://wedding-web-silk.vercel.app",
+        "status": 204,
+        "origin": "https://wedding-web-silk.vercel.app",
+        "credentials": true
+      },
+      {
+        "host": "https://wedding-manage-web.vercel.app",
+        "status": 204,
+        "origin": "https://wedding-manage-web.vercel.app",
+        "credentials": true
+      }
+    ],
+    "explicitOwnedRevocation": {
+      "status": 204,
+      "requestId": "abcabf87-a67c-4478-a83b-e1340c878fd5",
+      "oldAccessStatus": 401
+    },
+    "corsHeadersVerified": true,
+    "startups": [
+      {
+        "at": "2026-10-10T22:55:16.940Z",
+        "event": "runtime_feature_manifest",
+        "revision": "3f7842097977e8c931edfe1cfdd176c2d2006a58"
+      },
+      {
+        "at": "2026-10-10T23:05:27.077Z",
+        "event": "runtime_feature_manifest",
+        "revision": "3f7842097977e8c931edfe1cfdd176c2d2006a58"
+      },
+      {
+        "at": "2026-10-10T23:09:26.348Z",
+        "event": "runtime_feature_manifest",
+        "revision": "3f7842097977e8c931edfe1cfdd176c2d2006a58"
+      }
+    ],
+    "otpKeyStableAcrossRestart": true,
+    "browserNativeAcceptance": false
+  },
+  "rv07": {
+    "at": "2026-10-10T23:16:14.447Z",
+    "fixture": {
+      "dishId": "2f58b8f5-fd56-48a4-81e7-bfba337c71e0",
+      "versionId": "fb3ffec8-56ba-4471-9caf-ac2d0e833386",
+      "assetId": "c155eefc-f592-4593-a745-094b32f96385",
+      "nextVersionId": "f5e891ae-293e-47c5-b0ce-5a3ad2e40145",
+      "cleanupAssetId": "4d81f0f2-950d-4153-b616-f7ff17f49947"
+    },
+    "object": {
+      "objectKey": "venue-catalog-media/fb3ffec8-56ba-4471-9caf-ac2d0e833386/70e8f6ebef24da3c1675646e22deb59e4d26f1ebbc2c224e0a73cf5a60781432.png",
+      "checksumSha256": "70e8f6ebef24da3c1675646e22deb59e4d26f1ebbc2c224e0a73cf5a60781432",
+      "sizeBytes": 102,
+      "contentType": "image/png",
+      "providerMetadataMatched": true
+    },
+    "checks": [
+      {
+        "label": "storage-manager-login",
+        "status": 201,
+        "requestId": "f64a9b58-8b75-4a32-be5e-36be0d48869d"
+      },
+      {
+        "label": "unauthenticated-upload-denied",
+        "status": 401,
+        "requestId": "1e1c45cb-9048-4489-9641-8f6fd1d803b8"
+      },
+      {
+        "label": "restricted-upload-denied",
+        "status": 403,
+        "requestId": "8d37164a-e63a-4102-9513-2e7ec75326e2"
+      },
+      {
+        "label": "manager-draft-media-list",
+        "status": 200,
+        "requestId": "55068cbe-8118-4121-b935-5ae0ac10f904"
+      },
+      {
+        "label": "signed-read-sha256-matches",
+        "status": 200,
+        "checksumSha256": "70e8f6ebef24da3c1675646e22deb59e4d26f1ebbc2c224e0a73cf5a60781432",
+        "sizeBytes": 102
+      },
+      {
+        "label": "unsigned-provider-read-denied",
+        "status": 400
+      },
+      {
+        "label": "public-list",
+        "status": 200,
+        "requestId": "6e4318ad-684f-45f4-a6df-d5ca22fba6ba"
+      },
+      {
+        "label": "unauthenticated-draft-media-denied",
+        "status": 401,
+        "requestId": "08902300-c810-44f3-8af0-127ddec590d0"
+      },
+      {
+        "label": "expired-provider-signed-read-denied",
+        "status": 400
+      },
+      {
+        "label": "public-current-media-list",
+        "status": 200,
+        "requestId": "605ab6a3-9acb-48a0-84b8-1a30380fba74"
+      },
+      {
+        "label": "refresh-current-public-read",
+        "status": 200,
+        "requestId": "dc9540dc-7e28-471a-b934-bfd13245e1b8"
+      },
+      {
+        "label": "replace-only-owned-draft-media",
+        "status": 201,
+        "requestId": "bb0336df-2b6d-4d80-a79f-0c54b35e1ccc"
+      },
+      {
+        "label": "owned-draft-object-deleted",
+        "providerStatus": 400
+      }
+    ],
+    "audits": [
+      {
+        "action": "catalog.media-attached",
+        "requestId": "7692e576-e38c-418d-9de5-380b71857015"
+      }
+    ],
+    "retainedPublishedObject": true,
+    "deletedOnlyOwnedDraftObject": true,
+    "deletedSharedObjects": false,
+    "fixtureArchived": true,
+    "publishedDatabaseReferenceRetained": true,
+    "cleanup": {
+      "onlyOwnedDraftRemoved": true,
+      "publishedAssetRetained": true,
+      "replacementDraftAssetRetained": true
+    }
+  },
+  "rv12": {
+    "at": "2026-10-10T23:12:17.745Z",
+    "otpKeyStable": true,
+    "vnpaySettingsUnchanged": true,
+    "checkoutSigning": {
+      "mode": "offline-real-config",
+      "host": "sandbox.vnpayment.vn",
+      "queryEndpoint": "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction",
+      "signatureMatched": true,
+      "integerAmountMatched": true,
+      "createdPaymentAttempt": false
+    },
+    "returnRoute": {
+      "url": "https://wedding-be-production-e1dc.up.railway.app/docs",
+      "status": 200,
+      "paymentResultUi": false
+    },
+    "invalidIpn": {
+      "status": 200,
+      "responseCode": "97",
+      "requestId": "72d27a9f-ff1d-457a-8688-20d229311521",
+      "countsBefore": {
+        "attempts": 1,
+        "ledger": 2,
+        "receipts": 1
+      },
+      "countsAfter": {
+        "attempts": 1,
+        "ledger": 2,
+        "receipts": 1
+      }
+    },
+    "historicalLiveReceipts": [
+      {
+        "id": "7affb545-c0ae-42c0-87fd-2f6554f9d459",
+        "channel": "IPN",
+        "decision": "ACCEPTED",
+        "outcome": "SUCCEEDED",
+        "payloadHash": "4e425f79d7d1586b4bf481ecb6a29a21e68892ad2e7969a842c82b67d87b51c8",
+        "amountVnd": "15000000"
+      }
+    ],
+    "productionMoneyAcceptance": false,
+    "newProviderCheckout": false,
+    "newProviderQuery": false
+  },
+  "offlineRuns": [
+    {
+      "files": 6,
+      "tests": 187,
+      "scope": "Email, environment, Identity HTTP and OTP schemas/router"
+    },
+    {
+      "files": 5,
+      "tests": 67,
+      "scope": "Disposable PostgreSQL OTP/runtime, controlled Storage and VNPay protocol"
+    },
+    {
+      "files": 2,
+      "tests": 6,
+      "scope": "Disposable PostgreSQL catalog media and Booking runtime"
+    },
+    {
+      "files": 4,
+      "tests": 41,
+      "scope": "Workspace invitation service/acceptance, VNPay protocol/provider"
+    }
+  ],
+  "limitations": [
+    "OTP expiry was an audited controlled timestamp on the owned emailed challenge, not a ten-minute wall-clock expiry rehearsal",
+    "Backend HTTP proxy tests do not claim browser/native acceptance",
+    "No new VNPay checkout or QueryDr; preserve prior genuine provider/merchant evidence",
+    "VNPay ReturnURL remains /docs; frontend-owned result UI and production-money acceptance remain separate",
+    "Archived synthetic catalog fixture retains published and replacement-draft objects; only its detached draft object was deleted"
+  ],
+  "sessionCleanup": {
+    "at": "2026-10-10T23:20:43.488Z",
+    "revokedSessions": 21,
+    "onlyOwnedTestActors": true,
+    "checks": [
+      {
+        "status": 204,
+        "requestId": "79210a09-2241-4534-8a99-ea3167e1f3bb"
+      },
+      {
+        "status": 204,
+        "requestId": "8c1023dc-d472-4528-9ab6-bb84dd3e4d8b"
+      },
+      {
+        "status": 204,
+        "requestId": "16b2568b-f53a-4ea5-a935-9871d65cbf5a"
+      },
+      {
+        "status": 204,
+        "requestId": "3070b920-dfac-4286-9a30-daa36519e532"
+      },
+      {
+        "status": 204,
+        "requestId": "72f5b68a-4d9d-44d8-a40a-a8ae0d49b169"
+      },
+      {
+        "status": 204,
+        "requestId": "6d38f834-e4ce-4b19-839b-2abee7bc11ae"
+      },
+      {
+        "status": 204,
+        "requestId": "ab7b4fcd-139e-44eb-bc03-28e75c83bb70"
+      },
+      {
+        "status": 204,
+        "requestId": "b3360d55-a46d-4dde-a395-328ff95c6de3"
+      },
+      {
+        "status": 204,
+        "requestId": "010d1048-2f15-4964-831f-c843e9d8bea9"
+      },
+      {
+        "status": 204,
+        "requestId": "9e5a20aa-d400-4ead-a6c2-2bcfc16df410"
+      },
+      {
+        "status": 204,
+        "requestId": "46a9cd7b-80bd-4e52-bd27-eaa51b35a8c2"
+      },
+      {
+        "status": 204,
+        "requestId": "9ba0e7a5-4694-4d35-8494-30fd9729e3c1"
+      },
+      {
+        "status": 204,
+        "requestId": "ab16d64c-b501-4256-969c-e0912eb2ed73"
+      },
+      {
+        "status": 204,
+        "requestId": "b66d0a85-2e27-4b95-9c45-ccf136bbb7b9"
+      },
+      {
+        "status": 204,
+        "requestId": "63ced53e-cfab-4380-9cbd-776f94ee77fb"
+      },
+      {
+        "status": 204,
+        "requestId": "8ac48ac1-ec78-4929-9b5f-f23be3323c3c"
+      },
+      {
+        "status": 204,
+        "requestId": "65bb1a24-45be-4fcb-a697-0c647d7e43bd"
+      },
+      {
+        "status": 204,
+        "requestId": "4345a856-8649-42e1-a0d7-79880bb04d6e"
+      },
+      {
+        "status": 204,
+        "requestId": "6251589b-623d-43c4-b4f1-dd9bc74102a6"
+      },
+      {
+        "status": 204,
+        "requestId": "b4a3058b-3d27-44e2-9d78-f039c828a933"
+      },
+      {
+        "status": 204,
+        "requestId": "dce7a296-2077-4709-9c04-13c2a0f9eb8a"
+      }
+    ]
+  }
+}
