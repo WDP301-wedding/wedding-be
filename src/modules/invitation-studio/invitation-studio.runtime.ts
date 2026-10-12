@@ -12,11 +12,23 @@ import { createMediaRouter } from './http/media.router.js';
 import { createInvitationStudioServices } from './infrastructure/studio.composition.js';
 import { createStudioRouter } from './http/studio.router.js';
 import { createGeminiAiImageProvider } from '../../integrations/ai-image/gemini-ai-image-provider.js';
+import { createSeatingServices } from '../seating-plan/infrastructure/seating.composition.js';
+import { createSeatingRouter } from '../seating-plan/http/seating.router.js';
+import { startSeatingReconciler } from '../seating-plan/infrastructure/seating-reconciler.js';
+import { createLogger } from '../../core/logging/logger.js';
+import type {
+  SeatingPlanReader,
+  SeatingGuidanceReader,
+} from '../seating-plan/application/seating.contracts.js';
 
 export type InvitationStudioRuntime = Readonly<{
   router: Router;
   resource: ShutdownResource;
-  providers: Readonly<{ templateSelection: InvitationTemplateSelectionReader }>;
+  providers: Readonly<{
+    templateSelection: InvitationTemplateSelectionReader;
+    seatingPlan: SeatingPlanReader;
+    seatingGuidance: SeatingGuidanceReader;
+  }>;
 }>;
 
 /** Runtime never substitutes fake Storage or fake confirmed owner facts. */
@@ -48,14 +60,25 @@ export async function createInvitationStudioRuntime(
     const router = Router();
     router.use(createMediaRouter(composition.service, composition.identity.resolver));
     router.use(createStudioRouter(composition, composition.identity.resolver));
+    const seating = createSeatingServices(prisma, composition);
+    router.use(createSeatingRouter(seating.seating, seating.resolver));
+    const logger = createLogger({ level: 'warn', runtimeEnvironment: config.runtime.environment });
+    const reconciler = startSeatingReconciler(seating.seating, (failures) =>
+      logger.warn({ failures }, 'Seating reconciliation needs retry'),
+    );
     return Object.freeze({
       router,
       providers: Object.freeze({
         templateSelection: createInvitationTemplateSelectionProvider(prisma),
+        seatingPlan: seating.seating,
+        seatingGuidance: seating.seating,
       }),
       resource: Object.freeze({
         name: 'invitation-studio-database',
-        close: () => prisma.$disconnect(),
+        close: async () => {
+          await reconciler.close();
+          await prisma.$disconnect();
+        },
       }),
     });
   } catch (error: unknown) {

@@ -18,7 +18,7 @@ describe('runtime feature manifest', () => {
     expect(manifest.features.printFiles).toMatchObject({
       implementation: 'implemented',
       configuration: 'unconfigured',
-      mode: 'invitation-a5-v1',
+      mode: 'invitation-a5-v2-seating',
       liveVerification: 'pending',
     });
     expect(manifest.features.retention.mode).toBe('operator-cli-manual-procedure');

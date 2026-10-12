@@ -18910,7 +18910,7 @@
     },
     "/bookings/{bookingId}/printable-revisions/{printableRevisionId}/file": {
       "get": {
-        "description": "Two pages, 148x210 mm trim, 3 mm bleed, embedded Vietnamese fonts, raster placement at least 300 dpi, 30 mm vector generic QR with quiet zone. invitation-a5-v1 standard layout. No seating, current-design fallback or extra charge. 8 PNG assets/16 MiB images/12 MiB PDF; oversized content fails 422. Retained checksum failures fail 502/503. Existing confirmed-booking Invitation access policy applies.",
+        "description": "Two pages, 148x210 mm trim, 3 mm bleed, embedded Vietnamese fonts, raster placement at least 300 dpi, 30 mm vector generic QR with quiet zone. invitation-a5-v1 for existing invitations without Seating; invitation-a5-v2-seating renders retained fixed geometry, table labels and a textual Group/color legend. No current-design fallback or extra charge. 8 PNG assets/16 MiB images/12 MiB PDF; oversized or illegible content fails 422. Retained checksum failures fail 502/503. Existing confirmed-booking Invitation access policy applies.",
         "operationId": "getPrintableInvitationFile",
         "parameters": [
           {
@@ -18987,7 +18987,10 @@
               },
               "X-Renderer-Version": {
                 "schema": {
-                  "const": "invitation-a5-v1",
+                  "enum": [
+                    "invitation-a5-v1",
+                    "invitation-a5-v2-seating"
+                  ],
                   "type": "string"
                 }
               }
@@ -19101,6 +19104,1784 @@
         "summary": "Read a safe booking proposal workspace",
         "tags": [
           "Booking Lifecycle"
+        ]
+      }
+    },
+    "/bookings/{bookingId}/seating-layout-options": {
+      "get": {
+        "description": "Confirmed Booking, Manager or owning FULL Couple; exceptions require Manager. Independent planning count; zero named Guests and check-in NONE are supported. Fixed venue geometry and Group labels only. Every write requires Idempotency-Key; revisions and print history are immutable. Unknown query/body keys are rejected. Stale revisions, retired layouts, unavailable Groups/tables, range/physical-capacity conflicts return 409; foreign bookings return concealed 404.",
+        "operationId": "listSeatingLayoutOptions",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "bookingRevision": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "items": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "compatible": {
+                                "type": "boolean"
+                              },
+                              "layoutTemplateVersionId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "maxGuests": {
+                                "exclusiveMinimum": 0,
+                                "maximum": 9007199254740991,
+                                "type": "integer"
+                              },
+                              "minGuests": {
+                                "exclusiveMinimum": 0,
+                                "maximum": 9007199254740991,
+                                "type": "integer"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "totalSeatCapacity": {
+                                "exclusiveMinimum": 0,
+                                "maximum": 9007199254740991,
+                                "type": "integer"
+                              },
+                              "warning": {
+                                "anyOf": [
+                                  {
+                                    "enum": [
+                                      "HEADCOUNT_OUTSIDE_LAYOUT_RANGE",
+                                      "EXCEPTION_EXCEEDS_PHYSICAL_CAPACITY"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": [
+                              "layoutTemplateVersionId",
+                              "name",
+                              "minGuests",
+                              "maxGuests",
+                              "totalSeatCapacity",
+                              "compatible",
+                              "warning"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "planningHeadcount": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "planningHeadcount",
+                        "bookingRevision",
+                        "items"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Private immutable snapshot; Cache-Control: no-store."
+          },
+          "400": {
+            "$ref": "#/components/responses/IdempotencyKeyRequired"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Seating plan"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "bookingId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/bookings/{bookingId}/seating-plans": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "bookingId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "description": "Confirmed Booking, Manager or owning FULL Couple; exceptions require Manager. Independent planning count; zero named Guests and check-in NONE are supported. Fixed venue geometry and Group labels only. Every write requires Idempotency-Key; revisions and print history are immutable. Unknown query/body keys are rejected. Stale revisions, retired layouts, unavailable Groups/tables, range/physical-capacity conflicts return 409; foreign bookings return concealed 404.",
+        "operationId": "selectSeatingLayout",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "expectedBookingRevision": 1,
+                "layoutTemplateVersionId": "10000000-0000-4000-8000-000000000001"
+              },
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "expectedBookingRevision": {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  },
+                  "layoutTemplateVersionId": {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "layoutTemplateVersionId",
+                  "expectedBookingRevision"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "bookingId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "bookingRevision": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "currentBookingRevision": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "currentPlanningHeadcount": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "droppedTableIds": {
+                          "items": {
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "expectedAttendees": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "labels": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "colorSnapshot": {
+                                "pattern": "^#[A-F0-9]{6}$",
+                                "type": "string"
+                              },
+                              "groupName": {
+                                "maxLength": 80,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              "guestGroupId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "layoutTableId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "layoutTableId",
+                              "guestGroupId",
+                              "groupName",
+                              "colorSnapshot"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 500,
+                          "type": "array"
+                        },
+                        "layoutName": {
+                          "type": "string"
+                        },
+                        "layoutTemplateVersionId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "managerException": {
+                          "anyOf": [
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "actorAccountId": {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                },
+                                "approvalId": {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                },
+                                "approvedAt": {
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                                  "type": "string"
+                                },
+                                "approvedBookingRevision": {
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "type": "integer"
+                                },
+                                "approvedHeadcount": {
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "type": "integer"
+                                },
+                                "reason": {
+                                  "maxLength": 500,
+                                  "minLength": 10,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "approvalId",
+                                "approvedBookingRevision",
+                                "approvedHeadcount",
+                                "actorAccountId",
+                                "reason",
+                                "approvedAt"
+                              ],
+                              "type": "object"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "maxGuests": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "minGuests": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "renderSnapshot": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "color": {
+                                "anyOf": [
+                                  {
+                                    "pattern": "^#[A-F0-9]{6}$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "guestGroupId": {
+                                "anyOf": [
+                                  {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "guestGroupName": {
+                                "anyOf": [
+                                  {
+                                    "maxLength": 80,
+                                    "minLength": 1,
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "height": {
+                                "maximum": 10000,
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "layoutTableId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "rotationDegrees": {
+                                "maximum": 359,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "shape": {
+                                "enum": [
+                                  "ROUND",
+                                  "RECTANGLE"
+                                ],
+                                "type": "string"
+                              },
+                              "tableLabel": {
+                                "maxLength": 50,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              "width": {
+                                "maximum": 10000,
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "x": {
+                                "maximum": 10000,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "y": {
+                                "maximum": 10000,
+                                "minimum": 0,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "layoutTableId",
+                              "tableLabel",
+                              "shape",
+                              "x",
+                              "y",
+                              "width",
+                              "height",
+                              "rotationDegrees",
+                              "guestGroupId",
+                              "guestGroupName",
+                              "color"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 500,
+                          "minItems": 1,
+                          "type": "array"
+                        },
+                        "revisionId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "revisionNumber": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "seatingPlanId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "snapshotDigest": {
+                          "maxLength": 64,
+                          "minLength": 64,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "DRAFT",
+                            "CONFIRMED",
+                            "REQUIRES_REVIEW"
+                          ],
+                          "type": "string"
+                        },
+                        "totalSeatCapacity": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "warnings": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "layoutName",
+                        "minGuests",
+                        "maxGuests",
+                        "totalSeatCapacity",
+                        "labels",
+                        "renderSnapshot",
+                        "droppedTableIds",
+                        "managerException",
+                        "seatingPlanId",
+                        "bookingId",
+                        "revisionId",
+                        "revisionNumber",
+                        "status",
+                        "layoutTemplateVersionId",
+                        "expectedAttendees",
+                        "bookingRevision",
+                        "currentPlanningHeadcount",
+                        "currentBookingRevision",
+                        "warnings",
+                        "snapshotDigest"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Private immutable snapshot; Cache-Control: no-store."
+          },
+          "400": {
+            "$ref": "#/components/responses/IdempotencyKeyRequired"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Seating plan"
+        ]
+      }
+    },
+    "/bookings/{bookingId}/seating-plans/{planId}": {
+      "get": {
+        "description": "Confirmed Booking, Manager or owning FULL Couple; exceptions require Manager. Independent planning count; zero named Guests and check-in NONE are supported. Fixed venue geometry and Group labels only. Every write requires Idempotency-Key; revisions and print history are immutable. Unknown query/body keys are rejected. Stale revisions, retired layouts, unavailable Groups/tables, range/physical-capacity conflicts return 409; foreign bookings return concealed 404.",
+        "operationId": "readSeatingPlan",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "bookingId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "bookingRevision": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "currentBookingRevision": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "currentPlanningHeadcount": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "droppedTableIds": {
+                          "items": {
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "expectedAttendees": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "labels": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "colorSnapshot": {
+                                "pattern": "^#[A-F0-9]{6}$",
+                                "type": "string"
+                              },
+                              "groupName": {
+                                "maxLength": 80,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              "guestGroupId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "layoutTableId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "layoutTableId",
+                              "guestGroupId",
+                              "groupName",
+                              "colorSnapshot"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 500,
+                          "type": "array"
+                        },
+                        "layoutName": {
+                          "type": "string"
+                        },
+                        "layoutTemplateVersionId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "managerException": {
+                          "anyOf": [
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "actorAccountId": {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                },
+                                "approvalId": {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                },
+                                "approvedAt": {
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                                  "type": "string"
+                                },
+                                "approvedBookingRevision": {
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "type": "integer"
+                                },
+                                "approvedHeadcount": {
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "type": "integer"
+                                },
+                                "reason": {
+                                  "maxLength": 500,
+                                  "minLength": 10,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "approvalId",
+                                "approvedBookingRevision",
+                                "approvedHeadcount",
+                                "actorAccountId",
+                                "reason",
+                                "approvedAt"
+                              ],
+                              "type": "object"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "maxGuests": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "minGuests": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "renderSnapshot": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "color": {
+                                "anyOf": [
+                                  {
+                                    "pattern": "^#[A-F0-9]{6}$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "guestGroupId": {
+                                "anyOf": [
+                                  {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "guestGroupName": {
+                                "anyOf": [
+                                  {
+                                    "maxLength": 80,
+                                    "minLength": 1,
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "height": {
+                                "maximum": 10000,
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "layoutTableId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "rotationDegrees": {
+                                "maximum": 359,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "shape": {
+                                "enum": [
+                                  "ROUND",
+                                  "RECTANGLE"
+                                ],
+                                "type": "string"
+                              },
+                              "tableLabel": {
+                                "maxLength": 50,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              "width": {
+                                "maximum": 10000,
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "x": {
+                                "maximum": 10000,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "y": {
+                                "maximum": 10000,
+                                "minimum": 0,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "layoutTableId",
+                              "tableLabel",
+                              "shape",
+                              "x",
+                              "y",
+                              "width",
+                              "height",
+                              "rotationDegrees",
+                              "guestGroupId",
+                              "guestGroupName",
+                              "color"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 500,
+                          "minItems": 1,
+                          "type": "array"
+                        },
+                        "revisionId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "revisionNumber": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "seatingPlanId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "snapshotDigest": {
+                          "maxLength": 64,
+                          "minLength": 64,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "DRAFT",
+                            "CONFIRMED",
+                            "REQUIRES_REVIEW"
+                          ],
+                          "type": "string"
+                        },
+                        "totalSeatCapacity": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "warnings": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "layoutName",
+                        "minGuests",
+                        "maxGuests",
+                        "totalSeatCapacity",
+                        "labels",
+                        "renderSnapshot",
+                        "droppedTableIds",
+                        "managerException",
+                        "seatingPlanId",
+                        "bookingId",
+                        "revisionId",
+                        "revisionNumber",
+                        "status",
+                        "layoutTemplateVersionId",
+                        "expectedAttendees",
+                        "bookingRevision",
+                        "currentPlanningHeadcount",
+                        "currentBookingRevision",
+                        "warnings",
+                        "snapshotDigest"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Private immutable snapshot; Cache-Control: no-store."
+          },
+          "400": {
+            "$ref": "#/components/responses/IdempotencyKeyRequired"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Seating plan"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "bookingId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "planId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/bookings/{bookingId}/seating-plans/{planId}/confirmation": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "bookingId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "planId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "description": "Confirmed Booking, Manager or owning FULL Couple; exceptions require Manager. Independent planning count; zero named Guests and check-in NONE are supported. Fixed venue geometry and Group labels only. Every write requires Idempotency-Key; revisions and print history are immutable. Unknown query/body keys are rejected. Stale revisions, retired layouts, unavailable Groups/tables, range/physical-capacity conflicts return 409; foreign bookings return concealed 404.",
+        "operationId": "confirmSeatingPlan",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "expectedBookingRevision": 1,
+                "expectedRevision": 2
+              },
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "expectedBookingRevision": {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  },
+                  "expectedRevision": {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "expectedRevision",
+                  "expectedBookingRevision"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "bookingId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "bookingRevision": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "currentBookingRevision": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "currentPlanningHeadcount": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "droppedTableIds": {
+                          "items": {
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "expectedAttendees": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "labels": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "colorSnapshot": {
+                                "pattern": "^#[A-F0-9]{6}$",
+                                "type": "string"
+                              },
+                              "groupName": {
+                                "maxLength": 80,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              "guestGroupId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "layoutTableId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "layoutTableId",
+                              "guestGroupId",
+                              "groupName",
+                              "colorSnapshot"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 500,
+                          "type": "array"
+                        },
+                        "layoutName": {
+                          "type": "string"
+                        },
+                        "layoutTemplateVersionId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "managerException": {
+                          "anyOf": [
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "actorAccountId": {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                },
+                                "approvalId": {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                },
+                                "approvedAt": {
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                                  "type": "string"
+                                },
+                                "approvedBookingRevision": {
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "type": "integer"
+                                },
+                                "approvedHeadcount": {
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "type": "integer"
+                                },
+                                "reason": {
+                                  "maxLength": 500,
+                                  "minLength": 10,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "approvalId",
+                                "approvedBookingRevision",
+                                "approvedHeadcount",
+                                "actorAccountId",
+                                "reason",
+                                "approvedAt"
+                              ],
+                              "type": "object"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "maxGuests": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "minGuests": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "renderSnapshot": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "color": {
+                                "anyOf": [
+                                  {
+                                    "pattern": "^#[A-F0-9]{6}$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "guestGroupId": {
+                                "anyOf": [
+                                  {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "guestGroupName": {
+                                "anyOf": [
+                                  {
+                                    "maxLength": 80,
+                                    "minLength": 1,
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "height": {
+                                "maximum": 10000,
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "layoutTableId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "rotationDegrees": {
+                                "maximum": 359,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "shape": {
+                                "enum": [
+                                  "ROUND",
+                                  "RECTANGLE"
+                                ],
+                                "type": "string"
+                              },
+                              "tableLabel": {
+                                "maxLength": 50,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              "width": {
+                                "maximum": 10000,
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "x": {
+                                "maximum": 10000,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "y": {
+                                "maximum": 10000,
+                                "minimum": 0,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "layoutTableId",
+                              "tableLabel",
+                              "shape",
+                              "x",
+                              "y",
+                              "width",
+                              "height",
+                              "rotationDegrees",
+                              "guestGroupId",
+                              "guestGroupName",
+                              "color"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 500,
+                          "minItems": 1,
+                          "type": "array"
+                        },
+                        "revisionId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "revisionNumber": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "seatingPlanId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "snapshotDigest": {
+                          "maxLength": 64,
+                          "minLength": 64,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "DRAFT",
+                            "CONFIRMED",
+                            "REQUIRES_REVIEW"
+                          ],
+                          "type": "string"
+                        },
+                        "totalSeatCapacity": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "warnings": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "layoutName",
+                        "minGuests",
+                        "maxGuests",
+                        "totalSeatCapacity",
+                        "labels",
+                        "renderSnapshot",
+                        "droppedTableIds",
+                        "managerException",
+                        "seatingPlanId",
+                        "bookingId",
+                        "revisionId",
+                        "revisionNumber",
+                        "status",
+                        "layoutTemplateVersionId",
+                        "expectedAttendees",
+                        "bookingRevision",
+                        "currentPlanningHeadcount",
+                        "currentBookingRevision",
+                        "warnings",
+                        "snapshotDigest"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Private immutable snapshot; Cache-Control: no-store."
+          },
+          "400": {
+            "$ref": "#/components/responses/IdempotencyKeyRequired"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Seating plan"
+        ]
+      }
+    },
+    "/bookings/{bookingId}/seating-plans/{planId}/revisions": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "bookingId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "planId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "description": "Confirmed Booking, Manager or owning FULL Couple; exceptions require Manager. Independent planning count; zero named Guests and check-in NONE are supported. Fixed venue geometry and Group labels only. Every write requires Idempotency-Key; revisions and print history are immutable. Unknown query/body keys are rejected. Stale revisions, retired layouts, unavailable Groups/tables, range/physical-capacity conflicts return 409; foreign bookings return concealed 404.",
+        "operationId": "reviseSeatingPlan",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "expectedRevision": 1,
+                "labels": []
+              },
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "expectedRevision": {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  },
+                  "labels": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "guestGroupId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "layoutTableId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "layoutTableId",
+                        "guestGroupId"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 500,
+                    "type": "array"
+                  },
+                  "layoutTemplateVersionId": {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  },
+                  "remap": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "fromTableId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "toTableId": {
+                          "anyOf": [
+                            {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "fromTableId",
+                        "toTableId"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 500,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "expectedRevision"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "bookingId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "bookingRevision": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "currentBookingRevision": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "currentPlanningHeadcount": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "droppedTableIds": {
+                          "items": {
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "expectedAttendees": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "labels": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "colorSnapshot": {
+                                "pattern": "^#[A-F0-9]{6}$",
+                                "type": "string"
+                              },
+                              "groupName": {
+                                "maxLength": 80,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              "guestGroupId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "layoutTableId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "layoutTableId",
+                              "guestGroupId",
+                              "groupName",
+                              "colorSnapshot"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 500,
+                          "type": "array"
+                        },
+                        "layoutName": {
+                          "type": "string"
+                        },
+                        "layoutTemplateVersionId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "managerException": {
+                          "anyOf": [
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "actorAccountId": {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                },
+                                "approvalId": {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                },
+                                "approvedAt": {
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                                  "type": "string"
+                                },
+                                "approvedBookingRevision": {
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "type": "integer"
+                                },
+                                "approvedHeadcount": {
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "type": "integer"
+                                },
+                                "reason": {
+                                  "maxLength": 500,
+                                  "minLength": 10,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "approvalId",
+                                "approvedBookingRevision",
+                                "approvedHeadcount",
+                                "actorAccountId",
+                                "reason",
+                                "approvedAt"
+                              ],
+                              "type": "object"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "maxGuests": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "minGuests": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "renderSnapshot": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "color": {
+                                "anyOf": [
+                                  {
+                                    "pattern": "^#[A-F0-9]{6}$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "guestGroupId": {
+                                "anyOf": [
+                                  {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "guestGroupName": {
+                                "anyOf": [
+                                  {
+                                    "maxLength": 80,
+                                    "minLength": 1,
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "height": {
+                                "maximum": 10000,
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "layoutTableId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "rotationDegrees": {
+                                "maximum": 359,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "shape": {
+                                "enum": [
+                                  "ROUND",
+                                  "RECTANGLE"
+                                ],
+                                "type": "string"
+                              },
+                              "tableLabel": {
+                                "maxLength": 50,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              "width": {
+                                "maximum": 10000,
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "x": {
+                                "maximum": 10000,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "y": {
+                                "maximum": 10000,
+                                "minimum": 0,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "layoutTableId",
+                              "tableLabel",
+                              "shape",
+                              "x",
+                              "y",
+                              "width",
+                              "height",
+                              "rotationDegrees",
+                              "guestGroupId",
+                              "guestGroupName",
+                              "color"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 500,
+                          "minItems": 1,
+                          "type": "array"
+                        },
+                        "revisionId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "revisionNumber": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "seatingPlanId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "snapshotDigest": {
+                          "maxLength": 64,
+                          "minLength": 64,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "DRAFT",
+                            "CONFIRMED",
+                            "REQUIRES_REVIEW"
+                          ],
+                          "type": "string"
+                        },
+                        "totalSeatCapacity": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "warnings": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "layoutName",
+                        "minGuests",
+                        "maxGuests",
+                        "totalSeatCapacity",
+                        "labels",
+                        "renderSnapshot",
+                        "droppedTableIds",
+                        "managerException",
+                        "seatingPlanId",
+                        "bookingId",
+                        "revisionId",
+                        "revisionNumber",
+                        "status",
+                        "layoutTemplateVersionId",
+                        "expectedAttendees",
+                        "bookingRevision",
+                        "currentPlanningHeadcount",
+                        "currentBookingRevision",
+                        "warnings",
+                        "snapshotDigest"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Private immutable snapshot; Cache-Control: no-store."
+          },
+          "400": {
+            "$ref": "#/components/responses/IdempotencyKeyRequired"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Seating plan"
         ]
       }
     },
@@ -33518,6 +35299,412 @@
         "summary": "Manager proposes replacement quote for approved order; blocks production until decided",
         "tags": [
           "Invitation Print Orders"
+        ]
+      }
+    },
+    "/management/seating-plans/{planId}/exceptions": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "planId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "description": "Confirmed Booking, Manager or owning FULL Couple; exceptions require Manager. Independent planning count; zero named Guests and check-in NONE are supported. Fixed venue geometry and Group labels only. Every write requires Idempotency-Key; revisions and print history are immutable. Unknown query/body keys are rejected. Stale revisions, retired layouts, unavailable Groups/tables, range/physical-capacity conflicts return 409; foreign bookings return concealed 404.",
+        "operationId": "approveSeatingException",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "expectedBookingRevision": 1,
+                "expectedRevision": 2,
+                "reason": "Trong sức chứa vật lý của sảnh"
+              },
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "expectedBookingRevision": {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  },
+                  "expectedRevision": {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  },
+                  "reason": {
+                    "maxLength": 500,
+                    "minLength": 10,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "expectedRevision",
+                  "expectedBookingRevision",
+                  "reason"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "bookingId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "bookingRevision": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "currentBookingRevision": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "currentPlanningHeadcount": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "droppedTableIds": {
+                          "items": {
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "expectedAttendees": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "labels": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "colorSnapshot": {
+                                "pattern": "^#[A-F0-9]{6}$",
+                                "type": "string"
+                              },
+                              "groupName": {
+                                "maxLength": 80,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              "guestGroupId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "layoutTableId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "layoutTableId",
+                              "guestGroupId",
+                              "groupName",
+                              "colorSnapshot"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 500,
+                          "type": "array"
+                        },
+                        "layoutName": {
+                          "type": "string"
+                        },
+                        "layoutTemplateVersionId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "managerException": {
+                          "anyOf": [
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "actorAccountId": {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                },
+                                "approvalId": {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                },
+                                "approvedAt": {
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                                  "type": "string"
+                                },
+                                "approvedBookingRevision": {
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "type": "integer"
+                                },
+                                "approvedHeadcount": {
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "type": "integer"
+                                },
+                                "reason": {
+                                  "maxLength": 500,
+                                  "minLength": 10,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "approvalId",
+                                "approvedBookingRevision",
+                                "approvedHeadcount",
+                                "actorAccountId",
+                                "reason",
+                                "approvedAt"
+                              ],
+                              "type": "object"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "maxGuests": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "minGuests": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "renderSnapshot": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "color": {
+                                "anyOf": [
+                                  {
+                                    "pattern": "^#[A-F0-9]{6}$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "guestGroupId": {
+                                "anyOf": [
+                                  {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "guestGroupName": {
+                                "anyOf": [
+                                  {
+                                    "maxLength": 80,
+                                    "minLength": 1,
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "height": {
+                                "maximum": 10000,
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "layoutTableId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "rotationDegrees": {
+                                "maximum": 359,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "shape": {
+                                "enum": [
+                                  "ROUND",
+                                  "RECTANGLE"
+                                ],
+                                "type": "string"
+                              },
+                              "tableLabel": {
+                                "maxLength": 50,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              "width": {
+                                "maximum": 10000,
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "x": {
+                                "maximum": 10000,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "y": {
+                                "maximum": 10000,
+                                "minimum": 0,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "layoutTableId",
+                              "tableLabel",
+                              "shape",
+                              "x",
+                              "y",
+                              "width",
+                              "height",
+                              "rotationDegrees",
+                              "guestGroupId",
+                              "guestGroupName",
+                              "color"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 500,
+                          "minItems": 1,
+                          "type": "array"
+                        },
+                        "revisionId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "revisionNumber": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "seatingPlanId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "snapshotDigest": {
+                          "maxLength": 64,
+                          "minLength": 64,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "DRAFT",
+                            "CONFIRMED",
+                            "REQUIRES_REVIEW"
+                          ],
+                          "type": "string"
+                        },
+                        "totalSeatCapacity": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "warnings": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "layoutName",
+                        "minGuests",
+                        "maxGuests",
+                        "totalSeatCapacity",
+                        "labels",
+                        "renderSnapshot",
+                        "droppedTableIds",
+                        "managerException",
+                        "seatingPlanId",
+                        "bookingId",
+                        "revisionId",
+                        "revisionNumber",
+                        "status",
+                        "layoutTemplateVersionId",
+                        "expectedAttendees",
+                        "bookingRevision",
+                        "currentPlanningHeadcount",
+                        "currentBookingRevision",
+                        "warnings",
+                        "snapshotDigest"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Private immutable snapshot; Cache-Control: no-store."
+          },
+          "400": {
+            "$ref": "#/components/responses/IdempotencyKeyRequired"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Seating plan"
         ]
       }
     },

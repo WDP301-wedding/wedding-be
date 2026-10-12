@@ -62,7 +62,7 @@ export function createRuntimeFeatureManifest(config: BackendConfig, revision?: s
         Boolean(config.database.url) &&
           config.storage.enabled &&
           Boolean(config.invitationStudio.publicOrigin),
-        'invitation-a5-v1',
+        'invitation-a5-v2-seating',
       ),
       metrics: feature(
         config.metrics.enabled,

@@ -10,9 +10,16 @@ vi.mock('../../core/database/prisma.js', () => ({ createPrismaClient: vi.fn(() =
 vi.mock('./infrastructure/studio.composition.js', () => ({
   createInvitationStudioServices: vi.fn(() => ({ service: {}, identity: { resolver: {} } })),
 }));
+vi.mock('../seating-plan/infrastructure/seating.composition.js', () => ({
+  createSeatingServices: vi.fn(() => ({ seating: {}, resolver: {} })),
+}));
 
 function config(storage: Config['storage'] = { enabled: false }): Config {
-  return { database: { url: 'postgresql://local/test' }, storage } as Config;
+  return {
+    database: { url: 'postgresql://local/test' },
+    storage,
+    runtime: { environment: 'test' },
+  } as Config;
 }
 function storage(): StorageProvider {
   return vi.mocked(createInvitationStudioServices).mock.calls.at(-1)![1];

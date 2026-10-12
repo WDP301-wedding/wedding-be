@@ -62,7 +62,7 @@ export const invitationStudioOpenApiPaths = {
       operationId: 'getPrintableInvitationFile',
       summary: 'Manager or owning FULL Couple previews/downloads the exact accepted A5 revision',
       description:
-        'Two pages, 148x210 mm trim, 3 mm bleed, embedded Vietnamese fonts, raster placement at least 300 dpi, 30 mm vector generic QR with quiet zone. invitation-a5-v1 standard layout. No seating, current-design fallback or extra charge. 8 PNG assets/16 MiB images/12 MiB PDF; oversized content fails 422. Retained checksum failures fail 502/503. Existing confirmed-booking Invitation access policy applies.',
+        'Two pages, 148x210 mm trim, 3 mm bleed, embedded Vietnamese fonts, raster placement at least 300 dpi, 30 mm vector generic QR with quiet zone. invitation-a5-v1 for existing invitations without Seating; invitation-a5-v2-seating renders retained fixed geometry, table labels and a textual Group/color legend. No current-design fallback or extra charge. 8 PNG assets/16 MiB images/12 MiB PDF; oversized or illegible content fails 422. Retained checksum failures fail 502/503. Existing confirmed-booking Invitation access policy applies.',
       tags: ['Invitation Studio'],
       security: [{ bearerAuth: [] }],
       requestParams: {
@@ -84,7 +84,9 @@ export const invitationStudioOpenApiPaths = {
             },
             'X-Content-SHA256': { schema: { type: 'string', pattern: '^[a-f0-9]{64}$' } },
             'X-Printable-Content-Digest': { schema: { type: 'string', pattern: '^[a-f0-9]{64}$' } },
-            'X-Renderer-Version': { schema: { type: 'string', const: 'invitation-a5-v1' } },
+            'X-Renderer-Version': {
+              schema: { type: 'string', enum: ['invitation-a5-v1', 'invitation-a5-v2-seating'] },
+            },
             'Content-Disposition': { schema: { type: 'string' } },
             'Cache-Control': { schema: { type: 'string', const: 'private, no-store' } },
           },

@@ -53,6 +53,97 @@ const render = (c: ReturnType<typeof content>, images: Map<string, Uint8Array> =
     images,
   });
 describe('accepted A5 immutable print renderer', () => {
+  it('renders exact round/rotated rectangle geometry with shared Vietnamese Group legend', async () => {
+    const c = content(),
+      groupId = randomUUID();
+    const tables = [0, 1, 2].map((i) => ({
+      layoutTableId: randomUUID(),
+      tableLabel: `B${i + 1}`,
+      shape: i === 0 ? ('ROUND' as const) : ('RECTANGLE' as const),
+      x: i * 600,
+      y: 0,
+      width: 450,
+      height: 350,
+      rotationDegrees: i === 1 ? 45 : 0,
+      guestGroupId: i === 2 ? null : groupId,
+      guestGroupName: i === 2 ? null : 'Gia đình cô dâu',
+      color: i === 2 ? null : '#059669',
+    }));
+    const snapshot = {
+      ...c,
+      design: {
+        ...c.design,
+        sections: [{ kind: 'SEATING' as const, textKey: null, derivedAssetId: null }],
+        includesSeating: true,
+      },
+      seating: { seatingPlanRevisionId: randomUUID(), renderSnapshot: tables },
+    };
+    const a = await renderPrintablePdf({
+      content: snapshot,
+      contentDigest: digest(snapshot),
+      createdAt: new Date('2026-10-12T00:00:00Z'),
+      images: new Map(),
+    });
+    expect(a.rendererVersion).toBe('invitation-a5-v2-seating');
+    expect(a.bytes.toString('latin1').match(/\/Type \/Page\b/gu)).toHaveLength(2);
+  });
+  it('rejects illegible table labels and legends that do not fit instead of changing geometry', async () => {
+    const c = content();
+    const table = {
+      layoutTableId: randomUUID(),
+      tableLabel: 'Bàn 1',
+      shape: 'RECTANGLE' as const,
+      x: 0,
+      y: 0,
+      width: 10000,
+      height: 1,
+      rotationDegrees: 0,
+      guestGroupId: null,
+      guestGroupName: null,
+      color: null,
+    };
+    const snapshot = {
+      ...c,
+      design: {
+        ...c.design,
+        sections: [{ kind: 'SEATING' as const, textKey: null, derivedAssetId: null }],
+        includesSeating: true,
+      },
+      seating: { seatingPlanRevisionId: randomUUID(), renderSnapshot: [table] },
+    };
+    await expect(
+      renderPrintablePdf({
+        content: snapshot,
+        contentDigest: digest(snapshot),
+        createdAt: new Date(),
+        images: new Map(),
+      }),
+    ).rejects.toMatchObject({ code: 'PRINT_CONTENT_OVERFLOW' });
+    const legendOverflow = {
+      ...snapshot,
+      seating: {
+        ...snapshot.seating,
+        renderSnapshot: Array.from({ length: 15 }, (_, i) => ({
+          ...table,
+          layoutTableId: randomUUID(),
+          width: 500,
+          height: 500,
+          y: i * 600,
+          guestGroupId: randomUUID(),
+          guestGroupName: 'Gia đình cô dâu',
+          color: '#059669',
+        })),
+      },
+    };
+    await expect(
+      renderPrintablePdf({
+        content: legendOverflow,
+        contentDigest: digest(legendOverflow),
+        createdAt: new Date(),
+        images: new Map(),
+      }),
+    ).rejects.toMatchObject({ code: 'PRINT_CONTENT_OVERFLOW' });
+  });
   it('embeds fonts, two physical pages and deterministic file bytes', async () => {
     const c = content(),
       a = await render(c),
@@ -89,7 +180,7 @@ describe('accepted A5 immutable print renderer', () => {
       }),
     ).rejects.toMatchObject({ code: 'PRINTABLE_DIGEST_CONFLICT' });
     await expect(render({ ...c, seating: [] } as unknown as typeof c)).rejects.toMatchObject({
-      code: 'PRINT_SEATING_NOT_SUPPORTED',
+      status: 422,
     });
     await expect(render({ ...c, surprise: true } as typeof c)).rejects.toMatchObject({
       status: 422,
