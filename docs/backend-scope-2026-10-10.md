@@ -44,6 +44,11 @@ subsequently proposed but has not been confirmed. Settle that narrow requirement
 before implementing companion-dependent Guest/check-in schemas and counts; the
 named Guest identity/count is not the number of all people arriving with that Guest.
 
+SPEC-08 execution clarification, confirmed by the owner on 2026-10-12: implement
+only check-in of named Guests in this revision; companion quantities are deferred
+to separate requirements. This authorizes the named-only Staff implementation and
+does not prohibit accompanying people or confirm any companion counting rules.
+
 Couple/Manager may supply no names, some names or a full list. No list is required
 for contract/deposit, media, generic invitation/QR, printing, layout confirmation,
 event completion or final invoice. Imports and personalized read-only invitations

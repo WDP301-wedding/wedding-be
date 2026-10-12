@@ -24,6 +24,10 @@ Resolve companion-dependent fields/counts before implementing them. Guest owns
 Group/name/list facts and independent planning totals; Staff does not edit them.
 No attendance fact changes contract, deposit, invoice or planning quantities.
 
+On 2026-10-12 the owner explicitly chose named-Guest check-in only for this
+implementation; companion quantity requirements are deferred to a separate revision.
+This resolves the execution scope without prohibiting accompanying people.
+
 ## 2. Per-Booking Mode
 
 checkInMode is NONE by default or BY_GUEST_NAME. Owning FULL Couple/Manager may
