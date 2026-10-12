@@ -13,6 +13,7 @@ import { createVenueCatalogRuntime } from '../../modules/venue-catalog/venue-cat
 import { createIdentityRuntime } from '../../modules/identity-access/identity.runtime.js';
 import { createInvitationStudioRuntime } from '../../modules/invitation-studio/invitation-studio.runtime.js';
 import { createGuestManagementRuntime } from '../../modules/guest-management/guest-management.runtime.js';
+import { createAnalyticsRuntime } from '../../modules/analytics-dashboard/analytics.runtime.js';
 import { createNotificationsRuntime } from '../../modules/notifications-automation/notifications.runtime.js';
 import request from 'supertest';
 import { createPaymentsBillingRuntime } from '../../modules/payments-billing/payments-billing.runtime.js';
@@ -378,11 +379,18 @@ describe('server startup and process signals', () => {
     const notifications = (await vi.mocked(createNotificationsRuntime).mock.results.at(-1)!
       .value) as Awaited<ReturnType<typeof createNotificationsRuntime>>;
     expect(notifications.start).toHaveBeenCalledOnce();
+    const analytics = await (vi.mocked(createAnalyticsRuntime).mock.results.at(-1)!
+      .value as ReturnType<typeof createAnalyticsRuntime>);
+    expect(vi.spyOn(analytics, 'start')).toHaveBeenCalledOnce();
+    expect((await request(running.app).get('/api/v1/management/analytics/overview')).status).toBe(
+      401,
+    );
     const runtime = await (vi.mocked(createInvitationStudioRuntime).mock.results.at(-1)!
       .value as ReturnType<typeof createInvitationStudioRuntime>);
     await running.shutdown();
     expect(vi.mocked(runtime.resource).close.mock.calls).toHaveLength(1);
     expect(notifications.resource.close).toHaveBeenCalledOnce();
+    expect(vi.spyOn(analytics.resource, 'close')).toHaveBeenCalledOnce();
   });
 
   it('wires deployed database readiness, keeps liveness independent, and releases the probe', async () => {
@@ -407,6 +415,19 @@ describe('server startup and process signals', () => {
     expect(vi.mocked(database.resource).close.mock.calls).toHaveLength(1);
   });
 
+  it('closes all initialized owners and readiness when analytics startup fails', async () => {
+    vi.mocked(createAnalyticsRuntime).mockRejectedValueOnce(new Error('analytics startup failed'));
+    await expect(
+      bootstrap({ loadConfig: () => Promise.resolve(parseEnvironment({ NODE_ENV: 'test' })) }),
+    ).rejects.toThrow('analytics startup failed');
+    const notifications = await (vi.mocked(createNotificationsRuntime).mock.results.at(-1)!
+      .value as ReturnType<typeof createNotificationsRuntime>);
+    const database = vi.mocked(createDatabaseReadiness).mock.results.at(-1)!.value as ReturnType<
+      typeof createDatabaseReadiness
+    >;
+    expect(notifications.resource.close).toHaveBeenCalledOnce();
+    expect(vi.spyOn(database.resource, 'close')).toHaveBeenCalledOnce();
+  });
   it('closes earlier owner resources when invitation composition fails', async () => {
     vi.mocked(createInvitationStudioRuntime).mockRejectedValueOnce(
       new Error('media startup failed'),
@@ -550,4 +571,18 @@ describe('server startup and process signals', () => {
     expect(isMainModule('file:///different/server.js', entryPath)).toBe(false);
     expect(isMainModule(pathToFileURL(entryPath).href, undefined)).toBe(false);
   });
+});
+
+vi.mock('../../modules/analytics-dashboard/analytics.runtime.js', async () => {
+  const { Router } = await import('express');
+  return {
+    createAnalyticsRuntime: vi.fn(() => ({
+      router: Router().get('/management/analytics/overview', (_req, res) =>
+        res.status(401).json({ error: { code: 'AUTHENTICATION_REQUIRED' } }),
+      ),
+      start: vi.fn(),
+      stop: vi.fn(),
+      resource: { name: 'analytics', close: vi.fn() },
+    })),
+  };
 });

@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 1,
+  "module": "analytics-dashboard",
+  "providerVersion": "ANALYTICS-SOURCES@3.0.0",
+  "metricDefinitionVersion": "2",
+  "date": "2026-10-13",
+  "baseRevision": "376435941e8e876e16c7caa07855d234dc65338d",
+  "sourceState": "combined uncommitted workspace with pre-existing SPEC-09 changes; content hashes pin acceptance",
+  "environment": {
+    "platform": "Windows",
+    "node": "24.19.0",
+    "postgresql": "18.6",
+    "database": "isolated localhost disposable databases",
+    "externalProviderEvidence": "not executed",
+    "deployment": "not performed"
+  },
+  "api": {
+    "sha256": "8cb607c2149d35e6ae0dbb4626a42e795c523b7322fbc97b8f78dfd882a57586",
+    "prefix": "/api/v1",
+    "role": "active Manager",
+    "paths": [
+      "/management/analytics/attendance",
+      "/management/analytics/bookings",
+      "/management/analytics/exports/overview",
+      "/management/analytics/overview",
+      "/management/analytics/print-orders",
+      "/management/analytics/rebuild",
+      "/management/analytics/revenue"
+    ]
+  },
+  "tests": {
+    "finalScope": {
+      "files": 11,
+      "passed": 98,
+      "skipped": 0,
+      "errors": 0
+    },
+    "precedingWholeWorkspace": {
+      "files": 252,
+      "passed": 1797,
+      "skipped": 0,
+      "errors": 0,
+      "coverageGate": "failed: unfinished SPEC-09 per-file coverage; final SPEC-10 paths verified separately"
+    },
+    "coverage": {
+      "thresholds": {
+        "lines": 80,
+        "branches": 80,
+        "perFile": true
+      },
+      "totals": {
+        "lines": {
+          "total": 515,
+          "covered": 498,
+          "skipped": 0,
+          "pct": 96.69
+        },
+        "statements": {
+          "total": 563,
+          "covered": 541,
+          "skipped": 0,
+          "pct": 96.09
+        },
+        "functions": {
+          "total": 171,
+          "covered": 165,
+          "skipped": 0,
+          "pct": 96.49
+        },
+        "branches": {
+          "total": 383,
+          "covered": 360,
+          "skipped": 0,
+          "pct": 93.99
+        },
+        "branchesTrue": {
+          "total": 0,
+          "covered": 0,
+          "skipped": 0,
+          "pct": 100
+        }
+      },
+      "files": {
+        "src/server.ts": {
+          "lines": 90.14,
+          "branches": 80
+        },
+        "src/core/reporting/reporting-feed.ts": {
+          "lines": 100,
+          "branches": 100
+        },
+        "src/modules/analytics-dashboard/analytics.runtime.ts": {
+          "lines": 100,
+          "branches": 91.66
+        },
+        "src/modules/analytics-dashboard/application/analytics.service.ts": {
+          "lines": 98.65,
+          "branches": 99.4
+        },
+        "src/modules/analytics-dashboard/application/projection.ts": {
+          "lines": 100,
+          "branches": 96.07
+        },
+        "src/modules/analytics-dashboard/domain/metrics.ts": {
+          "lines": 100,
+          "branches": 92.85
+        },
+        "src/modules/analytics-dashboard/http/analytics.openapi.ts": {
+          "lines": 100,
+          "branches": 100
+        },
+        "src/modules/analytics-dashboard/http/analytics.router.ts": {
+          "lines": 100,
+          "branches": 100
+        },
+        "src/modules/analytics-dashboard/http/analytics.schemas.ts": {
+          "lines": 100,
+          "branches": 100
+        },
+        "src/modules/analytics-dashboard/infrastructure/analytics.composition.ts": {
+          "lines": 100,
+          "branches": 100
+        },
+        "src/modules/analytics-dashboard/infrastructure/projection.repository.ts": {
+          "lines": 96.66,
+          "branches": 91.3
+        },
+        "src/modules/booking-lifecycle/application/analytics-reporting.ts": {
+          "lines": 100,
+          "branches": 100
+        },
+        "src/modules/booking-lifecycle/infrastructure/analytics-reporting.reader.ts": {
+          "lines": 100,
+          "branches": 100
+        },
+        "src/modules/guest-management/infrastructure/analytics-reporting.reader.ts": {
+          "lines": 100,
+          "branches": 100
+        },
+        "src/modules/invitation-studio/application/analytics-reporting.ts": {
+          "lines": 100,
+          "branches": 100
+        },
+        "src/modules/invitation-studio/infrastructure/analytics-reporting.reader.ts": {
+          "lines": 100,
+          "branches": 100
+        },
+        "src/modules/payments-billing/application/analytics-reporting.ts": {
+          "lines": 100,
+          "branches": 100
+        },
+        "src/modules/payments-billing/infrastructure/analytics-reporting.reader.ts": {
+          "lines": 100,
+          "branches": 100
+        },
+        "src/modules/staff-operations/infrastructure/analytics-reporting.reader.ts": {
+          "lines": 100,
+          "branches": 100
+        },
+        "src/modules/venue-catalog/application/analytics-reporting.ts": {
+          "lines": 100,
+          "branches": 100
+        },
+        "src/modules/venue-catalog/infrastructure/analytics-reporting.reader.ts": {
+          "lines": 100,
+          "branches": 100
+        }
+      }
+    }
+  },
+  "migrationCount": 56,
+  "files": {
+    "openapi/openapi.json": "8cb607c2149d35e6ae0dbb4626a42e795c523b7322fbc97b8f78dfd882a57586",
+    "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql": "16e544b524326108e8927ba4f8cc48e40db0f3fdaf4bed9d060f91c8c1e5bba8",
+    "prisma/migrations/20261013002000_analytics_projection/migration.sql": "9449594ebe500e961a5847f80f0132dfafe87cf1376565a50681e1843beab05f",
+    "prisma/migrations/20261013003000_reporting_scope_and_planning_invalidation/migration.sql": "8e56b181ffac97688db07b0173cdffcfe17fa35b495e5993cb894b9254a10523",
+    "prisma/migrations/20261013004000_analytics_event_query_index/migration.sql": "b0bf5e05ee5d5b5cbfe5bd5d479a17eeb8903dddcb18d467e2aa02d94066a86d",
+    "prisma/schema.prisma": "76e379db8d8a8bab0b34939de6fa7ff289f51022a05c5f0e5938b04375516370",
+    "src/config/runtime-manifest.ts": "7b28e5098fb2f3220d48c2bd3767977dfcf6c28b84d13b0c8b1023303cddde5c",
+    "src/core/openapi/registry.ts": "73a4b6ed41c18fcf205028df79ea49d519498d04115ef73d67002ccc48b5cd3e",
+    "src/core/reporting/reporting-feed.ts": "d72def685389acf1bcade63287ffea85421cd56d6455587c8e6752a88ab8370c",
+    "src/modules/analytics-dashboard/analytics.runtime.ts": "1658806774bcd5536884651effaf551bf4d3a5d6cec0ec7270806cc142ca6f8e",
+    "src/modules/analytics-dashboard/application/analytics.service.ts": "18d57896a10b676e6135edd3f6ffc1decc3f1e711d81c925fbfac2a2c2d3d6a9",
+    "src/modules/analytics-dashboard/application/projection.ts": "70230253c14a4f5ccaea0ea51a209922013e60f9d42bda79f1fd50b61cbafddb",
+    "src/modules/analytics-dashboard/domain/metrics.ts": "509aeb5903e842e0a909f24db2004b05f024786fa7b1fc21ac98f1d46bb7b844",
+    "src/modules/analytics-dashboard/http/analytics.openapi.ts": "22bd3f03eeeee85b5d644ff0f8645c577d31018c6b439248d9fad94bc6d2918c",
+    "src/modules/analytics-dashboard/http/analytics.router.ts": "55dde167dc8d485abdac3c78b8e6ae687c83c7431a0afbc5903bc31b8a2edcb7",
+    "src/modules/analytics-dashboard/http/analytics.schemas.ts": "1785356801e5b9b8fc008f4300f730ae5fb6521392fa00bf1f5c13e006dbecf5",
+    "src/modules/analytics-dashboard/infrastructure/analytics.composition.ts": "512f73cc8e515ec7d0ec452b76bf2e654ed97f9a08261134a3e5847898eb73a2",
+    "src/modules/analytics-dashboard/infrastructure/projection.repository.ts": "d77efa5e5921e82badc1b727a2b32d294387698811ce20bf6c73f4f001e6b4f8",
+    "src/modules/booking-lifecycle/application/analytics-reporting.ts": "6502c45664f6221d08ced0a4cc16c6b8cee3d282d22f9ef85058d4bfe680c925",
+    "src/modules/booking-lifecycle/infrastructure/analytics-reporting.reader.ts": "b12956fdf11e74ead6e1abb36b5dcf18512978311cca2387f6a72e9b7871c726",
+    "src/modules/guest-management/infrastructure/analytics-reporting.reader.ts": "a58cc7d0bc5963cba2017349c34e3d3bb3f0f8970af8011110160478ed58d576",
+    "src/modules/invitation-studio/application/analytics-reporting.ts": "d658f911874d21d2fe9c472d024ea89b95598135bb6cade69dc2ca0cdaf415de",
+    "src/modules/invitation-studio/infrastructure/analytics-reporting.reader.ts": "203a93853eea847d175a59e461257377b2eea4d2042de2e00f78ae72abe8f52a",
+    "src/modules/payments-billing/application/analytics-reporting.ts": "fd05addbc49bffcd900306c0e94a2751fe784b5bbd392450ea4e99c463c43530",
+    "src/modules/payments-billing/infrastructure/analytics-reporting.reader.ts": "1d973ef468d131df5ce21e9c4a2acdc41286cd808f6b12e7be09f424b04267af",
+    "src/modules/staff-operations/infrastructure/analytics-reporting.reader.ts": "a46f9bfc580f27b2cea799658e2c703d3706e02b197863ed253d956d89b7ee9c",
+    "src/modules/venue-catalog/application/analytics-reporting.ts": "fd616a41c8c0002d46c9ad7b3fd1cdf1a62f41d58fef59bdf8613bffb397f2ba",
+    "src/modules/venue-catalog/infrastructure/analytics-reporting.reader.ts": "6de16cfbd65458f3a9065838d644255f9c81de581c03d18207b05a9794bca0e0",
+    "src/server.ts": "acda3656a75c8f4c9420d2c5b49092fb48afc3aaf6c6148034655b1476f6c701",
+    "tests/contract/analytics-openapi.test.ts": "7f3ea1475e1903847bab765f8894272254ddc37f9b1e10bdf12327c324e85a21",
+    "tests/integration/analytics-commercial-cases.ts": "e02f4405f005e0b6a8375f205432d11a65def1536027470c8fc9ccc24cf3426c",
+    "tests/integration/analytics-dashboard.test.ts": "25bcbb8e59d78c8da8fc61ad0fa8cc4de6d7ff0e1572643c67d7d9a7dbb2fea4",
+    "tests/integration/analytics-upgrade.test.ts": "c50e93d6337b66071de206a8afe3e3efef0b180391fdb53302d1cdda21ed4ab2"
+  },
+  "handoff": "docs/analytics-dashboard-w1-w4.md",
+  "evidence": "tasks/evidence/analytics-dashboard-w1-w4-2026-10-13.md",
+  "gates": {
+    "typecheck": "passed",
+    "lint": "passed",
+    "build": "passed",
+    "contractTests": {
+      "files": 17,
+      "passed": 44
+    },
+    "apiGenerate": "passed",
+    "apiCheck": "passed",
+    "migrationDeploy": {
+      "count": 56,
+      "result": "passed"
+    },
+    "formatChangedFiles": "passed",
+    "diffCheck": "passed",
+    "wholeWorkspaceCoverage": "blocked by 10 unfinished SPEC-09 files; no thresholds waived"
+  }
+}

@@ -56,6 +56,7 @@ export function createRuntimeFeatureManifest(config: BackendConfig, revision?: s
         config.invitationStudio.publicOrigin ? 'configured-origin' : 'disabled',
       ),
       vnpay: feature(config.vnpay.enabled, config.vnpay.enabled ? 'sandbox-only' : 'disabled'),
+      analytics: feature(Boolean(config.database.url), 'analytics-owner-feeds-v3-60s'),
       retention: feature(Boolean(config.database.url), 'operator-cli-manual-procedure'),
       workers: feature(
         config.notifications.workerEnabled,

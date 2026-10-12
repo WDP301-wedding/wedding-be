@@ -288,3 +288,15 @@ describe('HTTP security baseline', () => {
     }
   });
 });
+
+vi.mock('../../src/modules/analytics-dashboard/analytics.runtime.js', async () => {
+  const { Router } = await import('express');
+  return {
+    createAnalyticsRuntime: vi.fn(() => ({
+      router: Router(),
+      start: vi.fn(),
+      stop: vi.fn(),
+      resource: { name: 'analytics', close: vi.fn() },
+    })),
+  };
+});

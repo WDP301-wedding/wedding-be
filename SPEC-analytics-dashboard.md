@@ -2,7 +2,7 @@
 
 > Current scope (confirmed 2026-10-10): [backend amendment](./docs/backend-scope-2026-10-10.md) and [active tasks](./tasks/backend-revision-todo.md). SPEC-06 onward has backend acceptance only; client implementation and visual/native checks belong to the frontend team. Earlier conflicting outlines are superseded.
 
-- Status: **Business scope confirmed 2026-10-10 — backend implementation pending**
+- Status: **ANL-W1–W4 backend developer implementation/acceptance complete 2026-10-13** — [API hand-off](./docs/analytics-dashboard-w1-w4.md), [evidence](./tasks/evidence/analytics-dashboard-w1-w4-2026-10-13.md). Deployment, whole-workspace SPEC-09 coverage and production readiness remain separate.
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
 - Module ID: `analytics-dashboard` (`SPEC-10`)
 - Contract baseline: `WEDDING-CONTRACT-3@3.0.0`
