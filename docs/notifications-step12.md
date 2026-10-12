@@ -18,7 +18,9 @@ transaction issues/revalidates personalized credentials. Delivery/read state is
 never financial settlement, approval, attendance or planning authority.
 
 Existing synchronous Identity credential email remains in use. Android APIs are
-implemented; push provider/device delivery awaits the Android team. No Guest
+implemented; the owner-selected [FCM backend extension](android-fcm-backend.md)
+adds provider delivery behind explicit configuration. Live FCM acceptance and
+Android device receipt remain pending their own evidence. No Guest
 response routes, statuses, deadlines or jobs are added. Generic sharing, planning,
 seating, print and billing need no named Guest list or email destination.
 

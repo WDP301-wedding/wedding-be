@@ -328,6 +328,16 @@ unchanged. Production/live external providers and SPEC-09/10 consumers remain se
 - [x] NTF-W3: Contract/appendix/payment/invoice/print and guest-plan handlers; no response events/deadline jobs.
 - [x] NTF-W4: Due scheduler/reconciliation, media/D-3/completion jobs, retry/unknown/dedup proof.
 - [x] NTF-W5: Settings/inbox/operations HTTP, outbox/provider integration evidence and frontend hand-off.
+
+Android FCM extension selected by the owner on 2026-10-13; separate from the
+historical email acceptance above. [Configuration and client/backend hand-off](../docs/android-fcm-backend.md).
+
+- [x] NTF-FCM-W1: Direct FCM HTTP v1 adapter, secret-safe config and offline provider error tests.
+- [x] NTF-FCM-W2: Real event/due-job Android intents, FULL/Manager scope and device-specific durable retry/dedup.
+- [x] NTF-FCM-W3: Revocation/preferences/refresh/unknown recovery, persisted Retry-After, additive migration/RLS/OpenAPI and offline quality gates. [Final-source CI evidence](evidence/android-fcm-backend-2026-10-13.md).
+- [ ] NTF-FCM-W4: Configure service account for `wdp301-wedding`, migrate/deploy and record authorized Railway worker -> FCM acceptance evidence.
+- [x] NTF-FCM-W5: Publish backend API/configuration/provider-mode and recovery hand-off; attach Android receipt/display/navigation as a separately owned client dependency, never a backend test gate.
+
 - [ ] ANL-W1: Source formulas include agreed services/appendices/expenses/final invoices; separate explicit planning, optional named-list count and nullable mode-aware check-ins; no response metrics, disabled zeros or partial-list whole-event turnout rates.
 - [ ] ANL-W2: Projection/checkpoint/rebuild with monotonic source ordering.
 - [ ] ANL-W3: Authorized analytics HTTP/OpenAPI and bounded query/freshness proof.
