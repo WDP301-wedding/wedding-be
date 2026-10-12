@@ -198,6 +198,7 @@ describe('parseEnvironment', () => {
       openApi: { enabledInProduction: false },
       telemetry: { otlpEndpoint: undefined },
       notifications: {
+        fcm: { enabled: false },
         workerEnabled: false,
         credentialKeys: null,
         activeKeyVersion: null,
