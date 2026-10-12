@@ -3,8 +3,9 @@
 Date: 2026-10-12 (Asia/Saigon). Branch: `codex/spec08-staff-operations`.
 Provider: `staff-operations@1.0.0`.
 Implementation source commit: `275aeb3` (after the earlier STF-W1 checkpoint `8e933da`).
-Status: implementation and focused PostgreSQL proof complete; final repository gates
-are recorded below before task closure.
+Final runtime clock conformance commit: `623001b`.
+Status: ACCEPTED for confirmed backend scope; source `623001b` passed the complete
+Linux/PostgreSQL backend workflow. Production/live business providers remain separate.
 
 Authority: [confirmed backend scope](../../docs/backend-scope-2026-10-10.md),
 [SPEC-08](../../SPEC-staff-operations.md), [active backlog](../backend-revision-todo.md).
@@ -68,8 +69,28 @@ guidance/registry. It verifies:
 
 ## Verification record
 
-Final results, source commit and artifact digest are populated after the final gates.
+Final source: `623001b42a3347eaeb5edb0c08ea1f4a693eab72`.
 OpenAPI SHA-256: `8be62bc16348dbe60fed7c8482384beb8ba16bd9cf9d02f85a1995dd13b00f2b`.
+
+[PR #36](https://github.com/WDP301-wedding/wedding-be/pull/36) and the
+[successful exact-source workflow](https://github.com/WDP301-wedding/wedding-be/actions/runs/38204285681)
+provide the authoritative final quality record:
+
+| Gate | Result |
+| --- | --- |
+| Prisma generation and deploy to empty PostgreSQL 17 | PASS, all 47 migrations |
+| Formatting, lint, typecheck, build, dependency audit | PASS |
+| Unit suite | 139 files, 1250 tests PASS |
+| Contract suite | 15 files, 41 tests PASS |
+| Integration suite | 79 files, 431 tests PASS |
+| Full-suite PostgreSQL coverage | 233 files, 1722 tests PASS; no skipped tests/errors |
+| Coverage thresholds | 97.42% lines, 93.32% branches overall; every file satisfies unchanged 80% line/branch thresholds |
+| OpenAPI generation/check | PASS; exact digest above |
+| Local empty/populated Staff upgrade, native owners and HTTP | PASS; separate from interrupted broad Windows runs |
+
+The final CI includes the empty-search regression and controlled runtime clock fix.
+Its database is the workflow's disposable container service, not the application's
+shared configuration. Evidence publication changes docs/checklists only afterward.
 `scripts/staff-operations.verify.mjs` validates the existing local demo administrator,
 creates a fresh isolated foundation database, runs actual Prisma migration deploy,
 and binds DATABASE_URL/MIGRATION_DATABASE_URL to it. TEST_MIGRATION_DATABASE_URL
@@ -104,6 +125,21 @@ database. Final aggregate gates are recorded separately below.
 Review mutation: reversing the CHECK_IN duplicate condition made the named check-in
 test fail with GUEST_ALREADY_CHECKED_IN on the first arrival. The original condition
 was restored before final verification. Tests therefore detect the changed behavior.
+
+The review also added a real empty-search regression. It failed on `Prisma.join([])`;
+the corrected search skips creation of an IN list and both journal queries when there
+are no matched IDs. Successful empty results retain the strict response shape.
+
+Windows worker failures were additionally reproduced outside application tests as
+the Node 24.15.0/libuv assertion `UV_HANDLE_CLOSING` during an explicit async process
+exit. Interrupted/partial coverage reports are not accepted as quality evidence.
+The draft PR's normal Linux/PostgreSQL 17 workflow validates exact final source.
+
+The first Linux run reached the fixed legacy media fixture's D-3 cutoff on 2026-10-12
+and correctly returned MEDIA_CUTOFF_REACHED rather than the pre-cutoff responses
+expected by two HTTP tests. Runtime composition now accepts an internal clock and
+shares it across Studio, Staff and Seating; those two tests explicitly use the
+fixture clock. Production retains the server clock and the cutoff policy is unchanged.
 
 ## Separate readiness gates
 
