@@ -13,6 +13,7 @@ import { purpose as purposeSchema, parse } from '../domain/notification-policy.j
 import { workerContext } from './notification-scheduler.js';
 import type { InvitationAutomationReader } from '../../invitation-studio/application/automation.contracts.js';
 import { NotificationRetention } from '../infrastructure/notification-retention.js';
+import type { AndroidPushDispatcher } from './android-push-dispatcher.js';
 
 export interface DispatchPolicy {
   emailAllowlist: readonly string[] | null;
@@ -27,6 +28,7 @@ export class NotificationDispatcher {
     readonly invitation: InvitationAutomationReader,
     readonly cipher: CredentialCipher | null,
     readonly policy: DispatchPolicy,
+    readonly push: AndroidPushDispatcher | null = null,
   ) {}
   async send(
     row: NotificationIntent,
@@ -120,7 +122,9 @@ export class NotificationDispatcher {
         return cancelled('EMAIL_PREFERENCE_DISABLED');
     }
     if (row.channel === 'ANDROID')
-      return { outcome: 'DEAD_LETTER', errorCode: 'ANDROID_PROVIDER_DISABLED' };
+      return this.push && recipient.accountId
+        ? this.push.send(row, recipient.accountId)
+        : { outcome: 'DEAD_LETTER', errorCode: 'ANDROID_PROVIDER_DISABLED' };
     if (row.channel !== 'EMAIL' || !destination || !z.email().safeParse(destination).success)
       return { outcome: 'DEAD_LETTER', errorCode: 'DESTINATION_INVALID' };
     if (

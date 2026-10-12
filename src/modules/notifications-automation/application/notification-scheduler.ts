@@ -5,6 +5,7 @@ import type { ContractContext } from '../../../core/database/booking-boundary.js
 import { AppError } from '../../../core/errors/app-error.js';
 import type { NotificationEventConsumer } from '../infrastructure/event-consumer.js';
 import { scheduledId } from '../domain/scheduled-id.js';
+import { notificationChannels } from '../domain/notification-template.js';
 
 export class NotificationScheduler {
   constructor(
@@ -117,7 +118,7 @@ export class NotificationScheduler {
       }
     }
     for (const recipientId of new Set(recipients))
-      for (const channel of ['EMAIL', 'IN_APP'] as const) {
+      for (const channel of notificationChannels(purpose, this.consumer.androidEnabled)) {
         await this.consumer.foundation.enqueue({
           eventId,
           owner: purpose === 'MEDIA_CUTOFF' ? 'invitation-studio' : 'booking-lifecycle',

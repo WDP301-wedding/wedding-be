@@ -41,3 +41,13 @@ export const mandatoryEmail = new Set<NotificationInput['purpose']>([
   'FINAL_INVOICE',
   'GUEST_INVITATION',
 ]);
+
+/** Credential and financial transactional messages retain their email-only transport. */
+export function notificationChannels(
+  purpose: NotificationInput['purpose'],
+  androidEnabled: boolean,
+) {
+  return androidEnabled && !mandatoryEmail.has(purpose)
+    ? (['EMAIL', 'IN_APP', 'ANDROID'] as const)
+    : (['EMAIL', 'IN_APP'] as const);
+}

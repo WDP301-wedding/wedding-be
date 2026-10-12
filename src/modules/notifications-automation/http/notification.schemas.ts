@@ -30,6 +30,7 @@ export const state = z.enum([
   'QUEUED',
   'IN_FLIGHT',
   'DELIVERED',
+  'PROVIDER_ACCEPTED',
   'RETRYABLE_FAILED',
   'UNKNOWN',
   'DEAD_LETTER',

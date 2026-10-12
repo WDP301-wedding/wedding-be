@@ -92,6 +92,9 @@ describe('FCM HTTP v1 delivery', () => {
     expect(await fixture(200, { name: 'not-a-message' }).provider.send(command)).toMatchObject({
       outcome: 'UNKNOWN',
     });
+    expect(
+      await fixture(200, { name: 'projects/another-project/messages/123' }).provider.send(command),
+    ).toMatchObject({ outcome: 'UNKNOWN' });
     expect(await fixture(418, {}).provider.send(command)).toMatchObject({ outcome: 'UNKNOWN' });
     const x = fixture(200, {});
     x.fetcher.mockRejectedValueOnce(new Error('sensitive provider detail'));

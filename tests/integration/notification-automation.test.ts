@@ -22,100 +22,105 @@ import { createGuestServices } from '../../src/modules/guest-management/infrastr
     await db.connect();
   }, 60000);
   afterEach(() => db.disconnect());
-  it('deduplicates D3 schedules independently of booking headcount revisions and completes via the real owner port', async () => {
-    const f = await studioFixture(db.prisma);
-    const b = await db.prisma.booking.findUniqueOrThrow({
-      where: { id: f.bookingId },
-      include: { proposalSnapshot: true },
-    });
-    const start =
-      b.eventDate.getTime() +
-      b.proposalSnapshot!.shiftStartTime.getUTCHours() * 3600000 -
-      7 * 3600000;
-    let clock = new Date(start - 72 * 3600000);
-    const foundation = new NotificationFoundation(db.prisma, () => clock);
-    const consumer = new NotificationEventConsumer(
-      foundation,
-      createNotificationBookingReader(db.prisma),
-      createNotificationIdentityReader(db.prisma),
-    );
-    const automation = createBookingAutomationPort(
-      createPrismaBookingAutomationRepository(db.prisma, () => clock),
-      async () => {},
-    );
-    const scheduler = new NotificationScheduler(
-      consumer,
-      automation,
-      new PrismaInvitationAutomationReader(db.prisma),
-    );
-    await scheduler.tick();
-    const first = await db.prisma.notificationIntent.findMany({
-      where: { bookingId: f.bookingId, purpose: 'D3_REMINDER' },
-    });
-    expect(first).toHaveLength(2);
-    const guests = createGuestServices(db.prisma, () => f.now);
-    await guests.guests.groups(f.bookingId, f.couple);
-    const plan = await guests.guests.plan(f.bookingId, f.couple);
-    await guests.guests.updatePlan(
-      f.bookingId,
-      { expectedRevision: plan.revision, planningHeadcount: plan.planningHeadcount + 1 },
-      randomUUID(),
-      f.couple,
-    );
-    await scheduler.tick();
-    expect(
-      await db.prisma.notificationIntent.count({
+  it.each([false, true])(
+    'native due jobs with Android=%s',
+    async (androidEnabled) => {
+      const f = await studioFixture(db.prisma);
+      const b = await db.prisma.booking.findUniqueOrThrow({
+        where: { id: f.bookingId },
+        include: { proposalSnapshot: true },
+      });
+      const start =
+        b.eventDate.getTime() +
+        b.proposalSnapshot!.shiftStartTime.getUTCHours() * 3600000 -
+        7 * 3600000;
+      let clock = new Date(start - 72 * 3600000);
+      const foundation = new NotificationFoundation(db.prisma, () => clock);
+      const consumer = new NotificationEventConsumer(
+        foundation,
+        createNotificationBookingReader(db.prisma),
+        createNotificationIdentityReader(db.prisma),
+        androidEnabled,
+      );
+      const automation = createBookingAutomationPort(
+        createPrismaBookingAutomationRepository(db.prisma, () => clock),
+        async () => {},
+      );
+      const scheduler = new NotificationScheduler(
+        consumer,
+        automation,
+        new PrismaInvitationAutomationReader(db.prisma),
+      );
+      await scheduler.tick();
+      const first = await db.prisma.notificationIntent.findMany({
         where: { bookingId: f.bookingId, purpose: 'D3_REMINDER' },
-      }),
-    ).toBe(2);
-    // The worker can restart without losing a persisted due read or source intent identity.
-    await new NotificationScheduler(
-      consumer,
-      automation,
-      new PrismaInvitationAutomationReader(db.prisma),
-    ).tick();
-    expect(
-      await db.prisma.notificationIntent.count({
-        where: { bookingId: f.bookingId, purpose: 'D3_REMINDER' },
-      }),
-    ).toBe(2);
-    clock = new Date(
-      b.eventDate.getTime() +
-        b.proposalSnapshot!.shiftEndTime.getUTCHours() * 3600000 -
-        7 * 3600000 +
-        12 * 3600000 +
-        1,
-    );
-    await scheduler.tick();
-    expect((await db.prisma.booking.findUniqueOrThrow({ where: { id: f.bookingId } })).phase).toBe(
-      'COMPLETED',
-    );
-    const command = await db.prisma.notificationDueCommand.findFirstOrThrow({
-      where: { bookingId: f.bookingId },
-    });
-    expect(command.state).toBe('DONE');
-    expect(
-      await automation.completeDue(
-        {
-          bookingId: f.bookingId,
-          expectedBookingRevision: command.expectedRevision,
-          commandId: command.id,
-          now: command.requestedAt.toISOString(),
-        },
-        {
-          requestId: randomUUID(),
-          causationId: randomUUID(),
-          authority: 'SYSTEM',
-          actorAccountId: null,
-        },
-      ),
-    ).toEqual({ outcome: 'REPLAYED' });
-    expect(
-      await db.prisma.bookingOutboxEvent.count({
-        where: { aggregateId: f.bookingId, eventType: 'booking.completed' },
-      }),
-    ).toBe(1);
-  }, 30000);
+      });
+      expect(first).toHaveLength(androidEnabled ? 3 : 2);
+      const guests = createGuestServices(db.prisma, () => f.now);
+      await guests.guests.groups(f.bookingId, f.couple);
+      const plan = await guests.guests.plan(f.bookingId, f.couple);
+      await guests.guests.updatePlan(
+        f.bookingId,
+        { expectedRevision: plan.revision, planningHeadcount: plan.planningHeadcount + 1 },
+        randomUUID(),
+        f.couple,
+      );
+      await scheduler.tick();
+      expect(
+        await db.prisma.notificationIntent.count({
+          where: { bookingId: f.bookingId, purpose: 'D3_REMINDER' },
+        }),
+      ).toBe(androidEnabled ? 3 : 2);
+      // The worker can restart without losing a persisted due read or source intent identity.
+      await new NotificationScheduler(
+        consumer,
+        automation,
+        new PrismaInvitationAutomationReader(db.prisma),
+      ).tick();
+      expect(
+        await db.prisma.notificationIntent.count({
+          where: { bookingId: f.bookingId, purpose: 'D3_REMINDER' },
+        }),
+      ).toBe(androidEnabled ? 3 : 2);
+      clock = new Date(
+        b.eventDate.getTime() +
+          b.proposalSnapshot!.shiftEndTime.getUTCHours() * 3600000 -
+          7 * 3600000 +
+          12 * 3600000 +
+          1,
+      );
+      await scheduler.tick();
+      expect(
+        (await db.prisma.booking.findUniqueOrThrow({ where: { id: f.bookingId } })).phase,
+      ).toBe('COMPLETED');
+      const command = await db.prisma.notificationDueCommand.findFirstOrThrow({
+        where: { bookingId: f.bookingId },
+      });
+      expect(command.state).toBe('DONE');
+      expect(
+        await automation.completeDue(
+          {
+            bookingId: f.bookingId,
+            expectedBookingRevision: command.expectedRevision,
+            commandId: command.id,
+            now: command.requestedAt.toISOString(),
+          },
+          {
+            requestId: randomUUID(),
+            causationId: randomUUID(),
+            authority: 'SYSTEM',
+            actorAccountId: null,
+          },
+        ),
+      ).toEqual({ outcome: 'REPLAYED' });
+      expect(
+        await db.prisma.bookingOutboxEvent.count({
+          where: { aggregateId: f.bookingId, eventType: 'booking.completed' },
+        }),
+      ).toBe(1);
+    },
+    30000,
+  );
   it('persists page fences, honors rehearsal scopes and ignores invalid cutoff revisions', async () => {
     const a = await studioFixture(db.prisma),
       b = await studioFixture(db.prisma);

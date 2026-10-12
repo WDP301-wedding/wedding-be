@@ -17,13 +17,14 @@ import { createNotificationIdentityReader } from '../../src/modules/identity-acc
     const db = new CatalogTestDatabase('notification_events');
     beforeAll(() => db.connect(), 60000);
     afterAll(() => db.disconnect());
-    it('consumes native publication/explicit planning facts once and leaves independent outboxes intact', async () => {
+    it.each([false, true])('native events with Android=%s', async (androidEnabled) => {
       const f = await studioFixture(db.prisma);
       const reader = createNotificationBookingReader(db.prisma);
       const c = new NotificationEventConsumer(
         new NotificationFoundation(db.prisma, () => f.now),
         reader,
         createNotificationIdentityReader(db.prisma, () => f.now),
+        androidEnabled,
       );
       const design = await f.services.designs.create(
         { bookingId: f.bookingId, content: f.content, idempotencyKey: randomUUID() },
@@ -65,7 +66,9 @@ import { createNotificationIdentityReader } from '../../src/modules/identity-acc
       );
       expect(report.rows.every((r) => r.value.listedGuestCount === 0)).toBe(true);
       await c.poll(100);
-      const count = await db.prisma.notificationIntent.count({ where: { bookingId: f.bookingId } });
+      const count = await db.prisma.notificationIntent.count({
+        where: { bookingId: f.bookingId },
+      });
       expect(count).toBeGreaterThanOrEqual(4);
       expect(
         await db.prisma.notificationRecipient.count({ where: { accountId: f.manager.actorId } }),
@@ -74,7 +77,7 @@ import { createNotificationIdentityReader } from '../../src/modules/identity-acc
         await db.prisma.notificationIntent.count({
           where: { bookingId: f.bookingId, purpose: 'GUEST_PLAN' },
         }),
-      ).toBe(2);
+      ).toBe(androidEnabled ? 3 : 2);
       await c.poll(100);
       expect(await db.prisma.notificationIntent.count({ where: { bookingId: f.bookingId } })).toBe(
         count,

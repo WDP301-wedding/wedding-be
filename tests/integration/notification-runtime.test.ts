@@ -1,4 +1,4 @@
-import { randomBytes, randomUUID } from 'node:crypto';
+import { generateKeyPairSync, randomBytes, randomUUID } from 'node:crypto';
 import request from 'supertest';
 import { Registry } from 'prom-client';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -81,6 +81,15 @@ import { studioFixture } from './invitation-studio/studio-fixture.js';
         NOTIFICATIONS_WORKER_ENABLED: 'true',
         NOTIFICATIONS_CREDENTIAL_KEYS: JSON.stringify({ v1: randomBytes(32).toString('base64') }),
         NOTIFICATIONS_ACTIVE_KEY_VERSION: 'v1',
+        NOTIFICATIONS_FCM_ENABLED: 'true',
+        NOTIFICATIONS_FCM_SERVICE_ACCOUNT: JSON.stringify({
+          type: 'service_account',
+          project_id: 'wedding-test',
+          client_email: 'worker@example.invalid',
+          private_key: generateKeyPairSync('rsa', { modulusLength: 2048 })
+            .privateKey.export({ type: 'pkcs8', format: 'pem' })
+            .toString(),
+        }),
       });
       const start = vi.spyOn(NotificationWorker.prototype, 'start').mockImplementation(() => {});
       try {

@@ -63,7 +63,12 @@ export function createRuntimeFeatureManifest(config: BackendConfig, revision?: s
         'implemented',
       ),
       androidDeviceRegistry: feature(Boolean(config.database.url), 'account-session-bound'),
-      androidPush: feature(false, 'disabled-awaiting-client-provider', 'downstream-pending', true),
+      androidPush: feature(
+        config.notifications.fcm.enabled,
+        config.notifications.fcm.enabled ? 'fcm-http-v1' : 'disabled',
+        'implemented',
+        true,
+      ),
       printFiles: feature(
         Boolean(config.database.url) &&
           config.storage.enabled &&

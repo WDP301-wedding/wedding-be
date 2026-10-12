@@ -12,8 +12,11 @@ export type FcmCommand = Readonly<{
   owner: string;
   referenceId?: string;
 }>;
+type FcmEvidence = Omit<DeliveryEvidence, 'outcome'> & {
+  outcome: Exclude<DeliveryEvidence['outcome'], 'DELIVERED'>;
+};
 export interface FcmSender {
-  send(command: FcmCommand): Promise<DeliveryEvidence>;
+  send(command: FcmCommand): Promise<FcmEvidence>;
 }
 type Auth = { getAccessToken(): Promise<{ token?: string | null }> };
 const result = z.object({
@@ -49,7 +52,7 @@ export class NotificationFcmDelivery implements FcmSender {
           })
         : null);
   }
-  async send(command: FcmCommand): Promise<DeliveryEvidence> {
+  async send(command: FcmCommand): Promise<FcmEvidence> {
     if (!this.config.enabled || !this.auth)
       return { outcome: 'DEAD_LETTER', errorCode: 'ANDROID_PROVIDER_DISABLED' };
     if (
@@ -94,7 +97,8 @@ export class NotificationFcmDelivery implements FcmSender {
       const body: unknown = await response.json();
       if (response.ok) {
         const parsed = result.safeParse(body);
-        return parsed.success
+        return parsed.success &&
+          parsed.data.name.startsWith(`projects/${this.config.projectId}/messages/`)
           ? { outcome: 'ACCEPTED', providerMessageId: parsed.data.name }
           : { outcome: 'UNKNOWN', errorCode: 'FCM_RESPONSE_INVALID' };
       }

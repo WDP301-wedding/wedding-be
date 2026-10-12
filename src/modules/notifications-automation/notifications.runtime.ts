@@ -15,6 +15,8 @@ import { PrismaInvitationAutomationReader } from '../invitation-studio/infrastru
 import { NotificationFoundation } from './infrastructure/notification-foundation.js';
 import { NotificationEventConsumer } from './infrastructure/event-consumer.js';
 import { NotificationEmailDelivery } from './infrastructure/email-delivery.js';
+import { NotificationFcmDelivery } from './infrastructure/fcm-delivery.js';
+import { AndroidPushDispatcher } from './application/android-push-dispatcher.js';
 import { CredentialCipher } from './infrastructure/credential-cipher.js';
 import { createGuestDeliveryAdapter } from './infrastructure/guest-delivery.adapter.js';
 import { NotificationScheduler } from './application/notification-scheduler.js';
@@ -39,6 +41,7 @@ export async function createNotificationsRuntime(
       foundation,
       bookingReader,
       createNotificationIdentityReader(prisma),
+      config.notifications.fcm.enabled,
     );
     const access = createConsultationAccessReader(createPrismaConsultationAccessRepository(prisma));
     const booking = createBookingLifecycleProviders(
@@ -75,6 +78,13 @@ export async function createNotificationsRuntime(
       invitation,
       cipher,
       policy,
+      policy.fcm.enabled
+        ? new AndroidPushDispatcher(
+            consumer,
+            new NotificationFcmDelivery(policy.fcm),
+            policy.fcm.accountAllowlist,
+          )
+        : null,
     );
     const worker = new NotificationWorker(scheduler, dispatcher, logger, registry);
     const settings = new NotificationSettings(foundation, guests.identity.resolver, bookingReader);

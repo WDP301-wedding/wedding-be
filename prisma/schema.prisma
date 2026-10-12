@@ -78,6 +78,8 @@ model NotificationIntent {
   attempts NotificationAttempt[]
   inbox NotificationInbox[]
   credential NotificationCredential?
+  pushTargetsFrozenAt DateTime? @db.Timestamptz(6)
+  pushDeliveries NotificationPushDelivery[]
   @@unique([eventId, channel, recipientId, templateVersion])
   @@unique([bookingId, purpose, scheduleRevision, scheduledAt, channel, recipientId, templateVersion])
   @@index([state, nextAttemptAt, id])
@@ -139,6 +141,19 @@ model NotificationInstallation {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   @@unique([accountId, installationId])
   @@index([accountId, enabled])
+}
+
+model NotificationPushDelivery {
+  intentId String @db.Uuid
+  installationId String @db.Uuid
+  installationRevision Int
+  state String @default("QUEUED")
+  leaseId String? @db.Uuid
+  providerMessageId String? @db.VarChar(320)
+  errorCode String? @db.VarChar(80)
+  updatedAt DateTime @default(now()) @db.Timestamptz(6)
+  intent NotificationIntent @relation(fields: [intentId], references: [id], onDelete: Restrict)
+  @@id([intentId, installationId])
 }
 
 model NotificationInbox {

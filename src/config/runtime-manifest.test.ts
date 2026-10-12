@@ -20,7 +20,7 @@ describe('runtime feature manifest', () => {
       liveVerification: 'pending',
     });
     expect(manifest.features.androidPush).toMatchObject({
-      mode: 'disabled-awaiting-client-provider',
+      mode: 'disabled',
       liveVerification: 'optional-disabled',
     });
     expect(manifest.features.printFiles).toMatchObject({

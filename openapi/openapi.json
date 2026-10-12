@@ -35066,6 +35066,7 @@
                 "QUEUED",
                 "IN_FLIGHT",
                 "DELIVERED",
+                "PROVIDER_ACCEPTED",
                 "RETRYABLE_FAILED",
                 "UNKNOWN",
                 "DEAD_LETTER",
@@ -35180,6 +35181,7 @@
                                   "QUEUED",
                                   "IN_FLIGHT",
                                   "DELIVERED",
+                                  "PROVIDER_ACCEPTED",
                                   "RETRYABLE_FAILED",
                                   "UNKNOWN",
                                   "DEAD_LETTER",
@@ -35703,6 +35705,7 @@
                             "QUEUED",
                             "IN_FLIGHT",
                             "DELIVERED",
+                            "PROVIDER_ACCEPTED",
                             "RETRYABLE_FAILED",
                             "UNKNOWN",
                             "DEAD_LETTER",
@@ -38401,7 +38404,7 @@
         ]
       },
       "post": {
-        "description": "Active authorized Android session only; maximum five active installations. Registration is implemented; Android push delivery awaits the client/provider. Private no-store result. Delivery/read state is never booking approval, settlement or attendance evidence.",
+        "description": "Active authorized Android session only; maximum five active installations. pushToken must be a native FCM registration token, never an Expo push token or the installation UUID. Backend FCM delivery requires explicit provider configuration; provider acceptance does not prove device display. Private no-store result. Delivery/read state is never booking approval, settlement or attendance evidence.",
         "operationId": "registerAndroidNotificationInstallation",
         "parameters": [
           {

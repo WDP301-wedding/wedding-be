@@ -44,6 +44,17 @@ describe('structured logger', () => {
     expect(sanitized.notificationIntentId).toBe('safe-id');
     expect(text).toContain(REDACTED_VALUE);
   });
+  it('redacts FCM service-account JSON, RSA keys and service identity', () => {
+    expect(
+      redactLogRecord({
+        fcm: { privateKey: 'private-fcm-key', clientEmail: 'private-service@example.invalid' },
+        NOTIFICATIONS_FCM_SERVICE_ACCOUNT: 'private-service-account-json',
+      }),
+    ).toEqual({
+      fcm: { privateKey: REDACTED_VALUE, clientEmail: REDACTED_VALUE },
+      NOTIFICATIONS_FCM_SERVICE_ACCOUNT: REDACTED_VALUE,
+    });
+  });
   it('redacts Guest capabilities, link fragments, greetings and private notes', () => {
     expect(
       redactLogRecord({

@@ -79,7 +79,7 @@ export const notificationOpenApiPaths: NonNullable<ZodOpenApiObject['paths']> = 
       installationDto,
       installationBody,
       true,
-      'Active authorized Android session only; maximum five active installations. Registration is implemented; Android push delivery awaits the client/provider.',
+      'Active authorized Android session only; maximum five active installations. pushToken must be a native FCM registration token, never an Expo push token or the installation UUID. Backend FCM delivery requires explicit provider configuration; provider acceptance does not prove device display.',
     ),
   },
   [own + '/android-installations/{id}']: {

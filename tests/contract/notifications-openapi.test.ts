@@ -29,7 +29,7 @@ describe('SPEC-09 published notification boundaries', () => {
     }
     expect(operations).toBe(14);
     expect(document.paths?.['/notifications/android-installations']?.post?.description).toContain(
-      'awaits the client/provider',
+      'provider acceptance does not prove device display',
     );
     const status = JSON.stringify(
       document.paths?.['/management/notifications']?.get?.responses?.['200'],

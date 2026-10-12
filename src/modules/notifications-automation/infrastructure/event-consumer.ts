@@ -4,6 +4,7 @@ import type { createNotificationIdentityReader } from '../../identity-access/aut
 import { notificationEvent, notificationEventTypes } from '../domain/event-handler.js';
 import { digest, type NotificationInput } from '../domain/notification-policy.js';
 import type { NotificationFoundation } from './notification-foundation.js';
+import { notificationChannels } from '../domain/notification-template.js';
 
 type Source = {
   eventId: string;
@@ -31,6 +32,7 @@ export class NotificationEventConsumer {
     readonly foundation: NotificationFoundation,
     readonly booking: BookingReader,
     readonly identity: IdentityReader,
+    readonly androidEnabled = false,
   ) {}
 
   private source(owner: Owner, limit: number) {
@@ -108,7 +110,10 @@ export class NotificationEventConsumer {
               if (!(await this.identity.account(couple.accountId))) continue;
               const recipient = await this.coupleRecipient(couple.accountId, e.purpose);
               if (!recipient.enabled) continue;
-              for (const channel of ['EMAIL', 'IN_APP'] as const) {
+              for (const channel of notificationChannels(
+                e.purpose,
+                this.androidEnabled && couple.level === 'FULL',
+              )) {
                 intents.push({
                   eventId: e.eventId,
                   owner,
@@ -135,7 +140,7 @@ export class NotificationEventConsumer {
                 },
               });
               if (recipient)
-                for (const channel of ['EMAIL', 'IN_APP'] as const) {
+                for (const channel of notificationChannels(e.purpose, this.androidEnabled)) {
                   intents.push({
                     eventId: e.eventId,
                     owner,

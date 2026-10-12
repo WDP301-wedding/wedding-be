@@ -334,6 +334,10 @@ export class NotificationSettings {
         throw notificationConflict('NOTIFICATION_REQUEUE_NOT_ELIGIBLE');
       if (await tx.notificationCredential.findUnique({ where: { intentId } }))
         throw notificationConflict('NOTIFICATION_CREDENTIAL_REISSUE_REQUIRED');
+      await tx.notificationPushDelivery.updateMany({
+        where: { intentId, state: 'DEAD_LETTER', errorCode: { not: 'FCM_UNREGISTERED' } },
+        data: { state: 'QUEUED', errorCode: null, updatedAt: this.foundation.now() },
+      });
       const updated = await tx.notificationIntent.update({
         where: { id: intentId },
         data: {

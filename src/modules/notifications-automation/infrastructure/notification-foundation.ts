@@ -209,7 +209,9 @@ export class NotificationFoundation {
         throw new ValidationError();
       const state =
         outcome === 'ACCEPTED'
-          ? 'UNKNOWN'
+          ? row.channel === 'ANDROID'
+            ? 'PROVIDER_ACCEPTED'
+            : 'UNKNOWN'
           : outcome === 'RETRYABLE_FAILED' && next === undefined
             ? 'DEAD_LETTER'
             : outcome;
@@ -223,6 +225,11 @@ export class NotificationFoundation {
           occurredAt: now,
         },
       });
+      if (outcome === 'UNKNOWN')
+        await tx.notificationPushDelivery.updateMany({
+          where: { intentId, leaseId, state: 'IN_FLIGHT' },
+          data: { state: 'UNKNOWN', errorCode: 'FCM_RESULT_UNKNOWN', updatedAt: now },
+        });
       if (!['UNKNOWN', 'RETRYABLE_FAILED'].includes(state)) {
         await tx.notificationCredential.updateMany({
           where: { intentId, purgedAt: null },
@@ -250,6 +257,10 @@ export class NotificationFoundation {
         SELECT id, "leaseId" FROM "NotificationIntent" WHERE state='IN_FLIGHT' AND "leaseExpiresAt"<=${now}
         ORDER BY "leaseExpiresAt",id LIMIT ${limit} FOR UPDATE SKIP LOCKED`);
       for (const row of ids) {
+        await tx.notificationPushDelivery.updateMany({
+          where: { intentId: row.id, leaseId: row.leaseId, state: 'IN_FLIGHT' },
+          data: { state: 'UNKNOWN', errorCode: 'LEASE_EXPIRED', updatedAt: now },
+        });
         await tx.notificationAttempt.create({
           data: {
             intentId: row.id,
