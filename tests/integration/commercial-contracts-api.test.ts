@@ -471,7 +471,7 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     studio,
     staffSeating,
     context: (who) => ({
-      actorId: accounts[who]!,
+      actorId: accounts[who],
       accessToken: tokens[who]!,
       requestId: randomUUID(),
     }),
