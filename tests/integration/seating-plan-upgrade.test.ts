@@ -14,12 +14,39 @@ import { randomUUID } from 'node:crypto';
     afterAll(() => db.disconnect());
     it('preserves legacy Booking/Guest/print history and initializes no seating automatically', async () => {
       let oldBookingId = '';
+      let oldPrintableId = '',
+        oldPrintableDigest = '';
       await db.connect(async (name, url) => {
         if (name !== '20261012020000_seating_plan') return;
         const old = createPrismaClient(url);
         try {
           const f = await studioFixture(old);
           oldBookingId = f.bookingId;
+          const design = await f.services.designs.create(
+            { bookingId: f.bookingId, content: f.content, idempotencyKey: randomUUID() },
+            f.couple,
+          );
+          await f.services.publication.publish(
+            {
+              bookingId: f.bookingId,
+              designId: design.designId,
+              designRevisionId: design.revisionId,
+              expectedRevision: 1,
+              expectedPublicationRevision: 0,
+              idempotencyKey: randomUUID(),
+            },
+            f.couple,
+          );
+          const printable = await f.services.boundary.run(
+            { bookingId: f.bookingId, context: f.contract },
+            (scope) =>
+              f.services.printable.capture(
+                { bookingId: f.bookingId, designRevisionId: design.revisionId },
+                scope,
+              ),
+          );
+          oldPrintableId = printable.printableRevisionId;
+          oldPrintableDigest = printable.contentDigest;
         } finally {
           await old.$disconnect();
         }
@@ -30,6 +57,13 @@ import { randomUUID } from 'node:crypto';
         phase: 'CONFIRMED',
       });
       expect(await db.prisma.guestWorkspace.count()).toBe(0);
+      expect(
+        await db.prisma.invitationPrintableRevision.findUnique({ where: { id: oldPrintableId } }),
+      ).toMatchObject({
+        bookingId: oldBookingId,
+        contentDigest: oldPrintableDigest,
+        seatingPlanRevisionId: null,
+      });
       const f = await studioFixture(db.prisma),
         s = createSeatingServices(db.prisma, f.services);
       const selected = await s.seating.select(

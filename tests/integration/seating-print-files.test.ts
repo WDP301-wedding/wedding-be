@@ -239,6 +239,25 @@ import { createSeatingServices } from '../../src/modules/seating-plan/infrastruc
         ).sha256,
       ).toBe(file.sha256);
     }, 30000);
+    it('serializes real Venue retirement with Seating print capture', async () => {
+      const { f, capture } = await fixture();
+      const head = await db.prisma.layoutTemplate.findUniqueOrThrow({
+        where: { id: f.templateId },
+      });
+      const [printed, retired] = await Promise.allSettled([
+        capture(),
+        f.layout.changeLifecycle({
+          aggregateId: f.templateId,
+          expectedRevision: head.revision,
+          transition: 'RETIRE',
+          context: f.ownerContext,
+        }),
+      ]);
+      expect(retired.status).toBe('fulfilled');
+      if (printed.status === 'fulfilled') expect(printed.value.content.seating).not.toBeNull();
+      else expect(printed.reason).toMatchObject({ code: 'PRINTABLE_SEATING_REQUIRES_REVIEW' });
+      await expect(capture()).rejects.toMatchObject({ code: 'PRINTABLE_SEATING_REQUIRES_REVIEW' });
+    });
     it('blocks retired layouts at the print boundary while preserving old file bytes', async () => {
       const { f, capture } = await fixture(),
         printed = await capture();
