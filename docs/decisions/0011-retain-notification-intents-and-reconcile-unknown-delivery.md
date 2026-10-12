@@ -2,9 +2,10 @@
 
 ## Status
 
-Step 12 implementation in progress, 2026-10-12, on
-`codex/notifications-step-12`. Uncommitted by the owner's instruction. Automated
-checks, deployed provider evidence and RV-16/GM-W5 acceptance remain separate.
+Implemented and verified for backend developer acceptance, 2026-10-12, on
+`codex/notifications-step-12`. [Evidence](../../tasks/evidence/notifications-rv16-gmw5-2026-10-12.md)
+records CI, native owner journeys, hosted recovery and actual Brevo delivery separately.
+Client dependencies and production-readiness review remain separate.
 
 ## Context
 

@@ -1,8 +1,10 @@
 # Step 12 Notifications backend hand-off
 
-Status: implementation and verification in progress, 2026-10-12. Execute
-NTF-W1 -> NTF-W2 -> NTF-W3 -> NTF-W4 -> NTF-W5 -> RV-16 -> GM-W5. No commit
-has been made. Do not recreate the owner-deleted `tasks/plan.md`.
+Status: backend developer acceptance complete, 2026-10-12, for NTF-W1–W5,
+RV-16 and GM-W5 on `codex/notifications-step-12`. Executable source: `a424777`;
+[CI/runtime/provider evidence](../tasks/evidence/notifications-rv16-gmw5-2026-10-12.md)
+and [immutable source/API manifest](../tasks/evidence/notifications-provider-manifest-2026-10-12.json).
+Do not recreate the owner-deleted `tasks/plan.md`.
 
 ## Runtime and owner boundaries
 
@@ -125,7 +127,10 @@ Railway restart/health and metrics authentication remain in force.
 
 ## Migration and acceptance evidence
 
-Five additive migrations follow the existing 47-migration main baseline. They add
+Five additive Notifications migrations follow the existing 47-migration main baseline.
+A sixth forward migration extends Seating invalidation reasons for explicit planning
+headcount changes, including in-range changes. A new printable requires a fresh
+confirmation for that count; an existing PDF remains immutable. They add
 private RLS-protected tables, immutable intent/source/receipt/attempt guards,
 encrypted payload TTL/purge guards, recipient/account uniqueness, durable scans and
 command/inbox/device guards. Applied historical migrations remain unchanged.
@@ -138,7 +143,9 @@ integration tests cover real owners, transaction rollback, concurrent dedup/clai
 retry budget, UNKNOWN/no-resend, stale revisions, private HTTP/auth, Guest minimal
 view and retention. Slow-backlog and UUID-case regressions are explicit tests.
 
-Real hosted worker/provider/restart evidence and GM-W5 owner journeys are still
-being collected. Do not mark NTF-W5, RV-16 or GM-W5 complete based on local tests,
-configured secrets or health alone. Android push and frontend fragment consumption
-remain explicit downstream limits even after backend acceptance.
+Linux CI passes 1,780 tests with the unchanged per-file coverage gate. Railway
+compiled modules, OpenAPI and all 53 applied migration checksums match the accepted
+source. Hosted recurring-worker/restart, actual Brevo delivery and native GM-W5
+journeys are recorded in the linked evidence; configuration and health remain
+separate facts. Android push and frontend fragment consumption remain downstream
+limits. RV-21/release review and human PR approval remain separate.
