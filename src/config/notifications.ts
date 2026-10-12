@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { parseFcmConfiguration } from './fcm.js';
 type Source = Readonly<Record<string, string | undefined>>;
 export class NotificationConfigurationError extends Error {
   constructor(readonly variables: readonly string[]) {
@@ -88,6 +89,7 @@ export function parseNotificationConfiguration(
   }
   if (errors.length) throw new NotificationConfigurationError([...new Set(errors)].sort());
   return Object.freeze({
+    fcm: parseFcmConfiguration(source),
     workerEnabled: enabled === 'true',
     credentialKeys,
     activeKeyVersion,
