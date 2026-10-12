@@ -1,18 +1,44 @@
 import type { PrismaClient } from '../../../generated/prisma/client.js';
-import { PrismaBookingBoundary } from '../../../core/database/booking-boundary.js';
+import {
+  PrismaBookingBoundary,
+  type ContractContext,
+} from '../../../core/database/booking-boundary.js';
 import { createGuestServices } from '../../guest-management/infrastructure/guest.composition.js';
 import { StaffService } from '../application/staff.service.js';
 import { createStaffAccountProvisioner } from '../../identity-access/account/staff-provisioner.js';
 import { assignmentDto } from '../application/staff.service.js';
+import { CheckInService } from '../application/check-in.service.js';
+import { AttendanceReaders } from '../application/attendance-readers.js';
+import type { StaffSeatingGuidance } from '../application/staff.contracts.js';
+import { createPrismaBookingReaders } from '../../booking-lifecycle/infrastructure/prisma-booking.readers.js';
+import { createPrismaDepositSettlementReader } from '../../payments-billing/infrastructure/prisma-deposit-settlement.reader.js';
 
 export function createStaffServices(
   prisma: PrismaClient,
   now: () => Date = () => new Date(),
   sharedBoundary?: PrismaBookingBoundary,
+  seating?: StaffSeatingGuidance,
 ) {
   const boundary = sharedBoundary ?? new PrismaBookingBoundary(prisma);
-  const guests = createGuestServices(prisma, now, undefined, boundary);
-  const staff = new StaffService(guests);
+  const guests = createGuestServices(
+    prisma,
+    now,
+    {
+      requireAssignedOperationsAccess: (bookingId, context) =>
+        journal.requireAssignedOperationsAccess(bookingId, context),
+    },
+    boundary,
+  );
+  const events = createPrismaBookingReaders(
+    prisma,
+    boundary,
+    guests.identity.access,
+    createPrismaDepositSettlementReader(prisma, boundary),
+    { allowCompleted: true },
+  ).booking;
+  const staff = new StaffService(guests, events);
+  const journal = new CheckInService(staff, seating);
+  staff.onConfigurationChanged = (tx, bookingId) => journal.snapshot(tx, bookingId);
   const accounts = createStaffAccountProvisioner(
     prisma,
     guests.identity.resolver,
@@ -47,17 +73,19 @@ export function createStaffServices(
     },
     now,
   );
-  const readers = {
-    async getBookingAttendance(bookingId: string) {
-      const head = await prisma.staffConfiguration.findUnique({ where: { bookingId } });
-      return {
-        checkInMode: head?.checkInMode ?? 'NONE',
-        measurementStatus:
-          head?.checkInMode === 'BY_GUEST_NAME' ? 'LISTED_GUESTS_ONLY' : 'NOT_RECORDED',
-        checkedInGuestCount: head?.checkInMode === 'BY_GUEST_NAME' ? 0 : null,
-        byGuestGroup: [],
-      };
-    },
+  const readers = new AttendanceReaders(prisma, boundary, guests.readers, events);
+  const seatingAccess = {
+    requireAssignedOperationsAccess: (bookingId: string, scope: ContractContext) =>
+      journal.requireSeatingScopeAccess(bookingId, scope),
   };
-  return { staff, guests, readers, accounts, boundary, resolver: guests.identity.resolver };
+  return {
+    staff,
+    guests,
+    journal,
+    readers,
+    accounts,
+    seatingAccess,
+    boundary,
+    resolver: guests.identity.resolver,
+  };
 }

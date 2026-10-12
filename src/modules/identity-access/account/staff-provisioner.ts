@@ -1,14 +1,20 @@
 import type { Prisma, PrismaClient } from '../../../generated/prisma/client.js';
-import { NotFoundError, IdempotencyKeyReusedError } from '../../../core/errors/app-error.js';
+import {
+  NotFoundError,
+  IdempotencyKeyReusedError,
+  InvalidIdempotencyKeyError,
+} from '../../../core/errors/app-error.js';
 import { idempotencyKeySchema } from '../../../core/idempotency/idempotency.schemas.js';
 import type { AuthenticatedActorResolver } from '../authorization/authenticated-actor.middleware.js';
 import { normalizeEmail } from './account.service.js';
 import type {
   StaffAccountProvisioner,
-  StaffRequestContext,
-} from '../../staff-operations/application/staff.contracts.js';
-import { digest, parse } from '../../guest-management/domain/guest-policy.js';
-import { json } from '../../guest-management/infrastructure/guest.repository.js';
+  StaffProvisioningContext as StaffRequestContext,
+} from './staff-provisioner.contracts.js';
+import {
+  canonicalizeRequest,
+  hashCanonicalRequest as digest,
+} from '../../../core/idempotency/request-hash.js';
 
 /** Identity owns the account/role/session writes. Assignment reconciliation is
  * enlisted by Staff infrastructure so disable is one atomic command. */
@@ -30,7 +36,9 @@ export function createStaffAccountProvisioner(
     context: StaffRequestContext,
     work: (tx: Prisma.TransactionClient) => Promise<T>,
   ) {
-    const key = parse(idempotencyKeySchema, keyValue),
+    const parsedKey = idempotencyKeySchema.safeParse(keyValue);
+    if (!parsedKey.success) throw new InvalidIdempotencyKeyError();
+    const key = parsedKey.data,
       intentDigest = digest({ actorId: context.actorId, action, key }),
       commandDigest = digest(payload);
     return prisma.$transaction(
@@ -53,7 +61,11 @@ export function createStaffAccountProvisioner(
         }
         const result = await work(tx);
         await tx.identityStaffCommand.create({
-          data: { intentDigest, commandDigest, result: json(result) },
+          data: {
+            intentDigest,
+            commandDigest,
+            result: JSON.parse(canonicalizeRequest(result)) as Prisma.InputJsonValue,
+          },
         });
         return result;
       },

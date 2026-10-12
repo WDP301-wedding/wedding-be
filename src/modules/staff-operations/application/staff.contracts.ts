@@ -1,19 +1,7 @@
 import type { ContractContext } from '../../../core/database/booking-boundary.js';
 import type { GuestRequestContext } from '../../guest-management/application/guest.contracts.js';
 export type StaffRequestContext = GuestRequestContext;
-export interface StaffAccountProvisioner {
-  provision(
-    email: string,
-    key: string,
-    context: StaffRequestContext,
-  ): Promise<{ accountId: string; credentialSetupRequired: boolean }>;
-  setOperationalAccess(
-    accountId: string,
-    input: { enabled: boolean; reason: string },
-    key: string,
-    context: StaffRequestContext,
-  ): Promise<{ accountId: string; enabled: boolean }>;
-}
+export type { StaffAccountProvisioner } from '../../identity-access/account/staff-provisioner.contracts.js';
 export interface StaffSeatingGuidance {
   getGuidance(
     bookingId: string,

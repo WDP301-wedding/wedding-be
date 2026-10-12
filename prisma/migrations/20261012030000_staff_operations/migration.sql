@@ -157,3 +157,21 @@ CREATE FUNCTION staff_configuration_guard() RETURNS trigger LANGUAGE plpgsql AS 
  RETURN NEW;
 END $$;
 CREATE TRIGGER staff_configuration_guard BEFORE UPDATE OR DELETE ON "StaffConfiguration" FOR EACH ROW EXECUTE FUNCTION staff_configuration_guard();
+
+-- Enforce one effective named identity even if an infrastructure caller bypasses
+-- the application command. Same booking lock order as Guest/Staff owner writes.
+CREATE FUNCTION staff_journal_guard() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE cfg "StaffConfiguration"%ROWTYPE; previous "StaffCheckInRecord"%ROWTYPE;
+BEGIN
+ PERFORM pg_advisory_xact_lock(hashtext(NEW."bookingId"::text));
+ SELECT * INTO cfg FROM "StaffConfiguration" WHERE "bookingId"=NEW."bookingId" FOR UPDATE;
+ IF cfg."checkInMode" IS DISTINCT FROM 'BY_GUEST_NAME' OR NEW."ledgerRevision" IS DISTINCT FROM cfg."ledgerRevision"+1 THEN RAISE EXCEPTION 'Staff journal sequence or mode conflict'; END IF;
+ SELECT * INTO previous FROM "StaffCheckInRecord" WHERE "bookingId"=NEW."bookingId" AND "guestId"=NEW."guestId" ORDER BY "ledgerRevision" DESC LIMIT 1;
+ IF NEW.action='CHECK_IN' THEN
+  IF previous.action='CHECK_IN' OR NOT EXISTS(SELECT 1 FROM "Guest" WHERE id=NEW."guestId" AND "bookingId"=NEW."bookingId" AND status='ACTIVE') THEN RAISE EXCEPTION 'Guest check-in identity conflict'; END IF;
+ ELSE
+  IF previous.action IS DISTINCT FROM 'CHECK_IN' OR previous.id IS DISTINCT FROM NEW."checkInRecordId" THEN RAISE EXCEPTION 'Guest undo conflict'; END IF;
+ END IF;
+ RETURN NEW;
+END $$;
+CREATE TRIGGER staff_journal_guard BEFORE INSERT ON "StaffCheckInRecord" FOR EACH ROW EXECUTE FUNCTION staff_journal_guard();

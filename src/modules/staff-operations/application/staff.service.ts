@@ -1,4 +1,3 @@
-import { randomUUID } from 'node:crypto';
 import type {
   Prisma,
   StaffConfiguration,
@@ -12,6 +11,7 @@ import {
 } from '../../../core/errors/app-error.js';
 import { idempotencyKeySchema } from '../../../core/idempotency/idempotency.schemas.js';
 import type { createGuestServices } from '../../guest-management/infrastructure/guest.composition.js';
+import type { BookingMediaPrerequisiteReader } from '../../booking-lifecycle/application/booking-readers.js';
 import { digest, id, parse, conflict } from '../../guest-management/domain/guest-policy.js';
 import { json } from '../../guest-management/infrastructure/guest.repository.js';
 import { configurationInput, assignmentInput, revokeInput } from '../domain/staff-policy.js';
@@ -33,7 +33,11 @@ export const assignmentDto = (r: StaffAssignment) => ({
 export const denied = (code: string) => new AppError({ status: 403, code, message: code });
 
 export class StaffService {
-  constructor(readonly guests: ReturnType<typeof createGuestServices>) {}
+  onConfigurationChanged?: (tx: Prisma.TransactionClient, bookingId: string) => Promise<void>;
+  constructor(
+    readonly guests: ReturnType<typeof createGuestServices>,
+    readonly events: BookingMediaPrerequisiteReader,
+  ) {}
   get repository() {
     return this.guests.repository;
   }
@@ -42,6 +46,21 @@ export class StaffService {
     if (actor.accountId !== context.actorId || !actor.roles.includes('MANAGER'))
       throw new NotFoundError();
     return actor;
+  }
+  async ownerAccess(bookingId: string, context: StaffRequestContext) {
+    const actor = await this.guests.identity.resolver.resolve(context.accessToken);
+    if (
+      actor.accountId !== context.actorId ||
+      !actor.roles.some((r) => r === 'MANAGER' || r === 'COUPLE')
+    )
+      throw new NotFoundError();
+    if (!actor.roles.includes('MANAGER'))
+      await this.events.requireBookingAccess({
+        bookingId,
+        accountId: actor.accountId,
+        minimum: 'FULL',
+      });
+    await this.events.requireConfirmedEventContext(bookingId);
   }
   run<T>(
     bookingId: string,
@@ -86,11 +105,21 @@ export class StaffService {
     });
   }
   async configuration(tx: Prisma.TransactionClient, bookingId: string) {
-    return tx.staffConfiguration.upsert({
-      where: { bookingId },
-      update: {},
-      create: { bookingId },
-    });
+    const existing = await tx.staffConfiguration.findUnique({ where: { bookingId } });
+    if (existing) return existing;
+    const created = await tx.staffConfiguration.create({ data: { bookingId } });
+    const scope = this.repository.boundary.currentContext(bookingId)!;
+    await this.history(
+      tx,
+      scope,
+      bookingId,
+      bookingId,
+      'CONFIGURATION',
+      1,
+      configurationDto(created),
+    );
+    await this.onConfigurationChanged?.(tx, bookingId);
+    return created;
   }
   async history(
     tx: Prisma.TransactionClient,
@@ -129,7 +158,7 @@ export class StaffService {
     return this.run(
       bookingId,
       context,
-      () => this.guests.guests.authorize(bookingId, context),
+      () => this.ownerAccess(bookingId, context),
       async (tx) => configurationDto(await this.configuration(tx, bookingId)),
     );
   }
@@ -152,7 +181,7 @@ export class StaffService {
         if (
           input.checkInMode === 'BY_GUEST_NAME' &&
           head.checkInMode !== input.checkInMode &&
-          !(await tx.guest.count({ where: { bookingId, status: 'ACTIVE' } }))
+          !(await this.guests.readers.getActiveGuestCount(bookingId))
         )
           throw conflict('NAMED_GUEST_LIST_REQUIRED');
         const changed = await tx.staffConfiguration.update({
@@ -169,6 +198,7 @@ export class StaffService {
           changed.revision,
           result,
         );
+        await this.onConfigurationChanged?.(tx, bookingId);
         return result;
       },
     );

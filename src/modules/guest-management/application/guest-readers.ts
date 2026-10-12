@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Prisma } from '../../../generated/prisma/client.js';
 import type { ContractContext } from '../../../core/database/booking-boundary.js';
 import { NotFoundError, ValidationError } from '../../../core/errors/app-error.js';
 import type { GuestService } from './guest.service.js';
@@ -71,6 +72,28 @@ export class GuestReaders {
     readonly guests: GuestService,
     readonly staff?: GuestStaffAccessFacade,
   ) {}
+  private async operations<T>(
+    bookingId: string,
+    context: GuestRequestContext,
+    work: (tx: Prisma.TransactionClient) => Promise<T>,
+  ) {
+    const tx = this.guests.repository.boundary.current(bookingId);
+    if (tx !== undefined) {
+      if (
+        this.guests.repository.boundary.currentContext(bookingId)?.actorAccountId !==
+        context.actorId
+      )
+        throw new NotFoundError();
+      await this.authorizeOperations(bookingId, context);
+      return work(tx);
+    }
+    return this.guests.repository.run(
+      bookingId,
+      context,
+      () => this.authorizeOperations(bookingId, context),
+      work,
+    );
+  }
   async list(bookingId: string, value: unknown, context: GuestRequestContext) {
     const input = parse(listQuerySchema, value);
     return this.guests.read(bookingId, context, async (tx, _scope, workspace) => {
@@ -114,6 +137,21 @@ export class GuestReaders {
       expectedAttendees: row.planningHeadcount,
     };
   }
+  async getActiveGuestCount(bookingValue: string) {
+    const bookingId = parse(id, bookingValue);
+    return (
+      this.guests.repository.boundary.current(bookingId) ?? this.guests.repository.prisma
+    ).guest.count({ where: { bookingId, status: 'ACTIVE' } });
+  }
+  async getGuestReference(guestValue: string) {
+    const guestId = parse(id, guestValue);
+    const row = await (
+      this.guests.repository.boundary.current() ?? this.guests.repository.prisma
+    ).guest.findUnique({ where: { id: guestId }, select: { id: true, bookingId: true } });
+    if (!row) throw new NotFoundError();
+    this.guests.repository.boundary.current(row.bookingId);
+    return { guestId: row.id, bookingId: row.bookingId };
+  }
   async listGuestGroups(bookingValue: string) {
     const bookingId = parse(id, bookingValue);
     return (
@@ -144,35 +182,34 @@ export class GuestReaders {
   private async authorizeOperations(bookingId: string, context: GuestRequestContext) {
     const actor = await this.guests.resolver.resolve(context.accessToken);
     if (actor.accountId !== context.actorId) throw new NotFoundError();
+    if (this.staff !== undefined && actor.roles.some((r) => r === 'MANAGER' || r === 'STAFF')) {
+      await this.staff.requireAssignedOperationsAccess(bookingId, context);
+      return;
+    }
     if (actor.roles.includes('MANAGER')) return this.guests.authorize(bookingId, context);
     if (!actor.roles.includes('STAFF') || this.staff === undefined) throw new NotFoundError();
     await this.staff.requireAssignedOperationsAccess(bookingId, context);
-    await this.guests.owners.booking.requireConfirmedEventContext(bookingId);
   }
   async search(bookingValue: string, value: unknown, context: GuestRequestContext) {
     const bookingId = parse(id, bookingValue),
       input = parse(searchQuerySchema, value);
-    return this.guests.repository.run(
-      bookingId,
-      context,
-      () => this.authorizeOperations(bookingId, context),
-      async (tx) => {
-        const workspace = await tx.guestWorkspace.findUnique({ where: { bookingId } });
-        const sequence = workspace?.listSequence ?? 0;
-        const query = normalizeGroupName(input.query),
-          filter = { bookingId, query };
-        const after = cursor(input.cursor, sequence, filter);
-        const rank = after?.rank ?? -1,
-          afterId = after?.id ?? '00000000-0000-0000-0000-000000000000';
-        const rows = await tx.$queryRaw<
-          Array<{
-            id: string;
-            guestGroupId: string;
-            name: string;
-            phone: string | null;
-            rank: number;
-          }>
-        >`
+    return this.operations(bookingId, context, async (tx) => {
+      const workspace = await tx.guestWorkspace.findUnique({ where: { bookingId } });
+      const sequence = workspace?.listSequence ?? 0;
+      const query = normalizeGroupName(input.query),
+        filter = { bookingId, query };
+      const after = cursor(input.cursor, sequence, filter);
+      const rank = after?.rank ?? -1,
+        afterId = after?.id ?? '00000000-0000-0000-0000-000000000000';
+      const rows = await tx.$queryRaw<
+        Array<{
+          id: string;
+          guestGroupId: string;
+          name: string;
+          phone: string | null;
+          rank: number;
+        }>
+      >`
         WITH matches AS (SELECT id,"guestGroupId",name,phone,
           CASE WHEN "normalizedName"=${query} OR phone=${query} THEN 0
             WHEN starts_with("normalizedName",${query}) OR starts_with(phone,${query}) THEN 1 ELSE 2 END AS rank
@@ -180,46 +217,42 @@ export class GuestReaders {
             AND (strpos("normalizedName",${query})>0 OR strpos(phone,${query})>0))
         SELECT * FROM matches WHERE rank>${rank} OR (rank=${rank} AND id>${afterId}::uuid)
         ORDER BY rank,id LIMIT ${input.limit + 1}`;
-        const last = rows[input.limit - 1];
-        return {
-          sourceSequence: sequence,
-          items: rows.slice(0, input.limit).map((r) => ({
-            guestId: r.id,
-            guestGroupId: r.guestGroupId,
-            name: r.name,
-            phoneLast4: r.phone?.slice(-4) ?? null,
-          })),
-          nextCursor:
-            rows.length > input.limit && last
-              ? encode({ id: last.id, rank: last.rank, sequence, filterDigest: digest(filter) })
-              : null,
-        };
-      },
-    );
+      const last = rows[input.limit - 1];
+      return {
+        sourceSequence: sequence,
+        items: rows.slice(0, input.limit).map((r) => ({
+          guestId: r.id,
+          guestGroupId: r.guestGroupId,
+          name: r.name,
+          phoneLast4: r.phone?.slice(-4) ?? null,
+        })),
+        nextCursor:
+          rows.length > input.limit && last
+            ? encode({ id: last.id, rank: last.rank, sequence, filterDigest: digest(filter) })
+            : null,
+      };
+    });
   }
   async requireGuestForOperations(guestValue: string, context: GuestRequestContext) {
     const guestId = parse(id, guestValue);
-    const reference = await this.guests.repository.prisma.guest.findUnique({
+    const reference = await (
+      this.guests.repository.boundary.current() ?? this.guests.repository.prisma
+    ).guest.findUnique({
       where: { id: guestId },
     });
     if (reference === null) throw new NotFoundError();
-    return this.guests.repository.run(
-      reference.bookingId,
-      context,
-      () => this.authorizeOperations(reference.bookingId, context),
-      async (tx) => {
-        const row = await this.guests.requireGuest(tx, reference.bookingId, guestId);
-        if (row.status !== 'ACTIVE') throw new NotFoundError();
-        return {
-          bookingId: row.bookingId,
-          guestId: row.id,
-          guestGroupId: row.guestGroupId,
-          name: row.name,
-          disambiguatingPhone: row.phone,
-          operationalNote: row.operationalNote,
-        };
-      },
-    );
+    return this.operations(reference.bookingId, context, async (tx) => {
+      const row = await this.guests.requireGuest(tx, reference.bookingId, guestId);
+      if (row.status !== 'ACTIVE') throw new NotFoundError();
+      return {
+        bookingId: row.bookingId,
+        guestId: row.id,
+        guestGroupId: row.guestGroupId,
+        name: row.name,
+        disambiguatingPhone: row.phone,
+        operationalNote: row.operationalNote,
+      };
+    });
   }
   async readReportPage(bookingValue: string, value: unknown, context: ContractContext) {
     const bookingId = parse(id, bookingValue);

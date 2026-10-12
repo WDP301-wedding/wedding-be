@@ -12,7 +12,8 @@ import { createMediaRouter } from './http/media.router.js';
 import { createInvitationStudioServices } from './infrastructure/studio.composition.js';
 import { createStudioRouter } from './http/studio.router.js';
 import { createGeminiAiImageProvider } from '../../integrations/ai-image/gemini-ai-image-provider.js';
-import { createSeatingServices } from '../seating-plan/infrastructure/seating.composition.js';
+import { createStaffSeatingServices } from '../staff-operations/infrastructure/staff-seating.composition.js';
+import { createStaffRouter } from '../staff-operations/http/staff.router.js';
 import { createSeatingRouter } from '../seating-plan/http/seating.router.js';
 import { startSeatingReconciler } from '../seating-plan/infrastructure/seating-reconciler.js';
 import { createLogger } from '../../core/logging/logger.js';
@@ -28,6 +29,7 @@ export type InvitationStudioRuntime = Readonly<{
     templateSelection: InvitationTemplateSelectionReader;
     seatingPlan: SeatingPlanReader;
     seatingGuidance: SeatingGuidanceReader;
+    attendance: ReturnType<typeof createStaffSeatingServices>['staff']['readers'];
   }>;
 }>;
 
@@ -60,8 +62,9 @@ export async function createInvitationStudioRuntime(
     const router = Router();
     router.use(createMediaRouter(composition.service, composition.identity.resolver));
     router.use(createStudioRouter(composition, composition.identity.resolver));
-    const seating = createSeatingServices(prisma, composition);
+    const { staff, seating } = createStaffSeatingServices(prisma, composition);
     router.use(createSeatingRouter(seating.seating, seating.resolver));
+    router.use(createStaffRouter(staff));
     const logger = createLogger({ level: 'warn', runtimeEnvironment: config.runtime.environment });
     const reconciler = startSeatingReconciler(seating.seating, (failures) =>
       logger.warn({ failures }, 'Seating reconciliation needs retry'),
@@ -72,6 +75,7 @@ export async function createInvitationStudioRuntime(
         templateSelection: createInvitationTemplateSelectionProvider(prisma),
         seatingPlan: seating.seating,
         seatingGuidance: seating.seating,
+        attendance: staff.readers,
       }),
       resource: Object.freeze({
         name: 'invitation-studio-database',

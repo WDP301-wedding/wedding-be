@@ -7,6 +7,7 @@ import { commercialAppendixOpenApiPaths } from '../../modules/booking-lifecycle/
 import { finalInvoiceOpenApiPaths } from '../../modules/payments-billing/http/final-invoice.openapi.js';
 import { guestOpenApiPaths } from '../../modules/guest-management/http/guest.openapi.js';
 import { seatingOpenApiPaths } from '../../modules/seating-plan/http/seating.openapi.js';
+import { staffOpenApiPaths } from '../../modules/staff-operations/http/staff.openapi.js';
 import {
   experienceOpenApiPaths,
   experienceOpenApiSchemas,
@@ -518,6 +519,7 @@ export const openApiRegistry = {
         },
       },
     },
+    ...staffOpenApiPaths,
   },
   components: {
     schemas: {
