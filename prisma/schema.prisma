@@ -2262,3 +2262,36 @@ model SeatingOutbox {
 
   @@unique([bookingId, revisionNumber, eventType])
 }
+
+model ReportingSequence {
+  owner String @id
+  value Int @default(0)
+}
+model ReportingFact {
+  owner String
+  sequence Int
+  recordId String
+  changedAt DateTime @db.Timestamptz(6)
+  value Json @db.JsonB
+  @@id([owner, sequence])
+  @@index([owner, recordId, sequence])
+}
+model AnalyticsGeneration {
+  id String @id @db.Uuid
+  scope String
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  checkpoints Json @db.JsonB
+  @@index([scope, createdAt])
+}
+model AnalyticsHead {
+  scope String @id
+  generationId String @db.Uuid
+}
+model AnalyticsProjection {
+  generationId String @db.Uuid
+  owner String
+  recordId String
+  sequence Int
+  value Json @db.JsonB
+  @@id([generationId, owner, recordId])
+}

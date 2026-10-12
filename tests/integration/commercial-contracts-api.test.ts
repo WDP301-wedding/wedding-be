@@ -1,3 +1,4 @@
+import { registerAnalyticsCommercialCases } from './analytics-commercial-cases.js';
 import { registerGuestCompletionCases } from './guest-management-completion-cases.js';
 import { createStaffSeatingServices } from '../../src/modules/staff-operations/infrastructure/staff-seating.composition.js';
 import { registerStepSixApiCases } from './commercial-step6-api-cases.js';
@@ -466,6 +467,7 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     deposit,
   };
   registerCommercialAcceptanceCases(harness);
+  registerAnalyticsCommercialCases(harness);
   registerStepSixApiCases(harness);
   registerGuestCompletionCases(harness, () => ({
     studio,

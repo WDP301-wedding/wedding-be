@@ -338,10 +338,10 @@ historical email acceptance above. [Configuration and client/backend hand-off](.
 - [ ] NTF-FCM-W4: Configure service account for `wdp301-wedding`, migrate/deploy and record authorized Railway worker -> FCM acceptance evidence. Configuration, exact-source deployment, migrations, OAuth, IAM sending permission and recurring worker are verified in the [runtime checkpoint](evidence/android-fcm-backend-2026-10-13.md#authorized-runtime-checkpoint); actual message acceptance awaits an authorized native Android test registration/token. FCM remains disabled.
 - [x] NTF-FCM-W5: Publish backend API/configuration/provider-mode and recovery hand-off; attach Android receipt/display/navigation as a separately owned client dependency, never a backend test gate.
 
-- [ ] ANL-W1: Source formulas include agreed services/appendices/expenses/final invoices; separate explicit planning, optional named-list count and nullable mode-aware check-ins; no response metrics, disabled zeros or partial-list whole-event turnout rates.
-- [ ] ANL-W2: Projection/checkpoint/rebuild with monotonic source ordering.
-- [ ] ANL-W3: Authorized analytics HTTP/OpenAPI and bounded query/freshness proof.
-- [ ] ANL-W4: Deterministic fixture/real-source backend acceptance and frontend hand-off.
+- [x] ANL-W1: Source formulas include agreed services/appendices/expenses/final invoices; separate explicit planning, optional named-list count and nullable mode-aware check-ins; no response metrics, disabled zeros or partial-list whole-event turnout rates.
+- [x] ANL-W2: Projection/checkpoint/rebuild with monotonic source ordering.
+- [x] ANL-W3: Authorized analytics HTTP/OpenAPI and bounded query/freshness proof.
+- [x] ANL-W4: Deterministic fixture/real-source backend acceptance and frontend hand-off.
 - [ ] REL-W1: Backend environment/auth/config/manifest validation.
 - [ ] REL-W2: Deterministic idempotent backend seeds/journeys: no names + Group seating + NONE through contract/deposit/print/event/final invoice, plus partial names + explicit check-in/undo; list changes never alter planning/money.
 - [ ] REL-W3: Empty/upgrade migrations, backend staging/runtime health/recovery evidence.
@@ -354,3 +354,5 @@ For each completed task append exact command, result, environment, immutable pro
 version/API digest and evidence link to the owning module evidence. A skipped database
 test is not migration/integration proof. Do not tick future commercial/guest tasks
 merely because this requirements amendment was confirmed.
+
+ANL-W1–W4: [backend integration evidence](evidence/analytics-spec09-integration-2026-10-13.md). Runtime and release evidence remain separate.

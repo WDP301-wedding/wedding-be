@@ -52,6 +52,11 @@ describe('runtime feature manifest', () => {
       mode: 'invitation-a5-v2-seating',
       liveVerification: 'pending',
     });
+    expect(manifest.features.analytics).toMatchObject({
+      implementation: 'implemented',
+      mode: 'analytics-owner-feeds-v3-60s',
+      liveVerification: 'pending',
+    });
     expect(manifest.features.retention.mode).toBe('operator-cli-manual-procedure');
     expect(manifest.features.metrics.liveVerification).toBe('optional-disabled');
   });

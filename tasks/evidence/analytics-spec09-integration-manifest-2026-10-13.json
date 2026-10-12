@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "module": "analytics-dashboard",
+  "providerVersion": "ANALYTICS-SOURCES@3.0.0",
+  "metricDefinitionVersion": "2",
+  "date": "2026-10-13",
+  "baseRevision": "6974141b2039f35025c94f221f35c228c54c2749",
+  "sourceState": "SPEC-10 on accepted SPEC-09/FCM main; SHA-256 of Git-normalized UTF-8 LF contents",
+  "api": {
+    "sha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+    "paths": [
+      "/management/analytics/attendance",
+      "/management/analytics/bookings",
+      "/management/analytics/exports/overview",
+      "/management/analytics/overview",
+      "/management/analytics/print-orders",
+      "/management/analytics/rebuild",
+      "/management/analytics/revenue"
+    ]
+  },
+  "migrationDeploy": {
+    "count": 60,
+    "result": "passed on empty isolated PostgreSQL",
+    "addedMigrations": [
+      "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql",
+      "prisma/migrations/20261013002000_analytics_projection/migration.sql",
+      "prisma/migrations/20261013003000_reporting_scope_and_planning_invalidation/migration.sql",
+      "prisma/migrations/20261013004000_analytics_event_query_index/migration.sql",
+      "prisma/migrations/20261013005000_analytics_private_reporting/migration.sql"
+    ]
+  },
+  "environment": {
+    "node": "24.19.0",
+    "postgresql": "18.6",
+    "platform": "Windows",
+    "externalProviderSend": "not performed",
+    "remoteDeployment": "pending after CI and merge"
+  },
+  "nativeAdditionalTests": {
+    "notificationsIdentityBoundaries": 4,
+    "lifecycle": 23,
+    "reportingRls": 1,
+    "result": "passed"
+  },
+  "qualityBar": {
+    "branchesPerFile": 80,
+    "linesPerFile": 80,
+    "unchanged": true,
+    "fullSuiteCoverage": "required on final PR head",
+    "independentReviewerApproval": "not represented by agent review or owner merge authorization"
+  },
+  "sourceHashes": {
+    "openapi/openapi.json": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+    "openapi/openapi.sha256": "ec6d58e7701aaf59012b71c6bbd2f03d4c6122abe514e1bed3b7df00b786855e",
+    "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql": "16e544b524326108e8927ba4f8cc48e40db0f3fdaf4bed9d060f91c8c1e5bba8",
+    "prisma/migrations/20261013002000_analytics_projection/migration.sql": "9449594ebe500e961a5847f80f0132dfafe87cf1376565a50681e1843beab05f",
+    "prisma/migrations/20261013003000_reporting_scope_and_planning_invalidation/migration.sql": "8e56b181ffac97688db07b0173cdffcfe17fa35b495e5993cb894b9254a10523",
+    "prisma/migrations/20261013004000_analytics_event_query_index/migration.sql": "b0bf5e05ee5d5b5cbfe5bd5d479a17eeb8903dddcb18d467e2aa02d94066a86d",
+    "prisma/migrations/20261013005000_analytics_private_reporting/migration.sql": "a44292999bd9cc9eade7e7be5f0f912f20a7b55c1207c35fea3213e91b901bdd",
+    "prisma/schema.prisma": "7ef0d151465a5a640296af560d6af77f9bd2f2889759afda00cb36c87d0f9ef6",
+    "src/config/runtime-manifest.test.ts": "48d721410aec3ea0a2899394eb6011ddbe57e2fb8550fd63ae055b24755fb253",
+    "src/config/runtime-manifest.ts": "42e180bf21b5a8040897b874fb5025b720fd925dd8a40e0c0f01a21e74c7f4c8",
+    "src/core/http/lifecycle.test.ts": "abbce9129d3e480662f5ce1d6399c5b53b46a747e538152c5967ff0d3decb1dc",
+    "src/core/openapi/registry.ts": "eb4912962e0323d4a2b19f6c26bc747457b56e8b28734aec5efe7595d0d57924",
+    "src/core/reporting/reporting-feed.test.ts": "308f968706fe9c70f238d43b8af600bdd8abc649cb48dfe56940ad85fd5cb9b5",
+    "src/core/reporting/reporting-feed.ts": "d72def685389acf1bcade63287ffea85421cd56d6455587c8e6752a88ab8370c",
+    "src/modules/analytics-dashboard/analytics.runtime.test.ts": "911b2acb93e8971b5b986a5b60e26b465cfc3ed991be66e0629d1bac4e06fb9e",
+    "src/modules/analytics-dashboard/analytics.runtime.ts": "1658806774bcd5536884651effaf551bf4d3a5d6cec0ec7270806cc142ca6f8e",
+    "src/modules/analytics-dashboard/application/analytics.service.test.ts": "55dbe897be9be57af79089d498aca6ce24c6bdaa4d6f9292f09247e68f81f7f6",
+    "src/modules/analytics-dashboard/application/analytics.service.ts": "18d57896a10b676e6135edd3f6ffc1decc3f1e711d81c925fbfac2a2c2d3d6a9",
+    "src/modules/analytics-dashboard/application/projection.test.ts": "20a80239211a09d0222447064e4477669838ea451fa0f6db509d7ae6980fbbd3",
+    "src/modules/analytics-dashboard/application/projection.ts": "70230253c14a4f5ccaea0ea51a209922013e60f9d42bda79f1fd50b61cbafddb",
+    "src/modules/analytics-dashboard/domain/metrics.test.ts": "a113ae7e88a5538beaca370e9fd549017cffcba39b8c782222d552bf1e668f09",
+    "src/modules/analytics-dashboard/domain/metrics.ts": "509aeb5903e842e0a909f24db2004b05f024786fa7b1fc21ac98f1d46bb7b844",
+    "src/modules/analytics-dashboard/http/analytics.openapi.ts": "22bd3f03eeeee85b5d644ff0f8645c577d31018c6b439248d9fad94bc6d2918c",
+    "src/modules/analytics-dashboard/http/analytics.router.ts": "55dde167dc8d485abdac3c78b8e6ae687c83c7431a0afbc5903bc31b8a2edcb7",
+    "src/modules/analytics-dashboard/http/analytics.schemas.ts": "1785356801e5b9b8fc008f4300f730ae5fb6521392fa00bf1f5c13e006dbecf5",
+    "src/modules/analytics-dashboard/infrastructure/analytics.composition.ts": "512f73cc8e515ec7d0ec452b76bf2e654ed97f9a08261134a3e5847898eb73a2",
+    "src/modules/analytics-dashboard/infrastructure/projection.repository.ts": "d77efa5e5921e82badc1b727a2b32d294387698811ce20bf6c73f4f001e6b4f8",
+    "src/modules/booking-lifecycle/application/analytics-reporting.ts": "6502c45664f6221d08ced0a4cc16c6b8cee3d282d22f9ef85058d4bfe680c925",
+    "src/modules/booking-lifecycle/infrastructure/analytics-reporting.reader.ts": "b12956fdf11e74ead6e1abb36b5dcf18512978311cca2387f6a72e9b7871c726",
+    "src/modules/guest-management/infrastructure/analytics-reporting.reader.ts": "a58cc7d0bc5963cba2017349c34e3d3bb3f0f8970af8011110160478ed58d576",
+    "src/modules/invitation-studio/application/analytics-reporting.ts": "d658f911874d21d2fe9c472d024ea89b95598135bb6cade69dc2ca0cdaf415de",
+    "src/modules/invitation-studio/infrastructure/analytics-reporting.reader.ts": "203a93853eea847d175a59e461257377b2eea4d2042de2e00f78ae72abe8f52a",
+    "src/modules/payments-billing/application/analytics-reporting.ts": "fd05addbc49bffcd900306c0e94a2751fe784b5bbd392450ea4e99c463c43530",
+    "src/modules/payments-billing/infrastructure/analytics-reporting.reader.ts": "1d973ef468d131df5ce21e9c4a2acdc41286cd808f6b12e7be09f424b04267af",
+    "src/modules/staff-operations/infrastructure/analytics-reporting.reader.ts": "a46f9bfc580f27b2cea799658e2c703d3706e02b197863ed253d956d89b7ee9c",
+    "src/modules/venue-catalog/application/analytics-reporting.ts": "fd616a41c8c0002d46c9ad7b3fd1cdf1a62f41d58fef59bdf8613bffb397f2ba",
+    "src/modules/venue-catalog/infrastructure/analytics-reporting.reader.ts": "6de16cfbd65458f3a9065838d644255f9c81de581c03d18207b05a9794bca0e0",
+    "src/server.ts": "bc16ebae1882ceee62a946e28dbb6c43a0193dde0c4c06ad90430c3d76190c38",
+    "tests/contract/analytics-openapi.test.ts": "7f3ea1475e1903847bab765f8894272254ddc37f9b1e10bdf12327c324e85a21",
+    "tests/integration/analytics-commercial-cases.ts": "e02f4405f005e0b6a8375f205432d11a65def1536027470c8fc9ccc24cf3426c",
+    "tests/integration/analytics-dashboard.test.ts": "25bcbb8e59d78c8da8fc61ad0fa8cc4de6d7ff0e1572643c67d7d9a7dbb2fea4",
+    "tests/integration/analytics-privacy.test.ts": "d05613a42467a70415461f6ecc9245270f54191d36e4fcd5fdd0ca2f75cc31c3",
+    "tests/integration/analytics-upgrade.test.ts": "c50e93d6337b66071de206a8afe3e3efef0b180391fdb53302d1cdda21ed4ab2",
+    "tests/integration/commercial-contracts-api.test.ts": "7feb1514e191b47b0015a7edefe6394461550d9a7f726918d0da26f194d92773",
+    "tests/integration/notification-identity-boundaries.test.ts": "33664c96b8cde946fb2fc8e62bd294e51b2ced99db1bd71fccac23a64cf77d24",
+    "tests/integration/security.test.ts": "0fddacf817e8591dad9079ce3cea7e8d1e5a212f4a58fec8f13f76a311f399c8"
+  },
+  "handoff": "docs/analytics-dashboard-w1-w4.md",
+  "evidence": "tasks/evidence/analytics-spec09-integration-2026-10-13.md"
+}
