@@ -360,9 +360,8 @@ export class PrintableService implements PrintableSeatingContentRegistry {
       throw studioConflict('PRINTABLE_SEATING_REQUIRES_REVIEW');
     if (!inRange && exception === null) throw studioConflict('PRINTABLE_SEATING_REQUIRES_REVIEW');
     if (
-      requireCurrentProof &&
-      (current.planningHeadcount !== proof.expectedAttendees ||
-        current.bookingRevision !== proof.bookingRevision)
+      current.planningHeadcount !== proof.expectedAttendees ||
+      (requireCurrentProof && current.bookingRevision !== proof.bookingRevision)
     )
       throw studioConflict('PRINTABLE_SEATING_REQUIRES_REVIEW');
   }

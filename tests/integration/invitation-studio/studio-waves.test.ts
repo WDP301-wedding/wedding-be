@@ -943,8 +943,21 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
       where: { id: f.bookingId },
       data: { planningHeadcount: 25, revision: 2 },
     });
+    await expect(capture(d)).rejects.toMatchObject({ code: 'PRINTABLE_SEATING_REQUIRES_REVIEW' });
+    const current = await f.prisma.booking.findUniqueOrThrow({ where: { id: f.bookingId } });
+    const reconfirmed = {
+      ...f.registry,
+      seatingPlanRevisionId: key(),
+      seatingPlanRevisionNumber: 2,
+      validityProof: {
+        ...f.registry.validityProof,
+        bookingRevision: current.revision,
+        expectedAttendees: 25,
+      },
+    };
+    await registered(reconfirmed);
     expect((await capture(d)).content.seating?.seatingPlanRevisionId).toBe(
-      f.registry.seatingPlanRevisionId,
+      reconfirmed.seatingPlanRevisionId,
     );
     for (const headcount of [31, 0, 41]) {
       await f.prisma.booking.update({
@@ -1698,6 +1711,19 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
       where: { id: f.bookingId },
       data: { planningHeadcount: 25, revision: { increment: 1 } },
     });
+    await expect(capture(d)).rejects.toMatchObject({ code: 'PRINTABLE_SEATING_REQUIRES_REVIEW' });
+    const current = await f.prisma.booking.findUniqueOrThrow({ where: { id: f.bookingId } });
+    const reconfirmed = {
+      ...f.registry,
+      seatingPlanRevisionId: key(),
+      seatingPlanRevisionNumber: 2,
+      validityProof: {
+        ...f.registry.validityProof,
+        bookingRevision: current.revision,
+        expectedAttendees: 25,
+      },
+    };
+    await registered(reconfirmed);
     expect((await capture(d)).content.timeline.timelineRevisionId).toBe(nextTimelineId);
   });
 });
