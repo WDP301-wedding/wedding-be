@@ -1,0 +1,23 @@
+{
+  "pdfSha256": "58bba95b048d207a012be45bdfaf77c7876e6d7504279cca23f2b0c919a11c45",
+  "contentDigest": "5244ff577d7a08bf610a11543c6613383301fd51b923ee47e290de9cdf2b4170",
+  "seating": {
+    "seatingPlanRevisionId": "69becf09-f1d7-44ca-9a50-e77da21365d6",
+    "renderSnapshot": [
+      {
+        "layoutTableId": "0d250ecc-9ab5-47d8-9c5e-2fe53d3b0768",
+        "tableLabel": "T1",
+        "shape": "ROUND",
+        "x": 0,
+        "y": 0,
+        "width": 500,
+        "height": 500,
+        "rotationDegrees": 0,
+        "guestGroupId": "b51b4196-641c-447a-9794-e0a024a38ae6",
+        "guestGroupName": "Gia đình cô dâu",
+        "color": "#059669"
+      }
+    ]
+  },
+  "qrPayload": "https://wedding.example.test/api/v1/public/invitations/19163e5fd421688836979c397962dd2e0d44dfeda44b761bb716b018a91616ca/render"
+}

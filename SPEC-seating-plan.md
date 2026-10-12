@@ -2,7 +2,7 @@
 
 > Current scope (confirmed 2026-10-10): [backend amendment](./docs/backend-scope-2026-10-10.md) and [active tasks](./tasks/backend-revision-todo.md). SPEC-06 onward has backend acceptance only; client implementation and visual/native checks belong to the frontend team. Earlier conflicting outlines are superseded.
 
-- Status: **Business scope confirmed 2026-10-10 — backend implementation pending**
+- Status: **Backend SEA-W1–W5 and RV-19 developer acceptance complete 2026-10-12; deployment/live readiness separate**
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
 - Module ID: `seating-plan` (`SPEC-07`)
 - Contract baseline: `WEDDING-CONTRACT-3@3.0.0`
@@ -13,6 +13,11 @@
 - Requirement ownership: SEA-003 through SEA-008
 - Depends on: `venue-catalog`, `booking-lifecycle`, `guest-management`
 - Consumers: `invitation-studio`, `staff-operations`, `analytics-dashboard`
+
+Implementation, strict schemas/errors/examples and source pins:
+[backend hand-off](./docs/seating-plan-w1-w5.md) and
+[native/CI/generated-file evidence](./tasks/evidence/seating-plan-rv19-2026-10-12.md).
+The future Staff assignment/check-in and Notifications consumers remain separate.
 
 ## 1. Purpose and hard boundary
 

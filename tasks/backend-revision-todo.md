@@ -105,7 +105,7 @@ authorized disposable/staging environment and bounded cost; CI remains offline.
 - [ ] RV-16
 - [x] RV-17 (owner-approved two-sided A5 PDF contract)
 - [x] RV-18 (deployed immutable PDF, retained images/QR and unchanged billing)
-- [ ] RV-19
+- [x] RV-19 (native SPEC-07 registry/print integration and inspected PDF/QR; deployment separate)
 - [x] RV-20 (target request/error/audit correlation; metrics/OTLP optional disabled)
 - [ ] RV-21
 
@@ -115,6 +115,13 @@ scope](evidence/rv04-05-07-12-runtime-2026-10-11.md) closes these three backend
 developer gates without another provider run. **18/21 RV tasks are complete**;
 RV-16 (actual Notifications workers), RV-19 (real Seating print integration) and
 RV-21 (owner-reviewed release/recovery checkpoint including REL-W3) remain open.
+
+2026-10-12 SPEC-07 → RV-19 checkpoint: SEA-W1–W5 and RV-19 backend developer
+acceptance complete. [Native/CI/file evidence](evidence/seating-plan-rv19-2026-10-12.md),
+[provider manifest](evidence/seating-plan-provider-manifest-2026-10-12.json) and
+[frontend hand-off](../docs/seating-plan-w1-w5.md). This makes **19/21 RV tasks
+complete**; RV-16 and RV-21 remain open. This checkpoint is native local + Linux CI
+and generated-file evidence, not a new deployed/provider-live acceptance.
 
 2026-10-12 RV-14 → RV-15 → RV-17 → RV-18 → RV-06 → RV-20 closure:
 [implementation, offline gates, configuration and runtime evidence](evidence/rv14-20-runtime-2026-10-12.md).
@@ -283,11 +290,18 @@ Linux CI pass; live providers/deployment and the downstream GM-W5 gate remain se
 
 ### SPEC-07–11 — Backend Only
 
-- [ ] SEA-W1: Compatibility/remapping and capacity tests use independent planningHeadcount, never Guest count; Groups/table labels work with no named list.
-- [ ] SEA-W2: Immutable plan persistence and migration/revision proof.
-- [ ] SEA-W3: Confirmation/exception/print registry/optional Staff guidance with real owner conformance and rollback/race tests; no-list/NONE mode cannot block a compatible layout/print.
-- [ ] SEA-W4: HTTP/OpenAPI and authorization; no geometry/person-seat writes.
-- [ ] SEA-W5: Backend acceptance evidence and frontend hand-off.
+- [x] SEA-W1: Compatibility/remapping and capacity tests use independent planningHeadcount, never Guest count; Groups/table labels work with no named list.
+- [x] SEA-W2: Immutable plan persistence and migration/revision proof.
+- [x] SEA-W3: Confirmation/exception/print registry/optional Staff guidance with real owner conformance and rollback/race tests; no-list/NONE mode cannot block a compatible layout/print.
+- [x] SEA-W4: HTTP/OpenAPI and authorization; no geometry/person-seat writes.
+- [x] SEA-W5: Backend acceptance evidence and frontend hand-off.
+
+SEA-W1–W5/RV-19: [backend evidence](evidence/seating-plan-rv19-2026-10-12.md) and
+[strict API/provider hand-off](../docs/seating-plan-w1-w5.md). Optional Staff guidance
+is an assignment-owner facade contract; real SPEC-08 check-in/assignment and SPEC-09
+notification delivery remain separate. No frontend, shared/provider operation or
+production deployment was performed for this checkpoint.
+
 - [ ] STF-W1: Staff provisioning/assignments plus NONE/BY_GUEST_NAME configuration; owning FULL Couple/Manager explicit enable requires active names; adding/importing names never enables; after first record mode cannot hide history.
 - [ ] STF-W2: Named Guest append-only CHECK_IN/UNDO journal; effective count 0/1 per Guest; real duplicate/replay/undo/archive/revocation/mode concurrency tests; settle companion recording separately before dependent implementation, without prohibiting accompanying people.
 - [ ] STF-W3: Named Guest search/Group guidance and mode-aware reporting providers; NONE -> null/not recorded, enabled -> listed-guests-only counts with retained Group history; no whole-event attendance inference.
