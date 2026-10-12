@@ -14,7 +14,15 @@ describe('runtime feature manifest', () => {
     expect(manifest.features.invitationStorage.mode).toBe('unavailable');
     expect(manifest.features.gemini.mode).toBe('disabled');
     expect(manifest.features.vnpay.mode).toBe('disabled');
-    expect(manifest.features.workers.implementation).toBe('downstream-pending');
+    expect(manifest.features.workers).toMatchObject({
+      implementation: 'implemented',
+      configuration: 'unconfigured',
+      liveVerification: 'pending',
+    });
+    expect(manifest.features.androidPush).toMatchObject({
+      mode: 'disabled-awaiting-client-provider',
+      liveVerification: 'optional-disabled',
+    });
     expect(manifest.features.printFiles).toMatchObject({
       implementation: 'implemented',
       configuration: 'unconfigured',

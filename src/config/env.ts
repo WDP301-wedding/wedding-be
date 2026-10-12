@@ -2,6 +2,11 @@ import { isIP } from 'node:net';
 
 import { z } from 'zod';
 import type { VnpaySettings } from '../modules/payments-billing/application/vnpay.port.js';
+import {
+  parseNotificationConfiguration,
+  NotificationConfigurationError,
+  type NotificationConfiguration,
+} from './notifications.js';
 
 const deployedEnvironments = new Set(['staging', 'production']);
 const loopbackHosts = new Set(['localhost', '127.0.0.1', '[::1]']);
@@ -510,6 +515,7 @@ export type BackendConfig = Readonly<{
   openApi: Readonly<{ enabledInProduction: boolean }>;
   invitationStudio: Readonly<{ publicOrigin: string | null }>;
   telemetry: Readonly<{ otlpEndpoint: string | undefined }>;
+  notifications: NotificationConfiguration;
 }>;
 
 export class EnvironmentConfigurationError extends Error {
@@ -532,7 +538,21 @@ export function parseEnvironment(source: EnvironmentSource): BackendConfig {
     );
   }
 
-  return createConfig(result.data);
+  const config = createConfig(result.data);
+  try {
+    return Object.freeze({
+      ...config,
+      notifications: parseNotificationConfiguration(
+        source,
+        result.data.NODE_ENV,
+        config.email.enabled,
+      ),
+    });
+  } catch (error) {
+    if (error instanceof NotificationConfigurationError)
+      throw new EnvironmentConfigurationError(error.variables);
+    throw error;
+  }
 }
 
 function pickEnvironment(source: EnvironmentSource): EnvironmentSource {
@@ -649,7 +669,7 @@ function rejectVariables<const Key extends EnvironmentKey>(
   }
 }
 
-function createConfig(environment: RawEnvironment): BackendConfig {
+function createConfig(environment: RawEnvironment): Omit<BackendConfig, 'notifications'> {
   const storage: StorageConfig =
     environment.SUPABASE_URL !== undefined &&
     environment.SUPABASE_SERVICE_ROLE_KEY !== undefined &&

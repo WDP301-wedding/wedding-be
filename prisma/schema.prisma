@@ -8,6 +8,161 @@ datasource db {
   provider = "postgresql"
 }
 
+model IdentityOutbox {
+  eventId String @id @db.Uuid
+  eventType String
+  eventVersion Int @default(1)
+  consultationId String @db.Uuid
+  payload Json @db.JsonB
+  occurredAt DateTime @default(now()) @db.Timestamptz(6)
+  @@index([occurredAt, eventId])
+}
+
+model NotificationScheduleScan {
+  kind String @id
+  dueBefore DateTime @db.Timestamptz(6)
+  cursor String? @db.VarChar(1024)
+  revision Int @default(1)
+}
+
+model NotificationDueCommand {
+  id String @id @db.Uuid
+  bookingId String @db.Uuid
+  expectedRevision Int
+  requestedAt DateTime @db.Timestamptz(6)
+  state String @default("PENDING")
+  @@unique([bookingId, expectedRevision])
+  @@index([state, requestedAt])
+}
+
+model NotificationRecipient {
+  id String @id @default(uuid()) @db.Uuid
+  accountId String? @db.Uuid
+  guestId String? @db.Uuid
+  bookingId String? @db.Uuid
+  deliveryEmail String? @db.VarChar(320)
+  operational Boolean @default(false)
+  nextRetentionAt DateTime @default(now()) @db.Timestamptz(6)
+  purposes String[] @default([])
+  enabled Boolean @default(true)
+  revision Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  intents NotificationIntent[]
+  @@index([accountId, enabled])
+  @@index([bookingId, guestId])
+  @@unique([accountId], where: raw("\"accountId\" IS NOT NULL"))
+}
+
+model NotificationIntent {
+  id String @id @default(uuid()) @db.Uuid
+  eventId String @db.Uuid
+  owner String
+  bookingId String? @db.Uuid
+  recipientId String @db.Uuid
+  channel String
+  purpose String
+  templateVersion Int
+  scheduledAt DateTime @db.Timestamptz(6)
+  scheduleRevision Int?
+  data Json @db.JsonB
+  payloadDigest String @db.Char(64)
+  state String @default("QUEUED")
+  revision Int @default(1)
+  attemptCount Int @default(0)
+  nextAttemptAt DateTime @db.Timestamptz(6)
+  nextReconcileAt DateTime @default(now()) @db.Timestamptz(6)
+  leaseId String? @db.Uuid
+  leaseExpiresAt DateTime? @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  recipient NotificationRecipient @relation(fields: [recipientId], references: [id], onDelete: Restrict)
+  attempts NotificationAttempt[]
+  inbox NotificationInbox[]
+  credential NotificationCredential?
+  @@unique([eventId, channel, recipientId, templateVersion])
+  @@unique([bookingId, purpose, scheduleRevision, scheduledAt, channel, recipientId, templateVersion])
+  @@index([state, nextAttemptAt, id])
+  @@index([state, leaseExpiresAt])
+  @@index([state, nextReconcileAt])
+}
+
+model NotificationEventReceipt {
+  owner String
+  eventId String @db.Uuid
+  payloadDigest String @db.Char(64)
+  intentIds Json @db.JsonB
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  @@id([owner, eventId])
+}
+
+model NotificationCredential {
+  intentId String @id @db.Uuid
+  credentialId String @db.Uuid
+  keyVersion String @db.VarChar(40)
+  nonce String? @db.VarChar(24)
+  tag String? @db.VarChar(24)
+  ciphertext String? @db.VarChar(2048)
+  expiresAt DateTime @db.Timestamptz(6)
+  purgedAt DateTime? @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  intent NotificationIntent @relation(fields: [intentId], references: [id], onDelete: Restrict)
+  @@index([expiresAt, purgedAt])
+}
+
+model NotificationAttempt {
+  id String @id @default(uuid()) @db.Uuid
+  intentId String @db.Uuid
+  leaseId String @db.Uuid
+  outcome String
+  providerMessageId String? @db.VarChar(320)
+  errorCode String? @db.VarChar(80)
+  occurredAt DateTime @default(now()) @db.Timestamptz(6)
+  intent NotificationIntent @relation(fields: [intentId], references: [id], onDelete: Restrict)
+  @@unique([intentId, leaseId, outcome])
+  @@index([intentId, occurredAt, id])
+}
+
+model NotificationPreference {
+  accountId String @id @db.Uuid
+  reminderEmail Boolean @default(true)
+  reminderPush Boolean @default(true)
+  revision Int @default(1)
+}
+
+model NotificationInstallation {
+  id String @id @default(uuid()) @db.Uuid
+  accountId String @db.Uuid
+  sessionId String @db.Uuid
+  installationId String @db.Uuid
+  pushToken String? @unique @db.VarChar(4096)
+  enabled Boolean @default(true)
+  revision Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  @@unique([accountId, installationId])
+  @@index([accountId, enabled])
+}
+
+model NotificationInbox {
+  id String @id @default(uuid()) @db.Uuid
+  intentId String @db.Uuid
+  accountId String @db.Uuid
+  bookingId String? @db.Uuid
+  readAt DateTime? @db.Timestamptz(6)
+  revision Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  intent NotificationIntent @relation(fields: [intentId], references: [id], onDelete: Restrict)
+  @@unique([intentId, accountId])
+  @@index([accountId, createdAt, id])
+}
+
+model NotificationCommand {
+  accountId String @db.Uuid
+  intentDigest String @db.Char(64)
+  commandDigest String @db.Char(64)
+  result Json @db.JsonB
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  @@id([accountId, intentDigest])
+}
+
 model StaffConfiguration {
   bookingId String @id @db.Uuid
   checkInMode String @default("NONE")

@@ -13,6 +13,7 @@ import { createVenueCatalogRuntime } from '../../modules/venue-catalog/venue-cat
 import { createIdentityRuntime } from '../../modules/identity-access/identity.runtime.js';
 import { createInvitationStudioRuntime } from '../../modules/invitation-studio/invitation-studio.runtime.js';
 import { createGuestManagementRuntime } from '../../modules/guest-management/guest-management.runtime.js';
+import { createNotificationsRuntime } from '../../modules/notifications-automation/notifications.runtime.js';
 import request from 'supertest';
 import { createPaymentsBillingRuntime } from '../../modules/payments-billing/payments-billing.runtime.js';
 import { createLogger } from '../logging/logger.js';
@@ -32,6 +33,23 @@ vi.mock('../../modules/identity-access/identity.runtime.js', async () => {
       router: Router(),
       resource: { name: 'identity-database', close: vi.fn() },
     })),
+  };
+});
+
+vi.mock('../../modules/notifications-automation/notifications.runtime.js', async () => {
+  const { Router } = await import('express');
+  return {
+    createNotificationsRuntime: vi.fn(() => {
+      const router = Router();
+      router.get('/notifications/preferences', (_req, res) =>
+        res.status(401).json({ error: { code: 'UNAUTHORIZED' } }),
+      );
+      return {
+        router,
+        start: vi.fn(),
+        resource: { name: 'notifications-automation', close: vi.fn() },
+      };
+    }),
   };
 });
 
@@ -356,10 +374,15 @@ describe('server startup and process signals', () => {
     expect(running.readiness.isReady()).toBe(true);
     expect((await request(running.app).get('/api/v1/bookings/one/media/two')).status).toBe(401);
     expect((await request(running.app).get('/api/v1/bookings/one/guest-groups')).status).toBe(401);
+    expect((await request(running.app).get('/api/v1/notifications/preferences')).status).toBe(401);
+    const notifications = (await vi.mocked(createNotificationsRuntime).mock.results.at(-1)!
+      .value) as Awaited<ReturnType<typeof createNotificationsRuntime>>;
+    expect(notifications.start).toHaveBeenCalledOnce();
     const runtime = await (vi.mocked(createInvitationStudioRuntime).mock.results.at(-1)!
       .value as ReturnType<typeof createInvitationStudioRuntime>);
     await running.shutdown();
     expect(vi.mocked(runtime.resource).close.mock.calls).toHaveLength(1);
+    expect(notifications.resource.close).toHaveBeenCalledOnce();
   });
 
   it('wires deployed database readiness, keeps liveness independent, and releases the probe', async () => {

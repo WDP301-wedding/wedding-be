@@ -28,6 +28,22 @@ function captureLogs(): {
 }
 
 describe('structured logger', () => {
+  it('redacts encrypted notification content and recipient overrides while retaining safe IDs', () => {
+    const record = {
+      event: 'notification_attempt_recorded',
+      notificationIntentId: 'safe-id',
+      credential: { ciphertext: 'private-cipher', nonce: 'private-nonce', tag: 'private-tag' },
+      deliveryEmail: 'private@example.invalid',
+      intendedEmail: 'private-target@example.invalid',
+      recipientEmail: 'private-recipient@example.invalid',
+      credentialKeys: { v1: 'private-key' },
+    };
+    const sanitized = redactLogRecord(record);
+    const text = JSON.stringify(sanitized);
+    expect(text).not.toContain('private');
+    expect(sanitized.notificationIntentId).toBe('safe-id');
+    expect(text).toContain(REDACTED_VALUE);
+  });
   it('redacts Guest capabilities, link fragments, greetings and private notes', () => {
     expect(
       redactLogRecord({

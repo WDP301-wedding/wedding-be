@@ -9,6 +9,25 @@ import type {
 
 export class PrismaInvitationAutomationReader implements InvitationAutomationReader {
   constructor(private readonly prisma: PrismaClient) {}
+  async readMediaCutoff(bookingId: string, context: ContractContext) {
+    if (
+      context.authority !== 'SYSTEM' ||
+      context.actorAccountId !== null ||
+      context.purpose !== 'notifications:media-cutoff'
+    )
+      throw new Error('INVITATION_AUTOMATION_FORBIDDEN');
+    const row = await this.prisma.invitationMediaPolicy.findUnique({
+      where: { bookingId },
+      select: { bookingId: true, cutoffAt: true, revision: true },
+    });
+    return row
+      ? {
+          bookingId: row.bookingId,
+          cutoffAt: row.cutoffAt.toISOString(),
+          policyRevision: row.revision,
+        }
+      : null;
+  }
 
   async listMediaCutoffs(
     input: ListMediaCutoffsInput,
@@ -78,7 +97,7 @@ export class PrismaInvitationAutomationReader implements InvitationAutomationRea
               phase: 'CONFIRMED',
               depositSettlement: { isNot: null },
             },
-            select: { id: true },
+            select: { id: true, consultationId: true },
           })
         : [];
     const eligibleBookingSet = new Set(eligibleBookings.map((b) => b.id));
@@ -87,11 +106,21 @@ export class PrismaInvitationAutomationReader implements InvitationAutomationRea
       bookingIds.length > 0
         ? await this.prisma.consultationAccess.findMany({
             where: {
-              bookingId: { in: bookingIds },
+              OR: [
+                { bookingId: { in: bookingIds } },
+                {
+                  consultationId: {
+                    in: eligibleBookings
+                      .map((b) => b.consultationId)
+                      .filter((id): id is string => Boolean(id)),
+                  },
+                },
+              ],
               level: 'FULL',
             },
             select: {
               bookingId: true,
+              consultationId: true,
               accountId: true,
             },
           })
@@ -99,8 +128,10 @@ export class PrismaInvitationAutomationReader implements InvitationAutomationRea
 
     const coupleAccountMap = new Map<string, string>();
     for (const acc of accesses) {
-      if (acc.bookingId) {
-        coupleAccountMap.set(acc.bookingId, acc.accountId);
+      const bookingId =
+        acc.bookingId ?? eligibleBookings.find((b) => b.consultationId === acc.consultationId)?.id;
+      if (bookingId) {
+        coupleAccountMap.set(bookingId, acc.accountId);
       }
     }
 

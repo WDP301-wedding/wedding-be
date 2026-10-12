@@ -57,7 +57,13 @@ export function createRuntimeFeatureManifest(config: BackendConfig, revision?: s
       ),
       vnpay: feature(config.vnpay.enabled, config.vnpay.enabled ? 'sandbox-only' : 'disabled'),
       retention: feature(Boolean(config.database.url), 'operator-cli-manual-procedure'),
-      workers: feature(false, 'outbox-and-due-ports-only', 'downstream-pending'),
+      workers: feature(
+        config.notifications.workerEnabled,
+        'durable-notifications-60s',
+        'implemented',
+      ),
+      androidDeviceRegistry: feature(Boolean(config.database.url), 'account-session-bound'),
+      androidPush: feature(false, 'disabled-awaiting-client-provider', 'downstream-pending', true),
       printFiles: feature(
         Boolean(config.database.url) &&
           config.storage.enabled &&

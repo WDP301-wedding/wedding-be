@@ -16,6 +16,10 @@ import {
 import { designResponse } from '../../src/modules/invitation-studio/http/studio.schemas.js';
 import { printOrderResponseSchema } from '../../src/modules/invitation-studio/http/print-orders.schemas.js';
 import { ipnFixture } from './payments-billing/vnpay-fixture.js';
+import { NotificationFoundation } from '../../src/modules/notifications-automation/infrastructure/notification-foundation.js';
+import { NotificationEventConsumer } from '../../src/modules/notifications-automation/infrastructure/event-consumer.js';
+import { createNotificationBookingReader } from '../../src/modules/booking-lifecycle/infrastructure/notification-context.reader.js';
+import { createNotificationIdentityReader } from '../../src/modules/identity-access/authorization/notification-recipient.reader.js';
 
 export function registerCommercialSettlementJourney(harness: StepSixApiHarness) {
   const { database, paidFixture, getLines, post, get, total, deposit } = harness;
@@ -251,5 +255,73 @@ export function registerCommercialSettlementJourney(harness: StepSixApiHarness) 
         })
       ).amountVnd.toNumber(),
     ).toBe(deposit);
+    const ledgerBefore = await database.prisma.billingLedgerEntry.findMany({
+      where: { bookingId: f.id },
+      orderBy: { id: 'asc' },
+    });
+    const consultation = await database.prisma.booking.findUniqueOrThrow({
+      where: { id: f.id },
+      select: { consultation: { select: { managerAccountId: true } } },
+    });
+    await database.prisma.notificationRecipient.create({
+      data: {
+        accountId: consultation.consultation.managerAccountId,
+        operational: true,
+        purposes: [
+          'CONTRACT',
+          'APPENDIX',
+          'PAYMENT',
+          'REFUND',
+          'FINAL_INVOICE',
+          'PRINT',
+          'ACCESS_PROMOTED',
+        ],
+      },
+    });
+    const notifications = new NotificationEventConsumer(
+      new NotificationFoundation(database.prisma),
+      createNotificationBookingReader(database.prisma),
+      createNotificationIdentityReader(database.prisma),
+    );
+    let remaining = 100;
+    for (let run = 0; run < 10 && remaining > 0; run++) remaining = await notifications.poll(100);
+    expect(remaining).toBe(0);
+    const intents = await database.prisma.notificationIntent.findMany({
+      where: { bookingId: f.id },
+    });
+    for (const purpose of [
+      'CONTRACT',
+      'APPENDIX',
+      'PAYMENT',
+      'REFUND',
+      'FINAL_INVOICE',
+      'PRINT',
+      'ACCESS_PROMOTED',
+    ]) {
+      expect(
+        intents.some((i) => i.purpose === purpose),
+        purpose,
+      ).toBe(true);
+    }
+    expect(intents.some((i) => i.recipientId !== intents[0]?.recipientId)).toBe(true);
+    const delivered = intents.length;
+    expect(await notifications.poll(100)).toBe(0);
+    expect(await database.prisma.notificationIntent.count({ where: { bookingId: f.id } })).toBe(
+      delivered,
+    );
+    expect(
+      await database.prisma.billingLedgerEntry.findMany({
+        where: { bookingId: f.id },
+        orderBy: { id: 'asc' },
+      }),
+    ).toEqual(ledgerBefore);
+    expect(
+      await database.prisma.billingOutboxEvent.count({
+        where: { aggregateId: f.id, publishedAt: { not: null } },
+      }),
+    ).toBe(0);
+    expect(JSON.stringify(intents.map((i) => i.data))).not.toMatch(
+      /credential|email|phone|evidenceReference|reason|items/u,
+    );
   }, 90_000);
 }

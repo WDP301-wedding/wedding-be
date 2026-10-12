@@ -438,6 +438,20 @@ export class GuestService {
           row.revision,
         );
         await this.changed(tx, bookingId);
+        await tx.guestOutbox.create({
+          data: {
+            eventId: randomUUID(),
+            bookingId,
+            eventType: 'guest.plan-changed',
+            sourceSequence: row.sourceSequence,
+            payload: {
+              bookingId,
+              planRevisionId: row.id,
+              planRevision: row.revision,
+              sourceSequence: row.sourceSequence,
+            },
+          },
+        });
         return this.planDto(tx, updated);
       },
     );

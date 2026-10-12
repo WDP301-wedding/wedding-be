@@ -170,7 +170,7 @@ export class GuestReaders {
   async getGuestListSummary(bookingValue: string) {
     const bookingId = parse(id, bookingValue);
     const snapshot = await this.guests.repository.prisma.guestOutbox.findFirst({
-      where: { bookingId },
+      where: { bookingId, eventType: 'guest.workspace-changed' },
       orderBy: { sourceSequence: 'desc' },
     });
     if (snapshot === null) throw new NotFoundError();
@@ -272,14 +272,18 @@ export class GuestReaders {
       throw new NotFoundError();
     return this.guests.repository.prisma.$transaction(async (tx) => {
       const head = await tx.guestOutbox.findFirst({
-        where: { bookingId },
+        where: { bookingId, eventType: 'guest.workspace-changed' },
         orderBy: { sourceSequence: 'desc' },
       });
       const fence = input.throughSequence ?? head?.sourceSequence ?? 0;
       if (fence > (head?.sourceSequence ?? 0) || fence < input.afterSequence)
         throw new ValidationError();
       const rows = await tx.guestOutbox.findMany({
-        where: { bookingId, sourceSequence: { gt: input.afterSequence, lte: fence } },
+        where: {
+          bookingId,
+          eventType: 'guest.workspace-changed',
+          sourceSequence: { gt: input.afterSequence, lte: fence },
+        },
         orderBy: { sourceSequence: 'asc' },
         take: input.limit + 1,
       });

@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { ProviderError } from '../../core/errors/app-error.js';
 
 import {
   emailIntentIdempotencyKeySchema,
@@ -24,6 +25,12 @@ export interface SentEmail {
 
 export interface EmailProvider {
   send(command: SendEmailCommand): Promise<SentEmail>;
+}
+/** Known HTTP rejection only. No response body, headers or destination is retained. */
+export class EmailRequestRejectedError extends ProviderError {
+  constructor(readonly responseStatus: number) {
+    super(responseStatus === 429 || responseStatus >= 500 ? 'unavailable' : 'failure');
+  }
 }
 
 export function createEmailIntentIdempotencyKey(intent: EmailIntent): EmailIntentIdempotencyKey {
