@@ -2,7 +2,9 @@ import { randomBytes, randomUUID } from 'node:crypto';
 import type { Prisma, GuestInvitationCredential } from '../../../generated/prisma/client.js';
 import { AppError } from '../../../core/errors/app-error.js';
 import type { GuestService } from './guest.service.js';
-import type { GuestRequestContext } from './guest.contracts.js';
+import type { GuestRequestContext, GuestCredentialDelivery } from './guest.contracts.js';
+import type { ContractContext } from '../../../core/database/booking-boundary.js';
+import { z } from 'zod';
 import {
   conflict,
   digest,
@@ -33,60 +35,124 @@ export class GuestLinksService {
       `invitation.issue:${guestId}`,
       input,
       async (tx, scope) => {
-        const guest = await this.guests.requireGuest(tx, bookingId, guestId);
-        if (guest.status !== 'ACTIVE') throw unavailable();
-        const latest = await tx.guestInvitationCredential.findFirst({
-          where: { bookingId, guestId },
-          orderBy: { revision: 'desc' },
-        });
-        if ((latest?.revision ?? 0) !== input.expectedRevision)
-          throw conflict('GUEST_INVITATION_REVISION_STALE');
-        const invitation = await this.publication(bookingId);
-        const event = await this.guests.owners.booking.requireConfirmedEventContext(bookingId);
-        const timeline = await this.guests.owners.timeline.resolveApprovedRevision(
-          { bookingId, timelineRevisionId: event.effectiveTimelineRevisionId },
-          scope,
-        );
-        const expiresAt = new Date(
-          new Date(`${timeline.eventDate}T${timeline.shiftEndTime}:00+07:00`).getTime() +
-            24 * 3600000,
-        );
-        if (expiresAt <= this.guests.now()) throw unavailable();
-        await tx.guestInvitationCredential.updateMany({
-          where: { bookingId, guestId, revokedAt: null },
-          data: { revokedAt: this.guests.now() },
-        });
-        credential = `wgc_${randomBytes(32).toString('base64url')}`;
-        const credentialId = randomUUID();
-        await tx.guestInvitationCredential.create({
-          data: {
-            id: credentialId,
-            bookingId,
-            guestId,
-            tokenHash: tokenHash(credential),
-            publicInvitationId: invitation.publicInvitationId,
-            revision: input.expectedRevision + 1,
-            expiresAt,
-          },
-        });
-        await this.guests.repository.audit(
+        const issued = await this.createCredential(
           tx,
           scope,
           bookingId,
-          'guest.invitation-issued',
-          credentialId,
-          input.expectedRevision + 1,
+          guestId,
+          input.expectedRevision,
         );
+        credential = issued.credential;
         return {
-          credentialId,
-          revision: input.expectedRevision + 1,
-          expiresAt: expiresAt.toISOString(),
+          credentialId: issued.credentialId,
+          revision: issued.revision,
+          expiresAt: issued.expiresAt.toISOString(),
         };
       },
     );
     // Raw credential exists only in this request. Durable retries cannot recover it.
     if (credential === undefined) throw conflict('INVITATION_CREDENTIAL_ALREADY_ISSUED');
     return { ...result, credential, fragment: `#credential=${credential}` };
+  }
+
+  issueDelivery(
+    bookingValue: string,
+    guestValue: string,
+    value: unknown,
+    key: string,
+    context: GuestRequestContext,
+    delivery: GuestCredentialDelivery,
+  ) {
+    const bookingId = parse(id, bookingValue),
+      guestId = parse(id, guestValue);
+    const input = parse(linkIssueSchema.extend({ intendedEmail: z.email().max(320) }), value);
+    return this.guests.command(
+      bookingId,
+      context,
+      key,
+      `invitation.delivery:${guestId}`,
+      input,
+      async (tx, scope) => {
+        const issued = await this.createCredential(
+          tx,
+          scope,
+          bookingId,
+          guestId,
+          input.expectedRevision,
+        );
+        const retained = await delivery.retain(
+          { ...issued, bookingId, guestId, intendedEmail: input.intendedEmail },
+          scope,
+        );
+        return {
+          credentialId: issued.credentialId,
+          revision: issued.revision,
+          expiresAt: issued.expiresAt.toISOString(),
+          notificationIntentId: retained.notificationIntentId,
+        };
+      },
+    );
+  }
+
+  private async createCredential(
+    tx: Prisma.TransactionClient,
+    scope: ContractContext,
+    bookingId: string,
+    guestId: string,
+    expectedRevision: number,
+  ) {
+    const guest = await this.guests.requireGuest(tx, bookingId, guestId);
+    if (guest.status !== 'ACTIVE') throw unavailable();
+    const latest = await tx.guestInvitationCredential.findFirst({
+      where: { bookingId, guestId },
+      orderBy: { revision: 'desc' },
+    });
+    if ((latest?.revision ?? 0) !== expectedRevision)
+      throw conflict('GUEST_INVITATION_REVISION_STALE');
+    const invitation = await this.publication(bookingId);
+    const event = await this.guests.owners.booking.requireConfirmedEventContext(bookingId);
+    const timeline = await this.guests.owners.timeline.resolveApprovedRevision(
+      { bookingId, timelineRevisionId: event.effectiveTimelineRevisionId },
+      scope,
+    );
+    const expiresAt = new Date(
+      new Date(`${timeline.eventDate}T${timeline.shiftEndTime}:00+07:00`).getTime() + 24 * 3600000,
+    );
+    if (expiresAt <= this.guests.now()) throw unavailable();
+    await tx.guestInvitationCredential.updateMany({
+      where: { bookingId, guestId, revokedAt: null },
+      data: { revokedAt: this.guests.now() },
+    });
+    const credential = `wgc_${randomBytes(32).toString('base64url')}`,
+      credentialId = randomUUID(),
+      revision = expectedRevision + 1;
+    await tx.guestInvitationCredential.create({
+      data: {
+        id: credentialId,
+        bookingId,
+        guestId,
+        tokenHash: tokenHash(credential),
+        publicInvitationId: invitation.publicInvitationId,
+        revision,
+        expiresAt,
+      },
+    });
+    await this.guests.repository.audit(
+      tx,
+      scope,
+      bookingId,
+      'guest.invitation-issued',
+      credentialId,
+      revision,
+    );
+    return {
+      credential,
+      credentialId,
+      revision,
+      expiresAt,
+      publicInvitationId: invitation.publicInvitationId,
+      publishedRevisionId: invitation.publishedRevisionId,
+    };
   }
   private async publication(bookingId: string, publicInvitationId?: string) {
     if (this.guests.owners.invitation === undefined) throw unavailable();
@@ -170,6 +236,18 @@ export class GuestLinksService {
       recipientGreeting: greeting,
       invitation: await this.publication(credential.bookingId, credential.publicInvitationId),
     }));
+  }
+  /** Internal delivery gate. It neither creates a Guest session nor discloses the list. */
+  async validateDeliveryCredential(value: string, bookingId: string, credentialId: string) {
+    if (!/^wgc_[A-Za-z0-9_-]{43}$/u.test(value)) throw unavailable();
+    return this.read(tokenHash(value), 'CREDENTIAL', async (_tx, credential) => {
+      if (credential.id !== credentialId || credential.bookingId !== bookingId) throw unavailable();
+      const invitation = await this.publication(bookingId, credential.publicInvitationId);
+      return {
+        publicInvitationId: invitation.publicInvitationId,
+        publicUrl: invitation.genericQrPayload,
+      };
+    });
   }
   private async rateLimit(key: string) {
     const now = this.guests.now();

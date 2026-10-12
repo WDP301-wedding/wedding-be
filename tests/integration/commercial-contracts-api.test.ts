@@ -1,3 +1,5 @@
+import { registerGuestCompletionCases } from './guest-management-completion-cases.js';
+import { createStaffSeatingServices } from '../../src/modules/staff-operations/infrastructure/staff-seating.composition.js';
 import { registerStepSixApiCases } from './commercial-step6-api-cases.js';
 import { registerCommercialAcceptanceCases } from './commercial-acceptance-api-cases.js';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
@@ -53,6 +55,8 @@ const directory = 'test-results/step6-api';
 describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', () => {
   const database = new CatalogTestDatabase('commercial_contract_api');
   let app: ReturnType<typeof createApp>;
+  let studio: ReturnType<typeof createInvitationStudioServices>;
+  let staffSeating: ReturnType<typeof createStaffSeatingServices>;
   let booking: Awaited<ReturnType<typeof createBookingLifecycleRuntime>> | undefined;
   let venue: Awaited<ReturnType<typeof createVenueCatalogRuntime>> | undefined;
   const tokens: Record<string, string> = {};
@@ -167,12 +171,13 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
         rateLimit: { ...config.security.rateLimit, maxRequests: 1000 },
       },
       registerRoutes(express) {
-        const studio = createInvitationStudioServices(
+        studio = createInvitationStudioServices(
           database.prisma,
           controlledStorage().provider,
           null,
           'https://wedding.example.com',
         );
+        staffSeating = createStaffSeatingServices(database.prisma, studio);
         express.use(
           '/api/v1',
           createStudioRouter(studio, createAuthenticatedActorResolver(sessions)),
@@ -462,6 +467,15 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
   };
   registerCommercialAcceptanceCases(harness);
   registerStepSixApiCases(harness);
+  registerGuestCompletionCases(harness, () => ({
+    studio,
+    staffSeating,
+    context: (who) => ({
+      actorId: accounts[who],
+      accessToken: tokens[who]!,
+      requestId: randomUUID(),
+    }),
+  }));
   it('lists, creates, submits, approves, downloads and withdraws the exact contract with retained PDF history', async () => {
     const f = await fixture();
     const empty = await get(f.path, 'own', 'List before conversion');

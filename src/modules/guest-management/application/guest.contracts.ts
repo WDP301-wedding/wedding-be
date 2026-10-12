@@ -67,3 +67,21 @@ export type GuestDeliveryPreparation = Readonly<{
   expiresAt: string;
   intendedEmail: string;
 }>;
+
+/** Only the privileged delivery adapter receives a transient token inside the
+ * Guest command's shared transaction. Its receipt must contain identifiers only. */
+export interface GuestCredentialDelivery {
+  retain(
+    command: Readonly<{
+      bookingId: string;
+      guestId: string;
+      intendedEmail: string;
+      credentialId: string;
+      credential: string;
+      expiresAt: Date;
+      publicInvitationId: string;
+      publishedRevisionId: string;
+    }>,
+    scope: ContractContext,
+  ): Promise<{ notificationIntentId: string }>;
+}

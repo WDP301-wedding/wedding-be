@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "environmentPurpose": "owner-authorized developer test",
+  "deployment": {
+    "id": "2cb3ee74-005f-4ce4-8705-f61be90c5efe",
+    "status": "SUCCESS",
+    "sourceSha": "a838a057945bba0eea3156273f51d1b95e70d7b0",
+    "executableSourceSha": "a325469714a4fba028b51a667162a9baec5fbc4e",
+    "openapiSha256": "5656f32255be1ca345dfc381b474db99c4e71b3f28bbc80f6740b598ccc2e1b3"
+  },
+  "configuration": {
+    "patchId": "commitChanges/08a2899c-b0d6-4200-a505-604965a4b3fc/fe55f0f6-0a3d-44f3-8180-a9ba3b39ed0a",
+    "serviceId": "0f70d648-8c59-48bd-84f3-29a86d2e2d38",
+    "environmentId": "08a2899c-b0d6-4200-a505-604965a4b3fc",
+    "variableNames": [
+      "NOTIFICATIONS_FCM_ENABLED",
+      "NOTIFICATIONS_FCM_SERVICE_ACCOUNT"
+    ],
+    "skipDeploys": true,
+    "checkedAt": "2026-10-12T19:30:44.429Z"
+  },
+  "runtime": {
+    "checkedAt": "2026-10-12T19:35:30.074Z",
+    "sourceSha": "a838a057945bba0eea3156273f51d1b95e70d7b0",
+    "fcmEnabled": false,
+    "serviceAccountValid": true,
+    "workerEnabled": true,
+    "compiledModuleCount": 461,
+    "compiledModulesExact": true,
+    "compiledMismatchPaths": [],
+    "openapiExact": true,
+    "migrationCount": 55,
+    "migrationsExact": true,
+    "migrationMismatchNames": [],
+    "unfinishedMigrations": 0,
+    "pushHistoryRls": true,
+    "registeredAndroidInstallations": 0
+  },
+  "providerPreflight": {
+    "checkedAt": "2026-10-12T19:39:25.630Z",
+    "projectId": "wdp301-wedding",
+    "workerFcmEnabled": false,
+    "validateOnly": true,
+    "syntheticToken": true,
+    "messagingOAuthSucceeded": true,
+    "validationHttpStatus": 400,
+    "validationStatus": "INVALID_ARGUMENT",
+    "validationTypedFcmCodes": [
+      "INVALID_ARGUMENT"
+    ],
+    "iamHttpStatus": 200,
+    "hasFcmSendPermission": true,
+    "workerAcceptanceVerified": false,
+    "deviceReceiptVerified": false
+  },
+  "httpAndWorker": {
+    "checkedAt": "2026-10-12T19:40:34.490Z",
+    "deploymentId": "2cb3ee74-005f-4ce4-8705-f61be90c5efe",
+    "probes": [
+      {
+        "path": "/health/live",
+        "status": 200
+      },
+      {
+        "path": "/health/ready",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/openapi.json",
+        "status": 200,
+        "sha256": "5656f32255be1ca345dfc381b474db99c4e71b3f28bbc80f6740b598ccc2e1b3"
+      },
+      {
+        "path": "/api/v1/notifications/android-installations",
+        "status": 401
+      }
+    ],
+    "workerEvents": [
+      {
+        "timestamp": "2026-10-12T19:34:41.671Z",
+        "event": "notification_worker_completed",
+        "consumed": 0,
+        "claimed": 0
+      },
+      {
+        "timestamp": "2026-10-12T19:35:42.636Z",
+        "event": "notification_worker_completed",
+        "consumed": 0,
+        "claimed": 0
+      },
+      {
+        "timestamp": "2026-10-12T19:36:42.188Z",
+        "event": "notification_worker_completed",
+        "consumed": 0,
+        "claimed": 0
+      },
+      {
+        "timestamp": "2026-10-12T19:37:42.604Z",
+        "event": "notification_worker_completed",
+        "consumed": 0,
+        "claimed": 0
+      },
+      {
+        "timestamp": "2026-10-12T19:38:42.687Z",
+        "event": "notification_worker_completed",
+        "consumed": 0,
+        "claimed": 0
+      },
+      {
+        "timestamp": "2026-10-12T19:39:42.198Z",
+        "event": "notification_worker_completed",
+        "consumed": 0,
+        "claimed": 0
+      }
+    ],
+    "workerCompletedCount": 6,
+    "workerFailureCount": 0
+  },
+  "diagnosticAccessCleanup": {
+    "checkedAt": "2026-10-12T19:40:53.925Z",
+    "taskKeyRemoved": true
+  },
+  "remaining": {
+    "workerFcmAcceptance": "pending native Android registration token and authorized fenced rehearsal",
+    "androidReceiptDisplayNavigation": "separate client-team evidence",
+    "productionReadiness": "not claimed"
+  }
+}

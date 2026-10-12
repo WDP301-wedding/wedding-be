@@ -187,6 +187,14 @@ describeWithDatabase('IA-11 and IA-12 identity transitions', () => {
       where: { accountId_consultationId: { accountId: account.id, consultationId } },
     });
     expect(access.level).toBe('FULL');
+    const promotionEvents = await prisma.identityOutbox.findMany({ where: { consultationId } });
+    expect(promotionEvents).toHaveLength(1);
+    expect(promotionEvents[0]).toMatchObject({
+      eventType: 'identity.consultation-access-promoted',
+      eventVersion: 1,
+      payload: { accountId: account.id, accessId: access.id },
+    });
+    expect(JSON.stringify(promotionEvents)).not.toMatch(/promotion@example|password|token/iu);
     await expect(
       prisma.accountRole.count({ where: { accountId: account.id, role: 'COUPLE' } }),
     ).resolves.toBe(1);

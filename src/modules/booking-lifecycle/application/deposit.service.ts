@@ -1,13 +1,8 @@
 import type { CoupleAccessPromoter } from '../../identity-access/authorization/couple-access-promotion.js';
 import type { DepositEligibilityReason } from '../domain/deposit.policy.js';
 
-export type ContractContext = Readonly<{
-  requestId: string;
-  causationId: string;
-  actorAccountId: string | null;
-  authority: 'AUTHENTICATED' | 'SYSTEM';
-  transactionScopeId?: string;
-}>;
+import type { ContractContext } from '../../../core/database/booking-boundary.js';
+export type { ContractContext } from '../../../core/database/booking-boundary.js';
 
 export type DepositEligibility = Readonly<{
   eligible: boolean;

@@ -1,0 +1,345 @@
+{
+  "date": "2026-10-12",
+  "scope": "backend developer acceptance; owner-authorized test environment",
+  "sourceRevision": "a424777a3b723982162604566e99bc5d1c89560e",
+  "branch": "codex/notifications-step-12",
+  "pullRequest": "https://github.com/WDP301-wedding/wedding-be/pull/37",
+  "complete": [
+    "NTF-W1",
+    "NTF-W2",
+    "NTF-W3",
+    "NTF-W4",
+    "NTF-W5",
+    "RV-16",
+    "GM-W5"
+  ],
+  "ci": {
+    "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38267911671",
+    "sourceRevision": "a424777a3b723982162604566e99bc5d1c89560e",
+    "status": "success",
+    "integration": {
+      "files": 89,
+      "tests": 466
+    },
+    "fullSuite": {
+      "files": 249,
+      "tests": 1780
+    },
+    "coverage": {
+      "statements": 96.48,
+      "branches": 93.13,
+      "functions": 98.44,
+      "lines": 97.41,
+      "perFileBranchesAndLinesMinimum": 80
+    }
+  },
+  "runtime": {
+    "target": "https://wedding-be-production-e1dc.up.railway.app",
+    "sourceRevision": "a424777a3b723982162604566e99bc5d1c89560e",
+    "deploymentId": "f2b25205-2f40-4b80-999d-3115e039f1c1",
+    "platformRevision": null,
+    "observedAt": "2026-10-12T15:25:18.913Z",
+    "compiledModules": 311,
+    "compiledAggregateSha256": "54d3cfaff98118252f773c40139adec6705ad8ba55297a3140366d5896336c2f",
+    "compiledSourceMatches": true,
+    "appliedMigrations": 53,
+    "migrationChecksumsMatch": true,
+    "migrations": [
+      {
+        "migration_name": "20261012040000_notification_foundation",
+        "checksum": "bb02f1537552bd34ab0bf97875c5f60727fda801af53b69e20a4235b7f43e43e"
+      },
+      {
+        "migration_name": "20261012041000_notification_credentials",
+        "checksum": "e917219baf97653bfee7b2e965aa43223bc13cfe218a29aeec2be98bc51ad5e2"
+      },
+      {
+        "migration_name": "20261012042000_notification_producer_facts",
+        "checksum": "6cba7909304a4a135342cc9e88294418334ae19aa3b4dc420eeb0f232cb937bd"
+      },
+      {
+        "migration_name": "20261012043000_notification_automation",
+        "checksum": "1bbabef05fdd6105dabd4d2f40887d7e19f2b8010fdeafe059f0727ab5eec454"
+      },
+      {
+        "migration_name": "20261012044000_notification_api_guards",
+        "checksum": "ccb58899b5f27f06cc9894031f47e9ab02f5340c91d003fee019a163de0b970c"
+      },
+      {
+        "migration_name": "20261012045000_seating_headcount_invalidation",
+        "checksum": "03f5d4a59ad0c1eedd78df6d9ec814bf61872f39bba06608af675643fce0e279"
+      }
+    ],
+    "openApiSha256": "61f5ad9e7857b85f48fc45ba8c3b20490f67017c3b535117a76e4c40a4ad0a2c",
+    "health": {
+      "live": 200,
+      "ready": 200
+    },
+    "tls": [
+      {
+        "ssl": true,
+        "version": "TLSv1.3"
+      }
+    ],
+    "http": [
+      {
+        "route": "/notifications/preferences",
+        "method": "GET",
+        "status": 200,
+        "privateCache": "no-store",
+        "referrer": "no-referrer"
+      },
+      {
+        "route": "/notifications/preferences",
+        "method": "PATCH",
+        "status": 200,
+        "privateCache": "no-store",
+        "referrer": "no-referrer"
+      },
+      {
+        "route": "/notifications/inbox",
+        "method": "GET",
+        "status": 200,
+        "privateCache": "no-store",
+        "referrer": "no-referrer"
+      },
+      {
+        "route": "/notifications/unread-count",
+        "method": "GET",
+        "status": 200,
+        "privateCache": "no-store",
+        "referrer": "no-referrer"
+      },
+      {
+        "route": "/notifications/android-installations",
+        "method": "GET",
+        "status": 200,
+        "privateCache": "no-store",
+        "referrer": "no-referrer"
+      },
+      {
+        "route": "/management/notifications/recipient",
+        "method": "GET",
+        "status": 200,
+        "privateCache": "no-store",
+        "referrer": "no-referrer"
+      },
+      {
+        "route": "/management/notifications",
+        "method": "GET",
+        "status": 200,
+        "privateCache": "no-store",
+        "referrer": "no-referrer"
+      },
+      {
+        "route": "/notifications/inbox",
+        "method": "GET",
+        "status": 401,
+        "privateCache": "no-store",
+        "referrer": "no-referrer"
+      },
+      {
+        "route": "/notifications/preferences",
+        "method": "PATCH",
+        "status": 422,
+        "privateCache": "no-store",
+        "referrer": "no-referrer"
+      }
+    ],
+    "operatorFixtureRetired": true,
+    "automaticWorker": {
+      "deploymentId": "f2b25205-2f40-4b80-999d-3115e039f1c1",
+      "checkedAt": "2026-10-12T15:27:08.953Z",
+      "workerCompleted": true,
+      "workerFailures": 0,
+      "facts": [
+        {
+          "event": "notification_worker_completed",
+          "timestamp": "2026-10-12T15:23:38.700Z",
+          "module": "notifications-automation",
+          "entryPoint": "scheduler",
+          "consumed": 0,
+          "claimed": 0
+        },
+        {
+          "event": "notification_worker_completed",
+          "timestamp": "2026-10-12T15:24:40.355Z",
+          "module": "notifications-automation",
+          "entryPoint": "scheduler",
+          "consumed": 0,
+          "claimed": 0
+        },
+        {
+          "event": "notification_worker_completed",
+          "timestamp": "2026-10-12T15:25:40.586Z",
+          "module": "notifications-automation",
+          "entryPoint": "scheduler",
+          "consumed": 0,
+          "claimed": 0
+        },
+        {
+          "event": "notification_worker_completed",
+          "timestamp": "2026-10-12T15:26:39.680Z",
+          "module": "notifications-automation",
+          "entryPoint": "scheduler",
+          "consumed": 0,
+          "claimed": 0
+        }
+      ]
+    }
+  },
+  "provider": {
+    "email": {
+      "provider": "brevo",
+      "mode": "live verification transport",
+      "recipientExplicitlyAuthorized": true,
+      "intentId": "289e371c-5a97-4a50-90e6-68e335aca436",
+      "outcome": "DELIVERED",
+      "providerMessageIdSha256": "5c88f1fcd176fcec3f8073b94bafc61f206f1bc84d795468cf381d0c85ef7be2",
+      "attempts": [
+        {
+          "outcome": "ACCEPTED",
+          "at": "2026-10-12T15:07:04.590Z"
+        },
+        {
+          "outcome": "CLAIMED",
+          "at": "2026-10-12T15:07:04.590Z"
+        },
+        {
+          "outcome": "DELIVERED",
+          "at": "2026-10-12T15:11:09.204Z"
+        }
+      ],
+      "credentialPurged": true,
+      "acceptedMessages": 1
+    },
+    "androidPush": {
+      "enabled": false,
+      "deviceDeliveryProven": false
+    },
+    "guestFrontend": {
+      "fragmentConsumerImplemented": false,
+      "owner": "frontend team"
+    }
+  },
+  "rehearsal": {
+    "schema": "ntf_rv16_edd0b9f9cfb4493195b69841b00a900f",
+    "deploymentId": "eef9eb10-69b7-4b3f-a31e-85f1695c703c",
+    "notificationCompiledHashes": [
+      {
+        "file": "dist/modules/notifications-automation/application/notification-scheduler.js",
+        "sha256": "c538296355572e9f54373567834a892acf0c1dae5d49d664d7a00e650fc94298",
+        "localSha256": "c538296355572e9f54373567834a892acf0c1dae5d49d664d7a00e650fc94298"
+      },
+      {
+        "file": "dist/modules/notifications-automation/notifications.runtime.js",
+        "sha256": "d871e2b25a304bb9f23958c316e5c2622e726d0168e8175c445489da7facbfee",
+        "localSha256": "d871e2b25a304bb9f23958c316e5c2622e726d0168e8175c445489da7facbfee"
+      },
+      {
+        "file": "dist/modules/notifications-automation/application/notification-worker.js",
+        "sha256": "e26faffc5e133635f978263a21aaef356b78a282ab86798177db4d11dcb97c96",
+        "localSha256": "e26faffc5e133635f978263a21aaef356b78a282ab86798177db4d11dcb97c96"
+      },
+      {
+        "file": "dist/modules/notifications-automation/infrastructure/email-delivery.js",
+        "sha256": "fa2f91b5c8058fbfc4207cc741e91caf64c97fd4019996df894ffd73e30ceff9",
+        "localSha256": "fa2f91b5c8058fbfc4207cc741e91caf64c97fd4019996df894ffd73e30ceff9"
+      }
+    ],
+    "startedAt": "2026-10-12T15:07:04.590Z",
+    "finishedAt": "2026-10-12T15:11:58.855Z",
+    "fixtureMode": "isolated canonical owner records; synthetic settlement, no financial provider claim",
+    "clock": "controlled process-only clock",
+    "retry": {
+      "intentId": "b590385d-cfe8-4ead-a756-21ce515bbd7c",
+      "attemptCount": 2,
+      "controlledFault": "RETRYABLE_FAILED then native IN_APP delivery"
+    },
+    "orphan": {
+      "intentId": "e377591d-238a-4762-b61c-b596f234aa3e",
+      "state": "UNKNOWN",
+      "resend": false
+    },
+    "completion": {
+      "commandId": "fb035f9c-d429-5321-83f4-8ae48bdedb8e",
+      "state": "DONE",
+      "phase": "COMPLETED",
+      "eventCount": 1,
+      "replay": "REPLAYED"
+    },
+    "reminderIds": [
+      "2a6a80b4-2185-4a9a-a01d-5862c79d4177",
+      "352696f3-43f3-47b7-a17a-dc389e42dd95",
+      "b8db5f0c-c638-4c0b-8544-8aaa6ab02b48",
+      "d6381ed4-616f-49f6-b8a7-b1b03d1f72ad"
+    ],
+    "recovery": {
+      "at": "2026-10-12T15:11:03.640Z",
+      "cause": "Controlled rehearsal clock was frozen; resumed from existing accepted intent with advancing clock",
+      "emailResent": false
+    },
+    "stages": [
+      "real timer start; actual SMTP acceptance -> provider delivery report",
+      "D-3 and media cutoff via real owner adapters, no HTTP/UI poll",
+      "stop and restart; +12h owner completion and replay without duplicate money/outbox"
+    ],
+    "metricSnapshotSha256": {
+      "beforeRestart": "980f864fd298e76b3ee3e02ff67ebb521b040c2f09f57aca8313d6f276a4145a",
+      "afterRestart": "ef28b69401c7627c85bc3e4d18f5e6aeb345ffc4b406f5364bd0a29e32782c03"
+    }
+  },
+  "gmw5": {
+    "nativeOwners": true,
+    "noNamedGuestsGroupSeating": true,
+    "actualPdfGenerated": true,
+    "pdfHistoryUnchanged": true,
+    "zeroIncidentalExpenseFinalInvoice": true,
+    "importArchivePreservePlanning": true,
+    "explicitCountInvalidatesSeatingAndNewPrint": true,
+    "notificationConsumerAndDispatcher": true
+  },
+  "cleanup": {
+    "schema": "ntf_rv16_edd0b9f9cfb4493195b69841b00a900f",
+    "sessionsRevoked": 2,
+    "credentialsRevoked": 1,
+    "activeSessions": 0,
+    "activeCredentials": 0,
+    "states": [
+      {
+        "id": "e377591d-238a-4762-b61c-b596f234aa3e",
+        "state": "UNKNOWN",
+        "attemptCount": 1
+      },
+      {
+        "id": "b590385d-cfe8-4ead-a756-21ce515bbd7c",
+        "state": "DELIVERED",
+        "attemptCount": 2
+      }
+    ],
+    "completed": 1,
+    "emailAccepted": 1,
+    "checkedAt": "2026-10-12T15:26:45.424Z",
+    "taskKeyRevoked": true,
+    "localKeyRemoved": true
+  },
+  "review": {
+    "axes": [
+      "correctness",
+      "readability",
+      "architecture",
+      "security",
+      "performance"
+    ],
+    "headcountPrintFinding": "fixed with forward-only migration and native regression tests",
+    "humanPeerApproval": "separate before merge"
+  },
+  "notClaimed": [
+    "production readiness",
+    "production-money payment",
+    "synthetic fixture settlement as provider evidence",
+    "Android push delivery",
+    "frontend Guest fragment journey",
+    "RV-21 release checkpoint"
+  ]
+}

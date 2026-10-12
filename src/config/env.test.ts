@@ -143,6 +143,7 @@ describe('parseEnvironment', () => {
         replicaCount: 1,
       },
       identityAccess: {
+        passwordOtpHashKey: undefined,
         trustedProxyHops: 0,
         refreshCookie: {
           name: '__Host-wedding-refresh',
@@ -196,6 +197,15 @@ describe('parseEnvironment', () => {
       vnpay: { enabled: false },
       openApi: { enabledInProduction: false },
       telemetry: { otlpEndpoint: undefined },
+      notifications: {
+        fcm: { enabled: false },
+        workerEnabled: false,
+        credentialKeys: null,
+        activeKeyVersion: null,
+        emailAllowlist: null,
+        bookingAllowlist: null,
+        guestLinkUrl: null,
+      },
     });
   });
 

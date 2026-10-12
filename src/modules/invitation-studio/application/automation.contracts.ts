@@ -19,6 +19,14 @@ export interface ListMediaCutoffsResult {
 }
 
 export interface InvitationAutomationReader {
+  readMediaCutoff(
+    bookingId: string,
+    context: ContractContext,
+  ): Promise<{
+    bookingId: string;
+    cutoffAt: string;
+    policyRevision: number;
+  } | null>;
   listMediaCutoffs(
     input: ListMediaCutoffsInput,
     context: ContractContext,

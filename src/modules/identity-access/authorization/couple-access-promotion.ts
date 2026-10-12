@@ -1,4 +1,5 @@
 import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
+import { randomUUID } from 'node:crypto';
 import { ConflictError, NotFoundError } from '../../../core/errors/app-error.js';
 
 export type PromotionInput = Readonly<{
@@ -111,6 +112,19 @@ async function promoteWithRetry(
             action: 'consultation-access.promoted',
             entityId: access.id,
             metadata: { level: 'FULL' },
+          });
+          await transaction.identityOutbox.create({
+            data: {
+              eventId: randomUUID(),
+              eventType: 'identity.consultation-access-promoted',
+              consultationId: input.consultationId,
+              payload: {
+                consultationId: input.consultationId,
+                accountId: input.accountId,
+                accessId: access.id,
+                sourcePaymentId: input.sourcePaymentId,
+              },
+            },
           });
           return { outcome: 'PROMOTED' as const, accessId: access.id };
         },

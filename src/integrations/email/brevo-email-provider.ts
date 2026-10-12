@@ -6,6 +6,7 @@ import { AppError, ProviderError } from '../../core/errors/app-error.js';
 import { resendFromEmailSchema } from './email.schemas.js';
 import {
   createSentEmail,
+  EmailRequestRejectedError,
   validateSendEmailCommand,
   type EmailProvider,
   type SendEmailCommand,
@@ -80,9 +81,7 @@ export class BrevoEmailProvider implements EmailProvider {
           }),
         });
         if (!response.ok) {
-          throw new ProviderError(
-            response.status === 429 || response.status >= 500 ? 'unavailable' : 'failure',
-          );
+          throw new EmailRequestRejectedError(response.status);
         }
         let body: unknown;
         try {

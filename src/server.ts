@@ -29,6 +29,11 @@ import { createGuestManagementRuntime } from './modules/guest-management/guest-m
 import { createGuestImportBodyParser } from './modules/guest-management/http/guest-import.parser.js';
 import { createBookingLifecycleRuntime } from './modules/booking-lifecycle/booking-lifecycle.runtime.js';
 import { createPaymentsBillingRuntime } from './modules/payments-billing/payments-billing.runtime.js';
+import { createNotificationsRuntime } from './modules/notifications-automation/notifications.runtime.js';
+import {
+  createObservabilityMetrics,
+  type ObservabilityMetrics,
+} from './core/observability/metrics.js';
 
 type ProcessExitCode = NodeJS.Process['exitCode'];
 type ProcessSignal = 'SIGINT' | 'SIGTERM';
@@ -48,6 +53,7 @@ export interface RunningServer {
 }
 
 export interface StartServerOptions {
+  readonly observabilityMetrics?: ObservabilityMetrics;
   readonly corsConfig?: Config['cors'];
   readonly enableOpenApiInProduction?: boolean;
   readonly port: number;
@@ -81,6 +87,9 @@ export async function startServer(options: StartServerOptions): Promise<RunningS
   let lifecycle: HttpLifecycle | undefined;
   try {
     app = (options.createApplication ?? createApp)({
+      ...(options.observabilityMetrics === undefined
+        ? {}
+        : { observabilityMetrics: options.observabilityMetrics }),
       ...(options.corsConfig === undefined ? {} : { corsConfig: options.corsConfig }),
       ...(options.enableOpenApiInProduction === undefined
         ? {}
@@ -303,6 +312,7 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
   });
 
   const tracingResource = getActiveTracingResource();
+  const metrics = createObservabilityMetrics();
   logger.info(
     {
       event: 'runtime_feature_manifest',
@@ -382,7 +392,24 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     ]);
     throw error;
   }
-  return startServer({
+  let notificationsRuntime: Awaited<ReturnType<typeof createNotificationsRuntime>>;
+  try {
+    notificationsRuntime = await createNotificationsRuntime(config, logger, metrics.registry);
+  } catch (error) {
+    await Promise.allSettled([
+      databaseReadiness.resource.close(),
+      guestManagementRuntime.resource.close(),
+      identityRuntime.resource.close(),
+      venueCatalogRuntime.resource.close(),
+      bookingLifecycleRuntime.resource.close(),
+      invitationStudioRuntime.resource.close(),
+      paymentsBillingRuntime.resource.close(),
+    ]);
+    throw error;
+  }
+  const running = await startServer({
+    observabilityMetrics: metrics,
+    ...(config.notifications.workerEnabled ? { shutdownTimeoutMs: 30000 } : {}),
     corsConfig: config.cors,
     enableOpenApiInProduction: config.openApi.enabledInProduction,
     logger,
@@ -393,6 +420,7 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     resources:
       tracingResource === undefined
         ? [
+            notificationsRuntime.resource,
             databaseReadiness.resource,
             guestManagementRuntime.resource,
             identityRuntime.resource,
@@ -402,6 +430,7 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
             paymentsBillingRuntime.resource,
           ]
         : [
+            notificationsRuntime.resource,
             databaseReadiness.resource,
             tracingResource,
             guestManagementRuntime.resource,
@@ -421,11 +450,14 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
       app.use('/api/v1', guestManagementRuntime.router);
       app.use('/api/v1', bookingLifecycleRuntime.router);
       app.use('/api/v1', paymentsBillingRuntime.router);
+      app.use('/api/v1', notificationsRuntime.router);
     },
     runtimeEnvironment: config.runtime.environment,
     securityConfig: config.security,
     trustedProxyHops: config.identityAccess.trustedProxyHops,
   });
+  notificationsRuntime.start();
+  return running;
 }
 
 function reportOperationalError(

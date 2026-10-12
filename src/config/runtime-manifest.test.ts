@@ -3,6 +3,29 @@ import { parseEnvironment } from './env.js';
 import { createRuntimeFeatureManifest } from './runtime-manifest.js';
 
 describe('runtime feature manifest', () => {
+  it('reports configured FCM separately from live proof and never publishes its service credentials', () => {
+    const config = parseEnvironment({ NODE_ENV: 'test' });
+    const manifest = createRuntimeFeatureManifest({
+      ...config,
+      notifications: {
+        ...config.notifications,
+        fcm: {
+          enabled: true,
+          projectId: 'wdp301-wedding',
+          clientEmail: 'private-service@example.invalid',
+          privateKey: 'private-key-sentinel',
+          accountAllowlist: ['private-account'],
+        },
+      },
+    });
+    expect(manifest.features.androidPush).toMatchObject({
+      implementation: 'implemented',
+      configuration: 'configured',
+      mode: 'fcm-http-v1',
+      liveVerification: 'pending',
+    });
+    expect(JSON.stringify(manifest)).not.toMatch(/private-|wdp301-wedding/u);
+  });
   it('labels absent integrations and development fallbacks without claiming verification', () => {
     const manifest = createRuntimeFeatureManifest(parseEnvironment({ NODE_ENV: 'test' }));
     expect(manifest.features.emailDelivery).toMatchObject({
@@ -14,7 +37,15 @@ describe('runtime feature manifest', () => {
     expect(manifest.features.invitationStorage.mode).toBe('unavailable');
     expect(manifest.features.gemini.mode).toBe('disabled');
     expect(manifest.features.vnpay.mode).toBe('disabled');
-    expect(manifest.features.workers.implementation).toBe('downstream-pending');
+    expect(manifest.features.workers).toMatchObject({
+      implementation: 'implemented',
+      configuration: 'unconfigured',
+      liveVerification: 'pending',
+    });
+    expect(manifest.features.androidPush).toMatchObject({
+      mode: 'disabled',
+      liveVerification: 'optional-disabled',
+    });
     expect(manifest.features.printFiles).toMatchObject({
       implementation: 'implemented',
       configuration: 'unconfigured',

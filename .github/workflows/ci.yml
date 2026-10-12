@@ -63,7 +63,8 @@ jobs:
   postgresql-integration:
     name: PostgreSQL migration and integration gates
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # Native owner integration (~5 minutes) plus the full coverage rerun exceed 10.
+    timeout-minutes: 20
     services:
       postgres:
         # Docker's official mirror avoids shared-runner Docker Hub pull limits.

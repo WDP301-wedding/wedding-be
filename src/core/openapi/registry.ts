@@ -6,6 +6,7 @@ import { commercialContractOpenApiPaths } from '../../modules/booking-lifecycle/
 import { commercialAppendixOpenApiPaths } from '../../modules/booking-lifecycle/http/commercial-appendix.openapi.js';
 import { finalInvoiceOpenApiPaths } from '../../modules/payments-billing/http/final-invoice.openapi.js';
 import { guestOpenApiPaths } from '../../modules/guest-management/http/guest.openapi.js';
+import { notificationOpenApiPaths } from '../../modules/notifications-automation/http/notification.openapi.js';
 import { seatingOpenApiPaths } from '../../modules/seating-plan/http/seating.openapi.js';
 import { staffOpenApiPaths } from '../../modules/staff-operations/http/staff.openapi.js';
 import {
@@ -195,6 +196,7 @@ export const openApiRegistry = {
     },
   ],
   paths: {
+    ...notificationOpenApiPaths,
     ...seatingOpenApiPaths,
     ...guestOpenApiPaths,
     ...invitationMediaOpenApiPaths,

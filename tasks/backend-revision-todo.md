@@ -102,12 +102,19 @@ authorized disposable/staging environment and bounded cost; CI remains offline.
   PR #28 remains draft for review. Developer verification is separate from production readiness.
 - [x] RV-14 (legacy and revised invoice-linked sandbox BALANCE)
 - [x] RV-15 (native multi-actor journey; authorized isolated future-event invoice clock)
-- [ ] RV-16
+- [x] RV-16
 - [x] RV-17 (owner-approved two-sided A5 PDF contract)
 - [x] RV-18 (deployed immutable PDF, retained images/QR and unchanged billing)
 - [x] RV-19 (native SPEC-07 registry/print integration and inspected PDF/QR; deployment separate)
 - [x] RV-20 (target request/error/audit correlation; metrics/OTLP optional disabled)
 - [ ] RV-21
+
+2026-10-12 SPEC-09 → RV-16 → GM-W5 backend checkpoint: NTF-W1–W5, RV-16 and
+GM-W5 are complete. [CI, native/runtime/provider and history evidence](evidence/notifications-rv16-gmw5-2026-10-12.md)
+and [source/API/provider manifest](evidence/notifications-provider-manifest-2026-10-12.json).
+This makes **20/21 RV tasks complete**; RV-21 remains separate. Android push and
+frontend Guest fragment consumption remain downstream dependencies. Earlier
+checkpoints below retain their historical pending status.
 
 2026-10-12 evidence reconciliation: RV-04/05/07 had completed receipts in ignored
 local files but no published evidence/todo ticks. [Recovered sanitized bundle and
@@ -286,7 +293,7 @@ GM-W1–GM-W4 evidence: [backend acceptance](./evidence/guest-management-w1-w4-2
 [frontend hand-off](../docs/guest-management-w1-w4.md). Local native tests and exact-source
 Linux CI pass; live providers/deployment and the downstream GM-W5 gate remain separate.
 
-- [ ] GM-W5: Verify no-list -> Group seating/printing/event/invoice path and explicit-count -> Seating/print invalidation with real owners; import/archive do not change planning; migrations/concurrency/history proof; automatic personalized sending needs explicit recipient and real Notifications adapter.
+- [x] GM-W5: Verify no-list -> Group seating/printing/event/invoice path and explicit-count -> Seating/print invalidation with real owners; import/archive do not change planning; migrations/concurrency/history proof; automatic personalized sending needs explicit recipient and real Notifications adapter.
 
 ### SPEC-07–11 — Backend Only
 
@@ -316,11 +323,21 @@ The owner confirmed named-Guest-only check-in on 2026-10-12 and deferred compani
 quantities to separate requirements. Real Staff/Guest/Seating owner integration now
 has exact-source Linux/PostgreSQL evidence: 1722 tests pass, per-file coverage bar
 unchanged. Production/live external providers and SPEC-09/10 consumers remain separate.
-- [ ] NTF-W1: Durable intents/recipient/device/channel registry and migration proof.
-- [ ] NTF-W2: Optional explicit-recipient Guest credential delivery, encryption and safe template/provider handling; absent names/contacts do not block generic invitation or other wedding notifications.
-- [ ] NTF-W3: Contract/appendix/payment/invoice/print and guest-plan handlers; no response events/deadline jobs.
-- [ ] NTF-W4: Due scheduler/reconciliation, media/D-3/completion jobs, retry/unknown/dedup proof.
-- [ ] NTF-W5: Settings/inbox/operations HTTP, outbox/provider integration evidence and frontend hand-off.
+- [x] NTF-W1: Durable intents/recipient/device/channel registry and migration proof.
+- [x] NTF-W2: Optional explicit-recipient Guest credential delivery, encryption and safe template/provider handling; absent names/contacts do not block generic invitation or other wedding notifications.
+- [x] NTF-W3: Contract/appendix/payment/invoice/print and guest-plan handlers; no response events/deadline jobs.
+- [x] NTF-W4: Due scheduler/reconciliation, media/D-3/completion jobs, retry/unknown/dedup proof.
+- [x] NTF-W5: Settings/inbox/operations HTTP, outbox/provider integration evidence and frontend hand-off.
+
+Android FCM extension selected by the owner on 2026-10-13; separate from the
+historical email acceptance above. [Configuration and client/backend hand-off](../docs/android-fcm-backend.md).
+
+- [x] NTF-FCM-W1: Direct FCM HTTP v1 adapter, secret-safe config and offline provider error tests.
+- [x] NTF-FCM-W2: Real event/due-job Android intents, FULL/Manager scope and device-specific durable retry/dedup.
+- [x] NTF-FCM-W3: Revocation/preferences/refresh/unknown recovery, persisted Retry-After, additive migration/RLS/OpenAPI and offline quality gates. [Final-source CI evidence](evidence/android-fcm-backend-2026-10-13.md).
+- [ ] NTF-FCM-W4: Configure service account for `wdp301-wedding`, migrate/deploy and record authorized Railway worker -> FCM acceptance evidence. Configuration, exact-source deployment, migrations, OAuth, IAM sending permission and recurring worker are verified in the [runtime checkpoint](evidence/android-fcm-backend-2026-10-13.md#authorized-runtime-checkpoint); actual message acceptance awaits an authorized native Android test registration/token. FCM remains disabled.
+- [x] NTF-FCM-W5: Publish backend API/configuration/provider-mode and recovery hand-off; attach Android receipt/display/navigation as a separately owned client dependency, never a backend test gate.
+
 - [ ] ANL-W1: Source formulas include agreed services/appendices/expenses/final invoices; separate explicit planning, optional named-list count and nullable mode-aware check-ins; no response metrics, disabled zeros or partial-list whole-event turnout rates.
 - [ ] ANL-W2: Projection/checkpoint/rebuild with monotonic source ordering.
 - [ ] ANL-W3: Authorized analytics HTTP/OpenAPI and bounded query/freshness proof.
