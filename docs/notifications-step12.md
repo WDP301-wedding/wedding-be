@@ -20,7 +20,11 @@ never financial settlement, approval, attendance or planning authority.
 Existing synchronous Identity credential email remains in use. Android APIs are
 implemented; the owner-selected [FCM backend extension](android-fcm-backend.md)
 adds provider delivery behind explicit configuration. Live FCM acceptance and
-Android device receipt remain pending their own evidence. No Guest
+Android device receipt remain pending their own evidence. The FCM extension is
+deployed on the developer test target with verified migrations, credential, OAuth
+and sending permission; sending remains disabled pending an Android test token.
+See the [FCM runtime checkpoint](../tasks/evidence/android-fcm-backend-2026-10-13.md#authorized-runtime-checkpoint).
+No Guest
 response routes, statuses, deadlines or jobs are added. Generic sharing, planning,
 seating, print and billing need no named Guest list or email destination.
 

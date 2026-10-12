@@ -335,7 +335,7 @@ historical email acceptance above. [Configuration and client/backend hand-off](.
 - [x] NTF-FCM-W1: Direct FCM HTTP v1 adapter, secret-safe config and offline provider error tests.
 - [x] NTF-FCM-W2: Real event/due-job Android intents, FULL/Manager scope and device-specific durable retry/dedup.
 - [x] NTF-FCM-W3: Revocation/preferences/refresh/unknown recovery, persisted Retry-After, additive migration/RLS/OpenAPI and offline quality gates. [Final-source CI evidence](evidence/android-fcm-backend-2026-10-13.md).
-- [ ] NTF-FCM-W4: Configure service account for `wdp301-wedding`, migrate/deploy and record authorized Railway worker -> FCM acceptance evidence.
+- [ ] NTF-FCM-W4: Configure service account for `wdp301-wedding`, migrate/deploy and record authorized Railway worker -> FCM acceptance evidence. Configuration, exact-source deployment, migrations, OAuth, IAM sending permission and recurring worker are verified in the [runtime checkpoint](evidence/android-fcm-backend-2026-10-13.md#authorized-runtime-checkpoint); actual message acceptance awaits an authorized native Android test registration/token. FCM remains disabled.
 - [x] NTF-FCM-W5: Publish backend API/configuration/provider-mode and recovery hand-off; attach Android receipt/display/navigation as a separately owned client dependency, never a backend test gate.
 
 - [ ] ANL-W1: Source formulas include agreed services/appendices/expenses/final invoices; separate explicit planning, optional named-list count and nullable mode-aware check-ins; no response metrics, disabled zeros or partial-list whole-event turnout rates.

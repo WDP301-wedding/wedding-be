@@ -1,9 +1,13 @@
 # Android push through FCM HTTP v1
 
 Owner selected direct FCM on 2026-10-13. Firebase project: `wdp301-wedding`;
-project number: `809672585844`. The owner confirmed that Railway does not yet have
-a service account configured. This document describes the additive backend
-extension to SPEC-09, not a completed live-provider or Android-client acceptance.
+project number: `809672585844`. The owner subsequently configured the service
+account and authorized deployment. On 2026-10-13 the Railway/Supabase developer
+test target was deployed and verified; Firebase OAuth and sending permission
+passed. FCM remains disabled because no Android test registration/token exists.
+[Runtime evidence](../tasks/evidence/android-fcm-backend-2026-10-13.md#authorized-runtime-checkpoint).
+This extension has not yet demonstrated actual worker-to-FCM acceptance or
+Android receipt/display.
 
 ## Prepare Firebase and Railway
 
@@ -128,8 +132,14 @@ console's test-send alone does not prove backend worker integration.
 Keep separate labels for **offline implementation verified**, **FCM acceptance
 verified**, and **Android receipt/display/navigation verified**. Backend provider
 acceptance may be recorded before client presentation testing, but neither is
-automatically production readiness. No live FCM claim is made while credentials
-and the authorized test registration are absent.
+automatically production readiness. The deployed credential/authentication check
+used `validate_only: true` with an explicitly synthetic invalid token; it sent no
+device notification and does not prove worker-to-provider message acceptance.
+The next backend rehearsal needs an authorized test account with a current Android
+session and native FCM token registered through the endpoint above. Then restrict
+the account/booking allowlists, explicitly enable FCM, trigger one permitted native
+informational event and capture the durable attempt plus FCM message ID. Disable
+FCM after rehearsal unless continued sending is explicitly authorized.
 
 Official references:
 [FCM HTTP v1 authentication and sending](https://firebase.google.com/docs/cloud-messaging/send/v1-api),
