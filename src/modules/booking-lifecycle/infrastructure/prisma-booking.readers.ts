@@ -21,6 +21,7 @@ export function createPrismaBookingReaders(
   boundary: PrismaBookingBoundary,
   access: ConsultationAccessReader,
   billing: DepositSettlementReader,
+  options: { allowCompleted?: boolean } = {},
 ): { booking: BookingMediaPrerequisiteReader; timeline: BookingTimelineSnapshotReader } {
   async function readBooking(bookingId: string) {
     bookingId = z.uuid().parse(bookingId).toLowerCase();
@@ -49,7 +50,11 @@ export function createPrismaBookingReaders(
     },
     async requireConfirmedEventContext(bookingId) {
       const row = await readBooking(bookingId);
-      if (row.phase !== 'CONFIRMED' || row.effectiveTimelineRevisionId === null)
+      if (
+        (row.phase !== 'CONFIRMED' &&
+          !(options.allowCompleted === true && row.phase === 'COMPLETED')) ||
+        row.effectiveTimelineRevisionId === null
+      )
         throw new NotFoundError();
       await billing.requireDepositSettlement(row.id);
       return {

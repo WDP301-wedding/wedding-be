@@ -1,0 +1,63 @@
+{
+  "module": "staff-operations",
+  "providerVersion": "1.0.0",
+  "date": "2026-10-12",
+  "timezone": "Asia/Saigon",
+  "baseline": "WEDDING-CONTRACT-3@3.0.0",
+  "branch": "codex/spec08-staff-operations",
+  "scope": "backend named-Guest operations",
+  "implementation": "IMPLEMENTED",
+  "verification": "BACKEND_ACCEPTED_LOCAL_OWNERS_AND_EXACT_SOURCE_LINUX_CI",
+  "sourceCommit": "623001b42a3347eaeb5edb0c08ea1f4a693eab72",
+  "openApiSha256": "8be62bc16348dbe60fed7c8482384beb8ba16bd9cf9d02f85a1995dd13b00f2b",
+  "pullRequest": "https://github.com/WDP301-wedding/wedding-be/pull/36",
+  "ci": {
+    "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38204285681",
+    "status": "success",
+    "postgresqlMajor": 17,
+    "migrations": 47,
+    "testFiles": 233,
+    "testsPassed": 1722,
+    "integrationTestsPassed": 431,
+    "contractTestsPassed": 41,
+    "coverageLinesPercent": 97.42,
+    "coverageBranchesPercent": 93.32,
+    "perFileLineBranchThresholdPercent": 80
+  },
+  "database": {
+    "provider": "PostgreSQL 18 local",
+    "target": "127.0.0.1:55435; isolated random test databases",
+    "migration": "20261012030000_staff_operations",
+    "rehearsals": ["all migrations from empty", "populated Booking/Guest upgrade"],
+    "sharedDatabaseMigration": "NOT_PERFORMED"
+  },
+  "runtime": {
+    "factory": "createStaffSeatingServices",
+    "mount": "createInvitationStudioRuntime -> startFromConfig",
+    "sharedBookingBoundary": true,
+    "providerPorts": [
+      "Identity StaffAccountProvisioner",
+      "Booking completed-aware Staff event reader",
+      "Guest operations/reference/count/Group readers",
+      "SeatingGuidanceReader",
+      "AttendanceReaders.getGuestCheckIn",
+      "AttendanceReaders.getBookingAttendance",
+      "AttendanceReaders.readPage"
+    ],
+    "defaultMode": "NONE",
+    "disabledMeasurement": "NOT_RECORDED/null",
+    "enabledMeasurement": "LISTED_GUESTS_ONLY",
+    "eventNamesV1": ["attendance.guest-checked-in", "attendance.guest-check-in-undone"]
+  },
+  "limitations": {
+    "companionQuantityRules": "Owner confirmed 2026-10-12: named-only check-in now; companion quantities deferred; accompanying people permitted",
+    "wholeEventAttendance": "NOT_MEASURED",
+    "notificationsDispatcher": "SPEC-09-pending",
+    "analyticsConsumer": "SPEC-10-pending",
+    "credentialSetupMail": "Identity password-OTP path; live delivery evidence is separate",
+    "externalProviderCalls": "No email/payment/generation/storage APIs. Initial broad core tests accidentally used shared DB for synthetic AuditLog/IdempotencyRecord fixtures with scoped cleanup; final runner isolates all DB selectors locally.",
+    "paidGenerationOrRealMoney": "NONE",
+    "productionDeployment": "NOT_PERFORMED",
+    "frontend": "TEAM_OWNED; not changed or tested"
+  }
+}

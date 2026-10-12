@@ -302,11 +302,20 @@ is an assignment-owner facade contract; real SPEC-08 check-in/assignment and SPE
 notification delivery remain separate. No frontend, shared/provider operation or
 production deployment was performed for this checkpoint.
 
-- [ ] STF-W1: Staff provisioning/assignments plus NONE/BY_GUEST_NAME configuration; owning FULL Couple/Manager explicit enable requires active names; adding/importing names never enables; after first record mode cannot hide history.
-- [ ] STF-W2: Named Guest append-only CHECK_IN/UNDO journal; effective count 0/1 per Guest; real duplicate/replay/undo/archive/revocation/mode concurrency tests; settle companion recording separately before dependent implementation, without prohibiting accompanying people.
-- [ ] STF-W3: Named Guest search/Group guidance and mode-aware reporting providers; NONE -> null/not recorded, enabled -> listed-guests-only counts with retained Group history; no whole-event attendance inference.
-- [ ] STF-W4: Strict mode/Guest check-in/undo HTTP/OpenAPI, assigned-scope/disabled-mode denials and privacy/retry proof; no Household identities; companion payload/correction rules follow the narrow confirmed clarification, not an inferred ban.
-- [ ] STF-W5: Backend acceptance evidence and frontend hand-off.
+- [x] STF-W1: Staff provisioning/assignments plus NONE/BY_GUEST_NAME configuration; owning FULL Couple/Manager explicit enable requires active names; adding/importing names never enables; after first record mode cannot hide history.
+- [x] STF-W2: Named Guest append-only CHECK_IN/UNDO journal; effective count 0/1 per Guest; real duplicate/replay/undo/archive/revocation/mode concurrency tests; settle companion recording separately before dependent implementation, without prohibiting accompanying people.
+- [x] STF-W3: Named Guest search/Group guidance and mode-aware reporting providers; NONE -> null/not recorded, enabled -> listed-guests-only counts with retained Group history; no whole-event attendance inference.
+- [x] STF-W4: Strict mode/Guest check-in/undo HTTP/OpenAPI, assigned-scope/disabled-mode denials and privacy/retry proof; no Household identities; companion payload/correction rules follow the narrow confirmed clarification, not an inferred ban.
+- [x] STF-W5: Backend acceptance evidence and frontend hand-off.
+
+STF-W1–W5: [backend evidence](evidence/staff-operations-w1-w5-2026-10-12.md),
+[provider manifest](evidence/staff-operations-provider-manifest-2026-10-12.json),
+[strict API hand-off](../docs/staff-operations-w1-w5.md), and
+[PR #36](https://github.com/WDP301-wedding/wedding-be/pull/36).
+The owner confirmed named-Guest-only check-in on 2026-10-12 and deferred companion
+quantities to separate requirements. Real Staff/Guest/Seating owner integration now
+has exact-source Linux/PostgreSQL evidence: 1722 tests pass, per-file coverage bar
+unchanged. Production/live external providers and SPEC-09/10 consumers remain separate.
 - [ ] NTF-W1: Durable intents/recipient/device/channel registry and migration proof.
 - [ ] NTF-W2: Optional explicit-recipient Guest credential delivery, encryption and safe template/provider handling; absent names/contacts do not block generic invitation or other wedding notifications.
 - [ ] NTF-W3: Contract/appendix/payment/invoice/print and guest-plan handlers; no response events/deadline jobs.

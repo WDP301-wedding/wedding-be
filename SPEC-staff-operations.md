@@ -6,7 +6,7 @@
 > not establish implementation or live readiness.
 
 - Module ID: `staff-operations` (`SPEC-08`).
-- Business amendment confirmed: 2026-10-10; implementation pending.
+- Business amendment confirmed: 2026-10-10; backend implemented and accepted on 2026-10-12.
 - Baseline: `WEDDING-CONTRACT-3@3.0.0`; previous 1.x/2.0 scope retained as history.
 - Original specification approved 2026-10-06 (baseline Section 21.9).
 - Requirements: CHK-001 through CHK-008.
@@ -23,6 +23,10 @@ below describe named Guest state only, not a final all-person arrival contract.
 Resolve companion-dependent fields/counts before implementing them. Guest owns
 Group/name/list facts and independent planning totals; Staff does not edit them.
 No attendance fact changes contract, deposit, invoice or planning quantities.
+
+On 2026-10-12 the owner explicitly chose named-Guest check-in only for this
+implementation; companion quantity requirements are deferred to a separate revision.
+This resolves the execution scope without prohibiting accompanying people.
 
 ## 2. Per-Booking Mode
 
@@ -159,3 +163,14 @@ journal; STF-W3 Guest/Seating/reporting ports; STF-W4 strict HTTP/runtime/OpenAP
 STF-W5 real-provider/migration/concurrency evidence and frontend hand-off.
 Use the [active backlog](./tasks/backend-revision-todo.md); do not reopen historical
 Household acceptance or claim proposed endpoints are already deployed.
+
+## 8. Backend implementation checkpoint — 2026-10-12
+
+STF-W1–W5 are complete for the confirmed named-Guest-only scope. The actual twelve
+private operations, schemas, errors, roles and provider ports are documented in the
+[hand-off](./docs/staff-operations-w1-w5.md); Section 6 remains the historical proposal.
+[Acceptance evidence](./tasks/evidence/staff-operations-w1-w5-2026-10-12.md) records
+the additive migration, real owner concurrency/rollback proof, OpenAPI digest and
+exact-source Linux/PostgreSQL CI with 1722 passing tests and the unchanged per-file
+80% coverage bar. This is backend evidence, not production deployment, live business
+provider operation or completion of downstream Notifications/Analytics.

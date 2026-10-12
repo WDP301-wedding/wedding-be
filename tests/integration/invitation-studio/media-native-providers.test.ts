@@ -119,15 +119,18 @@ describeDatabase('W1 native owner readers/shared transaction, controlled Storage
     const factory = vi
       .spyOn(storageModule, 'createSupabaseStorageProvider')
       .mockReturnValue(sdk.provider);
-    const runtime = await createInvitationStudioRuntime({
-      ...parseEnvironment({ NODE_ENV: 'test', DATABASE_URL: url.toString() }),
-      storage: {
-        enabled: true,
-        supabaseUrl: 'https://storage.example.test',
-        serviceRoleKey: 'fixture-key',
-        bucket: 'private-media',
+    const runtime = await createInvitationStudioRuntime(
+      {
+        ...parseEnvironment({ NODE_ENV: 'test', DATABASE_URL: url.toString() }),
+        storage: {
+          enabled: true,
+          supabaseUrl: 'https://storage.example.test',
+          serviceRoleKey: 'fixture-key',
+          bucket: 'private-media',
+        },
       },
-    });
+      () => now,
+    );
     const server = await startServer({
       port: 0,
       host: '127.0.0.1',
@@ -174,6 +177,7 @@ describeDatabase('W1 native owner readers/shared transaction, controlled Storage
     url.searchParams.delete('options');
     const runtime = await createInvitationStudioRuntime(
       parseEnvironment({ NODE_ENV: 'test', DATABASE_URL: url.toString() }),
+      () => now,
     );
     const server = await startServer({
       port: 0,

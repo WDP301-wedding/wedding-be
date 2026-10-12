@@ -211,5 +211,7 @@ databaseDescribe('SPEC-05 upgrade from accepted Booking ownership', () => {
     } finally {
       await database.disconnect();
     }
-  });
+    // This rehearsal applies the complete additive migration chain and seeds a
+    // populated legacy catalog; use the same bounded budget as migration hooks.
+  }, 60000);
 });

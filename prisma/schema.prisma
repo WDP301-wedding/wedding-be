@@ -8,6 +8,91 @@ datasource db {
   provider = "postgresql"
 }
 
+model StaffConfiguration {
+  bookingId String @id @db.Uuid
+  checkInMode String @default("NONE")
+  revision Int @default(1)
+  ledgerRevision Int @default(0)
+  reportSequence Int @default(0)
+}
+
+model StaffAssignment {
+  id String @id @default(uuid()) @db.Uuid
+  bookingId String @db.Uuid
+  staffAccountId String @db.Uuid
+  status String @default("ACTIVE")
+  revision Int @default(1)
+  @@unique([bookingId, staffAccountId])
+  @@index([staffAccountId, status])
+}
+
+model StaffHistory {
+  id String @id @default(uuid()) @db.Uuid
+  bookingId String @db.Uuid
+  entityId String @db.Uuid
+  entityType String
+  revision Int
+  actorAccountId String @db.Uuid
+  requestId String @db.Uuid
+  snapshot Json @db.JsonB
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  @@unique([entityType, entityId, revision])
+}
+
+model StaffCommand {
+  bookingId String @db.Uuid
+  intentDigest String @db.Char(64)
+  commandDigest String @db.Char(64)
+  result Json @db.JsonB
+  @@id([bookingId, intentDigest])
+}
+
+model StaffCheckInRecord {
+  id String @id @default(uuid()) @db.Uuid
+  bookingId String @db.Uuid
+  guestId String @db.Uuid
+  action String
+  ledgerRevision Int
+  checkInRecordId String? @unique @db.Uuid
+  guestGroupId String @db.Uuid
+  groupNameSnapshot String @db.VarChar(80)
+  groupColorSnapshot String @db.Char(7)
+  actorAccountId String @db.Uuid
+  requestId String @db.Uuid
+  reason String? @db.VarChar(500)
+  overrideReason String? @db.VarChar(500)
+  eventTime DateTime @db.Timestamptz(6)
+  recordedAt DateTime @default(now()) @db.Timestamptz(6)
+  @@unique([bookingId, ledgerRevision])
+  @@unique([id, bookingId, guestId])
+  @@index([bookingId, guestId, ledgerRevision])
+}
+
+model StaffAttendanceSnapshot {
+  id String @id @default(uuid()) @db.Uuid
+  bookingId String @db.Uuid
+  sourceSequence Int
+  payload Json @db.JsonB
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  @@unique([bookingId, sourceSequence])
+}
+
+model StaffOutbox {
+  id String @id @default(uuid()) @db.Uuid
+  bookingId String @db.Uuid
+  ledgerRevision Int
+  eventType String
+  payload Json @db.JsonB
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  @@unique([bookingId, ledgerRevision])
+}
+
+model IdentityStaffCommand {
+  intentDigest String @id @db.Char(64)
+  commandDigest String @db.Char(64)
+  result Json @db.JsonB
+}
+
 enum AuditActorType {
   SYSTEM
   USER
