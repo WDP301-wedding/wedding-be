@@ -108,7 +108,7 @@ export function createStudioRouter(
           )
           .set('X-Content-SHA256', file.sha256)
           .set('X-Printable-Content-Digest', file.contentDigest)
-            .set('X-Renderer-Version', file.rendererVersion)
+          .set('X-Renderer-Version', file.rendererVersion)
           .type('application/pdf')
           .send(file.bytes);
       })().catch(next);
