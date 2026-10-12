@@ -11,6 +11,7 @@ export type DeliveryEvidence = Readonly<{
   outcome: 'ACCEPTED' | 'DELIVERED' | 'UNKNOWN' | 'DEAD_LETTER' | 'RETRYABLE_FAILED';
   providerMessageId?: string;
   errorCode?: string;
+  retryNotBefore?: Date;
 }>;
 const report = z.object({
   events: z.array(z.object({ messageId: z.string(), event: z.string() })).max(100),

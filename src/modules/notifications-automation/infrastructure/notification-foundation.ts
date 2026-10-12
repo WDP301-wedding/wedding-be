@@ -26,6 +26,7 @@ const outcomeInput = z.enum([
   'SKIPPED_STALE',
 ]);
 const evidenceInput = z.strictObject({
+  retryNotBefore: z.date().optional(),
   providerMessageId: z
     .string()
     .min(1)
@@ -204,7 +205,12 @@ export class NotificationFoundation {
       }
       if (row.leaseId !== leaseId || !['IN_FLIGHT', 'UNKNOWN'].includes(row.state))
         throw notificationConflict('NOTIFICATION_LEASE_STALE');
-      const next = outcome === 'RETRYABLE_FAILED' ? retryAt(now, row.attemptCount) : undefined;
+      const scheduledRetry =
+        outcome === 'RETRYABLE_FAILED' ? retryAt(now, row.attemptCount) : undefined;
+      const next =
+        scheduledRetry && evidence.retryNotBefore
+          ? new Date(Math.max(scheduledRetry.getTime(), evidence.retryNotBefore.getTime()))
+          : scheduledRetry;
       if (outcome === 'ACCEPTED' && evidence.providerMessageId === undefined)
         throw new ValidationError();
       const state =

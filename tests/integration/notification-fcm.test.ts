@@ -163,6 +163,57 @@ import { notificationChannels } from '../../src/modules/notifications-automation
     expect((await x.dispatch()).state).toBe('PROVIDER_ACCEPTED');
     expect(x.send).toHaveBeenCalledTimes(3);
   }, 30000);
+  it('persists provider backoff across worker recreation and audited requeue', async () => {
+    const x = await fixture(2);
+    const deadline = new Date(x.f.now.getTime() + 1800000);
+    x.send
+      .mockResolvedValueOnce({
+        outcome: 'ACCEPTED',
+        providerMessageId: 'projects/wedding-test/messages/one',
+      })
+      .mockResolvedValueOnce({
+        outcome: 'RETRYABLE_FAILED',
+        errorCode: 'FCM_TEMPORARILY_UNAVAILABLE',
+        retryNotBefore: deadline,
+      });
+    expect(await x.dispatch()).toMatchObject({
+      state: 'RETRYABLE_FAILED',
+      nextAttemptAt: deadline,
+    });
+    x.setClock(new Date(x.f.now.getTime() + 60000));
+    expect(await x.foundation.claimDue()).toEqual([]);
+    // Model operator requeue after retry exhaustion, with the original provider deadline retained.
+    const failed = await db.prisma.notificationIntent.update({
+      where: { id: x.intent.id },
+      data: { state: 'DEAD_LETTER', revision: { increment: 1 } },
+    });
+    await db.prisma.notificationPushDelivery.updateMany({
+      where: { intentId: x.intent.id, state: 'RETRYABLE_FAILED' },
+      data: { state: 'DEAD_LETTER' },
+    });
+    await x.settings.requeue(
+      x.f.manager.accessToken,
+      failed.id,
+      {
+        expectedRevision: failed.revision,
+        reason: 'Provider recovered; retain provider backoff',
+      },
+      randomUUID(),
+    );
+    const row = await x.claim();
+    const evidence = await new AndroidPushDispatcher(x.consumer, { send: x.send }).send(
+      row,
+      x.f.couple.actorId,
+    );
+    const { outcome, ...metadata } = evidence;
+    expect(await x.foundation.recordOutcome(row.id, row.leaseId!, outcome, metadata)).toMatchObject(
+      { state: 'RETRYABLE_FAILED', nextAttemptAt: deadline },
+    );
+    expect(x.send).toHaveBeenCalledTimes(2);
+    x.setClock(deadline);
+    expect((await x.dispatch()).state).toBe('PROVIDER_ACCEPTED');
+    expect(x.send).toHaveBeenCalledTimes(3);
+  }, 30000);
   it('disables typed unregistered tokens and does not overwrite a concurrent refresh', async () => {
     const x = await fixture();
     x.send.mockResolvedValueOnce({ outcome: 'DEAD_LETTER', errorCode: 'FCM_UNREGISTERED' });

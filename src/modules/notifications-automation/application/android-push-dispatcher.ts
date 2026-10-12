@@ -57,6 +57,7 @@ export class AndroidPushDispatcher {
     const template = notificationTemplate(parse(purpose, row.purpose), row.data);
     for (const target of targets) {
       if (!['QUEUED', 'RETRYABLE_FAILED'].includes(target.state)) continue;
+      if (target.retryNotBefore && target.retryNotBefore > now()) continue;
       const lease = await prisma.notificationIntent.findUniqueOrThrow({ where: { id: row.id } });
       if (
         lease.state !== 'IN_FLIGHT' ||
@@ -117,6 +118,7 @@ export class AndroidPushDispatcher {
           state: evidence.outcome,
           providerMessageId: evidence.providerMessageId ?? null,
           errorCode: evidence.errorCode ?? null,
+          retryNotBefore: 'retryNotBefore' in evidence ? (evidence.retryNotBefore ?? null) : null,
           updatedAt: now(),
         },
       });
@@ -124,8 +126,17 @@ export class AndroidPushDispatcher {
     const records = await prisma.notificationPushDelivery.findMany({ where: { intentId: row.id } });
     if (records.some((r) => ['IN_FLIGHT', 'UNKNOWN'].includes(r.state)))
       return { outcome: 'UNKNOWN', errorCode: 'FCM_RESULT_UNKNOWN' };
-    if (records.some((r) => ['QUEUED', 'RETRYABLE_FAILED'].includes(r.state)))
-      return { outcome: 'RETRYABLE_FAILED', errorCode: 'FCM_TEMPORARILY_UNAVAILABLE' };
+    const retrying = records.filter((r) => ['QUEUED', 'RETRYABLE_FAILED'].includes(r.state));
+    if (retrying.length) {
+      const deadlines = retrying.flatMap((r) =>
+        r.retryNotBefore ? [r.retryNotBefore.getTime()] : [],
+      );
+      return {
+        outcome: 'RETRYABLE_FAILED',
+        errorCode: 'FCM_TEMPORARILY_UNAVAILABLE',
+        ...(deadlines.length ? { retryNotBefore: new Date(Math.max(...deadlines)) } : {}),
+      };
+    }
     if (records.some((r) => r.state === 'DEAD_LETTER'))
       return { outcome: 'DEAD_LETTER', errorCode: 'FCM_DEVICE_DELIVERY_FAILED' };
     const accepted = records.find((r) => r.state === 'ACCEPTED');

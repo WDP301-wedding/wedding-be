@@ -61,6 +61,28 @@ describe('FCM HTTP v1 delivery', () => {
       outcome: 'RETRYABLE_FAILED',
     });
   });
+  it.each([
+    ['1200', '2030-01-01T00:20:00.000Z'],
+    ['Tue, 01 Jan 2030 00:30:00 GMT', '2030-01-01T00:30:00.000Z'],
+    ['0', '2030-01-01T00:01:00.000Z'],
+    ['invalid', undefined],
+    ['9'.repeat(400), undefined],
+  ])('retains Retry-After %s without immediate resend', async (header, expected) => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify({ error: {} }), {
+        status: 503,
+        headers: { 'Retry-After': header },
+      }),
+    );
+    const provider = new NotificationFcmDelivery(
+      config,
+      fetcher,
+      auth,
+      () => new Date('2030-01-01T00:00:00Z'),
+    );
+    expect((await provider.send(command)).retryNotBefore?.toISOString()).toBe(expected);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
   it.each([400, 401, 403, 404])(
     'does not disable a device for generic rejection %i',
     async (status) => {

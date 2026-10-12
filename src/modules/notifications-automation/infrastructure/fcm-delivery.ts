@@ -40,6 +40,7 @@ export class NotificationFcmDelivery implements FcmSender {
     readonly config: FcmConfiguration,
     readonly fetcher: typeof fetch = fetch,
     auth?: Auth,
+    readonly now: () => Date = () => new Date(),
   ) {
     this.auth =
       auth ??
@@ -111,7 +112,11 @@ export class NotificationFcmDelivery implements FcmSender {
       if (response.status === 404 && code === 'UNREGISTERED')
         return { outcome: 'DEAD_LETTER', errorCode: 'FCM_UNREGISTERED' };
       if ([429, 500, 503].includes(response.status))
-        return { outcome: 'RETRYABLE_FAILED', errorCode: 'FCM_TEMPORARILY_UNAVAILABLE' };
+        return {
+          outcome: 'RETRYABLE_FAILED',
+          errorCode: 'FCM_TEMPORARILY_UNAVAILABLE',
+          ...retryAfter(response.headers.get('Retry-After'), this.now()),
+        };
       if ([400, 401, 403, 404].includes(response.status))
         return { outcome: 'DEAD_LETTER', errorCode: 'FCM_REQUEST_REJECTED' };
       return { outcome: 'UNKNOWN', errorCode: 'FCM_RESULT_UNKNOWN' };
@@ -119,4 +124,10 @@ export class NotificationFcmDelivery implements FcmSender {
       return { outcome: 'UNKNOWN', errorCode: 'FCM_RESULT_UNKNOWN' };
     }
   }
+}
+function retryAfter(header: string | null, now: Date): { retryNotBefore?: Date } {
+  if (header === null) return {};
+  const value = /^\d+$/u.test(header) ? now.getTime() + Number(header) * 1000 : Date.parse(header);
+  const date = new Date(Math.max(now.getTime() + 60000, value));
+  return Number.isFinite(date.getTime()) ? { retryNotBefore: date } : {};
 }

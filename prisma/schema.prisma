@@ -151,6 +151,7 @@ model NotificationPushDelivery {
   leaseId String? @db.Uuid
   providerMessageId String? @db.VarChar(320)
   errorCode String? @db.VarChar(80)
+  retryNotBefore DateTime? @db.Timestamptz(6)
   updatedAt DateTime @default(now()) @db.Timestamptz(6)
   intent NotificationIntent @relation(fields: [intentId], references: [id], onDelete: Restrict)
   @@id([intentId, installationId])
