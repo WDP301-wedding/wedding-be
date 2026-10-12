@@ -39,6 +39,7 @@ describe('InvitationStudioRuntime', () => {
       expect.any(Object),
       null,
       null,
+      expect.any(Function),
     );
     for (const operation of [
       storage().put({

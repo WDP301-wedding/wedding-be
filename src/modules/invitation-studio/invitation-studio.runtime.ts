@@ -36,6 +36,7 @@ export type InvitationStudioRuntime = Readonly<{
 /** Runtime never substitutes fake Storage or fake confirmed owner facts. */
 export async function createInvitationStudioRuntime(
   config: Config,
+  now: () => Date = () => new Date(),
 ): Promise<InvitationStudioRuntime> {
   const prisma = createPrismaClient(config.database.url);
   try {
@@ -58,11 +59,12 @@ export async function createInvitationStudioRuntime(
       storage,
       ai,
       config.invitationStudio?.publicOrigin ?? null,
+      now,
     );
     const router = Router();
     router.use(createMediaRouter(composition.service, composition.identity.resolver));
     router.use(createStudioRouter(composition, composition.identity.resolver));
-    const { staff, seating } = createStaffSeatingServices(prisma, composition);
+    const { staff, seating } = createStaffSeatingServices(prisma, composition, now);
     router.use(createSeatingRouter(seating.seating, seating.resolver));
     router.use(createStaffRouter(staff));
     const logger = createLogger({ level: 'warn', runtimeEnvironment: config.runtime.environment });
