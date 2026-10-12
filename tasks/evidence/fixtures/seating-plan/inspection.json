@@ -1,0 +1,14 @@
+{
+  "pages": 2,
+  "trimMm": [
+    148,
+    210
+  ],
+  "bleedMm": 3,
+  "embeddedFonts": true,
+  "vietnameseGlyphs": true,
+  "tableLabelsAndGroups": true,
+  "retainedVectorGeometry": true,
+  "qrDecoded": "https://wedding.example.test/api/v1/public/invitations/19163e5fd421688836979c397962dd2e0d44dfeda44b761bb716b018a91616ca/render",
+  "sha256": "58bba95b048d207a012be45bdfaf77c7876e6d7504279cca23f2b0c919a11c45"
+}

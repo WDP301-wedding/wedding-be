@@ -118,10 +118,10 @@ describe('print file integrity failures', () => {
     await expect(f.read()).rejects.toMatchObject({ status: 404 });
     expect(f.originalRead).not.toHaveBeenCalled();
   });
-  it('rejects unsupported seating and too many retained assets', async () => {
+  it('rejects malformed/missing seating and too many retained assets', async () => {
     const f = await fixture();
     f.setContent({ ...f.content, seating: [] });
-    await expect(f.read()).rejects.toMatchObject({ code: 'PRINT_SEATING_NOT_SUPPORTED' });
+    await expect(f.read()).rejects.toMatchObject({ status: 422 });
     f.setContent({
       ...f.content,
       design: {
@@ -130,7 +130,7 @@ describe('print file integrity failures', () => {
         sections: [{ kind: 'SEATING', textKey: null, derivedAssetId: null }],
       },
     });
-    await expect(f.read()).rejects.toMatchObject({ code: 'PRINT_SEATING_NOT_SUPPORTED' });
+    await expect(f.read()).rejects.toMatchObject({ status: 422 });
     f.setContent({
       ...f.content,
       design: {

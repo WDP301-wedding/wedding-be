@@ -1,0 +1,74 @@
+{
+  "date": "2026-10-12",
+  "timezone": "Asia/Saigon",
+  "provider": "seating-plan@1.0.0",
+  "baseline": "WEDDING-CONTRACT-3@3.0.0",
+  "implementationCommit": "b8ec6b1fd752f9a43a87a8cf750ebdde07ed8c9d",
+  "validatedRuntimeCommit": "b8ec6b1fd752f9a43a87a8cf750ebdde07ed8c9d",
+  "ci": {
+    "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38189087856",
+    "result": "PASS",
+    "migrationCount": 46,
+    "integrationTests": 418,
+    "fullSuiteTests": 1706,
+    "branchesPercent": 93.58,
+    "linesPercent": 97.44
+  },
+  "verification": {
+    "configuration": "not-a-readiness-proof",
+    "nativeOwners": "PASS-local-and-CI",
+    "generatedFileInspection": "PASS",
+    "liveExternalProviders": "not-run",
+    "productionDeployment": "not-run",
+    "staffAssignmentIntegration": "SPEC-08-pending",
+    "notificationsDelivery": "SPEC-09-pending"
+  },
+  "runtime": {
+    "node": "v24.15.0",
+    "postgres": "18-local / 17-CI",
+    "unchangedDependencyLockSha256": "b660aa9e1db7a369e36b5ffdccee8b8f86a4665a8f4be3f242ac1d5ff0283a32"
+  },
+  "api": {
+    "path": "openapi/openapi.json",
+    "sha256": "dbf4880f1f92a65ba503d9db0890b857e80e7fff46a6065a5d65ffbaf1ccc430",
+    "privateOperations": 6,
+    "publicSeatingOperations": 0
+  },
+  "migration": {
+    "path": "prisma/migrations/20261012020000_seating_plan/migration.sql",
+    "sha256": "bfcbebce5233c9a8416b875b68b2387581275066900f8ec06e0ede34f945eea6",
+    "kind": "new-forward",
+    "emptyAndPopulatedRehearsals": "PASS"
+  },
+  "print": {
+    "preservedWithoutSeatingVersion": "invitation-a5-v1",
+    "seatingVersion": "invitation-a5-v2-seating",
+    "fixture": "tasks/evidence/fixtures/seating-plan/seating-accepted.pdf",
+    "fixtureSha256": "58bba95b048d207a012be45bdfaf77c7876e6d7504279cca23f2b0c919a11c45",
+    "inspection": "tasks/evidence/fixtures/seating-plan/inspection.json"
+  },
+  "sources": {
+    "src/core/database/booking-boundary.ts": "7272265d7e82aa2703ec90d1c1fbc2dfa4c8c4a87d478f92b104386e0e9f945b",
+    "src/modules/booking-lifecycle/infrastructure/guest-planning.providers.ts": "50e8800ebb946ae4df8768f72b4b84a4046466f8c3c6389c56c2ed58fb9e71d9",
+    "src/modules/booking-lifecycle/infrastructure/prisma-planning-snapshot.reader.ts": "f610c3062c45ec6f7f8b59b3bd5ebab1a8b2bc2c6c098d268f9e0c50864e215c",
+    "src/modules/guest-management/application/guest-readers.ts": "06721424070ec1fbe5ef33d661aa31282aa29513130e6d881ebf04190a8edacf",
+    "src/modules/guest-management/application/guest.service.ts": "bc0d1a51f7e34429b096ad347cc8d3fbbc84e692242386e058cf011ab7dfce8f",
+    "src/modules/guest-management/infrastructure/guest.composition.ts": "928d77c52925b3ba66956946faf54fe8ce177a205455be97535abd412ada98b8",
+    "src/modules/invitation-studio/domain/studio-policy.ts": "b77d49bb6c062ffd57059fb9b6ea7ae4012bacd5f2d77ff95c5e33c5c02d29b7",
+    "src/modules/invitation-studio/http/studio.router.ts": "c5ea04ceaacec49fc63ba33b50b9595081e716f1eae07d2937830914d72eee76",
+    "src/modules/invitation-studio/infrastructure/print-file.renderer.ts": "e86b08ff5c3424313e9be01de3cc390f47385ae1618d6eda4a6e3b5866daed92",
+    "src/modules/invitation-studio/infrastructure/print-file.service.ts": "cae1accd770ec863369988d47faa5a45e3b2c94b5f7a930cc7dd5a5a13514824",
+    "src/modules/invitation-studio/infrastructure/printable.service.ts": "402df230815cd364d4b3986fc8fad583c5a09219b910240dce7f0aee1d346ee3",
+    "src/modules/invitation-studio/infrastructure/seating-print.renderer.ts": "3f6a7569602bab3384b4432a8a871ffb61cacb6fe0a13aa856b87c600404fee5",
+    "src/modules/invitation-studio/invitation-studio.runtime.ts": "c3898273997f47e8128e96c22ed28416f2e10e786060953a90d5c7a2a7b17dd8",
+    "src/modules/seating-plan/application/seating.contracts.ts": "76a6abc90905716d42ed4570c50218c853cb829e654f41ad29a0ba59cff2ac6d",
+    "src/modules/seating-plan/application/seating.service.ts": "392e2ec82d2ecfe17380346f31833394f9383c47e3532eab8eb4d9a918d50169",
+    "src/modules/seating-plan/domain/seating-policy.ts": "84e56f8022298f5d953dbde758d1eb75144b3f82d90c225730a2bae5797ae766",
+    "src/modules/seating-plan/http/seating.openapi.ts": "267e665d5f0dca0dee7b7a1a4aab9ef05d9ee07bf3ecc3305306770c461144f9",
+    "src/modules/seating-plan/http/seating.router.ts": "79c9153b7b1d313f8e14957750f93a73ea448af020f273be4bc1da106ab87f3e",
+    "src/modules/seating-plan/infrastructure/seating-reconciler.ts": "0716b4ebc0b8867d98e978c3d9d2d273fc6d2d1f54c8471745f895e367da6d1a",
+    "src/modules/seating-plan/infrastructure/seating.composition.ts": "057c9b86a9eb81972754c879aca7eaf3188352f94acb43558d593293e1bb1c6a",
+    "src/modules/venue-catalog/application/layout.service.ts": "831604d3847a3eeb3e6e3f66bec8181c6f740a9f23f86ff6ed17a3ac4a64d762",
+    "src/modules/venue-catalog/infrastructure/prisma-selection-eligibility.reader.ts": "2ed2677b765ec52814f2a1526dc3161bccaf7c417d77b5865bbb6a2fe5615219"
+  }
+}

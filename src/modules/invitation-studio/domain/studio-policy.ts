@@ -112,7 +112,7 @@ export const invalidateSeatingSchema = z.strictObject({
   bookingId: id,
   seatingPlanRevisionId: id,
   seatingPlanRevisionNumber: revision,
-  reasonCode: z.enum(['HEADCOUNT_OUTSIDE_LAYOUT_RANGE', 'LAYOUT_RETIRED']),
+  reasonCode: z.enum(['HEADCOUNT_OUTSIDE_LAYOUT_RANGE', 'LAYOUT_RETIRED', 'SEATING_PLAN_REPLACED']),
 });
 export function parseStudio<T extends z.ZodType>(schema: T, value: unknown): z.output<T> {
   const result = schema.safeParse(value);

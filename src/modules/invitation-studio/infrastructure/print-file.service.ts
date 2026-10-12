@@ -45,8 +45,6 @@ export class PrintFileService {
           if (digest(row.content) !== row.contentDigest)
             throw studioConflict('PRINTABLE_DIGEST_CONFLICT');
           const content = parseStudio(printableFileContentSchema, row.content);
-          if (content.seating !== null || content.design.includesSeating)
-            throw studioConflict('PRINT_SEATING_NOT_SUPPORTED');
           if (content.design.derivedAssetIds.length > 8) printLimit('PRINT_ASSET_LIMIT');
           const assets = await tx.invitationDerivedAsset.findMany({
             where: { bookingId, id: { in: content.design.derivedAssetIds } },

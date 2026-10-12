@@ -15,8 +15,9 @@ export function createGuestServices(
   prisma: PrismaClient,
   now: () => Date = () => new Date(),
   staff?: GuestStaffAccessFacade,
+  sharedBoundary?: PrismaBookingBoundary,
 ) {
-  const boundary = new PrismaBookingBoundary(prisma);
+  const boundary = sharedBoundary ?? new PrismaBookingBoundary(prisma);
   const identity = createScopedIdentityReaders(prisma, boundary, now);
   const billing = createPrismaDepositSettlementReader(prisma, boundary);
   const owners = {

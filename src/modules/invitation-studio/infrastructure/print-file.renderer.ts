@@ -12,9 +12,12 @@ import {
   id,
   parseStudio,
   studioConflict,
+  seatingRenderSchema,
 } from '../domain/studio-policy.js';
+import { renderSeating } from './seating-print.renderer.js';
 
 export const PRINT_RENDERER_VERSION = 'invitation-a5-v1';
+export const SEATING_PRINT_RENDERER_VERSION = 'invitation-a5-v2-seating';
 export const PRINT_MAX_IMAGE_BYTES = 16 * 1024 * 1024;
 const MAX_PDF_BYTES = 12 * 1024 * 1024;
 const mm = (n: number) => (n * 72) / 25.4;
@@ -22,17 +25,21 @@ const font = (name: string) =>
   readFileSync(new URL(`../../../../assets/fonts/${name}.ttf`, import.meta.url));
 const regular = font('BeVietnamPro-Regular'),
   bold = font('BeVietnamPro-SemiBold');
-export const printableFileContentSchema = z.strictObject({
-  design: designContentSchema,
-  timeline: approvedTimelineSnapshotSchema,
-  seating: z.unknown().nullable(),
-  genericQrPayload: z
-    .url()
-    .max(512)
-    .refine((value) => /^https?:\/\//u.test(value)),
-  publicInvitationId: id,
-  publishedRevisionId: id,
-});
+export const printableFileContentSchema = z
+  .strictObject({
+    design: designContentSchema,
+    timeline: approvedTimelineSnapshotSchema,
+    seating: z
+      .strictObject({ seatingPlanRevisionId: id, renderSnapshot: seatingRenderSchema })
+      .nullable(),
+    genericQrPayload: z
+      .url()
+      .max(512)
+      .refine((value) => /^https?:\/\//u.test(value)),
+    publicInvitationId: id,
+    publishedRevisionId: id,
+  })
+  .refine((v) => v.design.includesSeating === (v.seating !== null));
 export function printLimit(code: 'PRINT_CONTENT_OVERFLOW' | 'PRINT_ASSET_LIMIT'): never {
   throw new AppError({
     status: 422,
@@ -49,8 +56,8 @@ export async function renderPrintablePdf(input: {
   if (digest(input.content) !== input.contentDigest)
     throw studioConflict('PRINTABLE_DIGEST_CONFLICT');
   const content = parseStudio(printableFileContentSchema, input.content);
-  if (content.seating !== null || content.design.includesSeating)
-    throw studioConflict('PRINT_SEATING_NOT_SUPPORTED');
+  const rendererVersion =
+    content.seating === null ? PRINT_RENDERER_VERSION : SEATING_PRINT_RENDERER_VERSION;
   const ids = content.design.derivedAssetIds;
   if (ids.length > 8 || input.images.size !== ids.length) printLimit('PRINT_ASSET_LIMIT');
   const images: Array<{ bytes: Buffer; width: number; height: number }> = [];
@@ -88,7 +95,7 @@ export async function renderPrintablePdf(input: {
       Title: content.design.title,
       CreationDate: input.createdAt,
       ModDate: input.createdAt,
-      Producer: PRINT_RENDERER_VERSION,
+      Producer: rendererVersion,
     },
   });
   pdf.registerFont('Body', regular).registerFont('Heading', bold);
@@ -141,6 +148,8 @@ export async function renderPrintablePdf(input: {
     text(item.description ?? undefined);
   }
   text(content.design.textFields.footer);
+  if (content.seating !== null)
+    y = renderSeating(pdf, content.seating.renderSnapshot, { left, top: y, width, bottom });
   const qr = QRCode.create(content.genericQrPayload, { errorCorrectionLevel: 'M' });
   const qrSize = mm(30),
     cell = qrSize / (qr.modules.size + 8);
@@ -174,5 +183,5 @@ export async function renderPrintablePdf(input: {
   });
   pdf.end();
   const bytes = await complete;
-  return { bytes, sha256: createHash('sha256').update(bytes).digest('hex') };
+  return { bytes, sha256: createHash('sha256').update(bytes).digest('hex'), rendererVersion };
 }

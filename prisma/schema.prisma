@@ -1958,3 +1958,51 @@ model InvitationReportingSequence {
   owner String @id
   value BigInt @default(0)
 }
+
+model SeatingPlan {
+  bookingId               String @id @db.Uuid
+  id                      String @unique @default(uuid()) @db.Uuid
+  revisionId              String @unique @db.Uuid
+  revisionNumber          Int
+  observedBookingRevision Int
+}
+
+model SeatingPlanRevision {
+  id                      String   @id @default(uuid()) @db.Uuid
+  bookingId               String   @db.Uuid
+  planId                  String   @db.Uuid
+  revisionNumber          Int
+  predecessorRevisionId   String?  @db.Uuid
+  status                  String
+  layoutTemplateVersionId String   @db.Uuid
+  bookingRevision         Int
+  planningHeadcount       Int
+  snapshot                Json     @db.JsonB
+  snapshotDigest          String
+  createdByAccountId      String?  @db.Uuid
+  createdAt               DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([bookingId, revisionNumber])
+  @@unique([id, bookingId])
+}
+
+model SeatingCommand {
+  bookingId     String @db.Uuid
+  intentDigest  String
+  commandDigest String
+  result        Json   @db.JsonB
+
+  @@id([bookingId, intentDigest])
+}
+
+model SeatingOutbox {
+  id             String   @id @default(uuid()) @db.Uuid
+  bookingId      String   @db.Uuid
+  revisionId     String   @db.Uuid
+  revisionNumber Int
+  eventType      String
+  payload        Json     @db.JsonB
+  occurredAt     DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([bookingId, revisionNumber, eventType])
+}
