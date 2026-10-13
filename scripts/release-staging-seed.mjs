@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import fs from 'node:fs';
+import { inspect } from 'node:util';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { z } from 'zod';
 
 // Explicitly approved dedicated resources. Never run against the legacy service.
@@ -39,7 +41,7 @@ async function main() {
     DATABASE_URL: input.localDatabaseUrl,
     MIGRATION_DATABASE_URL: input.localDatabaseUrl,
   });
-  const { createPrismaClient } = await import('../dist/core/database/prisma.js');
+  const { PrismaClient } = await import('../dist/generated/prisma/client.js');
   const { seedVenueCatalog, CATALOG_SEED_IDS: ids } = await import('./catalog-seed.ts');
   const { hashPassword } = await import('../dist/modules/identity-access/crypto/password.js');
   const { config } = await import('../dist/config/config.js');
@@ -50,7 +52,14 @@ async function main() {
     await import('../dist/modules/invitation-studio/infrastructure/studio.composition.js');
   const { createStaffSeatingServices } =
     await import('../dist/modules/staff-operations/infrastructure/staff-seating.composition.js');
-  const p = createPrismaClient();
+  // Operator traffic traverses the public TCP proxy. Bound its multi-write seed
+  // transactions explicitly; runtime owners retain their own existing defaults.
+  const databaseUrl = new URL(input.localDatabaseUrl);
+  databaseUrl.searchParams.set('options', '-c timezone=UTC');
+  const p = new PrismaClient({
+    adapter: new PrismaPg({ connectionString: databaseUrl.toString() }),
+    transactionOptions: { maxWait: 10000, timeout: 120000 },
+  });
   const state = fs.existsSync(stateFile)
     ? JSON.parse(fs.readFileSync(stateFile, 'utf8'))
     : {
@@ -118,7 +127,11 @@ async function main() {
       where: { bookingId },
       orderBy: { id: 'asc' },
     }),
-    payments: await p.payment.findMany({ where: { bookingId }, orderBy: { id: 'asc' } }),
+    payments: await p.billingPaymentAttempt.findMany({
+      where: { bookingId },
+      orderBy: { id: 'asc' },
+    }),
+    ledger: await p.billingLedgerEntry.findMany({ where: { bookingId }, orderBy: { id: 'asc' } }),
   });
   try {
     if (state.completed) {
@@ -248,6 +261,38 @@ async function main() {
       active: true,
       content,
     });
+    // Existing demo layouts begin at 80 people. Create a separate native layout
+    // for this explicit 20-person plan rather than altering any catalog record.
+    const smallLayout = await call('small-layout', '/management/catalog/layout-templates', 'POST', {
+      templateId: key('small-layout/template'),
+      versionId: key('small-layout/version'),
+      hallId: ids.lotusHall,
+      displayOrder: 3,
+      name: 'SPEC-11 Group layout 20',
+      description: 'Sơ đồ riêng cho dữ liệu thử nghiệm SPEC-11',
+      minGuests: 1,
+      maxGuests: 20,
+      tables: [0, 1].map((n) => ({
+        tableId: key('small-layout/table/' + n),
+        label: 'REL-' + (n + 1),
+        shape: 'ROUND',
+        seatCapacity: 10,
+        x: 500 + n * 2000,
+        y: 500,
+        width: 500,
+        height: 500,
+        rotationDegrees: 0,
+        displayOrder: n + 1,
+      })),
+    });
+    await call(
+      'small-layout-publish',
+      '/management/catalog/layout-template-versions/' +
+        key('small-layout/version') +
+        '/publication',
+      'POST',
+      { expectedRevision: smallLayout.revision },
+    );
     const service = await call('service', '/management/services', 'POST', {
       name: 'MC thử SPEC-11',
       description: 'Dịch vụ thử nghiệm',
@@ -294,13 +339,23 @@ async function main() {
         note: 'REL-SEED:' + key(scenario),
       });
       await step(prefix + 'restricted-access', async () => {
-        await p.consultationAccess.create({
-          data: {
-            consultationId: c.consultationId,
-            accountId: state.accounts.couple,
-            level: 'RESTRICTED',
+        const existing = await p.consultationAccess.findUnique({
+          where: {
+            consultationId_accountId: {
+              consultationId: c.consultationId,
+              accountId: state.accounts.couple,
+            },
           },
         });
+        if (existing) assert.equal(existing.level, 'RESTRICTED', 'DEMO_SEED_CONFLICT');
+        else
+          await p.consultationAccess.create({
+            data: {
+              consultationId: c.consultationId,
+              accountId: state.accounts.couple,
+              level: 'RESTRICTED',
+            },
+          });
         return { syntheticInvitationAcceptance: true };
       });
       const b = await call(prefix + 'booking', '/bookings', 'POST', {
@@ -347,7 +402,7 @@ async function main() {
         const eventDate = new Date('2026-01-' + String(index + 1).padStart(2, '0') + 'T00:00:00Z');
         await p.$transaction(async (tx) => {
           assert.equal(await tx.commercialContractRevision.count({ where: { bookingId } }), 0);
-          assert.equal(await tx.payment.count({ where: { bookingId } }), 0);
+          assert.equal(await tx.billingPaymentAttempt.count({ where: { bookingId } }), 0);
           const priorBooking = await tx.booking.findUniqueOrThrow({ where: { id: bookingId } });
           assert.equal(priorBooking.revision, timeline.bookingRevision, 'DEMO_SEED_CONFLICT');
           assert.equal(
@@ -436,7 +491,7 @@ async function main() {
       );
       assert.equal(attendance.checkedInGuestCount, null);
       const options = await call(
-        prefix + 'seating-options',
+        prefix + 'seating-options-small-layout',
         base + '/seating-layout-options',
         'GET',
         undefined,
@@ -655,9 +710,13 @@ async function main() {
   }
 }
 await main().catch((error) => {
-  fs.writeFileSync('.local-demo/release-staging-seed-error.private.log', String(error.stack), {
-    mode: 0o600,
-  });
+  fs.writeFileSync(
+    '.local-demo/release-staging-seed-error.private.log',
+    inspect(error, { depth: 4 }),
+    {
+      mode: 0o600,
+    },
+  );
   console.error('Release seed failed; secret-safe private diagnostics saved.');
   process.exitCode = 1;
 });

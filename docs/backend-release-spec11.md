@@ -1,8 +1,9 @@
 # SPEC-11 backend release hand-off
 
 Date: 2026-10-13 (Asia/Saigon). Provider: `BACKEND-RELEASE@3.0.0`.
-Scope: wedding-be only. Decision: **NO_GO**, pending dependencies and staging
-acceptance. This hand-off is a workspace candidate, not an immutable release.
+Scope: wedding-be only. Decision: **NO_GO**, pending Android FCM acceptance and
+staging/recovery acceptance. Candidate PR: [#40](https://github.com/WDP301-wedding/wedding-be/pull/40),
+based on accepted `main@0fe78677acb145b30ab056c747c81a49a4cf5195`.
 
 Execution order: REL-W1 → REL-W2 → REL-W3 → RV-21 → REL-W4 → REL-W5.
 Later hand-off artifacts may be prepared while a prerequisite is pending; their
@@ -79,8 +80,11 @@ Scenario IDs are `no-names` and `partial-names`. Stable seed keys are derived fr
 provider version plus scenario. `ensureDemoSeed` exposes only owner reads and
 create commands with native idempotency keys. It verifies existing current facts
 including revision and refuses conflicting edits; it offers no update/upsert port.
-The implemented native seed adapter covers consultation intake in the acceptance
-harness. Whole-journey persistent staging seeds remain pending in REL-W2; do not
+The native acceptance harness covers the two journeys. The operator script
+`scripts/release-staging-seed.mjs` is fenced to the explicitly authorized separate
+Railway resources, uses native HTTP commands/idempotency and a private resumable
+checkpoint, verifies existing completed facts, and refuses conflicting edits.
+Its persistent staging execution remains pending in REL-W2; do not
 use the historical `scripts/demo-seed.ts` direct settlement fixtures as new release
 or live-payment proof. The offline journey separately verifies downstream owners.
 
@@ -133,12 +137,14 @@ backend GO with frontend PENDING still leaves product release pending.
 
 ## Proposed Railway staging artifact for owner review
 
-The owner authorized preparation of a **separate Railway staging environment**,
-with concrete deployment approval still pending. Reuse the repository Dockerfile
+The owner approved deployment to a **separate Railway staging environment** and
+named Lê Bá Bách as recovery owner. Use the repository Dockerfile
 and serialized migration pre-deploy command; one backend replica and a dedicated
 PostgreSQL database. Do not point the candidate at the existing live database.
-The current Notifications migration names differ from the previously deployed
-alternate worktree; copying its migration evidence would be invalid.
+Use the accepted SPEC-09/10 migration lineage on `origin/main`, including the FCM
+extension. The abandoned alternate candidate was stopped while the staging database
+was empty; no obsolete migration was applied. Its source/evidence cannot close this
+candidate's gates. Existing accepted RV-16, GM-W5 and Analytics evidence is preserved.
 
 Prepare an archive containing only explicit backend runtime/source/test/build
 inputs. Record archive/content/API/migration hashes and the base commit plus dirty
@@ -146,12 +152,36 @@ state. Before deployment, integrate/accept the correct Notifications implementat
 commit the candidate, pass pinned-runtime CI/full per-file coverage, designate the
 recovery owner, and obtain owner approval of the artifact and staging inputs.
 
-Initial staging workers stay disabled, with no provider secrets copied implicitly.
-Enable bounded fixture workers only after a separate fixture/recipient allowlist is
-approved. Test mailbox deliveries and sandbox VNPay require explicit test identities;
-paid Gemini and real-money payments are outside the current authorization. Historical
+Initial staging workers and FCM stay disabled. The owner authorized up to **two**
+test emails to `babachkt04@gmail.com` and VNPay sandbox on the isolated test data;
+retain booking/recipient allowlists when enabling a bounded worker.
+Paid Gemini generation and real-money payments are outside the authorization. Historical
 Gemini/sandbox receipts retain their original source/target limits. New provider
 tests or reuse of validated compatible evidence require owner review under RV-21.
+
+All 60 accepted migrations have been applied to the separate staging PostgreSQL.
+A local operator timeout interrupted the Staff migration before all DDL completed.
+The operator compared existing columns, indexes, constraints, functions and triggers
+against a fresh database with the unchanged migration, completed only missing DDL,
+verified exact equivalence and used `migrate resolve --applied` before deploying
+the remaining migrations. No migration file was changed and no business row/history
+was overwritten.
+
+The local rehearsal passed empty deployment, populated SPEC-08 upgrade, replay,
+readiness outage/recovery, graceful restart and disposable restore. Railway rejected
+native backup creation because it requires a Pro workspace. An AES-256-GCM encrypted
+dump was created in the operator workspace and its authenticated round trip passed.
+It was also restored into a separate disposable database on the staging PostgreSQL;
+all 60 migration records and the synthetic account were verified, then that disposable
+database was removed. The live staging database was not replaced or reopened from it.
+Hosted 30-day retention and native erasure-tombstone recovery remain unverified;
+the local rehearsal's synthetic tombstone is not that proof.
+
+An isolated synthetic Couple account has been created; credentials are kept in
+`.local-demo/android-test-account.private.json`, excluded from Git. Follow the
+[Android FCM setup guide](android-fcm-test-setup-vi.md). A created account or Android
+registration does not prove actual worker-to-FCM message acceptance. NTF-FCM-W4
+and RV-21 remain open until their own evidence exists.
 
 ## Recovery hand-off and NO_GO conditions
 

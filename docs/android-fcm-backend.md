@@ -141,6 +141,13 @@ the account/booking allowlists, explicitly enable FCM, trigger one permitted nat
 informational event and capture the durable attempt plus FCM message ID. Disable
 FCM after rehearsal unless continued sending is explicitly authorized.
 
+The owner reported that no Android token is available on 2026-10-13. Follow the
+[Vietnamese Android token/account setup guide](android-fcm-test-setup-vi.md).
+A synthetic Couple account has been bootstrapped in the separate SPEC-11 Railway
+database; credentials are kept in an ignored operator file. Native Android login,
+FULL booking scope and worker-to-FCM acceptance are separate verification steps.
+Creating the account does not close NTF-FCM-W4.
+
 Official references:
 [FCM HTTP v1 authentication and sending](https://firebase.google.com/docs/cloud-messaging/send/v1-api),
 [FCM error handling](https://firebase.google.com/docs/cloud-messaging/error-codes),
