@@ -73,16 +73,16 @@ Copy the backend variables from `.env.example` into Railway's variables UI or
 a secret-safe import process. Use the existing `.env` values for Supabase and
 Brevo, with these deployment-specific settings:
 
-| Variable                   | Deployment value                                    |
-| -------------------------- | --------------------------------------------------- |
-| `NODE_ENV`                 | `production`                                        |
-| `PORT`                     | `3001` (the generated domain targets this port)     |
-| `AUTH_TRUST_PROXY_HOPS`    | `1`                                                 |
-| `BACKEND_REPLICA_COUNT`    | `1`                                                 |
-| `OPENAPI_ENABLED`          | `true` (Swagger UI and OpenAPI exposed)             |
-| `PUBLIC_INVITATION_ORIGIN` | `https://wedding-be-production-e1dc.up.railway.app` |
-| `AUTH_OTP_HASH_KEY`        | Independent random secret, stable across restarts   |
-| `CORS_ALLOWED_ORIGINS`     | Exact HTTPS browser origins; public web first       |
+| Variable                   | Deployment value                                                                                 |
+| -------------------------- | ------------------------------------------------------------------------------------------------ |
+| `NODE_ENV`                 | `production`                                                                                     |
+| `PORT`                     | `3001` (the generated domain targets this port)                                                  |
+| `AUTH_TRUST_PROXY_HOPS`    | `1`                                                                                              |
+| `BACKEND_REPLICA_COUNT`    | `1`                                                                                              |
+| `OPENAPI_ENABLED`          | `true` (Swagger UI and OpenAPI exposed)                                                          |
+| `PUBLIC_INVITATION_ORIGIN` | `https://wedding-be-production-e1dc.up.railway.app`                                              |
+| `AUTH_OTP_HASH_KEY`        | Independent random secret, stable across restarts                                                |
+| `CORS_ALLOWED_ORIGINS`     | Exact browser origins; deployed HTTPS public web first, explicit HTTP loopback origins permitted |
 
 Do not configure `TEST_MIGRATION_DATABASE_URL` in the deployed service. Keep
 the legacy Resend group blank when using Brevo. When AI is disabled, also keep

@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-10-13T14:04:24.279Z",
+  "target": "https://wedding-be-production-e1dc.up.railway.app",
+  "results": [
+    {
+      "origin": "http://localhost:3000",
+      "status": 403,
+      "allowOrigin": null
+    },
+    {
+      "origin": "http://localhost:3001",
+      "status": 403,
+      "allowOrigin": null
+    },
+    {
+      "origin": "http://localhost:3002",
+      "status": 403,
+      "allowOrigin": null
+    }
+  ]
+}

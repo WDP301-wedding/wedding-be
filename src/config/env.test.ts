@@ -407,7 +407,7 @@ describe('parseEnvironment', () => {
     ).toThrow(EnvironmentConfigurationError);
   });
 
-  it('rejects cleartext deployed origins but permits loopback development origins', () => {
+  it('rejects cleartext non-loopback origins but permits loopback development origins', () => {
     expect(() =>
       parseEnvironment({
         ...validProductionEnvironment,
@@ -421,6 +421,34 @@ describe('parseEnvironment', () => {
       }).cors.allowedOrigins,
     ).toEqual(['http://localhost:3000', 'http://[::1]:3002']);
   });
+
+  it.each(['staging', 'production'] as const)(
+    'permits explicitly configured local frontend origins in %s',
+    (environment) => {
+      const origins = [
+        'https://wedding.example.com',
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://localhost:3002',
+      ];
+      expect(
+        parseEnvironment({
+          ...validProductionEnvironment,
+          NODE_ENV: environment,
+          CORS_ALLOWED_ORIGINS: origins.join(','),
+        }).cors.allowedOrigins,
+      ).toEqual(origins);
+    },
+  );
+
+  it.each(['http://localhost.example.com:3000', 'http://192.168.1.10:3000'])(
+    'rejects cleartext non-loopback deployed origin %s',
+    (origin) => {
+      expect(() =>
+        parseEnvironment({ ...validProductionEnvironment, CORS_ALLOWED_ORIGINS: origin }),
+      ).toThrow(EnvironmentConfigurationError);
+    },
+  );
 
   it('rejects duplicate CORS origins', () => {
     expect(() =>
