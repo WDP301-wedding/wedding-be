@@ -107,7 +107,7 @@ authorized disposable/staging environment and bounded cost; CI remains offline.
 - [x] RV-18 (deployed immutable PDF, retained images/QR and unchanged billing)
 - [x] RV-19 (native SPEC-07 registry/print integration and inspected PDF/QR; deployment separate)
 - [x] RV-20 (target request/error/audit correlation; metrics/OTLP optional disabled)
-- [ ] RV-21
+- [x] RV-21: Owner accepted the exact feature/evidence manifest as a synthetic-demo **NO_GO hand-off**, then authorized REL-W4/5. [Human approval and scope](evidence/spec11-rv21-owner-acceptance-2026-10-13.md). Runtime/provider gaps remain release blockers; no fresh provider or production acceptance is claimed.
 
 2026-10-12 SPEC-09 → RV-16 → GM-W5 backend checkpoint: NTF-W1–W5, RV-16 and
 GM-W5 are complete. [CI, native/runtime/provider and history evidence](evidence/notifications-rv16-gmw5-2026-10-12.md)
