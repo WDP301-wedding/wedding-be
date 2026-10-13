@@ -266,7 +266,7 @@ import {
         {
           emailAllowlist: ['explicit@example.invalid'],
           bookingAllowlist: [f.bookingId],
-          guestLinkUrl: null,
+          guestLinkUrl: 'https://wedding-web-silk.vercel.app/invitation/personal',
         },
       );
       const claim = (await foundation.claimDue()).find(
@@ -317,7 +317,10 @@ import {
       expect(destination).toEqual(['explicit@example.invalid']);
       expect(content).not.toMatch(/84900000000|private-note/u);
       const link = new URL(content.slice(content.indexOf('https://')));
-      const credential = link.hash.slice(1);
+      expect(link.origin + link.pathname).toBe(
+        'https://wedding-web-silk.vercel.app/invitation/personal',
+      );
+      const credential = new URLSearchParams(link.hash.slice(1)).get('credential');
       expect(credential).toMatch(/^wgc_[A-Za-z0-9_-]{43}$/u);
       const exchange = await request(app)
         .post('/api/v1/guest/invitation-sessions')

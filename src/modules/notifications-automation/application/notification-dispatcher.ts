@@ -166,7 +166,7 @@ export class NotificationDispatcher {
         return cancelled('GUEST_CREDENTIAL_REVOKED');
       }
       const link = new URL(this.policy.guestLinkUrl ?? target.publicUrl);
-      link.hash = raw;
+      link.hash = new URLSearchParams({ credential: raw }).toString();
       text = `Bạn nhận được lời mời dự tiệc. Mở liên kết riêng để xem thiệp: ${link.toString()}`;
     }
     return this.email.send({

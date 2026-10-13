@@ -9,6 +9,18 @@ import {
 } from '../../src/modules/guest-management/domain/guest-policy.js';
 import { GUEST_PROVIDER_VERSION } from '../../src/modules/guest-management/application/guest.contracts.js';
 describe('GM-W4 exact published API boundaries', () => {
+  it('publishes credential-free revision discovery for owners', () => {
+    const doc = createOpenApiDocument();
+    const get = doc.paths?.['/bookings/{bookingId}/guests/{guestId}/personalized-invitations']?.get;
+    expect(get?.operationId).toBe('readGuestInvitationMetadata');
+    expect(get?.security).toEqual([{ bearerAuth: [] }]);
+    expect(get?.requestBody).toBeUndefined();
+    const schema: unknown = get?.responses?.['200'];
+    expect(JSON.stringify(schema)).not.toMatch(
+      /"(?:credential|tokenHash|fragment|phone|operationalNote)"/u,
+    );
+    expect(JSON.stringify(schema)).toContain('revokedAt');
+  });
   it('publishes all runtime routes without Household, attendance or response endpoints', () => {
     const doc = createOpenApiDocument();
     expect(GUEST_PROVIDER_VERSION).toBe('guest-management@1.0.0');

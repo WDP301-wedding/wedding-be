@@ -55,6 +55,13 @@ export const issuedLinkSchema = z.strictObject({
   fragment: z.string(),
   expiresAt: z.iso.datetime(),
 });
+export const invitationMetadataSchema = z.strictObject({
+  guestId: z.uuid(),
+  revision: z.int().nonnegative(),
+  credentialId: z.uuid().nullable(),
+  expiresAt: z.iso.datetime().nullable(),
+  revokedAt: z.iso.datetime().nullable(),
+});
 export const exchangeBodySchema = z.strictObject({ credential: z.string().min(1).max(256) });
 export const sessionSchema = z.strictObject({
   capability: z.string().regex(/^wgs_[A-Za-z0-9_-]{43}$/u),

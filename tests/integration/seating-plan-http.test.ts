@@ -17,6 +17,68 @@ import {
     const db = new CatalogTestDatabase('seating_http');
     beforeAll(() => db.connect(), 60000);
     afterAll(() => db.disconnect());
+    it('finds the current plan by booking across clients and preserves empty/scoped outcomes', async () => {
+      const f = await studioFixture(db.prisma),
+        s = createSeatingServices(db.prisma, f.services);
+      const app = createApp({
+        runtimeEnvironment: 'test',
+        registerRoutes: (e) => e.use('/api/v1', createSeatingRouter(s.seating, s.resolver)),
+      });
+      const path = `/api/v1/bookings/${f.bookingId}/seating-plans/current`;
+      const read = (token = f.couple.accessToken) =>
+        request(app).get(path).auth(token, { type: 'bearer' });
+      await request(app).get(path).expect(401);
+      const empty = await read().expect(200);
+      expect(empty.body).toEqual({ data: null });
+      expect(empty.headers['cache-control']).toBe('no-store');
+      await request(app)
+        .get(`${path}?extra=1`)
+        .auth(f.couple.accessToken, { type: 'bearer' })
+        .expect(422);
+      for (const role of ['COUPLE', 'STAFF'] as const) {
+        await read((await f.actor(role)).accessToken).expect(404);
+      }
+      const restricted = await f.actor('COUPLE');
+      await db.prisma.consultationAccess.create({
+        data: {
+          consultationId: f.consultationId,
+          accountId: restricted.actorId,
+          level: 'RESTRICTED',
+        },
+      });
+      await read(restricted.accessToken).expect(403);
+      const created = await s.seating.select(
+        f.bookingId,
+        { layoutTemplateVersionId: f.layoutId, expectedBookingRevision: 1 },
+        randomUUID(),
+        f.couple,
+      );
+      const first = await read().expect(200);
+      expect(first.body).toEqual({ data: created });
+      await read(f.manager.accessToken).expect(200);
+      await s.seating.revise(
+        f.bookingId,
+        created.seatingPlanId,
+        { expectedRevision: 1, labels: [] },
+        randomUUID(),
+        f.couple,
+      );
+      const latest = await read().expect(200);
+      expect(planViewSchema.parse((latest.body as { data: unknown }).data).revisionNumber).toBe(2);
+      const byId = await request(app)
+        .get(path.replace('current', created.seatingPlanId))
+        .auth(f.couple.accessToken, { type: 'bearer' })
+        .expect(200);
+      expect(latest.body).toEqual(byId.body);
+      expect(await db.prisma.seatingPlanRevision.count({ where: { bookingId: f.bookingId } })).toBe(
+        2,
+      );
+      await db.prisma.session.update({
+        where: { id: f.couple.sessionId },
+        data: { status: 'REVOKED', revokedAt: new Date() },
+      });
+      await read().expect(401);
+    }, 30000);
     it('runs no-list selection/labels/confirmation/read/Manager exception through mounted routes', async () => {
       const f = await studioFixture(db.prisma),
         s = createSeatingServices(db.prisma, f.services),

@@ -19,6 +19,7 @@ import {
   importResultSchema,
   privateListSchema,
   issuedLinkSchema,
+  invitationMetadataSchema,
   exchangeBodySchema,
   sessionSchema,
   invitationViewSchema,
@@ -141,6 +142,12 @@ export const guestOpenApiPaths: NonNullable<ZodOpenApiObject['paths']> = {
   },
   '/bookings/{bookingId}/guests/{guestId}/personalized-invitations': {
     parameters: [booking, parameter('guestId')],
+    get: {
+      ...operation('readGuestInvitationMetadata', invitationMetadataSchema),
+      requestParams: { query: z.strictObject({}) },
+      description:
+        'Manager or owning FULL Couple on a confirmed Booking. Latest credential metadata only, including expired/revoked credentials and archived Guests; revision is zero with nullable metadata before first issuance. Use revision as expectedRevision when issuing/delivering. Does not issue, revoke or recover raw credentials. Unknown query keys are rejected; foreign Guests are concealed as 404.',
+    },
     post: {
       ...operation(
         'issueReadOnlyGuestInvitation',

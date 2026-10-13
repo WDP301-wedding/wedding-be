@@ -20,6 +20,7 @@ import {
   importResultSchema,
   privateListSchema,
   issuedLinkSchema,
+  invitationMetadataSchema,
   sessionSchema,
   invitationViewSchema,
 } from '../../src/modules/guest-management/http/guest.schemas.js';
@@ -365,4 +366,147 @@ describeDb('GM-W4 mounted strict HTTP + real Identity/Booking/Invitation', () =>
         .status,
     ).toBe(404);
   });
+  it('reads latest invitation metadata across clients without issuing or disclosing credentials', async () => {
+    const fixture = await studioFixture(db.prisma);
+    const [group] = await s.guests.groups(fixture.bookingId, fixture.couple);
+    const guest = await s.guests.createGuest(
+      fixture.bookingId,
+      { name: 'Metadata only', guestGroupId: group!.guestGroupId },
+      randomUUID(),
+      fixture.couple,
+    );
+    const path = `/api/v1/bookings/${fixture.bookingId}/guests/${guest.guestId}/personalized-invitations`;
+    const read = (token = fixture.couple.accessToken) =>
+      request(app).get(path).auth(token, { type: 'bearer' });
+    await request(app).get(path).expect(401);
+    const initial = await read().expect(200);
+    expect(initial.body).toEqual({
+      data: {
+        guestId: guest.guestId,
+        revision: 0,
+        credentialId: null,
+        expiresAt: null,
+        revokedAt: null,
+      },
+    });
+    expect(initial.headers['cache-control']).toBe('no-store');
+    await read(fixture.manager.accessToken).expect(200);
+    for (const role of ['COUPLE', 'STAFF'] as const) {
+      const actor = await fixture.actor(role);
+      await read(actor.accessToken).expect(404);
+    }
+    const restricted = await fixture.actor('COUPLE');
+    await db.prisma.consultationAccess.create({
+      data: {
+        consultationId: fixture.consultationId,
+        accountId: restricted.actorId,
+        level: 'RESTRICTED',
+      },
+    });
+    await read(restricted.accessToken).expect(403);
+    await request(app)
+      .get(`${path}?extra=1`)
+      .auth(fixture.couple.accessToken, { type: 'bearer' })
+      .expect(422);
+    await request(app)
+      .get(path.replace(guest.guestId, randomUUID()))
+      .auth(fixture.couple.accessToken, { type: 'bearer' })
+      .expect(404);
+    await request(app)
+      .get(path.replace(fixture.bookingId, f.bookingId))
+      .auth(f.couple.accessToken, { type: 'bearer' })
+      .expect(404);
+    const design = await fixture.services.designs.create(
+      { bookingId: fixture.bookingId, content: fixture.content, idempotencyKey: randomUUID() },
+      fixture.couple,
+    );
+    await fixture.services.publication.publish(
+      {
+        bookingId: fixture.bookingId,
+        designId: design.designId,
+        designRevisionId: design.revisionId,
+        expectedRevision: 1,
+        expectedPublicationRevision: 0,
+        idempotencyKey: randomUUID(),
+      },
+      fixture.couple,
+    );
+    const issued = await s.links.issue(
+      fixture.bookingId,
+      guest.guestId,
+      { expectedRevision: 0 },
+      randomUUID(),
+      fixture.couple,
+    );
+    const second = await s.links.issue(
+      fixture.bookingId,
+      guest.guestId,
+      { expectedRevision: 1 },
+      randomUUID(),
+      fixture.couple,
+    );
+    const latest = await read().expect(200);
+    expect(latest.body).toEqual({
+      data: {
+        guestId: guest.guestId,
+        revision: 2,
+        credentialId: second.credentialId,
+        expiresAt: second.expiresAt,
+        revokedAt: null,
+      },
+    });
+    expect(JSON.stringify(latest.body)).not.toMatch(/wgc_|tokenHash|fragment|publicInvitationId/u);
+    expect(
+      await db.prisma.guestInvitationCredential.count({ where: { guestId: guest.guestId } }),
+    ).toBe(2);
+    expect(
+      (
+        await db.prisma.guestInvitationCredential.findUniqueOrThrow({
+          where: { id: issued.credentialId },
+        })
+      ).revokedAt,
+    ).not.toBeNull();
+    const expiredAt = new Date(Date.now() - 60000);
+    const expiredGuest = await s.guests.createGuest(
+      fixture.bookingId,
+      { name: 'Expired link', guestGroupId: group!.guestGroupId },
+      randomUUID(),
+      fixture.couple,
+    );
+    const retained = await db.prisma.guestInvitationCredential.findUniqueOrThrow({
+      where: { id: second.credentialId },
+    });
+    await db.prisma.guestInvitationCredential.create({
+      data: {
+        id: randomUUID(),
+        bookingId: fixture.bookingId,
+        guestId: expiredGuest.guestId,
+        publicInvitationId: retained.publicInvitationId,
+        revision: 1,
+        tokenHash: 'e'.repeat(64),
+        expiresAt: expiredAt,
+      },
+    });
+    const expiredMetadata = await request(app)
+      .get(path.replace(guest.guestId, expiredGuest.guestId))
+      .auth(fixture.couple.accessToken, { type: 'bearer' })
+      .expect(200);
+    expect(data(expiredMetadata, invitationMetadataSchema)).toMatchObject({
+      revision: 1,
+      expiresAt: expiredAt.toISOString(),
+    });
+    await s.guests.updateGuest(
+      fixture.bookingId,
+      guest.guestId,
+      { expectedRevision: 1, status: 'ARCHIVED' },
+      randomUUID(),
+      fixture.couple,
+    );
+    expect(data(await read().expect(200), invitationMetadataSchema).revokedAt).not.toBeNull();
+    await db.prisma.session.update({
+      where: { id: fixture.couple.sessionId },
+      data: { status: 'REVOKED', revokedAt: new Date() },
+    });
+    await read().expect(401);
+  }, 30000);
 });

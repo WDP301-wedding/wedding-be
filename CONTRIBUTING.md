@@ -36,10 +36,13 @@ the head. Explain the problem, resulting behavior, and validation results.
 
 ## Review and merge
 
-Before merging, obtain at least one approval from another team member, resolve
-the review conversations, and require all existing CI quality gates to pass.
+Before merging, review the change, resolve any review conversations, and require
+all existing CI quality gates to pass on the exact head being merged. For
+`wedding-be`, an approval from another team member is optional; the project owner
+may authorize merge and deployment without it. This policy does not change the
+separate frontend repositories' policies.
 A failed dependency audit is a failed gate; do not remove or weaken checks to
-merge a pull request. New commits require a fresh review.
+merge a pull request. New commits require verification of the updated change.
 
 Merge through the pull request on GitHub. Do not push directly to `main`,
 force-push `main`, or delete `main`. When a cross-repository contract pins a
@@ -68,13 +71,12 @@ remove project features. Record the reason in the PR when closing it.
 
 ## Branch protection availability
 
-The repositories are private. GitHub currently rejects both rulesets and classic
-branch protection with HTTP 403 because the current plan does not support this
-feature for these repositories. Until protection is enabled, the rules above
-are team policy; GitHub does not enforce them against direct pushes.
+`wedding-be/main` has no active branch protection or rulesets in the latest
+backend policy inspection. The rules above are repository policy; GitHub does
+not currently enforce them against direct pushes. Earlier private-plan protection
+errors are historical observations, not proof of the current account's capability.
 
-An organization owner must enable a plan supporting private-repository branch
-protection, such as GitHub Team. Then configure `main` to require one approving
-review, dismiss stale reviews, require approval of the latest push, resolve all
-review conversations, require the existing CI jobs with an up-to-date branch,
+When server-side protection is configured for `wedding-be`, require
+pull requests with no mandatory approving-review count, resolve any review
+conversations, require the existing CI jobs with an up-to-date branch,
 apply the rules to administrators, and disallow force pushes and deletion.
