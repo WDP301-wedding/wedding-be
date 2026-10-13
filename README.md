@@ -16,6 +16,9 @@ is retained and future client delivery belongs to the frontend team.
 
 ### Requirements and Contracts
 
+- [Frontend screen brief and copyable Stitch prompt (Vietnamese)](docs/frontend-stitch-design-brief-vi.md):
+  role/channel screen map, business rules, UI states and the verified Swagger contract.
+
 - [Product requirements](PRODUCT-REQUIREMENTS.md), [capability map](CAPABILITY-MAP.md)
   and [contract baseline](CONTRACT-BASELINE.md#23-group-and-optional-guest-list--2026-10-10).
 - Foundation and completed modules: [Core](SPEC-core-platform.md),
