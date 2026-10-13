@@ -36,7 +36,11 @@ expired/revoked metadata, repeated issuance and latest plan discovery/revisions.
 The immutable credential expiry guard rejected an invalid test fixture update;
 the fixture was corrected to create separate expired evidence without weakening
 the guard. One Windows worker process exited unexpectedly; a subsequent isolated
-run passed. These failed attempts are not acceptance runs.
+run passed. A later combined Windows fork run also exited with native worker
+errors. These failed attempts are not acceptance runs. The final targeted run with
+the pinned Node 24.21.0 and a single threads worker passed all 17 tests in five files.
+Changing the runtime and pool together does not establish which caused the earlier
+native failures; this is successful bounded verification, not a claimed platform fix.
 
 Mutation check: invert the newly added empty-plan condition, run the current-plan
 HTTP regression, observe 200-vs-404 failure, restore the exact original source in
@@ -47,7 +51,7 @@ media concurrency tests and was stopped; no full local pass or coverage result i
 claimed. Exact-source Linux CI must run the repository's unchanged full gates.
 The broad local lint scan also traversed pre-existing untracked output; changed
 TypeScript files were checked independently. Final static/targeted and CI results
-are recorded below after completion.
+are recorded below.
 
 ## Runtime configuration and bounded IP probe
 
@@ -79,5 +83,24 @@ Provider delivery, PR approval/merge, deployment and product GO remain separate.
 
 ## Final verification
 
-Pending final static/targeted run and exact-source Linux CI. Do not treat this
-checkpoint as a completed full-suite or release acceptance until recorded here.
+- Local `npm run typecheck`, `npm run build`, `npm run api:check`: passed.
+- Changed TypeScript lint (including the corrected contract-test unknown type),
+  changed document/test formatting and `git diff --check`: passed.
+- Final targeted command using the SHA-256-verified official Node 24.21.0 binary:
+  `node scripts/staff-operations.verify.mjs tests/integration/notification-guest-delivery.test.ts tests/integration/guest-management-http.test.ts tests/integration/seating-plan-http.test.ts tests/contract/guest-management-openapi.test.ts tests/contract/seating-plan-openapi.test.ts --maxWorkers=1 --pool=threads`:
+  **17/17 tests, 5/5 files passed**, all 60 migrations applied on disposable local PostgreSQL.
+- [Exact-source Linux CI](https://github.com/WDP301-wedding/wedding-be/actions/runs/38427580014)
+  on `0613751b66c4fa698e24810a8cf9fc0e94dc992d`: both jobs succeeded.
+  Static formatting/lint/typecheck/build/API/audit gates passed; 1347 unit tests,
+  47 contract tests and 495 PostgreSQL integration tests passed.
+- Full PostgreSQL coverage: **1889 tests in 265 files passed**. Overall lines
+  97.5%, branches 93.44%; existing per-file 80% line/branch thresholds unchanged
+  and passed. The existing dependency audit policy was not changed.
+- Review examined ownership/concurrency, concealed foreign identities, no raw token
+  recovery, bounded indexed reads, shared seating revalidation and immutable evidence.
+  The empty-plan mutation was caught; no source/dependency/migration changes remain
+  outside the requested scope.
+- [PR #44](https://github.com/WDP301-wedding/wedding-be/pull/44) contains the backend
+  extension and final hand-off. Later documentation-only commits retain this code/API
+  identity; current-head check results are visible on the PR. Team review, merge,
+  deployment/configuration activation and live provider acceptance remain separate.

@@ -28,20 +28,18 @@ implementing dependent GM/STF fields/counts; do not infer a ban from Household r
 - [x] Publish revised product/specification/ownership documents; retire the former UI skill and installer.
 - [x] Verify the mapped guest-plan terminology cleanup: 49 unit/contract + 3 PostgreSQL tests, typecheck/lint/build/API/format checks; [evidence](./evidence/backend-scope-2026-10-10.md).
 
-## SPEC-01-05 Runtime and Provider Follow-ups
-
-### Web contract v3 integration extension — 2026-10-13
+## Web contract v3 integration extension — 2026-10-13
 
 Additional owner-requested integration work; preserves the completed 71-task
 baseline and its NO_GO decision. [Hand-off](../docs/contract-v3-web-integration-follow-up.md)
 and [verification record](evidence/contract-v3-web-integration-2026-10-13.md).
 
-- [ ] WEB-INT-01: Correct personalized email fragments and publish strict owner-only metadata/current-seating reads with exact-source tests/OpenAPI evidence.
+- [x] WEB-INT-01: Correct personalized email fragments and publish strict owner-only metadata/current-seating reads with exact-source tests/OpenAPI evidence; [1889-test CI and 17-test pinned-runtime verification](evidence/contract-v3-web-integration-2026-10-13.md#final-verification).
 - [x] WEB-INT-02: Verify return URL and save the missing personalized invitation URL on the selected Railway service; activation remains a deployment gate.
 - [ ] WEB-INT-03: Activate the reviewed backend/configuration release and verify mounted API identity; real delivered email acceptance stays separate.
 - [ ] WEB-INT-04: Verify original-client IP preservation through Vercel with a reviewed gateway trust contract, distinct clients, direct-route and forged-header tests. Current `trust proxy=1` probe does not close this gate.
 
-
+## SPEC-01-05 Runtime and Provider Follow-ups
 Added after the owner's 2026-10-10 request. Historical SPEC-01–05 implementation
 acceptance is preserved; it does not mean live external integrations or every
 operational follow-up has passed. The original audit findings remain historical.
