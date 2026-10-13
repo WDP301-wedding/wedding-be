@@ -1,0 +1,393 @@
+{
+  "checkedAt": "2026-10-13T14:58:50.589Z",
+  "scope": "backend workspace alignment; no live schema changes",
+  "branch": "codex/align-deployed-schema",
+  "originalSource": "56feb377fb9743ac86da1603ff397a601060f2dc",
+  "alignedSource": "65614996301481b1fb28dcb6ce24bf1a460b5338",
+  "decision": "ALIGN_WORKSPACE_TO_APPLIED_LINEAGE; NO_NEW_MIGRATION_OR_REDEPLOY_REQUIRED",
+  "migration": {
+    "count": 60,
+    "allNamesAndChecksumsMatch": true,
+    "rewrittenAppliedFiles": 0,
+    "sharedDatabaseWrites": 0,
+    "emptyDeployAndReplayPassed": true,
+    "restoredMigrationStatus": "UP_TO_DATE"
+  },
+  "schema": {
+    "applicationTables": 144,
+    "totalPublicTables": 145,
+    "missingModels": [],
+    "databaseOnlyTables": [],
+    "catalog": {
+      "columns": {
+        "cleanCount": 1147,
+        "liveCount": 1147,
+        "restoredCount": 1147,
+        "liveMatchesClean": true,
+        "restoredMatchesLive": true
+      },
+      "enums": {
+        "cleanCount": 105,
+        "liveCount": 105,
+        "restoredCount": 105,
+        "liveMatchesClean": true,
+        "restoredMatchesLive": true
+      },
+      "indexes": {
+        "cleanCount": 405,
+        "liveCount": 405,
+        "restoredCount": 405,
+        "liveMatchesClean": true,
+        "restoredMatchesLive": true
+      },
+      "constraints": {
+        "cleanCount": 558,
+        "liveCount": 558,
+        "restoredCount": 558,
+        "liveMatchesClean": true,
+        "restoredMatchesLive": false
+      },
+      "triggers": {
+        "cleanCount": 157,
+        "liveCount": 157,
+        "restoredCount": 157,
+        "liveMatchesClean": true,
+        "restoredMatchesLive": true
+      },
+      "functions": {
+        "cleanCount": 80,
+        "liveCount": 80,
+        "restoredCount": 80,
+        "liveMatchesClean": false,
+        "restoredMatchesLive": true
+      },
+      "rls": {
+        "cleanCount": 144,
+        "liveCount": 144,
+        "restoredCount": 144,
+        "liveMatchesClean": true,
+        "restoredMatchesLive": true
+      },
+      "policies": {
+        "cleanCount": 0,
+        "liveCount": 0,
+        "restoredCount": 0,
+        "liveMatchesClean": true,
+        "restoredMatchesLive": true
+      }
+    },
+    "normalizedCheckConstraintsMatch": true,
+    "functionBodiesMatch": true,
+    "searchPathAndEnforcement": {
+      "checkedAt": "2026-10-13T14:56:44.802Z",
+      "targets": [
+        {
+          "target": "live",
+          "capturedSearchPath": "\"\\$user\", public, extensions",
+          "tableResolutionCount": 144,
+          "allTablesResolveToPublic": true,
+          "allReferencedFunctionsResolveToPublic": true,
+          "effective_schemas": "{pg_catalog,public,extensions}",
+          "dollar_user_schema_exists": false,
+          "escaped_user_schema_exists": false,
+          "indexCount": 405,
+          "allIndexesValidReadyLive": true,
+          "internalTriggerCount": 620,
+          "allInternalTriggersEnabled": true,
+          "allConstraintsValidated": true
+        },
+        {
+          "target": "clean",
+          "capturedSearchPath": "\"$user\", public",
+          "tableResolutionCount": 144,
+          "allTablesResolveToPublic": true,
+          "allReferencedFunctionsResolveToPublic": true,
+          "effective_schemas": "{pg_catalog,public}",
+          "dollar_user_schema_exists": false,
+          "escaped_user_schema_exists": false,
+          "indexCount": 405,
+          "allIndexesValidReadyLive": true,
+          "internalTriggerCount": 620,
+          "allInternalTriggersEnabled": true,
+          "allConstraintsValidated": true
+        },
+        {
+          "target": "restored",
+          "capturedSearchPath": "\"\\$user\", public, extensions",
+          "tableResolutionCount": 144,
+          "allTablesResolveToPublic": true,
+          "allReferencedFunctionsResolveToPublic": true,
+          "effective_schemas": "{pg_catalog,public,extensions}",
+          "dollar_user_schema_exists": false,
+          "escaped_user_schema_exists": false,
+          "indexCount": 405,
+          "allIndexesValidReadyLive": true,
+          "internalTriggerCount": 620,
+          "allInternalTriggersEnabled": true,
+          "allConstraintsValidated": true
+        }
+      ],
+      "comparison": {
+        "indexesMatch": true,
+        "internalTriggersMatch": true,
+        "constraintsMatch": true
+      },
+      "privilegeGrantsCompared": false,
+      "providerCalls": 0
+    },
+    "prismaDatamodelDiff": {
+      "exitCode": 2,
+      "applied": false,
+      "reason": "SQL-owned foreign keys/indexes beyond Prisma model are intentional; migrations/native catalogs are the comparison baseline"
+    }
+  },
+  "preservation": {
+    "notificationRowsReadable": true,
+    "modelTables": 145,
+    "seedAccounts": 4,
+    "seedBookings": 3,
+    "seedGuests": 12,
+    "envUnchanged": true,
+    "allUntrackedFilesPreserved": true,
+    "originalBranchReachable": true,
+    "openapiDigest": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+    "deployedOpenapiDigest": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+    "openapiMatchesDeployment": true,
+    "databaseWrites": 0,
+    "checkedAt": "2026-10-13T14:46:52.030Z"
+  },
+  "restoredHttpSmoke": {
+    "checkedAt": "2026-10-13T14:46:01.810Z",
+    "target": "restored isolated localhost database",
+    "workerStarted": false,
+    "providerCalls": 0,
+    "allPrismaNotificationColumnsReadable": true,
+    "checks": [
+      {
+        "path": "/notifications/preferences",
+        "actor": "manager",
+        "status": 200,
+        "expected": 200,
+        "code": null
+      },
+      {
+        "path": "/notifications/inbox",
+        "actor": "manager",
+        "status": 200,
+        "expected": 200,
+        "code": null
+      },
+      {
+        "path": "/notifications/unread-count",
+        "actor": "manager",
+        "status": 200,
+        "expected": 200,
+        "code": null
+      },
+      {
+        "path": "/management/notifications",
+        "actor": "manager",
+        "status": 200,
+        "expected": 200,
+        "code": null
+      },
+      {
+        "path": "/management/notifications",
+        "actor": "couple",
+        "status": 403,
+        "expected": 403,
+        "code": "FORBIDDEN"
+      },
+      {
+        "path": "/management/notifications",
+        "actor": "staff",
+        "status": 403,
+        "expected": 403,
+        "code": "FORBIDDEN"
+      },
+      {
+        "path": "/notifications/inbox",
+        "actor": "anonymous",
+        "status": 401,
+        "expected": 401,
+        "code": "AUTHENTICATION_REQUIRED"
+      },
+      {
+        "path": "/bookings/48811c30-dee1-4774-aaba-e100b5b1d034/contracts",
+        "actor": "couple",
+        "status": 200,
+        "expected": 200,
+        "code": null
+      },
+      {
+        "path": "/bookings/fc84f6a5-9b07-40fb-8b05-0fd7eea335a4/contracts",
+        "actor": "couple",
+        "status": 404,
+        "expected": 404,
+        "code": "NOT_FOUND"
+      },
+      {
+        "path": "/bookings/48811c30-dee1-4774-aaba-e100b5b1d034/contracts",
+        "actor": "manager",
+        "status": 200,
+        "expected": 200,
+        "code": null
+      },
+      {
+        "path": "/bookings/28014903-2a3e-4738-bdb8-7a1146b8ebbb/guest-groups",
+        "actor": "manager",
+        "status": 200,
+        "expected": 200,
+        "code": null
+      },
+      {
+        "path": "/bookings/cd0b75ab-6256-427e-9b37-777f8b9c2822/guest-groups",
+        "actor": "manager",
+        "status": 200,
+        "expected": 200,
+        "code": null
+      }
+    ]
+  },
+  "hostedSmoke": {
+    "checkedAt": "2026-10-13T14:47:40.235Z",
+    "latest": {
+      "id": "c73f82b4-0cd7-459a-a134-c4f39a553751",
+      "status": "SUCCESS",
+      "source": "65614996301481b1fb28dcb6ce24bf1a460b5338",
+      "createdAt": "2026-10-13T14:29:38.044Z"
+    },
+    "active": [
+      {
+        "id": "c73f82b4-0cd7-459a-a134-c4f39a553751",
+        "status": "SUCCESS",
+        "source": "65614996301481b1fb28dcb6ce24bf1a460b5338",
+        "createdAt": "2026-10-13T14:29:38.044Z"
+      }
+    ],
+    "probes": [
+      {
+        "path": "/health/ready",
+        "status": 200
+      },
+      {
+        "path": "/docs",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/openapi.json",
+        "status": 200,
+        "sha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915"
+      },
+      {
+        "path": "/api/v1/notifications/inbox",
+        "status": 401
+      },
+      {
+        "path": "/api/v1/management/notifications",
+        "status": 401
+      }
+    ],
+    "authenticationSessionsCreated": 0,
+    "providerCalls": 0
+  },
+  "ci": {
+    "checkedAt": "2026-10-13T14:48:50.068Z",
+    "runs": [
+      {
+        "id": 38413826090,
+        "sha": "65614996301481b1fb28dcb6ce24bf1a460b5338",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38413826090",
+        "jobs": [
+          {
+            "id": 115352830919,
+            "name": "Static, test, build, and audit gates",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "id": 115352831419,
+            "name": "PostgreSQL migration and integration gates",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      }
+    ],
+    "unitTests": 1347,
+    "contractTests": 45,
+    "integrationTests": 493,
+    "fullCoverageTests": 1885,
+    "fullCoverageFiles": 265,
+    "coverage": {
+      "lines": 97.5,
+      "branches": 93.44
+    },
+    "thresholdsChanged": false
+  },
+  "localGates": {
+    "prismaGenerate": true,
+    "prismaValidate": true,
+    "typecheck": true,
+    "lint": true,
+    "build": true,
+    "openapiGenerate": true,
+    "openapiCheck": true,
+    "migrations": [
+      {
+        "name": "fenced-config",
+        "exitCode": 0,
+        "durationSeconds": 0
+      },
+      {
+        "name": "migration-deploy",
+        "exitCode": 0,
+        "durationSeconds": 2
+      },
+      {
+        "name": "migration-replay",
+        "exitCode": 0,
+        "durationSeconds": 2
+      },
+      {
+        "name": "focused-test",
+        "exitCode": 0,
+        "durationSeconds": 45
+      }
+    ],
+    "initialFullRun": "configuration failure; fixed provider-group fencing in private runner",
+    "secondFullRun": "FCM test failure; bounded Windows run interrupted, not PASS",
+    "focusedFcm": {
+      "tests": 8,
+      "passed": 8,
+      "pool": "threads",
+      "assertionsOrTimeoutsChanged": false
+    }
+  },
+  "review": {
+    "cycles": 3,
+    "freshContextReviewer": true,
+    "crossModel": "owner chose skip",
+    "issuesHandled": [
+      "preserve candidate evidence",
+      "pin actual serving deployment",
+      "avoid mutating GETs on shared DB",
+      "fence providers on restored DB",
+      "disable obsolete seed script",
+      "check exact search_path name resolution",
+      "check index validity, internal triggers and constraint enforcement",
+      "publish local failure/interruption separately from CI"
+    ]
+  },
+  "actions": {
+    "railwayMutations": 0,
+    "sharedDatabaseWrites": 0,
+    "providerCallsInitiated": 0,
+    "frontendFilesChanged": 0,
+    "oldSeedDisabled": true,
+    "originalSeedBackedUp": true
+  },
+  "releaseDecisionChanged": false
+}

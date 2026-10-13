@@ -1,0 +1,88 @@
+{
+  "seed": "demo-extra-20261013",
+  "verifiedAt": "2026-10-13T09:08:35.922Z",
+  "target": {
+    "host": "aws-0-ap-southeast-2.pooler.supabase.com",
+    "database": "postgres",
+    "schema": "public"
+  },
+  "accounts": 4,
+  "services": 5,
+  "templates": 3,
+  "printOfferings": 3,
+  "intakes": 4,
+  "bookings": [
+    {
+      "name": "DEMO • Lan và Minh",
+      "bookingId": "48811c30-dee1-4774-aaba-e100b5b1d034",
+      "phase": "DRAFT",
+      "contractState": "DRAFT",
+      "totalVnd": 45100000,
+      "depositVnd": 13530000
+    },
+    {
+      "name": "DEMO • Thảo và Huy",
+      "bookingId": "fc84f6a5-9b07-40fb-8b05-0fd7eea335a4",
+      "phase": "DRAFT",
+      "contractState": "AWAITING_APPROVAL",
+      "totalVnd": 98600000,
+      "depositVnd": 29580000
+    },
+    {
+      "name": "DEMO • Mai và Đức",
+      "bookingId": "ac082a0b-06f9-4625-b2bc-876bf5c92a2f",
+      "phase": "DRAFT",
+      "contractState": "DRAFT",
+      "totalVnd": 101750000,
+      "depositVnd": 30525000
+    }
+  ],
+  "guestScenarios": [
+    {
+      "bookingId": "28014903-2a3e-4738-bdb8-7a1146b8ebbb",
+      "planningHeadcount": 20,
+      "groups": 6,
+      "listedGuests": 12,
+      "checkInMode": "NONE"
+    },
+    {
+      "bookingId": "cd0b75ab-6256-427e-9b37-777f8b9c2822",
+      "planningHeadcount": 20,
+      "groups": 4,
+      "listedGuests": 0,
+      "checkInMode": "NONE"
+    }
+  ],
+  "existingRecordsUnchanged": true,
+  "externalCalls": 0,
+  "runs": [
+    {
+      "mode": "apply",
+      "verifiedAt": "2026-10-13T09:05:49.720Z",
+      "passed": true
+    },
+    {
+      "mode": "apply-replay",
+      "verifiedAt": "2026-10-13T09:08:35.922Z",
+      "passed": true
+    }
+  ],
+  "verification": {
+    "originalRecordsDigestUnchanged": true,
+    "noAdditionalFinancialApprovalOrAttendanceRecords": true,
+    "newPasswordsVerified": true,
+    "restrictedAccessAllowedAndFullDenied": true,
+    "guestCommandCount": 14,
+    "seedRecordCountsStable": true
+  },
+  "notificationObservation": {
+    "sourceSchemaMismatch": "NotificationIntent.accountId is absent on the inspected deployed database",
+    "newIntentCount": 8,
+    "states": {
+      "SKIPPED_STALE": 8
+    },
+    "providerDeliveryNotProven": true
+  },
+  "credentialsPublished": false,
+  "releaseAcceptanceChanged": false
+}
