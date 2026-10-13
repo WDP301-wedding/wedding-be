@@ -18,6 +18,9 @@ The [additive scope record](../tasks/evidence/spec11-demo-rebuild-scope-2026-10-
 supersedes the old checkpoint's pending backup choice. The worker remains off
 after consuming the authorized two-email budget; historical provider receipts
 retain their observed source rather than being relabeled as new runtime tests.
+The [RV-21 review package](../tasks/evidence/spec11-release-review-demo-rebuild-2026-10-13.md)
+and [immutable demo-rebuild manifest](../tasks/evidence/spec11-release-manifest-demo-rebuild-2026-10-13.json)
+pin the new policy candidate, successful CI and explicit NO_GO blockers.
 
 ## Executable verification
 
