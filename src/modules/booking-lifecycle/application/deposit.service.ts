@@ -7,6 +7,7 @@ export type ContractContext = Readonly<{
   actorAccountId: string | null;
   authority: 'AUTHENTICATED' | 'SYSTEM';
   transactionScopeId?: string;
+  purpose?: string;
 }>;
 
 export type DepositEligibility = Readonly<{

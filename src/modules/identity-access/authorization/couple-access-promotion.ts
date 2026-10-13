@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
 import { ConflictError, NotFoundError } from '../../../core/errors/app-error.js';
 
@@ -112,6 +113,19 @@ async function promoteWithRetry(
             entityId: access.id,
             metadata: { level: 'FULL' },
           });
+          const booking = await transaction.booking.findFirst({
+            where: { consultationId: input.consultationId },
+            select: { id: true },
+          });
+          if (booking !== null)
+            await transaction.identityNotificationOutbox.create({
+              data: {
+                eventId: randomUUID(),
+                bookingId: booking.id,
+                eventType: 'identity.consultation-access-promoted',
+                payload: { bookingId: booking.id, accountId: input.accountId, accessId: access.id },
+              },
+            });
           return { outcome: 'PROMOTED' as const, accessId: access.id };
         },
         { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },

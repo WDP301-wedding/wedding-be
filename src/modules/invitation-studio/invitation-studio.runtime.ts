@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { createInvitationTemplateSelectionProvider } from './infrastructure/template-selection.reader.js';
 import type { InvitationTemplateSelectionReader } from './application/template-selection.port.js';
+import type { InvitationAutomationReader } from './application/automation.contracts.js';
 
 import type { Config } from '../../config/config.js';
 import { createPrismaClient } from '../../core/database/prisma.js';
@@ -26,6 +27,7 @@ export type InvitationStudioRuntime = Readonly<{
   router: Router;
   resource: ShutdownResource;
   providers: Readonly<{
+    automation: InvitationAutomationReader;
     templateSelection: InvitationTemplateSelectionReader;
     seatingPlan: SeatingPlanReader;
     seatingGuidance: SeatingGuidanceReader;
@@ -74,6 +76,7 @@ export async function createInvitationStudioRuntime(
     return Object.freeze({
       router,
       providers: Object.freeze({
+        automation: composition.automation,
         templateSelection: createInvitationTemplateSelectionProvider(prisma),
         seatingPlan: seating.seating,
         seatingGuidance: seating.seating,

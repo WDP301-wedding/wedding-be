@@ -1,4 +1,5 @@
 import { isIP } from 'node:net';
+import { parseNotificationSettings, type NotificationSettings } from './notifications.js';
 
 import { z } from 'zod';
 import type { VnpaySettings } from '../modules/payments-billing/application/vnpay.port.js';
@@ -509,6 +510,7 @@ export type BackendConfig = Readonly<{
   vnpay: DisabledProvider | (Readonly<{ enabled: true }> & VnpaySettings);
   openApi: Readonly<{ enabledInProduction: boolean }>;
   invitationStudio: Readonly<{ publicOrigin: string | null }>;
+  notifications?: NotificationSettings;
   telemetry: Readonly<{ otlpEndpoint: string | undefined }>;
 }>;
 
@@ -532,7 +534,10 @@ export function parseEnvironment(source: EnvironmentSource): BackendConfig {
     );
   }
 
-  return createConfig(result.data);
+  return Object.freeze({
+    ...createConfig(result.data),
+    notifications: parseNotificationSettings(source),
+  });
 }
 
 function pickEnvironment(source: EnvironmentSource): EnvironmentSource {

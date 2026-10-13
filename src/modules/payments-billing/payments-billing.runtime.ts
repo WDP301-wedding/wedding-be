@@ -5,6 +5,7 @@ import { createPrismaSessionRepository } from '../identity-access/session/sessio
 import { createPaymentsBillingProviders } from './payments-billing.providers.js';
 import { createPaymentsBillingHttpServices } from './http/payments-billing.http-services.js';
 import { createPaymentsBillingRouter } from './http/payments-billing.router.js';
+import { createBillingReconciliationWorker } from './infrastructure/reconciliation.worker.js';
 
 export async function createPaymentsBillingRuntime(config: Config) {
   const prisma = createPrismaClient(config.database.url);
@@ -19,6 +20,10 @@ export async function createPaymentsBillingRuntime(config: Config) {
         resolveActor: createAuthenticatedActorResolver(createPrismaSessionRepository(prisma)),
       }),
       providers,
+      recovery:
+        providers.vnpay === null
+          ? undefined
+          : createBillingReconciliationWorker(prisma, providers.vnpay),
       resource: Object.freeze({
         name: 'payments-billing-database',
         close: () => prisma.$disconnect(),

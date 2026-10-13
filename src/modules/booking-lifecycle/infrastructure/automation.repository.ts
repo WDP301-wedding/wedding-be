@@ -44,13 +44,15 @@ export function createPrismaBookingAutomationRepository(
         readonly Readonly<{
           bookingId: string;
           bookingRevision: number;
+          scheduleRevision: number;
           dueAt: Date;
           coupleAccountId: string;
         }>[]
       >(Prisma.sql`
-        SELECT b."id" AS "bookingId", b."revision" AS "bookingRevision",
+        SELECT b."id" AS "bookingId", b."revision" AS "bookingRevision", COALESCE(t."revisionNumber",1) AS "scheduleRevision",
           ((b."eventDate" + ${shiftTime}) AT TIME ZONE 'Asia/Ho_Chi_Minh') + ${offset} AS "dueAt", ca."accountId" AS "coupleAccountId"
         FROM "Booking" b JOIN "BookingProposalSnapshot" p ON p."bookingId" = b."id"
+        LEFT JOIN "BookingTimelineRevision" t ON t.id=b."effectiveTimelineRevisionId"
         JOIN "BookingDepositSettlement" s ON s."bookingId" = b."id"
         JOIN "ConsultationAccess" ca ON ca."consultationId" = b."consultationId" AND ca."sourcePaymentId" = s."paymentId" AND ca."level" = 'FULL'
         JOIN "Account" a ON a."id" = ca."accountId" AND a."status" = 'ACTIVE'

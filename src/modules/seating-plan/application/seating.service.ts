@@ -274,7 +274,11 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
   private async invalidateRegistry(
     row: SeatingPlanRevision,
     scope: ContractContext,
-    reasonCode: 'HEADCOUNT_OUTSIDE_LAYOUT_RANGE' | 'LAYOUT_RETIRED' | 'SEATING_PLAN_REPLACED',
+    reasonCode:
+      | 'HEADCOUNT_OUTSIDE_LAYOUT_RANGE'
+      | 'PLANNING_HEADCOUNT_CHANGED'
+      | 'LAYOUT_RETIRED'
+      | 'SEATING_PLAN_REPLACED',
   ) {
     await this.registry.markRequiresReview(
       {
@@ -516,12 +520,20 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
       { ...layout, ...eligibility },
       e !== null && !invalidException,
     );
-    if (row.status === 'CONFIRMED' && (retired || invalidException || problem !== null)) {
+    const headcountChanged = row.planningHeadcount !== planning.planningHeadcount;
+    if (
+      row.status === 'CONFIRMED' &&
+      (retired || invalidException || problem !== null || headcountChanged)
+    ) {
       if (readOnly) return { ...this.view(row), status: 'REQUIRES_REVIEW' as const };
       await this.invalidateRegistry(
         row,
         scope,
-        retired ? 'LAYOUT_RETIRED' : 'HEADCOUNT_OUTSIDE_LAYOUT_RANGE',
+        retired
+          ? 'LAYOUT_RETIRED'
+          : headcountChanged
+            ? 'PLANNING_HEADCOUNT_CHANGED'
+            : 'HEADCOUNT_OUTSIDE_LAYOUT_RANGE',
       );
       return this.save(
         tx,

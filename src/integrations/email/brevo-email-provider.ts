@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { z } from 'zod';
 
 import { AppError, ProviderError } from '../../core/errors/app-error.js';
+import { EmailDeliveryError } from './email-delivery-error.js';
 import { resendFromEmailSchema } from './email.schemas.js';
 import {
   createSentEmail,
@@ -80,18 +81,22 @@ export class BrevoEmailProvider implements EmailProvider {
           }),
         });
         if (!response.ok) {
-          throw new ProviderError(
-            response.status === 429 || response.status >= 500 ? 'unavailable' : 'failure',
+          throw new EmailDeliveryError(
+            response.status === 429
+              ? 'RETRYABLE_FAILED'
+              : response.status >= 500
+                ? 'UNKNOWN'
+                : 'DEAD_LETTER',
           );
         }
         let body: unknown;
         try {
           body = await response.json();
         } catch {
-          throw new ProviderError('failure');
+          throw new EmailDeliveryError('UNKNOWN', 'failure');
         }
         const parsed = sendResponseSchema.safeParse(body);
-        if (!parsed.success) throw new ProviderError('failure');
+        if (!parsed.success) throw new EmailDeliveryError('UNKNOWN', 'failure');
         return createSentEmail(validated.idempotencyKey, parsed.data.messageId);
       };
       return await Promise.race([operation(), timeout]);

@@ -24,6 +24,7 @@ export interface BookingAutomationPort {
       items: readonly Readonly<{
         bookingId: string;
         bookingRevision: number;
+        scheduleRevision?: number;
         dueAt: string;
         coupleAccountId: string;
       }>[];

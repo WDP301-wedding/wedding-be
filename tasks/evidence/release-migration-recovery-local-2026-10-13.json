@@ -1,0 +1,248 @@
+{
+  "providerVersion": "BACKEND-RELEASE@3.0.0",
+  "observedAt": "2026-10-12T23:08:03.613Z",
+  "target": "disposable-local-postgresql",
+  "node": "v24.15.0",
+  "baseline": "20261012030000_staff_operations",
+  "migrationCount": 56,
+  "migrations": [
+    {
+      "name": "20260928000000_core_platform",
+      "sha256": "fdf48b9ad5baf3074bf3d310b90d945d66625131cc4f133e209fc6a4061f3902"
+    },
+    {
+      "name": "20261003000000_identity_access_persistence",
+      "sha256": "e68ae6978036b27180c0042ab6d74c7adf570b0fc8bb9f9b1a63864a5b0b268b"
+    },
+    {
+      "name": "20261005000000_venue_catalog_core",
+      "sha256": "e171ab99fecb2d735f2946548056a129157a7b625a4a095c2a2a562c0878c79b"
+    },
+    {
+      "name": "20261007000000_booking_lifecycle_foundation",
+      "sha256": "83eb52cf51cf428d058a69173542d263f5cac9457d6312a72d9f08400e91ab61"
+    },
+    {
+      "name": "20261007001000_booking_slot_holds",
+      "sha256": "bdd8f5891b87bcc6fafad084fc5261ce5313f84c7921d4ae0c64d09f3e02ab46"
+    },
+    {
+      "name": "20261007002000_booking_timelines",
+      "sha256": "b7a575364d75815e404dfdf65f73ef5d3bdcd8fe933c25a1aec649fbd4110041"
+    },
+    {
+      "name": "20261007003000_booking_deposit_intents",
+      "sha256": "3b3fccc1befe22e25d3d1a3284e2e76633f1c114a9d2de8d7c52485ecb5c69fb"
+    },
+    {
+      "name": "20261007004000_booking_post_deposit_lifecycle",
+      "sha256": "18e63d96c5c533cd5106bf3c1f0ce353879df406dd20e56fc4bedd3ac8820981"
+    },
+    {
+      "name": "20261008000000_invitation_delivery_intent",
+      "sha256": "12e32edcc98066031bfd4adc95d19a9c0f713bca425dbf487fb1781c999bea8e"
+    },
+    {
+      "name": "20261008000000_invitation_media",
+      "sha256": "9cf4f65369164c26b0861cf0184fc211df35e9b2e2362a8950efabc1fc2300d4"
+    },
+    {
+      "name": "20261008001000_booking_reporting",
+      "sha256": "a965b577973b1fbe3d8b1766ef980470dc65795bf530bfdd626b68855c264619"
+    },
+    {
+      "name": "20261008002000_booking_automation_command",
+      "sha256": "cbdbafac3282581f73e3b225f9eeff54c4b14c0dc7bb81f845c2791802ab2887"
+    },
+    {
+      "name": "20261008003000_confirmed_booking_slot",
+      "sha256": "31ec540b7d615e9488a63a64a8fb831eea4cd4d56ac20996cb371b0e436b1a22"
+    },
+    {
+      "name": "20261008004000_booking_event_envelope",
+      "sha256": "81c61924b14832e2e7eb567327537ff3e44a21c714251dee09e3596d97152a35"
+    },
+    {
+      "name": "20261008005000_retention_evidence_account_scope",
+      "sha256": "29344f1b7466ce2726b0c756c45e7d6c581affb04cb113059df160697e15e903"
+    },
+    {
+      "name": "20261008006000_payments_billing_ledger",
+      "sha256": "f83d49615742a4e32f3813e6c90bd84c5b01e4ed018cd4e559fc6a27dd4023c9"
+    },
+    {
+      "name": "20261008007000_billing_deposit_application",
+      "sha256": "14b34800d83772ebc3e138a0285e47194ebf0fd308a876e099b703ee03ab8859"
+    },
+    {
+      "name": "20261008007000_booking_commercial_acceptance",
+      "sha256": "487917d3482512b9107074d358c5758abde651965469f031b0b9e4009661d59f"
+    },
+    {
+      "name": "20261008008000_post_booking_experience",
+      "sha256": "b26e8a6e8b0c1c01d7d20b1dabb910c81ba17414f9cb2dc84e2b5b81b4c0f9ef"
+    },
+    {
+      "name": "20261008008000_vnpay_provider_evidence",
+      "sha256": "8afb100e53bda406b9a89257398ecc4f6fe6ffaa2cd98c2c4f430bfcdef6b10c"
+    },
+    {
+      "name": "20261008230000_password_email_otp",
+      "sha256": "0f6b8b9bfc1df18e2527ba7e187a74de0808edb903e969ee7c334860837a586e"
+    },
+    {
+      "name": "20261009000000_invitation_media_command_recovery",
+      "sha256": "3efb5e033b23ed9744248ba2f9b5a0c547f6ed3802714da5417bb57c2384ffa8"
+    },
+    {
+      "name": "20261009001000_billing_operations_reporting",
+      "sha256": "b4618f53fc5400595abf4ba9c684d6eb95d8e651141d900ce65a69ce56d70232"
+    },
+    {
+      "name": "20261009020000_invitation_design_publication_printable",
+      "sha256": "d7382834ec5de4c4810779a63b29f6f91e2381d96a756b440849d81b69f8a688"
+    },
+    {
+      "name": "20261009030000_invitation_print_order_and_billing",
+      "sha256": "92389959e42c72f7d83c953ecdea466f84656208f84540d7e2b3d9a9b1b0ec06"
+    },
+    {
+      "name": "20261009040000_invitation_reporting_snapshots",
+      "sha256": "6987ca2d0de50b54a5704de592999ad0426779767bb7e1e6746595559254accf"
+    },
+    {
+      "name": "20261010010000_couple_profile",
+      "sha256": "e0221a09fe53ee743a01e090944fa4cc145ccf4aa0eeedc638ce9232a47bc447"
+    },
+    {
+      "name": "20261010020000_restaurant_services",
+      "sha256": "cc036e694f881c0dc0878fc5fe8dd11bcb8482f485bed5cbebfef7ca888e40d5"
+    },
+    {
+      "name": "20261010030000_print_commercial_offerings",
+      "sha256": "01e86401787ef7d9ec0a472893cdfee86012b5fa06cbfd42bed5a9f7605eba52"
+    },
+    {
+      "name": "20261011009000_billing_contract_source",
+      "sha256": "2a33869b5c55cffcb61d3a8a923b9fa85f8d7583ee1c3fd54fd5bd03bc871b6a"
+    },
+    {
+      "name": "20261011010000_commercial_contracts",
+      "sha256": "deda31129f4a3d255a0fa68cb0ce29ed1abb88c4f47225251b07a7478baccfa4"
+    },
+    {
+      "name": "20261011019000_billing_extension_sources",
+      "sha256": "7e209e9a50916048338fd338d606b334313b0d8283f26dad972efa47cb7729b0"
+    },
+    {
+      "name": "20261011020000_commercial_appendices",
+      "sha256": "d5130faa50e1e8cf2681084550584808171ab96761d167c185af3cc53e2058fc"
+    },
+    {
+      "name": "20261011021000_appendix_ledger_guards",
+      "sha256": "8ed9c3e9ed72c154c85952fa5e7a289792a285855efa47fb3599d0f0145d1d9c"
+    },
+    {
+      "name": "20261011022000_commercial_billing_outbox",
+      "sha256": "f6001872bcbf62396aca5ebf4c3df1de210a774455e87596a8a02ab22ba31904"
+    },
+    {
+      "name": "20261011023000_contract_print_fulfillment",
+      "sha256": "5bae57ec05bae44c39d1de0e4bf270fe6513b5a490bef57e1d7a7bbb5110a2a1"
+    },
+    {
+      "name": "20261011024000_print_template_provenance",
+      "sha256": "a0c4a986c568f44e5ec5bf4e78b6bcbcb261a7739a817bb35a4943ea79d53bec"
+    },
+    {
+      "name": "20261011025000_final_commercial_invoices",
+      "sha256": "03ce34bd80bd596980dcb6ffa097735050de629843ff5a53fc7b48d29b978409"
+    },
+    {
+      "name": "20261011026000_invoice_adjustment_prefix_guard",
+      "sha256": "ba79cbd15dc4c52c39a598ebf1743029065d7c3e541ef002bbfd0f3f00ebdc1e"
+    },
+    {
+      "name": "20261011027000_invoice_balance_pins",
+      "sha256": "d3eca34ef4a30c32352b858e669f446f27a5e6e239697687e6555ffdfffec563"
+    },
+    {
+      "name": "20261011028000_invoice_document_integrity",
+      "sha256": "c1a1bb2d0d84aa545636aaeb9db798c567e7fdafda296a2f9f1e71638df41a79"
+    },
+    {
+      "name": "20261011029000_invoice_outbox_identity",
+      "sha256": "e2a2fb1d90d6620f097078b0ab15a3efe987288fe9334befac16fc2a060e2b20"
+    },
+    {
+      "name": "20261011030000_preserve_allocated_print_sources",
+      "sha256": "7b956219f2c082dd90d71aa4ad38105b5cc4749903b0387ecd475f8a6f24ecd4"
+    },
+    {
+      "name": "20261011031000_contracted_print_quote_bounds",
+      "sha256": "cef89fd72e9c3a77996b1d89488714235d0bdd59497c69c0d1dfed8b88ce4da5"
+    },
+    {
+      "name": "20261012010000_guest_management",
+      "sha256": "1eefac415e6418e5fdf2ce2b005b7755bc6b305310b182d1c1dfbe2e692bae9f"
+    },
+    {
+      "name": "20261012020000_seating_plan",
+      "sha256": "bfcbebce5233c9a8416b875b68b2387581275066900f8ec06e0ede34f945eea6"
+    },
+    {
+      "name": "20261012030000_staff_operations",
+      "sha256": "9ded716f13afe11615b40235e0f99c160bd6a19c1bb56a141964fb1a17802a68"
+    },
+    {
+      "name": "20261012040000_notifications_automation",
+      "sha256": "6efcdaff4bc6492e9dd61d174559c65f17aec004228b4ee5d179e1620a1db4b8"
+    },
+    {
+      "name": "20261012041000_notification_due_identity",
+      "sha256": "7169edb0d6f8c02d9ff996cd07996e2cb2f1576e75bbd111f35b4fdbea8af54c"
+    },
+    {
+      "name": "20261012042000_notification_reference",
+      "sha256": "cbee5429210ce8eddb0d51fd2d0c19a46374ce5e7c6984fb32c15a6eae181565"
+    },
+    {
+      "name": "20261012043000_billing_reconciliation_lease",
+      "sha256": "7d8b7d27482643dd2cc1a5f30659c3ac87b06da6880fab946a20c3cfd6b9c8ba"
+    },
+    {
+      "name": "20261012044000_notification_scan",
+      "sha256": "edf7035fbf75fae908b0303e5e1bc8aa30efdc835f5e490d49fd978fbf25b0e8"
+    },
+    {
+      "name": "20261013001000_analytics_owner_feeds",
+      "sha256": "16e544b524326108e8927ba4f8cc48e40db0f3fdaf4bed9d060f91c8c1e5bba8"
+    },
+    {
+      "name": "20261013002000_analytics_projection",
+      "sha256": "9449594ebe500e961a5847f80f0132dfafe87cf1376565a50681e1843beab05f"
+    },
+    {
+      "name": "20261013003000_reporting_scope_and_planning_invalidation",
+      "sha256": "8e56b181ffac97688db07b0173cdffcfe17fa35b495e5993cb894b9254a10523"
+    },
+    {
+      "name": "20261013004000_analytics_event_query_index",
+      "sha256": "b0bf5e05ee5d5b5cbfe5bd5d479a17eeb8903dddcb18d467e2aa02d94066a86d"
+    }
+  ],
+  "emptyDeployment": "PASS",
+  "populatedUpgrade": "PASS",
+  "repeatedDeployment": "PASS",
+  "outage": {
+    "ready": 503,
+    "live": 200,
+    "recovered": 200
+  },
+  "gracefulRestart": "PASS",
+  "backupSha256": "4aa47b2e0bd756b7ffbf7ef24100fc15bc5c5a1ade2db60ff8f8fde141fd54fe",
+  "restore": "PASS",
+  "syntheticErasureTombstoneBeforeReopen": "PASS",
+  "productionBackupRetentionAndEncryption": "NOT_VERIFIED",
+  "staging": "NOT_EXECUTED"
+}

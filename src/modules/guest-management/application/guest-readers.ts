@@ -333,4 +333,32 @@ export class GuestReaders {
       };
     });
   }
+  async isDeliveryCurrent(
+    bookingId: string,
+    credentialId: string,
+    context: ContractContext,
+  ): Promise<boolean> {
+    if (
+      context.authority !== 'SYSTEM' ||
+      context.actorAccountId !== null ||
+      context.purpose !== 'notifications:guest-delivery'
+    )
+      return false;
+    const tx = this.guests.repository.prisma;
+    const credential = await tx.guestInvitationCredential.findFirst({
+      where: { id: credentialId, bookingId, revokedAt: null, expiresAt: { gt: this.guests.now() } },
+    });
+    if (credential === null || this.guests.owners.invitation === undefined) return false;
+    const guest = await tx.guest.findFirst({
+      where: { id: credential.guestId, bookingId, status: 'ACTIVE' },
+    });
+    if (guest === null) return false;
+    try {
+      await this.guests.owners.planning.requireInvitationViewContext(bookingId);
+      await this.guests.owners.invitation.getCurrent(bookingId, credential.publicInvitationId);
+      return true;
+    } catch {
+      return false;
+    }
+  }
 }

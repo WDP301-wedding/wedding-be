@@ -8,6 +8,129 @@ datasource db {
   provider = "postgresql"
 }
 
+model NotificationIntent {
+  id String @id @default(uuid()) @db.Uuid
+  eventId String @db.Uuid
+  bookingId String @db.Uuid
+  purpose String @db.VarChar(100)
+  recipientId String @db.Uuid
+  accountId String? @db.Uuid
+  channel String
+  templateVersion String
+  referenceId String? @db.Uuid
+  scheduleRevision Int?
+  scheduledAt DateTime @db.Timestamptz(6)
+  state String @default("QUEUED")
+  revision Int @default(1)
+  attemptCount Int @default(0)
+  leaseToken String? @db.Uuid
+  leaseUntil DateTime? @db.Timestamptz(6)
+  nextAttemptAt DateTime @db.Timestamptz(6)
+  providerMessageId String?
+  credentialId String? @db.Uuid
+  ciphertext String?
+  secretExpiresAt DateTime? @db.Timestamptz(6)
+  readAt DateTime? @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  @@unique([eventId, channel, recipientId, templateVersion])
+  @@index([state, nextAttemptAt])
+  @@index([accountId, id])
+}
+
+model NotificationAttempt {
+  id String @id @default(uuid()) @db.Uuid
+  intentId String @db.Uuid
+  attemptNumber Int
+  outcome String
+  providerMessageId String?
+  errorCode String?
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  @@unique([intentId, attemptNumber, outcome])
+}
+
+model NotificationPreference {
+  accountId String @id @db.Uuid
+  reminderEmail Boolean @default(true)
+  reminderPush Boolean @default(true)
+  revision Int @default(1)
+}
+
+model NotificationInstallation {
+  id String @id @db.Uuid
+  accountId String @db.Uuid
+  sessionId String @db.Uuid
+  tokenDigest String @unique @db.Char(64)
+  ciphertext String?
+  active Boolean @default(true)
+  revision Int @default(1)
+  @@index([accountId, active])
+}
+
+model NotificationRecipient {
+  bookingId String @db.Uuid
+  accountId String @db.Uuid
+  purpose String
+  enabled Boolean @default(true)
+  revision Int @default(1)
+  @@id([bookingId, accountId, purpose])
+}
+
+model NotificationReceipt {
+  eventId String @id @db.Uuid
+  producer String
+  bookingId String @db.Uuid
+  eventType String
+  sourceSequence Int
+  outcome String
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model NotificationCheckpoint {
+  producer String
+  bookingId String @db.Uuid
+  stream String
+  sourceSequence Int
+  @@id([producer, bookingId, stream])
+}
+
+model NotificationCommand {
+  accountId String @db.Uuid
+  key String @db.Uuid
+  commandDigest String @db.Char(64)
+  result Json @db.JsonB
+  @@id([accountId, key])
+}
+
+model NotificationScan {
+  name String @id
+  fence DateTime @db.Timestamptz(6)
+  cursor String?
+}
+
+model NotificationDueCommand {
+  id String @id @db.Uuid
+  bookingId String @db.Uuid
+  expectedRevision Int
+  dueAt DateTime @db.Timestamptz(6)
+  requestedAt DateTime @db.Timestamptz(6)
+  outcome String @default("RETRY_PENDING")
+  lastErrorCode String?
+}
+
+model IdentityNotificationOutbox {
+  eventId String @id @db.Uuid
+  bookingId String @db.Uuid
+  eventType String
+  payload Json @db.JsonB
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model BillingReconciliationLease {
+  paymentAttemptId String @id @db.Uuid
+  leaseUntil DateTime @db.Timestamptz(6)
+  nextAttemptAt DateTime @db.Timestamptz(6)
+}
+
 model StaffConfiguration {
   bookingId String @id @db.Uuid
   checkInMode String @default("NONE")
@@ -2090,4 +2213,38 @@ model SeatingOutbox {
   occurredAt     DateTime @default(now()) @db.Timestamptz(6)
 
   @@unique([bookingId, revisionNumber, eventType])
+}
+
+// SPEC-10: owner-published minimal immutable facts and consumer-owned generations.
+model ReportingSequence {
+  owner String @id
+  value Int @default(0)
+}
+model ReportingFact {
+  owner String
+  sequence Int
+  recordId String
+  changedAt DateTime @db.Timestamptz(6)
+  value Json @db.JsonB
+  @@id([owner, sequence])
+  @@index([owner, recordId, sequence])
+}
+model AnalyticsGeneration {
+  id String @id @db.Uuid
+  scope String
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  checkpoints Json @db.JsonB
+  @@index([scope, createdAt])
+}
+model AnalyticsHead {
+  scope String @id
+  generationId String @db.Uuid
+}
+model AnalyticsProjection {
+  generationId String @db.Uuid
+  owner String
+  recordId String
+  sequence Int
+  value Json @db.JsonB
+  @@id([generationId, owner, recordId])
 }

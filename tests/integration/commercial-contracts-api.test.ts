@@ -1,5 +1,9 @@
 import { registerStepSixApiCases } from './commercial-step6-api-cases.js';
+import { registerAnalyticsCommercialCases } from './analytics-commercial-cases.js';
 import { registerCommercialAcceptanceCases } from './commercial-acceptance-api-cases.js';
+import { registerGuestCompletionCases } from './guest-management-completion-cases.js';
+import { registerReleaseDemoCases } from './release-demo-cases.js';
+import { createStaffSeatingServices } from '../../src/modules/staff-operations/infrastructure/staff-seating.composition.js';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import request, { type Response } from 'supertest';
@@ -55,6 +59,8 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
   let app: ReturnType<typeof createApp>;
   let booking: Awaited<ReturnType<typeof createBookingLifecycleRuntime>> | undefined;
   let venue: Awaited<ReturnType<typeof createVenueCatalogRuntime>> | undefined;
+  let studio: ReturnType<typeof createInvitationStudioServices>;
+  let staffSeating: ReturnType<typeof createStaffSeatingServices>;
   const tokens: Record<string, string> = {};
   const accounts = {
     manager: randomUUID(),
@@ -167,12 +173,13 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
         rateLimit: { ...config.security.rateLimit, maxRequests: 1000 },
       },
       registerRoutes(express) {
-        const studio = createInvitationStudioServices(
+        studio = createInvitationStudioServices(
           database.prisma,
           controlledStorage().provider,
           null,
           'https://wedding.example.com',
         );
+        staffSeating = createStaffSeatingServices(database.prisma, studio);
         express.use(
           '/api/v1',
           createStudioRouter(studio, createAuthenticatedActorResolver(sessions)),
@@ -462,6 +469,24 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
   };
   registerCommercialAcceptanceCases(harness);
   registerStepSixApiCases(harness);
+  registerAnalyticsCommercialCases(harness);
+  registerReleaseDemoCases(harness, () => ({
+    studio,
+    context: (who) => ({
+      actorId: accounts[who],
+      accessToken: tokens[who]!,
+      requestId: randomUUID(),
+    }),
+  }));
+  registerGuestCompletionCases(harness, () => ({
+    studio,
+    staffSeating,
+    context: (who: 'own' | 'manager') => ({
+      actorId: accounts[who],
+      accessToken: tokens[who]!,
+      requestId: randomUUID(),
+    }),
+  }));
   it('lists, creates, submits, approves, downloads and withdraws the exact contract with retained PDF history', async () => {
     const f = await fixture();
     const empty = await get(f.path, 'own', 'List before conversion');

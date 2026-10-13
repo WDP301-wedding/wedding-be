@@ -31,6 +31,7 @@ vi.mock('../../src/modules/invitation-studio/invitation-studio.runtime.js', asyn
   return {
     createInvitationStudioRuntime: vi.fn(() => ({
       router: Router(),
+      providers: { automation: {} },
       resource: { name: 'invitation-studio-database', close: vi.fn() },
     })),
   };
@@ -51,6 +52,7 @@ vi.mock('../../src/modules/booking-lifecycle/booking-lifecycle.runtime.js', asyn
   const { Router } = await import('express');
   return {
     createBookingLifecycleRuntime: vi.fn(() => ({
+      providers: { createAutomationWorker: vi.fn(() => ({})) },
       router: Router(),
       resource: { name: 'booking-lifecycle-database', close: vi.fn() },
     })),
@@ -287,4 +289,27 @@ describe('HTTP security baseline', () => {
       await running.shutdown();
     }
   });
+});
+
+vi.mock('../../src/modules/notifications-automation/notifications.runtime.js', async () => {
+  const { Router } = await import('express');
+  return {
+    createNotificationsRuntime: vi.fn(() => ({
+      router: Router(),
+      start: vi.fn(),
+      stop: vi.fn(),
+      resource: { name: 'notifications', close: vi.fn() },
+    })),
+  };
+});
+vi.mock('../../src/modules/analytics-dashboard/analytics.runtime.js', async () => {
+  const { Router } = await import('express');
+  return {
+    createAnalyticsRuntime: vi.fn(() => ({
+      router: Router(),
+      start: vi.fn(),
+      stop: vi.fn(),
+      resource: { name: 'analytics', close: vi.fn() },
+    })),
+  };
 });

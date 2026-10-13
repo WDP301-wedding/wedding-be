@@ -57,7 +57,24 @@ export function createRuntimeFeatureManifest(config: BackendConfig, revision?: s
       ),
       vnpay: feature(config.vnpay.enabled, config.vnpay.enabled ? 'sandbox-only' : 'disabled'),
       retention: feature(Boolean(config.database.url), 'operator-cli-manual-procedure'),
-      workers: feature(false, 'outbox-and-due-ports-only', 'downstream-pending'),
+      analytics: feature(Boolean(config.database.url), 'analytics-owner-feeds-v3-60s'),
+      workers: feature(
+        config.notifications?.workerEnabled === true,
+        config.notifications?.workerEnabled === true
+          ? 'notifications-60s-durable-lease'
+          : 'disabled',
+      ),
+      notificationCredentials: feature(
+        config.notifications?.activeKeyVersion !== null &&
+          config.notifications?.activeKeyVersion !== undefined,
+        'aes-256-gcm',
+      ),
+      androidPush: feature(
+        config.notifications?.fcm !== null && config.notifications?.fcm !== undefined,
+        config.notifications?.fcm ? 'fcm-http-v1' : 'disabled',
+        'implemented',
+        true,
+      ),
       printFiles: feature(
         Boolean(config.database.url) &&
           config.storage.enabled &&

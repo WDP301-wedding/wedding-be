@@ -2,7 +2,7 @@
 
 > Current execution scope: backend release verification and API hand-off only, under the [2026-10-10 amendment](./docs/backend-scope-2026-10-10.md). Web/Android builds, client screenshots and client deployment belong to the frontend team; full product release remains a separate joint gate.
 
-- Status: **Business scope confirmed — backend implementation and acceptance pending**
+- Status: **Backend release tooling/local checkpoint implemented — release acceptance NO_GO; staging/dependencies pending**
 - Approved: 2026-10-06 by the project owner (approval record: baseline Section 21.9)
 - Module ID: `release-demo` (`SPEC-11`)
 - Contract baseline: `WEDDING-CONTRACT-3@3.0.0`

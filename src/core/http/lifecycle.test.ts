@@ -13,6 +13,9 @@ import { createVenueCatalogRuntime } from '../../modules/venue-catalog/venue-cat
 import { createIdentityRuntime } from '../../modules/identity-access/identity.runtime.js';
 import { createInvitationStudioRuntime } from '../../modules/invitation-studio/invitation-studio.runtime.js';
 import { createGuestManagementRuntime } from '../../modules/guest-management/guest-management.runtime.js';
+import { createAnalyticsRuntime } from '../../modules/analytics-dashboard/analytics.runtime.js';
+import { createBookingLifecycleRuntime } from '../../modules/booking-lifecycle/booking-lifecycle.runtime.js';
+import { createNotificationsRuntime } from '../../modules/notifications-automation/notifications.runtime.js';
 import request from 'supertest';
 import { createPaymentsBillingRuntime } from '../../modules/payments-billing/payments-billing.runtime.js';
 import { createLogger } from '../logging/logger.js';
@@ -72,7 +75,11 @@ vi.mock('../../modules/invitation-studio/invitation-studio.runtime.js', async ()
       router.get('/bookings/:bookingId/media/:assetId', (_req, res) =>
         res.status(401).json({ error: { code: 'UNAUTHORIZED' } }),
       );
-      return { router, resource: { name: 'invitation-studio-database', close: vi.fn() } };
+      return {
+        router,
+        providers: { automation: {} },
+        resource: { name: 'invitation-studio-database', close: vi.fn() },
+      };
     }),
   };
 });
@@ -82,6 +89,7 @@ vi.mock('../../modules/booking-lifecycle/booking-lifecycle.runtime.js', async ()
   return {
     createBookingLifecycleRuntime: vi.fn(() => ({
       router: Router(),
+      providers: { createAutomationWorker: vi.fn(() => ({})) },
       resource: { name: 'booking-lifecycle-database', close: vi.fn() },
     })),
   };
@@ -351,6 +359,7 @@ describe('server startup and process signals', () => {
     expect(createVenueCatalogRuntime).toHaveBeenCalledWith(config);
     expect(createInvitationStudioRuntime).toHaveBeenCalledWith(config);
     expect(createGuestManagementRuntime).toHaveBeenCalledWith(config);
+    expect(createAnalyticsRuntime).toHaveBeenCalledWith(config);
     expect(createPaymentsBillingRuntime).toHaveBeenCalledWith(config);
     expect(running.httpServer.listening).toBe(true);
     expect(running.readiness.isReady()).toBe(true);
@@ -423,6 +432,51 @@ describe('server startup and process signals', () => {
     expect((venue as { resource: { close: () => unknown } }).resource.close).toHaveBeenCalledOnce();
   });
 
+  it('cleans up all earlier runtimes when analytics initialization fails', async () => {
+    vi.mocked(createAnalyticsRuntime).mockRejectedValueOnce(new Error('analytics startup failed'));
+    await expect(
+      bootstrap({ loadConfig: () => Promise.resolve(parseEnvironment({ NODE_ENV: 'test' })) }),
+    ).rejects.toThrow('analytics startup failed');
+    const notifications = await (vi.mocked(createNotificationsRuntime).mock.results.at(-1)!
+      .value as ReturnType<typeof createNotificationsRuntime>);
+    expect(vi.spyOn(notifications.resource, 'close')).toHaveBeenCalledOnce();
+    const identity = await (vi.mocked(createIdentityRuntime).mock.results.at(-1)!
+      .value as ReturnType<typeof createIdentityRuntime>);
+    expect(vi.spyOn(identity.resource, 'close')).toHaveBeenCalledOnce();
+  });
+  it('cleans up owner runtimes after Notifications failure and validates worker purpose', async () => {
+    vi.mocked(createNotificationsRuntime).mockRejectedValueOnce(
+      new Error('notifications startup failed'),
+    );
+    await expect(
+      bootstrap({ loadConfig: () => Promise.resolve(parseEnvironment({ NODE_ENV: 'test' })) }),
+    ).rejects.toThrow('notifications startup failed');
+    const booking = await (vi.mocked(createBookingLifecycleRuntime).mock.results.at(-1)!
+      .value as ReturnType<typeof createBookingLifecycleRuntime>);
+    expect(vi.spyOn(booking.resource, 'close')).toHaveBeenCalledOnce();
+    const authorize = vi.mocked(booking.providers.createAutomationWorker).mock.calls.at(-1)![0];
+    const context = {
+      authority: 'SYSTEM' as const,
+      actorAccountId: null,
+      requestId: 'test',
+      causationId: 'test',
+    };
+    expect(() => authorize(context)).toThrow('Worker purpose is not allowed');
+    await expect(
+      authorize({ ...context, purpose: 'notifications:completion' }),
+    ).resolves.toBeUndefined();
+  });
+  it('closes analytics after database readiness construction fails', async () => {
+    vi.mocked(createDatabaseReadiness).mockImplementationOnce(() => {
+      throw new Error('readiness init failed');
+    });
+    await expect(
+      bootstrap({ loadConfig: () => Promise.resolve(parseEnvironment({ NODE_ENV: 'test' })) }),
+    ).rejects.toThrow('readiness init failed');
+    const analytics = await (vi.mocked(createAnalyticsRuntime).mock.results.at(-1)!
+      .value as ReturnType<typeof createAnalyticsRuntime>);
+    expect(vi.spyOn(analytics.resource, 'close')).toHaveBeenCalledOnce();
+  });
   it('reports signal-triggered shutdown failures and sets a failing exit code', async () => {
     const signalTarget = new TestSignalTarget();
     const reportShutdownError = vi.fn();
@@ -527,4 +581,27 @@ describe('server startup and process signals', () => {
     expect(isMainModule('file:///different/server.js', entryPath)).toBe(false);
     expect(isMainModule(pathToFileURL(entryPath).href, undefined)).toBe(false);
   });
+});
+
+vi.mock('../../modules/notifications-automation/notifications.runtime.js', async () => {
+  const { Router } = await import('express');
+  return {
+    createNotificationsRuntime: vi.fn(() => ({
+      router: Router(),
+      start: vi.fn(),
+      stop: vi.fn(),
+      resource: { name: 'notifications', close: vi.fn() },
+    })),
+  };
+});
+vi.mock('../../modules/analytics-dashboard/analytics.runtime.js', async () => {
+  const { Router } = await import('express');
+  return {
+    createAnalyticsRuntime: vi.fn(() => ({
+      router: Router(),
+      start: vi.fn(),
+      stop: vi.fn(),
+      resource: { name: 'analytics', close: vi.fn() },
+    })),
+  };
 });

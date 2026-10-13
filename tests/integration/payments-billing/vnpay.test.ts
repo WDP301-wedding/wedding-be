@@ -11,6 +11,7 @@ import {
 } from '../venue-catalog/catalog-test-database.js';
 import { createPayableBooking } from './deposit-fixture.js';
 import { controlledVnpay, ipnFixture, queryFixture } from './vnpay-fixture.js';
+import { createBillingReconciliationWorker } from '../../../src/modules/payments-billing/infrastructure/reconciliation.worker.js';
 
 const databaseDescribe = catalogMigrationDatabaseUrl ? describe : describe.skip;
 databaseDescribe('PB-W4 verified VNPay with real Booking/Identity/PostgreSQL', () => {
@@ -39,6 +40,50 @@ databaseDescribe('PB-W4 verified VNPay with real Booking/Identity/PostgreSQL', (
   async function paid(bookingId: string) {
     return database.prisma.billingLedgerEntry.count({ where: { bookingId, kind: 'PAYMENT' } });
   }
+  it('journals owner recovery failures and waits for the persisted retry lease in an unbounded worker lane', async () => {
+    const f = await fixture();
+    const reconcile = vi.fn<typeof f.vnpay.reconcile>(() =>
+      Promise.reject(new Error('Owner unavailable before settlement')),
+    );
+    const worker = createBillingReconciliationWorker(database.prisma, { ...f.vnpay, reconcile });
+    expect(await worker.run()).toEqual({ attempted: 1, failed: 1 });
+    expect(await worker.run()).toEqual({ attempted: 0, failed: 0 });
+    expect(reconcile).toHaveBeenCalledOnce();
+    expect(await paid(f.bookingId)).toBe(0);
+    expect(
+      await database.prisma.billingReconciliationLease.findUnique({
+        where: { paymentAttemptId: f.id },
+      }),
+    ).not.toBeNull();
+  });
+  it('RV-16 worker leases native UNKNOWN attempts, retries signed status evidence after restart and applies settlement only once', async () => {
+    const query = vi
+      .fn<VnpayStatusGateway['query']>()
+      .mockRejectedValueOnce(new Error('controlled timeout'));
+    const f = await fixture({ query });
+    let at = new Date();
+    const worker = createBillingReconciliationWorker(database.prisma, f.vnpay, () => at);
+    expect(await worker.run([])).toEqual({ attempted: 0, failed: 0 });
+    const racing = await Promise.all([worker.run([f.bookingId]), worker.run([f.bookingId])]);
+    expect(racing.reduce((sum, r) => sum + r.attempted, 0)).toBe(1);
+    expect(query).toHaveBeenCalledTimes(1);
+    expect(
+      (await database.prisma.billingPaymentAttempt.findUniqueOrThrow({ where: { id: f.id } }))
+        .state,
+    ).toBe('UNKNOWN');
+    expect(await paid(f.bookingId)).toBe(0);
+    expect(await worker.run([f.bookingId])).toEqual({ attempted: 0, failed: 0 });
+    at = new Date(at.getTime() + 300001);
+    query.mockResolvedValueOnce(queryFixture(f.id));
+    const restarted = createBillingReconciliationWorker(database.prisma, f.vnpay, () => at);
+    expect(await restarted.run([f.bookingId])).toEqual({ attempted: 1, failed: 0 });
+    expect(await restarted.run([f.bookingId])).toEqual({ attempted: 0, failed: 0 });
+    expect(await paid(f.bookingId)).toBe(1);
+    expect(
+      await database.prisma.bookingDepositSettlement.count({ where: { bookingId: f.bookingId } }),
+    ).toBe(1);
+    expect(query).toHaveBeenCalledTimes(2);
+  }, 30000);
   it('commits checkout before exposure; same command retains dates/IP/URL, ReturnURL has no money or access effect', async () => {
     const f = await fixture();
     expect(f.checkout.attempt.state).toBe('PENDING');
@@ -124,7 +169,12 @@ databaseDescribe('PB-W4 verified VNPay with real Booking/Identity/PostgreSQL', (
     expect(
       await database.prisma.billingProviderEvidence.count({ where: { paymentAttemptId: f.id } }),
     ).toBe(1);
-    expect(await database.prisma.billingDepositApplication.count()).toBe(1);
+    const payment = await database.prisma.billingLedgerEntry.findFirstOrThrow({
+      where: { bookingId: f.bookingId, kind: 'PAYMENT' },
+    });
+    expect(
+      await database.prisma.billingDepositApplication.count({ where: { paymentId: payment.id } }),
+    ).toBe(1);
     expect(
       await f.vnpay.processIpn(
         ipnFixture(f.id, {

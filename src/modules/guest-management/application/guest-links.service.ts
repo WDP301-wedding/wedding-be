@@ -2,7 +2,7 @@ import { randomBytes, randomUUID } from 'node:crypto';
 import type { Prisma, GuestInvitationCredential } from '../../../generated/prisma/client.js';
 import { AppError } from '../../../core/errors/app-error.js';
 import type { GuestService } from './guest.service.js';
-import type { GuestRequestContext } from './guest.contracts.js';
+import type { GuestRequestContext, PersonalizedInvitationDeliveryPort } from './guest.contracts.js';
 import {
   conflict,
   digest,
@@ -22,6 +22,47 @@ export class GuestLinksService {
     key: string,
     context: GuestRequestContext,
   ) {
+    const result = await this.issueInternal(bookingValue, guestValue, value, key, context);
+    if (result.credential === undefined) throw conflict('INVITATION_CREDENTIAL_ALREADY_ISSUED');
+    return {
+      credentialId: result.credentialId,
+      revision: result.revision,
+      expiresAt: result.expiresAt,
+      credential: result.credential,
+      fragment: `#credential=${result.credential}`,
+    };
+  }
+  async deliver(
+    bookingId: string,
+    guestId: string,
+    value: { expectedRevision: number; intendedEmail: string },
+    key: string,
+    context: GuestRequestContext,
+    port: PersonalizedInvitationDeliveryPort,
+  ) {
+    const result = await this.issueInternal(
+      bookingId,
+      guestId,
+      { expectedRevision: value.expectedRevision },
+      key,
+      context,
+      { intendedEmail: value.intendedEmail, port },
+    );
+    return {
+      credentialId: result.credentialId,
+      revision: result.revision,
+      expiresAt: result.expiresAt,
+      notificationIntentId: result.notificationIntentId!,
+    };
+  }
+  private async issueInternal(
+    bookingValue: string,
+    guestValue: string,
+    value: unknown,
+    key: string,
+    context: GuestRequestContext,
+    delivery?: { intendedEmail: string; port: PersonalizedInvitationDeliveryPort },
+  ) {
     const bookingId = parse(id, bookingValue),
       guestId = parse(id, guestValue),
       input = parse(linkIssueSchema, value);
@@ -30,8 +71,8 @@ export class GuestLinksService {
       bookingId,
       context,
       key,
-      `invitation.issue:${guestId}`,
-      input,
+      `${delivery === undefined ? 'invitation.issue' : 'invitation.deliver'}:${guestId}`,
+      delivery === undefined ? input : { ...input, intendedEmail: delivery.intendedEmail },
       async (tx, scope) => {
         const guest = await this.guests.requireGuest(tx, bookingId, guestId);
         if (guest.status !== 'ACTIVE') throw unavailable();
@@ -77,16 +118,30 @@ export class GuestLinksService {
           credentialId,
           input.expectedRevision + 1,
         );
+        const notificationIntentId =
+          delivery === undefined
+            ? undefined
+            : await delivery.port.enqueue(tx, {
+                bookingId,
+                guestId,
+                credentialId,
+                credential,
+                intendedEmail: delivery.intendedEmail,
+                expiresAt,
+              });
         return {
           credentialId,
           revision: input.expectedRevision + 1,
           expiresAt: expiresAt.toISOString(),
+          ...(notificationIntentId === undefined ? {} : { notificationIntentId }),
         };
       },
     );
     // Raw credential exists only in this request. Durable retries cannot recover it.
-    if (credential === undefined) throw conflict('INVITATION_CREDENTIAL_ALREADY_ISSUED');
-    return { ...result, credential, fragment: `#credential=${credential}` };
+    return {
+      ...result,
+      ...(delivery === undefined && credential !== undefined ? { credential } : {}),
+    };
   }
   private async publication(bookingId: string, publicInvitationId?: string) {
     if (this.guests.owners.invitation === undefined) throw unavailable();

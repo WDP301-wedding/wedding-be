@@ -29,6 +29,9 @@ import { createGuestManagementRuntime } from './modules/guest-management/guest-m
 import { createGuestImportBodyParser } from './modules/guest-management/http/guest-import.parser.js';
 import { createBookingLifecycleRuntime } from './modules/booking-lifecycle/booking-lifecycle.runtime.js';
 import { createPaymentsBillingRuntime } from './modules/payments-billing/payments-billing.runtime.js';
+import { createNotificationsRuntime } from './modules/notifications-automation/notifications.runtime.js';
+import { createAnalyticsRuntime } from './modules/analytics-dashboard/analytics.runtime.js';
+import { AppError } from './core/errors/app-error.js';
 
 type ProcessExitCode = NodeJS.Process['exitCode'];
 type ProcessSignal = 'SIGINT' | 'SIGTERM';
@@ -368,6 +371,50 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     throw error;
   }
 
+  let notificationsRuntime: Awaited<ReturnType<typeof createNotificationsRuntime>>;
+  try {
+    notificationsRuntime = await createNotificationsRuntime(
+      config,
+      bookingLifecycleRuntime.providers.createAutomationWorker((context) => {
+        if (
+          !['notifications:d3_reminder', 'notifications:completion'].includes(context.purpose ?? '')
+        )
+          throw new AppError({
+            status: 403,
+            code: 'FORBIDDEN',
+            message: 'Worker purpose is not allowed.',
+          });
+        return Promise.resolve();
+      }),
+      invitationStudioRuntime.providers.automation,
+      paymentsBillingRuntime.recovery,
+    );
+  } catch (error) {
+    await Promise.allSettled([
+      identityRuntime.resource.close(),
+      venueCatalogRuntime.resource.close(),
+      bookingLifecycleRuntime.resource.close(),
+      paymentsBillingRuntime.resource.close(),
+      invitationStudioRuntime.resource.close(),
+      guestManagementRuntime.resource.close(),
+    ]);
+    throw error;
+  }
+  let analyticsRuntime: Awaited<ReturnType<typeof createAnalyticsRuntime>>;
+  try {
+    analyticsRuntime = await createAnalyticsRuntime(config);
+  } catch (error) {
+    await Promise.allSettled([
+      identityRuntime.resource.close(),
+      venueCatalogRuntime.resource.close(),
+      bookingLifecycleRuntime.resource.close(),
+      paymentsBillingRuntime.resource.close(),
+      invitationStudioRuntime.resource.close(),
+      guestManagementRuntime.resource.close(),
+      notificationsRuntime.resource.close(),
+    ]);
+    throw error;
+  }
   let databaseReadiness: ReturnType<typeof createDatabaseReadiness>;
   try {
     databaseReadiness = createDatabaseReadiness(config.database.url);
@@ -379,10 +426,12 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
       paymentsBillingRuntime.resource.close(),
       invitationStudioRuntime.resource.close(),
       guestManagementRuntime.resource.close(),
+      notificationsRuntime.resource.close(),
+      analyticsRuntime.resource.close(),
     ]);
     throw error;
   }
-  return startServer({
+  const running = await startServer({
     corsConfig: config.cors,
     enableOpenApiInProduction: config.openApi.enabledInProduction,
     logger,
@@ -390,27 +439,25 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     port: config.runtime.port,
     readinessProbe: databaseReadiness.probe,
     readinessTimeoutMs: DATABASE_READINESS_TIMEOUT_MS,
-    resources:
-      tracingResource === undefined
-        ? [
-            databaseReadiness.resource,
-            guestManagementRuntime.resource,
-            identityRuntime.resource,
-            venueCatalogRuntime.resource,
-            bookingLifecycleRuntime.resource,
-            invitationStudioRuntime.resource,
-            paymentsBillingRuntime.resource,
-          ]
-        : [
-            databaseReadiness.resource,
-            tracingResource,
-            guestManagementRuntime.resource,
-            identityRuntime.resource,
-            venueCatalogRuntime.resource,
-            invitationStudioRuntime.resource,
-            bookingLifecycleRuntime.resource,
-            paymentsBillingRuntime.resource,
-          ],
+    resources: [
+      databaseReadiness.resource,
+      notificationsRuntime.resource,
+      analyticsRuntime.resource,
+      ...(tracingResource === undefined ? [] : [tracingResource]),
+      guestManagementRuntime.resource,
+      identityRuntime.resource,
+      venueCatalogRuntime.resource,
+      bookingLifecycleRuntime.resource,
+      invitationStudioRuntime.resource,
+      paymentsBillingRuntime.resource,
+    ].map((resource) => ({
+      ...resource,
+      async close() {
+        // Drain the worker before closing any owner database it currently uses.
+        await notificationsRuntime.stop();
+        await resource.close();
+      },
+    })),
     registerBodyParsers: (app) => {
       app.use(createGuestImportBodyParser());
     },
@@ -419,6 +466,8 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
       app.use('/api/v1', venueCatalogRuntime.router);
       app.use('/api/v1', invitationStudioRuntime.router);
       app.use('/api/v1', guestManagementRuntime.router);
+      app.use('/api/v1', notificationsRuntime.router);
+      app.use('/api/v1', analyticsRuntime.router);
       app.use('/api/v1', bookingLifecycleRuntime.router);
       app.use('/api/v1', paymentsBillingRuntime.router);
     },
@@ -426,6 +475,9 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     securityConfig: config.security,
     trustedProxyHops: config.identityAccess.trustedProxyHops,
   });
+  notificationsRuntime.start();
+  analyticsRuntime.start();
+  return running;
 }
 
 function reportOperationalError(

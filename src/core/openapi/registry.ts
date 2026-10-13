@@ -8,6 +8,8 @@ import { finalInvoiceOpenApiPaths } from '../../modules/payments-billing/http/fi
 import { guestOpenApiPaths } from '../../modules/guest-management/http/guest.openapi.js';
 import { seatingOpenApiPaths } from '../../modules/seating-plan/http/seating.openapi.js';
 import { staffOpenApiPaths } from '../../modules/staff-operations/http/staff.openapi.js';
+import { notificationOpenApiPaths } from '../../modules/notifications-automation/http/notification.openapi.js';
+import { analyticsOpenApiPaths } from '../../modules/analytics-dashboard/http/analytics.openapi.js';
 import {
   experienceOpenApiPaths,
   experienceOpenApiSchemas,
@@ -520,6 +522,8 @@ export const openApiRegistry = {
       },
     },
     ...staffOpenApiPaths,
+    ...notificationOpenApiPaths,
+    ...analyticsOpenApiPaths,
   },
   components: {
     schemas: {

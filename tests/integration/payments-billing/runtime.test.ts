@@ -13,6 +13,7 @@ import {
   catalogMigrationDatabaseUrl,
 } from '../venue-catalog/catalog-test-database.js';
 import { createManualBillingFixture, seedBillingManager } from './operations-fixture.js';
+import { controlledVnpay } from './vnpay-fixture.js';
 
 (catalogMigrationDatabaseUrl ? describe : describe.skip)(
   'billing runtime with real Identity sessions',
@@ -23,6 +24,18 @@ import { createManualBillingFixture, seedBillingManager } from './operations-fix
       await seedBillingManager(database.prisma);
     }, 60000);
     afterAll(() => database.disconnect());
+    it('exposes recovery only for a configured VNPay runtime and runs an empty recovery lane safely', async () => {
+      const url = new URL(catalogMigrationDatabaseUrl!);
+      url.pathname = `/${database.databaseName}`;
+      const base = parseEnvironment({ NODE_ENV: 'test', DATABASE_URL: url.toString() });
+      const runtime = await createPaymentsBillingRuntime({ ...base, vnpay: controlledVnpay });
+      try {
+        expect(runtime.recovery).toBeDefined();
+        expect(await runtime.recovery!.run([])).toEqual({ attempted: 0, failed: 0 });
+      } finally {
+        await runtime.resource.close();
+      }
+    });
     it('uses current Identity authority for money, promotion, private reads and cached replay', async () => {
       const f = await createManualBillingFixture(database.prisma);
       const url = new URL(catalogMigrationDatabaseUrl!);

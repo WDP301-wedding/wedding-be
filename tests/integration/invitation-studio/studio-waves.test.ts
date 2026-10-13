@@ -943,8 +943,16 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
       where: { id: f.bookingId },
       data: { planningHeadcount: 25, revision: 2 },
     });
+    await expect(capture(d)).rejects.toMatchObject({ status: 409 });
+    const reconfirmed = {
+      ...f.registry,
+      seatingPlanRevisionId: key(),
+      seatingPlanRevisionNumber: 2,
+      validityProof: { ...f.registry.validityProof, expectedAttendees: 25, bookingRevision: 2 },
+    };
+    await registered(reconfirmed);
     expect((await capture(d)).content.seating?.seatingPlanRevisionId).toBe(
-      f.registry.seatingPlanRevisionId,
+      reconfirmed.seatingPlanRevisionId,
     );
     for (const headcount of [31, 0, 41]) {
       await f.prisma.booking.update({
@@ -1697,6 +1705,18 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
     await f.prisma.booking.update({
       where: { id: f.bookingId },
       data: { planningHeadcount: 25, revision: { increment: 1 } },
+    });
+    await expect(capture(d)).rejects.toMatchObject({ status: 409 });
+    await registered({
+      ...f.registry,
+      seatingPlanRevisionId: key(),
+      seatingPlanRevisionNumber: 2,
+      validityProof: {
+        ...f.registry.validityProof,
+        expectedAttendees: 25,
+        bookingRevision: (await f.prisma.booking.findUniqueOrThrow({ where: { id: f.bookingId } }))
+          .revision,
+      },
     });
     expect((await capture(d)).content.timeline.timelineRevisionId).toBe(nextTimelineId);
   });

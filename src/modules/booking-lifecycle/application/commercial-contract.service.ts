@@ -361,7 +361,26 @@ export function createCommercialContractService(options: Options) {
           await options.conversion(client).requireConvertible(bookingId);
         const document = await buildDocument(client, access, input);
         const row = await createRevision(client, access, document, actor);
-        return evidence(client, access, row, actor, requestId, 'draft-created');
+        const result = await evidence(client, access, row, actor, requestId, 'draft-created');
+        if (input.predecessorRevisionId !== null)
+          await client.bookingOutboxEvent.create({
+            data: {
+              id: randomUUID(),
+              eventType: 'booking.contract-superseded',
+              eventVersion: 1,
+              correlationId: requestId,
+              causationId: requestId,
+              aggregateId: bookingId,
+              aggregateRevision: result.bookingRevision,
+              occurredAt: now(),
+              payload: {
+                bookingId,
+                contractRevisionId: input.predecessorRevisionId,
+                successorRevisionId: row.id,
+              },
+            },
+          });
+        return result;
       });
     },
     async submit(

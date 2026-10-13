@@ -1,4 +1,5 @@
 import type { ContractContext } from '../../../core/database/booking-boundary.js';
+import type { Prisma } from '../../../generated/prisma/client.js';
 import type { PublicInvitation } from '../../invitation-studio/domain/public-invitation.js';
 import type {
   BookingMediaPrerequisiteReader,
@@ -67,3 +68,19 @@ export type GuestDeliveryPreparation = Readonly<{
   expiresAt: string;
   intendedEmail: string;
 }>;
+
+/** Privileged transient command, enlisted in the Guest transaction. No raw
+ * credential is persisted in Guest command receipts or ordinary events. */
+export interface PersonalizedInvitationDeliveryPort {
+  enqueue(
+    tx: Prisma.TransactionClient,
+    command: Readonly<{
+      bookingId: string;
+      guestId: string;
+      credentialId: string;
+      credential: string;
+      intendedEmail: string;
+      expiresAt: Date;
+    }>,
+  ): Promise<string>;
+}

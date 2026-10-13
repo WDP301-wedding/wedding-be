@@ -129,6 +129,13 @@ describe('parseEnvironment', () => {
 
     expect(parsed).toEqual({
       invitationStudio: { publicOrigin: null },
+      notifications: {
+        workerEnabled: false,
+        bookingIds: undefined,
+        activeKeyVersion: null,
+        keys: new Map(),
+        fcm: null,
+      },
       runtime: {
         environment: 'development',
         port: 3001,
@@ -175,6 +182,7 @@ describe('parseEnvironment', () => {
           },
         },
         tokenEntropyBytes: 32,
+        passwordOtpHashKey: undefined,
         rateLimits: {
           login: { maxAttempts: 10, windowSeconds: 900 },
           tokenConsume: { maxAttempts: 10, windowSeconds: 900 },

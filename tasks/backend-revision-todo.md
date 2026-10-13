@@ -316,20 +316,49 @@ The owner confirmed named-Guest-only check-in on 2026-10-12 and deferred compani
 quantities to separate requirements. Real Staff/Guest/Seating owner integration now
 has exact-source Linux/PostgreSQL evidence: 1722 tests pass, per-file coverage bar
 unchanged. Production/live external providers and SPEC-09/10 consumers remain separate.
-- [ ] NTF-W1: Durable intents/recipient/device/channel registry and migration proof.
-- [ ] NTF-W2: Optional explicit-recipient Guest credential delivery, encryption and safe template/provider handling; absent names/contacts do not block generic invitation or other wedding notifications.
-- [ ] NTF-W3: Contract/appendix/payment/invoice/print and guest-plan handlers; no response events/deadline jobs.
-- [ ] NTF-W4: Due scheduler/reconciliation, media/D-3/completion jobs, retry/unknown/dedup proof.
-- [ ] NTF-W5: Settings/inbox/operations HTTP, outbox/provider integration evidence and frontend hand-off.
-- [ ] ANL-W1: Source formulas include agreed services/appendices/expenses/final invoices; separate explicit planning, optional named-list count and nullable mode-aware check-ins; no response metrics, disabled zeros or partial-list whole-event turnout rates.
-- [ ] ANL-W2: Projection/checkpoint/rebuild with monotonic source ordering.
-- [ ] ANL-W3: Authorized analytics HTTP/OpenAPI and bounded query/freshness proof.
-- [ ] ANL-W4: Deterministic fixture/real-source backend acceptance and frontend hand-off.
-- [ ] REL-W1: Backend environment/auth/config/manifest validation.
+- [x] NTF-W1: Durable intents/recipient/device/channel registry and migration proof.
+- [x] NTF-W2: Optional explicit-recipient Guest credential delivery, encryption and safe template/provider handling; absent names/contacts do not block generic invitation or other wedding notifications.
+- [x] NTF-W3: Contract/appendix/payment/invoice/print and guest-plan handlers; no response events/deadline jobs.
+- [x] NTF-W4: Due scheduler/reconciliation, media/D-3/completion jobs, retry/unknown/dedup proof.
+- [x] NTF-W5: Settings/inbox/operations HTTP, outbox/provider integration evidence and frontend hand-off.
+- [x] ANL-W1: Source formulas include agreed services/appendices/expenses/final invoices; separate explicit planning, optional named-list count and nullable mode-aware check-ins; no response metrics, disabled zeros or partial-list whole-event turnout rates.
+- [x] ANL-W2: Projection/checkpoint/rebuild with monotonic source ordering.
+- [x] ANL-W3: Authorized analytics HTTP/OpenAPI and bounded query/freshness proof.
+- [x] ANL-W4: Deterministic fixture/real-source backend acceptance and frontend hand-off.
+
+ANL-W1–W4 backend developer acceptance, 2026-10-13: [native source/fixture/coverage evidence](evidence/analytics-dashboard-w1-w4-2026-10-13.md),
+[exact provider/API manifest](evidence/analytics-dashboard-provider-manifest-2026-10-13.json) and
+[frontend API hand-off](../docs/analytics-dashboard-w1-w4.md). 98 tests / 11 files
+pass on the final SPEC-10 slice, with all 21 implementation/provider files including
+server wiring at per-file lines/branches >=80%. A preceding broad native run passes
+1,797 tests, but combined-workspace coverage remains blocked by unfinished SPEC-09
+files; this does not close NTF/RV/REL, deployment, remote CI or production readiness.
+
+- [x] REL-W1: Backend environment/auth/config/manifest validation (developer implementation; no staging/deployment acceptance claim).
 - [ ] REL-W2: Deterministic idempotent backend seeds/journeys: no names + Group seating + NONE through contract/deposit/print/event/final invoice, plus partial names + explicit check-in/undo; list changes never alter planning/money.
 - [ ] REL-W3: Empty/upgrade migrations, backend staging/runtime health/recovery evidence.
 - [ ] REL-W4: Immutable API/provider manifest and frontend release integration checklist; frontend delivery recorded separately.
 - [ ] REL-W5: Backend go/no-go evidence and recovery hand-off; full product release waits for frontend integration.
+
+2026-10-13 SPEC-11 checkpoint: REL-W1 release validators/tooling are implemented;
+REL-W2 has native intake seed replay/conflict proof and no-name/partial-name journeys,
+but whole-journey persistent staging seeds remain pending. REL-W3 empty/upgrade,
+readiness outage/recovery, restart and disposable backup/restore pass locally;
+staging and hosted backup/recovery evidence remain pending. RV-21/REL-W4/5 have
+candidate inventories/checklists and a **NO_GO** recovery hand-off, not accepted
+release artifacts. [Evidence](evidence/release-spec11-2026-10-13.md) and
+[backend/frontend hand-off](../docs/backend-release-spec11.md).
+The owner authorized preparing separate Railway staging and reserved concrete
+deployment approval. No shared-data/provider operation was executed. The separate
+Notifications worktree's migration/source evidence cannot close the current
+NTF-W1–W5/GM-W5/RV-16 gates. Preserve all earlier completed acceptance history.
+
+Final current-source native verification: 1,848 tests / 256 files pass with no skips,
+all files meet the unchanged lines/branches >=80% coverage bar. Serialized local
+migrations and bundled Node 24.19.0/threads avoid the first Windows fork/parallel
+cleanup failures. The latest NTF developer checkboxes are preserved, but lack an
+attached current-source owner hand-off and do not close RV-16 live runtime proof.
+[Exact candidate/API/coverage/migration manifest](evidence/release-provider-manifest-2026-10-13.json).
 
 ## Verification Record
 

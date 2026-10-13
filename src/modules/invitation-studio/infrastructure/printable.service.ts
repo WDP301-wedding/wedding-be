@@ -345,6 +345,7 @@ export class PrintableService implements PrintableSeatingContentRegistry {
       !venue.hallActive ||
       !venue.templateActive ||
       venue.totalSeatCapacity !== proof.totalSeatCapacity ||
+      current.planningHeadcount !== proof.expectedAttendees ||
       current.planningHeadcount < 1 ||
       current.planningHeadcount > Math.min(venue.hallMaxGuests, venue.totalSeatCapacity)
     )
