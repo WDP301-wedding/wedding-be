@@ -38,5 +38,23 @@ also include the three local ports and `OPENAPI_ENABLED=true`.
   before/after values are in `local-cors-fcm-config-2026-10-13.json`.
 - No schema or migration changes; no paid generation, payment or provider smoke send.
 
-Deployment and live CORS results are recorded separately after rollout. Existing
-runtime/provider acceptance records and RV checklists remain unchanged.
+## Railway rollout
+
+Deployment `b9c90845-1798-4310-8d06-c6fc7db52b62` succeeded with source commit
+`11af3c6`. Before rollout, all three localhost origins returned 403 with no
+allow-origin header. After rollout, all three returned 204 preflight responses
+with the exact requested origin and credential support. Existing public and
+management Vercel origins still returned 204. Port 3003 and an unapproved HTTPS
+origin returned 403 `CORS_ORIGIN_DENIED` with no allow-origin header.
+
+`/health/ready`, `/docs` and `/api/v1/openapi.json` returned 200. The deployed
+OpenAPI SHA-256 matched the unchanged local artifact:
+`6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915`.
+Both selected flags read back as true. FCM device delivery remains untested.
+See `local-cors-before-deployment-2026-10-13.json` and
+`local-cors-fcm-runtime-2026-10-13.json`.
+
+Source changes are preserved in draft PR #42; production currently uses the
+uploaded source. Merge the source fix before a later GitHub deployment so it
+continues to accept the newly configured loopback origins. Existing runtime/
+provider acceptance records and RV checklists remain unchanged.
