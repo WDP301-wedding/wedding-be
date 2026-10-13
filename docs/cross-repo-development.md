@@ -16,8 +16,10 @@ workspace/
 
 All four repositories use `main` as their default branch. Follow the
 [contributing guide](../CONTRIBUTING.md): create a separate `codex/<module>-<slice>`
-branch, open a pull request into `main`, obtain a teammate review, and merge only
-after the CI quality gates pass. The guide also records the current GitHub plan
+branch, open a pull request into `main`, and merge only after the exact-head CI
+quality gates pass. In `wedding-be`, teammate approval is optional and the owner
+may authorize merge/deployment; frontend repositories retain their own review
+policies. The guide also records the current GitHub plan
 limitation that prevents server-side branch protection for these private repos.
 
 ## Ownership boundaries

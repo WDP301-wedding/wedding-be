@@ -15,6 +15,14 @@ evidence and frontend source. New requirements are extensions to completed work.
 
 ## 1. Team Boundary
 
+Backend merge-policy amendment confirmed by the owner on **2026-10-13**:
+`wedding-be` no longer requires approval from another team member before merge.
+The owner may authorize merge and deployment after change review, resolved
+conversations and passing exact-head CI. Required quality, migration, coverage,
+dependency-audit and provider-evidence gates remain unchanged. This is a backend
+policy change, not an amendment to frontend repository policies or historical
+review/acceptance evidence.
+
 SPEC-11 recovery amendment confirmed by the owner on **2026-10-13**: the current
 dedicated Railway staging/demo contains synthetic test data only. Recovery may
 rebuild a new database from the immutable migrations and deterministic native seed;

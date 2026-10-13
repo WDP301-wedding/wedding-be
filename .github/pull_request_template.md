@@ -16,4 +16,4 @@ contract.
 - [ ] The pull request targets `main` from a separate feature branch.
 - [ ] Relevant checks passed and the changed behavior was verified.
 - [ ] Contract and documentation changes are included where needed.
-- [ ] Another team member will review before merge; all conversations must be resolved.
+- [ ] The change has been reviewed, any conversations are resolved, and merge is authorized by the project owner; teammate approval is optional.

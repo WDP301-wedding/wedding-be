@@ -104,3 +104,19 @@ Provider delivery, PR approval/merge, deployment and product GO remain separate.
   extension and final hand-off. Later documentation-only commits retain this code/API
   identity; current-head check results are visible on the PR. Team review, merge,
   deployment/configuration activation and live provider acceptance remain separate.
+
+## Owner-authorized merge-policy amendment
+
+After approving the PR #44 review exception, the owner explicitly instructed this
+chat to remove the mandatory "at least one approval from another team member"
+requirement before merge and Railway deployment. The backend contributing guide,
+PR template, scope amendment and cross-repository/deployment guidance now make
+teammate approval optional for `wedding-be`. Change review, resolved conversations
+and exact-head CI remain required. No frontend policy or historical reviewer
+approval is changed or claimed. The owner authorized PR #44 merge/deployment;
+the updated policy and all implementation changes must pass final-head CI first.
+
+GitHub inspection: `main.protected=false`, classic protection GET returned 404,
+rulesets GET returned 200 with an empty list. No server-side approving-review
+requirement exists to remove; no CI/protection setting was weakened. Previous
+private-plan 403 notes remain historical evidence.

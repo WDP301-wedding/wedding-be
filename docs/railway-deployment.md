@@ -61,7 +61,9 @@ project-wide staged changes while updating this service.
 An owner-authorized developer rehearsal may upload a reviewed feature branch
 after its CI gates pass. Record the exact source commit and deployment ID, retain
 the GitHub source and Wait for CI settings, and leave the PR open for team review.
-This test deployment does not waive the review requirement for merging `main`.
+The backend owner may authorize merge/deployment without teammate approval under
+the current [contributing policy](../CONTRIBUTING.md#review-and-merge). Exact-head
+CI, change review and resolved review conversations remain required.
 
 `.railwayignore` excludes environment files, generated output, private local
 tooling and credentials from upload. `.dockerignore` also excludes them from
