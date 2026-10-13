@@ -107,7 +107,7 @@ authorized disposable/staging environment and bounded cost; CI remains offline.
 - [x] RV-18 (deployed immutable PDF, retained images/QR and unchanged billing)
 - [x] RV-19 (native SPEC-07 registry/print integration and inspected PDF/QR; deployment separate)
 - [x] RV-20 (target request/error/audit correlation; metrics/OTLP optional disabled)
-- [ ] RV-21
+- [x] RV-21: Owner accepted the exact feature/evidence manifest as a synthetic-demo **NO_GO hand-off**, then authorized REL-W4/5. [Human approval and scope](evidence/spec11-rv21-owner-acceptance-2026-10-13.md). Runtime/provider gaps remain release blockers; no fresh provider or production acceptance is claimed.
 
 2026-10-12 SPEC-09 → RV-16 → GM-W5 backend checkpoint: NTF-W1–W5, RV-16 and
 GM-W5 are complete. [CI, native/runtime/provider and history evidence](evidence/notifications-rv16-gmw5-2026-10-12.md)
@@ -335,20 +335,29 @@ historical email acceptance above. [Configuration and client/backend hand-off](.
 - [x] NTF-FCM-W1: Direct FCM HTTP v1 adapter, secret-safe config and offline provider error tests.
 - [x] NTF-FCM-W2: Real event/due-job Android intents, FULL/Manager scope and device-specific durable retry/dedup.
 - [x] NTF-FCM-W3: Revocation/preferences/refresh/unknown recovery, persisted Retry-After, additive migration/RLS/OpenAPI and offline quality gates. [Final-source CI evidence](evidence/android-fcm-backend-2026-10-13.md).
-- [ ] NTF-FCM-W4: Configure service account for `wdp301-wedding`, migrate/deploy and record authorized Railway worker -> FCM acceptance evidence. Configuration, exact-source deployment, migrations, OAuth, IAM sending permission and recurring worker are verified in the [runtime checkpoint](evidence/android-fcm-backend-2026-10-13.md#authorized-runtime-checkpoint); actual message acceptance awaits an authorized native Android test registration/token. FCM remains disabled.
+- [ ] NTF-FCM-W4 (DEFERRED BY OWNER, 2026-10-13): Live Android FCM configuration/test/acceptance resumes when the app team reaches integration. Backend preparation is complete: service-account configuration, migrations, OAuth/IAM, adapter, durable worker/device retry and hand-off are recorded in the [runtime checkpoint](evidence/android-fcm-backend-2026-10-13.md#authorized-runtime-checkpoint). No actual message acceptance is claimed. FCM remains disabled. The owner explicitly removed device-token/live-push testing from the current backend release gate; retain this future task rather than marking it passed.
 - [x] NTF-FCM-W5: Publish backend API/configuration/provider-mode and recovery hand-off; attach Android receipt/display/navigation as a separately owned client dependency, never a backend test gate.
 
 - [x] ANL-W1: Source formulas include agreed services/appendices/expenses/final invoices; separate explicit planning, optional named-list count and nullable mode-aware check-ins; no response metrics, disabled zeros or partial-list whole-event turnout rates.
 - [x] ANL-W2: Projection/checkpoint/rebuild with monotonic source ordering.
 - [x] ANL-W3: Authorized analytics HTTP/OpenAPI and bounded query/freshness proof.
 - [x] ANL-W4: Deterministic fixture/real-source backend acceptance and frontend hand-off.
-- [ ] REL-W1: Backend environment/auth/config/manifest validation.
-- [ ] REL-W2: Deterministic idempotent backend seeds/journeys: no names + Group seating + NONE through contract/deposit/print/event/final invoice, plus partial names + explicit check-in/undo; list changes never alter planning/money.
-- [ ] REL-W3: Empty/upgrade migrations, backend staging/runtime health/recovery evidence.
-- [ ] REL-W4: Immutable API/provider manifest and frontend release integration checklist; frontend delivery recorded separately.
-- [ ] REL-W5: Backend go/no-go evidence and recovery hand-off; full product release waits for frontend integration.
+- [x] REL-W1: Backend environment/auth/config/manifest validation. [Exact-source quality and isolated staging evidence](evidence/spec11-staging-checkpoint-2026-10-13.md); environment/provider configuration is kept separate from GO/production readiness.
+- [x] REL-W2: Deterministic idempotent backend seeds/journeys: no names + Group seating + NONE through contract/deposit/print/event/final invoice, plus partial names + explicit check-in/undo; list changes never alter planning/money. [Native staging journeys, replay/conflict and contracted print proof](evidence/spec11-staging-checkpoint-2026-10-13.md).
+- [x] REL-W3: Empty/upgrade migrations, backend staging/runtime health/recovery evidence. Owner-selected recovery is migration + native seed rebuild for the dedicated synthetic-only staging/demo, replacing 30-day backup retention. [Scope amendment and preserved recovery evidence](evidence/spec11-demo-rebuild-scope-2026-10-13.md). No production/shared-data backup exemption is granted.
+- [x] REL-W4: Finalized immutable API/provider identity and frontend/app integration checklist after owner-reviewed RV-21. [Final backend hand-off](../docs/spec11-final-backend-handoff.md). Client delivery remains separately owned and unchecked; the release decision remains NO_GO.
+- [x] REL-W5: Published owner-accepted **NO_GO** release decision and recovery hand-off after RV-21/REL-W4. [Final decision, residual gates and recovery](evidence/spec11-final-no-go-handoff-2026-10-13.md). All 71 current-scope backend tasks are complete; full product/frontend delivery, deferred live FCM and production readiness remain separate.
 
 ## Verification Record
+
+Current SPEC-11 closure (2026-10-13): **71/71 backend tasks complete** in the
+owner-selected scope, following REL-W1 → REL-W2 → REL-W3 → RV-21 → REL-W4 → REL-W5.
+The owner accepted a documented NO_GO hand-off. Earlier dated completion counts
+and pending review notes above are historical checkpoints, superseded by the
+[final decision record](evidence/spec11-final-no-go-handoff-2026-10-13.md), not
+rewritten runtime/provider proof. NTF-FCM-W4 remains separately owner-deferred.
+The backend release is still **NO_GO**, product integration is pending and PR
+approval/merge is separate from backlog completion.
 
 For each completed task append exact command, result, environment, immutable provider
 version/API digest and evidence link to the owning module evidence. A skipped database
