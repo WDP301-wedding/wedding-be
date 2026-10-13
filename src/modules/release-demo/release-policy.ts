@@ -89,7 +89,7 @@ export const releaseInputSchema = z.strictObject({
   configurationIssues: z.array(z.string().regex(/^[A-Z_]+$/u)),
   deployment: deploymentPlanSchema.nullable(),
   taskStatus: z.record(
-    z.string().regex(/^(?:RV-\d{2}|BE-\d{2}|(?:GM|SEA|STF|NTF|ANL|REL)-W\d)$/u),
+    z.string().regex(/^(?:RV-\d{2}|BE-\d{2}|(?:GM|SEA|STF|NTF|NTF-FCM|ANL|REL)-W\d)$/u),
     z.boolean(),
   ),
   evidence: z.array(releaseEvidenceSchema),
@@ -103,6 +103,7 @@ export const BACKEND_PREREQUISITES = [
     Array.from({ length: 5 }, (_, i) => `${owner}-W${i + 1}`),
   ),
   ...Array.from({ length: 4 }, (_, i) => `ANL-W${i + 1}`),
+  ...Array.from({ length: 5 }, (_, i) => `NTF-FCM-W${i + 1}`),
   ...Array.from({ length: 4 }, (_, i) => `REL-W${i + 1}`),
 ] as const;
 
@@ -152,7 +153,7 @@ export function evaluateBackendRelease(raw: ReleaseInput) {
 export function readBackendTaskStatus(text: string): Record<string, boolean> {
   const result: Record<string, boolean> = {};
   for (const match of text.matchAll(
-    /^- \[([ x])\] ((?:RV-\d{2}|BE-\d{2}|(?:GM|SEA|STF|NTF|ANL|REL)-W\d))\b/gmu,
+    /^- \[([ x])\] ((?:RV-\d{2}|BE-\d{2}|(?:GM|SEA|STF|NTF|NTF-FCM|ANL|REL)-W\d))\b/gmu,
   )) {
     if (Object.hasOwn(result, match[2]!)) throw Error('Duplicate backend task ID.');
     result[match[2]!] = match[1] === 'x';

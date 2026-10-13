@@ -138,48 +138,83 @@ async function main() {
       return;
     }
     await step('operator-bootstrap', async () => {
-      assert.equal(await p.account.count(), 0, 'EMPTY_DEDICATED_FIXTURE_DATABASE_REQUIRED');
+      const knownIds = ['manager', 'couple', 'staff'].map((name) => key('account/' + name));
+      assert.equal(
+        await p.account.count({ where: { id: { notIn: knownIds } } }),
+        0,
+        'DEDICATED_FIXTURE_DATABASE_REQUIRED',
+      );
       await seedVenueCatalog(p);
+      state.credentials ??= {};
+      state.verifiers ??= {};
       for (const [name, role] of [
         ['manager', 'MANAGER'],
         ['couple', 'COUPLE'],
         ['staff', 'STAFF'],
       ]) {
         const accountId = key('account/' + name);
-        const verifier = await hashPassword(
-          'Staging-' + randomUUID(),
+        state.credentials[name] ??= 'Staging-' + randomUUID();
+        state.verifiers[name] ??= await hashPassword(
+          state.credentials[name],
           config.identityAccess.password,
         );
-        await p.account.create({
-          data: {
-            id: accountId,
-            emailNormalized: 'rel-' + name + '@example.invalid',
-            displayEmail: 'rel-' + name + '@example.invalid',
-            displayName: 'SPEC-11 synthetic ' + name,
-            roles: { create: { role } },
-            passwordCredential: {
-              create: {
-                algorithm: verifier.algorithm,
-                version: verifier.version,
-                ...verifier.parameters,
-                saltEncoded: verifier.saltEncoded,
-                derivedKeyEncoded: verifier.derivedKeyEncoded,
+        save();
+        const verifier = state.verifiers[name];
+        const existingAccount = await p.account.findUnique({
+          where: { id: accountId },
+          include: { passwordCredential: true, roles: true },
+        });
+        if (existingAccount) {
+          assert.equal(
+            existingAccount.emailNormalized,
+            'rel-' + name + '@example.invalid',
+            'DEMO_SEED_CONFLICT',
+          );
+          assert.equal(existingAccount.status, 'ACTIVE', 'DEMO_SEED_CONFLICT');
+          assert.equal(existingAccount.roles[0]?.role, role, 'DEMO_SEED_CONFLICT');
+          assert.equal(
+            existingAccount.passwordCredential?.derivedKeyEncoded,
+            verifier.derivedKeyEncoded,
+            'DEMO_SEED_CONFLICT',
+          );
+        } else
+          await p.account.create({
+            data: {
+              id: accountId,
+              emailNormalized: 'rel-' + name + '@example.invalid',
+              displayEmail: 'rel-' + name + '@example.invalid',
+              displayName: 'SPEC-11 synthetic ' + name,
+              roles: { create: { role } },
+              passwordCredential: {
+                create: {
+                  algorithm: verifier.algorithm,
+                  version: verifier.version,
+                  ...verifier.parameters,
+                  saltEncoded: verifier.saltEncoded,
+                  derivedKeyEncoded: verifier.derivedKeyEncoded,
+                },
               },
             },
-          },
-        });
-        const now = new Date(),
-          token = 'wia_' + randomBytes(32).toString('base64url');
-        await createPrismaSessionRepository(p).createSession({
-          accountId,
-          clientKind: 'WEB',
-          accessTokenHash: hashOpaqueToken(token, 'access'),
-          refreshTokenHash: hashOpaqueToken(randomBytes(32).toString('hex'), 'refresh'),
-          now,
-          accessExpiresAt: new Date(now.getTime() + 3600000),
-          idleExpiresAt: new Date(now.getTime() + 3600000),
-          absoluteExpiresAt: new Date(now.getTime() + 3600000),
-        });
+          });
+        const now = new Date();
+        state.tokens[name] ??= 'wia_' + randomBytes(32).toString('base64url');
+        const token = state.tokens[name];
+        save();
+        if (
+          !(await p.accessCredential.findUnique({
+            where: { tokenHash: hashOpaqueToken(token, 'access') },
+          }))
+        )
+          await createPrismaSessionRepository(p).createSession({
+            accountId,
+            clientKind: 'WEB',
+            accessTokenHash: hashOpaqueToken(token, 'access'),
+            refreshTokenHash: hashOpaqueToken(randomBytes(32).toString('hex'), 'refresh'),
+            now,
+            accessExpiresAt: new Date(now.getTime() + 3600000),
+            idleExpiresAt: new Date(now.getTime() + 3600000),
+            absoluteExpiresAt: new Date(now.getTime() + 3600000),
+          });
         state.accounts[name] = accountId;
         state.tokens[name] = token;
         save();
@@ -313,6 +348,13 @@ async function main() {
         await p.$transaction(async (tx) => {
           assert.equal(await tx.commercialContractRevision.count({ where: { bookingId } }), 0);
           assert.equal(await tx.payment.count({ where: { bookingId } }), 0);
+          const priorBooking = await tx.booking.findUniqueOrThrow({ where: { id: bookingId } });
+          assert.equal(priorBooking.revision, timeline.bookingRevision, 'DEMO_SEED_CONFLICT');
+          assert.equal(
+            priorBooking.eventDate.toISOString().slice(0, 10),
+            '2027-06-' + String(index + 1).padStart(2, '0'),
+            'DEMO_SEED_CONFLICT',
+          );
           await tx.booking.update({ where: { id: bookingId }, data: { eventDate } });
           await tx.bookingSlotHold.updateMany({
             where: { bookingId, status: 'ACTIVE' },

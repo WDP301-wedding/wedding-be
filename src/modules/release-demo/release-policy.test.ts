@@ -60,6 +60,7 @@ describe('backend release evidence gates', () => {
   it('refuses dirty artifacts, absent prerequisites and missing deployment authority', () => {
     const input = complete();
     input.taskStatus['NTF-W4'] = false;
+    input.taskStatus['NTF-FCM-W4'] = false;
     delete input.taskStatus['BE-17'];
     expect(
       evaluateBackendRelease({
@@ -72,6 +73,7 @@ describe('backend release evidence gates', () => {
       expect.arrayContaining([
         'UNCOMMITTED_SOURCE',
         'NTF-W4',
+        'NTF-FCM-W4',
         'BE-17',
         'DEPLOYMENT_AND_RECOVERY_OWNER_PENDING',
         'WORKER_REQUIRED',
