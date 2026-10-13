@@ -1,0 +1,5248 @@
+{
+  "schemaVersion": 1,
+  "releaseId": "backend-6f5f97de9952-f3d3af24d147",
+  "createdAt": "2026-10-13T02:06:19.405Z",
+  "sourceRevision": "6f5f97de9952629b7dd2c5bfbd4cf12b2464a865",
+  "cleanSource": true,
+  "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+  "configurationIssues": [
+    "WORKER_REQUIRED"
+  ],
+  "taskStatus": {
+    "RV-01": true,
+    "RV-02": true,
+    "RV-03": true,
+    "RV-04": true,
+    "RV-05": true,
+    "RV-06": true,
+    "RV-07": true,
+    "RV-08": true,
+    "RV-09": true,
+    "RV-10": true,
+    "RV-11": true,
+    "RV-12": true,
+    "RV-13": true,
+    "RV-14": true,
+    "RV-15": true,
+    "RV-16": true,
+    "RV-17": true,
+    "RV-18": true,
+    "RV-19": true,
+    "RV-20": true,
+    "RV-21": false,
+    "BE-01": true,
+    "BE-02": true,
+    "BE-03": true,
+    "BE-04": true,
+    "BE-05": true,
+    "BE-06": true,
+    "BE-07": true,
+    "BE-08": true,
+    "BE-09": true,
+    "BE-10": true,
+    "BE-11": true,
+    "BE-12": true,
+    "BE-13": true,
+    "BE-14": true,
+    "BE-15": true,
+    "BE-16": true,
+    "BE-17": true,
+    "GM-W1": true,
+    "GM-W2": true,
+    "GM-W3": true,
+    "GM-W4": true,
+    "GM-W5": true,
+    "SEA-W1": true,
+    "SEA-W2": true,
+    "SEA-W3": true,
+    "SEA-W4": true,
+    "SEA-W5": true,
+    "STF-W1": true,
+    "STF-W2": true,
+    "STF-W3": true,
+    "STF-W4": true,
+    "STF-W5": true,
+    "NTF-W1": true,
+    "NTF-W2": true,
+    "NTF-W3": true,
+    "NTF-W4": true,
+    "NTF-W5": true,
+    "NTF-FCM-W1": true,
+    "NTF-FCM-W2": true,
+    "NTF-FCM-W3": true,
+    "NTF-FCM-W4": false,
+    "NTF-FCM-W5": true,
+    "ANL-W1": true,
+    "ANL-W2": true,
+    "ANL-W3": true,
+    "ANL-W4": true,
+    "REL-W1": true,
+    "REL-W2": true,
+    "REL-W3": false,
+    "REL-W4": false,
+    "REL-W5": false
+  },
+  "deployment": {
+    "apiOrigin": "https://wedding-be-spec11-spec11-staging.up.railway.app",
+    "publicWebOrigin": "https://wedding-be-spec11-spec11-staging.up.railway.app",
+    "managementWebOrigin": "https://wedding-be-spec11-spec11-staging.up.railway.app",
+    "sameSiteDomain": "wedding-be-spec11-spec11-staging.up.railway.app",
+    "recoveryOwner": "Le-Ba-Bach",
+    "backupRetentionDays": 30,
+    "encryptedBackups": true,
+    "restoreReplaysErasureTombstones": true
+  },
+  "evidence": [
+    {
+      "gate": "quality.backend",
+      "status": "PASS",
+      "dimension": "offline",
+      "sourceRevision": "e8e7945548ac40d8308a5e4841fc0314c2d40276",
+      "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+      "target": "disposable-postgresql",
+      "targetOrigin": null,
+      "observedAt": "2026-10-13T02:06:17.985Z",
+      "evidence": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+      "evidenceSha256": "5258f8fbf7457aa3313bffdb88ccb3e83ff8bfff27e606aa0ba0546cbdd66ee3"
+    },
+    {
+      "gate": "journey.no-names",
+      "status": "PASS",
+      "dimension": "offline",
+      "sourceRevision": "e8e7945548ac40d8308a5e4841fc0314c2d40276",
+      "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+      "target": "disposable-postgresql",
+      "targetOrigin": null,
+      "observedAt": "2026-10-13T02:06:17.985Z",
+      "evidence": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+      "evidenceSha256": "5258f8fbf7457aa3313bffdb88ccb3e83ff8bfff27e606aa0ba0546cbdd66ee3"
+    },
+    {
+      "gate": "journey.partial-names",
+      "status": "PASS",
+      "dimension": "offline",
+      "sourceRevision": "e8e7945548ac40d8308a5e4841fc0314c2d40276",
+      "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+      "target": "disposable-postgresql",
+      "targetOrigin": null,
+      "observedAt": "2026-10-13T02:06:17.985Z",
+      "evidence": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+      "evidenceSha256": "5258f8fbf7457aa3313bffdb88ccb3e83ff8bfff27e606aa0ba0546cbdd66ee3"
+    },
+    {
+      "gate": "migration.empty-upgrade",
+      "status": "PASS",
+      "dimension": "offline",
+      "sourceRevision": "e8e7945548ac40d8308a5e4841fc0314c2d40276",
+      "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+      "target": "disposable-postgresql",
+      "targetOrigin": null,
+      "observedAt": "2026-10-13T02:06:17.985Z",
+      "evidence": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+      "evidenceSha256": "5258f8fbf7457aa3313bffdb88ccb3e83ff8bfff27e606aa0ba0546cbdd66ee3"
+    },
+    {
+      "gate": "staging.runtime",
+      "status": "PASS",
+      "dimension": "runtime",
+      "sourceRevision": "e8e7945548ac40d8308a5e4841fc0314c2d40276",
+      "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+      "target": "authorized-staging",
+      "targetOrigin": "https://wedding-be-spec11-spec11-staging.up.railway.app",
+      "observedAt": "2026-10-13T02:06:17.985Z",
+      "evidence": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+      "evidenceSha256": "5258f8fbf7457aa3313bffdb88ccb3e83ff8bfff27e606aa0ba0546cbdd66ee3"
+    },
+    {
+      "gate": "staging.recovery",
+      "status": "PENDING",
+      "dimension": "runtime",
+      "sourceRevision": "e8e7945548ac40d8308a5e4841fc0314c2d40276",
+      "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+      "target": "authorized-staging",
+      "targetOrigin": "https://wedding-be-spec11-spec11-staging.up.railway.app",
+      "observedAt": "2026-10-13T02:06:17.985Z",
+      "evidence": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+      "evidenceSha256": "5258f8fbf7457aa3313bffdb88ccb3e83ff8bfff27e606aa0ba0546cbdd66ee3"
+    },
+    {
+      "gate": "provider.revised-journey",
+      "status": "PENDING",
+      "dimension": "runtime",
+      "sourceRevision": "e8e7945548ac40d8308a5e4841fc0314c2d40276",
+      "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+      "target": "authorized-staging",
+      "targetOrigin": "https://wedding-be-spec11-spec11-staging.up.railway.app",
+      "observedAt": "2026-10-13T02:06:17.985Z",
+      "evidence": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+      "evidenceSha256": "5258f8fbf7457aa3313bffdb88ccb3e83ff8bfff27e606aa0ba0546cbdd66ee3"
+    },
+    {
+      "gate": "workers.runtime",
+      "status": "PASS",
+      "dimension": "runtime",
+      "sourceRevision": "e8e7945548ac40d8308a5e4841fc0314c2d40276",
+      "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+      "target": "authorized-staging",
+      "targetOrigin": "https://wedding-be-spec11-spec11-staging.up.railway.app",
+      "observedAt": "2026-10-13T02:06:17.985Z",
+      "evidence": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+      "evidenceSha256": "5258f8fbf7457aa3313bffdb88ccb3e83ff8bfff27e606aa0ba0546cbdd66ee3"
+    },
+    {
+      "gate": "RV-21",
+      "status": "PENDING",
+      "dimension": "owner-review",
+      "sourceRevision": "e8e7945548ac40d8308a5e4841fc0314c2d40276",
+      "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+      "target": "authorized-staging",
+      "targetOrigin": "https://wedding-be-spec11-spec11-staging.up.railway.app",
+      "observedAt": "2026-10-13T02:06:17.985Z",
+      "evidence": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+      "evidenceSha256": "5258f8fbf7457aa3313bffdb88ccb3e83ff8bfff27e606aa0ba0546cbdd66ee3"
+    }
+  ],
+  "frontendIntegrationStatus": "PENDING",
+  "providerVersion": "BACKEND-RELEASE@3.0.0",
+  "sourceState": "COMMITTED_CANDIDATE",
+  "backendStatus": "NO_GO",
+  "productStatus": "PENDING",
+  "blockers": [
+    "WORKER_REQUIRED",
+    "RV-21",
+    "REL-W3",
+    "REL-W4",
+    "quality.backend",
+    "journey.no-names",
+    "journey.partial-names",
+    "migration.empty-upgrade",
+    "staging.runtime",
+    "staging.recovery",
+    "provider.revised-journey",
+    "workers.runtime"
+  ],
+  "repositoryCommits": [
+    {
+      "repo": "wedding-be",
+      "sha": "6f5f97de9952629b7dd2c5bfbd4cf12b2464a865"
+    }
+  ],
+  "testedBaseRevision": "6f5f97de9952629b7dd2c5bfbd4cf12b2464a865",
+  "goNoGoResult": "NO_GO",
+  "androidBuildId": null,
+  "evidenceLinks": [
+    "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+    "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+    "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+    "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+    "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+    "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+    "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+    "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+    "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md"
+  ],
+  "workspaceContentSha256": "f3d3af24d14784fd1a94215a06ec17666949989ed0b16ac35a9d38d7975a63a5",
+  "sourceFiles": [
+    {
+      "path": ".dockerignore",
+      "sha256": "b8e26fb031aeb8efff3097e749867d36658e6be33ff5fb9d27943c83d2d41283"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "e4a2890e22034b51f590a96f95999fc85faf3164519099862a92d5d8d2b052f0"
+    },
+    {
+      "path": ".node-version",
+      "sha256": "73fb1b615e2043a933be1c0895cde4358036acc28d785692509b822aa53c761f"
+    },
+    {
+      "path": ".railway/railway.ts",
+      "sha256": "06a40abe3e500e42331cdc3cd219c0f28b1f840ad568c35c53e16257acf3bc75"
+    },
+    {
+      "path": "Dockerfile",
+      "sha256": "ce3b56f790e01c2989cb61a866c473f58c4e31f0d32e031ed5845fe232e8fed8"
+    },
+    {
+      "path": "assets/fonts/BeVietnamPro-Regular.ttf",
+      "sha256": "cd1ef6e9d7db28ad5cdb88a65ccbe693870e60d340b791f349d248342b4fe4c3"
+    },
+    {
+      "path": "assets/fonts/BeVietnamPro-SemiBold.ttf",
+      "sha256": "bd8e27eb02720b9d91e59e4f10a90878643219f25ce6a8d9a4f06a8a88d3bb71"
+    },
+    {
+      "path": "assets/fonts/OFL.txt",
+      "sha256": "6b7f8f73609a25ea78c891e34cf37b06f8a676b7ea986e941e43b009110f2a85"
+    },
+    {
+      "path": "assets/fonts/README.md",
+      "sha256": "169f4fc636bc2f5290659c696056d7546fc4487af84ac78d6dc9a676713c7f79"
+    },
+    {
+      "path": "certs/railway-spec11-root-ca.crt",
+      "sha256": "8d3797598b3c36c25b584908beb92622dad8b741991cf29ebb430db00c686142"
+    },
+    {
+      "path": "certs/supabase-root-ca.crt",
+      "sha256": "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7"
+    },
+    {
+      "path": "eslint.config.mjs",
+      "sha256": "befc473488567f4e09d8b75dd8ac3fda0c91457f03f2883a3fc85afb4075bc90"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "ede799fe5a5aeb73d4211e2f7e8a1cef0391b133aabc81e612a63adc06d1c6ed"
+    },
+    {
+      "path": "package.json",
+      "sha256": "b7ee9f5c5efecf690ea54decde9d481e4b059de3d8f6bcaf352ae86d10a060f8"
+    },
+    {
+      "path": "prisma.config.ts",
+      "sha256": "b375d6c2f77ff9c7a73e8d80c8dea8ee9c4976f8dc2db2614602f0d6a58aede2"
+    },
+    {
+      "path": "prisma/migrations/20260928000000_core_platform/migration.sql",
+      "sha256": "fdf48b9ad5baf3074bf3d310b90d945d66625131cc4f133e209fc6a4061f3902"
+    },
+    {
+      "path": "prisma/migrations/20261003000000_identity_access_persistence/migration.sql",
+      "sha256": "e68ae6978036b27180c0042ab6d74c7adf570b0fc8bb9f9b1a63864a5b0b268b"
+    },
+    {
+      "path": "prisma/migrations/20261005000000_venue_catalog_core/migration.sql",
+      "sha256": "e171ab99fecb2d735f2946548056a129157a7b625a4a095c2a2a562c0878c79b"
+    },
+    {
+      "path": "prisma/migrations/20261007000000_booking_lifecycle_foundation/migration.sql",
+      "sha256": "83eb52cf51cf428d058a69173542d263f5cac9457d6312a72d9f08400e91ab61"
+    },
+    {
+      "path": "prisma/migrations/20261007001000_booking_slot_holds/migration.sql",
+      "sha256": "bdd8f5891b87bcc6fafad084fc5261ce5313f84c7921d4ae0c64d09f3e02ab46"
+    },
+    {
+      "path": "prisma/migrations/20261007002000_booking_timelines/migration.sql",
+      "sha256": "b7a575364d75815e404dfdf65f73ef5d3bdcd8fe933c25a1aec649fbd4110041"
+    },
+    {
+      "path": "prisma/migrations/20261007003000_booking_deposit_intents/migration.sql",
+      "sha256": "3b3fccc1befe22e25d3d1a3284e2e76633f1c114a9d2de8d7c52485ecb5c69fb"
+    },
+    {
+      "path": "prisma/migrations/20261007004000_booking_post_deposit_lifecycle/migration.sql",
+      "sha256": "18e63d96c5c533cd5106bf3c1f0ce353879df406dd20e56fc4bedd3ac8820981"
+    },
+    {
+      "path": "prisma/migrations/20261008000000_invitation_delivery_intent/migration.sql",
+      "sha256": "12e32edcc98066031bfd4adc95d19a9c0f713bca425dbf487fb1781c999bea8e"
+    },
+    {
+      "path": "prisma/migrations/20261008000000_invitation_media/migration.sql",
+      "sha256": "9cf4f65369164c26b0861cf0184fc211df35e9b2e2362a8950efabc1fc2300d4"
+    },
+    {
+      "path": "prisma/migrations/20261008001000_booking_reporting/migration.sql",
+      "sha256": "a965b577973b1fbe3d8b1766ef980470dc65795bf530bfdd626b68855c264619"
+    },
+    {
+      "path": "prisma/migrations/20261008002000_booking_automation_command/migration.sql",
+      "sha256": "cbdbafac3282581f73e3b225f9eeff54c4b14c0dc7bb81f845c2791802ab2887"
+    },
+    {
+      "path": "prisma/migrations/20261008003000_confirmed_booking_slot/migration.sql",
+      "sha256": "31ec540b7d615e9488a63a64a8fb831eea4cd4d56ac20996cb371b0e436b1a22"
+    },
+    {
+      "path": "prisma/migrations/20261008004000_booking_event_envelope/migration.sql",
+      "sha256": "81c61924b14832e2e7eb567327537ff3e44a21c714251dee09e3596d97152a35"
+    },
+    {
+      "path": "prisma/migrations/20261008005000_retention_evidence_account_scope/migration.sql",
+      "sha256": "29344f1b7466ce2726b0c756c45e7d6c581affb04cb113059df160697e15e903"
+    },
+    {
+      "path": "prisma/migrations/20261008006000_payments_billing_ledger/migration.sql",
+      "sha256": "f83d49615742a4e32f3813e6c90bd84c5b01e4ed018cd4e559fc6a27dd4023c9"
+    },
+    {
+      "path": "prisma/migrations/20261008007000_billing_deposit_application/migration.sql",
+      "sha256": "14b34800d83772ebc3e138a0285e47194ebf0fd308a876e099b703ee03ab8859"
+    },
+    {
+      "path": "prisma/migrations/20261008007000_booking_commercial_acceptance/migration.sql",
+      "sha256": "487917d3482512b9107074d358c5758abde651965469f031b0b9e4009661d59f"
+    },
+    {
+      "path": "prisma/migrations/20261008008000_post_booking_experience/migration.sql",
+      "sha256": "b26e8a6e8b0c1c01d7d20b1dabb910c81ba17414f9cb2dc84e2b5b81b4c0f9ef"
+    },
+    {
+      "path": "prisma/migrations/20261008008000_vnpay_provider_evidence/migration.sql",
+      "sha256": "8afb100e53bda406b9a89257398ecc4f6fe6ffaa2cd98c2c4f430bfcdef6b10c"
+    },
+    {
+      "path": "prisma/migrations/20261008230000_password_email_otp/migration.sql",
+      "sha256": "0f6b8b9bfc1df18e2527ba7e187a74de0808edb903e969ee7c334860837a586e"
+    },
+    {
+      "path": "prisma/migrations/20261009000000_invitation_media_command_recovery/migration.sql",
+      "sha256": "3efb5e033b23ed9744248ba2f9b5a0c547f6ed3802714da5417bb57c2384ffa8"
+    },
+    {
+      "path": "prisma/migrations/20261009001000_billing_operations_reporting/migration.sql",
+      "sha256": "b4618f53fc5400595abf4ba9c684d6eb95d8e651141d900ce65a69ce56d70232"
+    },
+    {
+      "path": "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql",
+      "sha256": "d7382834ec5de4c4810779a63b29f6f91e2381d96a756b440849d81b69f8a688"
+    },
+    {
+      "path": "prisma/migrations/20261009030000_invitation_print_order_and_billing/migration.sql",
+      "sha256": "92389959e42c72f7d83c953ecdea466f84656208f84540d7e2b3d9a9b1b0ec06"
+    },
+    {
+      "path": "prisma/migrations/20261009040000_invitation_reporting_snapshots/migration.sql",
+      "sha256": "6987ca2d0de50b54a5704de592999ad0426779767bb7e1e6746595559254accf"
+    },
+    {
+      "path": "prisma/migrations/20261010010000_couple_profile/migration.sql",
+      "sha256": "e0221a09fe53ee743a01e090944fa4cc145ccf4aa0eeedc638ce9232a47bc447"
+    },
+    {
+      "path": "prisma/migrations/20261010020000_restaurant_services/migration.sql",
+      "sha256": "cc036e694f881c0dc0878fc5fe8dd11bcb8482f485bed5cbebfef7ca888e40d5"
+    },
+    {
+      "path": "prisma/migrations/20261010030000_print_commercial_offerings/migration.sql",
+      "sha256": "01e86401787ef7d9ec0a472893cdfee86012b5fa06cbfd42bed5a9f7605eba52"
+    },
+    {
+      "path": "prisma/migrations/20261011009000_billing_contract_source/migration.sql",
+      "sha256": "2a33869b5c55cffcb61d3a8a923b9fa85f8d7583ee1c3fd54fd5bd03bc871b6a"
+    },
+    {
+      "path": "prisma/migrations/20261011010000_commercial_contracts/migration.sql",
+      "sha256": "deda31129f4a3d255a0fa68cb0ce29ed1abb88c4f47225251b07a7478baccfa4"
+    },
+    {
+      "path": "prisma/migrations/20261011019000_billing_extension_sources/migration.sql",
+      "sha256": "7e209e9a50916048338fd338d606b334313b0d8283f26dad972efa47cb7729b0"
+    },
+    {
+      "path": "prisma/migrations/20261011020000_commercial_appendices/migration.sql",
+      "sha256": "d5130faa50e1e8cf2681084550584808171ab96761d167c185af3cc53e2058fc"
+    },
+    {
+      "path": "prisma/migrations/20261011021000_appendix_ledger_guards/migration.sql",
+      "sha256": "8ed9c3e9ed72c154c85952fa5e7a289792a285855efa47fb3599d0f0145d1d9c"
+    },
+    {
+      "path": "prisma/migrations/20261011022000_commercial_billing_outbox/migration.sql",
+      "sha256": "f6001872bcbf62396aca5ebf4c3df1de210a774455e87596a8a02ab22ba31904"
+    },
+    {
+      "path": "prisma/migrations/20261011023000_contract_print_fulfillment/migration.sql",
+      "sha256": "5bae57ec05bae44c39d1de0e4bf270fe6513b5a490bef57e1d7a7bbb5110a2a1"
+    },
+    {
+      "path": "prisma/migrations/20261011024000_print_template_provenance/migration.sql",
+      "sha256": "a0c4a986c568f44e5ec5bf4e78b6bcbcb261a7739a817bb35a4943ea79d53bec"
+    },
+    {
+      "path": "prisma/migrations/20261011025000_final_commercial_invoices/migration.sql",
+      "sha256": "03ce34bd80bd596980dcb6ffa097735050de629843ff5a53fc7b48d29b978409"
+    },
+    {
+      "path": "prisma/migrations/20261011026000_invoice_adjustment_prefix_guard/migration.sql",
+      "sha256": "ba79cbd15dc4c52c39a598ebf1743029065d7c3e541ef002bbfd0f3f00ebdc1e"
+    },
+    {
+      "path": "prisma/migrations/20261011027000_invoice_balance_pins/migration.sql",
+      "sha256": "d3eca34ef4a30c32352b858e669f446f27a5e6e239697687e6555ffdfffec563"
+    },
+    {
+      "path": "prisma/migrations/20261011028000_invoice_document_integrity/migration.sql",
+      "sha256": "c1a1bb2d0d84aa545636aaeb9db798c567e7fdafda296a2f9f1e71638df41a79"
+    },
+    {
+      "path": "prisma/migrations/20261011029000_invoice_outbox_identity/migration.sql",
+      "sha256": "e2a2fb1d90d6620f097078b0ab15a3efe987288fe9334befac16fc2a060e2b20"
+    },
+    {
+      "path": "prisma/migrations/20261011030000_preserve_allocated_print_sources/migration.sql",
+      "sha256": "7b956219f2c082dd90d71aa4ad38105b5cc4749903b0387ecd475f8a6f24ecd4"
+    },
+    {
+      "path": "prisma/migrations/20261011031000_contracted_print_quote_bounds/migration.sql",
+      "sha256": "cef89fd72e9c3a77996b1d89488714235d0bdd59497c69c0d1dfed8b88ce4da5"
+    },
+    {
+      "path": "prisma/migrations/20261012010000_guest_management/migration.sql",
+      "sha256": "1eefac415e6418e5fdf2ce2b005b7755bc6b305310b182d1c1dfbe2e692bae9f"
+    },
+    {
+      "path": "prisma/migrations/20261012020000_seating_plan/migration.sql",
+      "sha256": "bfcbebce5233c9a8416b875b68b2387581275066900f8ec06e0ede34f945eea6"
+    },
+    {
+      "path": "prisma/migrations/20261012030000_staff_operations/migration.sql",
+      "sha256": "9ded716f13afe11615b40235e0f99c160bd6a19c1bb56a141964fb1a17802a68"
+    },
+    {
+      "path": "prisma/migrations/20261012040000_notification_foundation/migration.sql",
+      "sha256": "bb02f1537552bd34ab0bf97875c5f60727fda801af53b69e20a4235b7f43e43e"
+    },
+    {
+      "path": "prisma/migrations/20261012041000_notification_credentials/migration.sql",
+      "sha256": "e917219baf97653bfee7b2e965aa43223bc13cfe218a29aeec2be98bc51ad5e2"
+    },
+    {
+      "path": "prisma/migrations/20261012042000_notification_producer_facts/migration.sql",
+      "sha256": "6cba7909304a4a135342cc9e88294418334ae19aa3b4dc420eeb0f232cb937bd"
+    },
+    {
+      "path": "prisma/migrations/20261012043000_notification_automation/migration.sql",
+      "sha256": "1bbabef05fdd6105dabd4d2f40887d7e19f2b8010fdeafe059f0727ab5eec454"
+    },
+    {
+      "path": "prisma/migrations/20261012044000_notification_api_guards/migration.sql",
+      "sha256": "ccb58899b5f27f06cc9894031f47e9ab02f5340c91d003fee019a163de0b970c"
+    },
+    {
+      "path": "prisma/migrations/20261012045000_seating_headcount_invalidation/migration.sql",
+      "sha256": "03f5d4a59ad0c1eedd78df6d9ec814bf61872f39bba06608af675643fce0e279"
+    },
+    {
+      "path": "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql",
+      "sha256": "16e544b524326108e8927ba4f8cc48e40db0f3fdaf4bed9d060f91c8c1e5bba8"
+    },
+    {
+      "path": "prisma/migrations/20261013002000_analytics_projection/migration.sql",
+      "sha256": "9449594ebe500e961a5847f80f0132dfafe87cf1376565a50681e1843beab05f"
+    },
+    {
+      "path": "prisma/migrations/20261013003000_reporting_scope_and_planning_invalidation/migration.sql",
+      "sha256": "8e56b181ffac97688db07b0173cdffcfe17fa35b495e5993cb894b9254a10523"
+    },
+    {
+      "path": "prisma/migrations/20261013004000_analytics_event_query_index/migration.sql",
+      "sha256": "b0bf5e05ee5d5b5cbfe5bd5d479a17eeb8903dddcb18d467e2aa02d94066a86d"
+    },
+    {
+      "path": "prisma/migrations/20261013005000_analytics_private_reporting/migration.sql",
+      "sha256": "a44292999bd9cc9eade7e7be5f0f912f20a7b55c1207c35fea3213e91b901bdd"
+    },
+    {
+      "path": "prisma/migrations/20261013010000_notification_fcm_delivery/migration.sql",
+      "sha256": "c36eff277874bc613143c8ae3902a3da02fcfd3a08eecaee051e5caad613b736"
+    },
+    {
+      "path": "prisma/migrations/20261013020000_notification_fcm_retry_after/migration.sql",
+      "sha256": "d9f278096e7097b776c99696f9ba4190011891490a98bca2d1a83c2420eb650c"
+    },
+    {
+      "path": "prisma/migrations/migration_lock.toml",
+      "sha256": "c6c80103f4f06df5cd3878eccb31ce235a12cd186384cb6dea3c9a241d0a9d81"
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "sha256": "7ef0d151465a5a640296af560d6af77f9bd2f2889759afda00cb36c87d0f9ef6"
+    },
+    {
+      "path": "scripts/catalog-seed.ts",
+      "sha256": "230f41cca196dadc62e097ff88c45594f260b1732adcf37a03cdc414fa2dde69"
+    },
+    {
+      "path": "scripts/demo-seed.ts",
+      "sha256": "6f5a3b19b31152d40a35fa27eaa1e633fe3287f5ba345f03a34e3f81f32a0cc7"
+    },
+    {
+      "path": "scripts/demo-setup.mjs",
+      "sha256": "f9132c173a2a70a0a60bb4293f35a0f7ed838802cf6b38a3fac8356b95b4b27f"
+    },
+    {
+      "path": "scripts/dependency-audit-policy.ts",
+      "sha256": "c88186b5b64ba04bb439603ebb7b00c83fa3584d306256844fbf1bc7a3c29d00"
+    },
+    {
+      "path": "scripts/dependency-audit.ts",
+      "sha256": "6b91e9d72febae95db3e1489445ef6e8a0d91bca2d304561010b33b1737c3e23"
+    },
+    {
+      "path": "scripts/identity-retention.ts",
+      "sha256": "c50d0005fd2319b7081bb994e0de0158ba32c8ca7a49153b575ebec1ef867b40"
+    },
+    {
+      "path": "scripts/inspect-seating-print.py",
+      "sha256": "d32487c5c05fdd3ff0642aaacfbc9348b4a9549d3ae2a7be9438bbee4332600b"
+    },
+    {
+      "path": "scripts/intake-retention.ts",
+      "sha256": "f004874fe41eb402a2ab24fa566a9ce102d6c6fd9c2b1e6f1144562ac593a6ee"
+    },
+    {
+      "path": "scripts/openapi.ts",
+      "sha256": "e7ebeef29c573e3e309842db72b86ac001a8aa12325b3bc090c99a68e70b7eeb"
+    },
+    {
+      "path": "scripts/release-manifest.ts",
+      "sha256": "a647717ba05c12ce38ee02d288cb6f79208f54be5a5dd6287bc6b20c0a7340c7"
+    },
+    {
+      "path": "scripts/release-rehearsal.ts",
+      "sha256": "ebe21877d4d74b5fdbc206b00ff0e6e383dc4fca30c1f083808ceb37e216a1bf"
+    },
+    {
+      "path": "scripts/release-staging-seed.mjs",
+      "sha256": "5b8a46a7e03cef3627a70ee6923448b4d8283c8525fb2ef816fd28aecf8e536a"
+    },
+    {
+      "path": "scripts/retention-options.ts",
+      "sha256": "737e7802e6e9f77065cb02f71f95fc5ceb1b6b9c67aad62f59fa3a0f90a847c7"
+    },
+    {
+      "path": "scripts/runtime-manifest.ts",
+      "sha256": "07b657bd55c41b25ba48581d4c66b3e7f33491a4f7984166ea0cff76c875b517"
+    },
+    {
+      "path": "scripts/staff-operations.verify.mjs",
+      "sha256": "8a26bf3a425a4e2d527f895cc548f12c30ca01275f6947d8dae23bf4b25d5b40"
+    },
+    {
+      "path": "src/app.ts",
+      "sha256": "0b56fe0eb08ae3df4ab85b8bd4e68616aaa0ae3db8d6e485c5f858c11bb2a513"
+    },
+    {
+      "path": "src/config/config.ts",
+      "sha256": "f8339a22c61bd2aea97e50614832b43414b40ebe27c0bc080ec139078d8b5954"
+    },
+    {
+      "path": "src/config/env.test.ts",
+      "sha256": "6fa873908797c7ecad4d2f41879e3bc116f631819dbdfacabf9abd8424f742fa"
+    },
+    {
+      "path": "src/config/env.ts",
+      "sha256": "77779e8ea520eccd2a59d8af69cc98e3e81d1e5d2be4a37bd79f1354ea3b2d03"
+    },
+    {
+      "path": "src/config/fcm.test.ts",
+      "sha256": "32dbd0ecbb0aa6c41c858723888d0f913c9ff1f22115f82dc81358abfd09b2fe"
+    },
+    {
+      "path": "src/config/fcm.ts",
+      "sha256": "debf94340625f3f3b010b6ec8351c2d212c7a9c477c99b089bbb2f7abc65f45c"
+    },
+    {
+      "path": "src/config/notifications.test.ts",
+      "sha256": "1e335bba1faf6f6fb6703b3c75ece67e9c29b0c628568357c733f75ba6b2d4e7"
+    },
+    {
+      "path": "src/config/notifications.ts",
+      "sha256": "11253baab2fbffec7934f80d6e1aadd54382cd0c2b958b6adf0ad8ee9d70b9f6"
+    },
+    {
+      "path": "src/config/runtime-manifest.test.ts",
+      "sha256": "48d721410aec3ea0a2899394eb6011ddbe57e2fb8550fd63ae055b24755fb253"
+    },
+    {
+      "path": "src/config/runtime-manifest.ts",
+      "sha256": "42e180bf21b5a8040897b874fb5025b720fd925dd8a40e0c0f01a21e74c7f4c8"
+    },
+    {
+      "path": "src/core/audit/audit.repository.test.ts",
+      "sha256": "83f140995d39506cb8d70768fbbdf12a208decd552517fa4802bb48769b37d8a"
+    },
+    {
+      "path": "src/core/audit/audit.repository.ts",
+      "sha256": "d06df2a5ca05b59f37b3aff45abf706e3e908f2955be6f885b059fc991064529"
+    },
+    {
+      "path": "src/core/audit/audit.service.test.ts",
+      "sha256": "07786dbb0429a3cf97b195f71a4efee532c794fb03d88e71e82463a23fd4ab4c"
+    },
+    {
+      "path": "src/core/audit/audit.service.ts",
+      "sha256": "a23dec16a83163bc19b7347a7eb33521854b6dcba7e85a6c0cedbd514c008f02"
+    },
+    {
+      "path": "src/core/audit/audit.types.ts",
+      "sha256": "a25cf47c4353afbe3b536adc482ef5dd866d68ef5f644705757cfa32c09e702a"
+    },
+    {
+      "path": "src/core/database/booking-boundary.ts",
+      "sha256": "7272265d7e82aa2703ec90d1c1fbc2dfa4c8c4a87d478f92b104386e0e9f945b"
+    },
+    {
+      "path": "src/core/database/booking-unit-of-work.test.ts",
+      "sha256": "e376fda916031035d938b7c4e29e119e86c95220773371ccc0e0935d050e7478"
+    },
+    {
+      "path": "src/core/database/booking-unit-of-work.ts",
+      "sha256": "ece46f3da8925723b98c9a29d55f001ec8475e96fed98563cbba0b214d5a56a2"
+    },
+    {
+      "path": "src/core/database/database-readiness.test.ts",
+      "sha256": "6f35ed7c02472854ec07d63abe0dae6ba71f9106ddd23a63c24994b2d8f895a5"
+    },
+    {
+      "path": "src/core/database/database-readiness.ts",
+      "sha256": "072f5dcad163952508c667382a1a6705d469bdd2c7b4da272616069a4e766e54"
+    },
+    {
+      "path": "src/core/database/enlisted-prisma-client.test.ts",
+      "sha256": "12ebd96da7809f14779e14daddf6d56a44473bb96e12b7cb1a64abad7f0d905d"
+    },
+    {
+      "path": "src/core/database/enlisted-prisma-client.ts",
+      "sha256": "e7f68a3b3e1a289901687e2cd24d1a7f45d052ee7d6cfbcb710ae788a3f5bc65"
+    },
+    {
+      "path": "src/core/database/prisma.test.ts",
+      "sha256": "b934e8dd98fe8b874023469b37e090c6495058a54056c081970d81a8b07ac06a"
+    },
+    {
+      "path": "src/core/database/prisma.ts",
+      "sha256": "b86e70e98f746c4a19769d867e01631752393b38905185f3e118643c5fd6024e"
+    },
+    {
+      "path": "src/core/errors/app-error.ts",
+      "sha256": "916edfaf66c8e4886aca5438842a0636854b637dd23d032dd547ba1e3af439b5"
+    },
+    {
+      "path": "src/core/errors/error-handler.ts",
+      "sha256": "6278c8fe68ebab59193c67f78bfeeb1bfc6c309a24346e81c41c4130dd084715"
+    },
+    {
+      "path": "src/core/http/common.schemas.ts",
+      "sha256": "1ed0380527341966bc00292c6f59bea48e975cd840481d808a68cdc9e0079b16"
+    },
+    {
+      "path": "src/core/http/health.router.ts",
+      "sha256": "8bce6e427b8dd4c89c891921654fb47ddced59d06c2dcf1764cea9eb81fb2f0f"
+    },
+    {
+      "path": "src/core/http/health.schemas.ts",
+      "sha256": "b0044d24aea6c82ffd95aa73e5b59537cdc8f4984db23d8c1c595fd9d855c047"
+    },
+    {
+      "path": "src/core/http/http-contract.test.ts",
+      "sha256": "9f44331c5ad89e693b94c4852d0a78a7a002b0c4f832139c085c95292044156a"
+    },
+    {
+      "path": "src/core/http/lifecycle.test.ts",
+      "sha256": "abbce9129d3e480662f5ce1d6399c5b53b46a747e538152c5967ff0d3decb1dc"
+    },
+    {
+      "path": "src/core/http/lifecycle.ts",
+      "sha256": "e4753b4149dba2c3c5447ed623efe02ffeb5b4bab1cf0939ae5839a602577362"
+    },
+    {
+      "path": "src/core/http/rate-limit.ts",
+      "sha256": "65dc94f4cb58cf862b437a817996329268232b694895a28d1a388228404eb33c"
+    },
+    {
+      "path": "src/core/http/readiness.test.ts",
+      "sha256": "fa97ad0e8aae6a487c097d8426a582a5a691e0a770efe1f03130e1f4a5326699"
+    },
+    {
+      "path": "src/core/http/readiness.ts",
+      "sha256": "1f67bbcf0f8cc3ca2216a153d34ead561a73857e000e82f6151e80ef8adbdc9c"
+    },
+    {
+      "path": "src/core/http/request-context.ts",
+      "sha256": "21be83d57467a50fe15560be741be975092c1719a3e2a91443c2c9f3f3afcb4a"
+    },
+    {
+      "path": "src/core/http/security.test.ts",
+      "sha256": "fd32a2a60f147a96d9b4e104c51490f70df8ee669b620560259c8b24e8d68f21"
+    },
+    {
+      "path": "src/core/http/security.ts",
+      "sha256": "8113b2bed315b9e65b32ba297ea2994ea9a148b9beac1422ffa29969e7bc320f"
+    },
+    {
+      "path": "src/core/http/validate.ts",
+      "sha256": "da802e299680828ccd011540d04cc7d9f18e5339516635ee0a7fb39fec6dae1e"
+    },
+    {
+      "path": "src/core/idempotency/idempotency-hash.test.ts",
+      "sha256": "2141cb871af0cbd43237ee779204ef41771e36b8a82de23cfa7d43c7acd0926f"
+    },
+    {
+      "path": "src/core/idempotency/idempotency.middleware.test.ts",
+      "sha256": "4ff30a996b5aa1e491ca613011f1aa12484c05e85eae91861e247443402f4f61"
+    },
+    {
+      "path": "src/core/idempotency/idempotency.middleware.ts",
+      "sha256": "dd72d913031282d032a3a22a21f3b84bfdd4231852b03eccace6101d92e509e6"
+    },
+    {
+      "path": "src/core/idempotency/idempotency.policy.test.ts",
+      "sha256": "b5dfa8b9757c2c188e950522ef77bd9e7156532b85fb1decb43891880bddd5a2"
+    },
+    {
+      "path": "src/core/idempotency/idempotency.policy.ts",
+      "sha256": "2a487017efd03183c1bbb9de14394a61149a9f13d3a3d6a39b2e5c3cf1248e1e"
+    },
+    {
+      "path": "src/core/idempotency/idempotency.repository.test.ts",
+      "sha256": "4c846d24d45765b58da1c9a27e1e93f8854da72c78415e39d4593e79f08b4691"
+    },
+    {
+      "path": "src/core/idempotency/idempotency.repository.ts",
+      "sha256": "a2c85383e677bfb82c001e0d40f4127e09159f27ffb92f5e6c821cf7c657e0e0"
+    },
+    {
+      "path": "src/core/idempotency/idempotency.schemas.ts",
+      "sha256": "e7eeff93ac5b1353fe7d692b34ee6da25952c007f54e8693dbc9caa7a25c30a9"
+    },
+    {
+      "path": "src/core/idempotency/idempotency.service.test.ts",
+      "sha256": "ebae13f37edde016de471739f1a0d5e8babef846b436d0eb9e754bc169688935"
+    },
+    {
+      "path": "src/core/idempotency/idempotency.service.ts",
+      "sha256": "fb5ba28d77dc762413fae78a8bdbc4139be834fb6a9856867993c9eb7395cb44"
+    },
+    {
+      "path": "src/core/idempotency/request-hash.ts",
+      "sha256": "b3086db4254f41b2fa66300c459e5224ac31d5c9adad74c38a5d7b62ebf88520"
+    },
+    {
+      "path": "src/core/idempotency/response-codec.ts",
+      "sha256": "e192d9191dc24a6fa90c2ab8481b9b43d2d9906546b51637663ed7f0e705881a"
+    },
+    {
+      "path": "src/core/integration-events/booking-event.test.ts",
+      "sha256": "e885f74ee5ab069aab3325c8b49e22b7cee494cceca8e84cdb71937f11ffadd5"
+    },
+    {
+      "path": "src/core/integration-events/booking-event.ts",
+      "sha256": "62a007fa0f5b520f567bf5f8da156d703d9349d9d9294c605d6a1a51c5960a96"
+    },
+    {
+      "path": "src/core/logging/logger.ts",
+      "sha256": "ce7c598b0e8872021ea2f19f1d78b72cabd5354b8b904e940ad518543f8e6941"
+    },
+    {
+      "path": "src/core/logging/logging.test.ts",
+      "sha256": "6cb4f6372ce9e57004200556a09f13554f5fb4f13350daef73ddfb1e22daaec6"
+    },
+    {
+      "path": "src/core/logging/redaction.ts",
+      "sha256": "7adc6c91a4f58313a2049540898daf1eb72e5bf2f1496c769068d087146c0e1f"
+    },
+    {
+      "path": "src/core/logging/request-logger.ts",
+      "sha256": "5956568c8512b57f2730841da0b6692c2df17d0ab0a6cd68eec68dd446d56a5b"
+    },
+    {
+      "path": "src/core/observability/instrumentation-observability.test.ts",
+      "sha256": "cfa3696ff4f24335952be9136c5814d6a49b8f87ef1680c473c03645b439f1d1"
+    },
+    {
+      "path": "src/core/observability/metrics.router.ts",
+      "sha256": "5eb53997cbbe19e07e1e16835aef14f569e2dc3daddd4b24785de3751b7a6854"
+    },
+    {
+      "path": "src/core/observability/metrics.ts",
+      "sha256": "9edb1182f013ce8bafe86ad6736e08a886326026e92829223178044984021611"
+    },
+    {
+      "path": "src/core/observability/observability.test.ts",
+      "sha256": "ebf9f2eaae716ae9342400fa2517597cbdb2fd2753286e30a497fe8ad5ddfcb9"
+    },
+    {
+      "path": "src/core/observability/tracing.ts",
+      "sha256": "39f8bae02d9dfd1ffbc740a044574848497ded207a1c38c77683e710a42ed5cc"
+    },
+    {
+      "path": "src/core/openapi/artifact.ts",
+      "sha256": "1dbd4e80cb1d924605bd2d85f51ad3df6679eb65e965ea959f2b7616087fdaca"
+    },
+    {
+      "path": "src/core/openapi/docs.router.ts",
+      "sha256": "b4a1f2ded1cfb2eb6cc2c6e24bd92ebbc1e32d7e0f9bb86856bada18e2bc3f0f"
+    },
+    {
+      "path": "src/core/openapi/generate.ts",
+      "sha256": "04148b33e0ce5e674a934520787419232aa1668cb4fb8ecc399f91b2ac47da03"
+    },
+    {
+      "path": "src/core/openapi/openapi.router.ts",
+      "sha256": "5a145ad971b8688b25ed179440e002c6a24969392cf963ae33a8108fda785b37"
+    },
+    {
+      "path": "src/core/openapi/registry.ts",
+      "sha256": "eb4912962e0323d4a2b19f6c26bc747457b56e8b28734aec5efe7595d0d57924"
+    },
+    {
+      "path": "src/core/reporting/reporting-feed.test.ts",
+      "sha256": "308f968706fe9c70f238d43b8af600bdd8abc649cb48dfe56940ad85fd5cb9b5"
+    },
+    {
+      "path": "src/core/reporting/reporting-feed.ts",
+      "sha256": "d72def685389acf1bcade63287ffea85421cd56d6455587c8e6752a88ab8370c"
+    },
+    {
+      "path": "src/core/security/authentication-material.ts",
+      "sha256": "de8cbd4c51d8cf62b14bf893adfcb224be4a92b7c52a5ad37be062c8adb0d9b6"
+    },
+    {
+      "path": "src/core/smoke.test.ts",
+      "sha256": "eb2221ff9c62f0c8d250a9f4c6fee4f1294e438e087e2db46dbbab15fe3ebbab"
+    },
+    {
+      "path": "src/index.ts",
+      "sha256": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
+    },
+    {
+      "path": "src/instrumentation.ts",
+      "sha256": "d8c04d3d277456a77130dd9d0186915bee213077cfa60572e6442dc873711c6a"
+    },
+    {
+      "path": "src/integrations/ai-image/ai-image-provider.test.ts",
+      "sha256": "c100a09fb2cbce95a84861589c1c5e784adb6272c32ceb1d8f40338d8aec1d03"
+    },
+    {
+      "path": "src/integrations/ai-image/ai-image-provider.ts",
+      "sha256": "3080794c116d12a998ff9f89fc220254a25e88b636da23f97973324b802c945a"
+    },
+    {
+      "path": "src/integrations/ai-image/ai-image.schemas.ts",
+      "sha256": "7385db4d866943653bf78b2576c7bca674594438bdf9babe09f07fee03ea8837"
+    },
+    {
+      "path": "src/integrations/ai-image/fake-ai-image-provider.ts",
+      "sha256": "1aa7f1727e04ce7b583ee6dd28ea92ead6c8e91af7e0d8fbbfdc70ddb2d2dd32"
+    },
+    {
+      "path": "src/integrations/ai-image/gemini-ai-image-provider.ts",
+      "sha256": "3fdfd6aef04b88b00aaf9d49b481bec086e53382769f34c7b201150dac78bfdb"
+    },
+    {
+      "path": "src/integrations/email/brevo-email-provider.test.ts",
+      "sha256": "6ec769434c3509677496793e7b316c22cbccc3795a38324b1d707df7ff45aa08"
+    },
+    {
+      "path": "src/integrations/email/brevo-email-provider.ts",
+      "sha256": "f8c701b128800fe61fde0f8cf7e0244d37ce650940a01db1789a5b3827853163"
+    },
+    {
+      "path": "src/integrations/email/email-provider.factory.test.ts",
+      "sha256": "b3b0351b9e8678676eadfdc7243ca2abdac90951fd7aee13378af9a69a172d65"
+    },
+    {
+      "path": "src/integrations/email/email-provider.factory.ts",
+      "sha256": "e2a8e6ec8b5f5be4d8369136c3446440049e8e089f6cb88a212775ced710d23d"
+    },
+    {
+      "path": "src/integrations/email/email-provider.test.ts",
+      "sha256": "124358b2b4af0e5bad18cf9801b992001ed6536a8d597f711bac864f57549b89"
+    },
+    {
+      "path": "src/integrations/email/email-provider.ts",
+      "sha256": "5aefcf9844da00cfcb53964ef9405c43246e63f84ca8fbc5cc2cb38cbb34cc2f"
+    },
+    {
+      "path": "src/integrations/email/email.schemas.ts",
+      "sha256": "a293efa7938496a691ea89fbc6d809affb051215f64ad5d56aff62094e8da9c6"
+    },
+    {
+      "path": "src/integrations/email/fake-email-provider.ts",
+      "sha256": "ee4c6837a23de75c708e3de5a1cad699705cd033e0253df5349e185a55300d2f"
+    },
+    {
+      "path": "src/integrations/email/resend-email-provider.ts",
+      "sha256": "cadab0b12da127974b7f88e3132b878fdb200e6cce656e06636314e143d787d2"
+    },
+    {
+      "path": "src/integrations/storage/fake-storage-provider.ts",
+      "sha256": "5ad9733c2a42f4af0641b1ead7be5d0a7410d7f8bc48548e4fa04dc4a13b2fdc"
+    },
+    {
+      "path": "src/integrations/storage/storage-provider.test.ts",
+      "sha256": "fe24d9b19aa463e325aa07eb3b734854899490bd1a3b9cb7df55b1ef46d87ed5"
+    },
+    {
+      "path": "src/integrations/storage/storage-provider.ts",
+      "sha256": "3965daca414122741fa5f66ca9df7603a032f4263a1b95c76b56f15e7aead44f"
+    },
+    {
+      "path": "src/integrations/storage/storage-read.test.ts",
+      "sha256": "f1aa338ffb2a5c196a7a209799337ec93bb6c140458410486f20f7b568486b18"
+    },
+    {
+      "path": "src/integrations/storage/storage.schemas.ts",
+      "sha256": "f4635984f79bf6796c0824531ff0332c53c72be773a0b255fd1dc5a25f01129c"
+    },
+    {
+      "path": "src/integrations/storage/supabase-storage-provider.ts",
+      "sha256": "39845e3abd28ac0d003d3c2c44e3868b4ce47ea9994ac76b9c3227fc173584e1"
+    },
+    {
+      "path": "src/modules/analytics-dashboard/analytics.runtime.test.ts",
+      "sha256": "911b2acb93e8971b5b986a5b60e26b465cfc3ed991be66e0629d1bac4e06fb9e"
+    },
+    {
+      "path": "src/modules/analytics-dashboard/analytics.runtime.ts",
+      "sha256": "1658806774bcd5536884651effaf551bf4d3a5d6cec0ec7270806cc142ca6f8e"
+    },
+    {
+      "path": "src/modules/analytics-dashboard/application/analytics.service.test.ts",
+      "sha256": "55dbe897be9be57af79089d498aca6ce24c6bdaa4d6f9292f09247e68f81f7f6"
+    },
+    {
+      "path": "src/modules/analytics-dashboard/application/analytics.service.ts",
+      "sha256": "18d57896a10b676e6135edd3f6ffc1decc3f1e711d81c925fbfac2a2c2d3d6a9"
+    },
+    {
+      "path": "src/modules/analytics-dashboard/application/projection.test.ts",
+      "sha256": "20a80239211a09d0222447064e4477669838ea451fa0f6db509d7ae6980fbbd3"
+    },
+    {
+      "path": "src/modules/analytics-dashboard/application/projection.ts",
+      "sha256": "70230253c14a4f5ccaea0ea51a209922013e60f9d42bda79f1fd50b61cbafddb"
+    },
+    {
+      "path": "src/modules/analytics-dashboard/domain/metrics.test.ts",
+      "sha256": "a113ae7e88a5538beaca370e9fd549017cffcba39b8c782222d552bf1e668f09"
+    },
+    {
+      "path": "src/modules/analytics-dashboard/domain/metrics.ts",
+      "sha256": "509aeb5903e842e0a909f24db2004b05f024786fa7b1fc21ac98f1d46bb7b844"
+    },
+    {
+      "path": "src/modules/analytics-dashboard/http/analytics.openapi.ts",
+      "sha256": "22bd3f03eeeee85b5d644ff0f8645c577d31018c6b439248d9fad94bc6d2918c"
+    },
+    {
+      "path": "src/modules/analytics-dashboard/http/analytics.router.ts",
+      "sha256": "55dde167dc8d485abdac3c78b8e6ae687c83c7431a0afbc5903bc31b8a2edcb7"
+    },
+    {
+      "path": "src/modules/analytics-dashboard/http/analytics.schemas.ts",
+      "sha256": "1785356801e5b9b8fc008f4300f730ae5fb6521392fa00bf1f5c13e006dbecf5"
+    },
+    {
+      "path": "src/modules/analytics-dashboard/infrastructure/analytics.composition.ts",
+      "sha256": "512f73cc8e515ec7d0ec452b76bf2e654ed97f9a08261134a3e5847898eb73a2"
+    },
+    {
+      "path": "src/modules/analytics-dashboard/infrastructure/projection.repository.ts",
+      "sha256": "d77efa5e5921e82badc1b727a2b32d294387698811ce20bf6c73f4f001e6b4f8"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/analytics-reporting.ts",
+      "sha256": "6502c45664f6221d08ced0a4cc16c6b8cee3d282d22f9ef85058d4bfe680c925"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/automation.test.ts",
+      "sha256": "60c9bc939a3c8a7864f568c9225ceeda39fc33b1fbb750b6f5e722ddfb6041e0"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/automation.ts",
+      "sha256": "dbed2efd5b04bdeb49b22e361dae129fdd081e59ea6a24da82201850f92f0362"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/booking-identity.adapter.test.ts",
+      "sha256": "38edde7e93e4bc43710efd1f84eb5739ae715287fe8c74452c09c081941ae4dd"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/booking-identity.adapter.ts",
+      "sha256": "7162166e4aa0c63c89d121c8b17ffe5390e10b9d653329b3843dc2a4856a2a13"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/booking-readers.test.ts",
+      "sha256": "a2a15045a81681f23d5aa263f5f4762c90e684255dd160264e7cadb1db67c9e2"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/booking-readers.ts",
+      "sha256": "bf2606f47e6a97f508ee26bdf0728b18bade3235d562c7c98b8cf6db2ba4e730"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/booking-snapshots.ts",
+      "sha256": "92cbf5106ab71f17475f0039eb832365568fa8d92331b7b2cfa9be4082207c5a"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/commercial-appendix.service.ts",
+      "sha256": "41895b030d9dc8b8993ba71353f3117a53cc99f830e6831afa696e88f349a682"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/commercial-contract.port.ts",
+      "sha256": "73f61176b2ae4007bc885a27e878ace5b60449b12a41ee589e30e997d9c39577"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/commercial-contract.service.ts",
+      "sha256": "3ade7b22aec7b7da7b2faf290288fa601eae4e053f74dccdff677b7c3431b522"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/consultation-workspace.service.test.ts",
+      "sha256": "0903b721ac766bc77bfa8ded35ccbe0693df69fcea32b3df8ff37a7d279b0672"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/consultation-workspace.service.ts",
+      "sha256": "04cd349d140397c88a9307de11559e958872030fc8c55b4e4616b27d138e9dd5"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/consultation.service.test.ts",
+      "sha256": "577bbca627ba2fdf8eea1fb8d565a99effa352b6aa76ea417e91c7332af7fdce"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/consultation.service.ts",
+      "sha256": "84fde9439afd15e7544d4a92d3a847fd64a81a1d701d4d61f686c3b2d589b7d1"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/couple-profile.service.ts",
+      "sha256": "d1fb2f17ff3affe87b0ca5a9920896067b3e34f7b99e9f12a145daeefe3b764e"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/deposit.service.test.ts",
+      "sha256": "a0ca7504b4155cb7bdad7e06443e860f9819988e256b5836ef4a1dcb64bb0059"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/deposit.service.ts",
+      "sha256": "7660d3c0c573d5ac39a1bf7149d52b7f96703804b1c46af543c260c076953114"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/intake-retention.ts",
+      "sha256": "7a7e109d0e75fcd6589aa34d611e0e88a153f81442110b734c9beda554c16dae"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/lifecycle.service.test.ts",
+      "sha256": "040ab6da8373386e674a00c8d321a2875ee05641747618ee4f6e06e68486ce55"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/lifecycle.service.ts",
+      "sha256": "c7576cad2728fa7a063e6abb5b613675610c688a9db7721e1d92db8de4859009"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/planning-snapshot.reader.ts",
+      "sha256": "2d7ad6471612c91b2db75bee5dbb4dc14ba41275f409cc765358ce0432ee1f64"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/proposal-catalog.adapter.test.ts",
+      "sha256": "3e059b931645fcc4eadd77037ee6109463ec1991ee0424c2a87a8824af57046e"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/proposal-catalog.adapter.ts",
+      "sha256": "60a02ca6bbe45592cb3aa58121eaa7ad572c5b5383885f83e92560e07e2d0787"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/proposal-query.service.test.ts",
+      "sha256": "be1ded6b70a87b7af64abc566c729b45429c62f16c858e52422d7be8c2f8e44f"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/proposal-query.service.ts",
+      "sha256": "021069e08342caccd63f4835aa58fc103fd264e55b4b80eadd83992601ad8f0b"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/reporting.schemas.ts",
+      "sha256": "7f1553b5b2278db2dda28c3e4aa58363f9870edd4d64adc9aa878b06c1c2942d"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/slot-hold.service.test.ts",
+      "sha256": "aec1377c8b5cd0abffc415afa675d2ea43eb92f6a07686a019b1d4b7bf8418e1"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/slot-hold.service.ts",
+      "sha256": "51e0bd639afeadf6058028ebcd5778f97acc1296d720c07d059642195c2e7c80"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/timeline.service.test.ts",
+      "sha256": "a2e78bac43cb812b8c75a19636fb305bb6fa81a4a8c8f58a5c8f8710f663b6e2"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/application/timeline.service.ts",
+      "sha256": "cabfeea96b9880e2ceff7ee9d4c07be745fc4b6ca70551fb017114b8b9b28525"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/booking-lifecycle.providers.ts",
+      "sha256": "e4fb5d9e7dba812a9ac75cbbf235e694ec8999af7e2579e83d5838adae29acf2"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/booking-lifecycle.runtime.ts",
+      "sha256": "460c4f9b9bcf6d3bcadd54a7c2d5da9208460a70fa33a80d5560b5bbb6be6759"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/booking-policy.test.ts",
+      "sha256": "9e1c80bd64f43f266539d41d5040368de14e45411daa4ed5657f23154b1c7188"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/booking-policy.ts",
+      "sha256": "06630b4871ab3ff9dbfe25a5158ab074f775c4b34ef0f7708f73247c5b971157"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/commercial-appendix.test.ts",
+      "sha256": "8a068cc9cde4ae2d6dcdda4f718a21965c0c0bc11046ce8d71669751a226db2c"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/commercial-appendix.ts",
+      "sha256": "a972998a12be0b7245860edcacd476521884db91952f2f149d2dd9beaf4432ca"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/commercial-contract.test.ts",
+      "sha256": "3bc1de38379f778fee355ba0086c85085afc4075d064b9354889a8cc864789df"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/commercial-contract.ts",
+      "sha256": "65d818107115b49373a8d7afa836469099ff100c851a7c639b1e25d204c9514a"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/couple-profile.test.ts",
+      "sha256": "296ff594259d631b8a7f62e31101e82e6ce3553e757aec17b227dc192dfd658b"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/couple-profile.ts",
+      "sha256": "c6db00b82d8bd16010a446489c396248985742cb6907135b40a91e4c579c2b4d"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/deposit.policy.test.ts",
+      "sha256": "7257590b542aa98308be42c2c0697043729edf410416d6891021a10d8695e757"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/deposit.policy.ts",
+      "sha256": "5ff961d3ab7e1ec3fe1323a8c311a3b3bc29171ff57c2ea87f9c8db737ffa8cd"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/event-date.ts",
+      "sha256": "7d701e597a44433253f88963c50ce9556b21759909b1ce25171b8ece8c4c69f8"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/lifecycle.policy.test.ts",
+      "sha256": "6cdb35c7864bfc098dd2c8f55e2eb3f430cb5101fc3c7a3e1ffa2f464096f0cb"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/lifecycle.policy.ts",
+      "sha256": "5a153da633651a29206c594660f2ed95a7d58c864a47c36e60d1bc997af47368"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/slot-hold.policy.test.ts",
+      "sha256": "48218c68e633358196c7e63edd642fafbd7bb8990cdad1c20afda867189f695f"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/slot-hold.policy.ts",
+      "sha256": "2c846844eadc0d9d1f0568f1ee6519add07496a3181687a42b46e1cac5c8d206"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/timeline.policy.test.ts",
+      "sha256": "77c58aea4acc1d12f21ac0308a635a67811a7b9a4a606f98f8f524ed08eee4df"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/domain/timeline.policy.ts",
+      "sha256": "fda713cf73588664b86b343fbe5c7d1753728a50e78b05326adbc28d41d0a69e"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/http/booking-lifecycle.openapi.ts",
+      "sha256": "1fff2b35ddcfb54cfacc972965fbaab571ddc16b0579419f02c572e871b306b8"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/http/booking-lifecycle.responses.ts",
+      "sha256": "423bb5d90230236a73e011260de1dff74c456be013a0a22f9d2ac13da06da0d7"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/http/booking-lifecycle.router.test.ts",
+      "sha256": "0ab91dabcc8ef2cd06668b276817e7ec8df310af52feff5ff26b7cfa0a67db56"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/http/booking-lifecycle.router.ts",
+      "sha256": "50723058927228766643cea3a1154d5755289b6770db295c8cb7ef290162e8be"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/http/booking-lifecycle.schemas.test.ts",
+      "sha256": "8e9164218af9f31e66f2de031f6c8cbb158fc09a31920f508544d91329fa0297"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/http/booking-lifecycle.schemas.ts",
+      "sha256": "557cfdc552eb03562d3d2293c9fba4fd41ad93e456dcd65317d9e15f7359dd34"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/http/commercial-appendix.openapi.ts",
+      "sha256": "dd72b7426213f7771c48bc54e323ff733c723f1efbbad058e7fde41729c2d730"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/http/commercial-appendix.router.ts",
+      "sha256": "972c67cca7ba37cc1464ad47b4cf0bddea16a601cbee96850e30901108de8f0c"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/http/commercial-contract.openapi.ts",
+      "sha256": "5442c76396fe538f423dc1f57c6557aa245857e6a688cd6e8db8d4dfd373dda7"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/http/commercial-contract.router.ts",
+      "sha256": "93ad44dfe2a92481689d3469b3ef201b4ad31c768c9c47f8d6c027314b364fbc"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/http/couple-profile.openapi.ts",
+      "sha256": "87383388572be6a65258fca83c31cc8bbc7d998cdf71bf5b33724a24e273ad9a"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/http/couple-profile.router.ts",
+      "sha256": "a219f7ef29e4aeb8844e3c3faac83a51f5ec2b29784169621caf9ad17d49b38a"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/http/experience.openapi.ts",
+      "sha256": "a59bafaa4f151274ffb61728b848f1f18a53fa4362dccab558c501501fc8fade"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/http/experience.router.test.ts",
+      "sha256": "bb6a52053e6ffe76505312507b235bea767b0221cd4be280eec2cd5878b3b225"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/http/experience.router.ts",
+      "sha256": "1015576f72753f9b4d0e36bf84d0e0aebf66645e7e0e3fd35b36104dddf00f37"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/http/experience.schemas.test.ts",
+      "sha256": "9b412e1c48d5b86ff59159aeda590ae56454e46c0e31d5e0cc88c384f54d2415"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/http/experience.schemas.ts",
+      "sha256": "64d8cdbea8d00163d8eaeda11b08fc0cfff773011e7d83df30e878af7e04859e"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/analytics-reporting.reader.ts",
+      "sha256": "b12956fdf11e74ead6e1abb36b5dcf18512978311cca2387f6a72e9b7871c726"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/automation.repository.test.ts",
+      "sha256": "90c1260e581725ed3e7017e420fd87016422696ca165a9a33ce44a35358c6bf2"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/automation.repository.ts",
+      "sha256": "b2bac7badab73f1cf9d122d7bf92e10844a1e7ef798cd740b0a40b75b35e1d72"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/booking-readers.repository.test.ts",
+      "sha256": "a35c0f481aa3c0ef29353f29743b3ac80ee38140545e44f5fdb8cc215e58c99b"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/booking-readers.repository.ts",
+      "sha256": "5d47feb7e4696cfec476dd67154d19befafdfdb1493cc03d0f9d4dfca074529a"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/commercial-write.retry.test.ts",
+      "sha256": "cd657dbc0b9c0812f4e3d905a20df52ed637f0d820a4bab168ce7ccecd01ebb4"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/commercial-write.retry.ts",
+      "sha256": "f4cad04b3e44be80f994565c5c49f8faa089b19be3e905d965691273cfb99cf6"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/consultation-workspace.repository.test.ts",
+      "sha256": "047fa3207c356b0d285b2dbea8818a628e7b592aba053062063daae95c038a33"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/consultation.repository.test.ts",
+      "sha256": "664383e957e8e1cf89175582b2c8f4deb71689d4014a5b99c2caa4018ab16e55"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/consultation.repository.ts",
+      "sha256": "ce45f3b68e33a4ae27c3f08ce985d84c4e08db29815ee4e58d8f9457c4e69084"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/contract-financial.reader.test.ts",
+      "sha256": "8d5d93702c478ff857ba7554ca49df80c08abeecc243b0cefcbe4c50987503d1"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/contract-financial.reader.ts",
+      "sha256": "f6bf1f28d137f7a6f00ce1e17c6aadd127b4b99a6a46c607c8d363442a5df7f6"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/contract-pdf.renderer.test.ts",
+      "sha256": "65a65f2bcb0702adeb2b49a7f2b96be0953181f9e10bfcbb4ceedb8eace4f827"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/contract-pdf.renderer.ts",
+      "sha256": "1ede6a85fcf1cce1f6b52c4a897f929b038fde97e057b78f6de80a4c5b4cf7f5"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/deposit.repository.test.ts",
+      "sha256": "7edf0031fcc5b2d86a2d5846623ae33457b007c46461cc204a2ca6b587729bad"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/deposit.repository.ts",
+      "sha256": "3b6f41babc6f385de4d8169dcb4fe189a58f748ee14fedb7835e7719e582d3c9"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/effective-commercial.reader.test.ts",
+      "sha256": "95efd2d8e5e60a55e43d078e6a2a60b7eb8afaa2b6b15e497a8fdddb505810d4"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/effective-commercial.reader.ts",
+      "sha256": "91d4c7601fb95b889c619f45ddce02cd8a964f895b2398691f6b189eef149262"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/event-end.reader.test.ts",
+      "sha256": "423be51783adfb9298119ef811cead8dfb0f1e2c4f13558a329ae4ebb303e44e"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/event-end.reader.ts",
+      "sha256": "677d3156c3817186d0d86f68474674ee468aee4fbc3218f09e5d9f81f8c3bd10"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/guest-planning.providers.ts",
+      "sha256": "50e8800ebb946ae4df8768f72b4b84a4046466f8c3c6389c56c2ed58fb9e71d9"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/lifecycle.repository.test.ts",
+      "sha256": "ddb90e599c6c2cffbcdc056adcc0bb088ba3c29f8193a4a2f92ecd6ec761b507"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/lifecycle.repository.ts",
+      "sha256": "837c8ff30632572b5510521e6e1f5c06a99019631b0ffc705ebdf47205f753aa"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/notification-context.reader.ts",
+      "sha256": "4fb3344dbfa5356e8d5a09aaf396e239f5e3548aae550ed43902de69cef1509d"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/prisma-booking.readers.ts",
+      "sha256": "453fdfe411de24a271863c1e31a2020c4fb7216b32e176dada672f776a4f5cce"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/prisma-planning-snapshot.reader.ts",
+      "sha256": "f610c3062c45ec6f7f8b59b3bd5ebab1a8b2bc2c6c098d268f9e0c50864e215c"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/reporting.repository.ts",
+      "sha256": "46d835ba6dd597303b885b96ddc2d3050a41ac31e59641e08d783d97fe778487"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/slot-hold.repository.test.ts",
+      "sha256": "3a43170c6fc7cbbf40f8228c9c318799f851e0aa32d60f9b616d6e1c38395619"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/slot-hold.repository.ts",
+      "sha256": "fec6682a4423381411e6e9bbe796e21a558a348b434b142c157a94c978bac4fd"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/timeline.repository.test.ts",
+      "sha256": "5bd751c1dd3da8c4119448d3a04f6074f95925ce60cdc9df916a3834e692b1fe"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/timeline.repository.ts",
+      "sha256": "e209b1039f987ad3b6b2b2baf2d50f9b4e52272be3fe7973e1f4c80940a4d937"
+    },
+    {
+      "path": "src/modules/guest-management/application/guest-links.service.ts",
+      "sha256": "359969f32bc78c11d271369ed0367680b55ac4f87d462ea1d20dc01c058c077b"
+    },
+    {
+      "path": "src/modules/guest-management/application/guest-readers.ts",
+      "sha256": "114e98164aee8b3d92203c2449901164e02782e09ace59c8bd2d232f3cffff63"
+    },
+    {
+      "path": "src/modules/guest-management/application/guest.contracts.ts",
+      "sha256": "b9017cea09cedfd0f477957407b35e46c5fbf853f1b1ab0e549689d4af53533e"
+    },
+    {
+      "path": "src/modules/guest-management/application/guest.service.ts",
+      "sha256": "5978e5ce570044ad5aeeaa36179c1cab55964d7c1fc5480bb7783d89df031410"
+    },
+    {
+      "path": "src/modules/guest-management/domain/guest-policy.test.ts",
+      "sha256": "d3df38924380269e4ffa099c1eea408f0848fa5f96807f90715af969b7cb9553"
+    },
+    {
+      "path": "src/modules/guest-management/domain/guest-policy.ts",
+      "sha256": "f7dd0ffb137454e69c7ae358889b9e0d48b02df5047aa5a8faded50b50b9e8fe"
+    },
+    {
+      "path": "src/modules/guest-management/domain/unicode-case-fold.ts",
+      "sha256": "a9ea1e31b559a400a71f01be5723d0581f65319bd380cc3016e0c7daad96b84d"
+    },
+    {
+      "path": "src/modules/guest-management/guest-management.runtime.test.ts",
+      "sha256": "a3d27e6c8a59d8480d4dd3c04765bed3174be1edcea857d7132d68ca5870bff5"
+    },
+    {
+      "path": "src/modules/guest-management/guest-management.runtime.ts",
+      "sha256": "65ee441faa0cb559bed19a51d5bf7a185e52ccfe2279987bd89cfcd005bede76"
+    },
+    {
+      "path": "src/modules/guest-management/http/guest-import.parser.ts",
+      "sha256": "bd06b2f1f6615b1f0f6715c77fdee63241ecbe563a22ba6a08f70e5150bbb896"
+    },
+    {
+      "path": "src/modules/guest-management/http/guest.openapi.ts",
+      "sha256": "80f8fbd223aef35aa7d93c184f66c80d132a16e5fc4b5b5b156df92e52e534b5"
+    },
+    {
+      "path": "src/modules/guest-management/http/guest.router.ts",
+      "sha256": "8d14af6e14024c1c11dfce37e37c7ebe9e255eb8835c1aff73ad95bf98969304"
+    },
+    {
+      "path": "src/modules/guest-management/http/guest.schemas.ts",
+      "sha256": "ce329a2d49bd882cecd0d5b0ddd48492c66d2e64aaa08f285d458ad3e8ffd790"
+    },
+    {
+      "path": "src/modules/guest-management/infrastructure/analytics-reporting.reader.ts",
+      "sha256": "a58cc7d0bc5963cba2017349c34e3d3bb3f0f8970af8011110160478ed58d576"
+    },
+    {
+      "path": "src/modules/guest-management/infrastructure/guest.composition.ts",
+      "sha256": "928d77c52925b3ba66956946faf54fe8ce177a205455be97535abd412ada98b8"
+    },
+    {
+      "path": "src/modules/guest-management/infrastructure/guest.repository.ts",
+      "sha256": "18d9310912c0bcf189b83d00374c33e2135520b8554b97969ef47c52a6f10451"
+    },
+    {
+      "path": "src/modules/identity-access/account/account.repository.test.ts",
+      "sha256": "aafe89f6f70ba34756c0cd37eda42d9e05ebd83fa557fee07c14b258094b3c64"
+    },
+    {
+      "path": "src/modules/identity-access/account/account.repository.ts",
+      "sha256": "7d2ae07f33f095c5db147082e1ab2b4f1d3ed142026302f62e4d2ef7ccbdaafd"
+    },
+    {
+      "path": "src/modules/identity-access/account/account.service.test.ts",
+      "sha256": "affe9658bee25bea79b355111637179db6660fabdd3372cca388e2b745a9a416"
+    },
+    {
+      "path": "src/modules/identity-access/account/account.service.ts",
+      "sha256": "f20071f28cc26c022fd81ff2661a63875d9b84d4e134b53cd357626b417b7a7b"
+    },
+    {
+      "path": "src/modules/identity-access/account/bootstrap-secret.test.ts",
+      "sha256": "0e828e70e633c2fee929af932412cfbcdb4a783d0d41539c1fd29fd9601c06ff"
+    },
+    {
+      "path": "src/modules/identity-access/account/bootstrap-secret.ts",
+      "sha256": "08ef7a6f38e4aa5bc5f598b79679b5211ada9a770b47139d619f0e1d397e3a28"
+    },
+    {
+      "path": "src/modules/identity-access/account/identity-locks.test.ts",
+      "sha256": "d44ea00052ef7c02b1ed131956d2bb972b0ceaa1737070d08c5ec527bc853c09"
+    },
+    {
+      "path": "src/modules/identity-access/account/identity-locks.ts",
+      "sha256": "efba6e3baee245f56557cf2d4580872c0ddfa5e16a140b7ce334424517652e51"
+    },
+    {
+      "path": "src/modules/identity-access/account/identity-retention.test.ts",
+      "sha256": "efaece00a9d68259daae5120725739d43fb1abbc523dad26e6407e43cc994ea9"
+    },
+    {
+      "path": "src/modules/identity-access/account/identity-retention.ts",
+      "sha256": "00edbab09b0e2863218fafbae49a94ca36429953669d64b88178a336bb51fc88"
+    },
+    {
+      "path": "src/modules/identity-access/account/manager-bootstrap.cli.test.ts",
+      "sha256": "cefa28631a556b03f59b5f14f3a8f0ba15f2bc13c678141b368098d32178d49a"
+    },
+    {
+      "path": "src/modules/identity-access/account/manager-bootstrap.cli.ts",
+      "sha256": "b7a19c343943c363d0dd7fc7efa56c5f2119e3d58363857612e2bd1e92c571da"
+    },
+    {
+      "path": "src/modules/identity-access/account/manager-bootstrap.test.ts",
+      "sha256": "164bea41d0442dd39908f4bd75dff2afa6870b8cfbfad90f0f89ff8b532d2fe0"
+    },
+    {
+      "path": "src/modules/identity-access/account/manager-bootstrap.ts",
+      "sha256": "3a1855f0ceb15eb26b4eb26e3036afa0fb69e2ce2e2e6ac8834a4c98543eab9f"
+    },
+    {
+      "path": "src/modules/identity-access/account/retention-eligibility.port.test.ts",
+      "sha256": "eebf4d40f37208133b3f90f66261f7b473e023d41b1a9082fd849cb4c2e21792"
+    },
+    {
+      "path": "src/modules/identity-access/account/retention-eligibility.port.ts",
+      "sha256": "504964f47c813617260febaa200ba3c1e7f23de726a3afef7b40b4553d989d2d"
+    },
+    {
+      "path": "src/modules/identity-access/account/settings.router.test.ts",
+      "sha256": "fa6a83b7df2c08b45970fc170e249ce3f1ca70c31fa60531f75a9d6e330dc8c7"
+    },
+    {
+      "path": "src/modules/identity-access/account/settings.router.ts",
+      "sha256": "456867bf6c82aff2787333b9e81b0f2cab26f53a1caafeeb26b17a1f269c5dd4"
+    },
+    {
+      "path": "src/modules/identity-access/account/settings.schemas.ts",
+      "sha256": "ea2447211e0c38d791689c2fcb68ba50533ce8b545acfddebf1099f37ccdb0aa"
+    },
+    {
+      "path": "src/modules/identity-access/account/staff-provisioner.contracts.ts",
+      "sha256": "62feb6fb5d20995cca408be15fa84cbd365563ac0ae95052c848733f836f2464"
+    },
+    {
+      "path": "src/modules/identity-access/account/staff-provisioner.ts",
+      "sha256": "1964e0981cda0c773a8f89d412a2be838d5a89ef6026201ef2a43c83ecb13f87"
+    },
+    {
+      "path": "src/modules/identity-access/authorization/authenticated-actor.middleware.test.ts",
+      "sha256": "c0692beba4f7e2741015252a7a70a3ed803b6b1a8c3098e9d57b9231133c466f"
+    },
+    {
+      "path": "src/modules/identity-access/authorization/authenticated-actor.middleware.ts",
+      "sha256": "229102d07a309b69b54b25e8d1e85b275e87c8ef3573f1e30be6bf3008f1c1b2"
+    },
+    {
+      "path": "src/modules/identity-access/authorization/authorization.service.test.ts",
+      "sha256": "c5bd26a3b4ca8dfb8eaacb5e43ee9c6116540b99c87a95cdfffeface29bc70a0"
+    },
+    {
+      "path": "src/modules/identity-access/authorization/authorization.service.ts",
+      "sha256": "60a4ebad7c72f5683691abee34cc3c84d7085171919738557ca4917f4a102663"
+    },
+    {
+      "path": "src/modules/identity-access/authorization/couple-access-promotion.test.ts",
+      "sha256": "698c585e5b6c0186de8bb024f82126cc04d9d4f045a93ec0ca580e9b3bd6a009"
+    },
+    {
+      "path": "src/modules/identity-access/authorization/couple-access-promotion.ts",
+      "sha256": "a1ea3376204539d0b2156032c22beeb4dd4332177837f286af911c34eaf42d90"
+    },
+    {
+      "path": "src/modules/identity-access/authorization/invitation-editor.reader.ts",
+      "sha256": "5b991234dc3f3747a32244fcd13386e190efa0cf67050294176ba217573ab2f5"
+    },
+    {
+      "path": "src/modules/identity-access/authorization/notification-authority.ts",
+      "sha256": "1cdd1ddac34c9585b6a7aa6f0d4359dcf11a5598ca23b489bb5d2bc25429be9b"
+    },
+    {
+      "path": "src/modules/identity-access/authorization/notification-recipient.reader.ts",
+      "sha256": "0747fb3144a6d3ffd2ea71f7e429e71ea0f3e609053ad364543e31ee058c785f"
+    },
+    {
+      "path": "src/modules/identity-access/authorization/scoped-identity.reader.test.ts",
+      "sha256": "26f7ab8c4e0833310a9ef76fd5af11bd3161e8862d2909288c06798d26e8d881"
+    },
+    {
+      "path": "src/modules/identity-access/authorization/scoped-identity.reader.ts",
+      "sha256": "abc403db3880715644baf59aaa01decb7de4309a9cccca99b64a86425847b6bb"
+    },
+    {
+      "path": "src/modules/identity-access/crypto/password.test.ts",
+      "sha256": "991a255c99a91940f14c910bf30a7d10e77957982f034ec52a13183efae56fe1"
+    },
+    {
+      "path": "src/modules/identity-access/crypto/password.ts",
+      "sha256": "6ba3e111fed3198700570c031bcd46ee64dfdd4c3becfb0fd8d9e3bd25388165"
+    },
+    {
+      "path": "src/modules/identity-access/crypto/token.test.ts",
+      "sha256": "df58e07c880b33aa29027724882c71fa40f1a022143b1f31564a190a96d6f0d0"
+    },
+    {
+      "path": "src/modules/identity-access/crypto/token.ts",
+      "sha256": "55cf86754ca2b2d04d8f075ef696812dbf8d3a790bc1ec46cba6a3b0b3426142"
+    },
+    {
+      "path": "src/modules/identity-access/identity-notification.port.test.ts",
+      "sha256": "3e689d10248408aadab8ff6cc3cf938a4c303ad673808c8cfe17e8d99ad1fbed"
+    },
+    {
+      "path": "src/modules/identity-access/identity-notification.port.ts",
+      "sha256": "32b5047ccc0168cb7348f92fb568d181b4acf72df3619fc2dad8ffdd3913607e"
+    },
+    {
+      "path": "src/modules/identity-access/identity.router.test.ts",
+      "sha256": "0cd1e1df15df0e78b65d51c73bfda43b86343194b9fff67c13d9a51a325a18f1"
+    },
+    {
+      "path": "src/modules/identity-access/identity.router.ts",
+      "sha256": "847e9140edca189960b39396d5b865766cb657007ebd4edbc72f998305d253cf"
+    },
+    {
+      "path": "src/modules/identity-access/identity.runtime.ts",
+      "sha256": "d33da8c753fe848c42fdd371139e15419c72d8af52ccc0eb776e416856a94ac6"
+    },
+    {
+      "path": "src/modules/identity-access/identity.schemas.ts",
+      "sha256": "95b61bb900728b2dc46003bc8360ad7c0da0f966b26ff67d5b6c6c247f0bf2d2"
+    },
+    {
+      "path": "src/modules/identity-access/password-otp/password-otp.router.test.ts",
+      "sha256": "fc7a0556e813c82a92f4cd198f382cf82b462b261edb93dbba8bd9935f00c74f"
+    },
+    {
+      "path": "src/modules/identity-access/password-otp/password-otp.router.ts",
+      "sha256": "71457e261a9fc4220663e50c49fe0b0c92d71fd640b8498a0d159d2e6bc72f0b"
+    },
+    {
+      "path": "src/modules/identity-access/password-otp/password-otp.schemas.ts",
+      "sha256": "639aa26f69a74cea029c37e22b716f88ae2120c72a589aad54acf1b1d56f7ac0"
+    },
+    {
+      "path": "src/modules/identity-access/password-otp/password-otp.service.ts",
+      "sha256": "370b4c2c95c8c8053ac25c558ae71be2f4343ce3e6fc5ac6752bf93658844fce"
+    },
+    {
+      "path": "src/modules/identity-access/password-reset/password-reset.repository.ts",
+      "sha256": "c4d1999263998a9bdc6d9c820bf4c7709f0e7d268419d9799bf7efac00d5f614"
+    },
+    {
+      "path": "src/modules/identity-access/password-reset/password-reset.service.test.ts",
+      "sha256": "ba4d64a73ed2b23afba50aeca4e9d97b5fd4e723a6a10328badb37157b97cf3f"
+    },
+    {
+      "path": "src/modules/identity-access/password-reset/password-reset.service.ts",
+      "sha256": "d2b191b9b997a201fa0a462d3114a78a9ace26149756bee975dfce6e1d6438a2"
+    },
+    {
+      "path": "src/modules/identity-access/session/session.repository.test.ts",
+      "sha256": "7e6174df7253b2bbdfffbf8da7aade3b26132ec65baa6248b5da03839437164d"
+    },
+    {
+      "path": "src/modules/identity-access/session/session.repository.ts",
+      "sha256": "9db3d4c6a2c3dcc8a34d5a513c27c777e45383d5334867637f6d940d993eea12"
+    },
+    {
+      "path": "src/modules/identity-access/session/session.service.test.ts",
+      "sha256": "90d71a3dfbb065bc18acd30d6069f184ee1377c54a7ff4a3f1f5267d4186a164"
+    },
+    {
+      "path": "src/modules/identity-access/session/session.service.ts",
+      "sha256": "32a2f85036b99ccd722805856015be478d251131409024964f25f9801ce0e51e"
+    },
+    {
+      "path": "src/modules/identity-access/workspace-invitation/workspace-invitation.acceptance.test.ts",
+      "sha256": "addd481a9d979b62aff855d339587789068ec8229ee160ce9d7e3804d83ac54e"
+    },
+    {
+      "path": "src/modules/identity-access/workspace-invitation/workspace-invitation.acceptance.ts",
+      "sha256": "8fa5f8f86b45d72988c81c31dcfe2a34aa8da8055bf7bcfe2d9f09e1db9c516d"
+    },
+    {
+      "path": "src/modules/identity-access/workspace-invitation/workspace-invitation.repository.retry.test.ts",
+      "sha256": "db3edbe5d821003092c971113637cb7a6683cbaa7c7ea94dbbe3ceb1b215b931"
+    },
+    {
+      "path": "src/modules/identity-access/workspace-invitation/workspace-invitation.repository.ts",
+      "sha256": "e84d90973f4165ec02323898d8b8e79549a65e4989756edd6a67581413ccc140"
+    },
+    {
+      "path": "src/modules/identity-access/workspace-invitation/workspace-invitation.service.test.ts",
+      "sha256": "2a1affd2620af47e94202a8e925a766c6c9d815084ccb55f33a6ad6bf0e14616"
+    },
+    {
+      "path": "src/modules/identity-access/workspace-invitation/workspace-invitation.service.ts",
+      "sha256": "67f412a484b639e379776862d507e5d2acb828727adfe815876b204440aeb6a8"
+    },
+    {
+      "path": "src/modules/invitation-studio/application/analytics-reporting.ts",
+      "sha256": "d658f911874d21d2fe9c472d024ea89b95598135bb6cade69dc2ca0cdaf415de"
+    },
+    {
+      "path": "src/modules/invitation-studio/application/automation.contracts.ts",
+      "sha256": "ef7897983125fefb2a74e54519888f952b648310eb865acc501cf7a5a9665ae2"
+    },
+    {
+      "path": "src/modules/invitation-studio/application/media-access.guard.test.ts",
+      "sha256": "00a77d9040211e69a1c887176514a1434a26e92f94e3079ed945a9a61186fce7"
+    },
+    {
+      "path": "src/modules/invitation-studio/application/media-access.guard.ts",
+      "sha256": "5516eef696593cbfa5e58b2ddbd7b0cf2f5e53557d260c5117d46298f00ae87b"
+    },
+    {
+      "path": "src/modules/invitation-studio/application/media-event-start.reader.test.ts",
+      "sha256": "8915a9ee9ba511ce28152fc7d32382884ba553b3db215d7aeb75cc52bd7ce439"
+    },
+    {
+      "path": "src/modules/invitation-studio/application/media-event-start.reader.ts",
+      "sha256": "68a13b4d499947b3958878b9406b47495d6171d4f19c8d28778149e6d01284ed"
+    },
+    {
+      "path": "src/modules/invitation-studio/application/media.contracts.ts",
+      "sha256": "cbf1825147e945555bcd604228c495803b852ba5d629e4b4ef19468201946921"
+    },
+    {
+      "path": "src/modules/invitation-studio/application/media.service.test.ts",
+      "sha256": "2e724a1fb882676287ad5f58beea40970c3fc9e39f36e8d65a54767f85a2139e"
+    },
+    {
+      "path": "src/modules/invitation-studio/application/media.service.ts",
+      "sha256": "4f055098284e278a66b8622dcda38824fa6d492e6975de74d9c7800a4b52e1d6"
+    },
+    {
+      "path": "src/modules/invitation-studio/application/print-order.contracts.ts",
+      "sha256": "4b0867368c847a628b7ee8940fa951961d7ddfc8eef5be77f1d447bcbef0b22d"
+    },
+    {
+      "path": "src/modules/invitation-studio/application/publication.events.test.ts",
+      "sha256": "445d0f70ab1e0156bb534a1c6b7e017fc904addb54fcfa45da3ece03bbcc1952"
+    },
+    {
+      "path": "src/modules/invitation-studio/application/publication.events.ts",
+      "sha256": "69a8d44c09d75b91de83d5ef53695116b7a5e6f94312486f0523bc03cbc7a0d4"
+    },
+    {
+      "path": "src/modules/invitation-studio/application/reporting.contracts.ts",
+      "sha256": "191375313579fd824ca877af40f904a523eb4b8f79eceb6445d4e0d507f91be7"
+    },
+    {
+      "path": "src/modules/invitation-studio/application/studio.contracts.ts",
+      "sha256": "b8c4cedc7603c14dc05f653fecd6b092fe43e4b0d2cc5ac55f6b81b16a1d9c35"
+    },
+    {
+      "path": "src/modules/invitation-studio/application/template-selection.port.ts",
+      "sha256": "ee6dc99950ce0eac311a521321a8d66846d08ab60e396d7e4d4987196725282f"
+    },
+    {
+      "path": "src/modules/invitation-studio/domain/contracted-print.test.ts",
+      "sha256": "507b4b710b425d4f0b4a05f45c979414c05bcbb5d65741f3b88a1833e7044592"
+    },
+    {
+      "path": "src/modules/invitation-studio/domain/contracted-print.ts",
+      "sha256": "a19b2eecef7adc37e44ed32beb4149be426e0ab881ec397628adacaaa965a3a8"
+    },
+    {
+      "path": "src/modules/invitation-studio/domain/generation-recovery.ts",
+      "sha256": "d720e50d5fb9eff002e7f7d03d58f0dc85751c3bfe889fa4d4ed0bbac1e702e7"
+    },
+    {
+      "path": "src/modules/invitation-studio/domain/media-policy.ts",
+      "sha256": "516db663096fcd9e6fa7bed455ca94a039648f7fb18ef2dce326260382843c06"
+    },
+    {
+      "path": "src/modules/invitation-studio/domain/print-policy.test.ts",
+      "sha256": "b569c639d6f170b6708e0fb1d82f5eeb45e069406580dedfbf5f4db5e8df25a7"
+    },
+    {
+      "path": "src/modules/invitation-studio/domain/print-policy.ts",
+      "sha256": "53bbac7fe05f7172db20e09ca3113093cce3af5e7ff0eb24640917dcec67801b"
+    },
+    {
+      "path": "src/modules/invitation-studio/domain/public-invitation.ts",
+      "sha256": "51198919b32a96a3b12c9468c04656a1ca0185283bd73e601cce203a74a47b35"
+    },
+    {
+      "path": "src/modules/invitation-studio/domain/studio-policy.test.ts",
+      "sha256": "6343d211ebc71f42936d2cae879a8cad3cc75ac6c003a2246599091e8d19fdaf"
+    },
+    {
+      "path": "src/modules/invitation-studio/domain/studio-policy.ts",
+      "sha256": "94f6672a087cc916f079dc9824f499775dad0731d6713b978a4d7ac9e796b13a"
+    },
+    {
+      "path": "src/modules/invitation-studio/http/media.openapi.ts",
+      "sha256": "b5e686fdec4650786193e19f567552df47ace355b1b2ceb00ec112f291fa818b"
+    },
+    {
+      "path": "src/modules/invitation-studio/http/media.router.test.ts",
+      "sha256": "0c814af0f3ccb7e229738875ab141a665a181631f97fa82dca0dd67b0de331ba"
+    },
+    {
+      "path": "src/modules/invitation-studio/http/media.router.ts",
+      "sha256": "d3bac8b92a656913b84d74f119e0d2e2c837e6fc49052f00890e9760d8513ace"
+    },
+    {
+      "path": "src/modules/invitation-studio/http/media.schemas.ts",
+      "sha256": "47db845aa732383ab0f476ed67e7ee581d6d0b41e981f8096bf15d40767a3ce1"
+    },
+    {
+      "path": "src/modules/invitation-studio/http/print-orders.openapi.ts",
+      "sha256": "2d691b8647429e82eaf1b6176af9d9fd3ada22e5251369d0c73b6abdedb73497"
+    },
+    {
+      "path": "src/modules/invitation-studio/http/print-orders.router.ts",
+      "sha256": "35d8e12b2daae439185d66f3c65497ff08d6e29cfa22eb986344905ebd4183d0"
+    },
+    {
+      "path": "src/modules/invitation-studio/http/print-orders.schemas.ts",
+      "sha256": "68db64e711ce3f9b256d0a96236b0c5ef20eaee871902ad3987c7172b15e8493"
+    },
+    {
+      "path": "src/modules/invitation-studio/http/studio.openapi.ts",
+      "sha256": "d4dce0bafd84ed81d57423f679f892b71d504ad3a41fa17ab50dbe5b69ed65a3"
+    },
+    {
+      "path": "src/modules/invitation-studio/http/studio.router.ts",
+      "sha256": "c5ea04ceaacec49fc63ba33b50b9595081e716f1eae07d2937830914d72eee76"
+    },
+    {
+      "path": "src/modules/invitation-studio/http/studio.schemas.ts",
+      "sha256": "ab792aff7152c0f744ea91ab39a8693e545337e29a8aa80ab9ec5aa1a93d6669"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/analytics-reporting.reader.ts",
+      "sha256": "203a93853eea847d175a59e461257377b2eea4d2042de2e00f78ae72abe8f52a"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/contracted-print.entitlement.reader.test.ts",
+      "sha256": "5717e0484d5ba41e3acf708a555548c25f80f01a3b0dd3bd1a3e6037fae17c84"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/contracted-print.entitlement.reader.ts",
+      "sha256": "cbf32a15bd13fc4ac036a9d8b9ddb27f84dc0f497e05ff4b8334999a6a757d9b"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/contracted-print.fulfillment.test.ts",
+      "sha256": "12bfa1e61eac7862583f9144de6ac2b334455ec915983f90c4fa4e93705b875d"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/contracted-print.fulfillment.ts",
+      "sha256": "87555e2801e2fce8972a0dc7bbcf78afba981e2e04a4a45cbfafc7aa39fc2f63"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/contracted-print.providers.test.ts",
+      "sha256": "9baea6120ecbb5a600b8bc0e7e13d7b46fb28c0397ca08aa2e0f0f83ac2a7bc3"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/contracted-print.providers.ts",
+      "sha256": "3472ee8da333359b5eb924dada7515d419548c4a394d1967b8a94b582c26bb7c"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/derived-assets.service.ts",
+      "sha256": "d8cf503a4ccf0774b20951bc3d36cdbd52d83af4bba1dd9942d5d414c372c02a"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/design.service.ts",
+      "sha256": "1d50c982dd9b6f80ac56ab714833cbb477d6bb8529f7ca7c6ffebbcfd8a59b10"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/generation.service.ts",
+      "sha256": "85b5509c0016f0e61bf86a8dafb1225c0aaadd0315d6a490ac31965d3af5a925"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/guest-publication.reader.ts",
+      "sha256": "377674a194a97633c88976eb8e0f428cd88930370206bcbb8cad1aa7dfde880b"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/media.composition.ts",
+      "sha256": "7b4b1130dd22abcedb5844dfbeea085a2f8af4a4de58b7dcf656eaddb356135c"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/memory-media.repository.ts",
+      "sha256": "43aa89f7021940f3968f0332aab80a3723b01f2e9ccc1973da7b6f9bbb3106a6"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/print-file.renderer.test.ts",
+      "sha256": "cf8aaf4219deddb0af3a27ed275bafa84026ff5de0d675ab16247fc196647109"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/print-file.renderer.ts",
+      "sha256": "e86b08ff5c3424313e9be01de3cc390f47385ae1618d6eda4a6e3b5866daed92"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/print-file.service.test.ts",
+      "sha256": "199bb77bad06752c493c59c4946642e89203786ee28059da2bce47297cf162f7"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/print-file.service.ts",
+      "sha256": "cae1accd770ec863369988d47faa5a45e3b2c94b5f7a930cc7dd5a5a13514824"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/print-order.service.ts",
+      "sha256": "c3e0d1b9d60001414d92f865984b166f940b1a191588daac272c4848fa85694a"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/printable.service.ts",
+      "sha256": "708baa014eddba4bc6a373d27ae3347798abce216cf561e603f53fca6ccec5d1"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/prisma-automation.reader.test.ts",
+      "sha256": "53ccf1be668bb8678644f08547fe887015f2e650c7976e5fd9b28dc611a5ae3d"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/prisma-automation.reader.ts",
+      "sha256": "a4a9b20680ed75f023e5c6d379669b38d15f830dfa7a5da5f11d7204ac9878b7"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/prisma-media.repository.ts",
+      "sha256": "9de4f8f68f169032e6186766e07674ef2443c2bf905368ee0e9ead8cd3946af2"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/prisma-reporting.reader.test.ts",
+      "sha256": "fb7ac2f4ce0a77326527faf00bd6e737b348721eb12f059e0a32a523ba873e46"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/prisma-reporting.reader.ts",
+      "sha256": "b665651a2c1ccaa6f96ed439dd65744a2b6862c248763fb4b55434226c67c217"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/publication.service.ts",
+      "sha256": "942ef4035f574b30e3070de20a765e9bf10ee98f7f682f20d3c06edd8a4fc2a0"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/reporting-snapshot-validation.test.ts",
+      "sha256": "c70dd9e4b0d27c6fb66806f75c51cc356629a430a79da9a4c45367d7969ff752"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/seating-print.renderer.ts",
+      "sha256": "3f6a7569602bab3384b4432a8a871ffb61cacb6fe0a13aa856b87c600404fee5"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/sharp-media.inspector.test.ts",
+      "sha256": "ac864ea9c6125f33619070182ded1afb7bd3fee4fdf43620468d79f964d83553"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/sharp-media.inspector.ts",
+      "sha256": "28980e56368241f8d37ae4f60955aee17a5e5366cdd696fd9e3ea00be4d88682"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/studio-authorization.ts",
+      "sha256": "008c7d1395446ec8d03ed252b3aef1e70ac7dfaaff86e0ae0fb2c1b99b819b4b"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/studio.composition.ts",
+      "sha256": "96b27cd7a1116c216714be58cae724f6237b876c5e593ddc1107bb56e1d6475d"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/studio.repository.ts",
+      "sha256": "d148515a345ce30d92128727f157f76a6d16293dc536559856e1f7b6538a8f2e"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/template-selection.reader.ts",
+      "sha256": "d0612250a8ce0a5a7bdc845cb177898eb5d238e96753d619898c376dc29ea061"
+    },
+    {
+      "path": "src/modules/invitation-studio/invitation-studio.runtime.test.ts",
+      "sha256": "e6fbe8ce60557bc136c4ec2c0fb501ffe77382f0ed74064044d57b614cd806b8"
+    },
+    {
+      "path": "src/modules/invitation-studio/invitation-studio.runtime.ts",
+      "sha256": "8d43e862ade9c784d1c83be4f83cb5c7652bb1b450ee1d36eb5b42a444f60d37"
+    },
+    {
+      "path": "src/modules/notifications-automation/application/android-push-dispatcher.ts",
+      "sha256": "9d83d8dcd03d2e65e2e56e44ba834ffac67521a7374036b09777b58371df8515"
+    },
+    {
+      "path": "src/modules/notifications-automation/application/notification-dispatcher.ts",
+      "sha256": "5d1b5f7313e210e902c81df20d6656d6e901afbba02703bb900d75868359011b"
+    },
+    {
+      "path": "src/modules/notifications-automation/application/notification-scheduler.ts",
+      "sha256": "a90e14a9b06c8700f92fc350afb2c47ea8c560a82a93693da213af6e913629ad"
+    },
+    {
+      "path": "src/modules/notifications-automation/application/notification-settings.ts",
+      "sha256": "ce78b03776c6d7d3a18a9867a62664aaac651e248667c4791c0c03b2d51bca8b"
+    },
+    {
+      "path": "src/modules/notifications-automation/application/notification-worker.ts",
+      "sha256": "d1d905402240225c8c7cf2b13c1ae5b7e7e416500a63ed619059a891bff281d5"
+    },
+    {
+      "path": "src/modules/notifications-automation/domain/event-handler.test.ts",
+      "sha256": "3fdd44c077beae4e7172522ded1583f9c46dd59d308eb0e193466f148abc0302"
+    },
+    {
+      "path": "src/modules/notifications-automation/domain/event-handler.ts",
+      "sha256": "c6463619ae09e19b212e980b028275c953e88818378bdca30a89215b80a39fcd"
+    },
+    {
+      "path": "src/modules/notifications-automation/domain/notification-policy.test.ts",
+      "sha256": "9ed6909b6da988fdbbbe8271928dc87a186885c2fe4384bf88cae6715fd3937d"
+    },
+    {
+      "path": "src/modules/notifications-automation/domain/notification-policy.ts",
+      "sha256": "36b770c8f1a5c4639181ebe05449818d554e244b643f179e7acef4c702454e3e"
+    },
+    {
+      "path": "src/modules/notifications-automation/domain/notification-template.ts",
+      "sha256": "5b44cdbf297d07d0b005288dd6ce86e96812fff1d235bc2da514a1db9b1b0b7d"
+    },
+    {
+      "path": "src/modules/notifications-automation/domain/scheduled-id.ts",
+      "sha256": "7d4c9d387b4464f0bc4274e8056e35ff83be83516d44530828f243918fc5de28"
+    },
+    {
+      "path": "src/modules/notifications-automation/http/notification.openapi.ts",
+      "sha256": "461d3ebb8ef13215486bf7bef929e211ad960eb06f65df51b33537d0f16f4afe"
+    },
+    {
+      "path": "src/modules/notifications-automation/http/notification.router.ts",
+      "sha256": "3ca81f3c029f5e88d40a04e8e1fe662fbb4e664af8e6a60a42cd9b9e8a39d5c2"
+    },
+    {
+      "path": "src/modules/notifications-automation/http/notification.schemas.ts",
+      "sha256": "d1170e93c0fc89244657c1138670caae8cc9883dd1d3ad42c0bf2911b88d0ce8"
+    },
+    {
+      "path": "src/modules/notifications-automation/infrastructure/credential-cipher.test.ts",
+      "sha256": "c1b0e0bc61980fd2ae57f7cc4a5d5d54d85240ecf1a6b51497669b41686b3fa3"
+    },
+    {
+      "path": "src/modules/notifications-automation/infrastructure/credential-cipher.ts",
+      "sha256": "c199252b684073a20dcb05bbb1f8d10cca144fce20f84ca2edaf0e037eb8d84c"
+    },
+    {
+      "path": "src/modules/notifications-automation/infrastructure/email-delivery.test.ts",
+      "sha256": "14112feca9c9d7d07d08e3b57e17c47ebf20b8c245946fda89e4a66797e04d9e"
+    },
+    {
+      "path": "src/modules/notifications-automation/infrastructure/email-delivery.ts",
+      "sha256": "4388813dd79bd3f2b23fc1d00acc4cd3b837c4fdb9a40cb048b917e00e789693"
+    },
+    {
+      "path": "src/modules/notifications-automation/infrastructure/event-consumer.ts",
+      "sha256": "0ae1a260cf2561e8903f7adba6842324e235431b065d9b5f83774fa797e06c75"
+    },
+    {
+      "path": "src/modules/notifications-automation/infrastructure/fcm-delivery.test.ts",
+      "sha256": "0765a2f22002aa19afed64b48180621c74f102b615ff0ddbaa8c6d55055ae92c"
+    },
+    {
+      "path": "src/modules/notifications-automation/infrastructure/fcm-delivery.ts",
+      "sha256": "bf0c09f86887c12c4af87608dfbe64990f8d24f0c690ca7eb812c8ef0be93436"
+    },
+    {
+      "path": "src/modules/notifications-automation/infrastructure/guest-delivery.adapter.ts",
+      "sha256": "454a07764f2e6ecc17f1a0e2987776a2ff54180aa104cb064ff9400bd6394dbc"
+    },
+    {
+      "path": "src/modules/notifications-automation/infrastructure/notification-foundation.ts",
+      "sha256": "40cac3920a07f423829b98a87d7704f248037377f8851c8b1975adbd5eac5a79"
+    },
+    {
+      "path": "src/modules/notifications-automation/infrastructure/notification-retention.ts",
+      "sha256": "36fbe51a4a71001ed72f8ed725bc619271ed7d6368113aec70bdfce289a82bb9"
+    },
+    {
+      "path": "src/modules/notifications-automation/notifications.runtime.ts",
+      "sha256": "e7a01189d6dd68fd5d40dd7d547fe43eb9058ab981802587583922a01d677c09"
+    },
+    {
+      "path": "src/modules/payments-billing/application/analytics-reporting.ts",
+      "sha256": "fd05addbc49bffcd900306c0e94a2751fe784b5bbd392450ea4e99c463c43530"
+    },
+    {
+      "path": "src/modules/payments-billing/application/billing-ledger.port.test.ts",
+      "sha256": "e31c10da4e3d8b0ed46db0fb37d7c96a644d3b91e081a62e9c9058a1b37bd2f1"
+    },
+    {
+      "path": "src/modules/payments-billing/application/billing-ledger.port.ts",
+      "sha256": "b01f178675b783d28a34b245fa28b5cf741f2986f06945c0d4d0e92a3fa7c589"
+    },
+    {
+      "path": "src/modules/payments-billing/application/billing-operations.port.test.ts",
+      "sha256": "9b7f10f3944b6a62711a6924cee53a3114c4b3bad684c13a7278e54a96f30379"
+    },
+    {
+      "path": "src/modules/payments-billing/application/billing-operations.port.ts",
+      "sha256": "f2c0ff6257eb1d3c9857eb7ee822f14cf48c8698870858e4966aa68e7719cd6f"
+    },
+    {
+      "path": "src/modules/payments-billing/application/billing-operations.service.ts",
+      "sha256": "7e3896ca7a9ce1fc97108299780b96d81bd176165694344c152424a74fe71034"
+    },
+    {
+      "path": "src/modules/payments-billing/application/billing-views.service.ts",
+      "sha256": "d903b9724c815e1413625c555518c552f1c5f40bb6c9a12180c388a436819634"
+    },
+    {
+      "path": "src/modules/payments-billing/application/billing.contracts.ts",
+      "sha256": "cbd0e2057f7061fb5345b9bf64078e0218ca26eaca76a13ac3467fbcb907ac54"
+    },
+    {
+      "path": "src/modules/payments-billing/application/charge-registration.service.test.ts",
+      "sha256": "8bea33c8eaa75174bcb9cefc0514e92632b24086d2857ca925146a23a9e7c5a8"
+    },
+    {
+      "path": "src/modules/payments-billing/application/charge-registration.service.ts",
+      "sha256": "13d015b02eb00d709a119454422d160a1f6766e966bbbf6573c733c42718386e"
+    },
+    {
+      "path": "src/modules/payments-billing/application/commercial-conversion.guard.test.ts",
+      "sha256": "6dcf00a99c835c83ff41ddb4e2d1c98299cbfc3260ea97d3fd450f8dbf57904d"
+    },
+    {
+      "path": "src/modules/payments-billing/application/commercial-conversion.guard.ts",
+      "sha256": "6fea2a33cca28c4d91f213c4330d796299c2a3f568caa6ef3cf3ab7322727de4"
+    },
+    {
+      "path": "src/modules/payments-billing/application/commercial-financial.service.ts",
+      "sha256": "e845d7f307b4ae2cb81b3085a5a76029fd1ab761647bd47245b9b10238d41c25"
+    },
+    {
+      "path": "src/modules/payments-billing/application/commercial-ledger.test.ts",
+      "sha256": "df210b2c80784b05a0d6a8fe5111c23d0fc9665df851d1152de3ef51e4256fe7"
+    },
+    {
+      "path": "src/modules/payments-billing/application/contract-charge.service.test.ts",
+      "sha256": "d1779af98a5f18cb84fb94ab79bb47136b601daf21830d0f27158bd1feb2a1e2"
+    },
+    {
+      "path": "src/modules/payments-billing/application/contract-charge.service.ts",
+      "sha256": "371ff18bd2c7c8fdeda4ffa1cb9d5908bf049534e448674772313cd9e38e47ad"
+    },
+    {
+      "path": "src/modules/payments-billing/application/deposit-orchestration.service.test.ts",
+      "sha256": "c241fe9dbe8511fa86b6fb5582fd40dcdeaadbe96d631bef82e55a27655d4530"
+    },
+    {
+      "path": "src/modules/payments-billing/application/deposit-orchestration.service.ts",
+      "sha256": "71423ca472c7e14a7a0839fb6d0782123fd236ff4edb36e5fed76f24aa920630"
+    },
+    {
+      "path": "src/modules/payments-billing/application/deposit-settlement.reader.ts",
+      "sha256": "9c6cea499b99e43d44cf58eb1cc9a3d02e2294e40039b408da544b600a567109"
+    },
+    {
+      "path": "src/modules/payments-billing/application/final-invoice.service.ts",
+      "sha256": "c37c6b29c86f0da5f4db5cfc45abb3832eb6651ec4ef00184c4ffbfa1e314108"
+    },
+    {
+      "path": "src/modules/payments-billing/application/incidental-expense.service.ts",
+      "sha256": "eb50a8672747ef2cb3b3fa5542f29e7c32b2513d39f9fedd318c38b774810ef3"
+    },
+    {
+      "path": "src/modules/payments-billing/application/payments-billing.providers.test.ts",
+      "sha256": "0c93adecc5437fea11ce1775d977f23f4c28ea45f3ad985627d68c53ed3b642c"
+    },
+    {
+      "path": "src/modules/payments-billing/application/payments-billing.providers.ts",
+      "sha256": "9653a6f4d6b7b6d6e40e7cbfd24f117c6ed7352f6524edfeae95d75e185a5f38"
+    },
+    {
+      "path": "src/modules/payments-billing/application/vnpay.port.ts",
+      "sha256": "8d41e2068dea428db59ffe58c040a18170f5125674e4be140ff04c4593293cee"
+    },
+    {
+      "path": "src/modules/payments-billing/application/vnpay.service.test.ts",
+      "sha256": "05feb31ac470337ffc8a4541adb1d4d13058eba871f1c7bd798118cfe039f89c"
+    },
+    {
+      "path": "src/modules/payments-billing/application/vnpay.service.ts",
+      "sha256": "a65fd06dab3b0daf17bf801dd226ce61020c6b05ceacb39c7df28c239f83e4cc"
+    },
+    {
+      "path": "src/modules/payments-billing/domain/billing-policy.test.ts",
+      "sha256": "61a97a8d70b05250c7ea30a88fc41ab47850489aca9832a50796b52fc58e96c0"
+    },
+    {
+      "path": "src/modules/payments-billing/domain/billing-policy.ts",
+      "sha256": "4daf3b35ee9c83c8c62315bc2b186f1d4b3de4274ec1b3aee50410717e250546"
+    },
+    {
+      "path": "src/modules/payments-billing/domain/final-invoice.test.ts",
+      "sha256": "3ac8addb320f9ed068e9b32190ca7e7d4146c7a397e2a8426c41ad9ff431056a"
+    },
+    {
+      "path": "src/modules/payments-billing/domain/final-invoice.ts",
+      "sha256": "df5fae3736ac120fa985c6599758ad2892e3e1146de0814d722cf900b4c3097e"
+    },
+    {
+      "path": "src/modules/payments-billing/http/final-invoice.openapi.ts",
+      "sha256": "66d2a3259da44e02f774692d6b69d51d32be7c90fa35a8033a19117045d81640"
+    },
+    {
+      "path": "src/modules/payments-billing/http/final-invoice.router.ts",
+      "sha256": "216fa09cbdbb5b1da372cdbecaca9785020dbce46e2e29261170e28b1e15d4dc"
+    },
+    {
+      "path": "src/modules/payments-billing/http/payments-billing.http-services.ts",
+      "sha256": "526feaf13a86df20f5548dbc369c8024b14eedb2c37f8181444b6111e7faf6c9"
+    },
+    {
+      "path": "src/modules/payments-billing/http/payments-billing.openapi.ts",
+      "sha256": "308dbcab6d90aa294e33d036d0afa8e58dcf9f90166f9f53c86dd569b321f942"
+    },
+    {
+      "path": "src/modules/payments-billing/http/payments-billing.router.ts",
+      "sha256": "b0f190ca922c54d9e24807182dbcd0604bc21e87bef2b0ae54553a48161f3e10"
+    },
+    {
+      "path": "src/modules/payments-billing/http/payments-billing.schemas.test.ts",
+      "sha256": "e2ec119eb4ccf103cc86264ae77ce61c1c71cef8d5f00a1df8a187e56c85e093"
+    },
+    {
+      "path": "src/modules/payments-billing/http/payments-billing.schemas.ts",
+      "sha256": "3b2840e038e30d6006c3f61377e478821222992c3c5e2eabb77e40cd02c376c8"
+    },
+    {
+      "path": "src/modules/payments-billing/infrastructure/analytics-reporting.reader.ts",
+      "sha256": "1d973ef468d131df5ce21e9c4a2acdc41286cd808f6b12e7be09f424b04267af"
+    },
+    {
+      "path": "src/modules/payments-billing/infrastructure/billing-http-idempotency.ts",
+      "sha256": "4ea7bd7c93166b4b65116a14e8452f7957a44c076caed8ca766de2d34eea54d3"
+    },
+    {
+      "path": "src/modules/payments-billing/infrastructure/billing-operations.repository.ts",
+      "sha256": "a51b11a6c2a49d8282310ff6160a171580020a9ece0c199cebbaf948034850cb"
+    },
+    {
+      "path": "src/modules/payments-billing/infrastructure/billing-reporting.repository.ts",
+      "sha256": "53a520cddf830bde175e4811bc50650dac896f2ca8d1c18158bd185157d729b8"
+    },
+    {
+      "path": "src/modules/payments-billing/infrastructure/billing.persistence.ts",
+      "sha256": "fbb1de43825b610f906d88de0310314dfb93f7f02cf679154de8a3b055202289"
+    },
+    {
+      "path": "src/modules/payments-billing/infrastructure/invoice-balance.reader.ts",
+      "sha256": "04be60e1b82a30e0df4ad18a4af19ad77092438decf97e5af95dc780d843b9ca"
+    },
+    {
+      "path": "src/modules/payments-billing/infrastructure/prisma-billing.adapter.ts",
+      "sha256": "90365442aa11959cac2d3516ab392975565939684c08bf8822836a26692d4aca"
+    },
+    {
+      "path": "src/modules/payments-billing/infrastructure/prisma-deposit-settlement.reader.test.ts",
+      "sha256": "c09c64e4213e8624b86cf9c7fc75d343464191bf3b62217f94bee543921fe5fa"
+    },
+    {
+      "path": "src/modules/payments-billing/infrastructure/prisma-deposit-settlement.reader.ts",
+      "sha256": "92c021c9ad8bedfb4afc9c3f7462b27eaecbd4b03eb42e30c7916ede01ddd51e"
+    },
+    {
+      "path": "src/modules/payments-billing/infrastructure/vnpay.gateway.test.ts",
+      "sha256": "b3272498c5bd9bb833afba47b4ffa7f0fcd714cea020fff4c1a4b263207b1a91"
+    },
+    {
+      "path": "src/modules/payments-billing/infrastructure/vnpay.gateway.ts",
+      "sha256": "02fd579327cfaf2c173eba72c1a6816a03e25915524b4eebcef2257496a15084"
+    },
+    {
+      "path": "src/modules/payments-billing/infrastructure/vnpay.persistence.ts",
+      "sha256": "b260adcc4bf13acf13cff53f302dccd275be3ed6003fad40eb891d1037d32bc8"
+    },
+    {
+      "path": "src/modules/payments-billing/infrastructure/vnpay.protocol.test.ts",
+      "sha256": "0afa613d3b0600f36098ae480feb1a522cafcae7517e4612830ed604b47f8544"
+    },
+    {
+      "path": "src/modules/payments-billing/infrastructure/vnpay.protocol.ts",
+      "sha256": "85ff1287233d2dca891b945061135c6162b3c46605ba57f39d803cdb71a1e1a3"
+    },
+    {
+      "path": "src/modules/payments-billing/payments-billing.providers.ts",
+      "sha256": "8138ef9f8ce317ec5f9305720973b154bf06cb5ecf2979f25c63b78703889361"
+    },
+    {
+      "path": "src/modules/payments-billing/payments-billing.runtime.ts",
+      "sha256": "be50d329db8fee1a1fedb86d85d1e0f54b12f00db0b83e77e4b8304e842580de"
+    },
+    {
+      "path": "src/modules/release-demo/demo-seed.test.ts",
+      "sha256": "7966c38df7e3f54e699f338eb4d20eef74933d27e9aec1bf30791a4d826d4c8b"
+    },
+    {
+      "path": "src/modules/release-demo/demo-seed.ts",
+      "sha256": "43145f7d1b8f952f29fdd3ce6a163d0addf74648fe781add6e142d1ec50459c6"
+    },
+    {
+      "path": "src/modules/release-demo/release-policy.test.ts",
+      "sha256": "5a6891be7c86f3036dbf18579a303a11dbb8cbb723f08e8c7354409fdaec651a"
+    },
+    {
+      "path": "src/modules/release-demo/release-policy.ts",
+      "sha256": "18ec4e8c895629ab92f2ee768487dbab371af6625a9f63fc88658bca113c1921"
+    },
+    {
+      "path": "src/modules/seating-plan/application/seating.contracts.ts",
+      "sha256": "76a6abc90905716d42ed4570c50218c853cb829e654f41ad29a0ba59cff2ac6d"
+    },
+    {
+      "path": "src/modules/seating-plan/application/seating.service.ts",
+      "sha256": "8e1e93617716e0700605719965fb8d58eced718103c05aca154e604b376f4752"
+    },
+    {
+      "path": "src/modules/seating-plan/domain/seating-policy.test.ts",
+      "sha256": "7b3e6db2fe84a296d03fb07178941c37c1f8f9c260ff837f4b091c088dc4d5ed"
+    },
+    {
+      "path": "src/modules/seating-plan/domain/seating-policy.ts",
+      "sha256": "84e56f8022298f5d953dbde758d1eb75144b3f82d90c225730a2bae5797ae766"
+    },
+    {
+      "path": "src/modules/seating-plan/http/seating.openapi.ts",
+      "sha256": "267e665d5f0dca0dee7b7a1a4aab9ef05d9ee07bf3ecc3305306770c461144f9"
+    },
+    {
+      "path": "src/modules/seating-plan/http/seating.router.ts",
+      "sha256": "79c9153b7b1d313f8e14957750f93a73ea448af020f273be4bc1da106ab87f3e"
+    },
+    {
+      "path": "src/modules/seating-plan/infrastructure/seating-reconciler.test.ts",
+      "sha256": "73d261d8c5a24d6f7fd2aa20e9e4bde42431bb255a275f5741993a051c2d3ea6"
+    },
+    {
+      "path": "src/modules/seating-plan/infrastructure/seating-reconciler.ts",
+      "sha256": "0716b4ebc0b8867d98e978c3d9d2d273fc6d2d1f54c8471745f895e367da6d1a"
+    },
+    {
+      "path": "src/modules/seating-plan/infrastructure/seating.composition.ts",
+      "sha256": "057c9b86a9eb81972754c879aca7eaf3188352f94acb43558d593293e1bb1c6a"
+    },
+    {
+      "path": "src/modules/staff-operations/application/attendance-readers.ts",
+      "sha256": "b9946f24917f4ca4bdf09a9e347394b69dd1e9ea058e9127df4e841d409d68c3"
+    },
+    {
+      "path": "src/modules/staff-operations/application/check-in.service.ts",
+      "sha256": "024ec15eeb06fa98cfe83308661671dff7d23989d0e23a6ea6d3409fcd3f2af6"
+    },
+    {
+      "path": "src/modules/staff-operations/application/staff.contracts.ts",
+      "sha256": "3df8d4ca424107be40e1aa055cdf18acedfdd0602a8176850cd3c0f55ae3ddad"
+    },
+    {
+      "path": "src/modules/staff-operations/application/staff.service.ts",
+      "sha256": "e9c182ce35c71352e1775f97e076fc49cb8b4a5baedacd4ee2f573e4b17a50ad"
+    },
+    {
+      "path": "src/modules/staff-operations/domain/staff-policy.test.ts",
+      "sha256": "db7861905388bc45b1f3177450a776346e5f48350c472cfbab1f7114a7339708"
+    },
+    {
+      "path": "src/modules/staff-operations/domain/staff-policy.ts",
+      "sha256": "121638258588d506dd94127db4f9570ea2344b6d89940fbdee906e9559fe08fc"
+    },
+    {
+      "path": "src/modules/staff-operations/http/staff.openapi.ts",
+      "sha256": "0eeb469cc6164035402eee24b31af1ea82f984fe907b5c01f12991429f7f1051"
+    },
+    {
+      "path": "src/modules/staff-operations/http/staff.router.ts",
+      "sha256": "3ff48cd99701bce25a90ca84d9a41ac0c82c116a02ca95ee917885a404e6eb63"
+    },
+    {
+      "path": "src/modules/staff-operations/http/staff.schemas.ts",
+      "sha256": "8ad3a81ec5b1eaf6b92a052d2b91caaf489f6fb382df16a2df202ac4c36b9c03"
+    },
+    {
+      "path": "src/modules/staff-operations/infrastructure/analytics-reporting.reader.ts",
+      "sha256": "a46f9bfc580f27b2cea799658e2c703d3706e02b197863ed253d956d89b7ee9c"
+    },
+    {
+      "path": "src/modules/staff-operations/infrastructure/staff-seating.composition.ts",
+      "sha256": "d343928e4236d5f348d66ed00a8608f394c8af6d13a78a6be95d6056b521a7a7"
+    },
+    {
+      "path": "src/modules/staff-operations/infrastructure/staff.composition.ts",
+      "sha256": "05b16aac7b20342a9913b6780d9d95ccd253f8bae5b49644df86cff1b83960b5"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/analytics-reporting.ts",
+      "sha256": "fd616a41c8c0002d46c9ad7b3fd1cdf1a62f41d58fef59bdf8613bffb397f2ba"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/catalog-media.service.test.ts",
+      "sha256": "924bd4fb0159f87c0b927ce94068e3d777194378c83c2deb0381d63dca2302f2"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/catalog-media.service.ts",
+      "sha256": "93c5ffe772cbafb79c05c3d9e8d8180712b779aa43fa259b99bc993996d3c2d1"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/catalog-query.service.test.ts",
+      "sha256": "5584de1a805b7c70d6bd7fe53cec6fbfbb61e1e0c46f34820fff6ff95ba74e8c"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/catalog-query.service.ts",
+      "sha256": "41974955a723ce808990c1875e8910f4d238ea192be3a2771ab31cfa43104937"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/commercial-selection.reader.test.ts",
+      "sha256": "50d436e5ec15f03d1858f8ab16e437b18bd0ab791d292aa793700b0915fe9220"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/commercial-selection.reader.ts",
+      "sha256": "be2eee8364fb74e213d63797cc9f8c98393e3de8308456b42c9d29450601eeaf"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/layout.service.test.ts",
+      "sha256": "ffd795502db2649bacc7e27089d88da64a7850eb83ea9a3f5abd294579cbaa7c"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/layout.service.ts",
+      "sha256": "831604d3847a3eeb3e6e3f66bec8181c6f740a9f23f86ff6ed17a3ac4a64d762"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/menu.service.test.ts",
+      "sha256": "b7ab4b21d8183c14362ebd060a2b8bd6fa71bdddb67ab0ceb4622bbfbc9dafa9"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/menu.service.ts",
+      "sha256": "f46fb7e4cf5f18807d1a7dca5447d81fd63bf22c221a0f3240e599c2d82ec3a3"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/print-offering.service.ts",
+      "sha256": "b4179c4d2e84bc2758ffe7e99f9f7f68a7b26bd5ce9732ae0e4ff2dac68d906d"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/restaurant-service.service.ts",
+      "sha256": "63c8b62b0833709231e0a9e96ee994b8afe696f1f7f677469fd298b207014314"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/selection-eligibility.reader.ts",
+      "sha256": "4d461764d522a2d84914984a416294ef37a674e31d6e48d3084fa98287fed69a"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/timeline.service.test.ts",
+      "sha256": "67ffd293b4f4c3c812aaeb9f56626847c68e52d5e3cff0e9b183b1a1e45c6643"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/timeline.service.ts",
+      "sha256": "639fc7af3f65f7031d627a7b0cee97b8f147d46eadd1930d5c4ef3a1ccdc96b4"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/venue-catalog.provider.test.ts",
+      "sha256": "a63dbb773b960d38a94081e7e306d247a8f315a126b6fa6829139753a03871f5"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/venue-catalog.provider.ts",
+      "sha256": "fb1a6dd4e830385a5293b65fcf002ebdc8a9a8f9786b42b42a1a662f3b3e1eb4"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/venue.service.test.ts",
+      "sha256": "33557be5f0a64b7630b1cc1369a0ebc6cf4392248ba03eeca36db6a36bb6c3b6"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/venue.service.ts",
+      "sha256": "b407137762d86277513e06661a5028779526fd21a6317d8734e67a153e3d8533"
+    },
+    {
+      "path": "src/modules/venue-catalog/domain/catalog-policy.test.ts",
+      "sha256": "bc2264a988d72e97768767dccbdeeb1b77736c2aec01dd614713ffd2d4b4b1c1"
+    },
+    {
+      "path": "src/modules/venue-catalog/domain/catalog-policy.ts",
+      "sha256": "6d9e2ee22f301ddf06abd1c7f69bed36af0f01efd961f53c60f6b6e909f17dcc"
+    },
+    {
+      "path": "src/modules/venue-catalog/domain/commercial-offering.test.ts",
+      "sha256": "b2a83e548d487f229c3829e9189bc5c7115cc67fd5ece1399109fb073391dc9e"
+    },
+    {
+      "path": "src/modules/venue-catalog/domain/commercial-offering.ts",
+      "sha256": "410ed20bfcf38e96f642a7a9e382591dd309cdbb7a5257e769f752da6011ef70"
+    },
+    {
+      "path": "src/modules/venue-catalog/http/commercial-catalog.openapi.ts",
+      "sha256": "822d81e4b2a1ae4880ea93681d94e8b8419dadee9f1579e2ab96578e4cba2726"
+    },
+    {
+      "path": "src/modules/venue-catalog/http/commercial-catalog.router.ts",
+      "sha256": "5268a7de4c8fc2ca765a3aa9ecad3f1d6b963e63aaf32b2aafb4fa94b7b12492"
+    },
+    {
+      "path": "src/modules/venue-catalog/http/venue-catalog.openapi.ts",
+      "sha256": "cb2207f3135fffe2646f96f057c3b15ab7e70e688e06a24a1a81bb5a0399fa48"
+    },
+    {
+      "path": "src/modules/venue-catalog/http/venue-catalog.router.test.ts",
+      "sha256": "6b8fbeb731efc433487f89d1b267c77d771e0f836be0de7152280704558db926"
+    },
+    {
+      "path": "src/modules/venue-catalog/http/venue-catalog.router.ts",
+      "sha256": "b420c68ed6cbbf2da4f36c15e9ea372e41c82a24a529218d0931abe9cd022dc7"
+    },
+    {
+      "path": "src/modules/venue-catalog/http/venue-catalog.schemas.ts",
+      "sha256": "67bc778d2b12ec3cf98a5054268208e2ff3e327210a01c968f6a63877101e5ec"
+    },
+    {
+      "path": "src/modules/venue-catalog/infrastructure/analytics-reporting.reader.ts",
+      "sha256": "6de16cfbd65458f3a9065838d644255f9c81de581c03d18207b05a9794bca0e0"
+    },
+    {
+      "path": "src/modules/venue-catalog/infrastructure/catalog-version.repository.test.ts",
+      "sha256": "1b7a50c4c8ceccbde94c9e4b205aa5733c967abb8ce5de0526c35da2c331e81c"
+    },
+    {
+      "path": "src/modules/venue-catalog/infrastructure/catalog-version.repository.ts",
+      "sha256": "c30a38329ccd48f6dfde5798c59cffafca36c1ec7fce108655ff5098f49ca2b8"
+    },
+    {
+      "path": "src/modules/venue-catalog/infrastructure/guest-planning-capacity.reader.ts",
+      "sha256": "4878ac8bbb795cbecc1f8f0724ccc6bedd62401bafb9171527f121a8af56fe5b"
+    },
+    {
+      "path": "src/modules/venue-catalog/infrastructure/prisma-selection-eligibility.reader.ts",
+      "sha256": "2ed2677b765ec52814f2a1526dc3161bccaf7c417d77b5865bbb6a2fe5615219"
+    },
+    {
+      "path": "src/modules/venue-catalog/venue-catalog.runtime.test.ts",
+      "sha256": "7d78a3ded2b06eb053ef320cc8d089dfe346899899e6606ea503ecb30ce27b4e"
+    },
+    {
+      "path": "src/modules/venue-catalog/venue-catalog.runtime.ts",
+      "sha256": "6acbe1de5ea62d7eed4eb189863e4d6ffba4eb1fa7753620d8c0b6dd09d6edef"
+    },
+    {
+      "path": "src/server.ts",
+      "sha256": "bc16ebae1882ceee62a946e28dbb6c43a0193dde0c4c06ad90430c3d76190c38"
+    },
+    {
+      "path": "tests/contract/analytics-openapi.test.ts",
+      "sha256": "7f3ea1475e1903847bab765f8894272254ddc37f9b1e10bdf12327c324e85a21"
+    },
+    {
+      "path": "tests/contract/booking-lifecycle-openapi.test.ts",
+      "sha256": "e8254fb0868ee255b9a50d1e7edbaf95757bdc28f8a72dabcf57ec1182b73b1f"
+    },
+    {
+      "path": "tests/contract/ci-workflow.test.ts",
+      "sha256": "c25638b2c25b374265ed0814fc4ba26f317975eace11964da4349ec1b92c129a"
+    },
+    {
+      "path": "tests/contract/commercial-step6-openapi.test.ts",
+      "sha256": "22dd74384d57b0554c15a56464bd35c49c3ea5f07ff0835ac8c07b245b36626b"
+    },
+    {
+      "path": "tests/contract/dependency-audit-policy.test.ts",
+      "sha256": "dc6f3206ae97405e98eff7ac9cfb0741099ebc37cceaab1196280abff543d02a"
+    },
+    {
+      "path": "tests/contract/docs.test.ts",
+      "sha256": "282c4b4bcb76060cd680a0c043352b0ddf2d66471592f4102835d4f01f340ca1"
+    },
+    {
+      "path": "tests/contract/guest-management-openapi.test.ts",
+      "sha256": "cdafcb68d858b8010b58e60045683247615e78992a13285be8259ff7ea1bd826"
+    },
+    {
+      "path": "tests/contract/identity-access-boundaries.test.ts",
+      "sha256": "137c0900e4f05aad600b89dbc08c9ab3d602c2bcfe0f0e81b20ff7656af7a76e"
+    },
+    {
+      "path": "tests/contract/invitation-media-openapi.test.ts",
+      "sha256": "abb4263d20e12dea608b9cee31b9d2c790ecde1c4d7a69ba8004e4a17f9deb76"
+    },
+    {
+      "path": "tests/contract/invitation-studio-openapi.test.ts",
+      "sha256": "ebdabf7980221beb9081efea6431508fd9d1c1270f22e32c7b94d7ba36d0c0eb"
+    },
+    {
+      "path": "tests/contract/notifications-openapi.test.ts",
+      "sha256": "7a1e552776bf315ea405d546c6d172ce304bd98edc3861517cf908f78ce132c5"
+    },
+    {
+      "path": "tests/contract/openapi.test.ts",
+      "sha256": "4fdbd62bc94921f7516599fccecddea8961a7510e83f1f60802e8b2eb017394b"
+    },
+    {
+      "path": "tests/contract/payments-billing-openapi.test.ts",
+      "sha256": "673cc6df4e9c0328d3e4d8ee792dbe558ffa4a0638a5d0910fe067ee47b72a8d"
+    },
+    {
+      "path": "tests/contract/retention-options.test.ts",
+      "sha256": "ef418ad01033eade62911218e84df062bf8e74c328ac6a914cc01e07ed000356"
+    },
+    {
+      "path": "tests/contract/seating-plan-openapi.test.ts",
+      "sha256": "fe5418993d316ea057acbe61bafd4d0059ecee119f3eea3170972ba18f9d28a5"
+    },
+    {
+      "path": "tests/contract/staff-operations-openapi.test.ts",
+      "sha256": "1193c4bd87121eb9f4cb28b6fd1524161309522057ddabbea0a16c86f1aec475"
+    },
+    {
+      "path": "tests/contract/venue-catalog-openapi.test.ts",
+      "sha256": "95e51aa190894477ce761314b52961b640f45355c7657457dbf8630dc57e0a32"
+    },
+    {
+      "path": "tests/fixtures/commercial-contract.ts",
+      "sha256": "e87b2ddf008dcd059c03374fcc1da9b22e2623d449d2a43e5351fc7392b9a443"
+    },
+    {
+      "path": "tests/integration/analytics-commercial-cases.ts",
+      "sha256": "e02f4405f005e0b6a8375f205432d11a65def1536027470c8fc9ccc24cf3426c"
+    },
+    {
+      "path": "tests/integration/analytics-dashboard.test.ts",
+      "sha256": "25bcbb8e59d78c8da8fc61ad0fa8cc4de6d7ff0e1572643c67d7d9a7dbb2fea4"
+    },
+    {
+      "path": "tests/integration/analytics-privacy.test.ts",
+      "sha256": "d05613a42467a70415461f6ecc9245270f54191d36e4fcd5fdd0ca2f75cc31c3"
+    },
+    {
+      "path": "tests/integration/analytics-upgrade.test.ts",
+      "sha256": "c50e93d6337b66071de206a8afe3e3efef0b180391fdb53302d1cdda21ed4ab2"
+    },
+    {
+      "path": "tests/integration/audit.test.ts",
+      "sha256": "982d6f63e029aa4eb887824c0a4cb703a090ade1ab4fab7fa79d4988c039c7d7"
+    },
+    {
+      "path": "tests/integration/booking-lifecycle/experience.test.ts",
+      "sha256": "4a0e33d30f1b99327a0a422148fa3d486029411a7de6f96520cd83f726e1ebca"
+    },
+    {
+      "path": "tests/integration/booking-lifecycle/review-regressions.test.ts",
+      "sha256": "2ab66a93fc53213dc71411139afe5b4e8a72f6f415f9d2dadab899e249855318"
+    },
+    {
+      "path": "tests/integration/booking-lifecycle/runtime.test.ts",
+      "sha256": "a3e5ec2c89496575e0ef2e595cd56b44aced7da3a0c59e3218bf596fc56ce74d"
+    },
+    {
+      "path": "tests/integration/booking-lifecycle/slot-hold-race.test.ts",
+      "sha256": "5b69a2cd431700309295f3975d6ad55ebdc2a087ea70165efa63f5edf32a9679"
+    },
+    {
+      "path": "tests/integration/booking-lifecycle/upgrade.test.ts",
+      "sha256": "4f918331307cc9f46dd8533b56256db12ea0f68a0219aa1f979b9ab0d8dfd482"
+    },
+    {
+      "path": "tests/integration/commercial-acceptance-api-cases.ts",
+      "sha256": "496903aa949f77f7cba3bff288409d06fc0eca11cc86e88c4186a012bb6d0817"
+    },
+    {
+      "path": "tests/integration/commercial-contracts-api.test.ts",
+      "sha256": "16c8852280e6eb0b891949d009a550b7023c3243c6c2a63186e5ca0e50324427"
+    },
+    {
+      "path": "tests/integration/commercial-foundations.test.ts",
+      "sha256": "6153d615f8ec98098e7bba113b571ccc9de2ffee08cb01b9f46cca9c59262d1c"
+    },
+    {
+      "path": "tests/integration/commercial-settlement-journey.ts",
+      "sha256": "f378618251a0d4a383f8d83e4a431555133adb61da0fca29ae1f3863ad993b44"
+    },
+    {
+      "path": "tests/integration/commercial-step6-api-cases.ts",
+      "sha256": "e8ed112359948c7960f086c16a12245ac904bb0d699fd370d33da52cd9de655f"
+    },
+    {
+      "path": "tests/integration/common-errors.test.ts",
+      "sha256": "f59f7a00a974d91077a8f3bb4dccaf4ffc4efbaa3714aeb3fb890f6cbda4c3da"
+    },
+    {
+      "path": "tests/integration/contracted-print-price-api-cases.ts",
+      "sha256": "8c794dd87ebb07f0754bb0bca7fb95fe28130240206ab081ccb26d4c57af89ef"
+    },
+    {
+      "path": "tests/integration/database.test.ts",
+      "sha256": "b1addf5fbf62ffd5b8ae168ecccdb4824d04e886e0e60725358dd1c0050fed4c"
+    },
+    {
+      "path": "tests/integration/guest-management-boundaries.test.ts",
+      "sha256": "6edd73af96305da788e09263c2967b7e4c4402863c832bf3ab28d14402564fba"
+    },
+    {
+      "path": "tests/integration/guest-management-completion-cases.ts",
+      "sha256": "3a44ca835e7cc78851109c7bef04af1752dd490845f30dd2dddac8e30cda47ef"
+    },
+    {
+      "path": "tests/integration/guest-management-http.test.ts",
+      "sha256": "3c446df89ca564bac32ec73138db91a5d592e7b1320051957adb0ed284443177"
+    },
+    {
+      "path": "tests/integration/guest-management-providers.test.ts",
+      "sha256": "db5f5b0c9e49a306cc4967eab3b507030d2a19f0152a26d403f8b0ff5ed42338"
+    },
+    {
+      "path": "tests/integration/guest-management-security.test.ts",
+      "sha256": "84241c780be0338aebdf39a04f597b67b567116bc4fa593992086f8d8aaaf58a"
+    },
+    {
+      "path": "tests/integration/guest-management.test.ts",
+      "sha256": "b4d2925a43782f5c167e92df7cec09d1c40fb2e4a2af2a3e2c37c0a9365b9feb"
+    },
+    {
+      "path": "tests/integration/health.test.ts",
+      "sha256": "7692a37e1883d86a9e4c84b49e402603feac672a660af28f61370158d675aa3e"
+    },
+    {
+      "path": "tests/integration/idempotency-http.test.ts",
+      "sha256": "011c5641a8f405265801a9d58806569f7dfc2eac60b80847c94374762c614493"
+    },
+    {
+      "path": "tests/integration/idempotency-repository.test.ts",
+      "sha256": "b74c4c45424dbe6350698677defd88da2ca4ab09afe24da77245fc1a4187808b"
+    },
+    {
+      "path": "tests/integration/identity-access-account.test.ts",
+      "sha256": "6f8922848d81147591d1f0bcd20061749c88c85da1fac424e58de05ddc32207c"
+    },
+    {
+      "path": "tests/integration/identity-access-invitation-acceptance-promotion.test.ts",
+      "sha256": "752148b54a917aa51b65d4ee46204721f628fc9549c11e392790773aff13ba4e"
+    },
+    {
+      "path": "tests/integration/identity-access-password-reset.test.ts",
+      "sha256": "a43aff46315c574e3a285ec699986d0f8d51019aa056d3b959ba079038aecfe3"
+    },
+    {
+      "path": "tests/integration/identity-access-persistence.test.ts",
+      "sha256": "1be398bc04e44840aabe05a63a4685077805c50b910ceeaf5521be619e26b49b"
+    },
+    {
+      "path": "tests/integration/identity-access-retention.test.ts",
+      "sha256": "8b6bac4bfdc1468b18ca14b1ca79ef224b38b2bc59bf654fc17c2c4b1978dedd"
+    },
+    {
+      "path": "tests/integration/identity-access-runtime.test.ts",
+      "sha256": "d505fe751ac10649899183794ae1a3f2804b9711d2bd9ac83ab9ec083c7bb83f"
+    },
+    {
+      "path": "tests/integration/identity-access-session.test.ts",
+      "sha256": "ee33ab5dae947a70ab51f91cdd8e8d573504424a64ca828cae037dcda4802002"
+    },
+    {
+      "path": "tests/integration/identity-access-workspace-invitation.test.ts",
+      "sha256": "c34f4c9473475859fa5ddff0db905f4fcf0cbf820ebbce24111df5f5d88cccf4"
+    },
+    {
+      "path": "tests/integration/invitation-studio/controlled-storage.ts",
+      "sha256": "29d9acc80f9c2b9ab2e2cdb4638effe9f10ebc7d9445f917105476274d4a27da"
+    },
+    {
+      "path": "tests/integration/invitation-studio/media-database-fixtures.ts",
+      "sha256": "8d7a901b11fb195dbf1efc7a5565df85c50f2dacceed20efd1fcabe37244910e"
+    },
+    {
+      "path": "tests/integration/invitation-studio/media-native-providers.test.ts",
+      "sha256": "cb9e2b6d31a132f9fe2852d75b84a3174cd8ed5044f4a9fb1c4000c7adf10b4f"
+    },
+    {
+      "path": "tests/integration/invitation-studio/media-persistence.test.ts",
+      "sha256": "16ccb05b27e11ecc0bc6a727bc7262aeb81580a889129c1d9485632dde7015ef"
+    },
+    {
+      "path": "tests/integration/invitation-studio/media-upgrade.test.ts",
+      "sha256": "4bc1a8526e6ef342cbde2a094641c8840ffa700c35fa1274b0bf403f2da624e2"
+    },
+    {
+      "path": "tests/integration/invitation-studio/migration-upgrade.test.ts",
+      "sha256": "bb1f130fb81c3049c54e3fe8574320a57e7d490a7d3bdb2490d447e813142dfb"
+    },
+    {
+      "path": "tests/integration/invitation-studio/native-booking-fixture.ts",
+      "sha256": "eef6e542495cdec8214c92d2836ab7caedcb772e77834f5eaca5e2bb591ad2ef"
+    },
+    {
+      "path": "tests/integration/invitation-studio/print-file.test.ts",
+      "sha256": "69c1992ce3e241fe54835e0bcf8a9f91e1f5236754f143c9638b7affea00576a"
+    },
+    {
+      "path": "tests/integration/invitation-studio/print-order-native.test.ts",
+      "sha256": "b835c6392a28387f266d7887b4f2697ccfdbbb894aef6cc86ca868a3d84734aa"
+    },
+    {
+      "path": "tests/integration/invitation-studio/print-order-safety.test.ts",
+      "sha256": "167408adc4f22c522a255edad57b9aec990a11cf151173d31877ad5ee4231e60"
+    },
+    {
+      "path": "tests/integration/invitation-studio/reader-boundaries.test.ts",
+      "sha256": "737c421bc79857787b15d9c5f7e230115f117dbe35fb300492fc93301c455717"
+    },
+    {
+      "path": "tests/integration/invitation-studio/registry-conformance.test.ts",
+      "sha256": "27a3d254eda1313ccf41fb040978f139344fd4813b75ace6291dec7aef020158"
+    },
+    {
+      "path": "tests/integration/invitation-studio/review-regressions.test.ts",
+      "sha256": "dbfbaa7eb4f155e6891b3f42d902e31556db3df546753fe02d55b867c65578b2"
+    },
+    {
+      "path": "tests/integration/invitation-studio/studio-fixture.ts",
+      "sha256": "03d39cb43dd7752668056f69f3d7884f33666913bdeea7e096289722c5d687f2"
+    },
+    {
+      "path": "tests/integration/invitation-studio/studio-waves.test.ts",
+      "sha256": "77046e3058fd8a42dc0cc3df91c2ff78f6d4c1e5938305b95803490a743f8253"
+    },
+    {
+      "path": "tests/integration/metrics.test.ts",
+      "sha256": "a44e57adc16383005761c4fbe177ba981033b2599978399d8c042c6f6f001777"
+    },
+    {
+      "path": "tests/integration/migration-policy.test.ts",
+      "sha256": "e9cf6a0fdb63d496ec4736dbad22da2d98e201b728d58a9f5cc0df67f42fc9bc"
+    },
+    {
+      "path": "tests/integration/notification-automation.test.ts",
+      "sha256": "707a88ae62e779e400d876b9a009b3b85b0b56a47e7b48c3c2e756e60b786671"
+    },
+    {
+      "path": "tests/integration/notification-dispatch.test.ts",
+      "sha256": "262aa15c3cce58ceb1ffeaaf19f97e3cbd93d2d64463db39e9ea32f21bffe691"
+    },
+    {
+      "path": "tests/integration/notification-events.test.ts",
+      "sha256": "388bac3b98fa0e5ead86d2df59c0d6a4f8f25374b0a2c5de303fa97090de0f6d"
+    },
+    {
+      "path": "tests/integration/notification-fcm-upgrade.test.ts",
+      "sha256": "b915c63028ce510cb2bb351014f7d00f2208e38ba97a366fb596fb0e50032357"
+    },
+    {
+      "path": "tests/integration/notification-fcm.test.ts",
+      "sha256": "a1f9193ab92996dcc6298dbce77fd7f78c9b1aebd70ca7cbed9d3977edffc8b5"
+    },
+    {
+      "path": "tests/integration/notification-foundation.test.ts",
+      "sha256": "42107082c28a69600f6c369698a7ae9ad00b38256e16039ab425fe7e60e0b421"
+    },
+    {
+      "path": "tests/integration/notification-guest-delivery.test.ts",
+      "sha256": "59d3c3270432c9216e0a3023c3bd803fa0e8d1c58445810774a78d8136faae9b"
+    },
+    {
+      "path": "tests/integration/notification-http.test.ts",
+      "sha256": "c254466fcbbf34f287327cf724e8f77a2cfe495fb7cd05004c8064950613c0ef"
+    },
+    {
+      "path": "tests/integration/notification-identity-boundaries.test.ts",
+      "sha256": "33664c96b8cde946fb2fc8e62bd294e51b2ced99db1bd71fccac23a64cf77d24"
+    },
+    {
+      "path": "tests/integration/notification-runtime.test.ts",
+      "sha256": "50d23a51831d4a5d98674cc358d069e79419ea2cceeafcc355eb2c118efec905"
+    },
+    {
+      "path": "tests/integration/notification-security.test.ts",
+      "sha256": "bb68b290ef9305bc4554f44f8b253779acbf5ab82b1cc73bfd744f8b2e62360e"
+    },
+    {
+      "path": "tests/integration/notification-upgrade.test.ts",
+      "sha256": "a74dc34e5e0369ead9be36b453a9e0b404ef3c34c56af39bf791313934bd8254"
+    },
+    {
+      "path": "tests/integration/notification-worker.test.ts",
+      "sha256": "ac5eccb907b8817da695b2545dfcf1b0c9c80fc659f68e04427d8dee0965baf8"
+    },
+    {
+      "path": "tests/integration/password-email-otp.test.ts",
+      "sha256": "96708af02d5961d5ecea0ef7c66a62c134299903bdda669db268db1871179a55"
+    },
+    {
+      "path": "tests/integration/payments-billing/acceptance-fixture.ts",
+      "sha256": "f8e679a1c5cc8f24faca044e20b37ba167ee1d59fb1f8d34abb04619c46696e8"
+    },
+    {
+      "path": "tests/integration/payments-billing/acceptance.test.ts",
+      "sha256": "f3ee4e6df3ac39b04ed3ff302ee4c2548af974afdbd8b8f8f3d6cc36897007d7"
+    },
+    {
+      "path": "tests/integration/payments-billing/application-upgrade.test.ts",
+      "sha256": "ff6a0a7a8349f33ddd6ad7082079df032c465564a7b104667c731bacfe0ed02b"
+    },
+    {
+      "path": "tests/integration/payments-billing/balance-vnpay.test.ts",
+      "sha256": "06aada46d4c772b900ddced7af765734c83236be74f3deedcfa65537f2ce156c"
+    },
+    {
+      "path": "tests/integration/payments-billing/charge-registration.test.ts",
+      "sha256": "1b8509339bb72bb80e3bab22cb2872ec8c6fea1de419e3e370acf664d8855a36"
+    },
+    {
+      "path": "tests/integration/payments-billing/deposit-fixture.ts",
+      "sha256": "f8a7096c763dcc5f2d8f0d0115ef3ed7ec414041ad9d994dbea2c70b56a7be0e"
+    },
+    {
+      "path": "tests/integration/payments-billing/deposit-orchestration.test.ts",
+      "sha256": "5c30b6d297264819d47160e3236deeee56efd2822dfed68aa852cec52e87f072"
+    },
+    {
+      "path": "tests/integration/payments-billing/http-idempotency.test.ts",
+      "sha256": "bdfe9d5cd34c4bab4d6e5ed74198fd67c254ce061d84bd65b39e30e0c1879f29"
+    },
+    {
+      "path": "tests/integration/payments-billing/http-recovery.test.ts",
+      "sha256": "5734f66450e41d42c18dd1432763bd1c51e4b8b3ebe7db2cb424d39090392a23"
+    },
+    {
+      "path": "tests/integration/payments-billing/http.test.ts",
+      "sha256": "d3231c524d42ce4da3c84ed5a35eeec5bd3453b89c6358079811ee34eaf9e8da"
+    },
+    {
+      "path": "tests/integration/payments-billing/ledger.test.ts",
+      "sha256": "68d3a220a38d427c9b9f3f8ccfe79ae6c0803591694f2caea47e7b4dc8e23d6e"
+    },
+    {
+      "path": "tests/integration/payments-billing/operations-fixture.ts",
+      "sha256": "b310d9e576a7a9733aad94126b38506acfb24bbd864ca976abcd6b4ae8a9929e"
+    },
+    {
+      "path": "tests/integration/payments-billing/operations-safety.test.ts",
+      "sha256": "e1d397ef1affa5cea79b8874034d1f0b87eb4d95580992459760d348604978cd"
+    },
+    {
+      "path": "tests/integration/payments-billing/operations-storage.test.ts",
+      "sha256": "d2dbed1294d100209b6eddbd17574fa804a356440fcdd495102fec80008a23d5"
+    },
+    {
+      "path": "tests/integration/payments-billing/operations-upgrade.test.ts",
+      "sha256": "402ee311d133951e0ad421799aeb3c84c7cbc7b955958288b56d58ec976ad8e0"
+    },
+    {
+      "path": "tests/integration/payments-billing/operations.test.ts",
+      "sha256": "63fb4ff357175f0d6dc61294cd373820cb5b522e69e3cf7afa287377797ceb2d"
+    },
+    {
+      "path": "tests/integration/payments-billing/readers-conformance.test.ts",
+      "sha256": "da12beb6e26bb3ba4c99d21d21c0c03f91b2f566ee9f8bc2db353da43365c2e5"
+    },
+    {
+      "path": "tests/integration/payments-billing/runtime.test.ts",
+      "sha256": "cb2eef2796fa7edfa84602139f828f575795e06eb7e1b61ebaaddae43665e0bf"
+    },
+    {
+      "path": "tests/integration/payments-billing/transaction-latency.test.ts",
+      "sha256": "65896775c33085a74e58c644d1a205ac7f822f4ea4d638c8cfde2387aa390d56"
+    },
+    {
+      "path": "tests/integration/payments-billing/upgrade-fixture.ts",
+      "sha256": "05966c3eb6280b6993c4c80ebb8751c46ed49677fa8ff34211f60fe60f4a7d4a"
+    },
+    {
+      "path": "tests/integration/payments-billing/upgrade.test.ts",
+      "sha256": "e18e7edae66c34aa97ea6ff46c83e41e46c6a6da93104e5a6f83de8a534c1364"
+    },
+    {
+      "path": "tests/integration/payments-billing/views.test.ts",
+      "sha256": "deb4ee3e53baccff8d163dca619fb314f2324ce7eccdfb4ee4748142466ba5ce"
+    },
+    {
+      "path": "tests/integration/payments-billing/vnpay-evidence.test.ts",
+      "sha256": "9d2fdff442ecf32752d9baa97f33295eae9e8d9a0b03d21acbf98b93a14de8fc"
+    },
+    {
+      "path": "tests/integration/payments-billing/vnpay-fixture.ts",
+      "sha256": "b69e6ec3100d9fbeaa5ba0d59faaff914d1518073e9bb8f71c7175beba8c18aa"
+    },
+    {
+      "path": "tests/integration/payments-billing/vnpay-upgrade.test.ts",
+      "sha256": "c67d97c210f43502d4b3653485ee893af639b96f36c9764ec3b90c242e34f4aa"
+    },
+    {
+      "path": "tests/integration/payments-billing/vnpay.test.ts",
+      "sha256": "2c19e4451be91eeac2fc2d8d8ea662e712529aa5ec8db5686f7d86052320ae71"
+    },
+    {
+      "path": "tests/integration/print-catalog-page.test.ts",
+      "sha256": "4d8340ab02f080623331fc3134efb066d34bc2ec34147e5f58fd4c698d260dea"
+    },
+    {
+      "path": "tests/integration/release-demo-cases.ts",
+      "sha256": "e61974c164a59ced46d3881a59de61ebc49dfdbf6f75b6951a3d256192ba00b6"
+    },
+    {
+      "path": "tests/integration/request-logging.test.ts",
+      "sha256": "349eab6ed2bc8f10cbfd22b42a39516d7d1ec9f500cf3911458caa5e7d100e35"
+    },
+    {
+      "path": "tests/integration/retention-cli.test.ts",
+      "sha256": "25728f95cc5186b2c00e2e279deca77368b8a782cd2f1d0e605c5a2129978e6c"
+    },
+    {
+      "path": "tests/integration/runtime-foundation.test.ts",
+      "sha256": "47556045f9758aac456651a8b92247717e2acff865c502532f289e955b5212ab"
+    },
+    {
+      "path": "tests/integration/seating-plan-http.test.ts",
+      "sha256": "aa4bf2fd65425ce925b1ade9d3a7f7155f666e31d04f302a5ad2debc42c65960"
+    },
+    {
+      "path": "tests/integration/seating-plan-upgrade.test.ts",
+      "sha256": "87cb208b9110a7bae931e941427108c1753234cec8dc4e24f54a5fb4b46f18d2"
+    },
+    {
+      "path": "tests/integration/seating-plan.test.ts",
+      "sha256": "189f414933233de444e76a296ab84e7ae85dff1ba641556b63858301c3332060"
+    },
+    {
+      "path": "tests/integration/seating-print-files.test.ts",
+      "sha256": "64e9d59a211b6dd29a050d07526bf8bb03730e6614f192d354247af114f70157"
+    },
+    {
+      "path": "tests/integration/security.test.ts",
+      "sha256": "0fddacf817e8591dad9079ce3cea7e8d1e5a212f4a58fec8f13f76a311f399c8"
+    },
+    {
+      "path": "tests/integration/staff-operations-upgrade.test.ts",
+      "sha256": "196b0a99f45d7c4e2ccf3ecda1216ee1196635414df33daddc4ced586dcf8793"
+    },
+    {
+      "path": "tests/integration/staff-operations.test.ts",
+      "sha256": "48d6cd076db28f67c7bba1bb87e00465f107ace0a28de1dc3c18177d7872dcad"
+    },
+    {
+      "path": "tests/integration/venue-catalog/catalog-media-behavior.test.ts",
+      "sha256": "9c3e620dacd575936e022a762221f715d8b96f48b9ca5d0bbc3b7be677ba5326"
+    },
+    {
+      "path": "tests/integration/venue-catalog/catalog-persistence.test.ts",
+      "sha256": "7bc31ec20cb6eb4c66b3b463e6232ddf9970a8dc474435788bd7983fc4c3a221"
+    },
+    {
+      "path": "tests/integration/venue-catalog/catalog-seed.test.ts",
+      "sha256": "9872334aabfcbff0eec833d580b582576718030f5cae6b7c208f6c494369cdb4"
+    },
+    {
+      "path": "tests/integration/venue-catalog/catalog-test-database.ts",
+      "sha256": "1b30283dc419699096d60e81fb8d6c40f848c9bb3135f6dfb6fb0b6858825c5b"
+    },
+    {
+      "path": "tests/integration/venue-catalog/layout-behavior.test.ts",
+      "sha256": "c0b3f752e866c7c578a7164cddeb715400803b87608199823967f9f48b310fc5"
+    },
+    {
+      "path": "tests/integration/venue-catalog/menu-behavior.test.ts",
+      "sha256": "420cbe8e974de369a340a68190f1dc2156ef1f88cd06c269514bda8515d6b964"
+    },
+    {
+      "path": "tests/integration/venue-catalog/timeline-behavior.test.ts",
+      "sha256": "56ff28af919fb6da75abf19985b1dddfab2be6008a1c0c4a7f723c03ae167cdf"
+    },
+    {
+      "path": "tests/integration/venue-catalog/venue-behavior.test.ts",
+      "sha256": "b8e9b908caffca1f187d8aaae4b38902158b1487a1d03bdf2a9e1c3c54cc7ec1"
+    },
+    {
+      "path": "tsconfig.build.json",
+      "sha256": "f69d4d155e8e58b5f2c0e8d9a39176517344c13ab8bcfc19f34f83bfd7cc15a2"
+    },
+    {
+      "path": "tsconfig.json",
+      "sha256": "a6b2fedf5426813d97e6548acd5b96c2ebe7f2a3c76677eb82742d85480039c2"
+    },
+    {
+      "path": "vitest.config.ts",
+      "sha256": "b85a21a09f414c91a685d313b6be2baf2229228ed11c5f908964c8f3bb26d041"
+    }
+  ],
+  "migrationNames": [
+    "20260928000000_core_platform",
+    "20261003000000_identity_access_persistence",
+    "20261005000000_venue_catalog_core",
+    "20261007000000_booking_lifecycle_foundation",
+    "20261007001000_booking_slot_holds",
+    "20261007002000_booking_timelines",
+    "20261007003000_booking_deposit_intents",
+    "20261007004000_booking_post_deposit_lifecycle",
+    "20261008000000_invitation_delivery_intent",
+    "20261008000000_invitation_media",
+    "20261008001000_booking_reporting",
+    "20261008002000_booking_automation_command",
+    "20261008003000_confirmed_booking_slot",
+    "20261008004000_booking_event_envelope",
+    "20261008005000_retention_evidence_account_scope",
+    "20261008006000_payments_billing_ledger",
+    "20261008007000_billing_deposit_application",
+    "20261008007000_booking_commercial_acceptance",
+    "20261008008000_post_booking_experience",
+    "20261008008000_vnpay_provider_evidence",
+    "20261008230000_password_email_otp",
+    "20261009000000_invitation_media_command_recovery",
+    "20261009001000_billing_operations_reporting",
+    "20261009020000_invitation_design_publication_printable",
+    "20261009030000_invitation_print_order_and_billing",
+    "20261009040000_invitation_reporting_snapshots",
+    "20261010010000_couple_profile",
+    "20261010020000_restaurant_services",
+    "20261010030000_print_commercial_offerings",
+    "20261011009000_billing_contract_source",
+    "20261011010000_commercial_contracts",
+    "20261011019000_billing_extension_sources",
+    "20261011020000_commercial_appendices",
+    "20261011021000_appendix_ledger_guards",
+    "20261011022000_commercial_billing_outbox",
+    "20261011023000_contract_print_fulfillment",
+    "20261011024000_print_template_provenance",
+    "20261011025000_final_commercial_invoices",
+    "20261011026000_invoice_adjustment_prefix_guard",
+    "20261011027000_invoice_balance_pins",
+    "20261011028000_invoice_document_integrity",
+    "20261011029000_invoice_outbox_identity",
+    "20261011030000_preserve_allocated_print_sources",
+    "20261011031000_contracted_print_quote_bounds",
+    "20261012010000_guest_management",
+    "20261012020000_seating_plan",
+    "20261012030000_staff_operations",
+    "20261012040000_notification_foundation",
+    "20261012041000_notification_credentials",
+    "20261012042000_notification_producer_facts",
+    "20261012043000_notification_automation",
+    "20261012044000_notification_api_guards",
+    "20261012045000_seating_headcount_invalidation",
+    "20261013001000_analytics_owner_feeds",
+    "20261013002000_analytics_projection",
+    "20261013003000_reporting_scope_and_planning_invalidation",
+    "20261013004000_analytics_event_query_index",
+    "20261013005000_analytics_private_reporting",
+    "20261013010000_notification_fcm_delivery",
+    "20261013020000_notification_fcm_retry_after"
+  ],
+  "migrations": [
+    {
+      "name": "20260928000000_core_platform",
+      "checksum": "fdf48b9ad5baf3074bf3d310b90d945d66625131cc4f133e209fc6a4061f3902"
+    },
+    {
+      "name": "20261003000000_identity_access_persistence",
+      "checksum": "e68ae6978036b27180c0042ab6d74c7adf570b0fc8bb9f9b1a63864a5b0b268b"
+    },
+    {
+      "name": "20261005000000_venue_catalog_core",
+      "checksum": "e171ab99fecb2d735f2946548056a129157a7b625a4a095c2a2a562c0878c79b"
+    },
+    {
+      "name": "20261007000000_booking_lifecycle_foundation",
+      "checksum": "83eb52cf51cf428d058a69173542d263f5cac9457d6312a72d9f08400e91ab61"
+    },
+    {
+      "name": "20261007001000_booking_slot_holds",
+      "checksum": "bdd8f5891b87bcc6fafad084fc5261ce5313f84c7921d4ae0c64d09f3e02ab46"
+    },
+    {
+      "name": "20261007002000_booking_timelines",
+      "checksum": "b7a575364d75815e404dfdf65f73ef5d3bdcd8fe933c25a1aec649fbd4110041"
+    },
+    {
+      "name": "20261007003000_booking_deposit_intents",
+      "checksum": "3b3fccc1befe22e25d3d1a3284e2e76633f1c114a9d2de8d7c52485ecb5c69fb"
+    },
+    {
+      "name": "20261007004000_booking_post_deposit_lifecycle",
+      "checksum": "18e63d96c5c533cd5106bf3c1f0ce353879df406dd20e56fc4bedd3ac8820981"
+    },
+    {
+      "name": "20261008000000_invitation_delivery_intent",
+      "checksum": "12e32edcc98066031bfd4adc95d19a9c0f713bca425dbf487fb1781c999bea8e"
+    },
+    {
+      "name": "20261008000000_invitation_media",
+      "checksum": "9cf4f65369164c26b0861cf0184fc211df35e9b2e2362a8950efabc1fc2300d4"
+    },
+    {
+      "name": "20261008001000_booking_reporting",
+      "checksum": "a965b577973b1fbe3d8b1766ef980470dc65795bf530bfdd626b68855c264619"
+    },
+    {
+      "name": "20261008002000_booking_automation_command",
+      "checksum": "cbdbafac3282581f73e3b225f9eeff54c4b14c0dc7bb81f845c2791802ab2887"
+    },
+    {
+      "name": "20261008003000_confirmed_booking_slot",
+      "checksum": "31ec540b7d615e9488a63a64a8fb831eea4cd4d56ac20996cb371b0e436b1a22"
+    },
+    {
+      "name": "20261008004000_booking_event_envelope",
+      "checksum": "81c61924b14832e2e7eb567327537ff3e44a21c714251dee09e3596d97152a35"
+    },
+    {
+      "name": "20261008005000_retention_evidence_account_scope",
+      "checksum": "29344f1b7466ce2726b0c756c45e7d6c581affb04cb113059df160697e15e903"
+    },
+    {
+      "name": "20261008006000_payments_billing_ledger",
+      "checksum": "f83d49615742a4e32f3813e6c90bd84c5b01e4ed018cd4e559fc6a27dd4023c9"
+    },
+    {
+      "name": "20261008007000_billing_deposit_application",
+      "checksum": "14b34800d83772ebc3e138a0285e47194ebf0fd308a876e099b703ee03ab8859"
+    },
+    {
+      "name": "20261008007000_booking_commercial_acceptance",
+      "checksum": "487917d3482512b9107074d358c5758abde651965469f031b0b9e4009661d59f"
+    },
+    {
+      "name": "20261008008000_post_booking_experience",
+      "checksum": "b26e8a6e8b0c1c01d7d20b1dabb910c81ba17414f9cb2dc84e2b5b81b4c0f9ef"
+    },
+    {
+      "name": "20261008008000_vnpay_provider_evidence",
+      "checksum": "8afb100e53bda406b9a89257398ecc4f6fe6ffaa2cd98c2c4f430bfcdef6b10c"
+    },
+    {
+      "name": "20261008230000_password_email_otp",
+      "checksum": "0f6b8b9bfc1df18e2527ba7e187a74de0808edb903e969ee7c334860837a586e"
+    },
+    {
+      "name": "20261009000000_invitation_media_command_recovery",
+      "checksum": "3efb5e033b23ed9744248ba2f9b5a0c547f6ed3802714da5417bb57c2384ffa8"
+    },
+    {
+      "name": "20261009001000_billing_operations_reporting",
+      "checksum": "b4618f53fc5400595abf4ba9c684d6eb95d8e651141d900ce65a69ce56d70232"
+    },
+    {
+      "name": "20261009020000_invitation_design_publication_printable",
+      "checksum": "d7382834ec5de4c4810779a63b29f6f91e2381d96a756b440849d81b69f8a688"
+    },
+    {
+      "name": "20261009030000_invitation_print_order_and_billing",
+      "checksum": "92389959e42c72f7d83c953ecdea466f84656208f84540d7e2b3d9a9b1b0ec06"
+    },
+    {
+      "name": "20261009040000_invitation_reporting_snapshots",
+      "checksum": "6987ca2d0de50b54a5704de592999ad0426779767bb7e1e6746595559254accf"
+    },
+    {
+      "name": "20261010010000_couple_profile",
+      "checksum": "e0221a09fe53ee743a01e090944fa4cc145ccf4aa0eeedc638ce9232a47bc447"
+    },
+    {
+      "name": "20261010020000_restaurant_services",
+      "checksum": "cc036e694f881c0dc0878fc5fe8dd11bcb8482f485bed5cbebfef7ca888e40d5"
+    },
+    {
+      "name": "20261010030000_print_commercial_offerings",
+      "checksum": "01e86401787ef7d9ec0a472893cdfee86012b5fa06cbfd42bed5a9f7605eba52"
+    },
+    {
+      "name": "20261011009000_billing_contract_source",
+      "checksum": "2a33869b5c55cffcb61d3a8a923b9fa85f8d7583ee1c3fd54fd5bd03bc871b6a"
+    },
+    {
+      "name": "20261011010000_commercial_contracts",
+      "checksum": "deda31129f4a3d255a0fa68cb0ce29ed1abb88c4f47225251b07a7478baccfa4"
+    },
+    {
+      "name": "20261011019000_billing_extension_sources",
+      "checksum": "7e209e9a50916048338fd338d606b334313b0d8283f26dad972efa47cb7729b0"
+    },
+    {
+      "name": "20261011020000_commercial_appendices",
+      "checksum": "d5130faa50e1e8cf2681084550584808171ab96761d167c185af3cc53e2058fc"
+    },
+    {
+      "name": "20261011021000_appendix_ledger_guards",
+      "checksum": "8ed9c3e9ed72c154c85952fa5e7a289792a285855efa47fb3599d0f0145d1d9c"
+    },
+    {
+      "name": "20261011022000_commercial_billing_outbox",
+      "checksum": "f6001872bcbf62396aca5ebf4c3df1de210a774455e87596a8a02ab22ba31904"
+    },
+    {
+      "name": "20261011023000_contract_print_fulfillment",
+      "checksum": "5bae57ec05bae44c39d1de0e4bf270fe6513b5a490bef57e1d7a7bbb5110a2a1"
+    },
+    {
+      "name": "20261011024000_print_template_provenance",
+      "checksum": "a0c4a986c568f44e5ec5bf4e78b6bcbcb261a7739a817bb35a4943ea79d53bec"
+    },
+    {
+      "name": "20261011025000_final_commercial_invoices",
+      "checksum": "03ce34bd80bd596980dcb6ffa097735050de629843ff5a53fc7b48d29b978409"
+    },
+    {
+      "name": "20261011026000_invoice_adjustment_prefix_guard",
+      "checksum": "ba79cbd15dc4c52c39a598ebf1743029065d7c3e541ef002bbfd0f3f00ebdc1e"
+    },
+    {
+      "name": "20261011027000_invoice_balance_pins",
+      "checksum": "d3eca34ef4a30c32352b858e669f446f27a5e6e239697687e6555ffdfffec563"
+    },
+    {
+      "name": "20261011028000_invoice_document_integrity",
+      "checksum": "c1a1bb2d0d84aa545636aaeb9db798c567e7fdafda296a2f9f1e71638df41a79"
+    },
+    {
+      "name": "20261011029000_invoice_outbox_identity",
+      "checksum": "e2a2fb1d90d6620f097078b0ab15a3efe987288fe9334befac16fc2a060e2b20"
+    },
+    {
+      "name": "20261011030000_preserve_allocated_print_sources",
+      "checksum": "7b956219f2c082dd90d71aa4ad38105b5cc4749903b0387ecd475f8a6f24ecd4"
+    },
+    {
+      "name": "20261011031000_contracted_print_quote_bounds",
+      "checksum": "cef89fd72e9c3a77996b1d89488714235d0bdd59497c69c0d1dfed8b88ce4da5"
+    },
+    {
+      "name": "20261012010000_guest_management",
+      "checksum": "1eefac415e6418e5fdf2ce2b005b7755bc6b305310b182d1c1dfbe2e692bae9f"
+    },
+    {
+      "name": "20261012020000_seating_plan",
+      "checksum": "bfcbebce5233c9a8416b875b68b2387581275066900f8ec06e0ede34f945eea6"
+    },
+    {
+      "name": "20261012030000_staff_operations",
+      "checksum": "9ded716f13afe11615b40235e0f99c160bd6a19c1bb56a141964fb1a17802a68"
+    },
+    {
+      "name": "20261012040000_notification_foundation",
+      "checksum": "bb02f1537552bd34ab0bf97875c5f60727fda801af53b69e20a4235b7f43e43e"
+    },
+    {
+      "name": "20261012041000_notification_credentials",
+      "checksum": "e917219baf97653bfee7b2e965aa43223bc13cfe218a29aeec2be98bc51ad5e2"
+    },
+    {
+      "name": "20261012042000_notification_producer_facts",
+      "checksum": "6cba7909304a4a135342cc9e88294418334ae19aa3b4dc420eeb0f232cb937bd"
+    },
+    {
+      "name": "20261012043000_notification_automation",
+      "checksum": "1bbabef05fdd6105dabd4d2f40887d7e19f2b8010fdeafe059f0727ab5eec454"
+    },
+    {
+      "name": "20261012044000_notification_api_guards",
+      "checksum": "ccb58899b5f27f06cc9894031f47e9ab02f5340c91d003fee019a163de0b970c"
+    },
+    {
+      "name": "20261012045000_seating_headcount_invalidation",
+      "checksum": "03f5d4a59ad0c1eedd78df6d9ec814bf61872f39bba06608af675643fce0e279"
+    },
+    {
+      "name": "20261013001000_analytics_owner_feeds",
+      "checksum": "16e544b524326108e8927ba4f8cc48e40db0f3fdaf4bed9d060f91c8c1e5bba8"
+    },
+    {
+      "name": "20261013002000_analytics_projection",
+      "checksum": "9449594ebe500e961a5847f80f0132dfafe87cf1376565a50681e1843beab05f"
+    },
+    {
+      "name": "20261013003000_reporting_scope_and_planning_invalidation",
+      "checksum": "8e56b181ffac97688db07b0173cdffcfe17fa35b495e5993cb894b9254a10523"
+    },
+    {
+      "name": "20261013004000_analytics_event_query_index",
+      "checksum": "b0bf5e05ee5d5b5cbfe5bd5d479a17eeb8903dddcb18d467e2aa02d94066a86d"
+    },
+    {
+      "name": "20261013005000_analytics_private_reporting",
+      "checksum": "a44292999bd9cc9eade7e7be5f0f912f20a7b55c1207c35fea3213e91b901bdd"
+    },
+    {
+      "name": "20261013010000_notification_fcm_delivery",
+      "checksum": "c36eff277874bc613143c8ae3902a3da02fcfd3a08eecaee051e5caad613b736"
+    },
+    {
+      "name": "20261013020000_notification_fcm_retry_after",
+      "checksum": "d9f278096e7097b776c99696f9ba4190011891490a98bca2d1a83c2420eb650c"
+    }
+  ],
+  "seedScenarioIds": [
+    "no-names",
+    "partial-names"
+  ],
+  "deploymentTargets": [
+    "https://wedding-be-spec11-spec11-staging.up.railway.app"
+  ],
+  "recoveryOwner": "Le-Ba-Bach",
+  "runtimeConfiguration": {
+    "schemaVersion": 1,
+    "environment": "staging",
+    "revision": "6f5f97de9952629b7dd2c5bfbd4cf12b2464a865",
+    "evidencePolicy": "Attach target-specific evidence separately; configuration is not verification.",
+    "features": {
+      "database": {
+        "configuration": "configured",
+        "mode": "postgresql",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "emailDelivery": {
+        "configuration": "configured",
+        "mode": "brevo",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "passwordOtpKey": {
+        "configuration": "configured",
+        "mode": "stable-configured",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "catalogStorage": {
+        "configuration": "configured",
+        "mode": "supabase-private",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "invitationStorage": {
+        "configuration": "configured",
+        "mode": "supabase-private",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "gemini": {
+        "configuration": "configured",
+        "mode": "gemini",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "publicInvitation": {
+        "configuration": "configured",
+        "mode": "configured-origin",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "vnpay": {
+        "configuration": "configured",
+        "mode": "sandbox-only",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "analytics": {
+        "configuration": "configured",
+        "mode": "analytics-owner-feeds-v3-60s",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "retention": {
+        "configuration": "configured",
+        "mode": "operator-cli-manual-procedure",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "workers": {
+        "configuration": "unconfigured",
+        "mode": "durable-notifications-60s",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "androidDeviceRegistry": {
+        "configuration": "configured",
+        "mode": "account-session-bound",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "androidPush": {
+        "configuration": "unconfigured",
+        "mode": "disabled",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "optional-disabled"
+      },
+      "printFiles": {
+        "configuration": "configured",
+        "mode": "invitation-a5-v2-seating",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "metrics": {
+        "configuration": "unconfigured",
+        "mode": "disabled",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "optional-disabled"
+      },
+      "tracing": {
+        "configuration": "unconfigured",
+        "mode": "disabled",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "optional-disabled"
+      }
+    }
+  },
+  "runtimeVersion": "v24.15.0",
+  "pinnedRuntimeVersion": "24.21.0",
+  "selectedGeminiModel": "gemini-3.1-flash-lite-image",
+  "providerDependencies": {
+    "@google/genai": "2.24.0",
+    "@supabase/storage-js": "2.116.0",
+    "@prisma/client": "7.10.0",
+    "@prisma/adapter-pg": "7.10.0",
+    "pg": "8.23.0",
+    "zod": "4.6.5",
+    "express": "5.2.1"
+  },
+  "routeInventory": [
+    {
+      "path": "/auth/android-session-refreshes",
+      "method": "POST",
+      "access": "NOT_DECLARED",
+      "securitySchemes": []
+    },
+    {
+      "path": "/auth/android-sessions",
+      "method": "POST",
+      "access": "NOT_DECLARED",
+      "securitySchemes": []
+    },
+    {
+      "path": "/auth/me",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/auth/password-change-otp-requests",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/auth/password-changes",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/auth/password-otp-completions",
+      "method": "POST",
+      "access": "PUBLIC",
+      "securitySchemes": []
+    },
+    {
+      "path": "/auth/password-otp-requests",
+      "method": "POST",
+      "access": "PUBLIC",
+      "securitySchemes": []
+    },
+    {
+      "path": "/auth/password-reset-completions",
+      "method": "POST",
+      "access": "NOT_DECLARED",
+      "securitySchemes": []
+    },
+    {
+      "path": "/auth/password-reset-requests",
+      "method": "POST",
+      "access": "NOT_DECLARED",
+      "securitySchemes": []
+    },
+    {
+      "path": "/auth/profile",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/auth/profile",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/auth/sessions",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/auth/sessions/current",
+      "method": "DELETE",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/auth/sessions/{sessionId}",
+      "method": "DELETE",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/auth/web-session-refreshes",
+      "method": "POST",
+      "access": "NOT_DECLARED",
+      "securitySchemes": []
+    },
+    {
+      "path": "/auth/web-sessions",
+      "method": "POST",
+      "access": "NOT_DECLARED",
+      "securitySchemes": []
+    },
+    {
+      "path": "/billing/callbacks/vnpay",
+      "method": "GET",
+      "access": "PUBLIC",
+      "securitySchemes": []
+    },
+    {
+      "path": "/bookings",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/attendance-summary",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/billing",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/cancellation-requests",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/change-requests",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/check-in-settings",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/check-in-settings",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/contract-appendices",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/contract-appendices",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/contract-appendices/{revisionId}/approvals",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/contract-appendices/{revisionId}/submissions",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/contracts",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/contracts",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/contracts/{revisionId}/approvals",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/contracts/{revisionId}/pdf",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/contracts/{revisionId}/submissions",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/contracts/{revisionId}/withdrawals",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/final-invoices",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/final-invoices/{invoiceRevisionId}",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/guest-groups",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/guest-groups",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/guest-groups/{groupId}",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/guest-plan",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/guest-plan",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/guests",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/guests",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/guests/import-previews",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/guests/imports",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/guests/{guestId}",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/guests/{guestId}/delivery",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/guests/{guestId}/personalized-invitations",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/incidental-expenses",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/invitation-derived-assets",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/invitation-image-generations",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/invitation-image-generations",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/invitation-image-generations/{intentDigest}/reconciliation",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/invitations",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/invitations",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/invitations/{designId}",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/invitations/{designId}/publication",
+      "method": "DELETE",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/invitations/{designId}/publication",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/invitations/{designId}/revisions",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/media",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/media/{assetId}",
+      "method": "DELETE",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/media/{assetId}",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/media/{assetId}",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/payments/balance",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/payments/deposit",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/payments/{attemptId}",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/print-orders",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/print-orders",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/print-orders/{orderId}",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/print-orders/{orderId}/approval",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/print-orders/{orderId}/cancellation",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/print-orders/{orderId}/cancellation-intents",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/print-orders/{orderId}/replacement-approvals",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/printable-revisions/{printableRevisionId}/file",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/proposal",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/seating-layout-options",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/seating-plans",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/seating-plans/{planId}",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/seating-plans/{planId}/confirmation",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/seating-plans/{planId}/revisions",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/slot-holds",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/timeline-revisions",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/timeline-revisions/{revisionId}/approvals",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/bookings/{bookingId}/timeline-revisions/{revisionId}/withdrawals",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/catalog/dishes",
+      "method": "GET",
+      "access": "NOT_DECLARED",
+      "securitySchemes": []
+    },
+    {
+      "path": "/catalog/halls",
+      "method": "GET",
+      "access": "NOT_DECLARED",
+      "securitySchemes": []
+    },
+    {
+      "path": "/catalog/halls/{hallId}",
+      "method": "GET",
+      "access": "NOT_DECLARED",
+      "securitySchemes": []
+    },
+    {
+      "path": "/catalog/menu-packages",
+      "method": "GET",
+      "access": "NOT_DECLARED",
+      "securitySchemes": []
+    },
+    {
+      "path": "/catalog/print-offerings",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/catalog/restaurant",
+      "method": "GET",
+      "access": "NOT_DECLARED",
+      "securitySchemes": []
+    },
+    {
+      "path": "/catalog/services",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/consultation-requests",
+      "method": "POST",
+      "access": "PUBLIC",
+      "securitySchemes": []
+    },
+    {
+      "path": "/consultations/{consultationId}/couple-profile",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/consultations/{consultationId}/couple-profile",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/couple/bookings",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/guest/invitation",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "guestInvitationCapability"
+      ]
+    },
+    {
+      "path": "/guest/invitation-sessions",
+      "method": "POST",
+      "access": "PUBLIC",
+      "securitySchemes": []
+    },
+    {
+      "path": "/health/live",
+      "method": "GET",
+      "access": "NOT_DECLARED",
+      "securitySchemes": []
+    },
+    {
+      "path": "/health/ready",
+      "method": "GET",
+      "access": "NOT_DECLARED",
+      "securitySchemes": []
+    },
+    {
+      "path": "/invitation-templates",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/analytics/attendance",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/analytics/bookings",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/analytics/exports/overview",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/analytics/overview",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/analytics/print-orders",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/analytics/rebuild",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/analytics/revenue",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/availability",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/billing/payments/manual",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/billing/refund-approvals",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/billing/refunds",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/bookings/{bookingId}/cancellation",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/bookings/{bookingId}/cancellation-requests/{requestId}/decision",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/bookings/{bookingId}/completion",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/bookings/{bookingId}/final-invoices",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/bookings/{bookingId}/incidental-expenses",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/bookings/{bookingId}/incidental-expenses",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/bookings/{bookingId}/incidental-expenses/{lineId}",
+      "method": "DELETE",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/bookings/{bookingId}/incidental-expenses/{lineId}",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/bookings/{bookingId}/invoice-adjustments",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/bookings/{bookingId}/media-policy",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/dish-versions/{versionId}",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/dish-versions/{versionId}/publication",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/dishes",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/dishes",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/dishes/{dishId}",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/dishes/{dishId}/versions",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/dishes/{id}/restoration",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/dishes/{id}/retirement",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/halls",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/halls",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/halls/{hallId}",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/halls/{id}/restoration",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/halls/{id}/retirement",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/layout-template-versions/{versionId}",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/layout-template-versions/{versionId}/publication",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/layout-templates",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/layout-templates",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/layout-templates/{id}/restoration",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/layout-templates/{id}/retirement",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/layout-templates/{templateId}",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/layout-templates/{templateId}/tables",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/layout-templates/{templateId}/tables/{tableId}/retirement",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/layout-templates/{templateId}/versions",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/media-assets",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/menu-package-versions/{versionId}",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/menu-package-versions/{versionId}/publication",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/menu-packages",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/menu-packages",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/menu-packages/{id}/restoration",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/menu-packages/{id}/retirement",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/menu-packages/{packageId}",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/menu-packages/{packageId}/versions",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/restaurant",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/restaurant",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/shifts",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/shifts/{shiftCode}",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/timeline-template-versions/{versionId}",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/timeline-template-versions/{versionId}/publication",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/timeline-templates",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/timeline-templates",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/timeline-templates/{id}/restoration",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/timeline-templates/{id}/retirement",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/timeline-templates/{templateId}",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/timeline-templates/{templateId}/versions",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/{resource}/{resourceId}/media",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/catalog/{resource}/{resourceId}/media-order",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/consultation-requests",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/consultation-requests/{id}/closure",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/consultation-requests/{id}/conversion",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/consultations",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/consultations/{consultationId}/workspace-invitations",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/events/{bookingId}/assignments",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/events/{bookingId}/assignments",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/events/{bookingId}/assignments/{assignmentId}/revocation",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/invitation-templates",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/invitation-templates",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/invitation-templates/{templateId}",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/invitation-templates/{templateId}",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/notifications",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/notifications/recipient",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/notifications/recipient",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/notifications/{id}/requeue",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/print-offerings",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/print-offerings",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/print-offerings/{id}",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/print-orders",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/print-orders/{orderId}",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/print-orders/{orderId}/cancellation",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/print-orders/{orderId}/handover",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/print-orders/{orderId}/production",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/print-orders/{orderId}/quotations",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/print-orders/{orderId}/ready",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/print-orders/{orderId}/replacement-proposals",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/seating-plans/{planId}/exceptions",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/services",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/services",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/services/{id}",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/staff-accounts",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/management/staff-accounts/{accountId}/operational-access",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/notifications/android-installations",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/notifications/android-installations",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/notifications/android-installations/{id}",
+      "method": "DELETE",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/notifications/inbox",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/notifications/inbox/read-all",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/notifications/inbox/{id}/read",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/notifications/preferences",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/notifications/preferences",
+      "method": "PATCH",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/notifications/unread-count",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/public/invitation-assets/{slug}",
+      "method": "GET",
+      "access": "PUBLIC",
+      "securitySchemes": []
+    },
+    {
+      "path": "/public/invitations/{slug}",
+      "method": "GET",
+      "access": "PUBLIC",
+      "securitySchemes": []
+    },
+    {
+      "path": "/public/invitations/{slug}/qr",
+      "method": "GET",
+      "access": "PUBLIC",
+      "securitySchemes": []
+    },
+    {
+      "path": "/public/invitations/{slug}/render",
+      "method": "GET",
+      "access": "PUBLIC",
+      "securitySchemes": []
+    },
+    {
+      "path": "/staff/events/{bookingId}/guests/search",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/staff/events/{bookingId}/guests/{guestId}/check-in-undos",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/staff/events/{bookingId}/guests/{guestId}/check-ins",
+      "method": "GET",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/staff/events/{bookingId}/guests/{guestId}/check-ins",
+      "method": "POST",
+      "access": "AUTHENTICATED",
+      "securitySchemes": [
+        "bearerAuth"
+      ]
+    },
+    {
+      "path": "/workspace-invitation-acceptances",
+      "method": "POST",
+      "access": "NOT_DECLARED",
+      "securitySchemes": []
+    }
+  ],
+  "privacy": "No credentials, tokens, raw PII, signed URLs or payment callback bodies."
+}
