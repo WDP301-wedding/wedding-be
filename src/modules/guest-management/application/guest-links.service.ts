@@ -17,6 +17,30 @@ import {
 
 export class GuestLinksService {
   constructor(readonly guests: GuestService) {}
+  metadata(bookingValue: string, guestValue: string, context: GuestRequestContext) {
+    const bookingId = parse(id, bookingValue),
+      guestId = parse(id, guestValue);
+    return this.guests.repository.run(
+      bookingId,
+      context,
+      () => this.guests.authorize(bookingId, context),
+      async (tx) => {
+        await this.guests.requireGuest(tx, bookingId, guestId);
+        const latest = await tx.guestInvitationCredential.findFirst({
+          where: { bookingId, guestId },
+          orderBy: { revision: 'desc' },
+          select: { id: true, revision: true, expiresAt: true, revokedAt: true },
+        });
+        return {
+          guestId,
+          revision: latest?.revision ?? 0,
+          credentialId: latest?.id ?? null,
+          expiresAt: latest?.expiresAt.toISOString() ?? null,
+          revokedAt: latest?.revokedAt?.toISOString() ?? null,
+        };
+      },
+    );
+  }
   async issue(
     bookingValue: string,
     guestValue: string,

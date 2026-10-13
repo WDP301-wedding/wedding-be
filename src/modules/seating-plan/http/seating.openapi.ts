@@ -63,6 +63,15 @@ export const seatingOpenApiPaths: NonNullable<ZodOpenApiObject['paths']> = {
       expectedBookingRevision: 1,
     }),
   },
+  '/bookings/{bookingId}/seating-plans/current': {
+    parameters: [booking],
+    get: {
+      ...op('readCurrentSeatingPlan', planViewSchema.nullable()),
+      requestParams: { query: z.strictObject({}) },
+      description:
+        'Manager or owning FULL Couple on a confirmed Booking. Returns the current plan without knowing planId, using the same revalidation and snapshot as readSeatingPlan. Returns data:null when no plan has been selected. No list/Guest/check-in requirement. Foreign bookings are concealed as 404. Unknown query keys are rejected.',
+    },
+  },
   '/bookings/{bookingId}/seating-plans/{planId}': {
     parameters: [booking, plan],
     get: op('readSeatingPlan', planViewSchema),

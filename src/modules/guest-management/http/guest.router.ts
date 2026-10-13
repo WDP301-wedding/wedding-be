@@ -34,6 +34,7 @@ import {
   importResultSchema,
   privateListSchema,
   issuedLinkSchema,
+  invitationMetadataSchema,
   exchangeBodySchema,
   sessionSchema,
   invitationViewSchema,
@@ -233,6 +234,19 @@ export function createGuestRouter(services: ReturnType<typeof createGuestService
             key(req),
             context(req, res),
           ),
+        }),
+      );
+    },
+  );
+  router.get(
+    `${guests}/:guestId/personalized-invitations`,
+    authenticate,
+    validateRequest({ params: guestParams, query: z.strictObject({}) }),
+    async (req, res) => {
+      const { params } = validatedRequest(res, { params: guestParams });
+      res.json(
+        responseSchema(invitationMetadataSchema).parse({
+          data: await services.links.metadata(params.bookingId, params.guestId, context(req, res)),
         }),
       );
     },

@@ -89,6 +89,19 @@ export function createSeatingRouter(service: SeatingService, resolver: Authentic
     },
   );
   router.get(
+    `${root}/current`,
+    authenticate,
+    validateRequest({ params: bookingParams, query: emptyQuery }),
+    async (req, res) => {
+      const { params } = validatedRequest(res, { params: bookingParams });
+      res.json({
+        data: planViewSchema
+          .nullable()
+          .parse(await service.readCurrent(params.bookingId, context(req, res))),
+      });
+    },
+  );
+  router.get(
     selected,
     authenticate,
     validateRequest({ params: planParams, query: emptyQuery }),

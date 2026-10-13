@@ -557,14 +557,24 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
     const planId = parse(id, planValue);
     return this.run(bookingId, context, async (tx, scope) => {
       await this.current(tx, bookingId, planId);
-      const value = await this.revalidate(tx, scope, bookingId);
-      const planning = await this.guest.owners.planning.getSource(bookingId, scope);
-      return {
-        ...value,
-        currentPlanningHeadcount: planning.planningHeadcount,
-        currentBookingRevision: planning.bookingRevision,
-      };
+      return this.readView(tx, scope, bookingId);
     });
+  }
+  readCurrent(bookingId: string, context: SeatingRequestContext) {
+    return this.run(bookingId, context, async (tx, scope) => {
+      const head = await tx.seatingPlan.findUnique({ where: { bookingId } });
+      if (head === null) return null;
+      return this.readView(tx, scope, bookingId);
+    });
+  }
+  private async readView(tx: Prisma.TransactionClient, scope: ContractContext, bookingId: string) {
+    const value = await this.revalidate(tx, scope, bookingId);
+    const planning = await this.guest.owners.planning.getSource(bookingId, scope);
+    return {
+      ...value,
+      currentPlanningHeadcount: planning.planningHeadcount,
+      currentBookingRevision: planning.bookingRevision,
+    };
   }
   async bookingForPlan(planValue: string, context: SeatingRequestContext) {
     const actor = await this.guest.identity.resolver.resolve(context.accessToken);
