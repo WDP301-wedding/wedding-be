@@ -342,8 +342,8 @@ historical email acceptance above. [Configuration and client/backend hand-off](.
 - [x] ANL-W2: Projection/checkpoint/rebuild with monotonic source ordering.
 - [x] ANL-W3: Authorized analytics HTTP/OpenAPI and bounded query/freshness proof.
 - [x] ANL-W4: Deterministic fixture/real-source backend acceptance and frontend hand-off.
-- [ ] REL-W1: Backend environment/auth/config/manifest validation.
-- [ ] REL-W2: Deterministic idempotent backend seeds/journeys: no names + Group seating + NONE through contract/deposit/print/event/final invoice, plus partial names + explicit check-in/undo; list changes never alter planning/money.
+- [x] REL-W1: Backend environment/auth/config/manifest validation. [Exact-source quality and isolated staging evidence](evidence/spec11-staging-checkpoint-2026-10-13.md); environment/provider configuration is kept separate from GO/production readiness.
+- [x] REL-W2: Deterministic idempotent backend seeds/journeys: no names + Group seating + NONE through contract/deposit/print/event/final invoice, plus partial names + explicit check-in/undo; list changes never alter planning/money. [Native staging journeys, replay/conflict and contracted print proof](evidence/spec11-staging-checkpoint-2026-10-13.md).
 - [ ] REL-W3: Empty/upgrade migrations, backend staging/runtime health/recovery evidence.
 - [ ] REL-W4: Immutable API/provider manifest and frontend release integration checklist; frontend delivery recorded separately.
 - [ ] REL-W5: Backend go/no-go evidence and recovery hand-off; full product release waits for frontend integration.
