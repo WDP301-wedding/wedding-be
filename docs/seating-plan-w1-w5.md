@@ -19,7 +19,7 @@ historical geometry; retirement prevents confirmation and new selection.
 
 ## Private API
 
-All six operations require a current bearer session. Manager and owning FULL Couple
+All seven operations require a current bearer session. Manager and owning FULL Couple
 may select, label, confirm and read a confirmed Booking. Manager alone may approve
 exceptions. Staff, RESTRICTED, unrelated Couple, public and Guest credentials receive
 no plan access. Foreign identities are concealed as 404. Responses use no-store.
@@ -33,6 +33,7 @@ Unknown body/query keys are 422. Every POST requires printable ASCII
 | POST `/bookings/{bookingId}/seating-plans/{planId}/confirmation` | `expectedRevision`, `expectedBookingRevision`; successor CONFIRMED and registered printable snapshot, 201 |
 | POST `/management/seating-plans/{planId}/exceptions`             | Same revision fields plus NFC reason 10–500 characters; Manager confirmation, 201                         |
 | GET `/bookings/{bookingId}/seating-plans/{planId}`               | Retained selected snapshot plus revalidated status/current count/revision, 200                            |
+| GET `/bookings/{bookingId}/seating-plans/current`                | Same revalidated snapshot without planId, or `data:null` before selection, 200                            |
 | GET `/bookings/{bookingId}/seating-layout-options`               | No query fields; current planning/Booking revision and ranked options, 200                                |
 
 Paths above are relative to `/api/v1`. Labels are

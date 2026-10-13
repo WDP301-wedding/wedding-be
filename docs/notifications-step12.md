@@ -92,6 +92,10 @@ loopback HTTP is accepted only in test/development. Without it the existing publ
 invitation URL supplies the target. A configured URL still needs actual frontend
 implementation and its separate verification.
 
+Personalized email fragments use `#credential=wgc_...`, matching the public web
+credential parser. See the [contract-v3 integration follow-up](contract-v3-web-integration-follow-up.md)
+for current metadata discovery, configured web URLs and proxy-IP verification limits.
+
 The worker starts after HTTP startup and uses its own owner composition/pool.
 Every 60 seconds it reconciles expired leases and unknown provider evidence,
 consumes at most 100 supported outbox facts, pages due readers, and claims/sends

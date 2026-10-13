@@ -37,6 +37,7 @@ are UTC ISO strings. Every Guest endpoint sets `Cache-Control: no-store` and
 | POST       | `/bookings/{bookingId}/guests/imports`                            | Same ownership; commit exact preview/digest atomically                     |
 | GET, PATCH | `/bookings/{bookingId}/guest-plan`                                | Same ownership; read or explicitly revise independent total                |
 | POST       | `/bookings/{bookingId}/guests/{guestId}/personalized-invitations` | Same ownership; issue/reissue for an active Guest and published invitation |
+| GET        | `/bookings/{bookingId}/guests/{guestId}/personalized-invitations` | Same ownership; latest revision/expiry/revocation metadata, no raw token   |
 | POST       | `/guest/invitation-sessions`                                      | Anonymous credential exchange; durable rate limit                          |
 | GET        | `/guest/invitation`                                               | `Authorization: Bearer wgs_...`; minimal invitation view                   |
 
@@ -88,6 +89,10 @@ cannot be silently resurrected by import. Any invalid row or provider failure
 rolls back every row, history, command and outbox write.
 
 ## Optional personalized invitation
+
+Owners can read the latest credential revision/expiry/revocation metadata without
+recovering raw credentials. See the [web integration follow-up](contract-v3-web-integration-follow-up.md)
+for the GET contract and concurrent issuance/retry rules.
 
 Issuance expects the latest credential revision (zero initially). It returns a
 32-byte random `wgc_...` credential once plus `#credential=...`, revision and expiry
