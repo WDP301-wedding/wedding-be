@@ -1,8 +1,9 @@
 # SPEC-11 backend release hand-off
 
 Date: 2026-10-13 (Asia/Saigon). Provider: `BACKEND-RELEASE@3.0.0`.
-Scope: wedding-be only. Decision: **NO_GO**, pending Android FCM acceptance and
-staging/recovery acceptance. Candidate PR: [#40](https://github.com/WDP301-wedding/wedding-be/pull/40),
+Scope: wedding-be only. Decision: **NO_GO**, pending staging/recovery acceptance.
+Live Android FCM acceptance is explicitly deferred by the owner to app integration.
+Candidate PR: [#40](https://github.com/WDP301-wedding/wedding-be/pull/40),
 based on accepted `main@0fe78677acb145b30ab056c747c81a49a4cf5195`.
 
 Execution order: REL-W1 → REL-W2 → REL-W3 → RV-21 → REL-W4 → REL-W5.
@@ -84,7 +85,11 @@ The native acceptance harness covers the two journeys. The operator script
 `scripts/release-staging-seed.mjs` is fenced to the explicitly authorized separate
 Railway resources, uses native HTTP commands/idempotency and a private resumable
 checkpoint, verifies existing completed facts, and refuses conflicting edits.
-Its persistent staging execution remains pending in REL-W2; do not
+Its persistent staging execution has passed both scenarios, including native
+contract/deposit, Group seating/PDF, contracted print request/quotation/approval,
+manual completion and final invoice. A separately retained initial checkpoint
+replayed with zero writes; subsequent new payment facts correctly refuse replay.
+Do not
 use the historical `scripts/demo-seed.ts` direct settlement fixtures as new release
 or live-payment proof. The offline journey separately verifies downstream owners.
 
@@ -181,7 +186,11 @@ An isolated synthetic Couple account has been created; credentials are kept in
 `.local-demo/android-test-account.private.json`, excluded from Git. Follow the
 [Android FCM setup guide](android-fcm-test-setup-vi.md). A created account or Android
 registration does not prove actual worker-to-FCM message acceptance. NTF-FCM-W4
-and RV-21 remain open until their own evidence exists.
+is deferred by the owner to the app team's integration phase. Its backend adapter,
+retry/persistence, migrations, configuration and hand-off remain required and
+accepted prerequisites. A token/device push test is not a gate for this backend-only
+SPEC-11 checkpoint; actual provider acceptance remains unclaimed. RV-21 remains
+open until its own release/recovery evidence and owner review exist.
 
 ## Recovery hand-off and NO_GO conditions
 

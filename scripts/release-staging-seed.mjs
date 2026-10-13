@@ -330,18 +330,18 @@ async function main() {
       },
     ];
     for (const [index, scenario] of ['no-names', 'partial-names'].entries()) {
-      const prefix = scenario + '/';
+      const prefix = scenario + '/with-print-order/';
       const c = await call(prefix + 'consultation', '/management/consultations', 'POST', {
         intendedEmail: 'rel-couple@example.invalid',
         displayName: 'SPEC-11 ' + scenario,
         brideName: 'Cô dâu thử',
         groomName: 'Chú rể thử',
-        note: 'REL-SEED:' + key(scenario),
+        note: 'REL-SEED:' + key(prefix),
       });
       await step(prefix + 'restricted-access', async () => {
         const existing = await p.consultationAccess.findUnique({
           where: {
-            consultationId_accountId: {
+            accountId_consultationId: {
               consultationId: c.consultationId,
               accountId: state.accounts.couple,
             },
@@ -361,7 +361,7 @@ async function main() {
       const b = await call(prefix + 'booking', '/bookings', 'POST', {
         consultationId: c.consultationId,
         hallId: ids.lotusHall,
-        eventDate: '2027-06-' + String(index + 1).padStart(2, '0'),
+        eventDate: '2027-06-' + String(index + 3).padStart(2, '0'),
         shiftCode: 'DINNER',
         menuPackageVersionId: ids.classicMenuVersion,
         tableCount: 2,
@@ -399,7 +399,7 @@ async function main() {
         );
       // Historical fixture correction occurs before any signed commercial document or payment.
       await step(prefix + 'historical-fixture', async () => {
-        const eventDate = new Date('2026-01-' + String(index + 1).padStart(2, '0') + 'T00:00:00Z');
+        const eventDate = new Date('2026-01-' + String(index + 3).padStart(2, '0') + 'T00:00:00Z');
         await p.$transaction(async (tx) => {
           assert.equal(await tx.commercialContractRevision.count({ where: { bookingId } }), 0);
           assert.equal(await tx.billingPaymentAttempt.count({ where: { bookingId } }), 0);
@@ -407,7 +407,7 @@ async function main() {
           assert.equal(priorBooking.revision, timeline.bookingRevision, 'DEMO_SEED_CONFLICT');
           assert.equal(
             priorBooking.eventDate.toISOString().slice(0, 10),
-            '2027-06-' + String(index + 1).padStart(2, '0'),
+            '2027-06-' + String(index + 3).padStart(2, '0'),
             'DEMO_SEED_CONFLICT',
           );
           await tx.booking.update({ where: { id: bookingId }, data: { eventDate } });
@@ -534,11 +534,19 @@ async function main() {
         },
         'couple',
       );
-      const design = await call(
-        prefix + 'design',
+      let design = await call(
+        prefix + 'template-design',
         base + '/invitations',
         'POST',
+        { templateId: template.templateId, templateVersionId: template.versionId },
+        'couple',
+      );
+      design = await call(
+        prefix + 'template-design-seating',
+        base + '/invitations/' + design.designId + '/revisions',
+        'POST',
         {
+          expectedRevision: design.revisionNumber,
           content: {
             ...content,
             sections: [{ kind: 'SEATING', textKey: null, derivedAssetId: null }],
@@ -548,18 +556,23 @@ async function main() {
         'couple',
       );
       await call(
-        prefix + 'publication',
+        prefix + 'template-publication',
         base + '/invitations/' + design.designId + '/publication',
         'POST',
         {
           expectedRevision: design.revisionNumber,
           designRevisionId: design.revisionId,
-          expectedPublicationRevision: 0,
+          expectedPublicationRevision: await step(
+            prefix + 'publication-head',
+            async () =>
+              (await p.invitationPublicIdentity.findUnique({ where: { bookingId } }))?.revision ??
+              0,
+          ),
         },
         'couple',
         200,
       );
-      const printable = await step(prefix + 'printable', () =>
+      const printable = await step(prefix + 'template-printable', () =>
         studio.boundary.run(
           {
             bookingId,
@@ -577,6 +590,51 @@ async function main() {
       const file = await studio.printFiles.read(bookingId, printable.printableRevisionId, ctx);
       assert.equal(file.bytes.subarray(0, 5).toString(), '%PDF-');
       assert.equal(printable.content.seating.seatingPlanRevisionId, plan.revisionId);
+      let printOrder = await call(
+        prefix + 'template-print-order',
+        base + '/print-orders',
+        'POST',
+        {
+          lines: [
+            {
+              designId: design.designId,
+              quantity: 20,
+              commercialSource: {
+                agreementRevisionId: contract.contract.revisionId,
+                offeringId: print.offeringId,
+                sourceRevisionId: print.sourceRevisionId,
+              },
+            },
+          ],
+        },
+        'couple',
+      );
+      printOrder = await call(
+        prefix + 'print-quote',
+        '/management/print-orders/' + printOrder.orderId + '/quotations',
+        'POST',
+        {
+          expectedRevision: printOrder.revision,
+          lines: [{ lineId: printOrder.lines[0].lineId, unitPriceVnd: 5000 }],
+          estimatedHandoverAt: await step(prefix + 'handover-date', async () =>
+            new Date(Date.now() + 86400000).toISOString(),
+          ),
+        },
+        'manager',
+        200,
+      );
+      printOrder = await call(
+        prefix + 'print-approval',
+        base + '/print-orders/' + printOrder.orderId + '/approval',
+        'POST',
+        {
+          expectedRevision: printOrder.revision,
+          commercialRevisionId: printOrder.currentCommercialRevisionId,
+        },
+        'couple',
+        200,
+      );
+      assert.equal(printOrder.status, 'APPROVED');
       if (scenario === 'partial-names') {
         const guests = [];
         for (const n of [1, 2])
@@ -683,8 +741,10 @@ async function main() {
         planningHeadcount: 20,
         totalVnd: document.contractTotalVnd,
         depositVnd: document.depositAmountVnd,
-        invoiceRevisionId: invoice.revisionId,
+        invoiceRevisionId: invoice.invoiceRevisionId,
         pdfSha256: file.sha256,
+        printOrderId: printOrder.orderId,
+        printStatus: printOrder.status,
         attendance,
         fingerprint: sha256(await snapshot(bookingId)),
       };

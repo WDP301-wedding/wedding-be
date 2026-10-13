@@ -148,6 +148,11 @@ database; credentials are kept in an ignored operator file. Native Android login
 FULL booking scope and worker-to-FCM acceptance are separate verification steps.
 Creating the account does not close NTF-FCM-W4.
 
+The owner subsequently clarified that only backend preparation is required now.
+Live configuration, device-token testing and push acceptance are deferred until
+the app team reaches this feature. Keep FCM disabled; retain NTF-FCM-W4 as a
+future integration task, excluded from the current SPEC-11 backend release gate.
+
 Official references:
 [FCM HTTP v1 authentication and sending](https://firebase.google.com/docs/cloud-messaging/send/v1-api),
 [FCM error handling](https://firebase.google.com/docs/cloud-messaging/error-codes),

@@ -73,12 +73,22 @@ describe('backend release evidence gates', () => {
       expect.arrayContaining([
         'UNCOMMITTED_SOURCE',
         'NTF-W4',
-        'NTF-FCM-W4',
         'BE-17',
         'DEPLOYMENT_AND_RECOVERY_OWNER_PENDING',
         'WORKER_REQUIRED',
       ]),
     );
+  });
+  it('keeps Android FCM live acceptance deferred under the explicit backend-only release scope', () => {
+    const input = complete();
+    input.taskStatus['NTF-FCM-W4'] = false;
+    expect(evaluateBackendRelease(input).backendStatus).toBe('GO');
+    for (const task of ['NTF-FCM-W1', 'NTF-FCM-W2', 'NTF-FCM-W3', 'NTF-FCM-W5']) {
+      expect(
+        evaluateBackendRelease({ ...input, taskStatus: { ...input.taskStatus, [task]: false } })
+          .blockers,
+      ).toContain(task);
+    }
   });
   it.each([
     'status',

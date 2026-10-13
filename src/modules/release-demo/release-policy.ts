@@ -103,7 +103,9 @@ export const BACKEND_PREREQUISITES = [
     Array.from({ length: 5 }, (_, i) => `${owner}-W${i + 1}`),
   ),
   ...Array.from({ length: 4 }, (_, i) => `ANL-W${i + 1}`),
-  ...Array.from({ length: 5 }, (_, i) => `NTF-FCM-W${i + 1}`),
+  // Owner explicitly deferred live FCM/device acceptance until the app team's
+  // integration phase on 2026-10-13. Backend implementation and hand-off remain gates.
+  ...[1, 2, 3, 5].map((i) => `NTF-FCM-W${i}`),
   ...Array.from({ length: 4 }, (_, i) => `REL-W${i + 1}`),
 ] as const;
 
