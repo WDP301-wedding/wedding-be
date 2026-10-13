@@ -346,9 +346,18 @@ historical email acceptance above. [Configuration and client/backend hand-off](.
 - [x] REL-W2: Deterministic idempotent backend seeds/journeys: no names + Group seating + NONE through contract/deposit/print/event/final invoice, plus partial names + explicit check-in/undo; list changes never alter planning/money. [Native staging journeys, replay/conflict and contracted print proof](evidence/spec11-staging-checkpoint-2026-10-13.md).
 - [x] REL-W3: Empty/upgrade migrations, backend staging/runtime health/recovery evidence. Owner-selected recovery is migration + native seed rebuild for the dedicated synthetic-only staging/demo, replacing 30-day backup retention. [Scope amendment and preserved recovery evidence](evidence/spec11-demo-rebuild-scope-2026-10-13.md). No production/shared-data backup exemption is granted.
 - [x] REL-W4: Finalized immutable API/provider identity and frontend/app integration checklist after owner-reviewed RV-21. [Final backend hand-off](../docs/spec11-final-backend-handoff.md). Client delivery remains separately owned and unchecked; the release decision remains NO_GO.
-- [ ] REL-W5: Backend go/no-go evidence and recovery hand-off; full product release waits for frontend integration.
+- [x] REL-W5: Published owner-accepted **NO_GO** release decision and recovery hand-off after RV-21/REL-W4. [Final decision, residual gates and recovery](evidence/spec11-final-no-go-handoff-2026-10-13.md). All 71 current-scope backend tasks are complete; full product/frontend delivery, deferred live FCM and production readiness remain separate.
 
 ## Verification Record
+
+Current SPEC-11 closure (2026-10-13): **71/71 backend tasks complete** in the
+owner-selected scope, following REL-W1 → REL-W2 → REL-W3 → RV-21 → REL-W4 → REL-W5.
+The owner accepted a documented NO_GO hand-off. Earlier dated completion counts
+and pending review notes above are historical checkpoints, superseded by the
+[final decision record](evidence/spec11-final-no-go-handoff-2026-10-13.md), not
+rewritten runtime/provider proof. NTF-FCM-W4 remains separately owner-deferred.
+The backend release is still **NO_GO**, product integration is pending and PR
+approval/merge is separate from backlog completion.
 
 For each completed task append exact command, result, environment, immutable provider
 version/API digest and evidence link to the owning module evidence. A skipped database

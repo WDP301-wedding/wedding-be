@@ -10,8 +10,10 @@ The immutable checkpoint and manifest are in
 Use their exact source, API, ordered migration and archive hashes. Runtime source
 `e8e7945548ac40d8308a5e4841fc0314c2d40276` passed CI and was deployed to staging;
 later evidence-only commit identities must not be presented as a runtime test.
-The current manifest intentionally remains NO_GO when evidence comes from a
-different source, required workers are disabled or review/recovery gates are pending.
+The final [owner acceptance and NO_GO decision](../tasks/evidence/spec11-final-no-go-handoff-2026-10-13.md)
+completes RV-21/REL-W4/REL-W5. Recovery is the selected synthetic-demo rebuild below.
+The release intentionally remains NO_GO while exact-candidate evidence is missing
+or required workers are disabled; completed hand-off is not production readiness.
 
 ## Recovery material
 

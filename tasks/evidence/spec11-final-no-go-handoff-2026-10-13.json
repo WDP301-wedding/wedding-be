@@ -1,0 +1,501 @@
+{
+  "schemaVersion": 1,
+  "recordType": "OWNER_ACCEPTED_NO_GO_HANDOFF",
+  "createdAt": "2026-10-13T03:18:07.278Z",
+  "evaluationContext": "Acceptance overlay on the immutable reviewed d0001d9 candidate; not a current-HEAD CLI manifest or fresh runtime/provider proof.",
+  "reviewedCandidate": {
+    "sourceRevision": "d0001d93e52dd392d7b2b5873ebbbf664084958d",
+    "cleanSourceFromReviewedManifest": true,
+    "workspaceContentSha256": "215da03a471e80529e0ea0a87c6ad695332a184c3a8aaa6f514a2feae47e41fd",
+    "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+    "sourceFileHashesVerified": 714,
+    "routeCount": 218,
+    "migrationCount": 60
+  },
+  "baseManifest": {
+    "path": "tasks/evidence/spec11-release-manifest-demo-rebuild-2026-10-13.json",
+    "sha256": "7e14cb47e2358ba94dd411c923206f72d65e5feff59b050e8854e8408fab8246"
+  },
+  "ownerReview": {
+    "status": "ACCEPTED_NO_GO",
+    "authority": "Project owner; direct human reply in current task",
+    "quote": "tôi duyệt, hãy làm tiếp",
+    "record": "tasks/evidence/spec11-rv21-owner-acceptance-2026-10-13.md",
+    "sha256": "6447eb761ae58f1b73b34d1460dcc1192a6e859b0900f115e7a07746d13700c4"
+  },
+  "completion": {
+    "order": [
+      "REL-W1",
+      "REL-W2",
+      "REL-W3",
+      "RV-21",
+      "REL-W4",
+      "REL-W5"
+    ],
+    "backendScopeTaskCount": 71,
+    "backendScopeCompleted": 71,
+    "deferredTasks": [
+      {
+        "id": "NTF-FCM-W4",
+        "owner": "App integration team",
+        "status": "DEFERRED_BY_OWNER"
+      }
+    ],
+    "pullRequest": "https://github.com/WDP301-wedding/wedding-be/pull/40",
+    "pullRequestMerged": false
+  },
+  "recovery": {
+    "mode": "REBUILD_SYNTHETIC_DEMO",
+    "scope": "SYNTHETIC_STAGING_DEMO",
+    "owner": "Le-Ba-Bach",
+    "artifact": "MIGRATIONS_AND_SEED",
+    "backupRetentionDays": null,
+    "procedure": "docs/spec11-recovery-operator.md"
+  },
+  "policyInput": {
+    "releaseId": "backend-d0001d93e52d-215da03a471e-accepted",
+    "createdAt": "2026-10-13T03:18:07.278Z",
+    "sourceRevision": "d0001d93e52dd392d7b2b5873ebbbf664084958d",
+    "cleanSource": true,
+    "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+    "configurationIssues": [
+      "WORKER_REQUIRED"
+    ],
+    "deployment": {
+      "apiOrigin": "https://wedding-be-spec11-spec11-staging.up.railway.app",
+      "publicWebOrigin": "https://wedding-be-spec11-spec11-staging.up.railway.app",
+      "managementWebOrigin": "https://wedding-be-spec11-spec11-staging.up.railway.app",
+      "sameSiteDomain": "wedding-be-spec11-spec11-staging.up.railway.app",
+      "recoveryOwner": "Le-Ba-Bach",
+      "recoveryMode": "REBUILD_SYNTHETIC_DEMO",
+      "syntheticDataOnly": true,
+      "recoveryArtifact": "MIGRATIONS_AND_SEED",
+      "backupRetentionDays": null,
+      "encryptedBackups": false,
+      "restoreReplaysErasureTombstones": false
+    },
+    "taskStatus": {
+      "RV-01": true,
+      "RV-02": true,
+      "RV-03": true,
+      "RV-04": true,
+      "RV-05": true,
+      "RV-06": true,
+      "RV-07": true,
+      "RV-08": true,
+      "RV-09": true,
+      "RV-10": true,
+      "RV-11": true,
+      "RV-12": true,
+      "RV-13": true,
+      "RV-14": true,
+      "RV-15": true,
+      "RV-16": true,
+      "RV-17": true,
+      "RV-18": true,
+      "RV-19": true,
+      "RV-20": true,
+      "RV-21": true,
+      "BE-01": true,
+      "BE-02": true,
+      "BE-03": true,
+      "BE-04": true,
+      "BE-05": true,
+      "BE-06": true,
+      "BE-07": true,
+      "BE-08": true,
+      "BE-09": true,
+      "BE-10": true,
+      "BE-11": true,
+      "BE-12": true,
+      "BE-13": true,
+      "BE-14": true,
+      "BE-15": true,
+      "BE-16": true,
+      "BE-17": true,
+      "GM-W1": true,
+      "GM-W2": true,
+      "GM-W3": true,
+      "GM-W4": true,
+      "GM-W5": true,
+      "SEA-W1": true,
+      "SEA-W2": true,
+      "SEA-W3": true,
+      "SEA-W4": true,
+      "SEA-W5": true,
+      "STF-W1": true,
+      "STF-W2": true,
+      "STF-W3": true,
+      "STF-W4": true,
+      "STF-W5": true,
+      "NTF-W1": true,
+      "NTF-W2": true,
+      "NTF-W3": true,
+      "NTF-W4": true,
+      "NTF-W5": true,
+      "NTF-FCM-W1": true,
+      "NTF-FCM-W2": true,
+      "NTF-FCM-W3": true,
+      "NTF-FCM-W4": false,
+      "NTF-FCM-W5": true,
+      "ANL-W1": true,
+      "ANL-W2": true,
+      "ANL-W3": true,
+      "ANL-W4": true,
+      "REL-W1": true,
+      "REL-W2": true,
+      "REL-W3": true,
+      "REL-W4": true,
+      "REL-W5": true
+    },
+    "evidence": [
+      {
+        "gate": "quality.backend",
+        "status": "PASS",
+        "dimension": "offline",
+        "sourceRevision": "d0001d93e52dd392d7b2b5873ebbbf664084958d",
+        "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+        "target": "disposable-postgresql",
+        "targetOrigin": null,
+        "observedAt": "2026-10-13T03:03:26.662Z",
+        "evidence": "tasks/evidence/spec11-demo-rebuild-scope-2026-10-13.md"
+      },
+      {
+        "gate": "journey.no-names",
+        "status": "PASS",
+        "dimension": "offline",
+        "sourceRevision": "e8e7945548ac40d8308a5e4841fc0314c2d40276",
+        "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+        "target": "disposable-postgresql",
+        "targetOrigin": null,
+        "observedAt": "2026-10-13T02:02:38.164Z",
+        "evidence": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md"
+      },
+      {
+        "gate": "journey.partial-names",
+        "status": "PASS",
+        "dimension": "offline",
+        "sourceRevision": "e8e7945548ac40d8308a5e4841fc0314c2d40276",
+        "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+        "target": "disposable-postgresql",
+        "targetOrigin": null,
+        "observedAt": "2026-10-13T02:02:38.164Z",
+        "evidence": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md"
+      },
+      {
+        "gate": "migration.empty-upgrade",
+        "status": "PASS",
+        "dimension": "offline",
+        "sourceRevision": "e8e7945548ac40d8308a5e4841fc0314c2d40276",
+        "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+        "target": "disposable-postgresql",
+        "targetOrigin": null,
+        "observedAt": "2026-10-13T02:02:38.164Z",
+        "evidence": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md"
+      },
+      {
+        "gate": "staging.runtime",
+        "status": "PASS",
+        "dimension": "runtime",
+        "sourceRevision": "e8e7945548ac40d8308a5e4841fc0314c2d40276",
+        "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+        "target": "authorized-staging",
+        "targetOrigin": "https://wedding-be-spec11-spec11-staging.up.railway.app",
+        "observedAt": "2026-10-13T02:02:38.164Z",
+        "evidence": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md"
+      },
+      {
+        "gate": "staging.recovery",
+        "status": "PASS",
+        "dimension": "runtime",
+        "sourceRevision": "e8e7945548ac40d8308a5e4841fc0314c2d40276",
+        "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+        "target": "authorized-staging",
+        "targetOrigin": "https://wedding-be-spec11-spec11-staging.up.railway.app",
+        "observedAt": "2026-10-13T02:02:38.164Z",
+        "evidence": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md"
+      },
+      {
+        "gate": "provider.revised-journey",
+        "status": "PENDING",
+        "dimension": "runtime",
+        "sourceRevision": "e8e7945548ac40d8308a5e4841fc0314c2d40276",
+        "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+        "target": "authorized-staging",
+        "targetOrigin": "https://wedding-be-spec11-spec11-staging.up.railway.app",
+        "observedAt": "2026-10-13T02:02:38.164Z",
+        "evidence": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md"
+      },
+      {
+        "gate": "workers.runtime",
+        "status": "PASS",
+        "dimension": "runtime",
+        "sourceRevision": "e8e7945548ac40d8308a5e4841fc0314c2d40276",
+        "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+        "target": "authorized-staging",
+        "targetOrigin": "https://wedding-be-spec11-spec11-staging.up.railway.app",
+        "observedAt": "2026-10-13T02:02:38.164Z",
+        "evidence": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md"
+      },
+      {
+        "gate": "RV-21",
+        "status": "PASS",
+        "dimension": "owner-review",
+        "sourceRevision": "d0001d93e52dd392d7b2b5873ebbbf664084958d",
+        "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+        "target": "authorized-staging",
+        "targetOrigin": "https://wedding-be-spec11-spec11-staging.up.railway.app",
+        "observedAt": "2026-10-13T03:18:07.278Z",
+        "evidence": "tasks/evidence/spec11-rv21-owner-acceptance-2026-10-13.md"
+      }
+    ],
+    "frontendIntegrationStatus": "PENDING"
+  },
+  "decision": {
+    "providerVersion": "BACKEND-RELEASE@3.0.0",
+    "releaseId": "backend-d0001d93e52d-215da03a471e-accepted",
+    "sourceRevision": "d0001d93e52dd392d7b2b5873ebbbf664084958d",
+    "sourceState": "COMMITTED_CANDIDATE",
+    "apiContractSha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915",
+    "backendStatus": "NO_GO",
+    "frontendIntegrationStatus": "PENDING",
+    "productStatus": "PENDING",
+    "blockers": [
+      "WORKER_REQUIRED",
+      "journey.no-names",
+      "journey.partial-names",
+      "migration.empty-upgrade",
+      "staging.runtime",
+      "staging.recovery",
+      "provider.revised-journey",
+      "workers.runtime"
+    ]
+  },
+  "evidenceHashes": [
+    {
+      "gate": "quality.backend",
+      "path": "tasks/evidence/spec11-demo-rebuild-scope-2026-10-13.md",
+      "sha256": "1a9a5d652820d69e08568b2c6d99e6ff84cc504131af7eddf90384bbc987b9ee"
+    },
+    {
+      "gate": "journey.no-names",
+      "path": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+      "sha256": "5258f8fbf7457aa3313bffdb88ccb3e83ff8bfff27e606aa0ba0546cbdd66ee3"
+    },
+    {
+      "gate": "journey.partial-names",
+      "path": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+      "sha256": "5258f8fbf7457aa3313bffdb88ccb3e83ff8bfff27e606aa0ba0546cbdd66ee3"
+    },
+    {
+      "gate": "migration.empty-upgrade",
+      "path": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+      "sha256": "5258f8fbf7457aa3313bffdb88ccb3e83ff8bfff27e606aa0ba0546cbdd66ee3"
+    },
+    {
+      "gate": "staging.runtime",
+      "path": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+      "sha256": "5258f8fbf7457aa3313bffdb88ccb3e83ff8bfff27e606aa0ba0546cbdd66ee3"
+    },
+    {
+      "gate": "staging.recovery",
+      "path": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+      "sha256": "5258f8fbf7457aa3313bffdb88ccb3e83ff8bfff27e606aa0ba0546cbdd66ee3"
+    },
+    {
+      "gate": "provider.revised-journey",
+      "path": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+      "sha256": "5258f8fbf7457aa3313bffdb88ccb3e83ff8bfff27e606aa0ba0546cbdd66ee3"
+    },
+    {
+      "gate": "workers.runtime",
+      "path": "tasks/evidence/spec11-staging-checkpoint-2026-10-13.md",
+      "sha256": "5258f8fbf7457aa3313bffdb88ccb3e83ff8bfff27e606aa0ba0546cbdd66ee3"
+    },
+    {
+      "gate": "RV-21",
+      "path": "tasks/evidence/spec11-rv21-owner-acceptance-2026-10-13.md",
+      "sha256": "6447eb761ae58f1b73b34d1460dcc1192a6e859b0900f115e7a07746d13700c4"
+    }
+  ],
+  "handoffArtifacts": [
+    {
+      "path": "tasks/evidence/spec11-release-manifest-demo-rebuild-2026-10-13.json",
+      "sha256": "7e14cb47e2358ba94dd411c923206f72d65e5feff59b050e8854e8408fab8246"
+    },
+    {
+      "path": "tasks/evidence/spec11-release-review-demo-rebuild-2026-10-13.md",
+      "sha256": "260652fd337a9a8e8dd2d912df902134f72f084320862c50116e14e51767934c"
+    },
+    {
+      "path": "tasks/evidence/spec11-rv21-owner-acceptance-2026-10-13.md",
+      "sha256": "6447eb761ae58f1b73b34d1460dcc1192a6e859b0900f115e7a07746d13700c4"
+    },
+    {
+      "path": "tasks/evidence/spec11-final-no-go-handoff-2026-10-13.md",
+      "sha256": "318b8288fd69ae1a52d0a64144a8736aa633a81fa943c5e6408da9dd0a841f8a"
+    },
+    {
+      "path": "docs/spec11-final-backend-handoff.md",
+      "sha256": "ff72475fb0e957b5c3f9b60c673f509381e1156aa91ba851d57771b258a44793"
+    },
+    {
+      "path": "docs/backend-release-spec11.md",
+      "sha256": "d767e5ef247c28652fafa3c9f41edca5cbe449a91985bf472eb515e87a2145fc"
+    },
+    {
+      "path": "docs/spec11-recovery-operator.md",
+      "sha256": "56e6ef1ad52a2e2f3cc7011c51b9b02afeaf9c35d00436767204d8bd8d4f9f85"
+    },
+    {
+      "path": "tasks/backend-revision-todo.md",
+      "sha256": "84ed6bbb8499e0a724f8436ce2b8f6925ad10b7da01bd7436c23803420790c81"
+    },
+    {
+      "path": "openapi/openapi.json",
+      "sha256": "6a8be82541ca2d8ce274f9817d10bcd300c91de2f5e734055cf9108b23db0915"
+    },
+    {
+      "path": "openapi/openapi.sha256",
+      "sha256": "ec6d58e7701aaf59012b71c6bbd2f03d4c6122abe514e1bed3b7df00b786855e"
+    }
+  ],
+  "runtimeConfigurationSnapshot": {
+    "schemaVersion": 1,
+    "environment": "staging",
+    "revision": "d0001d93e52dd392d7b2b5873ebbbf664084958d",
+    "evidencePolicy": "Attach target-specific evidence separately; configuration is not verification.",
+    "features": {
+      "database": {
+        "configuration": "configured",
+        "mode": "postgresql",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "emailDelivery": {
+        "configuration": "configured",
+        "mode": "brevo",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "passwordOtpKey": {
+        "configuration": "configured",
+        "mode": "stable-configured",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "catalogStorage": {
+        "configuration": "configured",
+        "mode": "supabase-private",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "invitationStorage": {
+        "configuration": "configured",
+        "mode": "supabase-private",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "gemini": {
+        "configuration": "configured",
+        "mode": "gemini",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "publicInvitation": {
+        "configuration": "configured",
+        "mode": "configured-origin",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "vnpay": {
+        "configuration": "configured",
+        "mode": "sandbox-only",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "analytics": {
+        "configuration": "configured",
+        "mode": "analytics-owner-feeds-v3-60s",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "retention": {
+        "configuration": "configured",
+        "mode": "operator-cli-manual-procedure",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "workers": {
+        "configuration": "unconfigured",
+        "mode": "durable-notifications-60s",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "androidDeviceRegistry": {
+        "configuration": "configured",
+        "mode": "account-session-bound",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "androidPush": {
+        "configuration": "unconfigured",
+        "mode": "disabled",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "optional-disabled"
+      },
+      "printFiles": {
+        "configuration": "configured",
+        "mode": "invitation-a5-v2-seating",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "pending"
+      },
+      "metrics": {
+        "configuration": "unconfigured",
+        "mode": "disabled",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "optional-disabled"
+      },
+      "tracing": {
+        "configuration": "unconfigured",
+        "mode": "disabled",
+        "implementation": "implemented",
+        "offlineVerification": "not-evaluated",
+        "liveVerification": "optional-disabled"
+      }
+    }
+  },
+  "providerDependencies": {
+    "@google/genai": "2.24.0",
+    "@supabase/storage-js": "2.116.0",
+    "@prisma/client": "7.10.0",
+    "@prisma/adapter-pg": "7.10.0",
+    "pg": "8.23.0",
+    "zod": "4.6.5",
+    "express": "5.2.1"
+  },
+  "selectedGeminiModel": "gemini-3.1-flash-lite-image",
+  "boundaries": {
+    "newRuntimeProviderTests": false,
+    "providerReceiptsRelabeled": false,
+    "frontEndAcceptanceClaimed": false,
+    "liveFcmAcceptanceClaimed": false,
+    "productionReadinessClaimed": false
+  },
+  "privacy": "No credentials, tokens, raw PII, private keys, signed URLs or payment callback bodies."
+}

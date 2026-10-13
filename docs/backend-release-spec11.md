@@ -1,7 +1,8 @@
 # SPEC-11 backend release hand-off
 
 Date: 2026-10-13 (Asia/Saigon). Provider: `BACKEND-RELEASE@3.0.0`.
-Scope: wedding-be only. Decision: **NO_GO**, pending exact release evidence and RV-21 review.
+Scope: wedding-be only. Hand-off accepted and backend backlog complete.
+Decision: **NO_GO**, pending remaining exact-candidate runtime/provider/worker evidence.
 Live Android FCM acceptance is explicitly deferred by the owner to app integration.
 Candidate PR: [#40](https://github.com/WDP301-wedding/wedding-be/pull/40),
 based on accepted `main@0fe78677acb145b30ab056c747c81a49a4cf5195`.
@@ -11,8 +12,8 @@ Later hand-off artifacts may be prepared while a prerequisite is pending; their
 preparation does not close the prerequisite or mark a release accepted.
 
 Current owner-selected scope: synthetic staging/demo, recovered from migrations
-and native seed without 30-day backup retention. REL-W1/2/3 are complete;
-RV-21 and sequential REL-W4/5 remain open. This is **68/71** current backend
+and native seed without 30-day backup retention. REL-W1/2/3, owner-reviewed RV-21
+and sequential REL-W4/5 are complete. This is **71/71** current backend
 tasks complete, with NTF-FCM-W4 retained separately for future app integration.
 The [additive scope record](../tasks/evidence/spec11-demo-rebuild-scope-2026-10-13.md)
 supersedes the old checkpoint's pending backup choice. The worker remains off
@@ -21,6 +22,12 @@ retain their observed source rather than being relabeled as new runtime tests.
 The [RV-21 review package](../tasks/evidence/spec11-release-review-demo-rebuild-2026-10-13.md)
 and [immutable demo-rebuild manifest](../tasks/evidence/spec11-release-manifest-demo-rebuild-2026-10-13.json)
 pin the new policy candidate, successful CI and explicit NO_GO blockers.
+The owner subsequently approved that NO_GO package. The additive
+[final acceptance/decision record](../tasks/evidence/spec11-final-no-go-handoff-2026-10-13.md)
+resolves the review/hand-off task blockers while retaining eight runtime/provider/
+worker release blockers. The [final API/provider hand-off](spec11-final-backend-handoff.md)
+supplies the separate frontend/app checklist. Historical manifest snapshots remain
+unchanged; backlog completion is not production or full-product readiness.
 
 ## Executable verification
 
@@ -215,8 +222,8 @@ registration does not prove actual worker-to-FCM message acceptance. NTF-FCM-W4
 is deferred by the owner to the app team's integration phase. Its backend adapter,
 retry/persistence, migrations, configuration and hand-off remain required and
 accepted prerequisites. A token/device push test is not a gate for this backend-only
-SPEC-11 checkpoint; actual provider acceptance remains unclaimed. RV-21 remains
-open until its own release/recovery evidence and owner review exist.
+SPEC-11 checkpoint; actual provider acceptance remains unclaimed. RV-21 is now
+owner-reviewed and complete as a documented NO_GO hand-off.
 
 ## Recovery hand-off and NO_GO conditions
 
