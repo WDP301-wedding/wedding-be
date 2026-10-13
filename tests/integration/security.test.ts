@@ -96,6 +96,27 @@ function expectStandardError(
 }
 
 describe('HTTP security baseline', () => {
+  it.each([3000, 3001, 3002])(
+    'permits the configured local frontend port %s in production',
+    async (port) => {
+      const origins = [3000, 3001, 3002].map((value) => `http://localhost:${value}`);
+      const corsConfig = parseEnvironment({ CORS_ALLOWED_ORIGINS: origins.join(',') }).cors;
+      const app = createApp({ corsConfig, runtimeEnvironment: 'production' });
+      const origin = `http://localhost:${port}`;
+      const preflight = await request(app)
+        .options('/api/v1/weddings')
+        .set('origin', origin)
+        .set('access-control-request-method', 'POST')
+        .set('access-control-request-headers', 'authorization,content-type');
+      expect(preflight.status).toBe(204);
+      expect(preflight.headers['access-control-allow-origin']).toBe(origin);
+      expect(preflight.headers['access-control-allow-credentials']).toBe('true');
+      const denied = await request(app).get('/health/live').set('origin', 'http://localhost:3003');
+      expect(denied.status).toBe(403);
+      expect(denied.headers['access-control-allow-origin']).toBeUndefined();
+    },
+  );
+
   it('sets production security headers and permits only a configured credentialed origin', async () => {
     const app = createApp({
       corsConfig: { allowedOrigins: [allowedOrigin] },

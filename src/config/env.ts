@@ -357,11 +357,11 @@ const rawEnvironmentSchema = z
 
       const url = new URL(parsedOrigin.data);
 
-      if (url.protocol !== 'https:' && (deployed || !loopbackHosts.has(url.hostname))) {
+      if (url.protocol !== 'https:' && !loopbackHosts.has(url.hostname)) {
         context.addIssue({
           code: 'custom',
           path: ['CORS_ALLOWED_ORIGINS', index],
-          message: 'Cleartext origins are allowed only for loopback development and test hosts.',
+          message: 'Cleartext origins are allowed only for explicitly configured loopback hosts.',
         });
       }
     }

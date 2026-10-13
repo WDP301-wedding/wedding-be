@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-13",
+  "target": {
+    "service": "wedding-be",
+    "environment": "production",
+    "projectId": "1c56721d-021a-442c-9e01-bb91abe73adb"
+  },
+  "before": {
+    "CORS_ALLOWED_ORIGINS": "https://wedding-web-silk.vercel.app,https://wedding-manage-web.vercel.app,https://wedding-be-production-e1dc.up.railway.app",
+    "OPENAPI_ENABLED": "true",
+    "NOTIFICATIONS_FCM_ENABLED": "false"
+  },
+  "after": {
+    "CORS_ALLOWED_ORIGINS": "https://wedding-web-silk.vercel.app,https://wedding-manage-web.vercel.app,https://wedding-be-production-e1dc.up.railway.app,http://localhost:3000,http://localhost:3001,http://localhost:3002",
+    "OPENAPI_ENABLED": "true",
+    "NOTIFICATIONS_FCM_ENABLED": "true"
+  },
+  "configurationValidated": true,
+  "liveFcmDelivery": "not-tested"
+}
