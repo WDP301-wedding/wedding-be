@@ -130,6 +130,12 @@ async function main() {
         seedScenarioIds: ['no-names', 'partial-names'],
         deploymentTargets: input.deployment ? [input.deployment.apiOrigin] : [],
         recoveryOwner: input.deployment?.recoveryOwner ?? null,
+        recoveryMode:
+          input.deployment?.recoveryMode ?? (input.deployment ? 'BACKUP_RESTORE' : null),
+        releaseScope:
+          input.deployment?.recoveryMode === 'REBUILD_SYNTHETIC_DEMO'
+            ? 'SYNTHETIC_STAGING_DEMO'
+            : 'BACKUP_PROTECTED_DEPLOYMENT',
         runtimeConfiguration: releaseFeatureConfiguration(config, sha),
         runtimeVersion: process.version,
         pinnedRuntimeVersion: (await readFile('.node-version', 'utf8')).trim(),

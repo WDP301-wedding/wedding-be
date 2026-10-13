@@ -15,6 +15,17 @@ evidence and frontend source. New requirements are extensions to completed work.
 
 ## 1. Team Boundary
 
+SPEC-11 recovery amendment confirmed by the owner on **2026-10-13**: the current
+dedicated Railway staging/demo contains synthetic test data only. Recovery may
+rebuild a new database from the immutable migrations and deterministic native seed;
+there is no 30-day backup-retention requirement for this demo. Accept loss of
+transient test accounts, sessions, fixtures and provider sandbox state. Never use
+this exception for real customer/contract/payment data or production. Existing
+backup/restore/erasure rehearsal evidence remains preserved; selecting rebuild
+does not authorize deleting retained business history or resetting a shared DB.
+Recovery owner stays Lê Bá Bách. Live Android FCM test/acceptance is separately
+deferred to the app team's integration phase; backend preparation remains required.
+
 From SPEC-06 onward, executable tasks change only `wedding-be`. The frontend team
 owns client implementations and their UI redesign. Keep sibling repositories intact.
 Remove the former mandatory design skill, local installation and installer.

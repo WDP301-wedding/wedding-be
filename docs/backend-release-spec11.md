@@ -1,7 +1,7 @@
 # SPEC-11 backend release hand-off
 
 Date: 2026-10-13 (Asia/Saigon). Provider: `BACKEND-RELEASE@3.0.0`.
-Scope: wedding-be only. Decision: **NO_GO**, pending staging/recovery acceptance.
+Scope: wedding-be only. Decision: **NO_GO**, pending exact release evidence and RV-21 review.
 Live Android FCM acceptance is explicitly deferred by the owner to app integration.
 Candidate PR: [#40](https://github.com/WDP301-wedding/wedding-be/pull/40),
 based on accepted `main@0fe78677acb145b30ab056c747c81a49a4cf5195`.
@@ -9,6 +9,15 @@ based on accepted `main@0fe78677acb145b30ab056c747c81a49a4cf5195`.
 Execution order: REL-W1 → REL-W2 → REL-W3 → RV-21 → REL-W4 → REL-W5.
 Later hand-off artifacts may be prepared while a prerequisite is pending; their
 preparation does not close the prerequisite or mark a release accepted.
+
+Current owner-selected scope: synthetic staging/demo, recovered from migrations
+and native seed without 30-day backup retention. REL-W1/2/3 are complete;
+RV-21 and sequential REL-W4/5 remain open. This is **68/71** current backend
+tasks complete, with NTF-FCM-W4 retained separately for future app integration.
+The [additive scope record](../tasks/evidence/spec11-demo-rebuild-scope-2026-10-13.md)
+supersedes the old checkpoint's pending backup choice. The worker remains off
+after consuming the authorized two-email budget; historical provider receipts
+retain their observed source rather than being relabeled as new runtime tests.
 
 ## Executable verification
 
@@ -60,6 +69,14 @@ CORS, one replica, stable OTP key and required real-provider/worker/encryption
 configuration. Existing environment parsing enforces deployed auth lifetimes,
 cookie defaults, proxy policy and database TLS. Domain registration/public-suffix
 ownership and actual browser transport remain joint deployment checks.
+
+The owner selected synthetic-only demo rebuild on 2026-10-13. For this staging
+scope use `recoveryMode: "REBUILD_SYNTHETIC_DEMO"`, `syntheticDataOnly: true`,
+`recoveryArtifact: "MIGRATIONS_AND_SEED"`, `backupRetentionDays: null`,
+`encryptedBackups: false`, `restoreReplaysErasureTombstones: false` alongside the
+same topology/recovery-owner fields. These values describe the selected method,
+not a false backup receipt. Production rejects this exception. Protected backup
+plans keep their existing strict 30-day/encryption/erasure requirements.
 
 Each receipt has strict fields `gate`, `status`, `dimension`, `sourceRevision`,
 `apiContractSha256`, `target`, `targetOrigin`, `observedAt`, and `evidence`.
@@ -181,6 +198,12 @@ all 60 migration records and the synthetic account were verified, then that disp
 database was removed. The live staging database was not replaced or reopened from it.
 Hosted 30-day retention and native erasure-tombstone recovery remain unverified;
 the local rehearsal's synthetic tombstone is not that proof.
+
+Subsequent native staging restore verified erasure replay before readiness while
+retaining the ledger. The owner then explicitly replaced operational 30-day backup
+retention with migration-and-seed rebuild for this synthetic-only demo. REL-W3 is
+closed under that selected scope; existing immutable checkpoints retain their
+historical pending status. [Scope decision and evidence](../tasks/evidence/spec11-demo-rebuild-scope-2026-10-13.md).
 
 An isolated synthetic Couple account has been created; credentials are kept in
 `.local-demo/android-test-account.private.json`, excluded from Git. Follow the

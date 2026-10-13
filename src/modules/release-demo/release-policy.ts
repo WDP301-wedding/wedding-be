@@ -9,16 +9,31 @@ const origin = z.url().refine((value) => {
   const url = new URL(value);
   return url.protocol === 'https:' && url.origin === value;
 });
-export const deploymentPlanSchema = z.strictObject({
+const deploymentTopology = {
   apiOrigin: origin,
   publicWebOrigin: origin,
   managementWebOrigin: origin,
   sameSiteDomain: z.string().regex(/^[a-z0-9-]+(?:\.[a-z0-9-]+)+$/u),
   recoveryOwner: z.string().regex(/^[A-Za-z0-9_.-]{1,80}$/u),
-  backupRetentionDays: z.literal(30),
-  encryptedBackups: z.literal(true),
-  restoreReplaysErasureTombstones: z.literal(true),
-});
+};
+export const deploymentPlanSchema = z.union([
+  z.strictObject({
+    ...deploymentTopology,
+    recoveryMode: z.literal('BACKUP_RESTORE').optional(),
+    backupRetentionDays: z.literal(30),
+    encryptedBackups: z.literal(true),
+    restoreReplaysErasureTombstones: z.literal(true),
+  }),
+  z.strictObject({
+    ...deploymentTopology,
+    recoveryMode: z.literal('REBUILD_SYNTHETIC_DEMO'),
+    syntheticDataOnly: z.literal(true),
+    recoveryArtifact: z.literal('MIGRATIONS_AND_SEED'),
+    backupRetentionDays: z.null(),
+    encryptedBackups: z.literal(false),
+    restoreReplaysErasureTombstones: z.literal(false),
+  }),
+]);
 export type DeploymentPlan = z.infer<typeof deploymentPlanSchema>;
 
 /** Checks configuration only. A successful check never asserts deployed delivery. */
@@ -39,6 +54,11 @@ export function validateReleaseEnvironment(config: BackendConfig, plan: Deployme
   if (!config.invitationStudio.publicOrigin) issues.push('PUBLIC_INVITATION_ORIGIN_REQUIRED');
   const parsed = deploymentPlanSchema.safeParse(plan);
   if (!parsed.success) return { valid: false, issues: [...issues, 'INVALID_DEPLOYMENT_PLAN'] };
+  if (
+    parsed.data.recoveryMode === 'REBUILD_SYNTHETIC_DEMO' &&
+    config.runtime.environment !== 'staging'
+  )
+    issues.push('SYNTHETIC_DEMO_REQUIRES_STAGING');
   const origins = [plan.apiOrigin, plan.publicWebOrigin, plan.managementWebOrigin];
   if (
     origins.some((value) => {

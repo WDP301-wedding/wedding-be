@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { parseEnvironment } from '../../config/env.js';
 import {
   BACKEND_PREREQUISITES,
+  deploymentPlanSchema,
   RELEASE_GATES,
   evaluateBackendRelease,
   readBackendTaskStatus,
@@ -21,6 +22,45 @@ const plan = {
   encryptedBackups: true as const,
   restoreReplaysErasureTombstones: true as const,
 };
+const demoPlan = {
+  ...plan,
+  recoveryMode: 'REBUILD_SYNTHETIC_DEMO' as const,
+  syntheticDataOnly: true as const,
+  recoveryArtifact: 'MIGRATIONS_AND_SEED' as const,
+  backupRetentionDays: null,
+  encryptedBackups: false as const,
+  restoreReplaysErasureTombstones: false as const,
+};
+
+describe('owner-approved synthetic demo recovery', () => {
+  it('accepts explicit rebuild mode without inventing backup or erasure replay evidence', () => {
+    expect(deploymentPlanSchema.safeParse(demoPlan).success).toBe(true);
+    expect(deploymentPlanSchema.safeParse(plan).success).toBe(true);
+    for (const changed of [
+      { syntheticDataOnly: false },
+      { recoveryArtifact: 'NONE' },
+      { backupRetentionDays: 30 },
+      { encryptedBackups: true },
+      { restoreReplaysErasureTombstones: true },
+    ])
+      expect(deploymentPlanSchema.safeParse({ ...demoPlan, ...changed }).success).toBe(false);
+  });
+  it('rejects production use of the staging-only rebuild exception', () => {
+    const base = parseEnvironment({ NODE_ENV: 'test' });
+    expect(
+      validateReleaseEnvironment(
+        { ...base, runtime: { ...base.runtime, environment: 'production' } },
+        demoPlan,
+      ).issues,
+    ).toContain('SYNTHETIC_DEMO_REQUIRES_STAGING');
+    expect(
+      validateReleaseEnvironment(
+        { ...base, runtime: { ...base.runtime, environment: 'staging' } },
+        demoPlan,
+      ).issues,
+    ).not.toContain('INVALID_DEPLOYMENT_PLAN');
+  });
+});
 function complete(): ReleaseInput {
   return {
     releaseId: 'release-test',
@@ -181,6 +221,7 @@ describe('backend release evidence gates', () => {
       invitationStudio: { publicOrigin: plan.apiOrigin },
     };
     expect(validateReleaseEnvironment(configured, plan)).toEqual({ valid: true, issues: [] });
+    expect(validateReleaseEnvironment(configured, demoPlan)).toEqual({ valid: true, issues: [] });
     expect(
       validateReleaseEnvironment(
         { ...configured, security: { ...base.security, replicaCount: 2 as 1 } },

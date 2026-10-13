@@ -344,7 +344,7 @@ historical email acceptance above. [Configuration and client/backend hand-off](.
 - [x] ANL-W4: Deterministic fixture/real-source backend acceptance and frontend hand-off.
 - [x] REL-W1: Backend environment/auth/config/manifest validation. [Exact-source quality and isolated staging evidence](evidence/spec11-staging-checkpoint-2026-10-13.md); environment/provider configuration is kept separate from GO/production readiness.
 - [x] REL-W2: Deterministic idempotent backend seeds/journeys: no names + Group seating + NONE through contract/deposit/print/event/final invoice, plus partial names + explicit check-in/undo; list changes never alter planning/money. [Native staging journeys, replay/conflict and contracted print proof](evidence/spec11-staging-checkpoint-2026-10-13.md).
-- [ ] REL-W3: Empty/upgrade migrations, backend staging/runtime health/recovery evidence.
+- [x] REL-W3: Empty/upgrade migrations, backend staging/runtime health/recovery evidence. Owner-selected recovery is migration + native seed rebuild for the dedicated synthetic-only staging/demo, replacing 30-day backup retention. [Scope amendment and preserved recovery evidence](evidence/spec11-demo-rebuild-scope-2026-10-13.md). No production/shared-data backup exemption is granted.
 - [ ] REL-W4: Immutable API/provider manifest and frontend release integration checklist; frontend delivery recorded separately.
 - [ ] REL-W5: Backend go/no-go evidence and recovery hand-off; full product release waits for frontend integration.
 

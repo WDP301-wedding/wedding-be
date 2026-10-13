@@ -32,14 +32,47 @@ and audit permissions. The rehearsal proves the native replay mechanism on one
 synthetic identity; it does not invent retention policy for Guest/media fields.
 
 Native Railway backup creation was rejected because the workspace lacks Pro.
-No upgrade, paid backup service or new cron service was created. The backup method
-and 30-day custody decision are pending the owner. If the owner selects manual
-custody, Lê Bá Bách must keep ciphertext, separate key and external tombstone ledger
-available for the agreed 30 days, take another backup before schema/data changes,
-and record disposal/recovery operations. This document does not assert automatic
-daily backups or that 30 elapsed days have already been observed.
+The owner explicitly selected **rebuild from migrations and seed for synthetic
+staging/demo** on 2026-10-13, replacing the 30-day retention requirement. No upgrade,
+paid backup service or new cron service was created. Existing encrypted rehearsal
+artifacts are preserved as evidence; no new 30-day custody obligation is asserted.
 
-## Restore sequence
+## Selected demo rebuild procedure
+
+This mode accepts loss of transient synthetic data; it does not restore a historical
+snapshot. It is permitted only while this dedicated environment contains no real
+customer/contract/payment data. The release validator rejects production use.
+
+1. Verify the exact project/environment/service/database IDs and synthetic-only
+   scope. Stop demo traffic and keep worker/FCM disabled. Retain diagnostic and
+   signed sandbox/provider evidence independently of the database.
+2. Provision a new isolated database; preserve the prior failed demo database until
+   recovery is reviewed. Do not reset the existing/shared database or rewrite SQL.
+3. Deploy the pinned complete migration history from empty with `npm run db:migrate:deploy`.
+   Compare all migration names/checksums and run readiness. This operation does not
+   reconstruct a real payment settlement or restore erased data from a backup.
+4. Prepare private bootstrap/seed configuration fenced to the new approved database
+   and API target. `scripts/release-staging-seed.mjs` currently refuses any target
+   other than the recorded staging resources; do not bypass that guard by pointing
+   an unfenced historical seed at a different database. The operator must review
+   and pin a new target before running the native migration-and-seed recipe.
+5. Use a **new private checkpoint** for the new database, then execute the two native
+   journeys. The script uses native idempotency and refuses conflicting existing
+   facts. Never reuse a completed checkpoint from a lost/different database.
+   Recreate synthetic manual payments only, explicitly labeled as fixtures. They
+   do not prove or reconstruct a VNPay transaction.
+6. Verify auth, scope denials, explicit planning, NONE/partial-name semantics,
+   Group seating, contracted print, immutable invoice and once-only ledger effects.
+   Keep email worker off because the two-email authorization is exhausted; FCM
+   remains deferred. Do not resend external emails or replay provider checkout
+   actions merely to rebuild demo fixtures. Reopen the demo after owner review.
+
+Evidence combines empty deployment/readiness and disposable recovery rehearsals
+with persistent native staging migration/seed journeys. It does not claim that
+the live staging database was reset during acceptance. Production/historical-data
+recovery uses the protected backup/erasure procedure below and needs its own scope.
+
+## Protected historical-data restore procedure (separate scope)
 
 1. Verify the exact target IDs and close traffic/write entry points. Keep notification
    worker and FCM off. Preserve provider UNKNOWN states; do not retry ambiguous sends
