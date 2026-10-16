@@ -197,8 +197,15 @@ cost. On unexpected errors/queues/latency, stop probes and revert to the prior
 reviewed deployment; retain all domain/provider evidence. Do not restore default
 pool max=10 in the new code without a larger validated capacity budget.
 
-PERF-11 and PERF-13 live-candidate acceptance stays open until the optimized code
-is deployed and measured. PERF-12's review is complete; cleanup is not authorized.
+Pre-rollout checkpoint: PERF-11 and PERF-13 live-candidate acceptance stays open
+until the optimized code is deployed and measured. PERF-12's review is complete;
+cleanup is not authorized.
 Assigned-Staff event-window success, container DB timing/region confirmation and
 external provider/readiness RV gates remain open. The existing product **NO_GO**
 decision is unchanged by code, configured credentials, health 200 or offline tests.
+
+Subsequent owner-authorized merges, deployment, matched live measurements and
+separate diagnostics are recorded in the
+[Railway rollout receipt](backend-performance-railway-rollout-2026-10-16.md).
+That record supersedes the undeployed-candidate status above. It preserves the
+older baseline and keeps unproved latency, cancellation and provider gates open.

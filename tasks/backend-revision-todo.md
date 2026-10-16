@@ -404,7 +404,17 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
   regression measurements and remaining rollout gates](../docs/backend-performance-11-13.md).
   PERF-12 review retains 145 public tables and 363 rehearsal tables, with zero
   eligible/approved deletions. PERF-11/13 retain live-candidate acceptance gates;
-  local/native proof and the unchanged deployed baseline are separate evidence.
+  that pre-rollout checkpoint separates local/native proof from the then-unchanged
+  deployed baseline.
+- 2026-10-16 subsequent [merged Railway rollout and matched live verification](../docs/backend-performance-railway-rollout-2026-10-16.md):
+  PRs #48/#49 are merged and commit `266dfa8` is deployed. All 777 matched read
+  samples returned 200, with separate initial/steady and 1/2/4-reader cohorts.
+  Full acceptance remains open: single-reader inbox/template and mixed-generation
+  Analytics timings do not support a blanket improvement claim. Investigate
+  connection acquisition/lifecycle and repeat the affected cohorts; isolate
+  Analytics warm reads versus refresh. Safe-read deadlines stay off pending live
+  pooler cancellation proof. Retain Staff-window, region/container and provider RV
+  gates; do not convert these checkboxes to complete from health or CI alone.
 
 ## Verification Record
 

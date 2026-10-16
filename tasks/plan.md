@@ -223,3 +223,14 @@ native-owner correctness and controlled measurements are recorded in
 matched Railway p95 acceptance remain separate; retain canonical open checkboxes
 until the live targets are demonstrated. No provider payment/generation or shared
 data cleanup is authorized by this extension.
+
+## Execution checkpoint — PERF-06–13 Railway rollout
+
+The owner's subsequent instruction authorized sequential merge of PRs #48/#49,
+controlled deployment and live verification. Commit `266dfa8` is now deployed;
+exact merge-commit CI passed and all 777 matched read samples returned 200.
+[The rollout receipt](../docs/backend-performance-railway-rollout-2026-10-16.md)
+records the separate diagnostic experiment, unchanged selected business digests
+and migrations, final configuration and restored auto-deploy policy. It supersedes
+the earlier undeployed-candidate status, while keeping unmet latency, live
+cancellation, assigned-Staff, region/container and provider gates explicit.

@@ -122,3 +122,8 @@ tracked source checks, test deadlines and coverage thresholds remain enforced.
 
 SQL semantics were checked against the
 [PostgreSQL SELECT reference](https://www.postgresql.org/docs/18/sql-select.html).
+
+The subsequent owner-authorized merge and deployment are recorded in the
+[matched Railway rollout receipt](backend-performance-railway-rollout-2026-10-16.md).
+It separates observed live improvements, slower cohorts and incomplete acceptance
+from the controlled native measurements above.
