@@ -3,7 +3,7 @@
   "build": { "builder": "DOCKERFILE", "dockerfilePath": "Dockerfile" },
   "deploy": {
     "preDeployCommand": [
-      "npm run db:migrate:deploy && node scripts/performance-db-probe.mjs --railway-predeploy --deadline --if-enabled"
+      "/bin/sh -c 'npm run db:migrate:deploy && node scripts/performance-db-probe.mjs --railway-predeploy --deadline --if-enabled'"
     ],
     "healthcheckPath": "/health/ready",
     "healthcheckTimeout": 120,
