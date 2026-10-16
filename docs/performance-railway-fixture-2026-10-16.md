@@ -39,8 +39,11 @@ booking rather than creating another synthetic payment on each measurement run.
 
 ## Measurement boundary
 
-The active deployment is `b1b875c0-25d8-4bcf-a6fe-2484bbb25c74`, source
-`5b2536212e9a6feafbb48d9a71bba1f90ded08ae`. PR #46 has not been deployed.
+At this baseline checkpoint the active deployment was
+`b1b875c0-25d8-4bcf-a6fe-2484bbb25c74`, source
+`5b2536212e9a6feafbb48d9a71bba1f90ded08ae`; PR #46 had not been deployed.
+The later owner-authorized merge, deployment and matched comparison are recorded
+[separately](perf46-railway-comparison-2026-10-16.md).
 `DB_DIAGNOSTICS_ENABLED` is false, so this run cannot demonstrate the new driver
 diagnostics or Identity optimization. No service variables, region, application
 deployment or migrations were changed.

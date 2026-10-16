@@ -10,12 +10,12 @@ and the product NO_GO decision are unchanged.
 
 ## Acceptance boundaries
 
-| Task    | Delivered locally                                                                                                                                        | Remaining acceptance                                                                                                                                                               |
-| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PERF-02 | Native-owner synthetic fixture, initialized Group/Guest/Seating/settings, assigned Staff, eight-family HTTP measurement and private-config runner        | Owner subsequently authorized a Railway synthetic fixture. See the follow-up receipt; successful assigned-Staff reads still require a valid event window.                          |
-| PERF-03 | Opt-in request-correlated driver/acquire/lock-command timing, pool observations, event-loop observation, safe DB probe and pool-context regression tests | Deploy approved instrumentation to a test target; measure container→DB RTT and attribute real slow request families. Pure server execution and lock wait require DB-side evidence. |
-| PERF-04 | Two matching region profiles, controlled experiment and rollback runbook                                                                                 | Provider-confirmed DB region, authorized temporary services and repeated matched US West/APAC receipts. No region winner is claimed.                                               |
-| PERF-05 | Joined/narrow Identity authority reads and narrow/empty-grant Couple overview reads; revocation and concurrency tests                                    | Same-topology authenticated Railway p95 improvement target (initially ≥30%); exact-source broad quality/coverage gates.                                                            |
+| Task    | Delivered locally                                                                                                                                        | Remaining acceptance                                                                                                                                                                |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PERF-02 | Native-owner synthetic fixture, initialized Group/Guest/Seating/settings, assigned Staff, eight-family HTTP measurement and private-config runner        | Owner subsequently authorized a Railway synthetic fixture. See the follow-up receipt; successful assigned-Staff reads still require a valid event window.                           |
+| PERF-03 | Opt-in request-correlated driver/acquire/lock-command timing, pool observations, event-loop observation, safe DB probe and pool-context regression tests | Deploy approved instrumentation to a test target; measure container→DB RTT and attribute real slow request families. Pure server execution and lock wait require DB-side evidence.  |
+| PERF-04 | Two matching region profiles, controlled experiment and rollback runbook                                                                                 | Provider-confirmed DB region, authorized temporary services and repeated matched US West/APAC receipts. No region winner is claimed.                                                |
+| PERF-05 | Joined/narrow Identity authority reads and narrow/empty-grant Couple overview reads; revocation and concurrency tests                                    | PR #46 is merged/deployed; observed same-topology backend p95 improved 75% for Identity and 43% for overview. Live driver attribution and remaining dependency gates stay separate. |
 
 These are partial implementation receipts, not four completed live-performance
 tasks. Canonical PERF checkboxes remain open until their full acceptance evidence
@@ -199,6 +199,14 @@ event-window gate. Container timings, provider region confirmation, temporary
 deployments and matched baseline/candidate latency remain unverified. The active
 deployment snapshot is still
 `b1b875c0-25d8-4bcf-a6fe-2484bbb25c74` / `5b2536212e9a6feafbb48d9a71bba1f90ded08ae`.
+
+Subsequent owner-authorized merge/deployment: [PR #46 Railway comparison](perf46-railway-comparison-2026-10-16.md).
+The baseline snapshot above is historical. The new active deployment is
+`0c9f9cd8-1e38-4855-b2a2-84a232bbbdd5`, source
+`03b9a6be46bc11488b3de5bb56270cb008dd884e`, with diagnostics still disabled and
+the same US West placement. Both exact-head premerge CI and merge-commit CI passed;
+200/200 steady live reads succeeded. The observed improvement does not close
+assigned-Staff event-window, live driver diagnostics/container RTT or region gates.
 
 Reference for pool observation semantics:
 [node-postgres Pool API](https://node-postgres.com/apis/pool).
