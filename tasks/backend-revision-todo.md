@@ -358,6 +358,33 @@ historical email acceptance above. [Configuration and client/backend hand-off](.
 - [x] REL-W4: Finalized immutable API/provider identity and frontend/app integration checklist after owner-reviewed RV-21. [Final backend hand-off](../docs/spec11-final-backend-handoff.md). Client delivery remains separately owned and unchecked; the release decision remains NO_GO.
 - [x] REL-W5: Published owner-accepted **NO_GO** release decision and recovery hand-off after RV-21/REL-W4. [Final decision, residual gates and recovery](evidence/spec11-final-no-go-handoff-2026-10-13.md). All 71 current-scope backend tasks are complete; full product/frontend delivery, deferred live FCM and production readiness remain separate.
 
+## Railway performance extension — 2026-10-16
+
+New owner-requested audit/optimization work; preserves the completed SPEC/RV scope.
+Plan and per-task acceptance: [Railway performance plan](plan.md).
+Live evidence: [API performance audit](../docs/railway-api-performance-audit-2026-10-16.md).
+Measurement authorizes no database deletion, business-rule reduction or deployment change.
+
+- [x] PERF-01: Published 380 successful samples across 19 route/role cases, all 380 matched to exact-deployment logs; schema inventory and coverage/token-expiry limits are in the [live audit](../docs/railway-api-performance-audit-2026-10-16.md). No optimization/deployment/deletion is implied.
+- [ ] PERF-02: Arrange initialized authorized booking/assigned Staff fixtures; complete booking-specific timings without manufacturing settlement/access.
+- [ ] PERF-03: Attribute request DB round trips, pool/lock wait and container-to-DB latency with secret-safe instrumentation.
+- [ ] PERF-04: Compare current US West and APAC application placement with the DB unchanged in an authorized test environment.
+- [ ] PERF-05: Reduce Identity/Couple overview read work while preserving current authorization and revocation semantics.
+- 2026-10-16 implementation checkpoint for PERF-02–05:
+  [local fixture, instrumentation, Identity comparison and remaining live gates](../docs/backend-performance-02-05.md).
+  The owner confirmed no live fixture is available. Local implementation and
+  controlled measurements do not close the Railway acceptance checkboxes.
+  [PERF-04 region profiles and rollback](../docs/performance-region-experiment.md)
+  are prepared; no deployment or production-region change has been performed.
+- [ ] PERF-06: Batch invitation-template versions; preserve version ownership, cursor and authority rechecks.
+- [ ] PERF-07: Batch print-order lines/commercial revisions/proposals without changing immutable monetary facts.
+- [ ] PERF-08: Reduce notification authority/booking-scope round trips for inbox and unread counts.
+- [ ] PERF-09: Bound catalog SQL pagination and batch media facts; preserve publication and signed-URL rules.
+- [ ] PERF-10: Measure and optimize analytics warm reads versus projection refresh with freshness/cursor/source semantics intact.
+- [ ] PERF-11: Budget aggregate pools and safe read cancellation; preserve money/provider UNKNOWN and idempotency.
+- [ ] PERF-12: Review table/rehearsal-schema cleanup with ownership, dependency and retention proof; deletion remains separately authorized.
+- [ ] PERF-13: Repeat matched live measurements, verify relevant correctness gates and set supported regression budgets.
+
 ## Verification Record
 
 Current SPEC-11 closure (2026-10-13): **71/71 backend tasks complete** in the
