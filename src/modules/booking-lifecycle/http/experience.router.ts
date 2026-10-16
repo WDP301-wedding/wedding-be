@@ -198,6 +198,12 @@ export function createBookingExperienceRouter(
         },
         select: { consultationId: true, level: true },
       });
+      if (grants.length === 0) {
+        response
+          .set('Cache-Control', 'no-store')
+          .json(overviewResponseSchema.parse({ data: [], nextCursor: null }));
+        return;
+      }
       const rows = await prisma.booking.findMany({
         where: {
           consultationId: { in: grants.map((grant) => grant.consultationId) },
@@ -205,7 +211,16 @@ export function createBookingExperienceRouter(
             ? { phase: { in: ['CONFIRMED' as const, 'COMPLETED' as const] } }
             : {}),
         },
-        include: { proposalSnapshot: true, currentTimelineRevision: true },
+        select: {
+          id: true,
+          consultationId: true,
+          eventDate: true,
+          phase: true,
+          shiftCode: true,
+          planningHeadcount: true,
+          proposalSnapshot: { select: { hallName: true } },
+          currentTimelineRevision: { select: { managerApprovedAt: true, coupleApprovedAt: true } },
+        },
         orderBy: [{ eventDate: 'desc' }, { id: 'desc' }],
         take: query.limit + 1,
         ...(query.cursor === undefined ? {} : { cursor: { id: query.cursor }, skip: 1 }),

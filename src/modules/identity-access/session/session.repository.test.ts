@@ -267,27 +267,28 @@ describe('Prisma session repository', () => {
       idleExpiresAt,
       absoluteExpiresAt,
     };
-    const findUnique = vi
+    const readActor = vi
       .fn()
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce({
-        status: 'ACTIVE',
-        expiresAt: new Date('2026-10-03T00:10:00.000Z'),
-        session: {
-          ...session,
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        {
           accountId,
-          account: {
-            displayEmail: 'couple@example.com',
-            status: 'ACTIVE',
-            roles: [{ role: 'COUPLE' }],
-          },
+          sessionId,
+          displayEmail: 'couple@example.com',
+          credentialStatus: 'ACTIVE',
+          credentialExpiresAt: new Date('2026-10-03T00:10:00.000Z'),
+          sessionStatus: 'ACTIVE',
+          idleExpiresAt,
+          absoluteExpiresAt,
+          accountStatus: 'ACTIVE',
+          roles: ['COUPLE'],
         },
-      });
+      ]);
     const findManySessions = vi.fn(() => Promise.resolve([session]));
     const repository = createPrismaSessionRepository(
       prisma({
         session: { findMany: findManySessions },
-        accessCredential: { findUnique },
+        $queryRaw: readActor,
       }),
     );
 

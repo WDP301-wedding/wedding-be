@@ -1,4 +1,4 @@
-import type { PrismaClient } from '../../../generated/prisma/client.js';
+import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
 import type { PrismaBookingBoundary } from '../../../core/database/booking-boundary.js';
 import type { AccessCredentialState } from '../session/session.repository.js';
 import { createAuthenticatedActorResolver } from './authenticated-actor.middleware.js';
@@ -6,6 +6,7 @@ import {
   createConsultationAccessReader,
   createPrismaConsultationAccessRepository,
 } from './authorization.service.js';
+import { identityTable, readAccessCredential } from './access-credential.reader.js';
 
 /** Identity-owned adapter: current authority is locked until the owner's shared
  * transaction commits. Outside a scope it is only a preflight read. Lock order is
@@ -22,42 +23,39 @@ export function createScopedIdentityReaders(
         const db = tx ?? prisma;
         let locked: { sessionId: string; accountId: string } | undefined;
         if (tx !== undefined) {
-          const reference = await tx.accessCredential.findUnique({
-            where: { tokenHash },
-            select: { id: true, session: { select: { id: true, accountId: true } } },
-          });
-          if (reference === null) return null;
-          locked = { sessionId: reference.session.id, accountId: reference.session.accountId };
-          await tx.$queryRaw`SELECT id FROM "Account" WHERE id=${reference.session.accountId}::uuid FOR SHARE`;
-          await tx.$queryRaw`SELECT id FROM "AccountRole" WHERE "accountId"=${reference.session.accountId}::uuid ORDER BY id FOR SHARE`;
-          await tx.$queryRaw`SELECT id FROM "Session" WHERE id=${reference.session.id}::uuid FOR SHARE`;
-          await tx.$queryRaw`SELECT id FROM "AccessCredential" WHERE id=${reference.id}::uuid FOR SHARE`;
+          const [reference] = await tx.$queryRaw<
+            { id: string; sessionId: string; accountId: string }[]
+          >(Prisma.sql`
+            SELECT c.id, c."sessionId", s."accountId"
+            FROM ${identityTable(prisma, 'AccessCredential')} c
+            JOIN ${identityTable(prisma, 'Session')} s ON s.id=c."sessionId"
+            WHERE c."tokenHash"=${tokenHash}
+          `);
+          if (!reference) return null;
+          locked = { sessionId: reference.sessionId, accountId: reference.accountId };
+          await tx.$queryRaw(
+            Prisma.sql`SELECT id FROM ${identityTable(prisma, 'Account')} WHERE id=${reference.accountId}::uuid FOR SHARE`,
+          );
+          await tx.$queryRaw(
+            Prisma.sql`SELECT id FROM ${identityTable(prisma, 'AccountRole')} WHERE "accountId"=${reference.accountId}::uuid ORDER BY id FOR SHARE`,
+          );
+          await tx.$queryRaw(
+            Prisma.sql`SELECT id FROM ${identityTable(prisma, 'Session')} WHERE id=${reference.sessionId}::uuid FOR SHARE`,
+          );
+          await tx.$queryRaw(
+            Prisma.sql`SELECT id FROM ${identityTable(prisma, 'AccessCredential')} WHERE id=${reference.id}::uuid FOR SHARE`,
+          );
         }
         // Re-read after row locks: a revocation that won the lock is observed here.
-        const credential = await db.accessCredential.findUnique({
-          where: { tokenHash },
-          include: { session: { include: { account: { include: { roles: true } } } } },
-        });
+        const credential = await readAccessCredential(db, prisma, tokenHash);
         if (credential === null) return null;
-        const { session } = credential;
         // A reparented token/session cannot authenticate against rows we did not lock.
         if (
           locked !== undefined &&
-          (locked.sessionId !== session.id || locked.accountId !== session.accountId)
+          (locked.sessionId !== credential.sessionId || locked.accountId !== credential.accountId)
         )
           return null;
-        return {
-          accountId: session.accountId,
-          sessionId: session.id,
-          displayEmail: session.account.displayEmail,
-          credentialStatus: credential.status,
-          credentialExpiresAt: credential.expiresAt,
-          sessionStatus: session.status,
-          idleExpiresAt: session.idleExpiresAt,
-          absoluteExpiresAt: session.absoluteExpiresAt,
-          accountStatus: session.account.status,
-          roles: session.account.roles.map(({ role }) => role),
-        };
+        return credential;
       },
     },
     now,
