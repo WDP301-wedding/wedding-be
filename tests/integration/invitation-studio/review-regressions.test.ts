@@ -96,6 +96,12 @@ describe('SPEC-05 review regressions', () => {
     expect(newer.pendingReplacementProposal!.revisionNumber).toBeGreaterThan(
       older.pendingReplacementProposal!.revisionNumber,
     );
+    const listed = await orders.listManagementPrintOrders(
+      { bookingId: f.bookingId, limit: 20 },
+      f.manager,
+    );
+    expect(listed.items).toEqual([await orders.getPrintOrder(null, approved.orderId, f.manager)]);
+    expect(listed.items[0]!.pendingReplacementProposal).toEqual(newer.pendingReplacementProposal);
 
     await expect(
       orders.approveReplacement(

@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import type { Prisma } from '../../../generated/prisma/client.js';
+import { Prisma } from '../../../generated/prisma/client.js';
+import { prismaSchema } from '../../../core/database/prisma.js';
 import { NotFoundError, ValidationError } from '../../../core/errors/app-error.js';
 import type {
   BookingMediaPrerequisiteReader,
@@ -1485,38 +1486,67 @@ export class PrintOrderService {
     const pageOrders = hasMore ? orders.slice(0, limit) : orders;
     const nextCursor = hasMore ? pageOrders[pageOrders.length - 1]!.id : null;
 
-    const items: PrintOrderView[] = [];
-    for (const order of pageOrders) {
-      const lines = await this.repository.prisma.invitationPrintLine.findMany({
-        where: { orderId: order.id },
-      });
-      let currentRev: {
-        id: string;
-        revisionNumber: number;
-        linesJson: Prisma.JsonValue;
-        orderTotalVnd: Prisma.Decimal;
-        estimatedHandoverAt: Date;
-        expiresAt: Date;
-        createdAt: Date;
-      } | null = null;
-      if (order.currentCommercialRevisionId !== null) {
-        currentRev = await this.repository.prisma.invitationCommercialRevision.findUnique({
-          where: { id: order.currentCommercialRevisionId },
-        });
-      }
-      let pendingProposal: typeof currentRev = null;
-      if (order.status === 'APPROVED' && currentRev !== null) {
-        pendingProposal = await this.repository.prisma.invitationCommercialRevision.findFirst({
-          where: {
-            orderId: order.id,
-            revisionNumber: { gt: currentRev.revisionNumber },
-            expiresAt: { gt: this.now() },
-          },
-          orderBy: { revisionNumber: 'desc' },
-        });
-      }
-      items.push(this.mapOrderView(order, lines, currentRev, pendingProposal));
+    const lines = await this.repository.prisma.invitationPrintLine.findMany({
+      where: { orderId: { in: pageOrders.map((order) => order.id) } },
+    });
+    const revisions = await this.repository.prisma.invitationCommercialRevision.findMany({
+      where: {
+        id: {
+          in: pageOrders.flatMap((order) =>
+            order.currentCommercialRevisionId === null ? [] : [order.currentCommercialRevisionId],
+          ),
+        },
+      },
+    });
+    const byId = new Map(revisions.map((row) => [row.id, row]));
+    const candidates = pageOrders.flatMap((order) => {
+      const current = byId.get(order.currentCommercialRevisionId ?? '');
+      if (current && (current.orderId !== order.id || current.bookingId !== order.bookingId))
+        throw new NotFoundError();
+      return order.status === 'APPROVED' && current
+        ? [
+            {
+              orderId: order.id,
+              bookingId: order.bookingId,
+              revisionNumber: current.revisionNumber,
+              expiresAt: this.now(),
+            },
+          ]
+        : [];
+    });
+    const proposals =
+      candidates.length === 0
+        ? []
+        : await this.repository.prisma.$queryRaw<typeof revisions>(Prisma.sql`
+            SELECT DISTINCT ON (r."orderId") r.*
+            FROM ${Prisma.raw('"' + prismaSchema(this.repository.prisma).replaceAll('"', '""') + '"')}."InvitationCommercialRevision" r
+            WHERE (${Prisma.join(
+              candidates.map(
+                (c) => Prisma.sql`
+              (r."orderId"=${c.orderId}::uuid AND r."bookingId"=${c.bookingId}::uuid
+                AND r."revisionNumber">${c.revisionNumber} AND r."expiresAt">${c.expiresAt})
+            `,
+              ),
+              ' OR ',
+            )})
+            ORDER BY r."orderId", r."revisionNumber" DESC
+          `);
+    const proposalByOrder = new Map(proposals.map((row) => [row.orderId, row]));
+    const linesByOrder = new Map<string, typeof lines>();
+    for (const line of lines) {
+      const group = linesByOrder.get(line.orderId) ?? [];
+      group.push(line);
+      linesByOrder.set(line.orderId, group);
     }
+    const items = pageOrders.map((order) =>
+      this.mapOrderView(
+        order,
+        linesByOrder.get(order.id) ?? [],
+        byId.get(order.currentCommercialRevisionId ?? '') ?? null,
+        proposalByOrder.get(order.id) ?? null,
+      ),
+    );
+    await this.authorization.manager(context);
     return { items, nextCursor };
   }
 }
