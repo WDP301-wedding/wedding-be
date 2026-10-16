@@ -1,0 +1,3970 @@
+{
+  "observedAt": "2026-10-16T14:55:05.222Z",
+  "sourceCommit": "5dfc9a579339e52be207839d822c5d799d317627",
+  "scope": "Read-only selected Railway database; reviewed against current source, no deletion performed",
+  "rawArtifactSha256": "25ab9fa20c464f9f5cdbe0b70c863a6d372b67fd7e43d5a4e22913e408f4c636",
+  "publicTableCount": 145,
+  "prismaModels": 144,
+  "approvedDeletions": 0,
+  "schemas": [
+    {
+      "schema": "auth",
+      "owner": "supabase_admin",
+      "tables": 27
+    },
+    {
+      "schema": "extensions",
+      "owner": "postgres",
+      "tables": 0
+    },
+    {
+      "schema": "graphql",
+      "owner": "supabase_admin",
+      "tables": 0
+    },
+    {
+      "schema": "graphql_public",
+      "owner": "supabase_admin",
+      "tables": 0
+    },
+    {
+      "schema": "identity_runtime_d0bf80bdc8244a03ba1d3a02906571e5",
+      "owner": "postgres",
+      "tables": 0
+    },
+    {
+      "schema": "ntf12_rehearsal_7469190783fb4b039f409b2f50843556",
+      "owner": "postgres",
+      "tables": 138
+    },
+    {
+      "schema": "ntf12_rehearsal_a96eee86c8e041bc94ceec99c8018d75",
+      "owner": "postgres",
+      "tables": 87
+    },
+    {
+      "schema": "ntf_rv16_edd0b9f9cfb4493195b69841b00a900f",
+      "owner": "postgres",
+      "tables": 138
+    },
+    {
+      "schema": "public",
+      "owner": "pg_database_owner",
+      "tables": 145
+    },
+    {
+      "schema": "realtime",
+      "owner": "supabase_admin",
+      "tables": 3
+    },
+    {
+      "schema": "storage",
+      "owner": "supabase_admin",
+      "tables": 8
+    },
+    {
+      "schema": "vault",
+      "owner": "supabase_admin",
+      "tables": 1
+    }
+  ],
+  "foreignKeyCount": 525,
+  "jsonColumnCount": 46,
+  "limitations": [
+    "Activity is a point-in-time observation, not absence-of-consumer proof.",
+    "Dynamic SQL, external consumers and JSON payload references require owner confirmation.",
+    "No deletions approved. Retained provider/UNKNOWN and immutable evidence must survive cleanup."
+  ],
+  "fixture": {
+    "bookingId": "e80c6f1b-a4fc-4674-a4dd-13ef2601206b",
+    "tables": {
+      "Booking": {
+        "count": 1,
+        "sha256": "20dcee6f97394382004b58c32131e5a6dba355b4191a6ade60ad6a7a3354cd99"
+      },
+      "GuestWorkspace": {
+        "count": 1,
+        "sha256": "740e1cfad05084d31b75caee13d7e3321381bd9f6d637403bc187266e8bf5444"
+      },
+      "GuestPlanRevision": {
+        "count": 1,
+        "sha256": "1d999c357118e047bbf2b054d4a62f233b7d5211a3df379e06720d89e3089a7e"
+      },
+      "Guest": {
+        "count": 8,
+        "sha256": "2fab9d7948048ad7f8ee99add51ceb1057e8bd75463d1d0209b0e8f5f2616661"
+      },
+      "GuestGroup": {
+        "count": 4,
+        "sha256": "4c16cb980d31b569683ca79ef4423e7519226c8c5bf831c5855312b0c4dfe395"
+      },
+      "GuestHistory": {
+        "count": 12,
+        "sha256": "b00ccae7b401b0e1f61f0247de74f671965cee799482fe1adddead565ccea544"
+      },
+      "SeatingPlan": {
+        "count": 1,
+        "sha256": "21324fbb0909ebe7b7847d5c123df7988539e163ae938e3873f0c07ef3cba10b"
+      },
+      "SeatingPlanRevision": {
+        "count": 2,
+        "sha256": "d3d9236f4ce95da45b5c26ee86e743bdd3a16ae2495caeefde36b123d16c58f8"
+      },
+      "StaffConfiguration": {
+        "count": 1,
+        "sha256": "c2069094393ddd40b16a802f3594d61fa05097fb29e3f765fc3c2031e45b524c"
+      },
+      "StaffAssignment": {
+        "count": 1,
+        "sha256": "7138dcfec52bee5e751fa90552a061e70e6cf464f0a5d0fa114f7e27096ee185"
+      },
+      "StaffHistory": {
+        "count": 3,
+        "sha256": "547f6018665f82fe9a9a84603e3faed5d49b237c3ae9cf872ebef2deb89a18f0"
+      },
+      "StaffCheckInRecord": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "CommercialContractRevision": {
+        "count": 1,
+        "sha256": "9826bab0f0440ef1e4bd62f5a6a731073359e734d2aa8cc0f6707ffa96bab600"
+      },
+      "FinalInvoiceRevision": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "BillingLedgerEntry": {
+        "count": 2,
+        "sha256": "4c31f36bde988dd800fcb73c6823f1c8e026cef32cf991a0e9b5f3eeee7c6c8d"
+      }
+    }
+  },
+  "tables": [
+    {
+      "name": "AccessCredential",
+      "database_owner": "postgres",
+      "bytes": 393216,
+      "estimated_rows": 660,
+      "prismaModel": "AccessCredential",
+      "runtimeReferences": [
+        "src/modules/identity-access/account/identity-retention.ts",
+        "src/modules/identity-access/account/staff-provisioner.ts",
+        "src/modules/identity-access/authorization/access-credential.reader.ts",
+        "src/modules/identity-access/authorization/notification-authority.ts",
+        "src/modules/identity-access/authorization/scoped-identity.reader.ts",
+        "src/modules/identity-access/password-otp/password-otp.service.ts",
+        "src/modules/identity-access/password-reset/password-reset.repository.ts",
+        "src/modules/identity-access/session/session.repository.ts"
+      ],
+      "workerReferences": [
+        "src/modules/identity-access/account/identity-retention.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261003000000_identity_access_persistence/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "identity-access",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": []
+    },
+    {
+      "name": "Account",
+      "database_owner": "postgres",
+      "bytes": 81920,
+      "estimated_rows": 17,
+      "prismaModel": "Account",
+      "runtimeReferences": [
+        "src/config/fcm.ts",
+        "src/config/runtime-manifest.ts",
+        "src/core/openapi/registry.ts",
+        "src/core/reporting/reporting-feed.ts",
+        "src/modules/booking-lifecycle/booking-lifecycle.providers.ts",
+        "src/modules/booking-lifecycle/booking-lifecycle.runtime.ts",
+        "src/modules/booking-lifecycle/http/commercial-contract.openapi.ts",
+        "src/modules/booking-lifecycle/http/couple-profile.openapi.ts",
+        "src/modules/booking-lifecycle/http/experience.openapi.ts",
+        "src/modules/booking-lifecycle/infrastructure/automation.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/consultation.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/deposit.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/lifecycle.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/reporting.repository.ts",
+        "src/modules/identity-access/account/account.repository.ts",
+        "src/modules/identity-access/account/account.service.ts",
+        "src/modules/identity-access/account/identity-locks.ts",
+        "src/modules/identity-access/account/identity-retention.ts",
+        "src/modules/identity-access/account/manager-bootstrap.ts",
+        "src/modules/identity-access/account/retention-eligibility.port.ts",
+        "src/modules/identity-access/account/settings.router.ts",
+        "src/modules/identity-access/account/staff-provisioner.contracts.ts",
+        "src/modules/identity-access/account/staff-provisioner.ts",
+        "src/modules/identity-access/authorization/access-credential.reader.ts",
+        "src/modules/identity-access/authorization/authenticated-actor.middleware.ts",
+        "src/modules/identity-access/authorization/invitation-editor.reader.ts",
+        "src/modules/identity-access/authorization/notification-authority.ts",
+        "src/modules/identity-access/authorization/notification-recipient.reader.ts",
+        "src/modules/identity-access/authorization/scoped-identity.reader.ts",
+        "src/modules/identity-access/identity.router.ts",
+        "src/modules/identity-access/identity.runtime.ts",
+        "src/modules/identity-access/identity.schemas.ts",
+        "src/modules/identity-access/password-otp/password-otp.service.ts",
+        "src/modules/identity-access/password-reset/password-reset.repository.ts",
+        "src/modules/identity-access/password-reset/password-reset.service.ts",
+        "src/modules/identity-access/session/session.repository.ts",
+        "src/modules/identity-access/session/session.service.ts",
+        "src/modules/identity-access/workspace-invitation/workspace-invitation.acceptance.ts",
+        "src/modules/identity-access/workspace-invitation/workspace-invitation.repository.ts",
+        "src/modules/identity-access/workspace-invitation/workspace-invitation.service.ts",
+        "src/modules/invitation-studio/application/media-access.guard.ts",
+        "src/modules/invitation-studio/infrastructure/prisma-automation.reader.ts",
+        "src/modules/notifications-automation/application/android-push-dispatcher.ts",
+        "src/modules/notifications-automation/application/notification-dispatcher.ts",
+        "src/modules/notifications-automation/application/notification-scheduler.ts",
+        "src/modules/notifications-automation/application/notification-settings.ts",
+        "src/modules/notifications-automation/http/notification.openapi.ts",
+        "src/modules/notifications-automation/infrastructure/event-consumer.ts",
+        "src/modules/notifications-automation/infrastructure/notification-retention.ts",
+        "src/modules/payments-billing/application/deposit-orchestration.service.ts",
+        "src/modules/payments-billing/http/payments-billing.http-services.ts",
+        "src/modules/payments-billing/infrastructure/billing-operations.repository.ts",
+        "src/modules/payments-billing/infrastructure/billing-reporting.repository.ts",
+        "src/modules/staff-operations/application/staff.contracts.ts",
+        "src/modules/staff-operations/application/staff.service.ts",
+        "src/modules/staff-operations/infrastructure/staff.composition.ts"
+      ],
+      "workerReferences": [
+        "src/modules/identity-access/account/identity-retention.ts",
+        "src/modules/identity-access/account/retention-eligibility.port.ts",
+        "src/modules/notifications-automation/application/notification-scheduler.ts",
+        "src/modules/notifications-automation/infrastructure/notification-retention.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261003000000_identity_access_persistence/migration.sql",
+        "prisma/migrations/20261008005000_retention_evidence_account_scope/migration.sql",
+        "prisma/migrations/20261008008000_post_booking_experience/migration.sql",
+        "prisma/migrations/20261008230000_password_email_otp/migration.sql",
+        "prisma/migrations/20261009001000_billing_operations_reporting/migration.sql",
+        "prisma/migrations/20261011010000_commercial_contracts/migration.sql",
+        "prisma/migrations/20261011020000_commercial_appendices/migration.sql",
+        "prisma/migrations/20261011028000_invoice_document_integrity/migration.sql",
+        "prisma/migrations/20261012020000_seating_plan/migration.sql",
+        "prisma/migrations/20261012030000_staff_operations/migration.sql",
+        "prisma/migrations/20261012040000_notification_foundation/migration.sql"
+      ],
+      "incomingForeignKeys": 17,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "identity-access",
+      "retention": "Existing approved Identity retention/eligibility workflow only; no blanket per-table TTL.",
+      "jsonColumns": []
+    },
+    {
+      "name": "AccountRetentionEligibilityFact",
+      "database_owner": "postgres",
+      "bytes": 32768,
+      "estimated_rows": 0,
+      "prismaModel": "AccountRetentionEligibilityFact",
+      "runtimeReferences": [
+        "src/modules/identity-access/account/account.repository.ts",
+        "src/modules/identity-access/account/identity-retention.ts"
+      ],
+      "workerReferences": [
+        "src/modules/identity-access/account/identity-retention.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261003000000_identity_access_persistence/migration.sql",
+        "prisma/migrations/20261008005000_retention_evidence_account_scope/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "identity-access",
+      "retention": "Existing approved Identity retention/eligibility workflow only; no blanket per-table TTL.",
+      "jsonColumns": []
+    },
+    {
+      "name": "AccountRole",
+      "database_owner": "postgres",
+      "bytes": 57344,
+      "estimated_rows": 15,
+      "prismaModel": "AccountRole",
+      "runtimeReferences": [
+        "src/modules/identity-access/account/account.repository.ts",
+        "src/modules/identity-access/account/account.service.ts",
+        "src/modules/identity-access/account/staff-provisioner.ts",
+        "src/modules/identity-access/authorization/access-credential.reader.ts",
+        "src/modules/identity-access/authorization/authenticated-actor.middleware.ts",
+        "src/modules/identity-access/authorization/couple-access-promotion.ts",
+        "src/modules/identity-access/authorization/invitation-editor.reader.ts",
+        "src/modules/identity-access/authorization/notification-authority.ts",
+        "src/modules/identity-access/authorization/scoped-identity.reader.ts",
+        "src/modules/identity-access/session/session.repository.ts",
+        "src/modules/staff-operations/application/staff.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261003000000_identity_access_persistence/migration.sql",
+        "prisma/migrations/20261009001000_billing_operations_reporting/migration.sql",
+        "prisma/migrations/20261011010000_commercial_contracts/migration.sql",
+        "prisma/migrations/20261011020000_commercial_appendices/migration.sql",
+        "prisma/migrations/20261011028000_invoice_document_integrity/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "identity-access",
+      "retention": "Existing approved Identity retention/eligibility workflow only; no blanket per-table TTL.",
+      "jsonColumns": []
+    },
+    {
+      "name": "AnalyticsGeneration",
+      "database_owner": "postgres",
+      "bytes": 81920,
+      "estimated_rows": 2,
+      "prismaModel": "AnalyticsGeneration",
+      "runtimeReferences": [
+        "src/modules/analytics-dashboard/infrastructure/analytics.composition.ts",
+        "src/modules/analytics-dashboard/infrastructure/projection.repository.ts"
+      ],
+      "workerReferences": [
+        "src/modules/analytics-dashboard/infrastructure/projection.repository.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261013002000_analytics_projection/migration.sql",
+        "prisma/migrations/20261013005000_analytics_private_reporting/migration.sql"
+      ],
+      "incomingForeignKeys": 2,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "analytics-dashboard",
+      "retention": "Derived generations: only existing owner publication/retirement rules; no ad-hoc deletion.",
+      "jsonColumns": [
+        "checkpoints"
+      ]
+    },
+    {
+      "name": "AnalyticsHead",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 2,
+      "prismaModel": "AnalyticsHead",
+      "runtimeReferences": [
+        "src/modules/analytics-dashboard/analytics.runtime.ts",
+        "src/modules/analytics-dashboard/infrastructure/projection.repository.ts"
+      ],
+      "workerReferences": [
+        "src/modules/analytics-dashboard/infrastructure/projection.repository.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261013002000_analytics_projection/migration.sql",
+        "prisma/migrations/20261013005000_analytics_private_reporting/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "analytics-dashboard",
+      "retention": "Derived generations: only existing owner publication/retirement rules; no ad-hoc deletion.",
+      "jsonColumns": []
+    },
+    {
+      "name": "AnalyticsProjection",
+      "database_owner": "postgres",
+      "bytes": 401408,
+      "estimated_rows": 160,
+      "prismaModel": "AnalyticsProjection",
+      "runtimeReferences": [
+        "src/modules/analytics-dashboard/infrastructure/projection.repository.ts"
+      ],
+      "workerReferences": [
+        "src/modules/analytics-dashboard/infrastructure/projection.repository.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261013002000_analytics_projection/migration.sql",
+        "prisma/migrations/20261013004000_analytics_event_query_index/migration.sql",
+        "prisma/migrations/20261013005000_analytics_private_reporting/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "analytics-dashboard",
+      "retention": "Derived generations: only existing owner publication/retirement rules; no ad-hoc deletion.",
+      "jsonColumns": [
+        "value"
+      ]
+    },
+    {
+      "name": "AuditLog",
+      "database_owner": "postgres",
+      "bytes": 655360,
+      "estimated_rows": 1412,
+      "prismaModel": "AuditLog",
+      "runtimeReferences": [
+        "src/core/audit/audit.repository.ts",
+        "src/modules/analytics-dashboard/infrastructure/analytics.composition.ts",
+        "src/modules/booking-lifecycle/application/commercial-appendix.service.ts",
+        "src/modules/booking-lifecycle/application/commercial-contract.service.ts",
+        "src/modules/booking-lifecycle/application/couple-profile.service.ts",
+        "src/modules/booking-lifecycle/application/intake-retention.ts",
+        "src/modules/booking-lifecycle/booking-lifecycle.runtime.ts",
+        "src/modules/booking-lifecycle/http/experience.router.ts",
+        "src/modules/booking-lifecycle/infrastructure/automation.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/consultation.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/deposit.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/lifecycle.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/slot-hold.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/timeline.repository.ts",
+        "src/modules/guest-management/infrastructure/guest.repository.ts",
+        "src/modules/identity-access/account/account.repository.ts",
+        "src/modules/identity-access/account/identity-retention.ts",
+        "src/modules/identity-access/account/settings.router.ts",
+        "src/modules/identity-access/account/staff-provisioner.ts",
+        "src/modules/identity-access/authorization/couple-access-promotion.ts",
+        "src/modules/identity-access/identity.runtime.ts",
+        "src/modules/identity-access/password-otp/password-otp.service.ts",
+        "src/modules/identity-access/password-reset/password-reset.repository.ts",
+        "src/modules/identity-access/workspace-invitation/workspace-invitation.repository.ts",
+        "src/modules/notifications-automation/application/notification-settings.ts",
+        "src/modules/payments-billing/application/final-invoice.service.ts",
+        "src/modules/payments-billing/application/incidental-expense.service.ts",
+        "src/modules/payments-billing/http/payments-billing.http-services.ts",
+        "src/modules/payments-billing/infrastructure/billing-operations.repository.ts",
+        "src/modules/payments-billing/infrastructure/billing.persistence.ts",
+        "src/modules/payments-billing/infrastructure/vnpay.persistence.ts",
+        "src/modules/seating-plan/application/seating.service.ts",
+        "src/modules/staff-operations/application/check-in.service.ts",
+        "src/modules/staff-operations/application/staff.service.ts",
+        "src/modules/venue-catalog/application/catalog-media.service.ts",
+        "src/modules/venue-catalog/application/layout.service.ts",
+        "src/modules/venue-catalog/application/menu.service.ts",
+        "src/modules/venue-catalog/application/print-offering.service.ts",
+        "src/modules/venue-catalog/application/restaurant-service.service.ts",
+        "src/modules/venue-catalog/application/timeline.service.ts",
+        "src/modules/venue-catalog/application/venue.service.ts",
+        "src/modules/venue-catalog/infrastructure/catalog-version.repository.ts"
+      ],
+      "workerReferences": [
+        "src/modules/booking-lifecycle/application/intake-retention.ts",
+        "src/modules/identity-access/account/identity-retention.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20260928000000_core_platform/migration.sql",
+        "prisma/migrations/20261008004000_booking_event_envelope/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "core audit/idempotency/reporting",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "metadata"
+      ]
+    },
+    {
+      "name": "BillingDepositApplication",
+      "database_owner": "postgres",
+      "bytes": 24576,
+      "estimated_rows": 7,
+      "prismaModel": "BillingDepositApplication",
+      "runtimeReferences": [
+        "src/modules/payments-billing/infrastructure/billing.persistence.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261008007000_billing_deposit_application/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "payments-billing",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BillingInvoice",
+      "database_owner": "postgres",
+      "bytes": 32768,
+      "estimated_rows": 0,
+      "prismaModel": "BillingInvoice",
+      "runtimeReferences": [
+        "src/modules/payments-billing/infrastructure/billing-operations.repository.ts",
+        "src/modules/payments-billing/infrastructure/billing.persistence.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261008006000_payments_billing_ledger/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "payments-billing",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": [
+        "snapshot"
+      ]
+    },
+    {
+      "name": "BillingLedgerEntry",
+      "database_owner": "postgres",
+      "bytes": 163840,
+      "estimated_rows": 20,
+      "prismaModel": "BillingLedgerEntry",
+      "runtimeReferences": [
+        "src/modules/payments-billing/application/commercial-conversion.guard.ts",
+        "src/modules/payments-billing/application/payments-billing.providers.ts",
+        "src/modules/payments-billing/http/payments-billing.http-services.ts",
+        "src/modules/payments-billing/infrastructure/billing.persistence.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261008006000_payments_billing_ledger/migration.sql",
+        "prisma/migrations/20261008007000_billing_deposit_application/migration.sql",
+        "prisma/migrations/20261009001000_billing_operations_reporting/migration.sql",
+        "prisma/migrations/20261009040000_invitation_reporting_snapshots/migration.sql",
+        "prisma/migrations/20261011010000_commercial_contracts/migration.sql",
+        "prisma/migrations/20261011020000_commercial_appendices/migration.sql",
+        "prisma/migrations/20261011021000_appendix_ledger_guards/migration.sql",
+        "prisma/migrations/20261011023000_contract_print_fulfillment/migration.sql",
+        "prisma/migrations/20261011024000_print_template_provenance/migration.sql",
+        "prisma/migrations/20261011025000_final_commercial_invoices/migration.sql",
+        "prisma/migrations/20261011027000_invoice_balance_pins/migration.sql"
+      ],
+      "incomingForeignKeys": 4,
+      "outgoingForeignKeys": 3,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "payments-billing",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BillingLedgerHead",
+      "database_owner": "postgres",
+      "bytes": 24576,
+      "estimated_rows": 7,
+      "prismaModel": "BillingLedgerHead",
+      "runtimeReferences": [],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261008006000_payments_billing_ledger/migration.sql",
+        "prisma/migrations/20261011021000_appendix_ledger_guards/migration.sql",
+        "prisma/migrations/20261011025000_final_commercial_invoices/migration.sql",
+        "prisma/migrations/20261011027000_invoice_balance_pins/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "payments-billing",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BillingOperationCommand",
+      "database_owner": "postgres",
+      "bytes": 32768,
+      "estimated_rows": 4,
+      "prismaModel": "BillingOperationCommand",
+      "runtimeReferences": [
+        "src/modules/payments-billing/http/payments-billing.http-services.ts",
+        "src/modules/payments-billing/infrastructure/billing-operations.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009001000_billing_operations_reporting/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "payments-billing",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": [
+        "result"
+      ]
+    },
+    {
+      "name": "BillingOutboxEvent",
+      "database_owner": "postgres",
+      "bytes": 81920,
+      "estimated_rows": 14,
+      "prismaModel": "BillingOutboxEvent",
+      "runtimeReferences": [
+        "src/modules/notifications-automation/infrastructure/event-consumer.ts",
+        "src/modules/payments-billing/application/final-invoice.service.ts",
+        "src/modules/payments-billing/infrastructure/billing.persistence.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261008006000_payments_billing_ledger/migration.sql",
+        "prisma/migrations/20261011022000_commercial_billing_outbox/migration.sql",
+        "prisma/migrations/20261011025000_final_commercial_invoices/migration.sql",
+        "prisma/migrations/20261011029000_invoice_outbox_identity/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "payments-billing",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": [
+        "payload"
+      ]
+    },
+    {
+      "name": "BillingPaymentAttempt",
+      "database_owner": "postgres",
+      "bytes": 98304,
+      "estimated_rows": 11,
+      "prismaModel": "BillingPaymentAttempt",
+      "runtimeReferences": [
+        "src/modules/payments-billing/application/commercial-conversion.guard.ts",
+        "src/modules/payments-billing/application/commercial-financial.service.ts",
+        "src/modules/payments-billing/infrastructure/billing-operations.repository.ts",
+        "src/modules/payments-billing/infrastructure/billing.persistence.ts",
+        "src/modules/payments-billing/infrastructure/vnpay.persistence.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261008006000_payments_billing_ledger/migration.sql",
+        "prisma/migrations/20261008007000_billing_deposit_application/migration.sql",
+        "prisma/migrations/20261008008000_vnpay_provider_evidence/migration.sql",
+        "prisma/migrations/20261009001000_billing_operations_reporting/migration.sql",
+        "prisma/migrations/20261011010000_commercial_contracts/migration.sql",
+        "prisma/migrations/20261011020000_commercial_appendices/migration.sql",
+        "prisma/migrations/20261011021000_appendix_ledger_guards/migration.sql",
+        "prisma/migrations/20261011025000_final_commercial_invoices/migration.sql",
+        "prisma/migrations/20261011027000_invoice_balance_pins/migration.sql"
+      ],
+      "incomingForeignKeys": 4,
+      "outgoingForeignKeys": 3,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "payments-billing",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BillingProviderEvidence",
+      "database_owner": "postgres",
+      "bytes": 49152,
+      "estimated_rows": 11,
+      "prismaModel": "BillingProviderEvidence",
+      "runtimeReferences": [
+        "src/modules/payments-billing/infrastructure/vnpay.persistence.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261008008000_vnpay_provider_evidence/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "payments-billing",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BillingProviderTransaction",
+      "database_owner": "postgres",
+      "bytes": 32768,
+      "estimated_rows": 10,
+      "prismaModel": "BillingProviderTransaction",
+      "runtimeReferences": [
+        "src/modules/payments-billing/infrastructure/vnpay.persistence.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261008008000_vnpay_provider_evidence/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "payments-billing",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BillingRefundApproval",
+      "database_owner": "postgres",
+      "bytes": 32768,
+      "estimated_rows": 0,
+      "prismaModel": "BillingRefundApproval",
+      "runtimeReferences": [
+        "src/modules/payments-billing/http/payments-billing.http-services.ts",
+        "src/modules/payments-billing/infrastructure/billing-operations.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009001000_billing_operations_reporting/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "payments-billing",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BillingReportingSequence",
+      "database_owner": "postgres",
+      "bytes": 32768,
+      "estimated_rows": 1,
+      "prismaModel": "BillingReportingSequence",
+      "runtimeReferences": [
+        "src/modules/payments-billing/infrastructure/billing-reporting.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009001000_billing_operations_reporting/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "payments-billing",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BillingReportingSnapshot",
+      "database_owner": "postgres",
+      "bytes": 81920,
+      "estimated_rows": 20,
+      "prismaModel": "BillingReportingSnapshot",
+      "runtimeReferences": [
+        "src/modules/payments-billing/infrastructure/billing-reporting.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009001000_billing_operations_reporting/migration.sql",
+        "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "payments-billing",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "value"
+      ]
+    },
+    {
+      "name": "BillingVnpayCheckout",
+      "database_owner": "postgres",
+      "bytes": 32768,
+      "estimated_rows": 10,
+      "prismaModel": "BillingVnpayCheckout",
+      "runtimeReferences": [
+        "src/modules/payments-billing/infrastructure/vnpay.persistence.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261008008000_vnpay_provider_evidence/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "payments-billing",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": [
+        "parameters"
+      ]
+    },
+    {
+      "name": "Booking",
+      "database_owner": "postgres",
+      "bytes": 122880,
+      "estimated_rows": 19,
+      "prismaModel": "Booking",
+      "runtimeReferences": [
+        "src/core/database/booking-unit-of-work.ts",
+        "src/core/idempotency/idempotency.schemas.ts",
+        "src/core/integration-events/booking-event.ts",
+        "src/core/openapi/registry.ts",
+        "src/core/reporting/reporting-feed.ts",
+        "src/modules/analytics-dashboard/application/analytics.service.ts",
+        "src/modules/analytics-dashboard/application/projection.ts",
+        "src/modules/analytics-dashboard/http/analytics.router.ts",
+        "src/modules/analytics-dashboard/infrastructure/analytics.composition.ts",
+        "src/modules/analytics-dashboard/infrastructure/projection.repository.ts",
+        "src/modules/booking-lifecycle/application/automation.ts",
+        "src/modules/booking-lifecycle/application/booking-readers.ts",
+        "src/modules/booking-lifecycle/application/commercial-appendix.service.ts",
+        "src/modules/booking-lifecycle/application/commercial-contract.service.ts",
+        "src/modules/booking-lifecycle/application/consultation-workspace.service.ts",
+        "src/modules/booking-lifecycle/application/consultation.service.ts",
+        "src/modules/booking-lifecycle/application/couple-profile.service.ts",
+        "src/modules/booking-lifecycle/application/deposit.service.ts",
+        "src/modules/booking-lifecycle/application/intake-retention.ts",
+        "src/modules/booking-lifecycle/application/planning-snapshot.reader.ts",
+        "src/modules/booking-lifecycle/application/proposal-catalog.adapter.ts",
+        "src/modules/booking-lifecycle/application/proposal-query.service.ts",
+        "src/modules/booking-lifecycle/application/timeline.service.ts",
+        "src/modules/booking-lifecycle/booking-lifecycle.providers.ts",
+        "src/modules/booking-lifecycle/booking-lifecycle.runtime.ts",
+        "src/modules/booking-lifecycle/domain/booking-policy.ts",
+        "src/modules/booking-lifecycle/domain/deposit.policy.ts",
+        "src/modules/booking-lifecycle/domain/lifecycle.policy.ts",
+        "src/modules/booking-lifecycle/domain/slot-hold.policy.ts",
+        "src/modules/booking-lifecycle/domain/timeline.policy.ts",
+        "src/modules/booking-lifecycle/http/booking-lifecycle.openapi.ts",
+        "src/modules/booking-lifecycle/http/booking-lifecycle.router.ts",
+        "src/modules/booking-lifecycle/http/commercial-appendix.openapi.ts",
+        "src/modules/booking-lifecycle/http/commercial-contract.openapi.ts",
+        "src/modules/booking-lifecycle/http/couple-profile.openapi.ts",
+        "src/modules/booking-lifecycle/http/couple-profile.router.ts",
+        "src/modules/booking-lifecycle/http/experience.router.ts",
+        "src/modules/booking-lifecycle/infrastructure/analytics-reporting.reader.ts",
+        "src/modules/booking-lifecycle/infrastructure/automation.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/booking-readers.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/consultation.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/deposit.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/event-end.reader.ts",
+        "src/modules/booking-lifecycle/infrastructure/guest-planning.providers.ts",
+        "src/modules/booking-lifecycle/infrastructure/lifecycle.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/locked-booking.reader.ts",
+        "src/modules/booking-lifecycle/infrastructure/notification-context.reader.ts",
+        "src/modules/booking-lifecycle/infrastructure/prisma-booking.readers.ts",
+        "src/modules/booking-lifecycle/infrastructure/prisma-planning-snapshot.reader.ts",
+        "src/modules/booking-lifecycle/infrastructure/reporting.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/slot-hold.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/timeline.repository.ts",
+        "src/modules/guest-management/application/guest-links.service.ts",
+        "src/modules/guest-management/application/guest-readers.ts",
+        "src/modules/guest-management/application/guest.contracts.ts",
+        "src/modules/guest-management/application/guest.service.ts",
+        "src/modules/guest-management/http/guest.openapi.ts",
+        "src/modules/guest-management/infrastructure/guest.composition.ts",
+        "src/modules/guest-management/infrastructure/guest.repository.ts",
+        "src/modules/identity-access/authorization/invitation-editor.reader.ts",
+        "src/modules/identity-access/authorization/scoped-identity.reader.ts",
+        "src/modules/invitation-studio/application/automation.contracts.ts",
+        "src/modules/invitation-studio/application/media-access.guard.ts",
+        "src/modules/invitation-studio/application/media.contracts.ts",
+        "src/modules/invitation-studio/application/reporting.contracts.ts",
+        "src/modules/invitation-studio/application/studio.contracts.ts",
+        "src/modules/invitation-studio/http/media.openapi.ts",
+        "src/modules/invitation-studio/http/print-orders.openapi.ts",
+        "src/modules/invitation-studio/http/studio.openapi.ts",
+        "src/modules/invitation-studio/infrastructure/contracted-print.entitlement.reader.ts",
+        "src/modules/invitation-studio/infrastructure/contracted-print.fulfillment.ts",
+        "src/modules/invitation-studio/infrastructure/contracted-print.providers.ts",
+        "src/modules/invitation-studio/infrastructure/derived-assets.service.ts",
+        "src/modules/invitation-studio/infrastructure/design.service.ts",
+        "src/modules/invitation-studio/infrastructure/generation.service.ts",
+        "src/modules/invitation-studio/infrastructure/guest-publication.reader.ts",
+        "src/modules/invitation-studio/infrastructure/media.composition.ts",
+        "src/modules/invitation-studio/infrastructure/print-file.renderer.ts",
+        "src/modules/invitation-studio/infrastructure/print-file.service.ts",
+        "src/modules/invitation-studio/infrastructure/print-order.service.ts",
+        "src/modules/invitation-studio/infrastructure/printable.service.ts",
+        "src/modules/invitation-studio/infrastructure/prisma-automation.reader.ts",
+        "src/modules/invitation-studio/infrastructure/prisma-media.repository.ts",
+        "src/modules/invitation-studio/infrastructure/prisma-reporting.reader.ts",
+        "src/modules/invitation-studio/infrastructure/publication.service.ts",
+        "src/modules/invitation-studio/infrastructure/studio-authorization.ts",
+        "src/modules/invitation-studio/infrastructure/studio.composition.ts",
+        "src/modules/invitation-studio/infrastructure/studio.repository.ts",
+        "src/modules/notifications-automation/application/android-push-dispatcher.ts",
+        "src/modules/notifications-automation/application/notification-dispatcher.ts",
+        "src/modules/notifications-automation/application/notification-scheduler.ts",
+        "src/modules/notifications-automation/application/notification-settings.ts",
+        "src/modules/notifications-automation/domain/event-handler.ts",
+        "src/modules/notifications-automation/domain/notification-policy.ts",
+        "src/modules/notifications-automation/domain/notification-template.ts",
+        "src/modules/notifications-automation/http/notification.openapi.ts",
+        "src/modules/notifications-automation/http/notification.schemas.ts",
+        "src/modules/notifications-automation/infrastructure/event-consumer.ts",
+        "src/modules/notifications-automation/infrastructure/notification-foundation.ts",
+        "src/modules/notifications-automation/notifications.runtime.ts",
+        "src/modules/payments-billing/application/billing-operations.service.ts",
+        "src/modules/payments-billing/application/billing-views.service.ts",
+        "src/modules/payments-billing/application/billing.contracts.ts",
+        "src/modules/payments-billing/application/commercial-conversion.guard.ts",
+        "src/modules/payments-billing/application/commercial-financial.service.ts",
+        "src/modules/payments-billing/application/contract-charge.service.ts",
+        "src/modules/payments-billing/application/deposit-orchestration.service.ts",
+        "src/modules/payments-billing/application/final-invoice.service.ts",
+        "src/modules/payments-billing/application/incidental-expense.service.ts",
+        "src/modules/payments-billing/application/payments-billing.providers.ts",
+        "src/modules/payments-billing/application/vnpay.service.ts",
+        "src/modules/payments-billing/domain/final-invoice.ts",
+        "src/modules/payments-billing/http/final-invoice.openapi.ts",
+        "src/modules/payments-billing/http/payments-billing.http-services.ts",
+        "src/modules/payments-billing/http/payments-billing.openapi.ts",
+        "src/modules/payments-billing/infrastructure/billing-http-idempotency.ts",
+        "src/modules/payments-billing/infrastructure/billing-operations.repository.ts",
+        "src/modules/payments-billing/infrastructure/billing.persistence.ts",
+        "src/modules/payments-billing/infrastructure/invoice-balance.reader.ts",
+        "src/modules/payments-billing/infrastructure/prisma-billing.adapter.ts",
+        "src/modules/payments-billing/infrastructure/prisma-deposit-settlement.reader.ts",
+        "src/modules/payments-billing/infrastructure/vnpay.persistence.ts",
+        "src/modules/payments-billing/payments-billing.providers.ts",
+        "src/modules/seating-plan/application/seating.contracts.ts",
+        "src/modules/seating-plan/application/seating.service.ts",
+        "src/modules/seating-plan/http/seating.openapi.ts",
+        "src/modules/staff-operations/application/attendance-readers.ts",
+        "src/modules/staff-operations/application/check-in.service.ts",
+        "src/modules/staff-operations/application/staff.contracts.ts",
+        "src/modules/staff-operations/application/staff.service.ts",
+        "src/modules/staff-operations/http/staff.openapi.ts",
+        "src/modules/staff-operations/infrastructure/staff.composition.ts",
+        "src/modules/venue-catalog/application/commercial-selection.reader.ts",
+        "src/modules/venue-catalog/application/selection-eligibility.reader.ts",
+        "src/modules/venue-catalog/infrastructure/guest-planning-capacity.reader.ts",
+        "src/modules/venue-catalog/infrastructure/prisma-selection-eligibility.reader.ts",
+        "src/modules/venue-catalog/infrastructure/scoped-layout.reader.ts",
+        "src/server.ts"
+      ],
+      "workerReferences": [
+        "src/modules/analytics-dashboard/application/projection.ts",
+        "src/modules/analytics-dashboard/infrastructure/projection.repository.ts",
+        "src/modules/booking-lifecycle/application/intake-retention.ts",
+        "src/modules/notifications-automation/application/notification-scheduler.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261007000000_booking_lifecycle_foundation/migration.sql",
+        "prisma/migrations/20261007001000_booking_slot_holds/migration.sql",
+        "prisma/migrations/20261007002000_booking_timelines/migration.sql",
+        "prisma/migrations/20261007003000_booking_deposit_intents/migration.sql",
+        "prisma/migrations/20261007004000_booking_post_deposit_lifecycle/migration.sql",
+        "prisma/migrations/20261008000000_invitation_media/migration.sql",
+        "prisma/migrations/20261008001000_booking_reporting/migration.sql",
+        "prisma/migrations/20261008003000_confirmed_booking_slot/migration.sql",
+        "prisma/migrations/20261008006000_payments_billing_ledger/migration.sql",
+        "prisma/migrations/20261008007000_booking_commercial_acceptance/migration.sql",
+        "prisma/migrations/20261009001000_billing_operations_reporting/migration.sql",
+        "prisma/migrations/20261011010000_commercial_contracts/migration.sql",
+        "prisma/migrations/20261011020000_commercial_appendices/migration.sql",
+        "prisma/migrations/20261011025000_final_commercial_invoices/migration.sql",
+        "prisma/migrations/20261011027000_invoice_balance_pins/migration.sql",
+        "prisma/migrations/20261011028000_invoice_document_integrity/migration.sql",
+        "prisma/migrations/20261012010000_guest_management/migration.sql",
+        "prisma/migrations/20261012020000_seating_plan/migration.sql",
+        "prisma/migrations/20261012030000_staff_operations/migration.sql",
+        "prisma/migrations/20261012040000_notification_foundation/migration.sql",
+        "prisma/migrations/20261012043000_notification_automation/migration.sql",
+        "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql",
+        "prisma/migrations/20261013004000_analytics_event_query_index/migration.sql"
+      ],
+      "incomingForeignKeys": 38,
+      "outgoingForeignKeys": 3,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BookingAutomationCommand",
+      "database_owner": "postgres",
+      "bytes": 8192,
+      "estimated_rows": 0,
+      "prismaModel": "BookingAutomationCommand",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/infrastructure/automation.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261008002000_booking_automation_command/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BookingCancellationRequest",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 1,
+      "prismaModel": "BookingCancellationRequest",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/infrastructure/lifecycle.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261007004000_booking_post_deposit_lifecycle/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BookingDepositIntent",
+      "database_owner": "postgres",
+      "bytes": 81920,
+      "estimated_rows": 8,
+      "prismaModel": "BookingDepositIntent",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/application/commercial-contract.service.ts",
+        "src/modules/booking-lifecycle/infrastructure/deposit.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/lifecycle.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/timeline.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261007003000_booking_deposit_intents/migration.sql",
+        "prisma/migrations/20261011010000_commercial_contracts/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 3,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BookingDepositSettlement",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 7,
+      "prismaModel": "BookingDepositSettlement",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/application/commercial-contract.service.ts",
+        "src/modules/booking-lifecycle/infrastructure/automation.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/deposit.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/effective-commercial.reader.ts",
+        "src/modules/payments-billing/infrastructure/prisma-deposit-settlement.reader.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261007003000_booking_deposit_intents/migration.sql",
+        "prisma/migrations/20261008001000_booking_reporting/migration.sql",
+        "prisma/migrations/20261011010000_commercial_contracts/migration.sql",
+        "prisma/migrations/20261011020000_commercial_appendices/migration.sql",
+        "prisma/migrations/20261011021000_appendix_ledger_guards/migration.sql",
+        "prisma/migrations/20261011023000_contract_print_fulfillment/migration.sql",
+        "prisma/migrations/20261011024000_print_template_provenance/migration.sql",
+        "prisma/migrations/20261011025000_final_commercial_invoices/migration.sql",
+        "prisma/migrations/20261011026000_invoice_adjustment_prefix_guard/migration.sql",
+        "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BookingHeadcountEvidence",
+      "database_owner": "postgres",
+      "bytes": 57344,
+      "estimated_rows": 1,
+      "prismaModel": "BookingHeadcountEvidence",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/infrastructure/guest-planning.providers.ts",
+        "src/modules/booking-lifecycle/infrastructure/lifecycle.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261007004000_booking_post_deposit_lifecycle/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BookingInvitationIntent",
+      "database_owner": "postgres",
+      "bytes": 81920,
+      "estimated_rows": 12,
+      "prismaModel": "BookingInvitationIntent",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/infrastructure/consultation.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261007000000_booking_lifecycle_foundation/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BookingOutboxEvent",
+      "database_owner": "postgres",
+      "bytes": 114688,
+      "estimated_rows": 81,
+      "prismaModel": "BookingOutboxEvent",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/application/commercial-appendix.service.ts",
+        "src/modules/booking-lifecycle/application/commercial-contract.service.ts",
+        "src/modules/booking-lifecycle/infrastructure/automation.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/deposit.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/lifecycle.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/slot-hold.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/timeline.repository.ts",
+        "src/modules/notifications-automation/infrastructure/event-consumer.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261007001000_booking_slot_holds/migration.sql",
+        "prisma/migrations/20261008004000_booking_event_envelope/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": [
+        "payload"
+      ]
+    },
+    {
+      "name": "BookingProposalSnapshot",
+      "database_owner": "postgres",
+      "bytes": 98304,
+      "estimated_rows": 19,
+      "prismaModel": "BookingProposalSnapshot",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/infrastructure/automation.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/timeline.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261007000000_booking_lifecycle_foundation/migration.sql",
+        "prisma/migrations/20261008001000_booking_reporting/migration.sql",
+        "prisma/migrations/20261008007000_booking_commercial_acceptance/migration.sql",
+        "prisma/migrations/20261011025000_final_commercial_invoices/migration.sql",
+        "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 3,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BookingReportingSequence",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 1,
+      "prismaModel": "BookingReportingSequence",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/infrastructure/reporting.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261008001000_booking_reporting/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BookingReportingSnapshot",
+      "database_owner": "postgres",
+      "bytes": 122880,
+      "estimated_rows": 108,
+      "prismaModel": "BookingReportingSnapshot",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/infrastructure/reporting.repository.ts",
+        "src/modules/payments-billing/http/payments-billing.http-services.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261008001000_booking_reporting/migration.sql",
+        "prisma/migrations/20261009001000_billing_operations_reporting/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "value"
+      ]
+    },
+    {
+      "name": "BookingSlotHold",
+      "database_owner": "postgres",
+      "bytes": 90112,
+      "estimated_rows": 10,
+      "prismaModel": "BookingSlotHold",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/infrastructure/deposit.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/lifecycle.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/slot-hold.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261007001000_booking_slot_holds/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BookingTimelineDecision",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 16,
+      "prismaModel": "BookingTimelineDecision",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/infrastructure/timeline.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261007002000_booking_timelines/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BookingTimelineItem",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 27,
+      "prismaModel": "BookingTimelineItem",
+      "runtimeReferences": [],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261007002000_booking_timelines/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "BookingTimelineRevision",
+      "database_owner": "postgres",
+      "bytes": 81920,
+      "estimated_rows": 13,
+      "prismaModel": "BookingTimelineRevision",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/infrastructure/booking-readers.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/deposit.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/timeline.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261007002000_booking_timelines/migration.sql",
+        "prisma/migrations/20261007003000_booking_deposit_intents/migration.sql",
+        "prisma/migrations/20261008007000_booking_commercial_acceptance/migration.sql",
+        "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql",
+        "prisma/migrations/20261011010000_commercial_contracts/migration.sql"
+      ],
+      "incomingForeignKeys": 7,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "CatalogMediaAsset",
+      "database_owner": "postgres",
+      "bytes": 81920,
+      "estimated_rows": 3,
+      "prismaModel": "CatalogMediaAsset",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/catalog-media.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261005000000_venue_catalog_core/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "CommercialAppendixApproval",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 4,
+      "prismaModel": "CommercialAppendixApproval",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/application/commercial-appendix.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261011020000_commercial_appendices/migration.sql",
+        "prisma/migrations/20261011021000_appendix_ledger_guards/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "CommercialAppendixHead",
+      "database_owner": "postgres",
+      "bytes": 57344,
+      "estimated_rows": 1,
+      "prismaModel": "CommercialAppendixHead",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/application/commercial-appendix.service.ts",
+        "src/modules/booking-lifecycle/infrastructure/effective-commercial.reader.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261011020000_commercial_appendices/migration.sql",
+        "prisma/migrations/20261011021000_appendix_ledger_guards/migration.sql",
+        "prisma/migrations/20261011023000_contract_print_fulfillment/migration.sql",
+        "prisma/migrations/20261011024000_print_template_provenance/migration.sql",
+        "prisma/migrations/20261011025000_final_commercial_invoices/migration.sql",
+        "prisma/migrations/20261011026000_invoice_adjustment_prefix_guard/migration.sql",
+        "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 5,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "CommercialAppendixRevision",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 2,
+      "prismaModel": "CommercialAppendixRevision",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/application/commercial-appendix.service.ts",
+        "src/modules/booking-lifecycle/infrastructure/effective-commercial.reader.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261011020000_commercial_appendices/migration.sql",
+        "prisma/migrations/20261011021000_appendix_ledger_guards/migration.sql",
+        "prisma/migrations/20261011023000_contract_print_fulfillment/migration.sql",
+        "prisma/migrations/20261011024000_print_template_provenance/migration.sql",
+        "prisma/migrations/20261011025000_final_commercial_invoices/migration.sql",
+        "prisma/migrations/20261011026000_invoice_adjustment_prefix_guard/migration.sql",
+        "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql"
+      ],
+      "incomingForeignKeys": 5,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "document"
+      ]
+    },
+    {
+      "name": "CommercialContract",
+      "database_owner": "postgres",
+      "bytes": 49152,
+      "estimated_rows": 6,
+      "prismaModel": "CommercialContract",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/application/commercial-contract.service.ts",
+        "src/modules/booking-lifecycle/infrastructure/booking-readers.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/contract-financial.reader.ts",
+        "src/modules/booking-lifecycle/infrastructure/deposit.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261011010000_commercial_contracts/migration.sql",
+        "prisma/migrations/20261011023000_contract_print_fulfillment/migration.sql",
+        "prisma/migrations/20261011024000_print_template_provenance/migration.sql",
+        "prisma/migrations/20261011027000_invoice_balance_pins/migration.sql",
+        "prisma/migrations/20261011031000_contracted_print_quote_bounds/migration.sql",
+        "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 3,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "CommercialContractApproval",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 6,
+      "prismaModel": "CommercialContractApproval",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/application/commercial-contract.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261011010000_commercial_contracts/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "CommercialContractLine",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 20,
+      "prismaModel": "CommercialContractLine",
+      "runtimeReferences": [],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261011010000_commercial_contracts/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "CommercialContractPdf",
+      "database_owner": "postgres",
+      "bytes": 147456,
+      "estimated_rows": 3,
+      "prismaModel": "CommercialContractPdf",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/application/commercial-contract.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261011010000_commercial_contracts/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "CommercialContractRevision",
+      "database_owner": "postgres",
+      "bytes": 106496,
+      "estimated_rows": 6,
+      "prismaModel": "CommercialContractRevision",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/application/commercial-contract.service.ts",
+        "src/modules/booking-lifecycle/infrastructure/contract-financial.reader.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261011010000_commercial_contracts/migration.sql",
+        "prisma/migrations/20261011020000_commercial_appendices/migration.sql",
+        "prisma/migrations/20261011023000_contract_print_fulfillment/migration.sql",
+        "prisma/migrations/20261011024000_print_template_provenance/migration.sql",
+        "prisma/migrations/20261011025000_final_commercial_invoices/migration.sql",
+        "prisma/migrations/20261011026000_invoice_adjustment_prefix_guard/migration.sql",
+        "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql"
+      ],
+      "incomingForeignKeys": 10,
+      "outgoingForeignKeys": 3,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "document"
+      ]
+    },
+    {
+      "name": "Consultation",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 27,
+      "prismaModel": "Consultation",
+      "runtimeReferences": [
+        "src/core/openapi/registry.ts",
+        "src/modules/booking-lifecycle/application/booking-identity.adapter.ts",
+        "src/modules/booking-lifecycle/application/commercial-appendix.service.ts",
+        "src/modules/booking-lifecycle/application/commercial-contract.service.ts",
+        "src/modules/booking-lifecycle/application/consultation-workspace.service.ts",
+        "src/modules/booking-lifecycle/application/consultation.service.ts",
+        "src/modules/booking-lifecycle/application/couple-profile.service.ts",
+        "src/modules/booking-lifecycle/application/intake-retention.ts",
+        "src/modules/booking-lifecycle/application/lifecycle.service.ts",
+        "src/modules/booking-lifecycle/application/proposal-catalog.adapter.ts",
+        "src/modules/booking-lifecycle/application/proposal-query.service.ts",
+        "src/modules/booking-lifecycle/booking-lifecycle.runtime.ts",
+        "src/modules/booking-lifecycle/http/booking-lifecycle.openapi.ts",
+        "src/modules/booking-lifecycle/http/commercial-contract.openapi.ts",
+        "src/modules/booking-lifecycle/http/couple-profile.openapi.ts",
+        "src/modules/booking-lifecycle/http/experience.openapi.ts",
+        "src/modules/booking-lifecycle/http/experience.router.ts",
+        "src/modules/booking-lifecycle/infrastructure/automation.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/booking-readers.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/consultation.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/deposit.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/lifecycle.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/notification-context.reader.ts",
+        "src/modules/booking-lifecycle/infrastructure/prisma-booking.readers.ts",
+        "src/modules/booking-lifecycle/infrastructure/slot-hold.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/timeline.repository.ts",
+        "src/modules/identity-access/account/account.repository.ts",
+        "src/modules/identity-access/authorization/couple-access-promotion.ts",
+        "src/modules/identity-access/workspace-invitation/workspace-invitation.repository.ts",
+        "src/modules/notifications-automation/application/notification-settings.ts",
+        "src/modules/notifications-automation/domain/event-handler.ts"
+      ],
+      "workerReferences": [
+        "src/modules/booking-lifecycle/application/intake-retention.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261007000000_booking_lifecycle_foundation/migration.sql",
+        "prisma/migrations/20261008005000_retention_evidence_account_scope/migration.sql",
+        "prisma/migrations/20261008008000_post_booking_experience/migration.sql",
+        "prisma/migrations/20261010010000_couple_profile/migration.sql",
+        "prisma/migrations/20261011010000_commercial_contracts/migration.sql",
+        "prisma/migrations/20261011020000_commercial_appendices/migration.sql"
+      ],
+      "incomingForeignKeys": 3,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "ConsultationAccess",
+      "database_owner": "postgres",
+      "bytes": 90112,
+      "estimated_rows": 15,
+      "prismaModel": "ConsultationAccess",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/application/couple-profile.service.ts",
+        "src/modules/booking-lifecycle/http/experience.router.ts",
+        "src/modules/booking-lifecycle/infrastructure/automation.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/deposit.repository.ts",
+        "src/modules/booking-lifecycle/infrastructure/notification-context.reader.ts",
+        "src/modules/identity-access/account/account.repository.ts",
+        "src/modules/identity-access/account/identity-retention.ts",
+        "src/modules/identity-access/account/retention-eligibility.port.ts",
+        "src/modules/identity-access/authorization/authorization.service.ts",
+        "src/modules/identity-access/authorization/couple-access-promotion.ts",
+        "src/modules/identity-access/authorization/notification-authority.ts",
+        "src/modules/identity-access/authorization/scoped-identity.reader.ts",
+        "src/modules/identity-access/workspace-invitation/workspace-invitation.repository.ts",
+        "src/modules/invitation-studio/infrastructure/prisma-automation.reader.ts",
+        "src/modules/payments-billing/http/payments-billing.http-services.ts",
+        "src/modules/payments-billing/infrastructure/billing-operations.repository.ts"
+      ],
+      "workerReferences": [
+        "src/modules/identity-access/account/identity-retention.ts",
+        "src/modules/identity-access/account/retention-eligibility.port.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261003000000_identity_access_persistence/migration.sql",
+        "prisma/migrations/20261011010000_commercial_contracts/migration.sql",
+        "prisma/migrations/20261011020000_commercial_appendices/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "identity-access",
+      "retention": "Existing approved Identity retention/eligibility workflow only; no blanket per-table TTL.",
+      "jsonColumns": []
+    },
+    {
+      "name": "ConsultationRequest",
+      "database_owner": "postgres",
+      "bytes": 81920,
+      "estimated_rows": 18,
+      "prismaModel": "ConsultationRequest",
+      "runtimeReferences": [
+        "src/modules/booking-lifecycle/application/intake-retention.ts",
+        "src/modules/booking-lifecycle/http/experience.router.ts"
+      ],
+      "workerReferences": [
+        "src/modules/booking-lifecycle/application/intake-retention.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261008008000_post_booking_experience/migration.sql",
+        "prisma/migrations/20261010010000_couple_profile/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "booking-lifecycle",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "Dish",
+      "database_owner": "postgres",
+      "bytes": 73728,
+      "estimated_rows": 5,
+      "prismaModel": "Dish",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/catalog-query.service.ts",
+        "src/modules/venue-catalog/application/menu.service.ts",
+        "src/modules/venue-catalog/domain/catalog-policy.ts",
+        "src/modules/venue-catalog/http/venue-catalog.openapi.ts",
+        "src/modules/venue-catalog/http/venue-catalog.router.ts",
+        "src/modules/venue-catalog/http/venue-catalog.schemas.ts",
+        "src/modules/venue-catalog/infrastructure/catalog-version.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261005000000_venue_catalog_core/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "DishVersion",
+      "database_owner": "postgres",
+      "bytes": 114688,
+      "estimated_rows": 7,
+      "prismaModel": "DishVersion",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/catalog-media.service.ts",
+        "src/modules/venue-catalog/application/catalog-query.service.ts",
+        "src/modules/venue-catalog/application/menu.service.ts",
+        "src/modules/venue-catalog/infrastructure/catalog-version.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261005000000_venue_catalog_core/migration.sql"
+      ],
+      "incomingForeignKeys": 3,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "FinalInvoiceHead",
+      "database_owner": "postgres",
+      "bytes": 40960,
+      "estimated_rows": 1,
+      "prismaModel": "FinalInvoiceHead",
+      "runtimeReferences": [
+        "src/modules/payments-billing/application/commercial-financial.service.ts",
+        "src/modules/payments-billing/application/final-invoice.service.ts",
+        "src/modules/payments-billing/application/incidental-expense.service.ts",
+        "src/modules/payments-billing/infrastructure/invoice-balance.reader.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261011025000_final_commercial_invoices/migration.sql",
+        "prisma/migrations/20261011026000_invoice_adjustment_prefix_guard/migration.sql",
+        "prisma/migrations/20261011027000_invoice_balance_pins/migration.sql",
+        "prisma/migrations/20261011028000_invoice_document_integrity/migration.sql",
+        "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 3,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "payments-billing",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "FinalInvoiceRevision",
+      "database_owner": "postgres",
+      "bytes": 98304,
+      "estimated_rows": 1,
+      "prismaModel": "FinalInvoiceRevision",
+      "runtimeReferences": [
+        "src/modules/payments-billing/application/final-invoice.service.ts",
+        "src/modules/payments-billing/infrastructure/billing.persistence.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261011025000_final_commercial_invoices/migration.sql",
+        "prisma/migrations/20261011026000_invoice_adjustment_prefix_guard/migration.sql",
+        "prisma/migrations/20261011027000_invoice_balance_pins/migration.sql",
+        "prisma/migrations/20261011028000_invoice_document_integrity/migration.sql",
+        "prisma/migrations/20261011029000_invoice_outbox_identity/migration.sql",
+        "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql"
+      ],
+      "incomingForeignKeys": 5,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "payments-billing",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "document"
+      ]
+    },
+    {
+      "name": "Guest",
+      "database_owner": "postgres",
+      "bytes": 98304,
+      "estimated_rows": 21,
+      "prismaModel": "Guest",
+      "runtimeReferences": [
+        "src/core/openapi/registry.ts",
+        "src/core/reporting/reporting-feed.ts",
+        "src/modules/analytics-dashboard/application/analytics.service.ts",
+        "src/modules/analytics-dashboard/http/analytics.openapi.ts",
+        "src/modules/analytics-dashboard/infrastructure/analytics.composition.ts",
+        "src/modules/guest-management/application/guest-links.service.ts",
+        "src/modules/guest-management/application/guest-readers.ts",
+        "src/modules/guest-management/application/guest.contracts.ts",
+        "src/modules/guest-management/application/guest.service.ts",
+        "src/modules/guest-management/domain/guest-policy.ts",
+        "src/modules/guest-management/guest-management.runtime.ts",
+        "src/modules/guest-management/http/guest.openapi.ts",
+        "src/modules/guest-management/http/guest.router.ts",
+        "src/modules/guest-management/http/guest.schemas.ts",
+        "src/modules/guest-management/infrastructure/analytics-reporting.reader.ts",
+        "src/modules/guest-management/infrastructure/guest.composition.ts",
+        "src/modules/guest-management/infrastructure/guest.repository.ts",
+        "src/modules/invitation-studio/infrastructure/guest-publication.reader.ts",
+        "src/modules/notifications-automation/application/notification-dispatcher.ts",
+        "src/modules/notifications-automation/domain/event-handler.ts",
+        "src/modules/notifications-automation/domain/notification-policy.ts",
+        "src/modules/notifications-automation/http/notification.openapi.ts",
+        "src/modules/notifications-automation/http/notification.router.ts",
+        "src/modules/notifications-automation/http/notification.schemas.ts",
+        "src/modules/notifications-automation/infrastructure/event-consumer.ts",
+        "src/modules/notifications-automation/infrastructure/guest-delivery.adapter.ts",
+        "src/modules/notifications-automation/notifications.runtime.ts",
+        "src/modules/seating-plan/application/seating.contracts.ts",
+        "src/modules/seating-plan/application/seating.service.ts",
+        "src/modules/seating-plan/http/seating.openapi.ts",
+        "src/modules/seating-plan/infrastructure/seating.composition.ts",
+        "src/modules/staff-operations/application/attendance-readers.ts",
+        "src/modules/staff-operations/application/check-in.service.ts",
+        "src/modules/staff-operations/application/staff.contracts.ts",
+        "src/modules/staff-operations/application/staff.service.ts",
+        "src/modules/staff-operations/http/staff.openapi.ts",
+        "src/modules/staff-operations/infrastructure/staff.composition.ts",
+        "src/server.ts"
+      ],
+      "workerReferences": [
+        "src/modules/notifications-automation/infrastructure/guest-delivery.adapter.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261012010000_guest_management/migration.sql",
+        "prisma/migrations/20261012030000_staff_operations/migration.sql",
+        "prisma/migrations/20261012040000_notification_foundation/migration.sql",
+        "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql"
+      ],
+      "incomingForeignKeys": 3,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "guest-management",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "GuestCommand",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 26,
+      "prismaModel": "GuestCommand",
+      "runtimeReferences": [
+        "src/modules/guest-management/infrastructure/guest.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012010000_guest_management/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "guest-management",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": [
+        "result"
+      ]
+    },
+    {
+      "name": "GuestExchangeLimit",
+      "database_owner": "postgres",
+      "bytes": 40960,
+      "estimated_rows": 11,
+      "prismaModel": "GuestExchangeLimit",
+      "runtimeReferences": [
+        "src/modules/guest-management/application/guest-links.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012010000_guest_management/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "guest-management",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "GuestGroup",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 31,
+      "prismaModel": "GuestGroup",
+      "runtimeReferences": [
+        "src/modules/guest-management/application/guest-readers.ts",
+        "src/modules/guest-management/application/guest.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012010000_guest_management/migration.sql",
+        "prisma/migrations/20261012020000_seating_plan/migration.sql",
+        "prisma/migrations/20261012030000_staff_operations/migration.sql"
+      ],
+      "incomingForeignKeys": 2,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "guest-management",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "GuestHistory",
+      "database_owner": "postgres",
+      "bytes": 90112,
+      "estimated_rows": 52,
+      "prismaModel": "GuestHistory",
+      "runtimeReferences": [
+        "src/modules/guest-management/infrastructure/guest.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012010000_guest_management/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "guest-management",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "snapshot"
+      ]
+    },
+    {
+      "name": "GuestImportPreview",
+      "database_owner": "postgres",
+      "bytes": 16384,
+      "estimated_rows": 0,
+      "prismaModel": "GuestImportPreview",
+      "runtimeReferences": [
+        "src/modules/guest-management/application/guest.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012010000_guest_management/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "guest-management",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": [
+        "rows"
+      ]
+    },
+    {
+      "name": "GuestInvitationCredential",
+      "database_owner": "postgres",
+      "bytes": 73728,
+      "estimated_rows": 1,
+      "prismaModel": "GuestInvitationCredential",
+      "runtimeReferences": [
+        "src/modules/guest-management/application/guest-links.service.ts",
+        "src/modules/guest-management/application/guest-readers.ts",
+        "src/modules/guest-management/application/guest.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012010000_guest_management/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 3,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "guest-management",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": []
+    },
+    {
+      "name": "GuestInvitationSession",
+      "database_owner": "postgres",
+      "bytes": 24576,
+      "estimated_rows": 1,
+      "prismaModel": "GuestInvitationSession",
+      "runtimeReferences": [
+        "src/modules/guest-management/application/guest-links.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012010000_guest_management/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "guest-management",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": []
+    },
+    {
+      "name": "GuestOutbox",
+      "database_owner": "postgres",
+      "bytes": 122880,
+      "estimated_rows": 33,
+      "prismaModel": "GuestOutbox",
+      "runtimeReferences": [
+        "src/modules/guest-management/application/guest-readers.ts",
+        "src/modules/guest-management/application/guest.service.ts",
+        "src/modules/notifications-automation/infrastructure/event-consumer.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012010000_guest_management/migration.sql",
+        "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "guest-management",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": [
+        "payload"
+      ]
+    },
+    {
+      "name": "GuestPlanRevision",
+      "database_owner": "postgres",
+      "bytes": 73728,
+      "estimated_rows": 8,
+      "prismaModel": "GuestPlanRevision",
+      "runtimeReferences": [
+        "src/modules/guest-management/application/guest-readers.ts",
+        "src/modules/guest-management/application/guest.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012010000_guest_management/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "guest-management",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "GuestWorkspace",
+      "database_owner": "postgres",
+      "bytes": 40960,
+      "estimated_rows": 7,
+      "prismaModel": "GuestWorkspace",
+      "runtimeReferences": [
+        "src/modules/guest-management/application/guest-readers.ts",
+        "src/modules/guest-management/application/guest.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012010000_guest_management/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "guest-management",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "Hall",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 2,
+      "prismaModel": "Hall",
+      "runtimeReferences": [
+        "src/modules/analytics-dashboard/infrastructure/projection.repository.ts",
+        "src/modules/booking-lifecycle/application/commercial-appendix.service.ts",
+        "src/modules/booking-lifecycle/application/commercial-contract.service.ts",
+        "src/modules/booking-lifecycle/application/proposal-catalog.adapter.ts",
+        "src/modules/booking-lifecycle/application/proposal-query.service.ts",
+        "src/modules/booking-lifecycle/domain/booking-policy.ts",
+        "src/modules/booking-lifecycle/http/booking-lifecycle.responses.ts",
+        "src/modules/booking-lifecycle/infrastructure/consultation.repository.ts",
+        "src/modules/venue-catalog/application/catalog-media.service.ts",
+        "src/modules/venue-catalog/application/catalog-query.service.ts",
+        "src/modules/venue-catalog/application/commercial-selection.reader.ts",
+        "src/modules/venue-catalog/application/layout.service.ts",
+        "src/modules/venue-catalog/application/venue.service.ts",
+        "src/modules/venue-catalog/http/venue-catalog.openapi.ts",
+        "src/modules/venue-catalog/http/venue-catalog.router.ts",
+        "src/modules/venue-catalog/infrastructure/guest-planning-capacity.reader.ts",
+        "src/modules/venue-catalog/infrastructure/prisma-selection-eligibility.reader.ts"
+      ],
+      "workerReferences": [
+        "src/modules/analytics-dashboard/infrastructure/projection.repository.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261005000000_venue_catalog_core/migration.sql",
+        "prisma/migrations/20261007000000_booking_lifecycle_foundation/migration.sql",
+        "prisma/migrations/20261007001000_booking_slot_holds/migration.sql",
+        "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql"
+      ],
+      "incomingForeignKeys": 3,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "IdempotencyRecord",
+      "database_owner": "postgres",
+      "bytes": 573440,
+      "estimated_rows": 300,
+      "prismaModel": "IdempotencyRecord",
+      "runtimeReferences": [
+        "src/core/idempotency/idempotency.repository.ts",
+        "src/core/idempotency/idempotency.service.ts",
+        "src/core/idempotency/response-codec.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20260928000000_core_platform/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "core audit/idempotency/reporting",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": [
+        "responseBody"
+      ]
+    },
+    {
+      "name": "IdentityOutbox",
+      "database_owner": "postgres",
+      "bytes": 49152,
+      "estimated_rows": 4,
+      "prismaModel": "IdentityOutbox",
+      "runtimeReferences": [
+        "src/modules/identity-access/authorization/couple-access-promotion.ts",
+        "src/modules/notifications-automation/infrastructure/event-consumer.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012042000_notification_producer_facts/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "identity-access",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": [
+        "payload"
+      ]
+    },
+    {
+      "name": "IdentityStaffCommand",
+      "database_owner": "postgres",
+      "bytes": 16384,
+      "estimated_rows": 0,
+      "prismaModel": "IdentityStaffCommand",
+      "runtimeReferences": [
+        "src/modules/identity-access/account/staff-provisioner.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012030000_staff_operations/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "identity-access",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": [
+        "result"
+      ]
+    },
+    {
+      "name": "IncidentalExpenseDraft",
+      "database_owner": "postgres",
+      "bytes": 24576,
+      "estimated_rows": 1,
+      "prismaModel": "IncidentalExpenseDraft",
+      "runtimeReferences": [
+        "src/modules/payments-billing/application/incidental-expense.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261011025000_final_commercial_invoices/migration.sql",
+        "prisma/migrations/20261011026000_invoice_adjustment_prefix_guard/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "payments-billing",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "IncidentalExpenseLine",
+      "database_owner": "postgres",
+      "bytes": 49152,
+      "estimated_rows": 1,
+      "prismaModel": "IncidentalExpenseLine",
+      "runtimeReferences": [
+        "src/modules/payments-billing/application/incidental-expense.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261011025000_final_commercial_invoices/migration.sql",
+        "prisma/migrations/20261011026000_invoice_adjustment_prefix_guard/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "payments-billing",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "InvitationCommercialRevision",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 2,
+      "prismaModel": "InvitationCommercialRevision",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/print-order.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009030000_invitation_print_order_and_billing/migration.sql",
+        "prisma/migrations/20261009040000_invitation_reporting_snapshots/migration.sql",
+        "prisma/migrations/20261011031000_contracted_print_quote_bounds/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "linesJson"
+      ]
+    },
+    {
+      "name": "InvitationDerivedAsset",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 3,
+      "prismaModel": "InvitationDerivedAsset",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/http/studio.openapi.ts",
+        "src/modules/invitation-studio/infrastructure/derived-assets.service.ts",
+        "src/modules/invitation-studio/infrastructure/design.service.ts",
+        "src/modules/invitation-studio/infrastructure/print-file.service.ts",
+        "src/modules/invitation-studio/infrastructure/publication.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": [
+        "object"
+      ]
+    },
+    {
+      "name": "InvitationDerivedUploadAttempt",
+      "database_owner": "postgres",
+      "bytes": 49152,
+      "estimated_rows": 3,
+      "prismaModel": "InvitationDerivedUploadAttempt",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/derived-assets.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": [
+        "object"
+      ]
+    },
+    {
+      "name": "InvitationDesign",
+      "database_owner": "postgres",
+      "bytes": 57344,
+      "estimated_rows": 6,
+      "prismaModel": "InvitationDesign",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/contracted-print.fulfillment.ts",
+        "src/modules/invitation-studio/infrastructure/design.service.ts",
+        "src/modules/invitation-studio/infrastructure/print-order.service.ts",
+        "src/modules/invitation-studio/infrastructure/printable.service.ts",
+        "src/modules/invitation-studio/infrastructure/publication.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql",
+        "prisma/migrations/20261011023000_contract_print_fulfillment/migration.sql",
+        "prisma/migrations/20261011024000_print_template_provenance/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "InvitationDesignRevision",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 10,
+      "prismaModel": "InvitationDesignRevision",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/contracted-print.fulfillment.ts",
+        "src/modules/invitation-studio/infrastructure/design.service.ts",
+        "src/modules/invitation-studio/infrastructure/printable.service.ts",
+        "src/modules/invitation-studio/infrastructure/publication.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql",
+        "prisma/migrations/20261011023000_contract_print_fulfillment/migration.sql",
+        "prisma/migrations/20261011024000_print_template_provenance/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "content"
+      ]
+    },
+    {
+      "name": "InvitationGenerationIntent",
+      "database_owner": "postgres",
+      "bytes": 32768,
+      "estimated_rows": 4,
+      "prismaModel": "InvitationGenerationIntent",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/generation.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": []
+    },
+    {
+      "name": "InvitationMediaAsset",
+      "database_owner": "postgres",
+      "bytes": 73728,
+      "estimated_rows": 6,
+      "prismaModel": "InvitationMediaAsset",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/derived-assets.service.ts",
+        "src/modules/invitation-studio/infrastructure/generation.service.ts",
+        "src/modules/invitation-studio/infrastructure/prisma-media.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261008000000_invitation_media/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "InvitationMediaAudit",
+      "database_owner": "postgres",
+      "bytes": 40960,
+      "estimated_rows": 11,
+      "prismaModel": "InvitationMediaAudit",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/prisma-media.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261008000000_invitation_media/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "InvitationMediaCommand",
+      "database_owner": "postgres",
+      "bytes": 24576,
+      "estimated_rows": 11,
+      "prismaModel": "InvitationMediaCommand",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/prisma-media.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009000000_invitation_media_command_recovery/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": []
+    },
+    {
+      "name": "InvitationMediaFile",
+      "database_owner": "postgres",
+      "bytes": 98304,
+      "estimated_rows": 7,
+      "prismaModel": "InvitationMediaFile",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/prisma-media.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261008000000_invitation_media/migration.sql",
+        "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "InvitationMediaPolicy",
+      "database_owner": "postgres",
+      "bytes": 24576,
+      "estimated_rows": 2,
+      "prismaModel": "InvitationMediaPolicy",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/generation.service.ts",
+        "src/modules/invitation-studio/infrastructure/prisma-automation.reader.ts",
+        "src/modules/invitation-studio/infrastructure/prisma-media.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261008000000_invitation_media/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "InvitationMediaReceipt",
+      "database_owner": "postgres",
+      "bytes": 32768,
+      "estimated_rows": 8,
+      "prismaModel": "InvitationMediaReceipt",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/prisma-media.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261008000000_invitation_media/migration.sql",
+        "prisma/migrations/20261009000000_invitation_media_command_recovery/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "result"
+      ]
+    },
+    {
+      "name": "InvitationMediaUploadAttempt",
+      "database_owner": "postgres",
+      "bytes": 106496,
+      "estimated_rows": 14,
+      "prismaModel": "InvitationMediaUploadAttempt",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/generation.service.ts",
+        "src/modules/invitation-studio/infrastructure/prisma-media.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261008000000_invitation_media/migration.sql",
+        "prisma/migrations/20261009000000_invitation_media_command_recovery/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": []
+    },
+    {
+      "name": "InvitationPrintAudit",
+      "database_owner": "postgres",
+      "bytes": 81920,
+      "estimated_rows": 10,
+      "prismaModel": "InvitationPrintAudit",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/print-order.service.ts",
+        "src/modules/invitation-studio/infrastructure/prisma-reporting.reader.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009030000_invitation_print_order_and_billing/migration.sql",
+        "prisma/migrations/20261009040000_invitation_reporting_snapshots/migration.sql",
+        "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "metadata",
+        "reportingSnapshot"
+      ]
+    },
+    {
+      "name": "InvitationPrintLine",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 3,
+      "prismaModel": "InvitationPrintLine",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/contracted-print.entitlement.reader.ts",
+        "src/modules/invitation-studio/infrastructure/contracted-print.fulfillment.ts",
+        "src/modules/invitation-studio/infrastructure/print-order.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009030000_invitation_print_order_and_billing/migration.sql",
+        "prisma/migrations/20261011023000_contract_print_fulfillment/migration.sql",
+        "prisma/migrations/20261011024000_print_template_provenance/migration.sql",
+        "prisma/migrations/20261011030000_preserve_allocated_print_sources/migration.sql",
+        "prisma/migrations/20261011031000_contracted_print_quote_bounds/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": [
+        "commercialSource"
+      ]
+    },
+    {
+      "name": "InvitationPrintOrder",
+      "database_owner": "postgres",
+      "bytes": 49152,
+      "estimated_rows": 3,
+      "prismaModel": "InvitationPrintOrder",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/contracted-print.entitlement.reader.ts",
+        "src/modules/invitation-studio/infrastructure/contracted-print.fulfillment.ts",
+        "src/modules/invitation-studio/infrastructure/print-order.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009030000_invitation_print_order_and_billing/migration.sql",
+        "prisma/migrations/20261009040000_invitation_reporting_snapshots/migration.sql",
+        "prisma/migrations/20261011023000_contract_print_fulfillment/migration.sql",
+        "prisma/migrations/20261011024000_print_template_provenance/migration.sql",
+        "prisma/migrations/20261011030000_preserve_allocated_print_sources/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "InvitationPrintableRevision",
+      "database_owner": "postgres",
+      "bytes": 49152,
+      "estimated_rows": 2,
+      "prismaModel": "InvitationPrintableRevision",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/print-file.service.ts",
+        "src/modules/invitation-studio/infrastructure/printable.service.ts",
+        "src/modules/invitation-studio/infrastructure/publication.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "content"
+      ]
+    },
+    {
+      "name": "InvitationPublicIdentity",
+      "database_owner": "postgres",
+      "bytes": 81920,
+      "estimated_rows": 3,
+      "prismaModel": "InvitationPublicIdentity",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/derived-assets.service.ts",
+        "src/modules/invitation-studio/infrastructure/guest-publication.reader.ts",
+        "src/modules/invitation-studio/infrastructure/printable.service.ts",
+        "src/modules/invitation-studio/infrastructure/publication.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql",
+        "prisma/migrations/20261012010000_guest_management/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "InvitationPublishedRevision",
+      "database_owner": "postgres",
+      "bytes": 49152,
+      "estimated_rows": 3,
+      "prismaModel": "InvitationPublishedRevision",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/derived-assets.service.ts",
+        "src/modules/invitation-studio/infrastructure/guest-publication.reader.ts",
+        "src/modules/invitation-studio/infrastructure/publication.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "content"
+      ]
+    },
+    {
+      "name": "InvitationReportingSequence",
+      "database_owner": "postgres",
+      "bytes": 32768,
+      "estimated_rows": 1,
+      "prismaModel": "InvitationReportingSequence",
+      "runtimeReferences": [],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009040000_invitation_reporting_snapshots/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "InvitationSeatingInvalidation",
+      "database_owner": "postgres",
+      "bytes": 32768,
+      "estimated_rows": 0,
+      "prismaModel": "InvitationSeatingInvalidation",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/printable.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql",
+        "prisma/migrations/20261012020000_seating_plan/migration.sql",
+        "prisma/migrations/20261012045000_seating_headcount_invalidation/migration.sql",
+        "prisma/migrations/20261013003000_reporting_scope_and_planning_invalidation/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "InvitationSeatingRevision",
+      "database_owner": "postgres",
+      "bytes": 49152,
+      "estimated_rows": 1,
+      "prismaModel": "InvitationSeatingRevision",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/printable.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "renderSnapshot",
+        "validityProof"
+      ]
+    },
+    {
+      "name": "InvitationSeatingState",
+      "database_owner": "postgres",
+      "bytes": 32768,
+      "estimated_rows": 1,
+      "prismaModel": "InvitationSeatingState",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/printable.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "InvitationStudioCommand",
+      "database_owner": "postgres",
+      "bytes": 24576,
+      "estimated_rows": 37,
+      "prismaModel": "InvitationStudioCommand",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/studio.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": []
+    },
+    {
+      "name": "InvitationStudioOutbox",
+      "database_owner": "postgres",
+      "bytes": 49152,
+      "estimated_rows": 8,
+      "prismaModel": "InvitationStudioOutbox",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/studio.repository.ts",
+        "src/modules/notifications-automation/infrastructure/event-consumer.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql",
+        "prisma/migrations/20261009040000_invitation_reporting_snapshots/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": [
+        "envelope"
+      ]
+    },
+    {
+      "name": "InvitationStudioReceipt",
+      "database_owner": "postgres",
+      "bytes": 81920,
+      "estimated_rows": 34,
+      "prismaModel": "InvitationStudioReceipt",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/studio.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "result"
+      ]
+    },
+    {
+      "name": "InvitationTemplate",
+      "database_owner": "postgres",
+      "bytes": 40960,
+      "estimated_rows": 5,
+      "prismaModel": "InvitationTemplate",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/http/studio.openapi.ts",
+        "src/modules/invitation-studio/infrastructure/design.service.ts",
+        "src/modules/invitation-studio/infrastructure/template-selection.reader.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "InvitationTemplateVersion",
+      "database_owner": "postgres",
+      "bytes": 49152,
+      "estimated_rows": 6,
+      "prismaModel": "InvitationTemplateVersion",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/infrastructure/design.service.ts",
+        "src/modules/invitation-studio/infrastructure/template-selection.reader.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261009020000_invitation_design_publication_printable/migration.sql",
+        "prisma/migrations/20261010030000_print_commercial_offerings/migration.sql",
+        "prisma/migrations/20261011024000_print_template_provenance/migration.sql"
+      ],
+      "incomingForeignKeys": 2,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "invitation-studio",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": [
+        "content"
+      ]
+    },
+    {
+      "name": "LayoutTableGeometry",
+      "database_owner": "postgres",
+      "bytes": 81920,
+      "estimated_rows": 10,
+      "prismaModel": "LayoutTableGeometry",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/layout.service.ts",
+        "src/modules/venue-catalog/infrastructure/prisma-selection-eligibility.reader.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261005000000_venue_catalog_core/migration.sql",
+        "prisma/migrations/20261012020000_seating_plan/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "LayoutTableIdentity",
+      "database_owner": "postgres",
+      "bytes": 57344,
+      "estimated_rows": 10,
+      "prismaModel": "LayoutTableIdentity",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/layout.service.ts",
+        "src/modules/venue-catalog/infrastructure/catalog-version.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261005000000_venue_catalog_core/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "LayoutTemplate",
+      "database_owner": "postgres",
+      "bytes": 73728,
+      "estimated_rows": 3,
+      "prismaModel": "LayoutTemplate",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/catalog-query.service.ts",
+        "src/modules/venue-catalog/application/layout.service.ts",
+        "src/modules/venue-catalog/application/venue.service.ts",
+        "src/modules/venue-catalog/http/venue-catalog.openapi.ts",
+        "src/modules/venue-catalog/infrastructure/catalog-version.repository.ts",
+        "src/modules/venue-catalog/infrastructure/prisma-selection-eligibility.reader.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261005000000_venue_catalog_core/migration.sql"
+      ],
+      "incomingForeignKeys": 2,
+      "outgoingForeignKeys": 3,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "LayoutTemplateVersion",
+      "database_owner": "postgres",
+      "bytes": 114688,
+      "estimated_rows": 3,
+      "prismaModel": "LayoutTemplateVersion",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/catalog-media.service.ts",
+        "src/modules/venue-catalog/application/catalog-query.service.ts",
+        "src/modules/venue-catalog/application/layout.service.ts",
+        "src/modules/venue-catalog/application/venue.service.ts",
+        "src/modules/venue-catalog/infrastructure/catalog-version.repository.ts",
+        "src/modules/venue-catalog/infrastructure/prisma-selection-eligibility.reader.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261005000000_venue_catalog_core/migration.sql",
+        "prisma/migrations/20261012020000_seating_plan/migration.sql"
+      ],
+      "incomingForeignKeys": 4,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "MenuPackage",
+      "database_owner": "postgres",
+      "bytes": 73728,
+      "estimated_rows": 2,
+      "prismaModel": "MenuPackage",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/catalog-query.service.ts",
+        "src/modules/venue-catalog/application/menu.service.ts",
+        "src/modules/venue-catalog/http/venue-catalog.openapi.ts",
+        "src/modules/venue-catalog/infrastructure/catalog-version.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261005000000_venue_catalog_core/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "MenuPackageItem",
+      "database_owner": "postgres",
+      "bytes": 57344,
+      "estimated_rows": 5,
+      "prismaModel": "MenuPackageItem",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/menu.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261005000000_venue_catalog_core/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "MenuPackageVersion",
+      "database_owner": "postgres",
+      "bytes": 114688,
+      "estimated_rows": 2,
+      "prismaModel": "MenuPackageVersion",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/catalog-media.service.ts",
+        "src/modules/venue-catalog/application/catalog-query.service.ts",
+        "src/modules/venue-catalog/application/menu.service.ts",
+        "src/modules/venue-catalog/infrastructure/catalog-version.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261005000000_venue_catalog_core/migration.sql",
+        "prisma/migrations/20261007000000_booking_lifecycle_foundation/migration.sql"
+      ],
+      "incomingForeignKeys": 4,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "NotificationAttempt",
+      "database_owner": "postgres",
+      "bytes": 180224,
+      "estimated_rows": 300,
+      "prismaModel": "NotificationAttempt",
+      "runtimeReferences": [
+        "src/modules/notifications-automation/application/notification-dispatcher.ts",
+        "src/modules/notifications-automation/infrastructure/notification-foundation.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012040000_notification_foundation/migration.sql",
+        "prisma/migrations/20261012041000_notification_credentials/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "notifications-automation",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": []
+    },
+    {
+      "name": "NotificationCommand",
+      "database_owner": "postgres",
+      "bytes": 32768,
+      "estimated_rows": 7,
+      "prismaModel": "NotificationCommand",
+      "runtimeReferences": [
+        "src/modules/notifications-automation/application/notification-settings.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012040000_notification_foundation/migration.sql",
+        "prisma/migrations/20261012044000_notification_api_guards/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "notifications-automation",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": [
+        "result"
+      ]
+    },
+    {
+      "name": "NotificationCredential",
+      "database_owner": "postgres",
+      "bytes": 49152,
+      "estimated_rows": 1,
+      "prismaModel": "NotificationCredential",
+      "runtimeReferences": [
+        "src/modules/notifications-automation/application/notification-dispatcher.ts",
+        "src/modules/notifications-automation/application/notification-settings.ts",
+        "src/modules/notifications-automation/infrastructure/guest-delivery.adapter.ts",
+        "src/modules/notifications-automation/infrastructure/notification-foundation.ts",
+        "src/modules/notifications-automation/infrastructure/notification-retention.ts"
+      ],
+      "workerReferences": [
+        "src/modules/notifications-automation/infrastructure/guest-delivery.adapter.ts",
+        "src/modules/notifications-automation/infrastructure/notification-retention.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261012041000_notification_credentials/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "notifications-automation",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": []
+    },
+    {
+      "name": "NotificationDueCommand",
+      "database_owner": "postgres",
+      "bytes": 32768,
+      "estimated_rows": 0,
+      "prismaModel": "NotificationDueCommand",
+      "runtimeReferences": [
+        "src/modules/notifications-automation/application/notification-scheduler.ts"
+      ],
+      "workerReferences": [
+        "src/modules/notifications-automation/application/notification-scheduler.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261012043000_notification_automation/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "notifications-automation",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": []
+    },
+    {
+      "name": "NotificationEventReceipt",
+      "database_owner": "postgres",
+      "bytes": 73728,
+      "estimated_rows": 81,
+      "prismaModel": "NotificationEventReceipt",
+      "runtimeReferences": [
+        "src/modules/notifications-automation/infrastructure/event-consumer.ts",
+        "src/modules/notifications-automation/infrastructure/notification-foundation.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012040000_notification_foundation/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "notifications-automation",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "intentIds"
+      ]
+    },
+    {
+      "name": "NotificationInbox",
+      "database_owner": "postgres",
+      "bytes": 57344,
+      "estimated_rows": 6,
+      "prismaModel": "NotificationInbox",
+      "runtimeReferences": [
+        "src/modules/notifications-automation/application/notification-dispatcher.ts",
+        "src/modules/notifications-automation/application/notification-settings.ts",
+        "src/modules/notifications-automation/infrastructure/notification-retention.ts"
+      ],
+      "workerReferences": [
+        "src/modules/notifications-automation/infrastructure/notification-retention.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261012040000_notification_foundation/migration.sql",
+        "prisma/migrations/20261012044000_notification_api_guards/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "notifications-automation",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "NotificationInstallation",
+      "database_owner": "postgres",
+      "bytes": 81920,
+      "estimated_rows": 1,
+      "prismaModel": "NotificationInstallation",
+      "runtimeReferences": [
+        "src/modules/notifications-automation/application/android-push-dispatcher.ts",
+        "src/modules/notifications-automation/application/notification-settings.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012040000_notification_foundation/migration.sql",
+        "prisma/migrations/20261012044000_notification_api_guards/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "notifications-automation",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "NotificationIntent",
+      "database_owner": "postgres",
+      "bytes": 270336,
+      "estimated_rows": 153,
+      "prismaModel": "NotificationIntent",
+      "runtimeReferences": [
+        "src/modules/notifications-automation/application/android-push-dispatcher.ts",
+        "src/modules/notifications-automation/application/notification-dispatcher.ts",
+        "src/modules/notifications-automation/application/notification-settings.ts",
+        "src/modules/notifications-automation/application/notification-worker.ts",
+        "src/modules/notifications-automation/infrastructure/notification-foundation.ts",
+        "src/modules/notifications-automation/infrastructure/notification-retention.ts"
+      ],
+      "workerReferences": [
+        "src/modules/notifications-automation/application/notification-worker.ts",
+        "src/modules/notifications-automation/infrastructure/notification-retention.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261012040000_notification_foundation/migration.sql",
+        "prisma/migrations/20261012041000_notification_credentials/migration.sql",
+        "prisma/migrations/20261012043000_notification_automation/migration.sql",
+        "prisma/migrations/20261013010000_notification_fcm_delivery/migration.sql"
+      ],
+      "incomingForeignKeys": 4,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "notifications-automation",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": [
+        "data"
+      ]
+    },
+    {
+      "name": "NotificationPreference",
+      "database_owner": "postgres",
+      "bytes": 24576,
+      "estimated_rows": 2,
+      "prismaModel": "NotificationPreference",
+      "runtimeReferences": [
+        "src/modules/notifications-automation/application/android-push-dispatcher.ts",
+        "src/modules/notifications-automation/application/notification-dispatcher.ts",
+        "src/modules/notifications-automation/application/notification-settings.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012040000_notification_foundation/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "notifications-automation",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "NotificationPushDelivery",
+      "database_owner": "postgres",
+      "bytes": 16384,
+      "estimated_rows": 0,
+      "prismaModel": "NotificationPushDelivery",
+      "runtimeReferences": [
+        "src/modules/notifications-automation/application/android-push-dispatcher.ts",
+        "src/modules/notifications-automation/application/notification-settings.ts",
+        "src/modules/notifications-automation/infrastructure/notification-foundation.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261013010000_notification_fcm_delivery/migration.sql",
+        "prisma/migrations/20261013020000_notification_fcm_retry_after/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "notifications-automation",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "NotificationRecipient",
+      "database_owner": "postgres",
+      "bytes": 81920,
+      "estimated_rows": 11,
+      "prismaModel": "NotificationRecipient",
+      "runtimeReferences": [
+        "src/modules/notifications-automation/application/android-push-dispatcher.ts",
+        "src/modules/notifications-automation/application/notification-dispatcher.ts",
+        "src/modules/notifications-automation/application/notification-scheduler.ts",
+        "src/modules/notifications-automation/application/notification-settings.ts",
+        "src/modules/notifications-automation/infrastructure/event-consumer.ts",
+        "src/modules/notifications-automation/infrastructure/guest-delivery.adapter.ts",
+        "src/modules/notifications-automation/infrastructure/notification-foundation.ts",
+        "src/modules/notifications-automation/infrastructure/notification-retention.ts"
+      ],
+      "workerReferences": [
+        "src/modules/notifications-automation/application/notification-scheduler.ts",
+        "src/modules/notifications-automation/infrastructure/guest-delivery.adapter.ts",
+        "src/modules/notifications-automation/infrastructure/notification-retention.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261012040000_notification_foundation/migration.sql",
+        "prisma/migrations/20261012041000_notification_credentials/migration.sql",
+        "prisma/migrations/20261012042000_notification_producer_facts/migration.sql",
+        "prisma/migrations/20261012044000_notification_api_guards/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "notifications-automation",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "NotificationScheduleScan",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 3,
+      "prismaModel": "NotificationScheduleScan",
+      "runtimeReferences": [
+        "src/modules/notifications-automation/application/notification-scheduler.ts"
+      ],
+      "workerReferences": [
+        "src/modules/notifications-automation/application/notification-scheduler.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261012043000_notification_automation/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "notifications-automation",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "PasswordCredential",
+      "database_owner": "postgres",
+      "bytes": 32768,
+      "estimated_rows": 16,
+      "prismaModel": "PasswordCredential",
+      "runtimeReferences": [
+        "src/modules/identity-access/account/account.repository.ts",
+        "src/modules/identity-access/account/identity-retention.ts",
+        "src/modules/identity-access/account/staff-provisioner.ts",
+        "src/modules/identity-access/password-otp/password-otp.service.ts",
+        "src/modules/identity-access/password-reset/password-reset.repository.ts",
+        "src/modules/identity-access/workspace-invitation/workspace-invitation.repository.ts"
+      ],
+      "workerReferences": [
+        "src/modules/identity-access/account/identity-retention.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261003000000_identity_access_persistence/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "identity-access",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": []
+    },
+    {
+      "name": "PasswordOtpChallenge",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 9,
+      "prismaModel": "PasswordOtpChallenge",
+      "runtimeReferences": [
+        "src/modules/identity-access/account/identity-retention.ts",
+        "src/modules/identity-access/password-otp/password-otp.service.ts"
+      ],
+      "workerReferences": [
+        "src/modules/identity-access/account/identity-retention.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261008230000_password_email_otp/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "identity-access",
+      "retention": "Existing approved Identity retention/eligibility workflow only; no blanket per-table TTL.",
+      "jsonColumns": []
+    },
+    {
+      "name": "PasswordResetCredential",
+      "database_owner": "postgres",
+      "bytes": 40960,
+      "estimated_rows": 0,
+      "prismaModel": "PasswordResetCredential",
+      "runtimeReferences": [
+        "src/modules/identity-access/account/identity-retention.ts",
+        "src/modules/identity-access/password-otp/password-otp.service.ts",
+        "src/modules/identity-access/password-reset/password-reset.repository.ts"
+      ],
+      "workerReferences": [
+        "src/modules/identity-access/account/identity-retention.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261003000000_identity_access_persistence/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "identity-access",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": []
+    },
+    {
+      "name": "PrintOffering",
+      "database_owner": "postgres",
+      "bytes": 24576,
+      "estimated_rows": 54,
+      "prismaModel": "PrintOffering",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/print-offering.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261010030000_print_commercial_offerings/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "PrintOfferingRevision",
+      "database_owner": "postgres",
+      "bytes": 90112,
+      "estimated_rows": 104,
+      "prismaModel": "PrintOfferingRevision",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/print-offering.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261010030000_print_commercial_offerings/migration.sql",
+        "prisma/migrations/20261011023000_contract_print_fulfillment/migration.sql",
+        "prisma/migrations/20261011024000_print_template_provenance/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "RefreshCredential",
+      "database_owner": "postgres",
+      "bytes": 450560,
+      "estimated_rows": 660,
+      "prismaModel": "RefreshCredential",
+      "runtimeReferences": [
+        "src/modules/identity-access/account/identity-retention.ts",
+        "src/modules/identity-access/account/staff-provisioner.ts",
+        "src/modules/identity-access/password-otp/password-otp.service.ts",
+        "src/modules/identity-access/password-reset/password-reset.repository.ts",
+        "src/modules/identity-access/session/session.repository.ts"
+      ],
+      "workerReferences": [
+        "src/modules/identity-access/account/identity-retention.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261003000000_identity_access_persistence/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "identity-access",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": []
+    },
+    {
+      "name": "ReportingFact",
+      "database_owner": "postgres",
+      "bytes": 122880,
+      "estimated_rows": 118,
+      "prismaModel": "ReportingFact",
+      "runtimeReferences": [
+        "src/core/reporting/reporting-feed.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql",
+        "prisma/migrations/20261013005000_analytics_private_reporting/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "core audit/idempotency/reporting",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "value"
+      ]
+    },
+    {
+      "name": "ReportingSequence",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 6,
+      "prismaModel": "ReportingSequence",
+      "runtimeReferences": [
+        "src/core/reporting/reporting-feed.ts",
+        "src/modules/analytics-dashboard/infrastructure/analytics.composition.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql",
+        "prisma/migrations/20261013005000_analytics_private_reporting/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "core audit/idempotency/reporting",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "RestaurantProfile",
+      "database_owner": "postgres",
+      "bytes": 49152,
+      "estimated_rows": 1,
+      "prismaModel": "RestaurantProfile",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/catalog-media.service.ts",
+        "src/modules/venue-catalog/application/print-offering.service.ts",
+        "src/modules/venue-catalog/application/restaurant-service.service.ts",
+        "src/modules/venue-catalog/application/venue.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261005000000_venue_catalog_core/migration.sql",
+        "prisma/migrations/20261010020000_restaurant_services/migration.sql",
+        "prisma/migrations/20261010030000_print_commercial_offerings/migration.sql"
+      ],
+      "incomingForeignKeys": 2,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "RestaurantService",
+      "database_owner": "postgres",
+      "bytes": 24576,
+      "estimated_rows": 6,
+      "prismaModel": "RestaurantService",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/restaurant-service.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261010020000_restaurant_services/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "RestaurantServiceRevision",
+      "database_owner": "postgres",
+      "bytes": 49152,
+      "estimated_rows": 6,
+      "prismaModel": "RestaurantServiceRevision",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/restaurant-service.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261010020000_restaurant_services/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": []
+    },
+    {
+      "name": "RestaurantShift",
+      "database_owner": "postgres",
+      "bytes": 24576,
+      "estimated_rows": 2,
+      "prismaModel": "RestaurantShift",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/venue.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261005000000_venue_catalog_core/migration.sql",
+        "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "SeatingCommand",
+      "database_owner": "postgres",
+      "bytes": 32768,
+      "estimated_rows": 2,
+      "prismaModel": "SeatingCommand",
+      "runtimeReferences": [
+        "src/modules/seating-plan/application/seating.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012020000_seating_plan/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "seating-plan",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": [
+        "result"
+      ]
+    },
+    {
+      "name": "SeatingOutbox",
+      "database_owner": "postgres",
+      "bytes": 49152,
+      "estimated_rows": 1,
+      "prismaModel": "SeatingOutbox",
+      "runtimeReferences": [
+        "src/modules/seating-plan/application/seating.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012020000_seating_plan/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "seating-plan",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": [
+        "payload"
+      ]
+    },
+    {
+      "name": "SeatingPlan",
+      "database_owner": "postgres",
+      "bytes": 57344,
+      "estimated_rows": 1,
+      "prismaModel": "SeatingPlan",
+      "runtimeReferences": [
+        "src/modules/invitation-studio/invitation-studio.runtime.ts",
+        "src/modules/seating-plan/application/seating.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012020000_seating_plan/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "seating-plan",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "SeatingPlanRevision",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 2,
+      "prismaModel": "SeatingPlanRevision",
+      "runtimeReferences": [
+        "src/modules/seating-plan/application/seating.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012020000_seating_plan/migration.sql"
+      ],
+      "incomingForeignKeys": 3,
+      "outgoingForeignKeys": 5,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "seating-plan",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "snapshot"
+      ]
+    },
+    {
+      "name": "Session",
+      "database_owner": "postgres",
+      "bytes": 204800,
+      "estimated_rows": 272,
+      "prismaModel": "Session",
+      "runtimeReferences": [
+        "src/config/env.ts",
+        "src/config/runtime-manifest.ts",
+        "src/core/openapi/registry.ts",
+        "src/modules/booking-lifecycle/booking-lifecycle.runtime.ts",
+        "src/modules/guest-management/application/guest-links.service.ts",
+        "src/modules/identity-access/account/identity-locks.ts",
+        "src/modules/identity-access/account/identity-retention.ts",
+        "src/modules/identity-access/account/settings.router.ts",
+        "src/modules/identity-access/account/staff-provisioner.contracts.ts",
+        "src/modules/identity-access/account/staff-provisioner.ts",
+        "src/modules/identity-access/authorization/access-credential.reader.ts",
+        "src/modules/identity-access/authorization/authenticated-actor.middleware.ts",
+        "src/modules/identity-access/authorization/invitation-editor.reader.ts",
+        "src/modules/identity-access/authorization/notification-authority.ts",
+        "src/modules/identity-access/authorization/notification-recipient.reader.ts",
+        "src/modules/identity-access/authorization/scoped-identity.reader.ts",
+        "src/modules/identity-access/identity.router.ts",
+        "src/modules/identity-access/identity.runtime.ts",
+        "src/modules/identity-access/password-otp/password-otp.service.ts",
+        "src/modules/identity-access/password-reset/password-reset.repository.ts",
+        "src/modules/identity-access/password-reset/password-reset.service.ts",
+        "src/modules/identity-access/session/session.repository.ts",
+        "src/modules/identity-access/session/session.service.ts",
+        "src/modules/identity-access/workspace-invitation/workspace-invitation.acceptance.ts",
+        "src/modules/identity-access/workspace-invitation/workspace-invitation.repository.ts",
+        "src/modules/invitation-studio/application/media-access.guard.ts",
+        "src/modules/invitation-studio/infrastructure/print-file.service.ts",
+        "src/modules/notifications-automation/application/notification-settings.ts",
+        "src/modules/notifications-automation/http/notification.openapi.ts",
+        "src/modules/payments-billing/payments-billing.runtime.ts",
+        "src/modules/seating-plan/application/seating.contracts.ts",
+        "src/modules/venue-catalog/venue-catalog.runtime.ts"
+      ],
+      "workerReferences": [
+        "src/modules/identity-access/account/identity-retention.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261003000000_identity_access_persistence/migration.sql",
+        "prisma/migrations/20261012040000_notification_foundation/migration.sql"
+      ],
+      "incomingForeignKeys": 3,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "identity-access",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": []
+    },
+    {
+      "name": "StaffAssignment",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 1,
+      "prismaModel": "StaffAssignment",
+      "runtimeReferences": [
+        "src/modules/staff-operations/application/check-in.service.ts",
+        "src/modules/staff-operations/application/staff.service.ts",
+        "src/modules/staff-operations/infrastructure/staff.composition.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012030000_staff_operations/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "staff-operations",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "StaffAttendanceSnapshot",
+      "database_owner": "postgres",
+      "bytes": 49152,
+      "estimated_rows": 5,
+      "prismaModel": "StaffAttendanceSnapshot",
+      "runtimeReferences": [
+        "src/modules/staff-operations/application/attendance-readers.ts",
+        "src/modules/staff-operations/application/check-in.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012030000_staff_operations/migration.sql",
+        "prisma/migrations/20261013001000_analytics_owner_feeds/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "staff-operations",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "payload"
+      ]
+    },
+    {
+      "name": "StaffCheckInRecord",
+      "database_owner": "postgres",
+      "bytes": 49152,
+      "estimated_rows": 0,
+      "prismaModel": "StaffCheckInRecord",
+      "runtimeReferences": [
+        "src/modules/staff-operations/application/attendance-readers.ts",
+        "src/modules/staff-operations/application/check-in.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012030000_staff_operations/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 5,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "staff-operations",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "StaffCommand",
+      "database_owner": "postgres",
+      "bytes": 32768,
+      "estimated_rows": 2,
+      "prismaModel": "StaffCommand",
+      "runtimeReferences": [
+        "src/modules/staff-operations/application/staff.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012030000_staff_operations/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "staff-operations",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": [
+        "result"
+      ]
+    },
+    {
+      "name": "StaffConfiguration",
+      "database_owner": "postgres",
+      "bytes": 32768,
+      "estimated_rows": 4,
+      "prismaModel": "StaffConfiguration",
+      "runtimeReferences": [
+        "src/modules/staff-operations/application/attendance-readers.ts",
+        "src/modules/staff-operations/application/check-in.service.ts",
+        "src/modules/staff-operations/application/staff.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012030000_staff_operations/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "staff-operations",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "StaffHistory",
+      "database_owner": "postgres",
+      "bytes": 49152,
+      "estimated_rows": 6,
+      "prismaModel": "StaffHistory",
+      "runtimeReferences": [
+        "src/modules/staff-operations/application/staff.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012030000_staff_operations/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "staff-operations",
+      "retention": "Durable/immutable evidence: retain; no cleanup TTL inferred.",
+      "jsonColumns": [
+        "snapshot"
+      ]
+    },
+    {
+      "name": "StaffOutbox",
+      "database_owner": "postgres",
+      "bytes": 24576,
+      "estimated_rows": 0,
+      "prismaModel": "StaffOutbox",
+      "runtimeReferences": [
+        "src/modules/staff-operations/application/check-in.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261012030000_staff_operations/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "staff-operations",
+      "retention": "Owner retention/idempotency/reconciliation policy only; unresolved UNKNOWN and durable evidence must remain.",
+      "jsonColumns": [
+        "payload"
+      ]
+    },
+    {
+      "name": "TimelineTemplate",
+      "database_owner": "postgres",
+      "bytes": 73728,
+      "estimated_rows": 1,
+      "prismaModel": "TimelineTemplate",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/catalog-query.service.ts",
+        "src/modules/venue-catalog/application/timeline.service.ts",
+        "src/modules/venue-catalog/http/venue-catalog.openapi.ts",
+        "src/modules/venue-catalog/infrastructure/catalog-version.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261005000000_venue_catalog_core/migration.sql"
+      ],
+      "incomingForeignKeys": 1,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "TimelineTemplateItem",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 2,
+      "prismaModel": "TimelineTemplateItem",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/timeline.service.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261005000000_venue_catalog_core/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "TimelineTemplateVersion",
+      "database_owner": "postgres",
+      "bytes": 114688,
+      "estimated_rows": 1,
+      "prismaModel": "TimelineTemplateVersion",
+      "runtimeReferences": [
+        "src/modules/venue-catalog/application/catalog-media.service.ts",
+        "src/modules/venue-catalog/application/catalog-query.service.ts",
+        "src/modules/venue-catalog/application/timeline.service.ts",
+        "src/modules/venue-catalog/infrastructure/catalog-version.repository.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [
+        "prisma/migrations/20261005000000_venue_catalog_core/migration.sql"
+      ],
+      "incomingForeignKeys": 3,
+      "outgoingForeignKeys": 1,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "venue-catalog",
+      "retention": "Active state/stable identity or referenced history: retain; additional purge policy unconfirmed.",
+      "jsonColumns": []
+    },
+    {
+      "name": "WorkspaceInvitation",
+      "database_owner": "postgres",
+      "bytes": 114688,
+      "estimated_rows": 13,
+      "prismaModel": "WorkspaceInvitation",
+      "runtimeReferences": [
+        "src/modules/identity-access/account/identity-retention.ts",
+        "src/modules/identity-access/workspace-invitation/workspace-invitation.repository.ts"
+      ],
+      "workerReferences": [
+        "src/modules/identity-access/account/identity-retention.ts"
+      ],
+      "migrationReferences": [
+        "prisma/migrations/20261003000000_identity_access_persistence/migration.sql",
+        "prisma/migrations/20261008000000_invitation_delivery_intent/migration.sql"
+      ],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 2,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "identity-access",
+      "retention": "Existing approved Identity retention/eligibility workflow only; no blanket per-table TTL.",
+      "jsonColumns": []
+    },
+    {
+      "name": "_prisma_migrations",
+      "database_owner": "postgres",
+      "bytes": 65536,
+      "estimated_rows": 60,
+      "prismaModel": null,
+      "runtimeReferences": [
+        "src/core/database/database-readiness.ts"
+      ],
+      "workerReferences": [],
+      "migrationReferences": [],
+      "incomingForeignKeys": 0,
+      "outgoingForeignKeys": 0,
+      "proposedAction": "RETAIN",
+      "applicationOwner": "database migrations",
+      "retention": "Applied migration/checksum history: retain permanently.",
+      "jsonColumns": []
+    }
+  ],
+  "rehearsals": [
+    {
+      "schema": "ntf12_rehearsal_7469190783fb4b039f409b2f50843556",
+      "owner": "postgres",
+      "tables": 138,
+      "proposedAction": "RETAIN_PENDING_OWNER_AND_EVIDENCE_REVIEW",
+      "applicationCustodian": "Notifications backend owner and release/provider-evidence custodian; named cleanup owner not confirmed",
+      "trackedEvidenceReferences": [],
+      "crossSchemaForeignKeys": [],
+      "crossSchemaViewDependencies": [],
+      "functionBodyOrSearchPathReferences": [],
+      "externalConsumers": "Not disproved by source scan/activity snapshot.",
+      "backupAndRestore": "No schema-specific backup/restore rehearsal attached; deletion blocked."
+    },
+    {
+      "schema": "ntf12_rehearsal_a96eee86c8e041bc94ceec99c8018d75",
+      "owner": "postgres",
+      "tables": 87,
+      "proposedAction": "RETAIN_PENDING_OWNER_AND_EVIDENCE_REVIEW",
+      "applicationCustodian": "Notifications backend owner and release/provider-evidence custodian; named cleanup owner not confirmed",
+      "trackedEvidenceReferences": [],
+      "crossSchemaForeignKeys": [],
+      "crossSchemaViewDependencies": [],
+      "functionBodyOrSearchPathReferences": [],
+      "externalConsumers": "Not disproved by source scan/activity snapshot.",
+      "backupAndRestore": "No schema-specific backup/restore rehearsal attached; deletion blocked."
+    },
+    {
+      "schema": "ntf_rv16_edd0b9f9cfb4493195b69841b00a900f",
+      "owner": "postgres",
+      "tables": 138,
+      "proposedAction": "RETAIN_PENDING_OWNER_AND_EVIDENCE_REVIEW",
+      "applicationCustodian": "Notifications backend owner and release/provider-evidence custodian; named cleanup owner not confirmed",
+      "trackedEvidenceReferences": [
+        "tasks/evidence/notifications-provider-manifest-2026-10-12.json",
+        "tasks/evidence/notifications-rv16-gmw5-2026-10-12.md"
+      ],
+      "crossSchemaForeignKeys": [],
+      "crossSchemaViewDependencies": [],
+      "functionBodyOrSearchPathReferences": [],
+      "externalConsumers": "Not disproved by source scan/activity snapshot.",
+      "backupAndRestore": "No schema-specific backup/restore rehearsal attached; deletion blocked."
+    }
+  ]
+}
