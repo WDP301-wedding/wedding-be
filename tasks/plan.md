@@ -234,3 +234,16 @@ records the separate diagnostic experiment, unchanged selected business digests
 and migrations, final configuration and restored auto-deploy policy. It supersedes
 the earlier undeployed-candidate status, while keeping unmet latency, live
 cancellation, assigned-Staff, region/container and provider gates explicit.
+
+## Execution checkpoint — connection lifecycle and Analytics follow-up
+
+The owner authorized the follow-up investigation, confirmed fixes, exact-head CI,
+controlled deployment and repeated live verification, and requested an explanation
+of fixture writes. [The 2026-10-17 follow-up](../docs/backend-performance-followup-2026-10-17.md)
+records PRs #50–52, matched 10/60-second idle variants with the same pool cap,
+separate runtime cancellation proof and Analytics cohorts. The fixture remains
+retained in the shared demo database. Session revocation, derived projection
+replacement and disposable local/CI database cleanup have different effects and
+are documented separately. No business cleanup, provider payment/generation or
+unconfirmed region change is part of this work. Earlier measurements and unmet
+acceptance gates remain preserved.
