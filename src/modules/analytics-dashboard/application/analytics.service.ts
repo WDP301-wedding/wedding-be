@@ -44,6 +44,8 @@ const dependencies: Record<AnalyticsReport, ReportingOwner[]> = {
   'print-orders': ['booking', 'invitation'],
 };
 export class AnalyticsService {
+  // Only in-flight work is shared; responses and authority are never cached.
+  private readonly refreshing = new Map<string, Promise<string>>();
   constructor(
     readonly projector: AnalyticsProjector,
     readonly store: ProjectionStore,
@@ -87,7 +89,16 @@ export class AnalyticsService {
       q.cursor === undefined
     ) {
       try {
-        await this.projector.refresh(scope, context);
+        let pending = this.refreshing.get(scope);
+        if (pending === undefined) {
+          pending = this.projector.refresh(scope, context);
+          this.refreshing.set(scope, pending);
+        }
+        try {
+          await pending;
+        } finally {
+          if (this.refreshing.get(scope) === pending) this.refreshing.delete(scope);
+        }
       } catch (error) {
         if (!(error instanceof AppError && error.code === 'ANALYTICS_REFRESH_CONFLICT'))
           throw error;

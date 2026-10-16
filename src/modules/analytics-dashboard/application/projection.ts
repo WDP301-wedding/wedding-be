@@ -55,8 +55,7 @@ export class AnalyticsProjector {
     const rows = new Map(
       (rebuild ? [] : (previous?.rows ?? [])).map((r) => [r.owner + '/' + r.recordId, r]),
     );
-    const checkpoints: Checkpoint[] = [];
-    for (const owner of reportingOwners) {
+    const readOwner = async (owner: ReportingOwner): Promise<Checkpoint> => {
       const checkpoint = previous?.checkpoints.find((c) => c.owner === owner);
       const afterSequence = rebuild ? 0 : (checkpoint?.throughSequence ?? 0);
       const staged = new Map<string, ProjectionRow>();
@@ -101,12 +100,12 @@ export class AnalyticsProjector {
           if (cursor !== undefined) seenCursors.add(cursor);
         } while (cursor !== undefined);
         for (const [key, row] of staged) rows.set(key, row);
-        checkpoints.push({
+        return {
           owner,
           throughSequence: fence,
           refreshedAt: this.now().toISOString(),
           status: 'READY',
-        });
+        };
       } catch (error) {
         if (rebuild)
           throw new AppError({
@@ -115,12 +114,24 @@ export class AnalyticsProjector {
             message: 'The rebuild preserved the current generation because a source failed.',
             cause: error,
           });
-        checkpoints.push({
+        return {
           owner,
           throughSequence: checkpoint?.throughSequence ?? 0,
           refreshedAt: checkpoint?.refreshedAt ?? null,
           status: checkpoint?.refreshedAt ? 'STALE' : 'SOURCE_NOT_READY',
-        });
+        };
+      }
+    };
+    const checkpoints: Checkpoint[] = [];
+    // Each owner keeps sequential cursor/fence validation. Three independent
+    // owners may read at once; this stays bounded even for a large source feed.
+    for (let offset = 0; offset < reportingOwners.length; offset += 3) {
+      const batch = await Promise.allSettled(
+        reportingOwners.slice(offset, offset + 3).map(readOwner),
+      );
+      for (const result of batch) {
+        if (result.status === 'rejected') throw result.reason;
+        checkpoints.push(result.value);
       }
     }
     return this.store.publish(scope, previous?.generationId ?? null, {

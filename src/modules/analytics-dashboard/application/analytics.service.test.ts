@@ -182,6 +182,48 @@ function fixture() {
   return { b, b2, p, store, api, projector, add };
 }
 describe('ANL-W1/W3 deterministic source formulas and bounded queries', () => {
+  it('coalesces concurrent automatic refreshes by actor scope without caching warm responses', async () => {
+    const f = fixture();
+    f.p.checkpoints.forEach((c) => {
+      c.status = 'STALE';
+    });
+    let release!: () => void;
+    const blocked = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const refresh = vi.spyOn(f.projector, 'refresh').mockImplementation(async () => {
+      await blocked;
+      f.p.checkpoints.forEach((c) => {
+        c.status = 'READY';
+      });
+      return f.p.generationId;
+    });
+    const reads = Array.from({ length: 4 }, () => f.api.query('revenue', query, ctx));
+    await vi.waitFor(() => expect(refresh).toHaveBeenCalled());
+    release();
+    const results = await Promise.all(reads);
+    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(results.every((r) => r.meta.generationId === f.p.generationId)).toBe(true);
+    await f.api.query('revenue', query, ctx);
+    expect(refresh).toHaveBeenCalledTimes(1);
+  });
+  it('never coalesces different Manager scopes and clears failed refresh work', async () => {
+    const f = fixture();
+    f.p.checkpoints[0]!.status = 'STALE';
+    const refresh = vi
+      .spyOn(f.projector, 'refresh')
+      .mockRejectedValue(new Error('source unavailable'));
+    await expect(
+      Promise.all([
+        f.api.query('revenue', query, ctx),
+        f.api.query('revenue', query, { ...ctx, actorAccountId: randomUUID() }),
+      ]),
+    ).rejects.toThrow('source unavailable');
+    expect(refresh).toHaveBeenCalledTimes(2);
+    refresh.mockResolvedValue(f.p.generationId);
+    await f.api.query('revenue', query, ctx);
+    expect(refresh).toHaveBeenCalledTimes(3);
+  });
   it('separates cash dates from event dates and takes balances from Billing once', async () => {
     const f = fixture();
     const r = analyticsResultSchemas.revenue.parse(await f.api.query('revenue', query, ctx));

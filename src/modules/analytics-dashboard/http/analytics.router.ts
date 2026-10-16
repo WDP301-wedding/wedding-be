@@ -58,6 +58,10 @@ export function createAnalyticsRouter(
     requestId: req.requestId,
     causationId: req.requestId,
   });
+  const recheck = async (req: Request) => {
+    const actor = await resolver.resolve(req.get('authorization')!.slice(7));
+    requireAnyRole(actor, ['MANAGER']);
+  };
   for (const report of Object.keys(
     analyticsResultSchemas,
   ) as (keyof typeof analyticsResultSchemas)[]) {
@@ -66,11 +70,11 @@ export function createAnalyticsRouter(
       validateRequest({ query: analyticsQuerySchema }),
       async (req, res) => {
         const q = validatedRequest(res, { query: analyticsQuerySchema }).query;
-        res.json({
-          data: analyticsResultSchemas[report].parse(
-            await service.query(report, q, context(req, res)),
-          ),
-        });
+        const data = analyticsResultSchemas[report].parse(
+          await service.query(report, q, context(req, res)),
+        );
+        await recheck(req);
+        res.json({ data });
       },
     );
   }
@@ -81,6 +85,7 @@ export function createAnalyticsRouter(
       const q = validatedRequest(res, { query: analyticsQuerySchema }).query,
         c = context(req, res);
       const result = analyticsResultSchemas.overview.parse(await service.query('overview', q, c));
+      await recheck(req);
       await audit(c, 'analytics.exported', {
         generationId: result.meta.generationId!,
         filters: {

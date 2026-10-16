@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import request from 'supertest';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { createApp } from '../../src/app.js';
 import { createLogger } from '../../src/core/logging/logger.js';
 import { createAnalyticsServices } from '../../src/modules/analytics-dashboard/infrastructure/analytics.composition.js';
@@ -41,6 +41,23 @@ import { bookingAnalyticsSchema } from '../../src/modules/booking-lifecycle/appl
         .auth(token, { type: 'bearer' });
     return { f, s, b, context, app, get, filter, date };
   }
+  it('PERF-10 rechecks the requesting session after waiting for projection refresh', async () => {
+    const { f, s, get } = await fixture();
+    const read = s.sources.booking.readPage.bind(s.sources.booking);
+    const pending = vi.spyOn(s.sources.booking, 'readPage').mockImplementationOnce(async (q, c) => {
+      const rows = await read(q, c);
+      await db.prisma.session.update({
+        where: { id: f.manager.sessionId },
+        data: { status: 'REVOKED' },
+      });
+      return rows;
+    });
+    try {
+      expect((await get('overview')).status).toBe(401);
+    } finally {
+      pending.mockRestore();
+    }
+  });
   it('mounts five strict reports, rechecks roles, minimizes data, and supports no names/NONE', async () => {
     const { f, s, b, context, app, get } = await fixture();
     for (const report of Object.keys(
