@@ -23,7 +23,7 @@ export class StudioAuthorization {
   }
   async manager(context: MediaRequestContext) {
     try {
-      const actor = await this.actor(context);
+      const actor = await this.authority(context);
       if (!actor.roles.includes('MANAGER')) throw new NotFoundError();
     } catch (error) {
       await this.recordTemplateDenial(error, context);
@@ -36,7 +36,7 @@ export class StudioAuthorization {
     context: MediaRequestContext,
   ) {
     try {
-      const actor = await this.actor(context);
+      const actor = await this.authority(context);
       if (!actor.roles.includes('MANAGER')) {
         if (!actor.roles.includes('COUPLE') || bookingId === undefined || includeArchived)
           throw new NotFoundError();
@@ -55,6 +55,15 @@ export class StudioAuthorization {
   async actor(context: MediaRequestContext) {
     if (context.accessToken === undefined) throw new AuthenticationRequiredError();
     const actor = await this.editor.resolve(
+      context.accessToken,
+      context.transactionScopeId === undefined ? undefined : contractContext(context),
+    );
+    if (actor.accountId !== context.actorId) throw new AuthenticationRequiredError();
+    return actor;
+  }
+  private async authority(context: MediaRequestContext) {
+    if (context.accessToken === undefined) throw new AuthenticationRequiredError();
+    const actor = await this.editor.resolveAuthority(
       context.accessToken,
       context.transactionScopeId === undefined ? undefined : contractContext(context),
     );
