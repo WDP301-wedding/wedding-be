@@ -1,0 +1,116 @@
+{
+  "at": "2026-10-16T17:22:44.297Z",
+  "source": "Operator via existing IPv4 pooler for same selected project/database; runtime endpoint is direct IPv6. Not container RTT.",
+  "method": "Six alternating pairs, 12s idle gap, max=1 per pool, operator-only connect timeout 8s, read-only transactions only. Runtime acquisition budget is unchanged.",
+  "samples": [
+    {
+      "round": 0,
+      "idleTimeoutMillis": 10000,
+      "acquireMs": 1654.0177,
+      "totalMs": 2425.8893,
+      "connectionsCreated": 1,
+      "readOnly": true
+    },
+    {
+      "round": 0,
+      "idleTimeoutMillis": 60000,
+      "acquireMs": 2103.6408,
+      "totalMs": 2892.5972,
+      "connectionsCreated": 1,
+      "readOnly": true
+    },
+    {
+      "round": 1,
+      "idleTimeoutMillis": 60000,
+      "acquireMs": 0.6385000000009313,
+      "totalMs": 786.1792000000023,
+      "connectionsCreated": 1,
+      "readOnly": true
+    },
+    {
+      "round": 1,
+      "idleTimeoutMillis": 10000,
+      "acquireMs": 1484.1893000000018,
+      "totalMs": 2224.8727,
+      "connectionsCreated": 2,
+      "readOnly": true
+    },
+    {
+      "round": 2,
+      "idleTimeoutMillis": 10000,
+      "acquireMs": 1520.9796999999962,
+      "totalMs": 2275.7886,
+      "connectionsCreated": 3,
+      "readOnly": true
+    },
+    {
+      "round": 2,
+      "idleTimeoutMillis": 60000,
+      "acquireMs": 0.07590000000345754,
+      "totalMs": 785.2055000000037,
+      "connectionsCreated": 1,
+      "readOnly": true
+    },
+    {
+      "round": 3,
+      "idleTimeoutMillis": 60000,
+      "acquireMs": 0.15869999999995343,
+      "totalMs": 786.7099999999991,
+      "connectionsCreated": 1,
+      "readOnly": true
+    },
+    {
+      "round": 3,
+      "idleTimeoutMillis": 10000,
+      "acquireMs": 1517.8333000000057,
+      "totalMs": 2263.442200000005,
+      "connectionsCreated": 4,
+      "readOnly": true
+    },
+    {
+      "round": 4,
+      "idleTimeoutMillis": 10000,
+      "acquireMs": 1681.3763000000035,
+      "totalMs": 2479.350400000003,
+      "connectionsCreated": 5,
+      "readOnly": true
+    },
+    {
+      "round": 4,
+      "idleTimeoutMillis": 60000,
+      "acquireMs": 0.1489000000001397,
+      "totalMs": 786.1744000000035,
+      "connectionsCreated": 1,
+      "readOnly": true
+    },
+    {
+      "round": 5,
+      "idleTimeoutMillis": 60000,
+      "acquireMs": 0.1414000000077067,
+      "totalMs": 784.8709999999992,
+      "connectionsCreated": 1,
+      "readOnly": true
+    },
+    {
+      "round": 5,
+      "idleTimeoutMillis": 10000,
+      "acquireMs": 1557.0535999999993,
+      "totalMs": 2331.0265999999974,
+      "connectionsCreated": 6,
+      "readOnly": true
+    }
+  ],
+  "finishedAt": "2026-10-16T17:24:05.161Z",
+  "sameProjectReferenceVerified": true,
+  "failedDirectAttempts": [
+    {
+      "file": "pool-lifecycle-operator-attempt1.json",
+      "samples": 0
+    },
+    {
+      "file": "pool-lifecycle-operator-attempt2.json",
+      "samples": 0
+    }
+  ],
+  "runtimePoolBudgetUnchanged": true
+}

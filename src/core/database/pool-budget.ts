@@ -10,6 +10,9 @@ export function parsePoolBudget(source: Readonly<Record<string, string | undefin
   };
   const max = integer('DB_POOL_MAX', 3);
   const connectionTimeoutMillis = integer('DB_POOL_ACQUIRE_TIMEOUT_MS', 2000);
+  const idleTimeoutMillis = integer('DB_POOL_IDLE_TIMEOUT_MS', 10000);
+  if (idleTimeoutMillis < 1000 || idleTimeoutMillis > 60000)
+    throw new Error('Invalid database pool setting: DB_POOL_IDLE_TIMEOUT_MS.');
   const plannedProcesses = integer('DB_PLANNED_PROCESSES', 2);
   const databaseMax = integer('DB_MAX_CONNECTIONS', 60);
   const reserve = integer('DB_CONNECTION_RESERVE', 10);
@@ -20,6 +23,7 @@ export function parsePoolBudget(source: Readonly<Record<string, string | undefin
   return Object.freeze({
     max,
     connectionTimeoutMillis,
+    idleTimeoutMillis,
     plannedProcesses,
     databaseMax,
     reserve,

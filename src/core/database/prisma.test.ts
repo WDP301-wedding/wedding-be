@@ -3,8 +3,11 @@ import { describe, expect, it } from 'vitest';
 import { DatabaseConfigurationError, createPrismaClient } from './prisma.js';
 
 describe('createPrismaClient', () => {
-  it('creates a Prisma 7 client backed by the PostgreSQL driver adapter', async () => {
-    const client = createPrismaClient('postgresql://runtime:secret@localhost:5432/wedding');
+  it.each([false, true])('creates a PostgreSQL adapter with diagnostics=%s', async (enabled) => {
+    const client = createPrismaClient(
+      'postgresql://runtime:secret@localhost:5432/wedding',
+      enabled,
+    );
 
     expect(typeof client.$connect).toBe('function');
     expect(typeof client.$transaction).toBe('function');
