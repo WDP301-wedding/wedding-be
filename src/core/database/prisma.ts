@@ -29,8 +29,8 @@ export function createPrismaClient(
   }
 
   const url = new URL(connectionString);
-  const { max, connectionTimeoutMillis } = parsePoolBudget(process.env);
-  const poolConfig = { max, connectionTimeoutMillis };
+  const { max, connectionTimeoutMillis, idleTimeoutMillis } = parsePoolBudget(process.env);
+  const poolConfig = { max, connectionTimeoutMillis, idleTimeoutMillis };
   const schema = url.searchParams.get('schema')?.trim();
   // Prisma's PostgreSQL adapter serializes and parses timestamps as UTC.
   const startupOptions = url.searchParams.get('options') ?? process.env.PGOPTIONS ?? '';

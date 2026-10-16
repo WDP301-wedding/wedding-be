@@ -26,5 +26,6 @@ COPY --from=build --chown=node:node /app/package.json /app/package-lock.json ./
 COPY --chown=node:node openapi ./openapi
 COPY --chown=node:node certs ./certs
 COPY --chown=node:node assets ./assets
+COPY --chown=node:node scripts/performance-db-probe.mjs ./scripts/performance-db-probe.mjs
 USER node
 CMD ["node", "--enable-source-maps", "--import", "./dist/instrumentation.js", "dist/server.js"]

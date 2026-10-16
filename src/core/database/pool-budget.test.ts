@@ -6,6 +6,7 @@ describe('aggregate runtime pool budget', () => {
     expect(parsePoolBudget({})).toEqual({
       max: 3,
       connectionTimeoutMillis: 2000,
+      idleTimeoutMillis: 10000,
       plannedProcesses: 2,
       databaseMax: 60,
       reserve: 10,
@@ -14,6 +15,20 @@ describe('aggregate runtime pool budget', () => {
     });
     expect(parsePoolBudget({ DB_POOL_MAX: '1', DB_PLANNED_PROCESSES: '4' }).aggregate).toBe(46);
   });
+  it('allows bounded idle reuse without increasing aggregate connections', () => {
+    const idle = parsePoolBudget({ DB_POOL_IDLE_TIMEOUT_MS: '60000' });
+    expect(idle.idleTimeoutMillis).toBe(60000);
+    expect(idle.aggregate).toBe(parsePoolBudget({}).aggregate);
+    expect(parsePoolBudget({ DB_POOL_IDLE_TIMEOUT_MS: '1000' }).idleTimeoutMillis).toBe(1000);
+  });
+  it.each(['0', '999', '60001', '-1', '1.5', '', 'x'])(
+    'rejects an unbounded or thrashing idle lifetime %s',
+    (value) => {
+      expect(() => parsePoolBudget({ DB_POOL_IDLE_TIMEOUT_MS: value })).toThrow(
+        'DB_POOL_IDLE_TIMEOUT_MS',
+      );
+    },
+  );
   it.each(['0', '-1', '1.5', 'x', '', '100001'])('rejects invalid pool limits %s', (max) => {
     expect(() => parsePoolBudget({ DB_POOL_MAX: max })).toThrow('DB_POOL_MAX');
   });
