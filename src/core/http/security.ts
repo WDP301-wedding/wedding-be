@@ -4,6 +4,7 @@ import helmet from 'helmet';
 
 import type { BackendConfig, RuntimeEnvironment } from '../../config/env.js';
 import { CorsOriginDeniedError, RequestTimeoutError } from '../errors/app-error.js';
+import { withRequestDeadline } from './request-deadline.js';
 
 const CORS_ALLOWED_HEADERS = [
   'Authorization',
@@ -56,8 +57,10 @@ export function createRequestDeadline(timeoutMs: number): RequestHandler {
   }
 
   return (_request, response, next) => {
+    const controller = new AbortController();
     const timeout = setTimeout(() => {
       if (!response.writableEnded) {
+        controller.abort();
         next(new RequestTimeoutError());
       }
     }, timeoutMs);
@@ -65,7 +68,13 @@ export function createRequestDeadline(timeoutMs: number): RequestHandler {
 
     const clearDeadline = (): void => clearTimeout(timeout);
     response.once('finish', clearDeadline);
-    response.once('close', clearDeadline);
-    next();
+    response.once('close', () => {
+      clearDeadline();
+      if (!response.writableEnded) controller.abort();
+    });
+    withRequestDeadline(
+      { expiresAt: performance.now() + timeoutMs, signal: controller.signal },
+      next,
+    );
   };
 }
