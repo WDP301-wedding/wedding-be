@@ -15,6 +15,7 @@ import { approvedTimelineSnapshotSchema } from '../application/booking-readers.j
 
 import { createPrismaBookingTimelineSnapshotReader } from './booking-readers.repository.js';
 import { BookingLifecycleNotFoundError } from './consultation.repository.js';
+import { readLockedBooking } from './locked-booking.reader.js';
 
 export function createPrismaBookingReaders(
   prisma: PrismaClient,
@@ -25,14 +26,7 @@ export function createPrismaBookingReaders(
 ): { booking: BookingMediaPrerequisiteReader; timeline: BookingTimelineSnapshotReader } {
   async function readBooking(bookingId: string) {
     bookingId = z.uuid().parse(bookingId).toLowerCase();
-    const tx = boundary.current(bookingId);
-    // A writer changing current phase/effective revision must wait until acceptance
-    // commits, including a legacy writer not yet enlisted on the advisory boundary.
-    if (tx !== undefined)
-      await tx.$queryRaw`SELECT id FROM "Booking" WHERE id=${bookingId}::uuid FOR SHARE`;
-    const row = await (tx ?? prisma).booking.findUnique({ where: { id: bookingId } });
-    if (row === null) throw new NotFoundError();
-    return row;
+    return readLockedBooking(prisma, boundary, bookingId);
   }
   const booking: BookingMediaPrerequisiteReader = {
     async requireBookingAccess(input) {

@@ -23,8 +23,11 @@ interface Scope {
   readonly bookingId: string;
   readonly context: ContractContext;
   readonly tx: Prisma.TransactionClient;
+  readonly lock: 'SHARED' | 'EXCLUSIVE';
   active: boolean;
 }
+
+class WriteScopeRequired extends Error {}
 
 /** Infrastructure-only transaction lookup. Application consumers receive opaque
  * contexts; each owner adapter enlists through this same composition-owned instance. */
@@ -45,6 +48,10 @@ export class PrismaBookingBoundary implements BookingBoundaryUnitOfWork {
     return this.storage.getStore()?.context;
   }
 
+  isReadScope(): boolean {
+    return this.current() !== undefined && this.storage.getStore()!.lock === 'SHARED';
+  }
+
   requireScope(bookingId: string, context: ContractContext): Prisma.TransactionClient {
     const scope = this.storage.getStore();
     if (
@@ -59,6 +66,13 @@ export class PrismaBookingBoundary implements BookingBoundaryUnitOfWork {
     )
       throw new ValidationError();
     return scope.tx;
+  }
+
+  /** Call before a lazy initialization/repair writes anything in a read callback. */
+  requireWriteScope(bookingId: string, context: ContractContext): Prisma.TransactionClient {
+    const tx = this.requireScope(bookingId, context);
+    if (this.storage.getStore()!.lock !== 'EXCLUSIVE') throw new WriteScopeRequired();
+    return tx;
   }
 
   /** Owner infrastructure enlistment for ports whose frozen input lacks bookingId. */
@@ -76,6 +90,23 @@ export class PrismaBookingBoundary implements BookingBoundaryUnitOfWork {
     if (input.context.authority !== 'AUTHENTICATED' || input.context.actorAccountId === null)
       throw new ValidationError();
     return this.runTrusted(input, work, admit);
+  }
+
+  /** Database-only reads may request a repair before any side effect. Release the
+   * shared transaction before rechecking under an exclusive lock; never upgrade. */
+  async runRead<T>(
+    input: Readonly<{ bookingId: string; context: ContractContext }>,
+    work: (scopedContext: ContractContext) => Promise<T>,
+  ): Promise<T> {
+    if (input.context.authority !== 'AUTHENTICATED' || input.context.actorAccountId === null)
+      throw new ValidationError();
+    try {
+      return await this.runTrusted(input, work, undefined, 'SHARED');
+    } catch (error) {
+      if (!(error instanceof WriteScopeRequired) || input.context.transactionScopeId !== undefined)
+        throw error;
+      return this.runTrusted(input, work);
+    }
   }
 
   /** Purpose-specific internal facade; never exposed to HTTP/body authority. */
@@ -100,12 +131,14 @@ export class PrismaBookingBoundary implements BookingBoundaryUnitOfWork {
     input: Readonly<{ bookingId: string; context: ContractContext }>,
     work: (scopedContext: ContractContext) => Promise<T>,
     admit?: (tx: Prisma.TransactionClient) => Promise<void>,
+    lock: 'SHARED' | 'EXCLUSIVE' = 'EXCLUSIVE',
   ): Promise<T> {
     const bookingId = z.uuid().parse(input.bookingId).toLowerCase();
     if (input.context.actorAccountId !== null) z.uuid().parse(input.context.actorAccountId);
     if (!input.context.requestId || !input.context.causationId) throw new ValidationError();
     if (input.context.transactionScopeId !== undefined) {
       const tx = this.requireScope(bookingId, input.context);
+      if (lock === 'EXCLUSIVE') this.requireWriteScope(bookingId, input.context);
       await admit?.(tx);
       return work(input.context);
     }
@@ -114,9 +147,11 @@ export class PrismaBookingBoundary implements BookingBoundaryUnitOfWork {
     return this.prisma.$transaction(
       async (tx) => {
         await admit?.(tx);
-        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${bookingId}::text))`;
+        if (lock === 'SHARED')
+          await tx.$executeRaw`SELECT pg_advisory_xact_lock_shared(hashtext(${bookingId}::text))`;
+        else await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${bookingId}::text))`;
         const context = Object.freeze({ ...input.context, transactionScopeId: randomUUID() });
-        const scope: Scope = { bookingId, context, tx, active: true };
+        const scope: Scope = { bookingId, context, tx, lock, active: true };
         try {
           return await this.storage.run(scope, () => work(context));
         } finally {

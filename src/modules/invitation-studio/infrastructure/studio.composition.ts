@@ -4,7 +4,7 @@ import type { AiImageProvider } from '../../../integrations/ai-image/ai-image-pr
 import { createInvitationEditorReader } from '../../identity-access/authorization/invitation-editor.reader.js';
 import { createPrismaPlanningSnapshotReader } from '../../booking-lifecycle/infrastructure/prisma-planning-snapshot.reader.js';
 import { createPrismaSelectionEligibilityReader } from '../../venue-catalog/infrastructure/prisma-selection-eligibility.reader.js';
-import { createLayoutService } from '../../venue-catalog/application/layout.service.js';
+import { createScopedLayoutReader } from '../../venue-catalog/infrastructure/scoped-layout.reader.js';
 import { createPersistentMediaService } from './media.composition.js';
 import { StudioRepository } from './studio.repository.js';
 import { StudioAuthorization } from './studio-authorization.js';
@@ -50,7 +50,7 @@ export function createInvitationStudioServices(
   );
   const planning = createPrismaPlanningSnapshotReader(media.boundary);
   const venue = createPrismaSelectionEligibilityReader(media.boundary);
-  const layout = createLayoutService(prisma);
+  const layout = createScopedLayoutReader(prisma, media.boundary);
   const printable = new PrintableService(
     repository,
     editor,

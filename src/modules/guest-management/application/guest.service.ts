@@ -83,6 +83,7 @@ export class GuestService {
       context,
       () => this.authorize(bookingId, context),
       async (tx, scope) => work(tx, scope, await this.initialize(tx, bookingId, scope)),
+      'READ',
     );
   }
   command<T>(
@@ -115,6 +116,7 @@ export class GuestService {
   ) {
     const existing = await tx.guestWorkspace.findUnique({ where: { bookingId } });
     if (existing !== null) return existing;
+    this.repository.boundary.requireWriteScope(bookingId, scope);
     const source = await this.owners.planning.getSource(bookingId, scope);
     const planRevisionId = source.sourceGuestPlanRevisionId ?? randomUUID();
     await tx.guestPlanRevision.create({

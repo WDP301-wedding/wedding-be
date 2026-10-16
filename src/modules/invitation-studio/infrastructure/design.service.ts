@@ -175,9 +175,24 @@ export class DesignService {
       orderBy: { id: 'asc' },
       take: query.limit + 1,
     });
-    const items = await Promise.all(
-      rows.slice(0, query.limit).map((row) => this.get(bookingId, row.id, context)),
-    );
+    const heads = rows.slice(0, query.limit);
+    const revisions = await this.repository.prisma.invitationDesignRevision.findMany({
+      where: { bookingId, id: { in: heads.map((row) => row.currentRevisionId) } },
+    });
+    const byId = new Map(revisions.map((row) => [row.id, row]));
+    const items = heads.map((head) => {
+      const row = byId.get(head.currentRevisionId);
+      if (row === undefined || row.designId !== head.id) throw new NotFoundError();
+      return designViewSchema.parse({
+        ...parseStudio(designContentSchema, row.content),
+        designId: head.id,
+        revisionId: row.id,
+        revisionNumber: row.revision,
+        updatedAt: row.createdAt.toISOString(),
+      });
+    });
+    // Recheck current authority once for the complete response, including empty pages.
+    await this.access.booking(bookingId, context);
     return { items, nextCursor: rows.length > query.limit ? rows[query.limit - 1]!.id : null };
   }
   async create(value: unknown, context: MediaRequestContext) {

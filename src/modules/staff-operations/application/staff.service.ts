@@ -67,6 +67,7 @@ export class StaffService {
     context: StaffRequestContext,
     authorize: () => Promise<unknown>,
     work: (tx: Prisma.TransactionClient, scope: ContractContext) => Promise<T>,
+    mode: 'READ' | 'WRITE' = 'WRITE',
   ) {
     return this.repository.run(
       bookingId,
@@ -75,6 +76,7 @@ export class StaffService {
         await authorize();
       },
       work,
+      mode,
     );
   }
   command<T>(
@@ -107,8 +109,9 @@ export class StaffService {
   async configuration(tx: Prisma.TransactionClient, bookingId: string) {
     const existing = await tx.staffConfiguration.findUnique({ where: { bookingId } });
     if (existing) return existing;
-    const created = await tx.staffConfiguration.create({ data: { bookingId } });
     const scope = this.repository.boundary.currentContext(bookingId)!;
+    this.repository.boundary.requireWriteScope(bookingId, scope);
+    const created = await tx.staffConfiguration.create({ data: { bookingId } });
     await this.history(
       tx,
       scope,
@@ -160,6 +163,7 @@ export class StaffService {
       context,
       () => this.ownerAccess(bookingId, context),
       async (tx) => configurationDto(await this.configuration(tx, bookingId)),
+      'READ',
     );
   }
   configure(bookingValue: string, value: unknown, key: string, context: StaffRequestContext) {
@@ -220,6 +224,7 @@ export class StaffService {
             take: 100,
           })
         ).map(assignmentDto),
+      'READ',
     );
   }
   assign(bookingValue: string, value: unknown, key: string, context: StaffRequestContext) {
