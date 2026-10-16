@@ -366,6 +366,8 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
       await lockObserver!.query('SELECT id FROM "Booking" WHERE id=$1::uuid FOR UPDATE', [f.id]);
       responses = Promise.all(commands.map((command) => command()));
       for (let i = 0; i < 100 && waiters < 2; i++) {
+        // The blocker transaction must not reuse its first activity snapshot.
+        await lockObserver!.query('SELECT pg_stat_clear_snapshot()');
         const { rows } = await lockObserver!.query<{ count: string }>(`
           SELECT count(*) FROM pg_stat_activity
           WHERE datname=current_database() AND wait_event_type='Lock'
