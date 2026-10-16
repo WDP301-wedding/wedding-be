@@ -56,6 +56,22 @@ separate from the immutable plan's original revision/headcount.
 
 ## Validation and operational limits
 
+On the same Node 24.21.0/Prisma 7.10.0 and isolated PostgreSQL, three samples per
+case at a controlled 100 ms driver delay gave these medians:
+
+| Case                                       | Original | Updated | Driver SQL commands, original → updated |
+| ------------------------------------------ | -------: | ------: | --------------------------------------- |
+| Four concurrent Guest/current-Seating GETs | 12.004 s | 3.978 s | 27/27/27/50 → 25/25/25/37               |
+| Ten layout options                         | 13.665 s | 3.643 s | 134 → 34                                |
+| Twenty invitation designs                  |  6.538 s | 3.310 s | 331 → 32                                |
+
+This comparison isolates the performance code change. The subsequent aligned
+Prisma 7.10.1 patch removes the vulnerable deepmerge-ts dependency from the CLI
+configuration path. The old exception expired on 2026-10-16 and is removed rather
+than extended. The [upstream patch](https://github.com/prisma/orm/releases/tag/7.10.1)
+and [advisory](https://github.com/advisories/GHSA-ggr8-5vv4-36mx) are the remediation
+sources; the audit policy and its expired-exception tests remain unchanged.
+
 Regression tests cover a pool with one connection, constant query work for a
 1-item versus 20-item invitation page, correct latest revisions and pagination,
 1-layout versus 10-layout eligibility, concurrent first workspace reads,

@@ -4,6 +4,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { PrismaClient } from '../../src/generated/prisma/client.js';
 import { createInvitationStudioServices } from '../../src/modules/invitation-studio/infrastructure/studio.composition.js';
 import { createSeatingServices } from '../../src/modules/seating-plan/infrastructure/seating.composition.js';
+import { createScopedLayoutReader } from '../../src/modules/venue-catalog/infrastructure/scoped-layout.reader.js';
 import {
   CatalogTestDatabase,
   catalogMigrationDatabaseUrl,
@@ -61,6 +62,9 @@ databaseDescribe('Backend read performance with real owner persistence', () => {
           () => f.now,
         );
         const { seating } = createSeatingServices(prisma, studio, () => f.now);
+        const layouts = createScopedLayoutReader(prisma, studio.boundary);
+        expect(await layouts.resolveVersion(f.layoutId)).toMatchObject({ id: f.layoutId });
+        expect(await layouts.listCurrentVersionsForHall(f.hallId)).toHaveLength(1);
 
         // A transaction already occupies the pool's sole connection. A nested read
         // must enlist it, rather than attempting to acquire another connection.
