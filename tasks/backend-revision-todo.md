@@ -416,6 +416,17 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
   pooler cancellation proof. Retain Staff-window, region/container and provider RV
   gates; do not convert these checkboxes to complete from health or CI alone.
 
+- 2026-10-17 owner-authorized [connection lifecycle and fixture-data follow-up](../docs/backend-performance-followup-2026-10-17.md):
+  PRs #50–52 are merged. The 10/60-second idle comparison keeps pool max 3,
+  acquisition timeout 2000 ms, source, fixture and SFO placement matched. Actual
+  runtime-container read-only cancellation is now observed independently of the
+  operator pooler; the global deadline flag remains off. Predeploy probe output
+  was not observed, and the missing shell wrapper was fixed rather than counted
+  as a pass. The retained fixture is reused; sessions are revoked, and Analytics
+  may replace derived projections. No business-history or rehearsal cleanup is
+  authorized. The report records complete measurements, final configuration and
+  remaining acceptance limits; the earlier rollout above remains historical.
+
 ## Verification Record
 
 Current SPEC-11 closure (2026-10-13): **71/71 backend tasks complete** in the
