@@ -32,7 +32,10 @@ describe('CatalogQueryService', () => {
         }),
       },
     };
-    const media = { listSigned: vi.fn(() => Promise.resolve([])) };
+    const media = {
+      listSigned: vi.fn(() => Promise.resolve([])),
+      listSignedBatch: vi.fn(() => Promise.resolve(new Map())),
+    };
     const service = createCatalogQueryService(prisma as never, media);
 
     const page = await service.listPublicDishes({ limit: 20 });
@@ -248,7 +251,10 @@ describe('CatalogQueryService', () => {
         }),
       },
     };
-    const media = { listSigned: vi.fn(() => Promise.resolve([{ url: 'signed' }])) };
+    const media = {
+      listSigned: vi.fn(),
+      listSignedBatch: vi.fn(() => Promise.resolve(new Map([[versionId, [{ url: 'signed' }]]]))),
+    };
     const service = createCatalogQueryService(prisma as never, media as never);
 
     const page = await service.listPublicMenuPackages({ limit: 1, cursor: randomUUID() });
@@ -328,7 +334,7 @@ describe('CatalogQueryService', () => {
           ),
         },
       } as never,
-      { listSigned: vi.fn() },
+      { listSigned: vi.fn(), listSignedBatch: vi.fn(() => Promise.resolve(new Map())) },
     );
     await expect(unsafe.listPublicDishes({ limit: 1 })).rejects.toBeInstanceOf(RangeError);
   });
@@ -350,7 +356,10 @@ describe('CatalogQueryService', () => {
       timelineTemplate: { findUnique: vi.fn(() => Promise.resolve(null)) },
       layoutTemplate: { findUnique: vi.fn(() => Promise.resolve(null)) },
     };
-    const service = createCatalogQueryService(prisma as never, { listSigned: vi.fn() });
+    const service = createCatalogQueryService(prisma as never, {
+      listSigned: vi.fn(),
+      listSignedBatch: vi.fn(() => Promise.resolve(new Map())),
+    });
 
     await expect(service.getDish(randomUUID())).rejects.toBeInstanceOf(NotFoundError);
     await expect(service.getMenuPackage(randomUUID())).rejects.toBeInstanceOf(NotFoundError);

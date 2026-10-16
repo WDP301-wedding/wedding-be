@@ -15,6 +15,10 @@ export function createInvitationEditorReader(
   resolver: AuthenticatedActorResolver,
 ) {
   return {
+    resolveAuthority(accessToken: string, context?: ContractContext) {
+      if (context !== undefined) boundary.enlist(context);
+      return resolver.resolve(accessToken);
+    },
     async resolveContext(context: ContractContext) {
       if (context.actorAccountId === null) throw new AuthenticationRequiredError();
       const tx = boundary.enlist(context);

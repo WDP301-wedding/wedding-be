@@ -7,22 +7,27 @@ import {
   type ProjectionReadFilter,
 } from '../application/projection.js';
 import { reportingOwners } from '../../../core/reporting/reporting-feed.js';
+import { prismaSchema } from '../../../core/database/prisma.js';
 
 export function createProjectionRepository(prisma: PrismaClient): ProjectionStore {
   return {
     async load(scope, bounded = false, filter) {
       return prisma.$transaction(
         async (tx) => {
-          const head = await tx.analyticsHead.findUnique({ where: { scope } });
-          if (!head) return null;
-          const generation = await tx.analyticsGeneration.findUniqueOrThrow({
-            where: { id: head.generationId },
-          });
+          const schema = Prisma.raw('"' + prismaSchema(prisma).replaceAll('"', '""') + '"');
+          const [generation] = await tx.$queryRaw<
+            { id: string; createdAt: Date; checkpoints: Prisma.JsonValue }[]
+          >(Prisma.sql`
+            SELECT g.id, g."createdAt", g.checkpoints FROM ${schema}."AnalyticsHead" h
+            JOIN ${schema}."AnalyticsGeneration" g ON g.id=h."generationId" AND g.scope=h.scope
+            WHERE h.scope=${scope}
+          `);
+          if (!generation) return null;
           const rows =
             bounded && filter
-              ? await readFiltered(tx, head.generationId, filter)
+              ? await readFiltered(tx, generation.id, filter)
               : await tx.analyticsProjection.findMany({
-                  where: { generationId: head.generationId },
+                  where: { generationId: generation.id },
                   ...(bounded ? { take: 60001 } : {}),
                   orderBy: [{ owner: 'asc' }, { recordId: 'asc' }],
                 });

@@ -4,6 +4,7 @@ import request from 'supertest';
 import { describe, expect, it, vi, type Mock } from 'vitest';
 
 import { createApp } from '../../../app.js';
+import { ValidationError } from '../../../core/errors/app-error.js';
 import { CatalogPolicyError } from '../domain/catalog-policy.js';
 import type { CatalogMutationContext } from '../infrastructure/catalog-version.repository.js';
 import {
@@ -176,6 +177,18 @@ function services(): VenueCatalogHttpServices {
       reorder: vi.fn(() => Promise.resolve()),
     } as unknown as VenueCatalogHttpServices['media'],
     queries: {
+      listPublicHalls: vi.fn((input: { limit: number; cursor?: string }) => {
+        if (input.cursor && input.cursor !== hallId)
+          throw new ValidationError([
+            { path: 'cursor', code: 'invalid_value', message: 'The catalog cursor is invalid.' },
+          ]);
+        return Promise.resolve({
+          items: input.cursor
+            ? []
+            : [{ id: hallId, name: 'Lotus', description: 'Main hall', maxGuests: 300, media: [] }],
+          nextCursor: input.limit === 1 ? hallId : null,
+        });
+      }),
       findAggregateIdForVersion: vi.fn(() => Promise.resolve(randomUUID())),
       listPublicDishes: vi.fn(() => Promise.resolve({ items: [], nextCursor: null })),
       listPublicMenuPackages: vi.fn(() => Promise.resolve({ items: [], nextCursor: null })),

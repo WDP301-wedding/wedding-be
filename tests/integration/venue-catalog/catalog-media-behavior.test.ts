@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { NotFoundError } from '../../../src/core/errors/app-error.js';
 import { FakeStorageProvider } from '../../../src/integrations/storage/fake-storage-provider.js';
@@ -59,6 +59,16 @@ describeWithDatabase('VC-09 catalog media behavior', () => {
     });
     expect(first).not.toHaveProperty('objectKey');
     expect(second.displayOrder).toBe(2);
+    const signing = vi.spyOn(storage, 'createSignedReadUrl');
+    try {
+      const batch = await service.listSignedBatch('HALL', [hallId, hallId]);
+      expect(batch.get(hallId)).toEqual([first, second]);
+      await service.listSignedBatch('HALL', [hallId]);
+      expect(signing).toHaveBeenCalledTimes(4);
+      expect(await service.listSignedBatch('HALL', [])).toEqual(new Map());
+    } finally {
+      signing.mockRestore();
+    }
 
     await service.reorder({
       resourceType: 'HALL',

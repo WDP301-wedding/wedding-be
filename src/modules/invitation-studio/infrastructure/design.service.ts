@@ -128,19 +128,21 @@ export class DesignService {
       orderBy: { id: 'asc' },
       take: query.limit + 1,
     });
-    const items = await Promise.all(
-      rows.slice(0, query.limit).map(async (row) => {
-        const version = await this.repository.prisma.invitationTemplateVersion.findUniqueOrThrow({
-          where: { id: row.currentVersionId },
-        });
-        return {
-          templateId: row.id,
-          versionId: version.id,
-          revisionNumber: row.revision,
-          ...parseStudio(designContentSchema, version.content),
-        };
-      }),
-    );
+    const heads = rows.slice(0, query.limit);
+    const versions = await this.repository.prisma.invitationTemplateVersion.findMany({
+      where: { id: { in: heads.map((row) => row.currentVersionId) } },
+    });
+    const byId = new Map(versions.map((version) => [version.id, version]));
+    const items = heads.map((row) => {
+      const version = byId.get(row.currentVersionId);
+      if (version === undefined || version.templateId !== row.id) throw new NotFoundError();
+      return {
+        templateId: row.id,
+        versionId: version.id,
+        revisionNumber: row.revision,
+        ...parseStudio(designContentSchema, version.content),
+      };
+    });
     await this.access.templates(query.bookingId, query.includeArchived, context);
     return { items, nextCursor: rows.length > query.limit ? rows[query.limit - 1]!.id : null };
   }

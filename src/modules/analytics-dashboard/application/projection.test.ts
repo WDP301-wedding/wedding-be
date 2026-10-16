@@ -33,6 +33,27 @@ function fixture() {
   return { store, sources, projector };
 }
 describe('ANL-W2 source fences', () => {
+  it('reads independent owners concurrently with at most three active source pages', async () => {
+    const f = fixture();
+    let active = 0,
+      peak = 0;
+    for (const owner of Object.keys(f.sources) as (keyof typeof f.sources)[]) {
+      f.sources[owner] = {
+        readPage: async () => {
+          active++;
+          peak = Math.max(peak, active);
+          await new Promise((resolve) => setTimeout(resolve, 1));
+          active--;
+          return { throughSequence: 0, nextCursor: null, rows: [] };
+        },
+      };
+    }
+    await f.projector.refresh('s', context);
+    expect(peak).toBe(3);
+    expect((await f.store.load('s'))?.checkpoints.map((c) => c.owner)).toEqual(
+      Object.keys(f.sources),
+    );
+  });
   it('pins all real owners to the same committed head observation without comparing their sequence values', async () => {
     const f = fixture();
     const through = { booking: 3, billing: 0, invitation: 0, guest: 0, staff: 0, venue: 0 };

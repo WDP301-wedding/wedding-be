@@ -13,7 +13,7 @@ const countResult = result(z.strictObject({ count: z.int().nonnegative() }));
 const readAllResult = result(
   z.strictObject({ count: z.int().nonnegative(), throughCreatedAt: z.iso.datetime() }),
 );
-import { beforeAll, afterAll, describe, expect, it } from 'vitest';
+import { beforeAll, afterAll, describe, expect, it, vi } from 'vitest';
 import {
   CatalogTestDatabase,
   catalogMigrationDatabaseUrl,
@@ -31,6 +31,101 @@ import { createPrismaSessionRepository } from '../../src/modules/identity-access
   const db = new CatalogTestDatabase('notification_http');
   beforeAll(() => db.connect(), 60000);
   afterAll(() => db.disconnect());
+  it('PERF-08 conceals populated inbox data after access is revoked during the read', async () => {
+    const f = await studioFixture(db.prisma),
+      guests = createGuestServices(db.prisma, () => f.now);
+    const foundation = new NotificationFoundation(db.prisma, () => f.now);
+    const settings = new NotificationSettings(
+      foundation,
+      guests.identity.resolver,
+      createNotificationBookingReader(db.prisma),
+    );
+    const recipient = await db.prisma.notificationRecipient.create({
+      data: { accountId: f.couple.actorId, purposes: ['CONTRACT'] },
+    });
+    const intent = await foundation.enqueue({
+      eventId: randomUUID(),
+      owner: 'booking-lifecycle',
+      bookingId: f.bookingId,
+      recipientId: recipient.id,
+      channel: 'IN_APP',
+      purpose: 'CONTRACT',
+      templateVersion: 1,
+      scheduledAt: f.now.toISOString(),
+      data: {},
+    });
+    await db.prisma.notificationInbox.create({
+      data: { intentId: intent.id, accountId: f.couple.actorId, bookingId: f.bookingId },
+    });
+    expect((await settings.inbox(f.couple.accessToken, {})).items).toHaveLength(1);
+    expect(await settings.unread(f.couple.accessToken)).toEqual({ count: 1 });
+    const read = db.prisma.notificationInbox.findMany.bind(db.prisma.notificationInbox);
+    const pending = vi
+      .spyOn(db.prisma.notificationInbox, 'findMany')
+      .mockImplementationOnce((args) => {
+        const result = read(args);
+        return result.then(async (rows) => {
+          await db.prisma.consultationAccess.deleteMany({
+            where: { consultationId: f.consultationId, accountId: f.couple.actorId },
+          });
+          return rows;
+        }) as typeof result;
+      });
+    try {
+      await expect(settings.inbox(f.couple.accessToken, {})).rejects.toMatchObject({ status: 404 });
+    } finally {
+      pending.mockRestore();
+    }
+    expect(await settings.unread(f.couple.accessToken)).toEqual({ count: 0 });
+    const app = createApp({
+      runtimeEnvironment: 'test',
+      registerRoutes: (a) => a.use('/api/v1', createNotificationRouter(settings, guests, null)),
+    });
+    for (const route of ['inbox', 'unread-count']) {
+      expect((await request(app).get('/api/v1/notifications/' + route)).status).toBe(401);
+      expect(
+        (
+          await request(app)
+            .get('/api/v1/notifications/' + route)
+            .set('Authorization', 'Basic invalid')
+        ).status,
+      ).toBe(401);
+    }
+  });
+  it('PERF-08 avoids an empty role transaction and rechecks revocation during inbox reads', async () => {
+    const f = await studioFixture(db.prisma),
+      guests = createGuestServices(db.prisma, () => f.now);
+    const settings = new NotificationSettings(
+      new NotificationFoundation(db.prisma, () => f.now),
+      guests.identity.resolver,
+      createNotificationBookingReader(db.prisma),
+    );
+    const transaction = vi.spyOn(db.prisma, '$transaction');
+    try {
+      expect(await settings.unread(f.couple.accessToken)).toEqual({ count: 0 });
+      expect(transaction).not.toHaveBeenCalled();
+    } finally {
+      transaction.mockRestore();
+    }
+    const read = db.prisma.notificationInbox.findMany.bind(db.prisma.notificationInbox);
+    const pending = vi
+      .spyOn(db.prisma.notificationInbox, 'findMany')
+      .mockImplementationOnce((args) => {
+        const result = read(args);
+        return result.then(async (rows) => {
+          await db.prisma.session.update({
+            where: { id: f.couple.sessionId },
+            data: { status: 'REVOKED' },
+          });
+          return rows;
+        }) as typeof result;
+      });
+    try {
+      await expect(settings.inbox(f.couple.accessToken, {})).rejects.toMatchObject({ status: 401 });
+    } finally {
+      pending.mockRestore();
+    }
+  });
   it('isolates settings/devices, revalidates replays and never returns destinations or tokens', async () => {
     const f = await studioFixture(db.prisma),
       guests = createGuestServices(db.prisma, () => f.now);

@@ -209,3 +209,13 @@ The owner confirmed no live initialized fixture is available (“chưa có”); 
 with local synthetic fixtures without manufacturing shared settlement or FULL access.
 PERF-04's [concrete experiment and rollback](../docs/performance-region-experiment.md)
 await a selected test target, valid fixture and deployment authorization.
+
+## Execution checkpoint — PERF-06–10
+
+The owner's 2026-10-16 instruction authorizes these five backend implementation
+slices and provides Railway test accounts for bounded verification. Implementation,
+native-owner correctness and controlled measurements are recorded in
+[PERF-06–10 evidence](../docs/backend-performance-06-10.md). Runtime rollout and
+matched Railway p95 acceptance remain separate; retain canonical open checkboxes
+until the live targets are demonstrated. No provider payment/generation or shared
+data cleanup is authorized by this extension.

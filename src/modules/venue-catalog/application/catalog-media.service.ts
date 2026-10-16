@@ -62,6 +62,10 @@ export interface CatalogMediaService {
     resourceType: CatalogMediaResourceType,
     resourceId: string,
   ): Promise<readonly CatalogMediaView[]>;
+  listSignedBatch(
+    resourceType: CatalogMediaResourceType,
+    resourceIds: readonly string[],
+  ): Promise<ReadonlyMap<string, readonly CatalogMediaView[]>>;
 }
 
 export class CatalogMediaConflictError extends AppError {
@@ -268,6 +272,20 @@ export function createCatalogMediaService(
       });
       return Object.freeze(await Promise.all(assets.map((asset) => signAsset(storage, asset))));
     },
+    async listSignedBatch(resourceTypeInput, resourceIds) {
+      const resourceType = validateResourceType(resourceTypeInput);
+      const ids = [...new Set(resourceIds)];
+      const result = new Map<string, CatalogMediaView[]>(ids.map((id) => [id, []]));
+      if (ids.length === 0) return result;
+      await requireResource(prisma, resourceType, ids);
+      const assets = await prisma.catalogMediaAsset.findMany({
+        where: { resourceType, resourceId: { in: ids }, detachedAt: null },
+        orderBy: [{ resourceId: 'asc' }, { displayOrder: 'asc' }],
+      });
+      const signed = await Promise.all(assets.map((asset) => signAsset(storage, asset)));
+      for (const asset of signed) result.get(asset.resourceId)!.push(asset);
+      return new Map([...result].map(([id, items]) => [id, Object.freeze(items)]));
+    },
   };
   return Object.freeze(service);
 }
@@ -412,30 +430,31 @@ async function signAsset(storage: StorageProvider, asset: MediaRow): Promise<Cat
 async function requireResource(
   prisma: PrismaClient | Transaction,
   resourceType: CatalogMediaResourceType,
-  resourceId: string,
+  resourceId: string | readonly string[],
 ): Promise<void> {
+  const where = { id: typeof resourceId === 'string' ? resourceId : { in: [...resourceId] } };
   let count: number;
   switch (resourceType) {
     case 'RESTAURANT_PROFILE':
-      count = await prisma.restaurantProfile.count({ where: { id: resourceId } });
+      count = await prisma.restaurantProfile.count({ where });
       break;
     case 'HALL':
-      count = await prisma.hall.count({ where: { id: resourceId } });
+      count = await prisma.hall.count({ where });
       break;
     case 'DISH_VERSION':
-      count = await prisma.dishVersion.count({ where: { id: resourceId } });
+      count = await prisma.dishVersion.count({ where });
       break;
     case 'MENU_PACKAGE_VERSION':
-      count = await prisma.menuPackageVersion.count({ where: { id: resourceId } });
+      count = await prisma.menuPackageVersion.count({ where });
       break;
     case 'TIMELINE_TEMPLATE_VERSION':
-      count = await prisma.timelineTemplateVersion.count({ where: { id: resourceId } });
+      count = await prisma.timelineTemplateVersion.count({ where });
       break;
     case 'LAYOUT_TEMPLATE_VERSION':
-      count = await prisma.layoutTemplateVersion.count({ where: { id: resourceId } });
+      count = await prisma.layoutTemplateVersion.count({ where });
       break;
   }
-  if (count !== 1) throw new NotFoundError();
+  if (count !== (typeof resourceId === 'string' ? 1 : resourceId.length)) throw new NotFoundError();
 }
 
 async function deleteOrphan(

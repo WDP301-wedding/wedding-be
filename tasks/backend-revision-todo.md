@@ -394,6 +394,9 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
 - [ ] PERF-08: Reduce notification authority/booking-scope round trips for inbox and unread counts.
 - [ ] PERF-09: Bound catalog SQL pagination and batch media facts; preserve publication and signed-URL rules.
 - [ ] PERF-10: Measure and optimize analytics warm reads versus projection refresh with freshness/cursor/source semantics intact.
+- 2026-10-16 PERF-06–10 implementation: [backend changes, native-owner tests,
+  controlled measurements and remaining live gates](../docs/backend-performance-06-10.md).
+  These checkboxes retain full Railway acceptance, separate from delivered code.
 - [ ] PERF-11: Budget aggregate pools and safe read cancellation; preserve money/provider UNKNOWN and idempotency.
 - [ ] PERF-12: Review table/rehearsal-schema cleanup with ownership, dependency and retention proof; deletion remains separately authorized.
 - [ ] PERF-13: Repeat matched live measurements, verify relevant correctness gates and set supported regression budgets.
