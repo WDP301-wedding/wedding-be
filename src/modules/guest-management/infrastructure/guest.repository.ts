@@ -21,9 +21,10 @@ export class GuestRepository {
     context: GuestRequestContext,
     authorize: () => Promise<void>,
     work: (tx: Prisma.TransactionClient, scope: ContractContext) => Promise<T>,
+    mode: 'READ' | 'WRITE' = 'WRITE',
   ) {
     const bookingId = parse(id, bookingValue);
-    return this.boundary.run(
+    return this.boundary[mode === 'READ' ? 'runRead' : 'run'](
       {
         bookingId,
         context: {

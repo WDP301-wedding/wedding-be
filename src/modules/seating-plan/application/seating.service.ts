@@ -88,6 +88,7 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
     bookingValue: string,
     context: SeatingRequestContext,
     work: (tx: Prisma.TransactionClient, scope: ContractContext) => Promise<T>,
+    mode: 'READ' | 'WRITE' = 'WRITE',
   ) {
     const bookingId = parse(id, bookingValue);
     return this.guest.repository.run(
@@ -95,6 +96,7 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
       context,
       () => this.authorize(bookingId, context),
       work,
+      mode,
     );
   }
   private command<T>(
@@ -129,7 +131,10 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
     const row = await tx.seatingPlanRevision.findUniqueOrThrow({ where: { id: head.revisionId } });
     return { head, row, snapshot: parse(snapshotSchema, row.snapshot) };
   }
-  private view(row: SeatingPlanRevision) {
+  private view(
+    row: SeatingPlanRevision,
+    planning?: { planningHeadcount: number; bookingRevision: number },
+  ) {
     return parse(planViewSchema, {
       ...parse(snapshotSchema, row.snapshot),
       seatingPlanId: row.planId,
@@ -140,8 +145,8 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
       layoutTemplateVersionId: row.layoutTemplateVersionId,
       expectedAttendees: row.planningHeadcount,
       bookingRevision: row.bookingRevision,
-      currentPlanningHeadcount: row.planningHeadcount,
-      currentBookingRevision: row.bookingRevision,
+      currentPlanningHeadcount: planning?.planningHeadcount ?? row.planningHeadcount,
+      currentBookingRevision: planning?.bookingRevision ?? row.bookingRevision,
       warnings: row.status === 'REQUIRES_REVIEW' ? ['SEATING_REQUIRES_REVIEW'] : [],
       snapshotDigest: row.snapshotDigest,
     });
@@ -291,42 +296,61 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
     );
   }
   options(bookingId: string, context: SeatingRequestContext) {
-    return this.run(bookingId, context, async (_tx, scope) => {
-      const event = await this.guest.owners.booking.requireConfirmedEventContext(bookingId),
-        planning = await this.guest.owners.planning.getSource(bookingId, scope);
-      const layouts = await this.layouts.listCurrentVersionsForHall(event.hallId);
-      const items = [];
-      for (const layout of layouts) {
-        const eligibility = await this.venue.getLayoutEligibility(layout.id, scope);
-        if (
-          !eligibility.currentForNewSelection ||
-          !eligibility.templateActive ||
-          !eligibility.hallActive
-        )
-          continue;
-        const warning = capacityProblem(planning.planningHeadcount, { ...layout, ...eligibility });
-        items.push({
-          layoutTemplateVersionId: layout.id,
-          name: layout.name,
-          minGuests: layout.minGuests,
-          maxGuests: layout.maxGuests,
-          totalSeatCapacity: layout.totalSeatCapacity,
-          compatible: warning === null,
-          warning,
-        });
-      }
-      items.sort(
-        (a, b) =>
-          Number(b.compatible) - Number(a.compatible) ||
-          a.totalSeatCapacity - b.totalSeatCapacity ||
-          a.layoutTemplateVersionId.localeCompare(b.layoutTemplateVersionId),
-      );
-      return {
-        planningHeadcount: planning.planningHeadcount,
-        bookingRevision: planning.bookingRevision,
-        items,
-      };
-    });
+    return this.run(
+      bookingId,
+      context,
+      async (_tx, scope) => {
+        const event = await this.guest.owners.booking.requireConfirmedEventContext(bookingId),
+          planning = await this.guest.owners.planning.getSource(bookingId, scope);
+        const layouts = await this.layouts.listCurrentVersionsForHall(event.hallId);
+        const batch = this.venue.getLayoutEligibilities
+          ? new Map(
+              (
+                await this.venue.getLayoutEligibilities(
+                  layouts.map((layout) => layout.id),
+                  scope,
+                )
+              ).map((facts) => [facts.layoutTemplateVersionId, facts]),
+            )
+          : undefined;
+        const items = [];
+        for (const layout of layouts) {
+          const eligibility =
+            batch?.get(layout.id) ?? (await this.venue.getLayoutEligibility(layout.id, scope));
+          if (
+            !eligibility.currentForNewSelection ||
+            !eligibility.templateActive ||
+            !eligibility.hallActive
+          )
+            continue;
+          const warning = capacityProblem(planning.planningHeadcount, {
+            ...layout,
+            ...eligibility,
+          });
+          items.push({
+            layoutTemplateVersionId: layout.id,
+            name: layout.name,
+            minGuests: layout.minGuests,
+            maxGuests: layout.maxGuests,
+            totalSeatCapacity: layout.totalSeatCapacity,
+            compatible: warning === null,
+            warning,
+          });
+        }
+        items.sort(
+          (a, b) =>
+            Number(b.compatible) - Number(a.compatible) ||
+            a.totalSeatCapacity - b.totalSeatCapacity ||
+            a.layoutTemplateVersionId.localeCompare(b.layoutTemplateVersionId),
+        );
+        return {
+          planningHeadcount: planning.planningHeadcount,
+          bookingRevision: planning.bookingRevision,
+          items,
+        };
+      },
+      'READ',
+    );
   }
   select(bookingId: string, value: unknown, key: string, context: SeatingRequestContext) {
     const input = parse(selectInput, value);
@@ -525,7 +549,8 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
       row.status === 'CONFIRMED' &&
       (retired || headcountChanged || invalidException || problem !== null)
     ) {
-      if (readOnly) return { ...this.view(row), status: 'REQUIRES_REVIEW' as const };
+      if (readOnly) return { ...this.view(row, planning), status: 'REQUIRES_REVIEW' as const };
+      this.boundary.requireWriteScope(bookingId, scope);
       await this.invalidateRegistry(
         row,
         scope,
@@ -546,35 +571,41 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
         snapshot,
       );
     }
-    if (!readOnly && planning.bookingRevision > head.observedBookingRevision)
+    if (!readOnly && planning.bookingRevision > head.observedBookingRevision) {
+      this.boundary.requireWriteScope(bookingId, scope);
       await tx.seatingPlan.update({
         where: { bookingId },
         data: { observedBookingRevision: planning.bookingRevision },
       });
-    return this.view(row);
+    }
+    return this.view(row, planning);
   }
   read(bookingId: string, planValue: string, context: SeatingRequestContext) {
     const planId = parse(id, planValue);
-    return this.run(bookingId, context, async (tx, scope) => {
-      await this.current(tx, bookingId, planId);
-      return this.readView(tx, scope, bookingId);
-    });
+    return this.run(
+      bookingId,
+      context,
+      async (tx, scope) => {
+        await this.current(tx, bookingId, planId);
+        return this.readView(tx, scope, bookingId);
+      },
+      'READ',
+    );
   }
   readCurrent(bookingId: string, context: SeatingRequestContext) {
-    return this.run(bookingId, context, async (tx, scope) => {
-      const head = await tx.seatingPlan.findUnique({ where: { bookingId } });
-      if (head === null) return null;
-      return this.readView(tx, scope, bookingId);
-    });
+    return this.run(
+      bookingId,
+      context,
+      async (tx, scope) => {
+        const head = await tx.seatingPlan.findUnique({ where: { bookingId } });
+        if (head === null) return null;
+        return this.readView(tx, scope, bookingId);
+      },
+      'READ',
+    );
   }
   private async readView(tx: Prisma.TransactionClient, scope: ContractContext, bookingId: string) {
-    const value = await this.revalidate(tx, scope, bookingId);
-    const planning = await this.guest.owners.planning.getSource(bookingId, scope);
-    return {
-      ...value,
-      currentPlanningHeadcount: planning.planningHeadcount,
-      currentBookingRevision: planning.bookingRevision,
-    };
+    return this.revalidate(tx, scope, bookingId);
   }
   async bookingForPlan(planValue: string, context: SeatingRequestContext) {
     const actor = await this.guest.identity.resolver.resolve(context.accessToken);

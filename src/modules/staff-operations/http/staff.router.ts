@@ -171,6 +171,7 @@ export function createStaffRouter(s: ReturnType<typeof createStaffServices>) {
         context(req, res),
         () => s.staff.ownerAccess(p.bookingId, context(req, res)),
         () => s.readers.getBookingAttendance(p.bookingId),
+        'READ',
       ),
   );
   get(

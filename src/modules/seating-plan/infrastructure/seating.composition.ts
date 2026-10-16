@@ -1,7 +1,7 @@
 import type { PrismaClient } from '../../../generated/prisma/client.js';
 import type { createInvitationStudioServices } from '../../invitation-studio/infrastructure/studio.composition.js';
 import { createGuestServices } from '../../guest-management/infrastructure/guest.composition.js';
-import { createLayoutService } from '../../venue-catalog/application/layout.service.js';
+import { createScopedLayoutReader } from '../../venue-catalog/infrastructure/scoped-layout.reader.js';
 import { SeatingService } from '../application/seating.service.js';
 import type { SeatingStaffAccess } from '../application/seating.contracts.js';
 export function createSeatingServices(
@@ -13,7 +13,7 @@ export function createSeatingServices(
   const guests = createGuestServices(prisma, now, undefined, studio.boundary);
   const seating = new SeatingService(
     guests,
-    createLayoutService(prisma),
+    createScopedLayoutReader(prisma, studio.boundary),
     studio.venue,
     studio.printable,
     now,
