@@ -372,8 +372,12 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
 - [ ] PERF-05: Reduce Identity/Couple overview read work while preserving current authorization and revocation semantics.
 - 2026-10-16 implementation checkpoint for PERF-02–05:
   [local fixture, instrumentation, Identity comparison and remaining live gates](../docs/backend-performance-02-05.md).
-  The owner confirmed no live fixture is available. Local implementation and
-  controlled measurements do not close the Railway acceptance checkboxes.
+  Initially the owner confirmed no live fixture was available. The owner later
+  supplied test accounts and authorized the
+  [Railway synthetic fixture follow-up](../docs/performance-railway-fixture-2026-10-16.md).
+  Synthetic manual accounting is not provider/real-money acceptance. Assigned-Staff
+  reads require the real event window; local proof and the partial Railway baseline
+  do not close the full PERF acceptance checkboxes.
   [PERF-04 region profiles and rollback](../docs/performance-region-experiment.md)
   are prepared; no deployment or production-region change has been performed.
 - [ ] PERF-06: Batch invitation-template versions; preserve version ownership, cursor and authority rechecks.

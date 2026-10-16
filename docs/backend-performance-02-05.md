@@ -3,14 +3,16 @@
 Date: 2026-10-16 (Asia/Saigon). Implementation checkpoint; exact-head CI receipts
 belong to the accompanying draft PR. Backend scope only. No migration, production
 deployment, production-region switch, AI generation, email delivery or real-money
-payment was performed. Existing provider acceptance and the product NO_GO decision
-are unchanged.
+payment was performed in the initial implementation checkpoint. The subsequently
+authorized Railway synthetic-fixture follow-up is recorded
+[separately](performance-railway-fixture-2026-10-16.md). Existing provider acceptance
+and the product NO_GO decision are unchanged.
 
 ## Acceptance boundaries
 
 | Task    | Delivered locally                                                                                                                                        | Remaining acceptance                                                                                                                                                               |
 | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PERF-02 | Native-owner synthetic fixture, initialized Group/Guest/Seating/settings, assigned Staff, eight-family HTTP measurement and private-config runner        | Owner confirmed no live fixture is available. Initialized FULL booking/Staff evidence and steady-state Railway timings remain pending.                                             |
+| PERF-02 | Native-owner synthetic fixture, initialized Group/Guest/Seating/settings, assigned Staff, eight-family HTTP measurement and private-config runner        | Owner subsequently authorized a Railway synthetic fixture. See the follow-up receipt; successful assigned-Staff reads still require a valid event window.                          |
 | PERF-03 | Opt-in request-correlated driver/acquire/lock-command timing, pool observations, event-loop observation, safe DB probe and pool-context regression tests | Deploy approved instrumentation to a test target; measure container→DB RTT and attribute real slow request families. Pure server execution and lock wait require DB-side evidence. |
 | PERF-04 | Two matching region profiles, controlled experiment and rollback runbook                                                                                 | Provider-confirmed DB region, authorized temporary services and repeated matched US West/APAC receipts. No region winner is claimed.                                               |
 | PERF-05 | Joined/narrow Identity authority reads and narrow/empty-grant Couple overview reads; revocation and concurrency tests                                    | Same-topology authenticated Railway p95 improvement target (initially ≥30%); exact-source broad quality/coverage gates.                                                            |
@@ -27,7 +29,10 @@ harness. Consultation, proposal, slot, timeline/contract approval and synthetic
 manual-accounting commands go through their existing owner APIs; no settled-row
 injection or direct FULL grant is added. Synthetic local accounting proves code
 behavior only, never a real cash receipt or provider settlement. No such fixture
-was created in a shared database.
+was created in a shared database during that initial checkpoint. The later
+owner-authorized Railway fixture uses clearly labeled synthetic manual accounting
+through the existing API, not provider or real-money settlement evidence; see the
+separate follow-up. No direct settled-row or FULL-grant insertion was used.
 
 Guest/settings initialization, explicit opt-in named check-in, Staff assignment,
 compatible Seating selection/confirmation and one invitation are setup work.
@@ -185,10 +190,14 @@ archives and is excluded from local lint selection, never from committed CI sour
 ## PERF-04 and next live checkpoint
 
 Use [the concrete region rollout and rollback](performance-region-experiment.md).
-No authenticated live fixture was available (owner response: “chưa có”), and an
-SSH attempt did not complete. Container timings, provider region confirmation,
-temporary deployments, provider connectivity and matched live latency therefore
-remain unverified. The active deployment snapshot is still
+At the initial checkpoint no authenticated live fixture was available (owner
+response: “chưa có”), and an SSH attempt did not complete. The owner subsequently
+provided test accounts and authorized the
+[Railway fixture and baseline follow-up](performance-railway-fixture-2026-10-16.md).
+That synthetic fixture does not close provider acceptance or the assigned-Staff
+event-window gate. Container timings, provider region confirmation, temporary
+deployments and matched baseline/candidate latency remain unverified. The active
+deployment snapshot is still
 `b1b875c0-25d8-4bcf-a6fe-2484bbb25c74` / `5b2536212e9a6feafbb48d9a71bba1f90ded08ae`.
 
 Reference for pool observation semantics:

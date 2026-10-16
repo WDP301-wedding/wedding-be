@@ -1,0 +1,2510 @@
+{
+  "at": "2026-10-16T11:25:53.392Z",
+  "origin": "https://wedding-be-production-e1dc.up.railway.app",
+  "bookingId": "e80c6f1b-a4fc-4674-a4dd-13ef2601206b",
+  "label": "PERF-TEST-20261016",
+  "synthetic": true,
+  "eventDate": "2026-11-19",
+  "planningHeadcount": 50,
+  "listedGuestCount": 8,
+  "groupCount": 4,
+  "seatingStatus": "CONFIRMED",
+  "assignedStaff": true,
+  "checkInMode": "BY_GUEST_NAME",
+  "recordedCheckIns": 0,
+  "settlementEvidence": "Synthetic Manager manual-accounting API only; no real transfer or VNPay/provider acceptance. No direct FULL-grant or settled-row insertion.",
+  "workspaceAcceptance": "Native Identity invitation issuer with captured notification, then Railway invitation-acceptance API; returned session revoked. No external invitation email.",
+  "deploymentId": "b1b875c0-25d8-4bcf-a6fe-2484bbb25c74",
+  "commit": "5b2536212e9a6feafbb48d9a71bba1f90ded08ae",
+  "runnerSha256": "7682d0056062795bb794bc4faa5ebe7f7ec13ddf3c31f303e7b5213d6cde1364",
+  "runnerAdaptation": "Audit runner from PR #46; last route measured as Manager, additional Staff 403 probe excluded from successes, Retry-After captured. Canonical assigned-Staff acceptance is unchanged.",
+  "activeDeploymentUnchanged": true,
+  "allRecordedFixtureTablesUnchanged": true,
+  "invariantTables": {
+    "Booking": {
+      "count": 1,
+      "sha256": "20dcee6f97394382004b58c32131e5a6dba355b4191a6ade60ad6a7a3354cd99"
+    },
+    "GuestWorkspace": {
+      "count": 1,
+      "sha256": "740e1cfad05084d31b75caee13d7e3321381bd9f6d637403bc187266e8bf5444"
+    },
+    "GuestPlanRevision": {
+      "count": 1,
+      "sha256": "1d999c357118e047bbf2b054d4a62f233b7d5211a3df379e06720d89e3089a7e"
+    },
+    "Guest": {
+      "count": 8,
+      "sha256": "2fab9d7948048ad7f8ee99add51ceb1057e8bd75463d1d0209b0e8f5f2616661"
+    },
+    "GuestGroup": {
+      "count": 4,
+      "sha256": "4c16cb980d31b569683ca79ef4423e7519226c8c5bf831c5855312b0c4dfe395"
+    },
+    "GuestHistory": {
+      "count": 12,
+      "sha256": "b00ccae7b401b0e1f61f0247de74f671965cee799482fe1adddead565ccea544"
+    },
+    "SeatingPlan": {
+      "count": 1,
+      "sha256": "21324fbb0909ebe7b7847d5c123df7988539e163ae938e3873f0c07ef3cba10b"
+    },
+    "SeatingPlanRevision": {
+      "count": 2,
+      "sha256": "d3d9236f4ce95da45b5c26ee86e743bdd3a16ae2495caeefde36b123d16c58f8"
+    },
+    "StaffConfiguration": {
+      "count": 1,
+      "sha256": "c2069094393ddd40b16a802f3594d61fa05097fb29e3f765fc3c2031e45b524c"
+    },
+    "StaffAssignment": {
+      "count": 1,
+      "sha256": "7138dcfec52bee5e751fa90552a061e70e6cf464f0a5d0fa114f7e27096ee185"
+    },
+    "StaffHistory": {
+      "count": 3,
+      "sha256": "547f6018665f82fe9a9a84603e3faed5d49b237c3ae9cf872ebef2deb89a18f0"
+    },
+    "StaffCheckInRecord": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "CommercialContractRevision": {
+      "count": 1,
+      "sha256": "9826bab0f0440ef1e4bd62f5a6a731073359e734d2aa8cc0f6707ffa96bab600"
+    },
+    "FinalInvoiceRevision": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "BillingLedgerEntry": {
+      "count": 2,
+      "sha256": "4c31f36bde988dd800fcb73c6823f1c8e026cef32cf991a0e9b5f3eeee7c6c8d"
+    }
+  },
+  "samples": 210,
+  "steadySuccesses": 200,
+  "matchedLogs": 211,
+  "staffProbe": {
+    "at": "2026-10-16T11:07:32.496Z",
+    "status": 403,
+    "durationMs": 6203.4823,
+    "requestId": "e7bb678f-b53f-493c-b3db-138de2068b83",
+    "retryAfterSeconds": null,
+    "bytes": 129,
+    "errorCode": "CHECK_IN_WINDOW_CLOSED",
+    "expected": "403 CHECK_IN_WINDOW_CLOSED; future synthetic event",
+    "countsAsSuccessfulMeasurement": false
+  },
+  "summary": [
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "n": 20,
+      "p50Ms": 5146.766799999983,
+      "p95Ms": 5578.080499999924,
+      "itemCounts": [
+        4
+      ],
+      "matchedServerLogs": 20,
+      "serverP50Ms": 4906.609,
+      "serverP95Ms": 5335.715
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "n": 20,
+      "p50Ms": 4056.2173000000184,
+      "p95Ms": 4128.744099999982,
+      "itemCounts": [
+        8
+      ],
+      "matchedServerLogs": 20,
+      "serverP50Ms": 3816.612,
+      "serverP95Ms": 3890.414
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "n": 20,
+      "p50Ms": 4042.3242999999784,
+      "p95Ms": 4119.086099999957,
+      "itemCounts": [],
+      "matchedServerLogs": 20,
+      "serverP50Ms": 3814.417,
+      "serverP95Ms": 3889.942
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "n": 20,
+      "p50Ms": 6941.541800000006,
+      "p95Ms": 7392.456700000097,
+      "itemCounts": [],
+      "matchedServerLogs": 20,
+      "serverP50Ms": 6715.233,
+      "serverP95Ms": 6905.786
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "n": 20,
+      "p50Ms": 5387.673399999971,
+      "p95Ms": 5532.649900000077,
+      "itemCounts": [
+        1
+      ],
+      "matchedServerLogs": 20,
+      "serverP50Ms": 5094.896,
+      "serverP95Ms": 5308.266
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "n": 20,
+      "p50Ms": 5754.081000000006,
+      "p95Ms": 5829.919900000008,
+      "itemCounts": [
+        1
+      ],
+      "matchedServerLogs": 20,
+      "serverP50Ms": 5517.22,
+      "serverP95Ms": 5586.849
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "n": 20,
+      "p50Ms": 4114.025599999994,
+      "p95Ms": 4323.7343999999575,
+      "itemCounts": [],
+      "matchedServerLogs": 20,
+      "serverP50Ms": 3854.174,
+      "serverP95Ms": 3914.858
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "n": 20,
+      "p50Ms": 10167.143500000006,
+      "p95Ms": 11307.106000000029,
+      "itemCounts": [
+        8
+      ],
+      "matchedServerLogs": 20,
+      "serverP50Ms": 9932.372,
+      "serverP95Ms": 11071.455
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "n": 20,
+      "p50Ms": 856.612799999999,
+      "p95Ms": 933.8259999999991,
+      "itemCounts": [],
+      "matchedServerLogs": 20,
+      "serverP50Ms": 613.677,
+      "serverP95Ms": 615.592
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "n": 20,
+      "p50Ms": 1335.3254000000015,
+      "p95Ms": 1357.4093999999968,
+      "itemCounts": [
+        1
+      ],
+      "matchedServerLogs": 20,
+      "serverP50Ms": 1091.16,
+      "serverP95Ms": 1096.549
+    }
+  ],
+  "cleanup": [
+    {
+      "role": "staff",
+      "status": 204
+    },
+    {
+      "role": "manager",
+      "status": 204
+    },
+    {
+      "role": "couple",
+      "status": 204
+    },
+    {
+      "role": "couple",
+      "status": 204
+    }
+  ],
+  "failure": null,
+  "acceptance": "Partial live baseline: seven Couple families plus Manager guest search. Assigned-Staff success pending future event window. PERF-03 diagnostics/container DB, PERF-04 regions and PERF-05 before/after remain unverified.",
+  "methods": [
+    "Sequential round-robin: one initial probe, then 20 samples per route. Initialization is a separate operator action. No business writes. Session login/logout only. PARTIAL ACCEPTANCE: seven Couple families plus Manager guest search outside event window; this is not assigned-Staff success. Staff denial is recorded separately.",
+    "Sequential round-robin: one initial probe, then 20 samples per route. Initialization is a separate operator action. No business writes. Session login/logout only. Separate PERF-05 legacy baseline on the same initialized fixture and deployment: Identity and non-empty Couple overview. No candidate deployment is implied."
+  ],
+  "requestPairs": [
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 0,
+      "phase": "initial",
+      "status": 200,
+      "requestId": "cc60eaa2-6dd7-4042-b737-3bab33422307",
+      "clientMs": 5164.182499999999,
+      "serverMs": 4912.983,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 0,
+      "phase": "initial",
+      "status": 200,
+      "requestId": "0cbc2619-77d3-459a-9f13-0a632ca6b58f",
+      "clientMs": 4272.960999999999,
+      "serverMs": 3834.346,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 0,
+      "phase": "initial",
+      "status": 200,
+      "requestId": "d0dadc1e-dfcc-44ba-ac45-e8b1bd1368c0",
+      "clientMs": 4089.5805,
+      "serverMs": 3848.195
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 0,
+      "phase": "initial",
+      "status": 200,
+      "requestId": "cebde018-358a-4e0d-8f41-3d46cbf17781",
+      "clientMs": 7165.502400000001,
+      "serverMs": 6924.485
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 0,
+      "phase": "initial",
+      "status": 200,
+      "requestId": "59c7c425-7c43-475e-81a3-78d0dd803df0",
+      "clientMs": 5531.269399999997,
+      "serverMs": 5292.212,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 0,
+      "phase": "initial",
+      "status": 200,
+      "requestId": "90dffa42-5eca-42be-89b2-aa73e22d2a39",
+      "clientMs": 5724.953199999996,
+      "serverMs": 5485.642,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 0,
+      "phase": "initial",
+      "status": 200,
+      "requestId": "18d10b16-5f69-46ab-85b9-68ded2a6285a",
+      "clientMs": 3960.977899999998,
+      "serverMs": 3724.547
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 0,
+      "phase": "initial",
+      "status": 200,
+      "requestId": "a98f8322-0869-425c-9a90-7c742a15f871",
+      "clientMs": 9791.559400000006,
+      "serverMs": 9567.412,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 1,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "9f9797a9-2584-4d03-95a5-8b55305de423",
+      "clientMs": 7162.423799999997,
+      "serverMs": 6938.8,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 1,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "145e95e5-9cda-42a0-bb09-f8c4a2112920",
+      "clientMs": 3937.0209999999934,
+      "serverMs": 3707.505,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 1,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "0d791a33-1807-488e-8e65-57c9a0fbf504",
+      "clientMs": 3936.923299999995,
+      "serverMs": 3706.86
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 1,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "7c9158e7-6826-445f-bcc7-f40d2586b303",
+      "clientMs": 6941.541800000006,
+      "serverMs": 6715.233
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 1,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "d9366472-7883-436c-beaf-0a5616b7a24a",
+      "clientMs": 5400.229699999996,
+      "serverMs": 5173.423,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 1,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "59d7c45b-f896-4589-9a8a-65bb9e70b6f1",
+      "clientMs": 5829.919900000008,
+      "serverMs": 5586.849,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 1,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "fbfab2a6-2ee8-4bc6-a89e-083462ed7fa4",
+      "clientMs": 4044.6947999999975,
+      "serverMs": 3820.971
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 1,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "712d6e06-ae5b-46c4-ba4a-ab9b51d04762",
+      "clientMs": 10251.229699999996,
+      "serverMs": 10011.567,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 2,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "5e56efb2-7b7b-49f1-8f58-2eb288a03a1a",
+      "clientMs": 5117.372500000012,
+      "serverMs": 4888.111,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 2,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "20f25057-feba-4010-9920-8ec12f89e0c2",
+      "clientMs": 4045.778900000005,
+      "serverMs": 3806.735,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 2,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "76fb2ca3-b27f-4862-93ef-162be38d7198",
+      "clientMs": 4029.1331999999966,
+      "serverMs": 3804.024
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 2,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "e283d635-b9cf-468b-8f30-1dd30af33553",
+      "clientMs": 7101.961500000005,
+      "serverMs": 6878.71
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 2,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "fb1a7765-d2d3-4dd2-9134-3cd1ee3a26d4",
+      "clientMs": 5528.176600000021,
+      "serverMs": 5299.66,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 2,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "e25d854b-d951-482e-9d47-d2ab096924e7",
+      "clientMs": 5784.833899999998,
+      "serverMs": 5557.859,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 2,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "1a6403d6-7d34-45eb-8808-b649641ccf1b",
+      "clientMs": 4148.274700000009,
+      "serverMs": 3914.858
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 2,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "deaee8b2-089a-4405-a779-0ef3255a21d7",
+      "clientMs": 10045.598999999987,
+      "serverMs": 9809.099,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 3,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "f2da0994-a004-446e-bb24-0604d95712dc",
+      "clientMs": 5325.494500000001,
+      "serverMs": 5093.348,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 3,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "8b10ef50-d515-4194-87b2-775e1d369a92",
+      "clientMs": 4128.744099999982,
+      "serverMs": 3881.769,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 3,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "6104eba5-82b7-4856-bf86-f9a11230481d",
+      "clientMs": 4111.569000000018,
+      "serverMs": 3880.895
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 3,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "689bcde4-b052-4e1e-8306-9f39a580f260",
+      "clientMs": 6827.722200000018,
+      "serverMs": 6599.514
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 3,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "6d1ca4a0-1e68-422b-b5a4-35a0da0d2723",
+      "clientMs": 5332.067500000005,
+      "serverMs": 5088.192,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 3,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "15b6161e-8010-416a-8a05-cda023d61eb7",
+      "clientMs": 5789.580799999996,
+      "serverMs": 5554.502,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 3,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "757aace7-75c9-4bc6-abe0-13e758651a92",
+      "clientMs": 4114.025599999994,
+      "serverMs": 3884.751
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 3,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "af03083c-898c-421e-ae2d-8615844d6e1a",
+      "clientMs": 10223.439800000022,
+      "serverMs": 9985.906,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 4,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "2463dee8-85bd-4802-881c-e260b1a353e2",
+      "clientMs": 5127.320999999996,
+      "serverMs": 4904.615,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 4,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "a18bca08-d875-44c9-afd5-459751c81baf",
+      "clientMs": 4056.2173000000184,
+      "serverMs": 3816.642,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 4,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "b2ea588f-1301-490a-8162-325a810bd587",
+      "clientMs": 4058.8240000000224,
+      "serverMs": 3822.291
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 4,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "93045008-e44a-4e31-a50a-003ac8fc8cac",
+      "clientMs": 6974.903599999991,
+      "serverMs": 6747.676
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 4,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "c1330234-73ae-4834-a098-d73e511e0f37",
+      "clientMs": 5421.903099999996,
+      "serverMs": 5198.698,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 4,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "ec73231c-4481-4fe6-afdc-beaa33cb926a",
+      "clientMs": 5681.095399999991,
+      "serverMs": 5448.153,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 4,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "941a2803-e37a-411d-8e56-ce60e609460a",
+      "clientMs": 4128.732499999984,
+      "serverMs": 3901.101
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 4,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "d5725b4b-f32c-4a75-837d-8cb3e997fd4a",
+      "clientMs": 9782.766100000008,
+      "serverMs": 9544.357,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 5,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "9b5c7912-47eb-409f-8add-053e7539337e",
+      "clientMs": 5018.604800000001,
+      "serverMs": 4778.792,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 5,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "33d78874-dae4-4b01-bdda-6b3089751834",
+      "clientMs": 3949.1711999999825,
+      "serverMs": 3720.838,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 5,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "d64458a0-0ff2-475c-92af-0f42286e3091",
+      "clientMs": 3943.2584000000206,
+      "serverMs": 3719.314
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 5,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "be2ca6aa-9621-4795-8c97-d2f0f53b5dae",
+      "clientMs": 6986.103000000003,
+      "serverMs": 6751.686
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 5,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "8ef08ced-6665-41a4-b2b7-5bf7c09f67b1",
+      "clientMs": 5417.202699999965,
+      "serverMs": 5191.866,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 5,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "682c9700-db05-408f-b863-096746abbdd4",
+      "clientMs": 5670.980800000019,
+      "serverMs": 5435.048,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 5,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "e40a5a8d-c7b6-4c58-b140-4de0c2b8a94f",
+      "clientMs": 4130.280999999959,
+      "serverMs": 3901.308
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 5,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "31f8b9ec-1348-466a-b5ff-f274ba81d1c1",
+      "clientMs": 11307.106000000029,
+      "serverMs": 11071.455,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 6,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "97f2b080-6861-42d4-87db-6db910be2ab3",
+      "clientMs": 5121.165900000022,
+      "serverMs": 4891.365,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 6,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "a6936cd6-3d6e-4685-b6e1-729c67985eb6",
+      "clientMs": 4055.1125000000466,
+      "serverMs": 3816.612,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 6,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "75750bf3-15fe-4e3b-8316-3dff61ebe03f",
+      "clientMs": 4042.3242999999784,
+      "serverMs": 3814.417
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 6,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "0ae7b86c-0b7a-4fe9-b7e9-aad68c3e5272",
+      "clientMs": 6968.700099999958,
+      "serverMs": 6745.376
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 6,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "2af165ed-8871-4b62-af38-cd9ab28187ce",
+      "clientMs": 5418.502099999983,
+      "serverMs": 5194.258,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 6,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "69e03f8d-b9da-4102-b219-b1204fd134a4",
+      "clientMs": 5800.899700000009,
+      "serverMs": 5569.24,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 6,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "9acc26c9-3d82-49ab-8044-3c60c3a2618f",
+      "clientMs": 4115.016100000008,
+      "serverMs": 3887.659
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 6,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "8bfdff0e-87e3-42c3-9d2a-71e353aa830e",
+      "clientMs": 10151.205599999987,
+      "serverMs": 9923.334,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 7,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "0be3f85c-6c26-4fec-a658-d2991b7109f1",
+      "clientMs": 5032.717799999984,
+      "serverMs": 4793.306,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 7,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "34d5b332-f6e7-4f36-a4c2-b05066f3feb7",
+      "clientMs": 3948.2304000000004,
+      "serverMs": 3717.827,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 7,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "c9fca344-63ea-4fca-8620-30fc3e00998b",
+      "clientMs": 3945.1445999999996,
+      "serverMs": 3716.204
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 7,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "8894e509-c472-44ba-99f3-988c731b5e61",
+      "clientMs": 7557.466600000043,
+      "serverMs": 7320.036
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 7,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "f135f55f-8d2d-4e71-988a-a28949e8f021",
+      "clientMs": 5440.702600000019,
+      "serverMs": 5210.095,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 7,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "bab547ed-5f78-477c-a5e5-7ddf55d3dfc8",
+      "clientMs": 5794.644100000034,
+      "serverMs": 5574.379,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 7,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "817b62b7-3569-46fb-93d9-e60ef4fbb972",
+      "clientMs": 3966.696100000001,
+      "serverMs": 3740.133
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 7,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "e1f525a0-ee28-447c-926a-2790dcbc4ea0",
+      "clientMs": 10167.143500000006,
+      "serverMs": 9932.372,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 8,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "36650168-179e-478c-aabc-b05540b30634",
+      "clientMs": 5203.837699999975,
+      "serverMs": 4979.428,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 8,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "289ba4ef-e4f5-402a-8b81-7b37084ae33b",
+      "clientMs": 4072.6322999999975,
+      "serverMs": 3829.633,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 8,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "918129e1-3e56-43e3-adb0-c65644804676",
+      "clientMs": 4054.8912999999593,
+      "serverMs": 3830.164
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 8,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "5542a16c-23db-4177-815f-72d0583f9509",
+      "clientMs": 6794.9997999999905,
+      "serverMs": 6558.849
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 8,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "1f6e58d7-d9c6-4a75-88f2-7133b9163a16",
+      "clientMs": 5288.680299999949,
+      "serverMs": 5047.904,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 8,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "d5e108aa-12fa-4835-b20c-4594a2928034",
+      "clientMs": 5754.081000000006,
+      "serverMs": 5528.673,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 8,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "68ba9d75-14b9-40e5-a7fe-2ae5eee4099d",
+      "clientMs": 4122.507800000021,
+      "serverMs": 3888.908
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 8,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "79750c50-880a-4111-a618-1f5a075feff1",
+      "clientMs": 10288.178400000033,
+      "serverMs": 10059.019,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 9,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "312a54f3-0eb8-402a-b6be-37598677be94",
+      "clientMs": 5374.48139999999,
+      "serverMs": 5033.514,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 9,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "cbe71cf7-2613-48e9-a7f2-9765175914a1",
+      "clientMs": 3978.1861999999965,
+      "serverMs": 3737.925,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 9,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "6df7a8f2-b79f-4efc-b520-4878886d3fa6",
+      "clientMs": 3985.9376000000047,
+      "serverMs": 3746.522
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 9,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "da053ad3-f45c-4a77-ac99-2a21b35b5110",
+      "clientMs": 6850.7740999999805,
+      "serverMs": 6617.227
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 9,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "1c145611-2d5e-4adf-ab20-82064b70b700",
+      "clientMs": 5322.739699999976,
+      "serverMs": 5094.896,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 9,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "d217102e-4025-4ea1-8bea-c2f662567600",
+      "clientMs": 5799.261300000013,
+      "serverMs": 5559.829,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 9,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "81cb60ef-a4ab-4d99-b6ac-d2f30fed34ce",
+      "clientMs": 4005.5713000000105,
+      "serverMs": 3768.413
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 9,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "e3fa4f1e-b331-4723-8541-6e429fb7bdd3",
+      "clientMs": 10232.159600000014,
+      "serverMs": 10006.956,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 10,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "bfb2b0f3-75ef-4bf8-9ebd-2fb1377bb8f3",
+      "clientMs": 5236.829199999978,
+      "serverMs": 5013.825,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 10,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "c72df40f-d2cb-4242-bbf0-743f4784ea88",
+      "clientMs": 4124.9684000000125,
+      "serverMs": 3902.684,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 10,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "ac6ebbfb-da60-4ea5-bdaa-4b8aee7d948d",
+      "clientMs": 4156.8973000000115,
+      "serverMs": 3910.438
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 10,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "b2ced626-4670-4864-ad93-a05bcb61d99a",
+      "clientMs": 7001.135299999965,
+      "serverMs": 6769.275
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 10,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "99543a14-f043-4b4f-925d-879d73bd295b",
+      "clientMs": 5300.473500000022,
+      "serverMs": 5074.307,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 10,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "4bfadfca-8652-4e07-91ad-ed7ff715bdd9",
+      "clientMs": 5638.290299999935,
+      "serverMs": 5408.862,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 10,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "c0f3e0fb-d79f-4586-8461-c948df531fd8",
+      "clientMs": 4059.1826000000583,
+      "serverMs": 3824.973
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 10,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "189feeb3-1c66-4ba1-96dd-d52b14ede8b1",
+      "clientMs": 9839.624500000034,
+      "serverMs": 9607.209,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 11,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "80627ed0-5c5d-40bc-9d81-6c64ca9b151b",
+      "clientMs": 5034.236499999999,
+      "serverMs": 4794.007,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 11,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "1595cfac-5e09-47ae-89e4-d6d83c6bed5f",
+      "clientMs": 3947.765100000077,
+      "serverMs": 3720.255,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 11,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "bd7f2310-082c-4e60-a773-235ed2249347",
+      "clientMs": 3956.7643999999855,
+      "serverMs": 3720.569
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 11,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "2e065243-10f8-4c67-8b65-07919783c46b",
+      "clientMs": 7113.947800000082,
+      "serverMs": 6867.915
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 11,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "cf2d9ae3-9121-4fd9-a6d2-285197279370",
+      "clientMs": 5515.6429000000935,
+      "serverMs": 5290.993,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 11,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "411414e3-01a3-4ec1-8c63-8c3d86e3008c",
+      "clientMs": 5852.268900000025,
+      "serverMs": 5614.264,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 11,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "347af72c-a95b-4cde-ab88-55764d96c5dd",
+      "clientMs": 4098.085400000098,
+      "serverMs": 3854.174
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 11,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "536c8805-4570-4ba5-9776-84d3459e725b",
+      "clientMs": 11143.539699999965,
+      "serverMs": 10903.414,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 12,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "a7996dbf-2605-4ed2-aa0e-79b0bf0169c6",
+      "clientMs": 5226.534600000014,
+      "serverMs": 4991.241,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 12,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "4ac0180b-6666-47c9-a51f-f376eca9695f",
+      "clientMs": 4137.659499999951,
+      "serverMs": 3890.414,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 12,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "f8905baf-1c78-44c4-b129-8bd30619536d",
+      "clientMs": 4115.768900000025,
+      "serverMs": 3889.942
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 12,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "373c6810-0ffa-4a41-b407-b514531a5683",
+      "clientMs": 6782.777000000002,
+      "serverMs": 6547.152
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 12,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "25a0321f-9af7-4f77-8aaf-846f2d40f5c2",
+      "clientMs": 5288.922900000005,
+      "serverMs": 5044.045,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 12,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "04399a3d-8bdb-4501-906d-6c47c8ce7195",
+      "clientMs": 5759.590800000005,
+      "serverMs": 5517.22,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 12,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "068306b9-974f-4cae-b7ea-1c9c31934eed",
+      "clientMs": 4142.596200000029,
+      "serverMs": 3911.361
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 12,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "148647ff-022c-444a-81e2-c9dbf7d3e9ab",
+      "clientMs": 10219.316100000055,
+      "serverMs": 9980.451,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 13,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "e50d6bb1-ae03-4fc7-b858-1c551e291c65",
+      "clientMs": 5300.513500000001,
+      "serverMs": 5067.72,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 13,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "2c126c88-473e-4a6d-a8a7-56024b82aaa1",
+      "clientMs": 4068.532799999928,
+      "serverMs": 3829.535,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 13,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "d69115f7-c448-4c4e-a6e1-8600968a8473",
+      "clientMs": 4055.771300000022,
+      "serverMs": 3827.183
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 13,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "0536ee13-51e6-4a73-b650-2ee1d34c4974",
+      "clientMs": 6807.9059000000125,
+      "serverMs": 6571.248
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 13,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "97152aaa-0bab-42a2-9a21-7c2f806441c6",
+      "clientMs": 5305.217700000037,
+      "serverMs": 5060.639,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 13,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "ac508616-9a16-431c-a50c-e02fe25d7b15",
+      "clientMs": 5609.527200000011,
+      "serverMs": 5371.923,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 13,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "1c18370e-3683-44f6-93e0-1e8e84830d85",
+      "clientMs": 4063.8386000000173,
+      "serverMs": 3834.093
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 13,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "31a265eb-aee5-4ba3-9a4c-593d81745b28",
+      "clientMs": 9759.37229999993,
+      "serverMs": 9529.841,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 14,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "e77b541f-9f1b-4b3e-9d3a-e79c8f595dc5",
+      "clientMs": 5194.464200000046,
+      "serverMs": 4968.173,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 14,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "6d3f8a59-c35c-482f-9148-1cbf701b2761",
+      "clientMs": 4117.118200000026,
+      "serverMs": 3877.675,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 14,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "97e8e9c2-e3cd-418e-8b2f-f0148abfc99c",
+      "clientMs": 4119.086099999957,
+      "serverMs": 3878.601
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 14,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "5856c487-e38e-4757-abc9-f5649d3c5dd5",
+      "clientMs": 7130.876099999994,
+      "serverMs": 6905.786
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 14,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "7296e219-ec09-431d-a3d2-56b14331a2ab",
+      "clientMs": 5532.649900000077,
+      "serverMs": 5309.689,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 14,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "95b47f32-df3f-42a9-a913-bcf6ef43122a",
+      "clientMs": 5701.870500000077,
+      "serverMs": 5475.344,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 14,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "ba5cd52a-6603-405b-87f3-bec2ea444a75",
+      "clientMs": 4121.586199999903,
+      "serverMs": 3893.859
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 14,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "1565a4d9-876e-4354-a9ee-76620ff47600",
+      "clientMs": 9731.26270000008,
+      "serverMs": 9505.958,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 15,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "8a97370d-0a78-41a3-9d6a-64e119131e32",
+      "clientMs": 5147.996399999945,
+      "serverMs": 4923.929,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 15,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "cefc28e9-9bad-4f8e-a95c-50a48889ea46",
+      "clientMs": 4058.640699999989,
+      "serverMs": 3832.485,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 15,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "0b464160-73a8-49e7-824d-623adaee86b1",
+      "clientMs": 4081.7611000000034,
+      "serverMs": 3843.138
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 15,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "4ea290dd-5be2-4063-9200-08fe2527c87a",
+      "clientMs": 6781.067000000039,
+      "serverMs": 6553.465
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 15,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "3b173033-d62b-42ec-9052-fb19d7b6d1ba",
+      "clientMs": 5280.4502999999095,
+      "serverMs": 5037.47,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 15,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "ada522df-35d9-4488-9db0-c324f0b9de91",
+      "clientMs": 5758.523099999991,
+      "serverMs": 5524.141,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 15,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "5f3c2329-3b2f-4532-8302-502b0cca3ec6",
+      "clientMs": 4377.595500000054,
+      "serverMs": 3729.984
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 15,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "c0fb1027-5b45-4b34-b646-fcdbbc763876",
+      "clientMs": 10261.814500000095,
+      "serverMs": 9943.362,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 16,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "42059717-03e1-4943-9961-4495602ad61b",
+      "clientMs": 5146.766799999983,
+      "serverMs": 4906.609,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 16,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "3127a5ec-41f7-45a4-8711-bf86940e3765",
+      "clientMs": 4063.5749999999534,
+      "serverMs": 3819.691,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 16,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "952a17c1-07b8-49b8-bae7-22c330179b59",
+      "clientMs": 4047.3924000000115,
+      "serverMs": 3815.017
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 16,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "d314a4b3-2d3f-4415-810a-34d6995f58d5",
+      "clientMs": 7392.456700000097,
+      "serverMs": 6883.495
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 16,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "ca9abfbc-5050-480f-903c-e29d3b60fbe0",
+      "clientMs": 5524.033299999894,
+      "serverMs": 5291.41,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 16,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "6cdebf27-a6a8-42e8-a999-8b81bfa1555b",
+      "clientMs": 5698.1070999999065,
+      "serverMs": 5458.992,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 16,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "ddcd7104-84b2-4e38-b2b1-85140e3a095b",
+      "clientMs": 4323.7343999999575,
+      "serverMs": 4085.423
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 16,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "101581ba-0890-47ce-a3dd-20a52cf9ef91",
+      "clientMs": 9800.415899999905,
+      "serverMs": 9575.165,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 17,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "a9ebab91-a9e5-4e0e-a5ef-bee7a4f2336b",
+      "clientMs": 5068.460099999909,
+      "serverMs": 4830.549,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 17,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "0f091f8c-ca57-4baa-b3c4-b1ffc4b3746a",
+      "clientMs": 3965.2922000000253,
+      "serverMs": 3724.004,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 17,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "e8dc5aa7-1647-4c73-af56-7b85452e9fd5",
+      "clientMs": 3955.8347000000067,
+      "serverMs": 3727.878
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 17,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "50daf59e-11a4-482a-9bb9-407e6f217a6c",
+      "clientMs": 6815.43319999997,
+      "serverMs": 6592.932
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 17,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "503884e6-ccbc-4772-80da-016fb6096e48",
+      "clientMs": 5387.673399999971,
+      "serverMs": 5077.104,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 17,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "b421991f-0d41-40a9-875a-d3dc1eb7fdb6",
+      "clientMs": 5706.618800000055,
+      "serverMs": 5468.71,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 17,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "ee254c0a-d2a6-438f-812e-ba2268310b14",
+      "clientMs": 3973.5734999999404,
+      "serverMs": 3741.533
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 17,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "c1f67182-2fc8-4233-825a-20cc3324645a",
+      "clientMs": 11346.296800000011,
+      "serverMs": 11112.562,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 18,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "0aa9fb49-3524-4932-a672-f6f8152af1ad",
+      "clientMs": 5015.303699999931,
+      "serverMs": 4777.54,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 18,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "a013171e-496a-4199-b690-cf31c16f6bb2",
+      "clientMs": 4086.808100000024,
+      "serverMs": 3721.38,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 18,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "cdd71ba4-3056-4956-9021-a6224f4d1b3b",
+      "clientMs": 3954.5084000000497,
+      "serverMs": 3720.986
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 18,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "38bbb886-ab27-488f-815b-5f3c800fed0b",
+      "clientMs": 6783.180200000061,
+      "serverMs": 6551.677
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 18,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "4d73f1f5-5d27-4231-b08f-77768995c650",
+      "clientMs": 5266.656100000022,
+      "serverMs": 5038.989,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 18,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "3c49937b-ab99-4a89-b9d5-bc2b052d8f62",
+      "clientMs": 5604.99040000001,
+      "serverMs": 5370.123,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 18,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "6a76dbc2-13c0-4c9b-aaa9-02164de9f188",
+      "clientMs": 3967.547499999986,
+      "serverMs": 3728.941
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 18,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "e114a912-e8ce-45d2-8da9-40abb6e26f58",
+      "clientMs": 9770.667400000035,
+      "serverMs": 9532.916,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 19,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "d721cd44-9bdf-42ee-b469-033157b401bb",
+      "clientMs": 5007.608400000026,
+      "serverMs": 4778.824,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 19,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "bd3271b5-b6d3-4073-9964-8fa51d7d998c",
+      "clientMs": 3935.2685000000056,
+      "serverMs": 3705.288,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 19,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "4b4aed39-07cf-46ce-a07f-bbc7f958cd8d",
+      "clientMs": 3943.888399999938,
+      "serverMs": 3708.606
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 19,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "474ef4b4-b4a4-4fc8-a18c-aac8229c2c25",
+      "clientMs": 6824.5098,
+      "serverMs": 6588.989
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 19,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "196dc08f-f03c-4b32-b8b9-2f76b5bc51a6",
+      "clientMs": 5300.861999999965,
+      "serverMs": 5072.562,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 19,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "3f84a89e-036b-4a91-ae1c-688cfe5cb6cc",
+      "clientMs": 5764.625599999912,
+      "serverMs": 5535.635,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 19,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "6352b482-dcca-4c6f-aa00-6e31d65d02f9",
+      "clientMs": 4142.21239999996,
+      "serverMs": 3906.144
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 19,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "6615b22e-caae-4c42-a445-c2ab55db4e62",
+      "clientMs": 10186.759300000034,
+      "serverMs": 9959.983,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-groups",
+      "round": 20,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "cdfbf458-899f-4582-8f2e-f0af6a2bb6f8",
+      "clientMs": 5578.080499999924,
+      "serverMs": 5335.715,
+      "itemCount": 4
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guests?limit=20",
+      "round": 20,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "27a01f07-01f2-455b-92e7-5ebfa78b89ba",
+      "clientMs": 4058.0673999999417,
+      "serverMs": 3818.818,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/guest-plan",
+      "round": 20,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "2138c220-993d-4c4a-8664-e10de4d84637",
+      "clientMs": 4047.5137000000104,
+      "serverMs": 3818.948
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+      "round": 20,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "640b2c3a-c1ff-42aa-b627-c51dd78c5032",
+      "clientMs": 7127.837300000014,
+      "serverMs": 6885.157
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/seating-layout-options",
+      "round": 20,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "657dd173-6596-4c17-b32e-4abf729d1649",
+      "clientMs": 5547.603100000066,
+      "serverMs": 5308.266,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/invitations?limit=20",
+      "round": 20,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "9abb0e36-3c4d-46e3-b2a2-c8fa8f782b90",
+      "clientMs": 5728.566399999894,
+      "serverMs": 5494.417,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/bookings/{bookingId}/billing",
+      "round": 20,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "4c39cfae-190c-4cf1-a3f6-87b64098c2a4",
+      "clientMs": 3985.0863000000827,
+      "serverMs": 3746.818
+    },
+    {
+      "role": "manager",
+      "route": "/api/v1/staff/events/{bookingId}/guests/search",
+      "round": 20,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "6e7c11d3-df6e-4891-96da-5d0fe8287b2b",
+      "clientMs": 9771.580100000021,
+      "serverMs": 9531.433,
+      "itemCount": 8
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 0,
+      "phase": "initial",
+      "status": 200,
+      "requestId": "3b561ee8-bfce-44f4-add0-6b442f9dacf9",
+      "clientMs": 1001.9040000000005,
+      "serverMs": 613.603
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 0,
+      "phase": "initial",
+      "status": 200,
+      "requestId": "cbdda159-445f-492e-8843-4c338ad0e9ed",
+      "clientMs": 3451.0636000000004,
+      "serverMs": 3209.83,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 1,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "5a4292f6-6d53-4d92-9915-24068985fe1d",
+      "clientMs": 1004.5433999999996,
+      "serverMs": 613.38
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 1,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "df2c6d1e-844e-465b-ad0b-0fb1ed7cf9ae",
+      "clientMs": 1340.8196000000007,
+      "serverMs": 1094.422,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 2,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "304242bc-5812-4fe1-8a68-d82c5cc596c4",
+      "clientMs": 933.8259999999991,
+      "serverMs": 614.292
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 2,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "80a41b9b-72ac-445e-9b6f-f92010b6f3e9",
+      "clientMs": 1343.9809000000005,
+      "serverMs": 1097.975,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 3,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "40d51d0b-a6ce-418a-97c4-e68c5fde5e69",
+      "clientMs": 859.3132999999998,
+      "serverMs": 614.032
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 3,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "4ca99c93-9157-4e95-9bea-734f0769af14",
+      "clientMs": 1336.9671999999991,
+      "serverMs": 1090.473,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 4,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "1147d0c3-6881-4d9f-a28d-2637b5e5316d",
+      "clientMs": 867.1198000000004,
+      "serverMs": 613.106
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 4,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "933bf16c-3d04-4a3a-8ccd-7988eb41285c",
+      "clientMs": 1368.3709000000017,
+      "serverMs": 1090.614,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 5,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "7537a1c7-5b64-4ba1-9ddc-c65c3e090594",
+      "clientMs": 857.0885999999991,
+      "serverMs": 613.22
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 5,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "8cbca3f3-69f6-40d9-b9d7-fb732535295f",
+      "clientMs": 1328.956000000002,
+      "serverMs": 1090.104,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 6,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "c9ef558a-908c-4818-8bd2-be27a036711a",
+      "clientMs": 853.9459000000024,
+      "serverMs": 613.464
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 6,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "eac1077a-8734-4040-8151-4ea9ce376d63",
+      "clientMs": 1357.4093999999968,
+      "serverMs": 1090.827,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 7,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "771e7b12-b5a0-4dc2-9da1-8209e23a8deb",
+      "clientMs": 860.4314999999988,
+      "serverMs": 615.592
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 7,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "65fec50a-8333-4a0d-8856-e7f9375b9846",
+      "clientMs": 1339.4297000000006,
+      "serverMs": 1093.038,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 8,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "5812714f-c705-470b-a704-79e2c450ac0b",
+      "clientMs": 855.0875999999989,
+      "serverMs": 613.006
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 8,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "e9ab65e9-9003-44a2-a2cd-409de740bfc0",
+      "clientMs": 1334.9071000000004,
+      "serverMs": 1090.096,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 9,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "8c6211fe-be2a-47f2-ac0c-d030d3ac1fdc",
+      "clientMs": 856.612799999999,
+      "serverMs": 615.052
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 9,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "efd47648-9a4e-4c49-be4a-74a491097b7c",
+      "clientMs": 1319.8801000000021,
+      "serverMs": 1090.211,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 10,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "38582584-f646-4c0f-9e49-fd7050431e12",
+      "clientMs": 846.5249000000003,
+      "serverMs": 613.314
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 10,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "f1f37a01-9d14-4e6a-9072-3495ad925922",
+      "clientMs": 1335.3254000000015,
+      "serverMs": 1093.643,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 11,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "5a7e1ed9-093b-4142-a37e-4ce48c14afec",
+      "clientMs": 843.1589999999997,
+      "serverMs": 613.631
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 11,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "ff47e727-8f99-4a81-8939-c47a1768770d",
+      "clientMs": 1340.8423999999977,
+      "serverMs": 1091.252,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 12,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "841de6ca-38c2-4c15-83d5-6ee2db7aa6d7",
+      "clientMs": 843.4183000000012,
+      "serverMs": 613.677
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 12,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "1f564d4e-727b-4449-b61b-7c6e0c05fa7b",
+      "clientMs": 1323.9614000000001,
+      "serverMs": 1090.782,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 13,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "b22aaa85-628d-4b16-b099-923cb2cd200d",
+      "clientMs": 856.5972000000038,
+      "serverMs": 613.289
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 13,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "bae2b892-ef9f-4598-9b1d-d814ce7d8daa",
+      "clientMs": 1334.0251999999964,
+      "serverMs": 1090.624,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 14,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "56bcae74-d722-46af-b458-533710812730",
+      "clientMs": 860.3715999999986,
+      "serverMs": 616.627
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 14,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "0b31415d-5493-4592-8f74-5cff6a6c09d0",
+      "clientMs": 1338.030700000003,
+      "serverMs": 1091.16,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 15,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "d98ead96-eac4-4e35-8858-f175a029621b",
+      "clientMs": 856.5994999999966,
+      "serverMs": 613.021
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 15,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "38225e92-6d6d-4943-89a4-b6f675927b3f",
+      "clientMs": 1335.1054999999978,
+      "serverMs": 1091.047,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 16,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "02ca4bc9-e43f-449a-aafc-e86eb931cc9c",
+      "clientMs": 855.7694000000047,
+      "serverMs": 614.108
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 16,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "49714248-6674-4b65-b419-8a4df2de680e",
+      "clientMs": 1337.7972000000009,
+      "serverMs": 1091.389,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 17,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "3832c83e-2988-43e5-926f-abfbb0cee7bc",
+      "clientMs": 860.3933999999936,
+      "serverMs": 614.392
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 17,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "855f7aae-1602-4e36-8ee0-38d43c5a16df",
+      "clientMs": 1327.3232999999964,
+      "serverMs": 1093.735,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 18,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "4f2fd5d2-6883-4fa3-908b-74607fa8163a",
+      "clientMs": 861.6186000000016,
+      "serverMs": 614.038
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 18,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "69a769d4-8fab-4d5e-97e2-270020860548",
+      "clientMs": 1325.995600000002,
+      "serverMs": 1091.308,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 19,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "95fff3c4-69a3-4c85-bcdb-ed080b3d8135",
+      "clientMs": 848.7393999999986,
+      "serverMs": 615.067
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 19,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "f19faff9-2efe-4df2-91d9-652508e1ab69",
+      "clientMs": 1333.9539000000004,
+      "serverMs": 1096.549,
+      "itemCount": 1
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/auth/me",
+      "round": 20,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "24e71a68-6e29-45c9-a617-728c7f1bcc1d",
+      "clientMs": 862.7574999999997,
+      "serverMs": 615.069
+    },
+    {
+      "role": "couple",
+      "route": "/api/v1/couple/bookings?limit=20",
+      "round": 20,
+      "phase": "steady",
+      "status": 200,
+      "requestId": "4a24646e-2f93-480f-bd55-105314df36c7",
+      "clientMs": 1342.4017999999996,
+      "serverMs": 1092.003,
+      "itemCount": 1
+    }
+  ],
+  "failedInitialAttempt": {
+    "startedAt": "2026-10-16T11:03:27.587Z",
+    "origin": "https://wedding-be-production-e1dc.up.railway.app",
+    "deploymentId": "b1b875c0-25d8-4bcf-a6fe-2484bbb25c74",
+    "commit": "5b2536212e9a6feafbb48d9a71bba1f90ded08ae",
+    "methodology": "Sequential round-robin: one initial probe, then 20 samples per route. Initialization is a separate operator action. No business writes. Session login/logout only.",
+    "samples": [],
+    "cleanup": [],
+    "failure": "Fixture couple login failed (429).",
+    "finishedAt": "2026-10-16T11:03:28.516Z"
+  },
+  "runtimeFences": {
+    "at": "2026-10-16T11:01:57.574Z",
+    "workerEnabled": true,
+    "diagnosticsEnabled": false,
+    "fixtureBookingInAllowlist": false
+  },
+  "containerProbe": {
+    "at": "2026-10-16T11:05:22.186Z",
+    "source": "Railway container probe attempt",
+    "readOnly": true,
+    "unavailable": true,
+    "exitCode": 11,
+    "reason": "SSH did not complete; no remote mutation requested"
+  },
+  "collectionWindows": {
+    "bookingFamilies": {
+      "startedAt": "2026-10-16T11:07:17.971Z",
+      "finishedAt": "2026-10-16T11:24:24.422Z"
+    },
+    "identityOverview": {
+      "startedAt": "2026-10-16T11:24:25.215Z",
+      "finishedAt": "2026-10-16T11:25:18.967Z"
+    }
+  }
+}
