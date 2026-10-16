@@ -45,7 +45,12 @@ export class NotificationSettings {
   }
   private async actor(token: string, manager = false) {
     const actor = await this.resolver.resolve(token);
-    await this.foundation.prisma.$transaction((tx) => requireNotificationRole(tx, actor, manager));
+    // These role branches are pure checks. Only roleless consultation accounts
+    // need a database-backed role gate; commands still lock and revalidate.
+    if (!(actor.roles.includes('MANAGER') || (!manager && actor.roles.includes('COUPLE'))))
+      await this.foundation.prisma.$transaction((tx) =>
+        requireNotificationRole(tx, actor, manager),
+      );
     return actor;
   }
   private async command<T>(
@@ -371,12 +376,34 @@ export class NotificationSettings {
       actor,
       where: {
         accountId: actor.accountId,
-        OR: [{ bookingId: null }, { bookingId: { in: bookingIds } }],
+        OR: [{ bookingId: null }, { bookingId: { in: bookingIds.sort() } }],
       },
     };
   }
+  private async recheckInboxScope(
+    token: string,
+    scope: Awaited<ReturnType<NotificationSettings['inboxScope']>>,
+  ) {
+    const wasManager = scope.actor.roles.includes('MANAGER');
+    // Both checks follow the data read. Audience lookup depends only on the
+    // captured principal; a changed principal/Manager role is rejected below.
+    const [actor, bookingIds] = await Promise.all([
+      this.actor(token),
+      this.booking.notificationBookingIds(scope.actor.accountId, wasManager),
+    ]);
+    const currentWhere = {
+      accountId: actor.accountId,
+      OR: [{ bookingId: null }, { bookingId: { in: bookingIds.sort() } }],
+    };
+    if (
+      actor.roles.includes('MANAGER') !== wasManager ||
+      JSON.stringify(currentWhere) !== JSON.stringify(scope.where)
+    )
+      throw new NotFoundError();
+  }
   async inbox(token: string, value: unknown) {
-    const { where } = await this.inboxScope(token),
+    const scope = await this.inboxScope(token),
+      { where } = scope,
       input = parse(listQuery, value);
     if (
       input.cursor &&
@@ -392,6 +419,7 @@ export class NotificationSettings {
       ...(input.cursor ? { cursor: { id: input.cursor }, skip: 1 } : {}),
       include: { intent: true },
     });
+    await this.recheckInboxScope(token, scope);
     return {
       items: rows.slice(0, input.limit).map((row) => {
         const purpose = parse(statusDto.shape.purpose, row.intent.purpose),
@@ -412,12 +440,13 @@ export class NotificationSettings {
     };
   }
   async unread(token: string) {
-    const { where } = await this.inboxScope(token);
-    return {
-      count: await this.foundation.prisma.notificationInbox.count({
-        where: { ...where, readAt: null },
-      }),
-    };
+    const scope = await this.inboxScope(token),
+      { where } = scope;
+    const count = await this.foundation.prisma.notificationInbox.count({
+      where: { ...where, readAt: null },
+    });
+    await this.recheckInboxScope(token, scope);
+    return { count };
   }
   async markRead(token: string, idValue: string, value: unknown, key: string | undefined) {
     const inboxId = parse(id, idValue),

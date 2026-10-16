@@ -45,7 +45,8 @@ export function createNotificationRouter(
       res.set({ 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' });
     next();
   });
-  const token = (req: Request) => req.get('authorization')!.slice(7),
+  const token = (req: Request) =>
+      /^Bearer ([^\s]+)$/u.exec(req.get('authorization') ?? '')?.[1] ?? '',
     key = (req: Request) => req.get('idempotency-key');
   const scope = (req: Request) => settings.withRequestId(req.requestId);
   const parameter = (req: Request) => parse(id, req.params['id']);
@@ -100,10 +101,11 @@ export function createNotificationRouter(
       }),
     ),
   );
-  router.get(own + '/inbox', authenticate, async (req, res) =>
+  // The read service resolves current authority before and after its data read.
+  router.get(own + '/inbox', async (req, res) =>
     res.json(result(page(inboxDto)).parse({ data: await scope(req).inbox(token(req), req.query) })),
   );
-  router.get(own + '/unread-count', authenticate, async (req, res) =>
+  router.get(own + '/unread-count', async (req, res) =>
     res.json(
       result(z.strictObject({ count: z.int().nonnegative() })).parse({
         data: await scope(req).unread(token(req)),

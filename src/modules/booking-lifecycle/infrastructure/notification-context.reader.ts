@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import type { PrismaClient } from '../../../generated/prisma/client.js';
+import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
+import { prismaSchema } from '../../../core/database/prisma.js';
 
 /** Booking-owned audience facts; no notification delivery becomes business authority. */
 export function createNotificationBookingReader(prisma: PrismaClient) {
@@ -36,19 +37,14 @@ export function createNotificationBookingReader(prisma: PrismaClient) {
   return {
     read,
     async notificationBookingIds(accountId: string, currentManager: boolean) {
-      const access = await prisma.consultationAccess.findMany({
-        where: { accountId },
-        select: { consultationId: true },
-      });
-      const rows = await prisma.booking.findMany({
-        where: {
-          OR: [
-            { consultationId: { in: access.map((a) => a.consultationId) } },
-            ...(currentManager ? [{ consultation: { managerAccountId: accountId } }] : []),
-          ],
-        },
-        select: { id: true },
-      });
+      const schema = Prisma.raw('"' + prismaSchema(prisma).replaceAll('"', '""') + '"');
+      const rows = await prisma.$queryRaw<{ id: string }[]>(Prisma.sql`
+        SELECT b.id FROM ${schema}."Booking" b
+        WHERE EXISTS (SELECT 1 FROM ${schema}."ConsultationAccess" a
+          WHERE a."consultationId"=b."consultationId" AND a."accountId"=${accountId}::uuid)
+        OR (${currentManager} AND EXISTS (SELECT 1 FROM ${schema}."Consultation" c
+          WHERE c.id=b."consultationId" AND c."managerAccountId"=${accountId}::uuid))
+      `);
       return rows.map((r) => r.id);
     },
     async fromConsultation(consultationId: string) {
