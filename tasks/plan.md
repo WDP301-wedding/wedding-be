@@ -169,6 +169,10 @@ audit, idempotency, outbox or snapshot history based on emptiness or low scan co
 No business-table deletion or `DROP ... CASCADE` is authorized by this plan. Do not
 promise an API speed gain from reclaiming unused rehearsal storage.
 
+2026-10-16 review completed: [145-table owner/retention matrix](../docs/backend-schema-retention-matrix-2026-10-16.md)
+and [review/procedure](../docs/backend-schema-retention-review-2026-10-16.md).
+All public/rehearsal objects are retained; no deletion is eligible or approved.
+
 ### PERF-13 — Verify and guard the improved baseline
 
 Dependencies: accepted optimization slices and PERF-02 for booking/Staff claims.

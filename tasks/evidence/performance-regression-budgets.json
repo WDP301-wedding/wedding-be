@@ -1,0 +1,31 @@
+{
+  "scope": "Native PERF-06–13 fixture; single reader; driver commands including transaction control. No Railway latency SLO.",
+  "basis": [
+    "perf06-10-local-comparison-2026-10-16.json",
+    "PERF-13 repeated 20-sample matched run, pool maximum 3, 40ms per submitted command"
+  ],
+  "queryCeilings": {
+    "templates-20": 4,
+    "print-orders-20": 5,
+    "inbox-empty": 6,
+    "unread-empty": 5,
+    "catalog-halls-no-assets": 3,
+    "catalog-halls-with-assets": 3,
+    "inbox-populated": 6,
+    "unread-populated": 5,
+    "analytics-warm": 6,
+    "analytics-refresh": 58
+  },
+  "modeledSingleReaderP95InvestigationMs": {
+    "templates-20": 240,
+    "print-orders-20": 300,
+    "inbox-empty": 300,
+    "unread-empty": 245,
+    "catalog-halls-no-assets": 185,
+    "catalog-halls-with-assets": 185,
+    "inbox-populated": 300,
+    "unread-populated": 245,
+    "analytics-warm": 355
+  },
+  "latencyPolicy": "Investigation bands include about 25% over the repeated measured p95. Observe only; do not fail shared Railway traffic or default CI wall-clock time. Concurrent reader stages have their own distributions and are not compared to single-reader bands."
+}

@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { setTimeout as delay } from 'node:timers/promises';
 import pg from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -35,6 +35,8 @@ import { studioFixture } from './invitation-studio/studio-fixture.js';
 
 const baseline = process.env.PERF_COMPARE_BASELINE;
 const sampleCount = Number(process.env.PERF_SAMPLES ?? 2);
+const poolMax = Number(process.env.PERF_POOL_MAX ?? 3);
+const readers = Number(process.env.PERF_READERS ?? 1);
 const addedDelay = baseline ? 40 : 0;
 // The model delays each real driver submission while its connection stays held.
 // It is not a Railway RTT measurement or a production latency budget.
@@ -74,7 +76,7 @@ const normalize = (value: unknown): unknown =>
       url.searchParams.delete('schema');
       const pool = new DiagnosticPool({
         connectionString: url.toString(),
-        max: 10,
+        max: poolMax,
         Client: DelayedClient,
       });
       measured = new PrismaClient({ adapter: new PrismaPg(pool, { disposeExternalPool: true }) });
@@ -86,6 +88,10 @@ const normalize = (value: unknown): unknown =>
     it('compares identical responses and records separate warm and refresh samples', async () => {
       if (!Number.isInteger(sampleCount) || sampleCount < 1 || sampleCount > 40)
         throw new Error('PERF_SAMPLES must be 1–40.');
+      if (![1, 2, 3, 10].includes(poolMax) || ![1, 2, 4].includes(readers))
+        throw new Error('Unsupported bounded pool/reader test.');
+      if (readers > 1 && !process.env.PERF_CASES)
+        throw new Error('Select pure read cases explicitly for concurrent measurement.');
       const f = await studioFixture(db.prisma);
       const design = await f.services.designs.create(
         { bookingId: f.bookingId, content: f.content, idempotencyKey: randomUUID() },
@@ -316,6 +322,11 @@ const normalize = (value: unknown): unknown =>
         cases[9]!.before = cases[3]!.before!;
       }
       const samples: { name: string; variant: string; ms: number; queries: number }[] = [];
+      const budgets = JSON.parse(
+        await readFile('tasks/evidence/performance-regression-budgets.json', 'utf8'),
+      ) as {
+        queryCeilings: Record<string, number>;
+      };
       const selected = process.env.PERF_CASES?.split(',');
       if (selected?.some((name) => !cases.some((c) => c.name === name)))
         throw new Error('Unknown performance case.');
@@ -325,24 +336,36 @@ const normalize = (value: unknown): unknown =>
         if (selected && !selected.includes(c.name)) continue;
         const reference = normalize(await (c.before ?? c.current)());
         expect(normalize(await c.current())).toEqual(reference);
-        for (let n = 0; n < sampleCount; n++) {
+        for (let n = 0; n < sampleCount; n += readers) {
           const variants = c.before
             ? ([
                 ['before', c.before],
                 ['current', c.current],
               ] as const)
             : ([['current', c.current]] as const);
-          for (const [variant, work] of n % 2 ? [...variants].reverse() : variants) {
-            const state = newDatabaseDiagnostics(),
-              started = performance.now();
-            const value = await withDatabaseDiagnostics(state, work);
-            expect(normalize(value)).toEqual(reference);
-            samples.push({
-              name: c.name,
-              variant,
-              ms: performance.now() - started,
-              queries: state.queries,
-            });
+          for (const [variant, work] of Math.floor(n / readers) % 2
+            ? [...variants].reverse()
+            : variants) {
+            await Promise.all(
+              Array.from({ length: Math.min(readers, sampleCount - n) }, async () => {
+                const state = newDatabaseDiagnostics(),
+                  started = performance.now();
+                const value = await withDatabaseDiagnostics(state, work);
+                expect(normalize(value)).toEqual(reference);
+                if (readers === 1 && variant === 'current') {
+                  expect(state.queries).toBeGreaterThan(0);
+                  expect(state.queries, `${c.name} driver-command regression`).toBeLessThanOrEqual(
+                    budgets.queryCeilings[c.name]!,
+                  );
+                }
+                samples.push({
+                  name: c.name,
+                  variant,
+                  ms: performance.now() - started,
+                  queries: state.queries,
+                });
+              }),
+            );
           }
         }
       }
@@ -354,7 +377,8 @@ const normalize = (value: unknown): unknown =>
             baseline: baseline ?? null,
             node: process.version,
             modelMs: addedDelay,
-            poolMax: 10,
+            poolMax,
+            readers,
             sampleCount,
             samples,
           },
