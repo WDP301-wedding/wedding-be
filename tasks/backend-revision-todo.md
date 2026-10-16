@@ -380,6 +380,15 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
   do not close the full PERF acceptance checkboxes.
   [PERF-04 region profiles and rollback](../docs/performance-region-experiment.md)
   are prepared; no deployment or production-region change has been performed.
+- 2026-10-16 subsequent owner-authorized PR #46 merge/deployment:
+  [live comparison](../docs/perf46-railway-comparison-2026-10-16.md) records successful
+  deployment of `03b9a6b`, green exact-head/merge CI (1934 tests), 200/200 steady
+  reads, unchanged fixture rows/counts and successful session revocation. Backend
+  p95 improved 75% for Identity and 43% for Couple overview at the same US West
+  placement. The other measured families improved 12–28%. Diagnostics remains
+  disabled; PERF-02 assigned-Staff success, PERF-03 live driver/container evidence
+  and PERF-04 region comparison remain open, so the dependency checkboxes above
+  are not closed solely by the PERF-05 latency result.
 - [ ] PERF-06: Batch invitation-template versions; preserve version ownership, cursor and authority rechecks.
 - [ ] PERF-07: Batch print-order lines/commercial revisions/proposals without changing immutable monetary facts.
 - [ ] PERF-08: Reduce notification authority/booking-scope round trips for inbox and unread counts.
