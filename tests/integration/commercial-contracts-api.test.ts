@@ -8,6 +8,7 @@ import { registerCommercialAcceptanceCases } from './commercial-acceptance-api-c
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import request, { type Response } from 'supertest';
+import { Client } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createApp } from '../../src/app.js';
 import { createInvitationStudioServices } from '../../src/modules/invitation-studio/infrastructure/studio.composition.js';
@@ -57,6 +58,7 @@ const records: object[] = [];
 const directory = 'test-results/step6-api';
 describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', () => {
   const database = new CatalogTestDatabase('commercial_contract_api');
+  let lockObserver: Client | undefined;
   let app: ReturnType<typeof createApp>;
   let studio: ReturnType<typeof createInvitationStudioServices>;
   let staffSeating: ReturnType<typeof createStaffSeatingServices>;
@@ -154,6 +156,15 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     url.pathname = '/' + database.databaseName;
     url.searchParams.delete('schema');
     url.searchParams.delete('options');
+    // Synthetic blocker/observer are test infrastructure, outside owner pools.
+    // Competing commands retain the same bounded runtime clients as production.
+    lockObserver = new Client({
+      connectionString: url.toString(),
+      connectionTimeoutMillis: 2000,
+      statement_timeout: 2000,
+      application_name: 'commercial-race-observer',
+    });
+    await lockObserver.connect();
     const config = parseEnvironment({
       NODE_ENV: 'test',
       DATABASE_URL: url.toString(),
@@ -278,6 +289,7 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     );
     await booking?.resource.close();
     await venue?.resource.close();
+    await lockObserver?.end();
     await database.disconnect();
   });
   async function fixture(names = true) {
@@ -346,38 +358,25 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
   }
   type Fixture = Awaited<ReturnType<typeof fixture>>;
   async function race(f: Fixture, commands: readonly (() => Promise<Response>)[]) {
-    let unlock!: () => void;
-    let locked!: () => void;
-    const gate = new Promise<void>((resolve) => {
-      unlock = resolve;
-    });
-    const ready = new Promise<void>((resolve) => {
-      locked = resolve;
-    });
-    const blocker = database.prisma.$transaction(
-      async (tx) => {
-        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${f.id}))`;
-        await tx.$queryRaw`SELECT id FROM "Booking" WHERE id=${f.id}::uuid FOR UPDATE`;
-        locked();
-        await gate;
-      },
-      { timeout: 30_000 },
-    );
-    await ready;
-    const responses = Promise.all(commands.map((command) => command()));
+    await lockObserver!.query('BEGIN');
+    let responses: Promise<Response[]>;
     let waiters = 0;
     try {
+      await lockObserver!.query('SELECT pg_advisory_xact_lock(hashtext($1))', [f.id]);
+      await lockObserver!.query('SELECT id FROM "Booking" WHERE id=$1::uuid FOR UPDATE', [f.id]);
+      responses = Promise.all(commands.map((command) => command()));
       for (let i = 0; i < 100 && waiters < 2; i++) {
-        const rows = await database.prisma.$queryRaw<{ count: bigint }[]>`
+        // The blocker transaction must not reuse its first activity snapshot.
+        await lockObserver!.query('SELECT pg_stat_clear_snapshot()');
+        const { rows } = await lockObserver!.query<{ count: string }>(`
           SELECT count(*) FROM pg_stat_activity
           WHERE datname=current_database() AND wait_event_type='Lock'
-        `;
+        `);
         waiters = Number(rows[0]!.count);
         if (waiters < 2) await new Promise((resolve) => setTimeout(resolve, 20));
       }
     } finally {
-      unlock();
-      await blocker;
+      await lockObserver!.query('ROLLBACK');
     }
     const resolved = await responses;
     expect(waiters).toBe(2);

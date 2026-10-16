@@ -1,0 +1,155 @@
+# PERF-12 ownership and retention matrix — 2026-10-16
+
+All 145 public tables are retained. Application owners below identify the responsible module, not authorization to purge. Database role ownership is recorded separately in the linked machine-readable inventory. FK counts include the observed public-table dependencies; the full raw catalog snapshot stays in the local audit output. Static file counts are supporting evidence, not proof of non-use.
+
+[Review and conditional cleanup procedure](backend-schema-retention-review-2026-10-16.md) · [Detailed inventory](../tasks/evidence/perf12-schema-retention-inventory-2026-10-16.json)
+
+Retention: **H** durable/immutable history; **P** existing owner policy only; **D** derived owner lifecycle; **A** active/referenced state, further purge policy unconfirmed; **M** applied migrations. Every action is RETAIN.
+
+| Table                           | Application owner                | Retention | Runtime files | Worker/retention files | Migrations | FK in/out | JSON columns |
+| ------------------------------- | -------------------------------- | --------- | ------------: | ---------------------: | ---------: | --------- | -----------: |
+| AccessCredential                | identity-access                  | P         |             8 |                      1 |          1 | 0/1       |            0 |
+| Account                         | identity-access                  | P         |            56 |                      4 |         11 | 17/0      |            0 |
+| AccountRetentionEligibilityFact | identity-access                  | P         |             2 |                      1 |          2 | 0/1       |            0 |
+| AccountRole                     | identity-access                  | P         |            11 |                      0 |          5 | 0/1       |            0 |
+| AnalyticsGeneration             | analytics-dashboard              | D         |             2 |                      1 |          2 | 2/0       |            1 |
+| AnalyticsHead                   | analytics-dashboard              | D         |             2 |                      1 |          2 | 0/1       |            0 |
+| AnalyticsProjection             | analytics-dashboard              | D         |             1 |                      1 |          3 | 0/1       |            1 |
+| AuditLog                        | core audit/idempotency/reporting | H         |            42 |                      2 |          2 | 0/0       |            1 |
+| BillingDepositApplication       | payments-billing                 | A         |             1 |                      0 |          1 | 0/1       |            0 |
+| BillingInvoice                  | payments-billing                 | A         |             2 |                      0 |          1 | 0/2       |            1 |
+| BillingLedgerEntry              | payments-billing                 | H         |             4 |                      0 |         11 | 4/3       |            0 |
+| BillingLedgerHead               | payments-billing                 | H         |             0 |                      0 |          4 | 0/1       |            0 |
+| BillingOperationCommand         | payments-billing                 | P         |             2 |                      0 |          1 | 0/1       |            1 |
+| BillingOutboxEvent              | payments-billing                 | P         |             3 |                      0 |          4 | 0/2       |            1 |
+| BillingPaymentAttempt           | payments-billing                 | P         |             5 |                      0 |          9 | 4/3       |            0 |
+| BillingProviderEvidence         | payments-billing                 | H         |             1 |                      0 |          1 | 1/1       |            0 |
+| BillingProviderTransaction      | payments-billing                 | H         |             1 |                      0 |          1 | 0/2       |            0 |
+| BillingRefundApproval           | payments-billing                 | H         |             2 |                      0 |          1 | 0/1       |            0 |
+| BillingReportingSequence        | payments-billing                 | H         |             1 |                      0 |          1 | 0/0       |            0 |
+| BillingReportingSnapshot        | payments-billing                 | H         |             1 |                      0 |          2 | 0/0       |            1 |
+| BillingVnpayCheckout            | payments-billing                 | A         |             1 |                      0 |          1 | 0/1       |            1 |
+| Booking                         | booking-lifecycle                | A         |           138 |                      4 |         23 | 38/3      |            0 |
+| BookingAutomationCommand        | booking-lifecycle                | P         |             1 |                      0 |          1 | 0/0       |            0 |
+| BookingCancellationRequest      | booking-lifecycle                | A         |             1 |                      0 |          1 | 0/1       |            0 |
+| BookingDepositIntent            | booking-lifecycle                | P         |             4 |                      0 |          2 | 0/3       |            0 |
+| BookingDepositSettlement        | booking-lifecycle                | H         |             5 |                      0 |         10 | 0/2       |            0 |
+| BookingHeadcountEvidence        | booking-lifecycle                | H         |             2 |                      0 |          1 | 0/1       |            0 |
+| BookingInvitationIntent         | booking-lifecycle                | P         |             1 |                      0 |          1 | 0/1       |            0 |
+| BookingOutboxEvent              | booking-lifecycle                | P         |             8 |                      0 |          2 | 0/0       |            1 |
+| BookingProposalSnapshot         | booking-lifecycle                | H         |             2 |                      0 |          5 | 0/3       |            0 |
+| BookingReportingSequence        | booking-lifecycle                | H         |             1 |                      0 |          1 | 0/0       |            0 |
+| BookingReportingSnapshot        | booking-lifecycle                | H         |             2 |                      0 |          2 | 0/0       |            1 |
+| BookingSlotHold                 | booking-lifecycle                | A         |             3 |                      0 |          1 | 0/2       |            0 |
+| BookingTimelineDecision         | booking-lifecycle                | A         |             1 |                      0 |          1 | 0/1       |            0 |
+| BookingTimelineItem             | booking-lifecycle                | A         |             0 |                      0 |          1 | 0/1       |            0 |
+| BookingTimelineRevision         | booking-lifecycle                | H         |             3 |                      0 |          5 | 7/2       |            0 |
+| CatalogMediaAsset               | venue-catalog                    | A         |             1 |                      0 |          1 | 0/0       |            0 |
+| CommercialAppendixApproval      | booking-lifecycle                | H         |             1 |                      0 |          2 | 0/1       |            0 |
+| CommercialAppendixHead          | booking-lifecycle                | A         |             2 |                      0 |          7 | 1/5       |            0 |
+| CommercialAppendixRevision      | booking-lifecycle                | H         |             2 |                      0 |          7 | 5/2       |            1 |
+| CommercialContract              | booking-lifecycle                | A         |             4 |                      0 |          6 | 1/3       |            0 |
+| CommercialContractApproval      | booking-lifecycle                | H         |             1 |                      0 |          1 | 0/1       |            0 |
+| CommercialContractLine          | booking-lifecycle                | A         |             0 |                      0 |          1 | 0/1       |            0 |
+| CommercialContractPdf           | booking-lifecycle                | A         |             1 |                      0 |          1 | 0/1       |            0 |
+| CommercialContractRevision      | booking-lifecycle                | H         |             2 |                      0 |          7 | 10/3      |            1 |
+| Consultation                    | booking-lifecycle                | A         |            31 |                      1 |          6 | 3/0       |            0 |
+| ConsultationAccess              | identity-access                  | P         |            16 |                      2 |          3 | 0/1       |            0 |
+| ConsultationRequest             | booking-lifecycle                | A         |             2 |                      1 |          2 | 0/1       |            0 |
+| Dish                            | venue-catalog                    | A         |             7 |                      0 |          1 | 1/2       |            0 |
+| DishVersion                     | venue-catalog                    | A         |             4 |                      0 |          1 | 3/1       |            0 |
+| FinalInvoiceHead                | payments-billing                 | A         |             4 |                      0 |          5 | 1/3       |            0 |
+| FinalInvoiceRevision            | payments-billing                 | H         |             2 |                      0 |          6 | 5/2       |            1 |
+| Guest                           | guest-management                 | A         |            38 |                      1 |          4 | 3/2       |            0 |
+| GuestCommand                    | guest-management                 | P         |             1 |                      0 |          1 | 0/1       |            1 |
+| GuestExchangeLimit              | guest-management                 | A         |             1 |                      0 |          1 | 0/0       |            0 |
+| GuestGroup                      | guest-management                 | A         |             2 |                      0 |          3 | 2/1       |            0 |
+| GuestHistory                    | guest-management                 | H         |             1 |                      0 |          1 | 0/1       |            1 |
+| GuestImportPreview              | guest-management                 | A         |             1 |                      0 |          1 | 0/1       |            1 |
+| GuestInvitationCredential       | guest-management                 | P         |             3 |                      0 |          1 | 1/3       |            0 |
+| GuestInvitationSession          | guest-management                 | P         |             1 |                      0 |          1 | 0/1       |            0 |
+| GuestOutbox                     | guest-management                 | P         |             3 |                      0 |          2 | 0/1       |            1 |
+| GuestPlanRevision               | guest-management                 | H         |             2 |                      0 |          1 | 1/1       |            0 |
+| GuestWorkspace                  | guest-management                 | A         |             2 |                      0 |          1 | 0/2       |            0 |
+| Hall                            | venue-catalog                    | A         |            17 |                      1 |          4 | 3/0       |            0 |
+| IdempotencyRecord               | core audit/idempotency/reporting | P         |             3 |                      0 |          1 | 0/0       |            1 |
+| IdentityOutbox                  | identity-access                  | P         |             2 |                      0 |          1 | 0/0       |            1 |
+| IdentityStaffCommand            | identity-access                  | P         |             1 |                      0 |          1 | 0/0       |            1 |
+| IncidentalExpenseDraft          | payments-billing                 | A         |             1 |                      0 |          2 | 1/1       |            0 |
+| IncidentalExpenseLine           | payments-billing                 | A         |             1 |                      0 |          2 | 0/1       |            0 |
+| InvitationCommercialRevision    | invitation-studio                | H         |             1 |                      0 |          3 | 0/0       |            1 |
+| InvitationDerivedAsset          | invitation-studio                | A         |             5 |                      0 |          1 | 0/0       |            1 |
+| InvitationDerivedUploadAttempt  | invitation-studio                | P         |             1 |                      0 |          1 | 0/0       |            1 |
+| InvitationDesign                | invitation-studio                | A         |             5 |                      0 |          3 | 0/0       |            0 |
+| InvitationDesignRevision        | invitation-studio                | H         |             4 |                      0 |          3 | 0/1       |            1 |
+| InvitationGenerationIntent      | invitation-studio                | P         |             1 |                      0 |          1 | 0/0       |            0 |
+| InvitationMediaAsset            | invitation-studio                | A         |             3 |                      0 |          1 | 1/1       |            0 |
+| InvitationMediaAudit            | invitation-studio                | H         |             1 |                      0 |          1 | 0/0       |            0 |
+| InvitationMediaCommand          | invitation-studio                | P         |             1 |                      0 |          1 | 0/0       |            0 |
+| InvitationMediaFile             | invitation-studio                | A         |             1 |                      0 |          2 | 1/2       |            0 |
+| InvitationMediaPolicy           | invitation-studio                | A         |             3 |                      0 |          1 | 0/0       |            0 |
+| InvitationMediaReceipt          | invitation-studio                | H         |             1 |                      0 |          2 | 0/0       |            1 |
+| InvitationMediaUploadAttempt    | invitation-studio                | P         |             2 |                      0 |          2 | 1/0       |            0 |
+| InvitationPrintAudit            | invitation-studio                | H         |             2 |                      0 |          3 | 0/0       |            2 |
+| InvitationPrintLine             | invitation-studio                | A         |             3 |                      0 |          5 | 0/0       |            1 |
+| InvitationPrintOrder            | invitation-studio                | A         |             3 |                      0 |          5 | 0/0       |            0 |
+| InvitationPrintableRevision     | invitation-studio                | H         |             3 |                      0 |          1 | 0/0       |            1 |
+| InvitationPublicIdentity        | invitation-studio                | A         |             4 |                      0 |          2 | 1/0       |            0 |
+| InvitationPublishedRevision     | invitation-studio                | H         |             3 |                      0 |          1 | 0/0       |            1 |
+| InvitationReportingSequence     | invitation-studio                | H         |             0 |                      0 |          1 | 0/0       |            0 |
+| InvitationSeatingInvalidation   | invitation-studio                | A         |             1 |                      0 |          4 | 0/0       |            0 |
+| InvitationSeatingRevision       | invitation-studio                | H         |             1 |                      0 |          1 | 0/0       |            2 |
+| InvitationSeatingState          | invitation-studio                | A         |             1 |                      0 |          1 | 0/0       |            0 |
+| InvitationStudioCommand         | invitation-studio                | P         |             1 |                      0 |          1 | 0/0       |            0 |
+| InvitationStudioOutbox          | invitation-studio                | P         |             2 |                      0 |          2 | 0/0       |            1 |
+| InvitationStudioReceipt         | invitation-studio                | H         |             1 |                      0 |          1 | 0/0       |            1 |
+| InvitationTemplate              | invitation-studio                | A         |             3 |                      0 |          1 | 0/0       |            0 |
+| InvitationTemplateVersion       | invitation-studio                | A         |             2 |                      0 |          3 | 2/0       |            1 |
+| LayoutTableGeometry             | venue-catalog                    | A         |             2 |                      0 |          2 | 0/2       |            0 |
+| LayoutTableIdentity             | venue-catalog                    | A         |             2 |                      0 |          1 | 1/1       |            0 |
+| LayoutTemplate                  | venue-catalog                    | A         |             6 |                      0 |          1 | 2/3       |            0 |
+| LayoutTemplateVersion           | venue-catalog                    | A         |             6 |                      0 |          2 | 4/1       |            0 |
+| MenuPackage                     | venue-catalog                    | A         |             4 |                      0 |          1 | 1/2       |            0 |
+| MenuPackageItem                 | venue-catalog                    | A         |             1 |                      0 |          1 | 0/2       |            0 |
+| MenuPackageVersion              | venue-catalog                    | A         |             4 |                      0 |          2 | 4/1       |            0 |
+| NotificationAttempt             | notifications-automation         | P         |             2 |                      0 |          2 | 0/1       |            0 |
+| NotificationCommand             | notifications-automation         | P         |             1 |                      0 |          2 | 0/0       |            1 |
+| NotificationCredential          | notifications-automation         | P         |             5 |                      2 |          1 | 0/1       |            0 |
+| NotificationDueCommand          | notifications-automation         | P         |             1 |                      1 |          1 | 0/1       |            0 |
+| NotificationEventReceipt        | notifications-automation         | H         |             2 |                      0 |          1 | 0/0       |            1 |
+| NotificationInbox               | notifications-automation         | A         |             3 |                      1 |          2 | 0/2       |            0 |
+| NotificationInstallation        | notifications-automation         | A         |             2 |                      0 |          2 | 0/2       |            0 |
+| NotificationIntent              | notifications-automation         | P         |             6 |                      2 |          4 | 4/2       |            1 |
+| NotificationPreference          | notifications-automation         | A         |             3 |                      0 |          1 | 0/1       |            0 |
+| NotificationPushDelivery        | notifications-automation         | A         |             3 |                      0 |          2 | 0/1       |            0 |
+| NotificationRecipient           | notifications-automation         | A         |             8 |                      3 |          4 | 1/2       |            0 |
+| NotificationScheduleScan        | notifications-automation         | A         |             1 |                      1 |          1 | 0/0       |            0 |
+| PasswordCredential              | identity-access                  | P         |             6 |                      1 |          1 | 0/1       |            0 |
+| PasswordOtpChallenge            | identity-access                  | P         |             2 |                      1 |          1 | 0/1       |            0 |
+| PasswordResetCredential         | identity-access                  | P         |             3 |                      1 |          1 | 0/1       |            0 |
+| PrintOffering                   | venue-catalog                    | A         |             1 |                      0 |          1 | 1/1       |            0 |
+| PrintOfferingRevision           | venue-catalog                    | H         |             1 |                      0 |          3 | 0/2       |            0 |
+| RefreshCredential               | identity-access                  | P         |             5 |                      1 |          1 | 1/2       |            0 |
+| ReportingFact                   | core audit/idempotency/reporting | H         |             1 |                      0 |          2 | 0/1       |            1 |
+| ReportingSequence               | core audit/idempotency/reporting | H         |             2 |                      0 |          2 | 1/0       |            0 |
+| RestaurantProfile               | venue-catalog                    | A         |             4 |                      0 |          3 | 2/0       |            0 |
+| RestaurantService               | venue-catalog                    | A         |             1 |                      0 |          1 | 1/1       |            0 |
+| RestaurantServiceRevision       | venue-catalog                    | H         |             1 |                      0 |          1 | 0/1       |            0 |
+| RestaurantShift                 | venue-catalog                    | A         |             1 |                      0 |          2 | 0/0       |            0 |
+| SeatingCommand                  | seating-plan                     | P         |             1 |                      0 |          1 | 0/1       |            1 |
+| SeatingOutbox                   | seating-plan                     | P         |             1 |                      0 |          1 | 0/1       |            1 |
+| SeatingPlan                     | seating-plan                     | A         |             2 |                      0 |          1 | 1/2       |            0 |
+| SeatingPlanRevision             | seating-plan                     | H         |             1 |                      0 |          1 | 3/5       |            1 |
+| Session                         | identity-access                  | P         |            32 |                      1 |          2 | 3/1       |            0 |
+| StaffAssignment                 | staff-operations                 | A         |             3 |                      0 |          1 | 0/2       |            0 |
+| StaffAttendanceSnapshot         | staff-operations                 | H         |             2 |                      0 |          2 | 0/1       |            1 |
+| StaffCheckInRecord              | staff-operations                 | A         |             2 |                      0 |          1 | 1/5       |            0 |
+| StaffCommand                    | staff-operations                 | P         |             1 |                      0 |          1 | 0/1       |            1 |
+| StaffConfiguration              | staff-operations                 | A         |             3 |                      0 |          1 | 0/1       |            0 |
+| StaffHistory                    | staff-operations                 | H         |             1 |                      0 |          1 | 0/2       |            1 |
+| StaffOutbox                     | staff-operations                 | P         |             1 |                      0 |          1 | 0/1       |            1 |
+| TimelineTemplate                | venue-catalog                    | A         |             4 |                      0 |          1 | 1/2       |            0 |
+| TimelineTemplateItem            | venue-catalog                    | A         |             1 |                      0 |          1 | 0/1       |            0 |
+| TimelineTemplateVersion         | venue-catalog                    | A         |             4 |                      0 |          1 | 3/1       |            0 |
+| WorkspaceInvitation             | identity-access                  | P         |             2 |                      1 |          2 | 0/2       |            0 |
+| _prisma_migrations              | database migrations              | M         |             1 |                      0 |          0 | 0/0       |            0 |

@@ -398,8 +398,13 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
   controlled measurements and remaining live gates](../docs/backend-performance-06-10.md).
   These checkboxes retain full Railway acceptance, separate from delivered code.
 - [ ] PERF-11: Budget aggregate pools and safe read cancellation; preserve money/provider UNKNOWN and idempotency.
-- [ ] PERF-12: Review table/rehearsal-schema cleanup with ownership, dependency and retention proof; deletion remains separately authorized.
+- [x] PERF-12: Review table/rehearsal-schema cleanup with ownership, dependency and retention proof; deletion remains separately authorized.
 - [ ] PERF-13: Repeat matched live measurements, verify relevant correctness gates and set supported regression budgets.
+- 2026-10-16 PERF-11–13: [pool budget, opt-in safe-read deadlines, retention review,
+  regression measurements and remaining rollout gates](../docs/backend-performance-11-13.md).
+  PERF-12 review retains 145 public tables and 363 rehearsal tables, with zero
+  eligible/approved deletions. PERF-11/13 retain live-candidate acceptance gates;
+  local/native proof and the unchanged deployed baseline are separate evidence.
 
 ## Verification Record
 

@@ -1,4 +1,5 @@
 import { NotFoundError, ValidationError } from '../../../core/errors/app-error.js';
+import { safeReadQuery } from '../../../core/database/safe-read.js';
 import type { Prisma, PrismaClient } from '../../../generated/prisma/client.js';
 import type { CatalogMediaService } from './catalog-media.service.js';
 
@@ -113,33 +114,38 @@ export function createCatalogQueryService(
 ): CatalogAdminQueryService {
   const service: CatalogAdminQueryService = {
     async listPublicHalls(input) {
+      const cursorId = input.cursor;
       const cursor =
-        input.cursor === undefined
+        cursorId === undefined
           ? null
-          : await prisma.hall.findFirst({
-              where: { id: input.cursor, lifecycle: 'ACTIVE' },
-              select: { id: true, displayOrder: true },
-            });
+          : await safeReadQuery(prisma, (db) =>
+              db.hall.findFirst({
+                where: { id: cursorId, lifecycle: 'ACTIVE' },
+                select: { id: true, displayOrder: true },
+              }),
+            );
       if (input.cursor !== undefined && cursor === null)
         throw new ValidationError([
           { path: 'cursor', code: 'invalid_value', message: 'The catalog cursor is invalid.' },
         ]);
-      const rows = await prisma.hall.findMany({
-        where: {
-          lifecycle: 'ACTIVE',
-          ...(cursor === null
-            ? {}
-            : {
-                OR: [
-                  { displayOrder: { gt: cursor.displayOrder } },
-                  { displayOrder: cursor.displayOrder, id: { gt: cursor.id } },
-                ],
-              }),
-        },
-        orderBy: [{ displayOrder: 'asc' }, { id: 'asc' }],
-        take: input.limit + 1,
-        select: { id: true, name: true, description: true, maxGuests: true },
-      });
+      const rows = await safeReadQuery(prisma, (db) =>
+        db.hall.findMany({
+          where: {
+            lifecycle: 'ACTIVE',
+            ...(cursor === null
+              ? {}
+              : {
+                  OR: [
+                    { displayOrder: { gt: cursor.displayOrder } },
+                    { displayOrder: cursor.displayOrder, id: { gt: cursor.id } },
+                  ],
+                }),
+          },
+          orderBy: [{ displayOrder: 'asc' }, { id: 'asc' }],
+          take: input.limit + 1,
+          select: { id: true, name: true, description: true, maxGuests: true },
+        }),
+      );
       const items = rows.slice(0, input.limit);
       const assets = await media.listSignedBatch(
         'HALL',
