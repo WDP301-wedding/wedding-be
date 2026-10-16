@@ -1,0 +1,2380 @@
+{
+  "date": "2026-10-16",
+  "scope": "PERF-11–13; candidate undeployed, live tests measure existing PERF-02–05 deployment.",
+  "live": [
+    {
+      "file": "live-baseline-2.json",
+      "sha256": "7ef1929841ade95e91a313fff61c76a7cfa254791f987f44b74b7cda85fa6e71",
+      "startedAt": "2026-10-16T14:52:31.084Z",
+      "finishedAt": "2026-10-16T15:03:33.265Z",
+      "deploymentId": "0c9f9cd8-1e38-4855-b2a2-84a232bbbdd5",
+      "commit": "03b9a6be46bc11488b3de5bb56270cb008dd884e",
+      "topology": {
+        "applicationRegion": "sfo",
+        "ingress": "sin1",
+        "databaseRegion": "not provider-confirmed; saved same-project pooler ap-southeast-2",
+        "replicas": 1,
+        "diagnostics": false,
+        "candidateDeployed": false
+      },
+      "fixture": {
+        "bookingId": "e80c6f1b-a4fc-4674-a4dd-13ef2601206b",
+        "groups": 4,
+        "listedGuests": 8,
+        "planningHeadcount": 50,
+        "menuTables": 5,
+        "staffAcceptance": "event-window success pending"
+      },
+      "methodology": "20 round-robin samples/case/stage plus initial probes. Reader caps 1 or 1/2/4; starts spaced >=750ms (<=80/min). Stop on unexpected status, transport failure or >25000ms (old measured Analytics tail ~13s). In-flight reads drain; no automatic retries. Session writes only; Analytics GET may refresh derived projections.",
+      "failure": null,
+      "samples": 399,
+      "statuses": {
+        "200": 399
+      },
+      "sessionOperations": [
+        {
+          "role": "couple",
+          "status": 201
+        },
+        {
+          "role": "staff",
+          "status": 201
+        },
+        {
+          "role": "manager",
+          "status": 201
+        },
+        {
+          "role": "couple",
+          "status": 201
+        },
+        {
+          "role": "staff",
+          "status": 201
+        },
+        {
+          "role": "manager",
+          "status": 201
+        },
+        {
+          "role": "couple",
+          "status": 201
+        },
+        {
+          "role": "staff",
+          "status": 201
+        },
+        {
+          "role": "manager",
+          "status": 201
+        }
+      ],
+      "cleanup": [
+        {
+          "role": "couple",
+          "status": 204
+        },
+        {
+          "role": "staff",
+          "status": 204
+        },
+        {
+          "role": "manager",
+          "status": 204
+        },
+        {
+          "role": "couple",
+          "status": 204
+        },
+        {
+          "role": "staff",
+          "status": 204
+        },
+        {
+          "role": "manager",
+          "status": 204
+        },
+        {
+          "role": "couple",
+          "status": 204
+        },
+        {
+          "role": "staff",
+          "status": 204
+        },
+        {
+          "role": "manager",
+          "status": 204
+        }
+      ],
+      "overlaps": [
+        {
+          "readerCap": 1,
+          "inferredMaximumHttpOverlap": 1,
+          "method": "Intervals inferred from client end timestamps/elapsed time, with 5ms granularity tolerance; approximate, not DB concurrency."
+        }
+      ],
+      "summaries": [
+        {
+          "role": "public",
+          "route": "/health/live",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [],
+          "client": {
+            "n": 20,
+            "p50Ms": 229.27390000002924,
+            "p95Ms": 322.48549999995157,
+            "minMs": 224.05309999996098,
+            "maxMs": 573.4749000000011
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 0.699,
+            "p95Ms": 0.861,
+            "minMs": 0.585,
+            "maxMs": 0.959
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 229.18009999999958,
+              "backendMs": 0.931
+            }
+          ]
+        },
+        {
+          "role": "public",
+          "route": "/health/ready",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [],
+          "client": {
+            "n": 20,
+            "p50Ms": 1471.902599999914,
+            "p95Ms": 1609.117099999974,
+            "minMs": 1422.2239000000118,
+            "maxMs": 1724.1146000000008
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 1231.653,
+            "p95Ms": 1253.876,
+            "minMs": 1194.778,
+            "maxMs": 1255.941
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 1490.2881000000016,
+              "backendMs": 1254.979
+            }
+          ]
+        },
+        {
+          "role": "public",
+          "route": "/api/v1/catalog/restaurant",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [],
+          "client": {
+            "n": 20,
+            "p50Ms": 1743.4745000000112,
+            "p95Ms": 1801.4937999999966,
+            "minMs": 898.0029000000068,
+            "maxMs": 1824.8614000000525
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 1507.489,
+            "p95Ms": 1567.218,
+            "minMs": 468.305,
+            "maxMs": 1576.642
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 1759.9421000000002,
+              "backendMs": 1531.69
+            }
+          ]
+        },
+        {
+          "role": "public",
+          "route": "/api/v1/catalog/halls?limit=20",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            2
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 687.565600000089,
+            "p95Ms": 711.6926000000094,
+            "minMs": 670.109999999986,
+            "maxMs": 1794.6896999999954
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 460.182,
+            "p95Ms": 472.472,
+            "minMs": 446.958,
+            "maxMs": 1560.768
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 689.8294000000005,
+              "backendMs": 462.408,
+              "itemCount": 2
+            }
+          ]
+        },
+        {
+          "role": "public",
+          "route": "/api/v1/catalog/dishes?limit=20",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            4
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 2460.6958000000013,
+            "p95Ms": 2626.7787000000244,
+            "minMs": 1409.5481999999902,
+            "maxMs": 2657.940600000031
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 2227.864,
+            "p95Ms": 2377.832,
+            "minMs": 1176.397,
+            "maxMs": 2428.606
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 2447.7821999999996,
+              "backendMs": 2219.202,
+              "itemCount": 4
+            }
+          ]
+        },
+        {
+          "role": "public",
+          "route": "/api/v1/catalog/menu-packages?limit=20",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            2
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 1160.344000000041,
+            "p95Ms": 1254.671800000011,
+            "minMs": 1120.4422999999952,
+            "maxMs": 1294.4000000000233
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 932.963,
+            "p95Ms": 938.558,
+            "minMs": 893.365,
+            "maxMs": 944.015
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 1166.6317000000017,
+              "backendMs": 936.261,
+              "itemCount": 2
+            }
+          ]
+        },
+        {
+          "role": "public",
+          "route": "/api/v1/openapi.json",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [],
+          "client": {
+            "n": 20,
+            "p50Ms": 354.90419999998994,
+            "p95Ms": 439.5731000000378,
+            "minMs": 283.1131999999634,
+            "maxMs": 637.6313999999547
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 20.129,
+            "p95Ms": 33.642,
+            "minMs": 12.548,
+            "maxMs": 43.386
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 705.6052999999993,
+              "backendMs": 21.955
+            }
+          ]
+        },
+        {
+          "role": "couple",
+          "route": "/api/v1/auth/me",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [],
+          "client": {
+            "n": 20,
+            "p50Ms": 1432.6352999999654,
+            "p95Ms": 1485.4760000000242,
+            "minMs": 377.43519999994896,
+            "maxMs": 1497.1419999999925
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 1204.646,
+            "p95Ms": 1254.978,
+            "minMs": 150.323,
+            "maxMs": 1270.236
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 1479.9399000000012,
+              "backendMs": 1250.884
+            }
+          ]
+        },
+        {
+          "role": "couple",
+          "route": "/api/v1/auth/profile",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [],
+          "client": {
+            "n": 20,
+            "p50Ms": 530.7575999999972,
+            "p95Ms": 543.1301999999996,
+            "minMs": 523.8265000000247,
+            "maxMs": 636.485800000024
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 300.112,
+            "p95Ms": 312.317,
+            "minMs": 297.431,
+            "maxMs": 314.911
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 535.6360999999997,
+              "backendMs": 311.345
+            }
+          ]
+        },
+        {
+          "role": "couple",
+          "route": "/api/v1/couple/bookings?limit=20",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            1
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 2988.9623999999603,
+            "p95Ms": 3151.7161999999953,
+            "minMs": 2918.5413999999873,
+            "maxMs": 3273.898999999976
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 2758.985,
+            "p95Ms": 2829.487,
+            "minMs": 2694.172,
+            "maxMs": 2924.284
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 2932.5270999999993,
+              "backendMs": 2705.393,
+              "itemCount": 1
+            }
+          ]
+        },
+        {
+          "role": "couple",
+          "route": "/api/v1/notifications/inbox?limit=20",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            0
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 2501.145100000009,
+            "p95Ms": 2588.0116999999736,
+            "minMs": 1421.0718000000343,
+            "maxMs": 2677.0829000000376
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 2256.391,
+            "p95Ms": 2359.488,
+            "minMs": 1188.092,
+            "maxMs": 2446.539
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 2488.2644,
+              "backendMs": 2260.92,
+              "itemCount": 0
+            }
+          ]
+        },
+        {
+          "role": "couple",
+          "route": "/api/v1/notifications/unread-count",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [],
+          "client": {
+            "n": 20,
+            "p50Ms": 1288.5160000000033,
+            "p95Ms": 1335.6936999999743,
+            "minMs": 1260.1014999999898,
+            "maxMs": 1341.2017999999225
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 1064.619,
+            "p95Ms": 1090.355,
+            "minMs": 1038.983,
+            "maxMs": 1101.827
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 1275.8919999999998,
+              "backendMs": 1050.43
+            }
+          ]
+        },
+        {
+          "role": "staff",
+          "route": "/api/v1/auth/me",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [],
+          "client": {
+            "n": 20,
+            "p50Ms": 379.49359999998705,
+            "p95Ms": 391.3450999999186,
+            "minMs": 374.1350000000093,
+            "maxMs": 394.6231999999727
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 153.332,
+            "p95Ms": 156.627,
+            "minMs": 149.164,
+            "maxMs": 156.965
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 382.8258999999998,
+              "backendMs": 156.677
+            }
+          ]
+        },
+        {
+          "role": "manager",
+          "route": "/api/v1/management/consultation-requests?limit=20",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            18
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 690.5982999999833,
+            "p95Ms": 713.6396999999997,
+            "minMs": 676.0303999999887,
+            "maxMs": 1115.3214000000153
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 460.984,
+            "p95Ms": 471.851,
+            "minMs": 448.938,
+            "maxMs": 475.267
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 684.7876000000033,
+              "backendMs": 450.437,
+              "itemCount": 18
+            }
+          ]
+        },
+        {
+          "role": "manager",
+          "route": "/api/v1/management/catalog/dishes?limit=20",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            5
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 1760.748900000006,
+            "p95Ms": 1799.344999999972,
+            "minMs": 1720.2983999999997,
+            "maxMs": 1922.404300000053
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 1508.453,
+            "p95Ms": 1571.432,
+            "minMs": 1493.532,
+            "maxMs": 1692.348
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 1802.5684999999976,
+              "backendMs": 1566.417,
+              "itemCount": 5
+            }
+          ]
+        },
+        {
+          "role": "manager",
+          "route": "/api/v1/management/catalog/menu-packages?limit=20",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            2
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 989.8330999999889,
+            "p95Ms": 1010.2214999999851,
+            "minMs": 970.8187999999936,
+            "maxMs": 1170.986499999999
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 750.163,
+            "p95Ms": 780.569,
+            "minMs": 742.708,
+            "maxMs": 781.779
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 1005.4693000000007,
+              "backendMs": 778.047,
+              "itemCount": 2
+            }
+          ]
+        },
+        {
+          "role": "manager",
+          "route": "/api/v1/management/invitation-templates?limit=20",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            4
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 2627.2869000000064,
+            "p95Ms": 2798.4235000000335,
+            "minMs": 2611.029999999999,
+            "maxMs": 3121.011400000076
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 2403.27,
+            "p95Ms": 2572.92,
+            "minMs": 2380.203,
+            "maxMs": 2577.527
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 1637.3407000000043,
+              "backendMs": 1407.006,
+              "itemCount": 4
+            }
+          ]
+        },
+        {
+          "role": "manager",
+          "route": "/api/v1/management/print-orders?limit=20",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            3
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 1578.7924999999814,
+            "p95Ms": 1651.7703000000329,
+            "minMs": 1563.2395999999717,
+            "maxMs": 1691.7127999999793
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 1348.583,
+            "p95Ms": 1405.859,
+            "minMs": 1336.35,
+            "maxMs": 1414.909
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 1631.2190999999948,
+              "backendMs": 1404.499,
+              "itemCount": 3
+            }
+          ]
+        },
+        {
+          "role": "manager",
+          "route": "/api/v1/management/analytics/overview?dateFrom=2026-10-01&dateTo=2026-10-31",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [],
+          "client": {
+            "n": 20,
+            "p50Ms": 2680.2011000000057,
+            "p95Ms": 3154.787100000074,
+            "minMs": 1480.077999999994,
+            "maxMs": 11734.192100000015
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 2407.279,
+            "p95Ms": 2511.544,
+            "minMs": 1251.832,
+            "maxMs": 11507.496
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 11854.3099,
+              "backendMs": 11632.265,
+              "analyticsStatus": "READY"
+            }
+          ]
+        }
+      ],
+      "analytics": [
+        {
+          "round": 0,
+          "phase": "initial",
+          "clientMs": 11854.3099,
+          "backendMs": 11632.265,
+          "generationId": "09a84a1e-24a2-4bde-8f7c-6f1c1c30f1e1",
+          "refreshedAt": "2026-10-16T14:53:12.903Z",
+          "status": "READY"
+        },
+        {
+          "round": 1,
+          "phase": "steady",
+          "clientMs": 2739.944000000003,
+          "backendMs": 2511.544,
+          "generationId": "09a84a1e-24a2-4bde-8f7c-6f1c1c30f1e1",
+          "refreshedAt": "2026-10-16T14:53:12.903Z",
+          "status": "READY"
+        },
+        {
+          "round": 2,
+          "phase": "steady",
+          "clientMs": 1480.077999999994,
+          "backendMs": 1251.832,
+          "generationId": "73c6c6d8-3655-41a2-9b8d-6553a3f96515",
+          "refreshedAt": "2026-10-16T14:54:12.233Z",
+          "status": "READY"
+        },
+        {
+          "round": 3,
+          "phase": "steady",
+          "clientMs": 2680.289499999999,
+          "backendMs": 2451.726,
+          "generationId": "73c6c6d8-3655-41a2-9b8d-6553a3f96515",
+          "refreshedAt": "2026-10-16T14:54:12.233Z",
+          "status": "READY"
+        },
+        {
+          "round": 4,
+          "phase": "steady",
+          "clientMs": 11734.192100000015,
+          "backendMs": 11507.496,
+          "generationId": "ece386d7-0154-4ff5-9cca-375fc9645358",
+          "refreshedAt": "2026-10-16T14:55:13.293Z",
+          "status": "READY"
+        },
+        {
+          "round": 5,
+          "phase": "steady",
+          "clientMs": 2619.7759999999835,
+          "backendMs": 2393.144,
+          "generationId": "ece386d7-0154-4ff5-9cca-375fc9645358",
+          "refreshedAt": "2026-10-16T14:55:13.293Z",
+          "status": "READY"
+        },
+        {
+          "round": 6,
+          "phase": "steady",
+          "clientMs": 1567.2733000000007,
+          "backendMs": 1339.015,
+          "generationId": "8f612089-f270-4f2d-8252-115cdd8d16dc",
+          "refreshedAt": "2026-10-16T14:56:11.511Z",
+          "status": "READY"
+        },
+        {
+          "round": 7,
+          "phase": "steady",
+          "clientMs": 2680.2011000000057,
+          "backendMs": 2454.841,
+          "generationId": "8f612089-f270-4f2d-8252-115cdd8d16dc",
+          "refreshedAt": "2026-10-16T14:56:11.511Z",
+          "status": "READY"
+        },
+        {
+          "round": 8,
+          "phase": "steady",
+          "clientMs": 2623.8103999999585,
+          "backendMs": 2397.382,
+          "generationId": "eaa45052-cac0-4dcc-a23b-4b22cbdf9975",
+          "refreshedAt": "2026-10-16T14:57:11.807Z",
+          "status": "READY"
+        },
+        {
+          "round": 9,
+          "phase": "steady",
+          "clientMs": 2738.479900000035,
+          "backendMs": 2508.918,
+          "generationId": "eaa45052-cac0-4dcc-a23b-4b22cbdf9975",
+          "refreshedAt": "2026-10-16T14:57:11.807Z",
+          "status": "READY"
+        },
+        {
+          "round": 10,
+          "phase": "steady",
+          "clientMs": 2622.5797999999486,
+          "backendMs": 2395.15,
+          "generationId": "261e0d77-5502-4e3e-8695-521161f891cc",
+          "refreshedAt": "2026-10-16T14:58:13.096Z",
+          "status": "READY"
+        },
+        {
+          "round": 11,
+          "phase": "steady",
+          "clientMs": 2635.828999999969,
+          "backendMs": 2397.759,
+          "generationId": "261e0d77-5502-4e3e-8695-521161f891cc",
+          "refreshedAt": "2026-10-16T14:58:13.096Z",
+          "status": "READY"
+        },
+        {
+          "round": 12,
+          "phase": "steady",
+          "clientMs": 1576.5645000000368,
+          "backendMs": 1349.745,
+          "generationId": "93e20b4f-3f9b-484b-bfdc-f95aa8cf8096",
+          "refreshedAt": "2026-10-16T14:59:12.752Z",
+          "status": "READY"
+        },
+        {
+          "round": 13,
+          "phase": "steady",
+          "clientMs": 2729.8428999999887,
+          "backendMs": 2504.519,
+          "generationId": "93e20b4f-3f9b-484b-bfdc-f95aa8cf8096",
+          "refreshedAt": "2026-10-16T14:59:12.752Z",
+          "status": "READY"
+        },
+        {
+          "round": 14,
+          "phase": "steady",
+          "clientMs": 1635.7895000000135,
+          "backendMs": 1402.465,
+          "generationId": "7873b8ab-2736-4fdf-8e06-87ec7d0d0acd",
+          "refreshedAt": "2026-10-16T15:00:12.248Z",
+          "status": "READY"
+        },
+        {
+          "round": 15,
+          "phase": "steady",
+          "clientMs": 2721.041900000011,
+          "backendMs": 2492.734,
+          "generationId": "7873b8ab-2736-4fdf-8e06-87ec7d0d0acd",
+          "refreshedAt": "2026-10-16T15:00:12.248Z",
+          "status": "READY"
+        },
+        {
+          "round": 16,
+          "phase": "steady",
+          "clientMs": 1623.319199999969,
+          "backendMs": 1398.326,
+          "generationId": "a22e2c79-2854-43ae-9c2b-31c59a23201d",
+          "refreshedAt": "2026-10-16T15:01:11.988Z",
+          "status": "READY"
+        },
+        {
+          "round": 17,
+          "phase": "steady",
+          "clientMs": 2697.2266999999993,
+          "backendMs": 2460.422,
+          "generationId": "a22e2c79-2854-43ae-9c2b-31c59a23201d",
+          "refreshedAt": "2026-10-16T15:01:11.988Z",
+          "status": "READY"
+        },
+        {
+          "round": 18,
+          "phase": "steady",
+          "clientMs": 2720.9109999999637,
+          "backendMs": 2407.279,
+          "generationId": "862ac320-d258-455a-aabb-bd95a15c2c74",
+          "refreshedAt": "2026-10-16T15:02:13.316Z",
+          "status": "READY"
+        },
+        {
+          "round": 19,
+          "phase": "steady",
+          "clientMs": 2722.1651999999303,
+          "backendMs": 2493.225,
+          "generationId": "862ac320-d258-455a-aabb-bd95a15c2c74",
+          "refreshedAt": "2026-10-16T15:02:13.316Z",
+          "status": "READY"
+        },
+        {
+          "round": 20,
+          "phase": "steady",
+          "clientMs": 3154.787100000074,
+          "backendMs": 2418.533,
+          "generationId": "732b6394-81d1-42e9-9585-5a7e73bba52f",
+          "refreshedAt": "2026-10-16T15:03:12.897Z",
+          "status": "READY"
+        }
+      ]
+    },
+    {
+      "file": "live-bounded.json",
+      "sha256": "18b511d3d7ff87a0f8c0d3781312750416ff2481d724459109bedc1b21bca608",
+      "startedAt": "2026-10-16T15:03:35.041Z",
+      "finishedAt": "2026-10-16T15:18:07.480Z",
+      "deploymentId": "0c9f9cd8-1e38-4855-b2a2-84a232bbbdd5",
+      "commit": "03b9a6be46bc11488b3de5bb56270cb008dd884e",
+      "topology": {
+        "applicationRegion": "sfo",
+        "ingress": "sin1",
+        "databaseRegion": "not provider-confirmed; saved same-project pooler ap-southeast-2",
+        "replicas": 1,
+        "diagnostics": false,
+        "candidateDeployed": false
+      },
+      "fixture": {
+        "bookingId": "e80c6f1b-a4fc-4674-a4dd-13ef2601206b",
+        "groups": 4,
+        "listedGuests": 8,
+        "planningHeadcount": 50,
+        "menuTables": 5,
+        "staffAcceptance": "event-window success pending"
+      },
+      "methodology": "20 round-robin samples/case/stage plus initial probes. Reader caps 1 or 1/2/4; starts spaced >=750ms (<=80/min). Stop on unexpected status, transport failure or >25000ms (old measured Analytics tail ~13s). In-flight reads drain; no automatic retries. Session writes only; Analytics GET may refresh derived projections.",
+      "failure": null,
+      "samples": 378,
+      "statuses": {
+        "200": 378
+      },
+      "sessionOperations": [
+        {
+          "role": "couple",
+          "status": 201
+        },
+        {
+          "role": "manager",
+          "status": 201
+        },
+        {
+          "role": "couple",
+          "status": 201
+        },
+        {
+          "role": "manager",
+          "status": 201
+        },
+        {
+          "role": "couple",
+          "status": 201
+        },
+        {
+          "role": "manager",
+          "status": 201
+        },
+        {
+          "role": "couple",
+          "status": 201
+        },
+        {
+          "role": "manager",
+          "status": 201
+        }
+      ],
+      "cleanup": [
+        {
+          "role": "couple",
+          "status": 204
+        },
+        {
+          "role": "manager",
+          "status": 204
+        },
+        {
+          "role": "couple",
+          "status": 204
+        },
+        {
+          "role": "manager",
+          "status": 204
+        },
+        {
+          "role": "couple",
+          "status": 204
+        },
+        {
+          "role": "manager",
+          "status": 204
+        },
+        {
+          "role": "couple",
+          "status": 204
+        },
+        {
+          "role": "manager",
+          "status": 204
+        }
+      ],
+      "overlaps": [
+        {
+          "readerCap": 1,
+          "inferredMaximumHttpOverlap": 1,
+          "method": "Intervals inferred from client end timestamps/elapsed time, with 5ms granularity tolerance; approximate, not DB concurrency."
+        },
+        {
+          "readerCap": 2,
+          "inferredMaximumHttpOverlap": 2,
+          "method": "Intervals inferred from client end timestamps/elapsed time, with 5ms granularity tolerance; approximate, not DB concurrency."
+        },
+        {
+          "readerCap": 4,
+          "inferredMaximumHttpOverlap": 4,
+          "method": "Intervals inferred from client end timestamps/elapsed time, with 5ms granularity tolerance; approximate, not DB concurrency."
+        }
+      ],
+      "summaries": [
+        {
+          "role": "public",
+          "route": "/api/v1/catalog/halls?limit=20",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            2
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 2847.127600000007,
+            "p95Ms": 3003.637599999998,
+            "minMs": 2773.737399999998,
+            "maxMs": 3465.0069000000367
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 2606.984,
+            "p95Ms": 2669.81,
+            "minMs": 2541.725,
+            "maxMs": 2670.665
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 2902.5730999999996,
+              "backendMs": 2660.525,
+              "itemCount": 2
+            }
+          ]
+        },
+        {
+          "role": "couple",
+          "route": "/api/v1/notifications/inbox?limit=20",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            0
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 2563.229600000006,
+            "p95Ms": 2764.3710999999894,
+            "minMs": 1466.6205999999947,
+            "maxMs": 2825.242499999993
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 2294.617,
+            "p95Ms": 2351.508,
+            "minMs": 1216.509,
+            "maxMs": 2354.586
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 2606.1530000000002,
+              "backendMs": 2353.573,
+              "itemCount": 0
+            }
+          ]
+        },
+        {
+          "role": "manager",
+          "route": "/api/v1/management/invitation-templates?limit=20",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            4
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 1634.5813999999955,
+            "p95Ms": 1756.4869999999937,
+            "minMs": 1610.8954999999987,
+            "maxMs": 2745.335299999977
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 1378.215,
+            "p95Ms": 1403.334,
+            "minMs": 1375.458,
+            "maxMs": 2503.017
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 2703.8148,
+              "backendMs": 2462.712,
+              "itemCount": 4
+            }
+          ]
+        },
+        {
+          "role": "couple",
+          "route": "/api/v1/bookings/{bookingId}/guest-groups",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            4
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 4106.151799999992,
+            "p95Ms": 4158.141499999998,
+            "minMs": 3953.020199999999,
+            "maxMs": 4165.344400000002
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 3834.021,
+            "p95Ms": 3915.251,
+            "minMs": 3718.433,
+            "maxMs": 3921.773
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 4021.5529000000006,
+              "backendMs": 3766.02,
+              "itemCount": 4
+            }
+          ]
+        },
+        {
+          "role": "couple",
+          "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [],
+          "client": {
+            "n": 20,
+            "p50Ms": 4853.498400000011,
+            "p95Ms": 5034.473700000002,
+            "minMs": 4814.645000000004,
+            "maxMs": 5048.8763000000035
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 4583.903,
+            "p95Ms": 4669.274,
+            "minMs": 4578.836,
+            "maxMs": 4669.529
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 4933.797500000001,
+              "backendMs": 4587.551
+            }
+          ]
+        },
+        {
+          "role": "couple",
+          "route": "/api/v1/bookings/{bookingId}/billing",
+          "readers": 1,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [],
+          "client": {
+            "n": 20,
+            "p50Ms": 3619.455399999977,
+            "p95Ms": 3780.206999999995,
+            "minMs": 3510.4948999999906,
+            "maxMs": 4246.909400000004
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 3373.321,
+            "p95Ms": 3443.622,
+            "minMs": 3270.928,
+            "maxMs": 3453.196
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 3744.0636000000013,
+              "backendMs": 3406.102
+            }
+          ]
+        },
+        {
+          "role": "public",
+          "route": "/api/v1/catalog/halls?limit=20",
+          "readers": 2,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            2
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 701.0312999999151,
+            "p95Ms": 2789.405299999984,
+            "minMs": 677.4226999999955,
+            "maxMs": 2846.384800000058
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 458.577,
+            "p95Ms": 2553.123,
+            "minMs": 446.604,
+            "maxMs": 2611.549
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 6853.560400000017,
+              "backendMs": 2542.652,
+              "itemCount": 2
+            }
+          ]
+        },
+        {
+          "role": "couple",
+          "route": "/api/v1/notifications/inbox?limit=20",
+          "readers": 2,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            0
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 1473.7905000000028,
+            "p95Ms": 2752.1412000000128,
+            "minMs": 1414.343799999915,
+            "maxMs": 2987.4868000000715
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 1239.137,
+            "p95Ms": 2335.806,
+            "minMs": 1191.513,
+            "maxMs": 2347.952
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 7567.616800000018,
+              "backendMs": 1194.322,
+              "itemCount": 0
+            }
+          ]
+        },
+        {
+          "role": "manager",
+          "route": "/api/v1/management/invitation-templates?limit=20",
+          "readers": 2,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            4
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 1610.8467999999411,
+            "p95Ms": 2715.293399999966,
+            "minMs": 1572.689400000032,
+            "maxMs": 2749.385399999912
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 1375.435,
+            "p95Ms": 2467.809,
+            "minMs": 1345.091,
+            "maxMs": 2503.87
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 2637.976800000004,
+              "backendMs": 2400.879,
+              "itemCount": 4
+            }
+          ]
+        },
+        {
+          "role": "couple",
+          "route": "/api/v1/bookings/{bookingId}/guest-groups",
+          "readers": 2,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            4
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 2918.221200000029,
+            "p95Ms": 3702.510099999956,
+            "minMs": 2890.94299999997,
+            "maxMs": 3950.7916999999434
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 2673.488,
+            "p95Ms": 3465.819,
+            "minMs": 2668.675,
+            "maxMs": 3727.04
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 4038.5877999999793,
+              "backendMs": 3811.746,
+              "itemCount": 4
+            }
+          ]
+        },
+        {
+          "role": "couple",
+          "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+          "readers": 2,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [],
+          "client": {
+            "n": 20,
+            "p50Ms": 4811.277200000011,
+            "p95Ms": 4925.1861999999965,
+            "minMs": 4704.055900000036,
+            "maxMs": 5201.586899999995
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 4577.091,
+            "p95Ms": 4668.193,
+            "minMs": 4473.79,
+            "maxMs": 4678.829
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 4712.412000000011,
+              "backendMs": 4482.902
+            }
+          ]
+        },
+        {
+          "role": "couple",
+          "route": "/api/v1/bookings/{bookingId}/billing",
+          "readers": 2,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [],
+          "client": {
+            "n": 20,
+            "p50Ms": 3810.549599999911,
+            "p95Ms": 4088.5430999999517,
+            "minMs": 3529.9591000000364,
+            "maxMs": 4129.11540000001
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 3570.767,
+            "p95Ms": 3827.625,
+            "minMs": 3299.234,
+            "maxMs": 3888.378
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 3502.382099999988,
+              "backendMs": 3271.579
+            }
+          ]
+        },
+        {
+          "role": "public",
+          "route": "/api/v1/catalog/halls?limit=20",
+          "readers": 4,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            2
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 701.7844000000041,
+            "p95Ms": 3031.703499999945,
+            "minMs": 685.000800000038,
+            "maxMs": 3069.1881000000285
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 463.972,
+            "p95Ms": 2607.232,
+            "minMs": 458.131,
+            "maxMs": 2650.764
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 691.4608000000007,
+              "backendMs": 458.446,
+              "itemCount": 2
+            }
+          ]
+        },
+        {
+          "role": "couple",
+          "route": "/api/v1/notifications/inbox?limit=20",
+          "readers": 4,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            0
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 1466.4605000000447,
+            "p95Ms": 2751.6957000000402,
+            "minMs": 1440.0256999999983,
+            "maxMs": 3086.6681999999564
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 1238.749,
+            "p95Ms": 2304.974,
+            "minMs": 1220.556,
+            "maxMs": 2339.887
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 1477.1241000000155,
+              "backendMs": 1241.463,
+              "itemCount": 0
+            }
+          ]
+        },
+        {
+          "role": "manager",
+          "route": "/api/v1/management/invitation-templates?limit=20",
+          "readers": 4,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            4
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 1633.1048000000883,
+            "p95Ms": 2808.8453000000445,
+            "minMs": 1565.1439999999711,
+            "maxMs": 3437.470900000073
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 1376.008,
+            "p95Ms": 2446.4,
+            "minMs": 1336.029,
+            "maxMs": 2459.951
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 1603.2726999999722,
+              "backendMs": 1378.486,
+              "itemCount": 4
+            }
+          ]
+        },
+        {
+          "role": "couple",
+          "route": "/api/v1/bookings/{bookingId}/guest-groups",
+          "readers": 4,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [
+            4
+          ],
+          "client": {
+            "n": 20,
+            "p50Ms": 2956.0756999999285,
+            "p95Ms": 4049.28740000003,
+            "minMs": 2890.664300000062,
+            "maxMs": 4080.09440000006
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 2673.03,
+            "p95Ms": 3830.571,
+            "minMs": 2667.482,
+            "maxMs": 3856.62
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 2906.019100000034,
+              "backendMs": 2671.284,
+              "itemCount": 4
+            }
+          ]
+        },
+        {
+          "role": "couple",
+          "route": "/api/v1/bookings/{bookingId}/seating-plans/current",
+          "readers": 4,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [],
+          "client": {
+            "n": 20,
+            "p50Ms": 4965.814000000013,
+            "p95Ms": 6065.092399999965,
+            "minMs": 4787.9059000000125,
+            "maxMs": 6183.015699999989
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 4577.344,
+            "p95Ms": 5648.147,
+            "minMs": 4441.249,
+            "maxMs": 5778.507
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 5001.613099999959,
+              "backendMs": 4576.192
+            }
+          ]
+        },
+        {
+          "role": "couple",
+          "route": "/api/v1/bookings/{bookingId}/billing",
+          "readers": 4,
+          "statuses": {
+            "200": 20
+          },
+          "itemCounts": [],
+          "client": {
+            "n": 20,
+            "p50Ms": 5295.217100000009,
+            "p95Ms": 6460.8321,
+            "minMs": 4901.030700000003,
+            "maxMs": 9642.572799999965
+          },
+          "backend": {
+            "n": 20,
+            "p50Ms": 5064.607,
+            "p95Ms": 6229.474,
+            "minMs": 4672.826,
+            "maxMs": 9416.562
+          },
+          "initial": [
+            {
+              "status": 200,
+              "clientMs": 5315.065599999973,
+              "backendMs": 5083.632
+            }
+          ]
+        }
+      ],
+      "analytics": []
+    }
+  ],
+  "failedLiveAttempt": {
+    "file": "live-baseline.json",
+    "sha256": "76d9fc67c9b588a7cf1447f6ff2eda743c496cf3bf1ce12691b4ee1e7d1707c7",
+    "reason": "Operator abort threshold 10 seconds below known ~13-second Analytics refresh tail; corrected to 25 seconds. No automatic retry.",
+    "failedSamples": [
+      {
+        "role": "manager",
+        "route": "/api/v1/management/analytics/overview?dateFrom=2026-10-01&dateTo=2026-10-31",
+        "readers": 1,
+        "round": 0,
+        "phase": "initial",
+        "status": 0,
+        "errorCode": "TimeoutError"
+      }
+    ],
+    "cleanup": [
+      {
+        "role": "couple",
+        "status": 204
+      },
+      {
+        "role": "staff",
+        "status": 204
+      },
+      {
+        "role": "manager",
+        "status": 204
+      }
+    ]
+  },
+  "correlation": {
+    "requested": 811,
+    "matched": 811,
+    "sha256": "54bf8743bf126bdbe3fe8506b1dbee7a5a5233ecb99f53567c55d1ec08db14e8"
+  },
+  "deploymentBefore": {
+    "at": "2026-10-16T14:50:10.181Z",
+    "active": [
+      {
+        "id": "0c9f9cd8-1e38-4855-b2a2-84a232bbbdd5",
+        "commit": "03b9a6be46bc11488b3de5bb56270cb008dd884e",
+        "status": "SUCCESS"
+      }
+    ]
+  },
+  "deploymentAfter": {
+    "at": "2026-10-16T15:19:07.469Z",
+    "active": [
+      {
+        "id": "0c9f9cd8-1e38-4855-b2a2-84a232bbbdd5",
+        "commit": "03b9a6be46bc11488b3de5bb56270cb008dd884e",
+        "status": "SUCCESS"
+      }
+    ]
+  },
+  "fixtureInvariants": {
+    "beforeAt": "2026-10-16T14:55:05.222Z",
+    "afterAt": "2026-10-16T15:18:57.576Z",
+    "all15TableDigestsUnchanged": true,
+    "matchesPriorPERF46FixtureSnapshot": true,
+    "tables": {
+      "Booking": {
+        "count": 1,
+        "sha256": "20dcee6f97394382004b58c32131e5a6dba355b4191a6ade60ad6a7a3354cd99"
+      },
+      "GuestWorkspace": {
+        "count": 1,
+        "sha256": "740e1cfad05084d31b75caee13d7e3321381bd9f6d637403bc187266e8bf5444"
+      },
+      "GuestPlanRevision": {
+        "count": 1,
+        "sha256": "1d999c357118e047bbf2b054d4a62f233b7d5211a3df379e06720d89e3089a7e"
+      },
+      "Guest": {
+        "count": 8,
+        "sha256": "2fab9d7948048ad7f8ee99add51ceb1057e8bd75463d1d0209b0e8f5f2616661"
+      },
+      "GuestGroup": {
+        "count": 4,
+        "sha256": "4c16cb980d31b569683ca79ef4423e7519226c8c5bf831c5855312b0c4dfe395"
+      },
+      "GuestHistory": {
+        "count": 12,
+        "sha256": "b00ccae7b401b0e1f61f0247de74f671965cee799482fe1adddead565ccea544"
+      },
+      "SeatingPlan": {
+        "count": 1,
+        "sha256": "21324fbb0909ebe7b7847d5c123df7988539e163ae938e3873f0c07ef3cba10b"
+      },
+      "SeatingPlanRevision": {
+        "count": 2,
+        "sha256": "d3d9236f4ce95da45b5c26ee86e743bdd3a16ae2495caeefde36b123d16c58f8"
+      },
+      "StaffConfiguration": {
+        "count": 1,
+        "sha256": "c2069094393ddd40b16a802f3594d61fa05097fb29e3f765fc3c2031e45b524c"
+      },
+      "StaffAssignment": {
+        "count": 1,
+        "sha256": "7138dcfec52bee5e751fa90552a061e70e6cf464f0a5d0fa114f7e27096ee185"
+      },
+      "StaffHistory": {
+        "count": 3,
+        "sha256": "547f6018665f82fe9a9a84603e3faed5d49b237c3ae9cf872ebef2deb89a18f0"
+      },
+      "StaffCheckInRecord": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "CommercialContractRevision": {
+        "count": 1,
+        "sha256": "9826bab0f0440ef1e4bd62f5a6a731073359e734d2aa8cc0f6707ffa96bab600"
+      },
+      "FinalInvoiceRevision": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "BillingLedgerEntry": {
+        "count": 2,
+        "sha256": "4c31f36bde988dd800fcb73c6823f1c8e026cef32cf991a0e9b5f3eeee7c6c8d"
+      }
+    },
+    "limit": "The before snapshot was taken during the early sequential baseline; equality to the prior PERF-46 snapshot covers the earlier boundary. Analytics projections and test session/audit rows are outside these domain digests."
+  },
+  "modeled": [
+    {
+      "baseline": "3c6e898",
+      "node": "v24.21.0",
+      "modelMs": 40,
+      "poolMax": 3,
+      "readers": 1,
+      "sampleCount": 20,
+      "summary": [
+        {
+          "name": "templates-20",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 280.2008999999998,
+          "p95Ms": 283.29569999999876,
+          "commands": [
+            6
+          ]
+        },
+        {
+          "name": "templates-20",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 187.86769999999888,
+          "p95Ms": 190.5108999999975,
+          "commands": [
+            4
+          ]
+        },
+        {
+          "name": "print-orders-20",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 1077.508299999994,
+          "p95Ms": 1083.7306000000026,
+          "commands": [
+            23
+          ]
+        },
+        {
+          "name": "print-orders-20",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 234.21889999999985,
+          "p95Ms": 237.46070000000327,
+          "commands": [
+            5
+          ]
+        },
+        {
+          "name": "inbox-empty",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 373.7314000000042,
+          "p95Ms": 378.9743000000017,
+          "commands": [
+            8
+          ]
+        },
+        {
+          "name": "inbox-empty",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 233.67339999999967,
+          "p95Ms": 237.4646999999968,
+          "commands": [
+            6
+          ]
+        },
+        {
+          "name": "unread-empty",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 326.5031999999992,
+          "p95Ms": 330.840200000006,
+          "commands": [
+            7
+          ]
+        },
+        {
+          "name": "unread-empty",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 187.57630000000063,
+          "p95Ms": 192.87019999999757,
+          "commands": [
+            5
+          ]
+        },
+        {
+          "name": "catalog-halls-no-assets",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 701.2795000000042,
+          "p95Ms": 704.3087999999989,
+          "commands": [
+            41
+          ]
+        },
+        {
+          "name": "catalog-halls-no-assets",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 140.15879999999015,
+          "p95Ms": 142.02650000000722,
+          "commands": [
+            3
+          ]
+        },
+        {
+          "name": "analytics-warm",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 326.75070000000414,
+          "p95Ms": 328.86479999999574,
+          "commands": [
+            7
+          ]
+        },
+        {
+          "name": "analytics-warm",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 279.9380999999994,
+          "p95Ms": 281.6849000000075,
+          "commands": [
+            6
+          ]
+        },
+        {
+          "name": "catalog-halls-with-assets",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 700.6748999999982,
+          "p95Ms": 705.534599999999,
+          "commands": [
+            41
+          ]
+        },
+        {
+          "name": "catalog-halls-with-assets",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 141.32719999999972,
+          "p95Ms": 143.97020000001066,
+          "commands": [
+            3
+          ]
+        },
+        {
+          "name": "inbox-populated",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 373.9771999999939,
+          "p95Ms": 377.32360000000335,
+          "commands": [
+            8
+          ]
+        },
+        {
+          "name": "inbox-populated",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 233.79869999999937,
+          "p95Ms": 236.23949999999604,
+          "commands": [
+            6
+          ]
+        },
+        {
+          "name": "unread-populated",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 326.37650000001304,
+          "p95Ms": 327.9947000000102,
+          "commands": [
+            7
+          ]
+        },
+        {
+          "name": "unread-populated",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 186.80470000000787,
+          "p95Ms": 188.73099999999977,
+          "commands": [
+            5
+          ]
+        }
+      ],
+      "rawSha256": "2167a42525a5eb136905ccfd96b42603b0da65096079f8f8cf4c72245e07c012"
+    },
+    {
+      "baseline": "3c6e898",
+      "node": "v24.21.0",
+      "modelMs": 40,
+      "poolMax": 3,
+      "readers": 2,
+      "sampleCount": 20,
+      "summary": [
+        {
+          "name": "templates-20",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 279.329099999999,
+          "p95Ms": 281.28199999999924,
+          "commands": [
+            6
+          ]
+        },
+        {
+          "name": "templates-20",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 186.6275999999998,
+          "p95Ms": 189.07890000000043,
+          "commands": [
+            4
+          ]
+        },
+        {
+          "name": "print-orders-20",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 1073.6054000000004,
+          "p95Ms": 1093.6764000000003,
+          "commands": [
+            23
+          ]
+        },
+        {
+          "name": "print-orders-20",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 234.31230000000141,
+          "p95Ms": 237.22569999999905,
+          "commands": [
+            5
+          ]
+        },
+        {
+          "name": "inbox-empty",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 373.21390000000247,
+          "p95Ms": 381.7332999999999,
+          "commands": [
+            8
+          ]
+        },
+        {
+          "name": "inbox-empty",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 274.6346999999987,
+          "p95Ms": 284.09189999999944,
+          "commands": [
+            6
+          ]
+        },
+        {
+          "name": "unread-empty",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 326.0994999999966,
+          "p95Ms": 328.5743999999977,
+          "commands": [
+            7
+          ]
+        },
+        {
+          "name": "unread-empty",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 187.95950000000448,
+          "p95Ms": 234.0702999999994,
+          "commands": [
+            5
+          ]
+        },
+        {
+          "name": "catalog-halls-no-assets",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 1030.3252999999968,
+          "p95Ms": 1312.9112999999998,
+          "commands": [
+            41
+          ]
+        },
+        {
+          "name": "catalog-halls-no-assets",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 140.16769999999815,
+          "p95Ms": 142.03869999999733,
+          "commands": [
+            3
+          ]
+        },
+        {
+          "name": "analytics-warm",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 326.834299999995,
+          "p95Ms": 335.7763999999952,
+          "commands": [
+            7
+          ]
+        },
+        {
+          "name": "analytics-warm",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 279.6085000000021,
+          "p95Ms": 297.77270000000135,
+          "commands": [
+            6
+          ]
+        },
+        {
+          "name": "catalog-halls-with-assets",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 1030.169499999989,
+          "p95Ms": 1312.255600000004,
+          "commands": [
+            41
+          ]
+        },
+        {
+          "name": "catalog-halls-with-assets",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 139.98530000000028,
+          "p95Ms": 142.55479999999807,
+          "commands": [
+            3
+          ]
+        },
+        {
+          "name": "inbox-populated",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 372.6848000000027,
+          "p95Ms": 375.9241000000038,
+          "commands": [
+            8
+          ]
+        },
+        {
+          "name": "inbox-populated",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 236.98360000000685,
+          "p95Ms": 282.25990000000456,
+          "commands": [
+            6
+          ]
+        },
+        {
+          "name": "unread-populated",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 328.79109999998764,
+          "p95Ms": 331.4695999999967,
+          "commands": [
+            7
+          ]
+        },
+        {
+          "name": "unread-populated",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 188.5225999999966,
+          "p95Ms": 235.38069999999425,
+          "commands": [
+            5
+          ]
+        }
+      ],
+      "rawSha256": "560b6005c494811065215bfc9ceaaad2db6e97d8809c208b944abdd0bb7636d0"
+    },
+    {
+      "baseline": "3c6e898",
+      "node": "v24.21.0",
+      "modelMs": 40,
+      "poolMax": 3,
+      "readers": 4,
+      "sampleCount": 20,
+      "summary": [
+        {
+          "name": "templates-20",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 373.7957000000006,
+          "p95Ms": 388.91510000000017,
+          "commands": [
+            6
+          ]
+        },
+        {
+          "name": "templates-20",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 234.21060000000034,
+          "p95Ms": 281.0190999999995,
+          "commands": [
+            4
+          ]
+        },
+        {
+          "name": "print-orders-20",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 1403.6767,
+          "p95Ms": 1493.2475999999988,
+          "commands": [
+            23
+          ]
+        },
+        {
+          "name": "print-orders-20",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 282.9708000000028,
+          "p95Ms": 329.3571000000011,
+          "commands": [
+            5
+          ]
+        },
+        {
+          "name": "inbox-empty",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 475.8545000000013,
+          "p95Ms": 521.4282999999996,
+          "commands": [
+            8
+          ]
+        },
+        {
+          "name": "inbox-empty",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 329.91489999999976,
+          "p95Ms": 420.16479999999865,
+          "commands": [
+            6
+          ]
+        },
+        {
+          "name": "unread-empty",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 418.6262999999999,
+          "p95Ms": 467.3572000000022,
+          "commands": [
+            7
+          ]
+        },
+        {
+          "name": "unread-empty",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 279.4500000000007,
+          "p95Ms": 327.251400000001,
+          "commands": [
+            5
+          ]
+        },
+        {
+          "name": "catalog-halls-no-assets",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 2083.2986999999994,
+          "p95Ms": 2621.6854999999996,
+          "commands": [
+            41
+          ]
+        },
+        {
+          "name": "catalog-halls-no-assets",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 185.22750000000087,
+          "p95Ms": 189.67619999999442,
+          "commands": [
+            3
+          ]
+        },
+        {
+          "name": "analytics-warm",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 331.5842000000048,
+          "p95Ms": 609.9565999999977,
+          "commands": [
+            7
+          ]
+        },
+        {
+          "name": "analytics-warm",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 282.8891000000003,
+          "p95Ms": 515.9784,
+          "commands": [
+            6
+          ]
+        },
+        {
+          "name": "catalog-halls-with-assets",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 1977.1605999999956,
+          "p95Ms": 2577.892399999997,
+          "commands": [
+            41
+          ]
+        },
+        {
+          "name": "catalog-halls-with-assets",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 186.9311000000016,
+          "p95Ms": 190.65690000000177,
+          "commands": [
+            3
+          ]
+        },
+        {
+          "name": "inbox-populated",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 497.36479999999574,
+          "p95Ms": 524.1389000000054,
+          "commands": [
+            8
+          ]
+        },
+        {
+          "name": "inbox-populated",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 325.3087999999989,
+          "p95Ms": 421.1049999999959,
+          "commands": [
+            6
+          ]
+        },
+        {
+          "name": "unread-populated",
+          "variant": "before",
+          "n": 20,
+          "p50Ms": 420.55310000000463,
+          "p95Ms": 467.69400000000314,
+          "commands": [
+            7
+          ]
+        },
+        {
+          "name": "unread-populated",
+          "variant": "current",
+          "n": 20,
+          "p50Ms": 280.21970000000147,
+          "p95Ms": 328.5737000000081,
+          "commands": [
+            5
+          ]
+        }
+      ],
+      "rawSha256": "f68af7f068fd9363ccb3220bd42e3bd19107ff01a4c7020504916392fb398d37"
+    }
+  ],
+  "safeReadCost": {
+    "node": "v24.21.0",
+    "poolMax": 1,
+    "modelMs": 0,
+    "fixtureHalls": 1,
+    "summary": [
+      {
+        "enabled": false,
+        "commands": [
+          1
+        ],
+        "n": 20,
+        "p50Ms": 0.7534000000005108,
+        "p95Ms": 1.6298999999999069,
+        "minMs": 0.6667999999999665,
+        "maxMs": 3.0793000000003303
+      },
+      {
+        "enabled": true,
+        "commands": [
+          5
+        ],
+        "n": 20,
+        "p50Ms": 2.9346999999997934,
+        "p95Ms": 5.489399999999478,
+        "minMs": 2.157799999999952,
+        "maxMs": 9.327000000000226
+      }
+    ],
+    "limit": "One hall, local PostgreSQL, no modeled network delay. Added four commands are material across a remote DB link; flag remains off."
+  },
+  "limits": [
+    "Not a candidate Railway comparison or production readiness verdict.",
+    "No capacity/SLO conclusion from capped 1/2/4 reads.",
+    "Cardinality differs from initial PERF-01: Couple now has one authorized synthetic booking; consultation/catalog fixture extensions are retained.",
+    "Generation changes do not attribute refresh work to the request versus background scheduler.",
+    "Assigned-Staff successful event-window search still pending.",
+    "DB provider region/container timing, selected pooler limits and live candidate pool/deadline behavior remain open."
+  ],
+  "validation": {
+    "node": "24.21.0",
+    "localPostgreSQL": "18",
+    "commercialApi": {
+      "files": 1,
+      "passed": 33
+    },
+    "focusedPoolDeadlineUnit": {
+      "files": 4,
+      "passed": 27
+    },
+    "unitAndContract": {
+      "files": 21,
+      "passed": 67,
+      "contractCases": 49
+    },
+    "static": "typecheck, tracked-source lint, API generate/check, production build and dependency audit passed; no high/critical advisories",
+    "coverageGate": "unchanged >=80% lines and branches per file; full exact-head CI is mandatory",
+    "pullRequest": "https://github.com/WDP301-wedding/wedding-be/pull/49",
+    "ciRecord": "Use the final PR head checks for full-suite/coverage acceptance; no future result inferred here.",
+    "attempts": [
+      {
+        "kind": "static CI",
+        "head": "75036266af2a9922b6a2ff747cb7ce409f1603d8",
+        "result": "format failure in prisma.ts; fixed"
+      },
+      {
+        "kind": "integration CI",
+        "head": "0bddd02d494877b99d8eeb0c1299bde30643b01e",
+        "passed": 535,
+        "failed": 3,
+        "result": "Artificial test blocker/observer consumed bounded application slots; moved into dedicated bounded test connection with refreshed statistics. All 33 commercial API cases subsequently passed locally."
+      }
+    ]
+  }
+}

@@ -58,6 +58,14 @@ recorded with the PERF-13 evidence. Verify startup/session-setting support throu
 the selected provider pooler and accept the added round trips before enabling it.
 Disabling the flag immediately restores the normal read path on the next request.
 
+The implementation follows the documented
+[node-postgres pool acquisition/size settings](https://node-postgres.com/apis/pool)
+and PostgreSQL's
+[statement timeout](https://www.postgresql.org/docs/17/runtime-config-client.html#GUC-STATEMENT-TIMEOUT)
+and [read-only transaction semantics](https://www.postgresql.org/docs/17/sql-set-transaction.html).
+It does not treat a client-side `query_timeout` rejection as proof that server SQL
+has stopped.
+
 HTTP timeout/disconnect never establishes the outcome of a payment, provider call
 or transaction already submitted. Their existing UNKNOWN, idempotency, settlement
 evidence and reconciliation paths remain authoritative. No payment/provider logic
@@ -103,12 +111,83 @@ source modules. Modeled latency is not a Railway latency budget. Per-request
 command counts under concurrency may reflect Prisma cross-request batching;
 single-reader command ceilings are the stable regression guard.
 
+## Measurements recorded
+
+[The sanitized receipt](../tasks/evidence/perf11-13-measurements-2026-10-16.json)
+includes p50/p95/min/max, every status distribution, initial probes, page counts,
+client/backend timings, artifact digests and limitations. Raw filtered samples and
+request logs remain in `output/perf11-13-20261016/`.
+
+- The unchanged deployed baseline completed 19 cases × 20 steady samples: **380/380
+  HTTP 200**, plus 19 separate initial probes. The bounded workload completed six
+  cases × 20 samples × reader caps 1/2/4: **360/360 HTTP 200**, plus 18 initial
+  probes. All 17 session renewal/final revocations returned 204. **811/811** GET and
+  session operation IDs matched sanitized application completion logs.
+- Deployment ID/source stayed unchanged. All 15 selected domain-table counts and
+  SHA-256 digests matched before/after and the retained pre-PERF-46 snapshot:
+  Booking, Guest workspace/plan/list/groups/history, Seating plan/revisions, Staff
+  settings/assignment/history/check-ins, contract revisions, final invoices and
+  ledger. Session/audit and derived Analytics projection lifecycle are outside
+  these domain digests. No new fixture, payment or cleanup was performed.
+- The three native pool-max=3 stages each compared 20 samples per variant across
+  nine cases. All normalized results matched the pinned baseline. Native model
+  p95 increases under four simultaneous readers; the pool's queue is an intentional
+  tradeoff, not a throughput claim.
+
+| Native current case        | p95, 1 reader ms | p95, 2 readers ms | p95, 4 readers ms | Commands/request |
+| -------------------------- | ---------------: | ----------------: | ----------------: | ---------------: |
+| Templates, 20              |           190.51 |            189.08 |            281.02 |                4 |
+| Requested print orders, 20 |           237.46 |            237.23 |            329.36 |                5 |
+| Populated inbox            |           236.24 |            282.26 |            421.10 |                6 |
+| Populated unread           |           188.73 |            235.38 |            328.57 |                5 |
+| Halls with 20 media assets |           143.97 |            142.55 |            190.66 |                3 |
+| Analytics warm service     |           281.68 |            297.77 |            515.98 |                6 |
+
+These timings model 40 ms per driver submission with real PostgreSQL persistence
+and fake Storage signing. The safe-read opt-in cost was measured separately with
+one hall, no added delay and pool max=1: 20 alternating samples each, 1 → 5 driver
+commands; local p95 1.63 → 5.49 ms. Across a remote connection, the four extra
+commands are the material cost. The flag therefore remains off pending a reviewed
+provider-specific rollout.
+
+`tasks/evidence/performance-regression-budgets.json` enforces single-reader driver
+command ceilings in the normal native integration test. Its modeled latency
+investigation bands allow roughly 25% over repeated p95; they are observational,
+not CI wall-clock failures or a Railway SLO. Shared Railway measurements varied
+materially even on unchanged code: halls p95 0.712 seconds in the 19-case baseline
+and 3.004 seconds in the one-reader mixed fixture stage. Billing's one-reader p95
+was 3.780 seconds and four-reader p95 6.461 seconds. Record both distributions;
+do not infer a candidate speedup or stable absolute live budget from them.
+
+Analytics's initial probe took 11.854 seconds; steady p95 was 3.155 seconds but its
+maximum was 11.734 seconds. All observed source statuses were READY. Changing
+generations and a concurrently running scheduler prevent attributing those
+durations exclusively to GET refresh. The receipt retains the entire observed
+generation sequence and maximum, rather than dropping the slower path.
+
 ## Rollout, rollback and acceptance
 
 Before rollout, require exact-head CI: typecheck, formatting/lint, unit/integration/
 contract tests, unchanged per-file 80% lines/branches, API generation/check, build,
 audit and migration rehearsal when applicable. This change adds no migrations.
 Replay revocation, reader/writer, immutable history and idempotency regressions.
+
+The first integration CI run exposed a test-harness pool dependency: an artificial
+blocker occupied an application slot, and the helper also queried lock waiters
+through that pool. The helper now uses a dedicated bounded test-only connection
+for both the artificial blocker and its observer. It still requires both competing transactions to reach their locks,
+and retains every monetary/idempotency/history assertion. Runtime pool limits,
+test deadlines and coverage thresholds were not relaxed.
+
+Local verification on Node 24.21.0/PostgreSQL 18 passed the 33-case commercial API
+suite after that correction, including the full-contract withdrawal/timeline,
+same-source finalization and adjustment/payment races. The focused pool/deadline
+plus unit suite passed 27 cases; a later unit/contract run passed 67 cases (49
+contract cases). The production build, API generation/check, typecheck, tracked
+source lint and dependency audit passed. OpenAPI remains unchanged. Final PR CI
+is the required full-suite/per-file-coverage acceptance record; local focused
+success alone does not substitute for it. Earlier failed attempts remain in the
+local evidence directory.
 
 Deploy only with the owner's separate authorization. First verify the declared
 process/provider allocation with the deadline flag off, then capture bounded

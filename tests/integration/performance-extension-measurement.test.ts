@@ -77,6 +77,7 @@ const normalize = (value: unknown): unknown =>
       const pool = new DiagnosticPool({
         connectionString: url.toString(),
         max: poolMax,
+        connectionTimeoutMillis: 2000,
         Client: DelayedClient,
       });
       measured = new PrismaClient({ adapter: new PrismaPg(pool, { disposeExternalPool: true }) });
@@ -328,6 +329,8 @@ const normalize = (value: unknown): unknown =>
         queryCeilings: Record<string, number>;
       };
       const selected = process.env.PERF_CASES?.split(',');
+      if (readers > 1 && selected?.includes('analytics-refresh'))
+        throw new Error('Concurrent measurement permits pure reads only.');
       if (selected?.some((name) => !cases.some((c) => c.name === name)))
         throw new Error('Unknown performance case.');
       for (const c of cases) {
