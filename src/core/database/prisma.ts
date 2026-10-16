@@ -40,7 +40,10 @@ export function createPrismaClient(
         ...(schema ? { schema } : {}),
         disposeExternalPool: true,
       })
-    : new PrismaPg({ connectionString: url.toString(), ...poolConfig }, schema ? { schema } : undefined);
+    : new PrismaPg(
+        { connectionString: url.toString(), ...poolConfig },
+        schema ? { schema } : undefined,
+      );
   const client = new PrismaClient({ adapter });
   schemas.set(client, schema || 'public');
   return client;
