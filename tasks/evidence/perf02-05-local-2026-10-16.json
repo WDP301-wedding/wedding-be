@@ -1,0 +1,330 @@
+{
+  "recordedAt": "2026-10-16T10:03:12.735Z",
+  "scope": "Local implementation evidence only; Railway acceptance remains open",
+  "booking": {
+    "node": "24.21.0",
+    "database": "unique loopback PostgreSQL",
+    "fixture": "native owner commands; synthetic manual-accounting only; no external provider",
+    "steadyStateUnchanged": true,
+    "summary": [
+      {
+        "route": "guest-groups",
+        "n": 20,
+        "statuses": [
+          200
+        ],
+        "items": [
+          4
+        ],
+        "p50Ms": 44.42,
+        "p95Ms": 117.645,
+        "commands": [
+          18
+        ],
+        "acquires": [
+          2
+        ]
+      },
+      {
+        "route": "guests?limit=20",
+        "n": 20,
+        "statuses": [
+          200
+        ],
+        "items": [
+          1
+        ],
+        "p50Ms": 44.026,
+        "p95Ms": 115.609,
+        "commands": [
+          18
+        ],
+        "acquires": [
+          2
+        ]
+      },
+      {
+        "route": "guest-plan",
+        "n": 20,
+        "statuses": [
+          200
+        ],
+        "items": [
+          null
+        ],
+        "p50Ms": 44.173,
+        "p95Ms": 88.417,
+        "commands": [
+          18
+        ],
+        "acquires": [
+          2
+        ]
+      },
+      {
+        "route": "seating-plans/current",
+        "n": 20,
+        "statuses": [
+          200
+        ],
+        "items": [
+          null
+        ],
+        "p50Ms": 78.937,
+        "p95Ms": 123.548,
+        "commands": [
+          30
+        ],
+        "acquires": [
+          2
+        ]
+      },
+      {
+        "route": "seating-layout-options",
+        "n": 20,
+        "statuses": [
+          200
+        ],
+        "items": [
+          2
+        ],
+        "p50Ms": 72.259,
+        "p95Ms": 132.992,
+        "commands": [
+          27
+        ],
+        "acquires": [
+          2
+        ]
+      },
+      {
+        "route": "invitations?limit=20",
+        "n": 20,
+        "statuses": [
+          200
+        ],
+        "items": [
+          1
+        ],
+        "p50Ms": 63.671,
+        "p95Ms": 91.272,
+        "commands": [
+          23
+        ],
+        "acquires": [
+          23
+        ]
+      },
+      {
+        "route": "billing",
+        "n": 20,
+        "statuses": [
+          200
+        ],
+        "items": [
+          null
+        ],
+        "p50Ms": 33.764,
+        "p95Ms": 52.498,
+        "commands": [
+          15
+        ],
+        "acquires": [
+          6
+        ]
+      },
+      {
+        "route": "assigned-guest-search",
+        "n": 20,
+        "statuses": [
+          200
+        ],
+        "items": [
+          1
+        ],
+        "p50Ms": 126.41,
+        "p95Ms": 251.558,
+        "commands": [
+          54
+        ],
+        "acquires": [
+          2
+        ]
+      }
+    ]
+  },
+  "identity": {
+    "node": "v24.15.0",
+    "source": "disposable loopback PostgreSQL; fixed synthetic Identity fixture; same pool/driver/config; controlled per-driver-command delay is a model, never Railway RTT",
+    "authorityMatches": true,
+    "summary": [
+      {
+        "name": "legacy",
+        "rttModelMs": 0,
+        "n": 60,
+        "p50Ms": 15.914099999994505,
+        "p95Ms": 75.5680999999895,
+        "queries": [
+          4
+        ],
+        "repeatP95": [
+          79.94610000000102,
+          25.509500000000116,
+          32.31970000000729
+        ]
+      },
+      {
+        "name": "joined",
+        "rttModelMs": 0,
+        "n": 60,
+        "p50Ms": 7.060200000007171,
+        "p95Ms": 17.521000000007916,
+        "queries": [
+          1
+        ],
+        "repeatP95": [
+          12.664000000004307,
+          17.521000000007916,
+          18.985399999990477
+        ]
+      },
+      {
+        "name": "legacy",
+        "rttModelMs": 40,
+        "n": 60,
+        "p50Ms": 210.69920000000275,
+        "p95Ms": 243.4672000000137,
+        "queries": [
+          4
+        ],
+        "repeatP95": [
+          238.86260000000766,
+          245.27670000000217,
+          236.20620000000054
+        ]
+      },
+      {
+        "name": "joined",
+        "rttModelMs": 40,
+        "n": 60,
+        "p50Ms": 51.96329999998852,
+        "p95Ms": 63.191299999991315,
+        "queries": [
+          1
+        ],
+        "repeatP95": [
+          62.64140000000771,
+          64.44689999999537,
+          63.191299999991315
+        ]
+      },
+      {
+        "name": "legacy",
+        "rttModelMs": 100,
+        "n": 60,
+        "p50Ms": 446.0140000000247,
+        "p95Ms": 478.24050000001444,
+        "queries": [
+          4
+        ],
+        "repeatP95": [
+          479.41070000000764,
+          478.24050000001444,
+          468.2612000000081
+        ]
+      },
+      {
+        "name": "joined",
+        "rttModelMs": 100,
+        "n": 60,
+        "p50Ms": 110.61689999999362,
+        "p95Ms": 122.88630000001285,
+        "queries": [
+          1
+        ],
+        "repeatP95": [
+          121.86460000000079,
+          121.09719999998924,
+          122.9366999999911
+        ]
+      }
+    ],
+    "driverOverheadBatches": [
+      {
+        "repeat": 1,
+        "name": "off",
+        "n": 200,
+        "totalMs": 832.046399999992
+      },
+      {
+        "repeat": 1,
+        "name": "on",
+        "n": 200,
+        "totalMs": 914.829700000002
+      },
+      {
+        "repeat": 2,
+        "name": "on",
+        "n": 200,
+        "totalMs": 965.3366000000096
+      },
+      {
+        "repeat": 2,
+        "name": "off",
+        "n": 200,
+        "totalMs": 1184.8791999999958
+      },
+      {
+        "repeat": 3,
+        "name": "off",
+        "n": 200,
+        "totalMs": 856.3871999999974
+      },
+      {
+        "repeat": 3,
+        "name": "on",
+        "n": 200,
+        "totalMs": 781.7636000000057
+      },
+      {
+        "repeat": 4,
+        "name": "on",
+        "n": 200,
+        "totalMs": 792.1521000000066
+      },
+      {
+        "repeat": 4,
+        "name": "off",
+        "n": 200,
+        "totalMs": 768.8163000000059
+      },
+      {
+        "repeat": 5,
+        "name": "off",
+        "n": 200,
+        "totalMs": 709.405299999984
+      },
+      {
+        "repeat": 5,
+        "name": "on",
+        "n": 200,
+        "totalMs": 695.5094000000099
+      }
+    ]
+  },
+  "gates": {
+    "focusedIdentity": "12 integration tests plus focused unit cases passed",
+    "focusedRunner": "2 contract cases passed",
+    "booking": "20 steady samples per family plus initial probe; test and cleanup passed",
+    "changedFileLint": "passed; method binding corrected",
+    "typecheck": "passed before the last test-only additions; exact-head CI required",
+    "fullWindowsCoverage": "failed CLI bootstrap timeout 30000 ms; run stopped; no full coverage success claimed"
+  },
+  "live": {
+    "fixtureAvailable": false,
+    "containerDbTiming": "not verified; SSH attempt did not complete",
+    "dbRegion": "pooler inference only; provider confirmation pending",
+    "regionComparison": "profiles/runbook prepared; no deployment",
+    "railwayP95Improvement": "not measured"
+  }
+}

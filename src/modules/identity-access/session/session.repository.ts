@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
 import type { AccountRole, AccountStatus } from '../account/account.repository.js';
+import { readAccessCredential } from '../authorization/access-credential.reader.js';
 
 export type SessionClientKind = 'WEB' | 'ANDROID';
 export type SessionStatus = 'ACTIVE' | 'REVOKED' | 'EXPIRED' | 'COMPROMISED';
@@ -186,31 +187,8 @@ export function createPrismaSessionRepository(prisma: PrismaClient): SessionRepo
       });
     },
 
-    async findActorByAccessTokenHash(tokenHash) {
-      const credential = await prisma.accessCredential.findUnique({
-        where: { tokenHash },
-        include: {
-          session: {
-            include: { account: { include: { roles: { select: { role: true } } } } },
-          },
-        },
-      });
-      if (credential === null) {
-        return null;
-      }
-      const { session } = credential;
-      return Object.freeze({
-        accountId: session.accountId,
-        sessionId: session.id,
-        displayEmail: session.account.displayEmail,
-        credentialStatus: credential.status,
-        credentialExpiresAt: credential.expiresAt,
-        sessionStatus: session.status,
-        idleExpiresAt: session.idleExpiresAt,
-        absoluteExpiresAt: session.absoluteExpiresAt,
-        accountStatus: session.account.status,
-        roles: Object.freeze(session.account.roles.map(({ role }) => role)),
-      });
+    findActorByAccessTokenHash(tokenHash) {
+      return readAccessCredential(prisma, prisma, tokenHash);
     },
   };
 }

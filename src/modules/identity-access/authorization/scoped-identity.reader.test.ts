@@ -12,25 +12,26 @@ describe('Identity scoped authority follows only the locked immutable references
       const accountId = randomUUID(),
         sessionId = randomUUID();
       const tx = {
-        $queryRaw: vi.fn().mockResolvedValue([]),
-        accessCredential: {
-          findUnique: vi
-            .fn()
-            .mockResolvedValueOnce({ id: randomUUID(), session: { id: sessionId, accountId } })
-            .mockResolvedValueOnce({
-              session: {
-                id: target === 'session' ? randomUUID() : sessionId,
-                accountId: target === 'account' ? randomUUID() : accountId,
-              },
-            }),
-        },
+        $queryRaw: vi
+          .fn()
+          .mockResolvedValueOnce([{ id: randomUUID(), sessionId, accountId }])
+          .mockResolvedValueOnce([])
+          .mockResolvedValueOnce([])
+          .mockResolvedValueOnce([])
+          .mockResolvedValueOnce([])
+          .mockResolvedValueOnce([
+            {
+              sessionId: target === 'session' ? randomUUID() : sessionId,
+              accountId: target === 'account' ? randomUUID() : accountId,
+            },
+          ]),
       };
       const boundary = { current: () => tx } as unknown as PrismaBookingBoundary;
       const reader = createScopedIdentityReaders({} as PrismaClient, boundary);
       await expect(
         reader.resolver.resolve(issueOpaqueToken('access', 32).token),
       ).rejects.toMatchObject({ status: 401 });
-      expect(tx.$queryRaw).toHaveBeenCalledTimes(4);
+      expect(tx.$queryRaw).toHaveBeenCalledTimes(6);
     },
   );
 });

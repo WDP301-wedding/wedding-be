@@ -2,6 +2,12 @@ import { PrismaPg } from '@prisma/adapter-pg';
 
 import { config } from '../../config/config.js';
 import { PrismaClient } from '../../generated/prisma/client.js';
+import { DiagnosticPool } from './diagnostics.js';
+
+const schemas = new WeakMap<PrismaClient, string>();
+export function prismaSchema(prisma: PrismaClient): string {
+  return schemas.get(prisma) ?? 'public';
+}
 
 export class DatabaseConfigurationError extends Error {
   override readonly name = 'DatabaseConfigurationError';
@@ -11,7 +17,10 @@ export class DatabaseConfigurationError extends Error {
   }
 }
 
-export function createPrismaClient(databaseUrl = config.database.url): PrismaClient {
+export function createPrismaClient(
+  databaseUrl = config.database.url,
+  diagnosticsEnabled = process.env.DB_DIAGNOSTICS_ENABLED === 'true',
+): PrismaClient {
   const connectionString = databaseUrl?.trim();
 
   if (connectionString === undefined || connectionString === '') {
@@ -23,10 +32,13 @@ export function createPrismaClient(databaseUrl = config.database.url): PrismaCli
   // Prisma's PostgreSQL adapter serializes and parses timestamps as UTC.
   const startupOptions = url.searchParams.get('options') ?? process.env.PGOPTIONS ?? '';
   url.searchParams.set('options', `${startupOptions} -c timezone=UTC`.trim());
-  const adapter = new PrismaPg(
-    { connectionString: url.toString() },
-    schema === undefined || schema === '' ? undefined : { schema },
-  );
-
-  return new PrismaClient({ adapter });
+  const adapter = diagnosticsEnabled
+    ? new PrismaPg(new DiagnosticPool({ connectionString: url.toString() }), {
+        ...(schema ? { schema } : {}),
+        disposeExternalPool: true,
+      })
+    : new PrismaPg({ connectionString: url.toString() }, schema ? { schema } : undefined);
+  const client = new PrismaClient({ adapter });
+  schemas.set(client, schema || 'public');
+  return client;
 }

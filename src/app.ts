@@ -27,6 +27,7 @@ import {
 import { createMetricsRouter } from './core/observability/metrics.router.js';
 import { createOpenApiRouter } from './core/openapi/openapi.router.js';
 import { createDocsRouter } from './core/openapi/docs.router.js';
+import { createDatabaseDiagnosticsMiddleware } from './core/database/diagnostics.js';
 
 export interface CreateAppOptions {
   readonly corsConfig?: BackendConfig['cors'];
@@ -44,6 +45,7 @@ export interface CreateAppOptions {
   readonly runtimeEnvironment?: RuntimeEnvironment;
   readonly securityConfig?: BackendConfig['security'];
   readonly trustedProxyHops?: 0 | 1;
+  readonly databaseDiagnosticsEnabled?: boolean;
 }
 
 export function createApp(options: CreateAppOptions = {}): Express {
@@ -56,6 +58,11 @@ export function createApp(options: CreateAppOptions = {}): Express {
   app.set('trust proxy', options.trustedProxyHops ?? 0);
 
   app.use(createRequestContext(options.isTrustedRequestId));
+  app.use(
+    createDatabaseDiagnosticsMiddleware(
+      options.databaseDiagnosticsEnabled ?? process.env.DB_DIAGNOSTICS_ENABLED === 'true',
+    ),
+  );
   app.use(createRequestLogger(logger));
   app.use(createHttpMetricsMiddleware(metrics));
   app.use(createSecurityHeaders(runtimeEnvironment));

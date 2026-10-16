@@ -1,6 +1,7 @@
 import { registerAnalyticsCommercialCases } from './analytics-commercial-cases.js';
 import { registerGuestCompletionCases } from './guest-management-completion-cases.js';
 import { registerReleaseDemoCases } from './release-demo-cases.js';
+import { registerPerformanceBookingCases } from './performance-booking-cases.js';
 import { createStaffSeatingServices } from '../../src/modules/staff-operations/infrastructure/staff-seating.composition.js';
 import { registerStepSixApiCases } from './commercial-step6-api-cases.js';
 import { registerCommercialAcceptanceCases } from './commercial-acceptance-api-cases.js';
@@ -477,6 +478,11 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
       accessToken: tokens[who]!,
       requestId: randomUUID(),
     }),
+  }));
+  registerPerformanceBookingCases(harness, (who) => ({
+    actorId: accounts[who],
+    accessToken: tokens[who]!,
+    requestId: randomUUID(),
   }));
   registerGuestCompletionCases(harness, () => ({
     studio,

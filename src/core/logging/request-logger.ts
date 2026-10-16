@@ -83,6 +83,9 @@ function requestLogFields(
     module: 'http',
     route: typeof capturedRoute === 'string' ? capturedRoute : resolveNormalizedRoute(request),
     statusClass: `${Math.floor(response.statusCode / 100)}xx`,
+    ...(response.locals.databaseDiagnostics
+      ? { database: response.locals.databaseDiagnostics as unknown }
+      : {}),
     ...(typeof errorCode === 'string' ? { errorCode } : {}),
   };
 }

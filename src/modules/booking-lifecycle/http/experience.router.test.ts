@@ -75,6 +75,16 @@ function fixture(currentActor = actor) {
 const management = '/api/v1/management/consultation-requests';
 
 describe('booking intake and couple overview HTTP contract', () => {
+  it('returns an empty overview without querying bookings when the actor has no grants', async () => {
+    const { app, db } = fixture();
+    db.consultationAccess.findMany.mockResolvedValue([]);
+    const response = await request(app)
+      .get('/api/v1/couple/bookings')
+      .set('Authorization', 'Bearer token');
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({ data: [], nextCursor: null });
+    expect(db.booking.findMany).not.toHaveBeenCalled();
+  });
   it('acknowledges a new intake privately and records one system audit', async () => {
     const { app, db } = fixture();
     const response = await request(app).post('/api/v1/consultation-requests').send(intake);
