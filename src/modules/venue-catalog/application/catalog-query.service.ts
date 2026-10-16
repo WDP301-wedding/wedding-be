@@ -1,4 +1,4 @@
-import { NotFoundError } from '../../../core/errors/app-error.js';
+import { NotFoundError, ValidationError } from '../../../core/errors/app-error.js';
 import type { Prisma, PrismaClient } from '../../../generated/prisma/client.js';
 import type { CatalogMediaService } from './catalog-media.service.js';
 
@@ -8,6 +8,7 @@ export interface CatalogPage<T> {
 }
 
 export interface CatalogAdminQueryService {
+  listPublicHalls(input: PageInput): Promise<CatalogPage<unknown>>;
   findAggregateIdForVersion(
     kind: 'DISH' | 'MENU_PACKAGE' | 'TIMELINE_TEMPLATE' | 'LAYOUT_TEMPLATE',
     versionId: string,
@@ -108,9 +109,48 @@ const menuAggregateSelect = {
 
 export function createCatalogQueryService(
   prisma: PrismaClient,
-  media: Pick<CatalogMediaService, 'listSigned'>,
+  media: Pick<CatalogMediaService, 'listSigned' | 'listSignedBatch'>,
 ): CatalogAdminQueryService {
   const service: CatalogAdminQueryService = {
+    async listPublicHalls(input) {
+      const cursor =
+        input.cursor === undefined
+          ? null
+          : await prisma.hall.findFirst({
+              where: { id: input.cursor, lifecycle: 'ACTIVE' },
+              select: { id: true, displayOrder: true },
+            });
+      if (input.cursor !== undefined && cursor === null)
+        throw new ValidationError([
+          { path: 'cursor', code: 'invalid_value', message: 'The catalog cursor is invalid.' },
+        ]);
+      const rows = await prisma.hall.findMany({
+        where: {
+          lifecycle: 'ACTIVE',
+          ...(cursor === null
+            ? {}
+            : {
+                OR: [
+                  { displayOrder: { gt: cursor.displayOrder } },
+                  { displayOrder: cursor.displayOrder, id: { gt: cursor.id } },
+                ],
+              }),
+        },
+        orderBy: [{ displayOrder: 'asc' }, { id: 'asc' }],
+        take: input.limit + 1,
+        select: { id: true, name: true, description: true, maxGuests: true },
+      });
+      const items = rows.slice(0, input.limit);
+      const assets = await media.listSignedBatch(
+        'HALL',
+        items.map((r) => r.id),
+      );
+      return page(
+        items.map((row) => ({ ...row, media: assets.get(row.id) ?? [] })),
+        rows,
+        input.limit,
+      );
+    },
     async findAggregateIdForVersion(kind, versionId) {
       const owner = await findVersionOwner(prisma, kind, versionId);
       if (owner === null) throw new NotFoundError();
@@ -136,27 +176,28 @@ export function createCatalogQueryService(
         take: input.limit + 1,
         select: { id: true, currentPublishedVersion: { select: dishVersionSelect } },
       });
+      const assets = await media.listSignedBatch(
+        'DISH_VERSION',
+        rows
+          .slice(0, input.limit)
+          .flatMap((r) => (r.currentPublishedVersion ? [r.currentPublishedVersion.id] : [])),
+      );
       return page(
-        await Promise.all(
-          rows.slice(0, input.limit).map(async ({ id, currentPublishedVersion }) => {
-            if (
-              currentPublishedVersion === null ||
-              currentPublishedVersion.versionNumber === null
-            ) {
-              throw new NotFoundError();
-            }
-            return Object.freeze({
-              id,
-              versionId: currentPublishedVersion.id,
-              versionNumber: currentPublishedVersion.versionNumber,
-              name: currentPublishedVersion.name,
-              description: currentPublishedVersion.description,
-              categoryLabel: currentPublishedVersion.categoryLabel,
-              priceVnd: decimalNumber(currentPublishedVersion.priceVnd),
-              media: await media.listSigned('DISH_VERSION', currentPublishedVersion.id),
-            });
-          }),
-        ),
+        rows.slice(0, input.limit).map(({ id, currentPublishedVersion }) => {
+          if (currentPublishedVersion === null || currentPublishedVersion.versionNumber === null) {
+            throw new NotFoundError();
+          }
+          return Object.freeze({
+            id,
+            versionId: currentPublishedVersion.id,
+            versionNumber: currentPublishedVersion.versionNumber,
+            name: currentPublishedVersion.name,
+            description: currentPublishedVersion.description,
+            categoryLabel: currentPublishedVersion.categoryLabel,
+            priceVnd: decimalNumber(currentPublishedVersion.priceVnd),
+            media: assets.get(currentPublishedVersion.id) ?? [],
+          });
+        }),
         rows,
         input.limit,
       );
@@ -170,32 +211,36 @@ export function createCatalogQueryService(
         take: input.limit + 1,
         select: { id: true, currentPublishedVersion: { select: menuVersionSelect } },
       });
+      const assets = await media.listSignedBatch(
+        'MENU_PACKAGE_VERSION',
+        rows
+          .slice(0, input.limit)
+          .flatMap((r) => (r.currentPublishedVersion ? [r.currentPublishedVersion.id] : [])),
+      );
       return page(
-        await Promise.all(
-          rows.slice(0, input.limit).map(async ({ id, currentPublishedVersion }) => {
-            if (currentPublishedVersion === null || currentPublishedVersion.versionNumber === null)
-              throw new NotFoundError();
-            return Object.freeze({
-              id,
-              versionId: currentPublishedVersion.id,
-              versionNumber: currentPublishedVersion.versionNumber,
-              name: currentPublishedVersion.name,
-              description: currentPublishedVersion.description,
-              priceVndPerTable: decimalNumber(currentPublishedVersion.priceVndPerTable),
-              items: currentPublishedVersion.items.map(({ displayOrder, dishVersion }) => ({
-                dishId: dishVersion.dishId,
-                dishVersionId: dishVersion.id,
-                dishVersionNumber: dishVersion.versionNumber,
-                name: dishVersion.name,
-                description: dishVersion.description,
-                categoryLabel: dishVersion.categoryLabel,
-                priceVnd: decimalNumber(dishVersion.priceVnd),
-                displayOrder,
-              })),
-              media: await media.listSigned('MENU_PACKAGE_VERSION', currentPublishedVersion.id),
-            });
-          }),
-        ),
+        rows.slice(0, input.limit).map(({ id, currentPublishedVersion }) => {
+          if (currentPublishedVersion === null || currentPublishedVersion.versionNumber === null)
+            throw new NotFoundError();
+          return Object.freeze({
+            id,
+            versionId: currentPublishedVersion.id,
+            versionNumber: currentPublishedVersion.versionNumber,
+            name: currentPublishedVersion.name,
+            description: currentPublishedVersion.description,
+            priceVndPerTable: decimalNumber(currentPublishedVersion.priceVndPerTable),
+            items: currentPublishedVersion.items.map(({ displayOrder, dishVersion }) => ({
+              dishId: dishVersion.dishId,
+              dishVersionId: dishVersion.id,
+              dishVersionNumber: dishVersion.versionNumber,
+              name: dishVersion.name,
+              description: dishVersion.description,
+              categoryLabel: dishVersion.categoryLabel,
+              priceVnd: decimalNumber(dishVersion.priceVnd),
+              displayOrder,
+            })),
+            media: assets.get(currentPublishedVersion.id) ?? [],
+          });
+        }),
         rows,
         input.limit,
       );

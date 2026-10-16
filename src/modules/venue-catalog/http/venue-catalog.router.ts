@@ -128,30 +128,7 @@ export function createVenueCatalogRouter(options: CreateVenueCatalogRouterOption
     validateRequest({ query: cursorQuerySchema }),
     asyncHandler(async (_request, response) => {
       const { query } = validatedRequest(response, { query: cursorQuerySchema });
-      const activeHalls = await options.services.venue.listActiveHalls();
-      const cursorIndex =
-        query.cursor === undefined ? -1 : activeHalls.findIndex(({ id }) => id === query.cursor);
-      if (query.cursor !== undefined && cursorIndex < 0) {
-        throw new ValidationError([
-          { path: 'cursor', code: 'invalid_value', message: 'The catalog cursor is invalid.' },
-        ]);
-      }
-      const halls = activeHalls.slice(cursorIndex + 1, cursorIndex + query.limit + 2);
-      const pageItems = halls.slice(0, query.limit);
-      response.json({
-        data: {
-          items: await Promise.all(
-            pageItems.map(async ({ id, name, description, maxGuests }) => ({
-              id,
-              name,
-              description,
-              maxGuests,
-              media: await options.services.media.listSigned('HALL', id),
-            })),
-          ),
-          nextCursor: halls.length > query.limit ? (pageItems.at(-1)?.id ?? null) : null,
-        },
-      });
+      response.json({ data: await options.services.queries.listPublicHalls(query) });
     }),
   );
 

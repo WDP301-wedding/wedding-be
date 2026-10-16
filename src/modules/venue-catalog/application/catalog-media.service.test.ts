@@ -75,6 +75,19 @@ function uploadPrisma(input: ReturnType<typeof uploadInput>, provider: FakeStora
 }
 
 describe('catalog media service', () => {
+  it('batches resource existence and empty asset facts', async () => {
+    const ids = [randomUUID(), randomUUID()];
+    const prisma = {
+      hall: { count: vi.fn(() => Promise.resolve(ids.length)) },
+      catalogMediaAsset: { findMany: vi.fn(() => Promise.resolve([])) },
+    };
+    const service = createCatalogMediaService(prisma as never, new FakeStorageProvider());
+    expect(await service.listSignedBatch('HALL', ids)).toEqual(new Map(ids.map((id) => [id, []])));
+    expect(prisma.hall.count).toHaveBeenCalledTimes(1);
+    expect(prisma.catalogMediaAsset.findMany).toHaveBeenCalledTimes(1);
+    prisma.hall.count.mockResolvedValueOnce(1);
+    await expect(service.listSignedBatch('HALL', ids)).rejects.toBeInstanceOf(NotFoundError);
+  });
   it('uploads only purpose-bound validated media and exposes a redacted signed view', async () => {
     const input = uploadInput();
     const provider = new FakeStorageProvider();
