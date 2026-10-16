@@ -156,8 +156,8 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     url.pathname = '/' + database.databaseName;
     url.searchParams.delete('schema');
     url.searchParams.delete('options');
-    // Observer is test infrastructure, not a competing application request.
-    // Blocker + two commands legitimately occupy all three application slots.
+    // Synthetic blocker/observer are test infrastructure, outside owner pools.
+    // Competing commands retain the same bounded runtime clients as production.
     lockObserver = new Client({
       connectionString: url.toString(),
       connectionTimeoutMillis: 2000,
@@ -358,27 +358,13 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
   }
   type Fixture = Awaited<ReturnType<typeof fixture>>;
   async function race(f: Fixture, commands: readonly (() => Promise<Response>)[]) {
-    let unlock!: () => void;
-    let locked!: () => void;
-    const gate = new Promise<void>((resolve) => {
-      unlock = resolve;
-    });
-    const ready = new Promise<void>((resolve) => {
-      locked = resolve;
-    });
-    const blocker = database.prisma.$transaction(
-      async (tx) => {
-        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${f.id}))`;
-        await tx.$queryRaw`SELECT id FROM "Booking" WHERE id=${f.id}::uuid FOR UPDATE`;
-        locked();
-        await gate;
-      },
-      { timeout: 30_000 },
-    );
-    await ready;
-    const responses = Promise.all(commands.map((command) => command()));
+    await lockObserver!.query('BEGIN');
+    let responses: Promise<Response[]>;
     let waiters = 0;
     try {
+      await lockObserver!.query('SELECT pg_advisory_xact_lock(hashtext($1))', [f.id]);
+      await lockObserver!.query('SELECT id FROM "Booking" WHERE id=$1::uuid FOR UPDATE', [f.id]);
+      responses = Promise.all(commands.map((command) => command()));
       for (let i = 0; i < 100 && waiters < 2; i++) {
         const { rows } = await lockObserver!.query<{ count: string }>(`
           SELECT count(*) FROM pg_stat_activity
@@ -388,8 +374,7 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
         if (waiters < 2) await new Promise((resolve) => setTimeout(resolve, 20));
       }
     } finally {
-      unlock();
-      await blocker;
+      await lockObserver!.query('ROLLBACK');
     }
     const resolved = await responses;
     expect(waiters).toBe(2);
