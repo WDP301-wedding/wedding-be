@@ -1,0 +1,439 @@
+{
+  "date": "2026-10-16",
+  "environment": "disposable loopback PostgreSQL 18; controlled Storage; service-level timing with modeled driver delay; not Railway",
+  "limits": [
+    "Run 1 template batching was neutral; retained source adds authority-only reads.",
+    "Run 2 inbox/unread used sequential final rechecks; run 3 measures parallel final rechecks.",
+    "Read correctness, native migrations and provider/live performance acceptance are separate.",
+    "Analytics warm measurement excludes HTTP auth; refresh includes existing derived-generation writes."
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "baseline": "3c6e898",
+      "node": "v24.21.0",
+      "modelMs": 40,
+      "poolMax": 10,
+      "cases": [
+        {
+          "name": "templates-20",
+          "before": {
+            "samples": 20,
+            "p50Ms": 281.6293000000005,
+            "p95Ms": 284.3271000000004,
+            "driverCommands": [
+              6
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 280.54269999999815,
+            "p95Ms": 282.3567000000003,
+            "driverCommands": [
+              6
+            ]
+          },
+          "p95ReductionPercent": 0.693004641485162
+        },
+        {
+          "name": "print-orders-20",
+          "before": {
+            "samples": 20,
+            "p50Ms": 1076.5491000000038,
+            "p95Ms": 1080.827099999995,
+            "driverCommands": [
+              23
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 327.1498999999967,
+            "p95Ms": 330.9835000000021,
+            "driverCommands": [
+              7
+            ]
+          },
+          "p95ReductionPercent": 69.37683187255357
+        },
+        {
+          "name": "inbox-empty",
+          "before": {
+            "samples": 20,
+            "p50Ms": 372.315300000002,
+            "p95Ms": 374.6834999999992,
+            "driverCommands": [
+              8
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 280.21540000000095,
+            "p95Ms": 282.6774000000005,
+            "driverCommands": [
+              6
+            ]
+          },
+          "p95ReductionPercent": 24.55568499813814
+        },
+        {
+          "name": "unread-empty",
+          "before": {
+            "samples": 20,
+            "p50Ms": 326.5698999999877,
+            "p95Ms": 329.62279999999737,
+            "driverCommands": [
+              7
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 233.30100000000675,
+            "p95Ms": 235.92750000000524,
+            "driverCommands": [
+              5
+            ]
+          },
+          "p95ReductionPercent": 28.425005794499913
+        },
+        {
+          "name": "catalog-halls-no-assets",
+          "before": {
+            "samples": 20,
+            "p50Ms": 234.4539000000077,
+            "p95Ms": 239.01879999999073,
+            "driverCommands": [
+              41
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 139.84960000000137,
+            "p95Ms": 141.74049999999988,
+            "driverCommands": [
+              3
+            ]
+          },
+          "p95ReductionPercent": 40.69901614433451
+        },
+        {
+          "name": "analytics-warm",
+          "before": {
+            "samples": 20,
+            "p50Ms": 327.5792999999976,
+            "p95Ms": 330.52240000000165,
+            "driverCommands": [
+              7
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 280.8542999999918,
+            "p95Ms": 282.89310000000114,
+            "driverCommands": [
+              6
+            ]
+          },
+          "p95ReductionPercent": 14.410309255893184
+        },
+        {
+          "name": "analytics-refresh",
+          "before": {
+            "samples": 20,
+            "p50Ms": 2763.6349000000046,
+            "p95Ms": 2781.2439000000013,
+            "driverCommands": [
+              59
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 1404.0097000000242,
+            "p95Ms": 1420.7727000000014,
+            "driverCommands": [
+              58
+            ]
+          },
+          "p95ReductionPercent": 48.91592571223254
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "baseline": "3c6e898",
+      "node": "v24.21.0",
+      "modelMs": 40,
+      "poolMax": 10,
+      "cases": [
+        {
+          "name": "templates-20",
+          "before": {
+            "samples": 20,
+            "p50Ms": 279.7999999999993,
+            "p95Ms": 282.88640000000123,
+            "driverCommands": [
+              6
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 187.5083999999988,
+            "p95Ms": 188.71240000000034,
+            "driverCommands": [
+              4
+            ]
+          },
+          "p95ReductionPercent": 33.29039501368764
+        },
+        {
+          "name": "print-orders-20",
+          "before": {
+            "samples": 20,
+            "p50Ms": 1076.7668999999987,
+            "p95Ms": 1082.6240000000034,
+            "driverCommands": [
+              23
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 234.22439999999915,
+            "p95Ms": 236.5573000000004,
+            "driverCommands": [
+              5
+            ]
+          },
+          "p95ReductionPercent": 78.14963459151103
+        },
+        {
+          "name": "inbox-empty",
+          "before": {
+            "samples": 20,
+            "p50Ms": 374.65690000000177,
+            "p95Ms": 378.11820000000444,
+            "driverCommands": [
+              8
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 281.23019999999815,
+            "p95Ms": 282.26870000000054,
+            "driverCommands": [
+              6
+            ]
+          },
+          "p95ReductionPercent": 25.349083963692507
+        },
+        {
+          "name": "unread-empty",
+          "before": {
+            "samples": 20,
+            "p50Ms": 328.3906999999963,
+            "p95Ms": 331.31609999999637,
+            "driverCommands": [
+              7
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 234.24740000000747,
+            "p95Ms": 235.67250000000058,
+            "driverCommands": [
+              5
+            ]
+          },
+          "p95ReductionPercent": 28.867779139014626
+        },
+        {
+          "name": "catalog-halls-no-assets",
+          "before": {
+            "samples": 20,
+            "p50Ms": 234.68109999998705,
+            "p95Ms": 236.15080000000307,
+            "driverCommands": [
+              41
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 139.7963000000018,
+            "p95Ms": 141.99490000000515,
+            "driverCommands": [
+              3
+            ]
+          },
+          "p95ReductionPercent": 39.87109084533979
+        },
+        {
+          "name": "analytics-warm",
+          "before": {
+            "samples": 20,
+            "p50Ms": 328.50989999999,
+            "p95Ms": 333.97249999998894,
+            "driverCommands": [
+              7
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 281.5136000000057,
+            "p95Ms": 284.4380999999994,
+            "driverCommands": [
+              6
+            ]
+          },
+          "p95ReductionPercent": 14.831879870345965
+        },
+        {
+          "name": "analytics-refresh",
+          "before": {
+            "samples": 20,
+            "p50Ms": 2765.9458000000013,
+            "p95Ms": 2779.893400000001,
+            "driverCommands": [
+              59
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 1403.8459000000148,
+            "p95Ms": 1424.443100000004,
+            "driverCommands": [
+              58
+            ]
+          },
+          "p95ReductionPercent": 48.759074718476484
+        }
+      ]
+    },
+    {
+      "run": 3,
+      "baseline": "3c6e898",
+      "node": "v24.21.0",
+      "modelMs": 40,
+      "poolMax": 10,
+      "cases": [
+        {
+          "name": "templates-20",
+          "before": {
+            "samples": 20,
+            "p50Ms": 281.0632000000005,
+            "p95Ms": 283.6284000000014,
+            "driverCommands": [
+              6
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 187.8267999999989,
+            "p95Ms": 188.86679999999978,
+            "driverCommands": [
+              4
+            ]
+          },
+          "p95ReductionPercent": 33.410476524918224
+        },
+        {
+          "name": "inbox-empty",
+          "before": {
+            "samples": 20,
+            "p50Ms": 374.9315000000024,
+            "p95Ms": 378.64050000000134,
+            "driverCommands": [
+              8
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 234.7416000000012,
+            "p95Ms": 236.35409999999683,
+            "driverCommands": [
+              6
+            ]
+          },
+          "p95ReductionPercent": 37.578230537938765
+        },
+        {
+          "name": "unread-empty",
+          "before": {
+            "samples": 20,
+            "p50Ms": 327.049500000001,
+            "p95Ms": 330.2037000000055,
+            "driverCommands": [
+              7
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 187.56319999999687,
+            "p95Ms": 188.8185999999987,
+            "driverCommands": [
+              5
+            ]
+          },
+          "p95ReductionPercent": 42.817539597528565
+        },
+        {
+          "name": "catalog-halls-with-assets",
+          "before": {
+            "samples": 20,
+            "p50Ms": 234.46309999999357,
+            "p95Ms": 237.41800000000512,
+            "driverCommands": [
+              41
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 139.41150000000198,
+            "p95Ms": 141.5668000000005,
+            "driverCommands": [
+              3
+            ]
+          },
+          "p95ReductionPercent": 40.37233908128387
+        },
+        {
+          "name": "inbox-populated",
+          "before": {
+            "samples": 20,
+            "p50Ms": 374.62279999999737,
+            "p95Ms": 377.81230000000505,
+            "driverCommands": [
+              8
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 233.54579999999987,
+            "p95Ms": 236.2644999999975,
+            "driverCommands": [
+              6
+            ]
+          },
+          "p95ReductionPercent": 37.46511164406391
+        },
+        {
+          "name": "unread-populated",
+          "before": {
+            "samples": 20,
+            "p50Ms": 327.4875999999931,
+            "p95Ms": 330.4618000000046,
+            "driverCommands": [
+              7
+            ]
+          },
+          "current": {
+            "samples": 20,
+            "p50Ms": 187.0344000000041,
+            "p95Ms": 189.1704999999929,
+            "driverCommands": [
+              5
+            ]
+          },
+          "p95ReductionPercent": 42.75571336838622
+        }
+      ]
+    }
+  ]
+}
