@@ -178,6 +178,28 @@ The next focused evidence task is **PERF-09**, a matched catalog comparison usin
 the retained real Storage-media fixture. APAC comparison, endpoint deadline rollout,
 broader PERF-13 budgets and external-provider/production readiness remain separate.
 
+## Report publication infrastructure recovery
+
+PR #58's first three CI attempts stop before checkout/tests when the ECR public
+mirror reports `toomanyrequests: Data limit exceeded`. Static/test/build/audit gates
+pass, but this does not replace the missing PostgreSQL integration/coverage job.
+The owner subsequently authorizes unblocking CI, merging #58 after its required
+checks and moving to PERF-09.
+
+Only the CI service-image reference changes: use Google's
+[official Docker Hub cache](https://docs.cloud.google.com/artifact-registry/docs/pull-cached-dockerhub-images)
+and pin PostgreSQL 17 to digest
+`sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3`.
+That is the exact manifest digest pulled by successful main CI job
+`117304741020`, not a database-version downgrade. A read-only registry request
+returns 200 with matching `Docker-Content-Digest` and SHA-256 of the manifest body;
+the linux/amd64 child manifest is
+`sha256:3cec7eb015ba8adb28139fa5c83b8489cdf0e666e53dfdf20f598ae0cc8739e3`.
+Both required jobs, migration commands, integration tests, coverage thresholds,
+timeouts, health checks and dependency audit stay unchanged. The three original
+failures and both Analytics evidence receipts remain immutable. Passing fresh
+exact-head CI is still required before merge; mirror availability alone is not CI.
+
 ## Instrumentation slice
 
 `ANALYTICS_DIAGNOSTICS_ENABLED` is strictly `true` or `false`, defaults to `false`,

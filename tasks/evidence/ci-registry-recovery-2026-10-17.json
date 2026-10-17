@@ -1,0 +1,270 @@
+{
+  "recordedAt": "2026-10-17T04:53:08.695Z",
+  "authorization": "Owner explicitly requested CI unblock, merge58 after required gates and PERF09 next",
+  "failure": {
+    "workflowRun": 39002926038,
+    "head": "bd01b31306b3556508a58c5930069385eb4f310a",
+    "attempts": 3,
+    "jobIds": [
+      117309440279,
+      117310376416,
+      117311279926
+    ],
+    "step": "Initialize containers",
+    "error": "ECR public mirror: toomanyrequests: Data limit exceeded",
+    "testsOrCheckoutReached": false
+  },
+  "previousSuccessfulImage": {
+    "ciRun": 39001344821,
+    "job": 117304741020,
+    "source": "public.ecr.aws/docker/library/postgres:17",
+    "digest": "sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3"
+  },
+  "replacement": {
+    "image": "mirror.gcr.io/library/postgres:17@sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3",
+    "googleDocumentation": "https://docs.cloud.google.com/artifact-registry/docs/pull-cached-dockerhub-images",
+    "manifest": {
+      "at": "2026-10-17T04:52:08.872Z",
+      "source": "Prior successful main CI job117304741020 pulled Docker Official PostgreSQL17 from ECR",
+      "requestedDigest": "sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3",
+      "status": 200,
+      "contentType": "application/vnd.oci.image.index.v1+json",
+      "reportedDigest": "sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3",
+      "bodySha256": "sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3",
+      "platforms": [
+        {
+          "digest": "sha256:3cec7eb015ba8adb28139fa5c83b8489cdf0e666e53dfdf20f598ae0cc8739e3",
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          }
+        },
+        {
+          "digest": "sha256:b36f7bfde6b7faba8bc10bc7793350d242846b0726f1d4eaa506f5ce9a85cb64",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          }
+        },
+        {
+          "digest": "sha256:f4666cb144655da6da86871a53563fc389319e22bc608f671ba82ad5052dd98c",
+          "platform": {
+            "architecture": "arm",
+            "os": "linux",
+            "variant": "v5"
+          }
+        },
+        {
+          "digest": "sha256:562c835752bd6342b68fd0783b38380cd7ff4c92328fd653dd9f801a6fc82391",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          }
+        },
+        {
+          "digest": "sha256:a8a5de3bc28e5ced8916428cfe77cf9e1bbfdd337474c7e1bbab6e0958946f59",
+          "platform": {
+            "architecture": "arm",
+            "os": "linux",
+            "variant": "v7"
+          }
+        },
+        {
+          "digest": "sha256:eeaa09100475d15a22bbdec34a92802a473e86e0ae830b16e0099eebf880579d",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          }
+        },
+        {
+          "digest": "sha256:2d46d14f5a051d8c1e4f9d7c07dbeb877ae08150654d69ca32903ccbae4a5421",
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux",
+            "variant": "v8"
+          }
+        },
+        {
+          "digest": "sha256:e5b611dc239e254fe6493592b15dcfc46c50bcdaa7f3cc12d0085988787e9dc6",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          }
+        },
+        {
+          "digest": "sha256:57542b13e50a8e7a6e33ff41c3b383c05de44b874e34dfc401e0592f507623b1",
+          "platform": {
+            "architecture": "386",
+            "os": "linux"
+          }
+        },
+        {
+          "digest": "sha256:ac924734a9ace87a11f24e19b023735097dfd6d5f227b765baf66b83a7d5cc1b",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          }
+        },
+        {
+          "digest": "sha256:d6820d697a67d23caa64799f06228969ec24a5ca19b6c0250850f478b29ccc37",
+          "platform": {
+            "architecture": "ppc64le",
+            "os": "linux"
+          }
+        },
+        {
+          "digest": "sha256:79c6f27981d491d6c78a4f5c08833b470d382ebd587a08d337a262a8028a7b0b",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          }
+        },
+        {
+          "digest": "sha256:486bb139f3384345d1f06e8d750d8a6cb83bcc0fc18378868d79255e14ecdf6f",
+          "platform": {
+            "architecture": "riscv64",
+            "os": "linux"
+          }
+        },
+        {
+          "digest": "sha256:65e923d45c731729654c2cccd2f2c3be02968ae4549e29fa64455b34011afdae",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          }
+        },
+        {
+          "digest": "sha256:185af42ee167822c697957ef933c138eb328a17854006f2c24db9327f42cebce",
+          "platform": {
+            "architecture": "s390x",
+            "os": "linux"
+          }
+        },
+        {
+          "digest": "sha256:14da78e536025ce379f8ec8c60f99dadffe11ff4ce79f9f8d2bf652b371eb63e",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          }
+        }
+      ]
+    },
+    "linuxAmd64": {
+      "digest": "sha256:3cec7eb015ba8adb28139fa5c83b8489cdf0e666e53dfdf20f598ae0cc8739e3",
+      "verifiedDigest": "sha256:3cec7eb015ba8adb28139fa5c83b8489cdf0e666e53dfdf20f598ae0cc8739e3",
+      "status": 200
+    },
+    "blobs": [
+      {
+        "digest": "sha256:327daa8fae7178d61f93142f146b098467b345e10997b9eb79f63bd58e5c8f3c",
+        "expectedBytes": 10143,
+        "status": 200,
+        "reportedBytes": 10143
+      },
+      {
+        "digest": "sha256:ecc510c1e359bdc007b39802570bb7e4dec7d6ebccf357c3201a74299113e05e",
+        "expectedBytes": 29843350,
+        "status": 200,
+        "reportedBytes": 29843350
+      },
+      {
+        "digest": "sha256:fcdd3a48135944f09d0d9f83d68d3356222480b32ef7acf7a2789ffb4b509c79",
+        "expectedBytes": 1169,
+        "status": 200,
+        "reportedBytes": 1169
+      },
+      {
+        "digest": "sha256:b86134c2eeb652f8580951a9ff263dcd4631c14f81cb59947f388d6e5bb361de",
+        "expectedBytes": 6442904,
+        "status": 200,
+        "reportedBytes": 6442904
+      },
+      {
+        "digest": "sha256:57644501a07fabeb73163875049d59967093363293b1f3464d7933fdd2fa8523",
+        "expectedBytes": 1256707,
+        "status": 200,
+        "reportedBytes": 1256707
+      },
+      {
+        "digest": "sha256:affbe3357b390687f917fd756602160257e2b8b25c76046fcfcfe13c29b5480b",
+        "expectedBytes": 8203797,
+        "status": 200,
+        "reportedBytes": 8203797
+      },
+      {
+        "digest": "sha256:3be737420556ae9d92e2aa46d59b692358fbaa9357079fc45f6a401607ed4f2f",
+        "expectedBytes": 1311688,
+        "status": 200,
+        "reportedBytes": 1311688
+      },
+      {
+        "digest": "sha256:e30751283c57bcc108c3b276bb491a281f17d59c6ac3716760f17d0811c6c47b",
+        "expectedBytes": 116,
+        "status": 200,
+        "reportedBytes": 116
+      },
+      {
+        "digest": "sha256:c5602f014e9e17fbdce40a548c7e33662e6c1fb12d6fabe89c94f5907d02495e",
+        "expectedBytes": 3143,
+        "status": 200,
+        "reportedBytes": 3143
+      },
+      {
+        "digest": "sha256:c9432d362cca11561d47d905a22448c01ed96b3f5a91bb4c42e00fe12d275f7d",
+        "expectedBytes": 114255956,
+        "status": 200,
+        "reportedBytes": 114255956
+      },
+      {
+        "digest": "sha256:dc30f2779c660e9fd93aa4d065bd4fa70a406be2d2c30ac71cf19de320734dbd",
+        "expectedBytes": 10453,
+        "status": 200,
+        "reportedBytes": 10453
+      },
+      {
+        "digest": "sha256:d43ee31e40df0061615da84f4493daa5a4b07b04c4dc51e615e5c60957236803",
+        "expectedBytes": 128,
+        "status": 200,
+        "reportedBytes": 128
+      },
+      {
+        "digest": "sha256:8aebe6431dc8bf2a382a406bf6121b32866f22f0a4d3c54a7efe80926796cc43",
+        "expectedBytes": 168,
+        "status": 200,
+        "reportedBytes": 168
+      },
+      {
+        "digest": "sha256:52fc2be321a4aff5c6dfdedaef66d2a6f4bd47629161fef538fccc6f5c0b5bbf",
+        "expectedBytes": 6108,
+        "status": 200,
+        "reportedBytes": 6108
+      },
+      {
+        "digest": "sha256:99ce35cabaf9528ec0b489a86b09f1809bd398fd0756a5bdeb1288f1add11730",
+        "expectedBytes": 186,
+        "status": 200,
+        "reportedBytes": 186
+      }
+    ]
+  },
+  "unchangedGates": [
+    "pull_request/main push triggers",
+    "both required jobs",
+    "PostgreSQL17 exact previously successful image content",
+    "healthcheck/ports/test-only DB environment",
+    "migration deployment/integration/full coverage",
+    "timeouts/coverage thresholds/dependency audit/OpenAPI"
+  ],
+  "runtimeOrProviderChange": false,
+  "proofBoundary": "Read-only registry index/platform digests and blob HEAD availability, not proof of fresh GitHub-hosted execution. New exact-head CI must pass before merge58.",
+  "preservedAnalyticsEvidence": [
+    {
+      "path": "tasks/evidence/perf10-analytics-verification-2026-10-17.json",
+      "sha256": "62d25fb1d78c956c16ba96bb79a3993fe2451ae2b089f310a5216219f7c9592c"
+    },
+    {
+      "path": "tasks/evidence/perf10-analytics-closure-2026-10-17.json",
+      "sha256": "2de1663a7fcff558e530d7157b6a38b3ca8496c8f00793fa92e2eaacb42cbcd0"
+    }
+  ]
+}

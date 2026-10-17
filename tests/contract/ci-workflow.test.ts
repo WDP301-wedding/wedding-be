@@ -28,7 +28,10 @@ describe('backend CI contract', () => {
     expect(workflow).toContain('run: npm run api:check');
     expect(workflow).toContain('run: npm run build');
     expect(workflow).toContain('run: npm run audit:ci');
-    expect(workflow).toContain('image: public.ecr.aws/docker/library/postgres:17');
+    expect(workflow).toContain(
+      'image: mirror.gcr.io/library/postgres:17@sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3',
+    );
+    expect(workflow).not.toContain('image: public.ecr.aws/');
     expect(workflow).toContain(
       'TEST_MIGRATION_DATABASE_URL: postgresql://wedding_ci:wedding_ci_only@127.0.0.1:5432/wedding_ci',
     );
