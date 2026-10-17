@@ -23,13 +23,13 @@ describe('runtime driver pool options', () => {
   it.each(['unexpected', 'toString', '__proto__'])(
     'rejects an unrecognized JavaScript pool owner %s before creating an adapter',
     (owner) => {
-      expect(() =>
+      expect(() => {
         Reflect.apply(createPrismaClient, undefined, [
           'postgresql://runtime:secret@localhost:5432/wedding',
           false,
           owner,
-        ]),
-      ).toThrow('pool owner');
+        ]);
+      }).toThrow('pool owner');
       expect(captured).toHaveLength(0);
     },
   );
