@@ -189,6 +189,13 @@ archives and is excluded from local lint selection, never from committed CI sour
 
 ## PERF-04 and next live checkpoint
 
+2026-10-17 update: the [controlled same-image region experiment](backend-performance-04-region-2026-10-17.md)
+confirms provider Sydney metadata and runtime-container RTT, then stops on a
+Singapore Seating 500. Its complete US West and partial Singapore cohorts,
+acquisition attribution and cleanup supersede the unverified regional setup
+status below. Three complete pairs remain unachieved; the older deployments and
+fixture limitations below remain historical rather than being rewritten.
+
 Use [the concrete region rollout and rollback](performance-region-experiment.md).
 At the initial checkpoint no authenticated live fixture was available (owner
 response: “chưa có”), and an SSH attempt did not complete. The owner subsequently
