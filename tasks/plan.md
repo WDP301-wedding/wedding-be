@@ -247,3 +247,19 @@ replacement and disposable local/CI database cleanup have different effects and
 are documented separately. No business cleanup, provider payment/generation or
 unconfirmed region change is part of this work. Earlier measurements and unmet
 acceptance gates remain preserved.
+
+## Execution checkpoint — remaining PERF evidence
+
+[The 2026-10-17 acceptance follow-up](../docs/backend-performance-acceptance-2026-10-17.md)
+records PR #53 merge and its exact-head/merge CI separately, real private Storage
+media checks, natural-TTL Analytics observations and the Staff-window fixture
+decision. The previous rebuild 409 remains retained. APAC placement and deadline
+rollout stay deferred; no new application optimization is part of this follow-up.
+
+The owner subsequently chose the separate audited historical synthetic Staff
+fixture. Its draft date was seeded before the first commercial revision/payment;
+normal owner APIs then established the confirmed named-Guest context. The
+[Staff-window appendix](evidence/perf-staff-window-2026-10-17.json) retains actual
+DB-clock window checks, separate initial/steady reads, unchanged original fixture
+digests and session cleanup. This supplies the missing PERF-02 role/window cohort,
+not a matched Staff speed-improvement baseline or production readiness.

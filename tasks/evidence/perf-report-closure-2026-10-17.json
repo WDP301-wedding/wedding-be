@@ -1,0 +1,67 @@
+{
+  "recordedAt": "2026-10-17T01:36:50.576Z",
+  "scope": "Publish the completed PERF report/evidence checkpoint; no application source, deployment, provider setting, migration or business-data change",
+  "completedPerf": [
+    "PERF-01",
+    "PERF-02",
+    "PERF-12"
+  ],
+  "openPerf": [
+    "PERF-03",
+    "PERF-04",
+    "PERF-05",
+    "PERF-06",
+    "PERF-07",
+    "PERF-08",
+    "PERF-09",
+    "PERF-10",
+    "PERF-11",
+    "PERF-13"
+  ],
+  "verification": {
+    "at": "2026-10-17T01:36:21.920Z",
+    "evidenceSha256": "fe69bfc86411a5d0d38ce398403995e06d5ed7b19db540b7cc3142be7f05c25f",
+    "invariants": "PASS",
+    "credentialAndSignedUrlScan": "PASS",
+    "exactCorrelatedRequests": 245,
+    "artifactHashesVerified": 59,
+    "relativeLinks": 80,
+    "scope": "Operator-side receipt consistency, exact request-log correlation, retained artifact hashes and supplied-credential/signed-URL scan; not a substitute for exact-head PR CI"
+  },
+  "retainedOperatorEvidence": {
+    "directory": "output/perf-acceptance-20261017/",
+    "committed": false,
+    "reason": "Raw receipts and runners remain in the retained operator workspace; public repository evidence contains sanitized cohorts, request IDs, exact backend durations and hashes. Do not publish private configuration, signed URLs or raw credentials."
+  },
+  "nextStep": "PERF-10 measurement-only: distinguish HTTP/scheduler refresh invocations, matched baseline/candidate TTL-refresh cohorts, separate pinned-generation warm cohorts and retain every conflict/failure. Review any required instrumentation before deployment.",
+  "unchangedBoundaries": {
+    "apac": "DEFERRED",
+    "endpointDeadlines": "OFF; rollout deferred",
+    "production": "NO_GO",
+    "paidGeneration": "NOT_AUTHORIZED",
+    "realMoney": "NOT_AUTHORIZED",
+    "historicalCleanup": "NOT_AUTHORIZED"
+  },
+  "publishedFiles": [
+    {
+      "path": "docs/backend-performance-acceptance-2026-10-17.md",
+      "sha256": "411f34d35b26bbc8f034f5b330666095ce379f159266ca6003317358a8b63427"
+    },
+    {
+      "path": "tasks/backend-revision-todo.md",
+      "sha256": "bdf97bc46f217c8ddec7e436a9f68615859dc685702ca5b1fbc34125cc37fe78"
+    },
+    {
+      "path": "tasks/plan.md",
+      "sha256": "0812e7f661273a971519c541cdd96ada500e9237022bab177ffd343ed3cbb457"
+    },
+    {
+      "path": "tasks/evidence/perf-acceptance-followup-2026-10-17.json",
+      "sha256": "b71d3c661b71fa2206fa88a5d7172a7e39361854e52cd7cec3de3cd87b2f4fa9"
+    },
+    {
+      "path": "tasks/evidence/perf-staff-window-2026-10-17.json",
+      "sha256": "fe69bfc86411a5d0d38ce398403995e06d5ed7b19db540b7cc3142be7f05c25f"
+    }
+  ]
+}
