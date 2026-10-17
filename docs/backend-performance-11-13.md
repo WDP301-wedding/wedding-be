@@ -10,7 +10,10 @@ No region, service variable, deployed code or applied migration is changed here.
 
 Subsequent [2026-10-17 actual verification](backend-performance-11-verification-2026-10-17.md)
 records observed overlap, queue/cancellation and authenticated provider findings.
-Verification is complete; aggregate provider headroom acceptance remains HOLD.
+Verification was complete; aggregate provider headroom acceptance was HOLD at that
+checkpoint. The subsequent [PERF-11 closure](backend-performance-11-closure-2026-10-17.md)
+records owner-applied provider Pool size5/client200, the completed aggregate
+allocation, matched Storage trial and the decision to keep DB deadlines OFF.
 
 The later authorized [pool trial result](backend-performance-11-pool-result-2026-10-17.md)
 records the selected Catalog3/Analytics2/six-other1 profile and counted owner overrides.

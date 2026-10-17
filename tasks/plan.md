@@ -173,7 +173,15 @@ deadline remains disabled and no PERF-09 cohort is repeated.
 Subsequent authorized [pool allocation trial and adjustment](../docs/backend-performance-11-pool-result-2026-10-17.md)
 keeps Catalog3/Analytics2/six others1, reducing two-process app allocation50 →24.
 Source `6c08b1e` passes exact-head CI and bounded demo verification;68 focused tests
-pass. Other provider allocation and endpoint decision remain open; deadline stays off.
+pass. Other provider allocation and endpoint decision remained open at that checkpoint.
+
+The subsequent [PERF-11 closure](../docs/backend-performance-11-closure-2026-10-17.md)
+records the owner-applied provider Pool size15 ->5/client200 setting, matched60/60
+Storage HTTP200 and explicit allocation60 including two ordinary spare slots.
+Queue/cancellation/small-pool proof is retained; the endpoint decision is DB deadline
+OFF with the existing HTTP timeout30s active. Close PERF-11 for the admitted dedicated
+demo topology; new processes/pool combinations require rebudgeting. Production and
+PERF-13 gates remain separate; no PERF-09 repeat or missing-history invention.
 
 ### PERF-12 — Review schema cleanup separately
 
