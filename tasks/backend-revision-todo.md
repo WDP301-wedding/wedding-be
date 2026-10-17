@@ -393,7 +393,18 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
 - [ ] PERF-07: Batch print-order lines/commercial revisions/proposals without changing immutable monetary facts.
 - [ ] PERF-08: Reduce notification authority/booking-scope round trips for inbox and unread counts.
 - [ ] PERF-09: Bound catalog SQL pagination and batch media facts; preserve publication and signed-URL rules.
-- [ ] PERF-10: Measure and optimize analytics warm reads versus projection refresh with freshness/cursor/source semantics intact.
+- [x] PERF-10: Measure and optimize analytics warm reads versus projection refresh with freshness/cursor/source semantics intact.
+  - 2026-10-17 final [Analytics acceptance and preserved failures](../docs/backend-performance-analytics-closure-2026-10-17.md):
+    PR #57 fixes scoped in-flight snapshot contention after a real PostgreSQL P2028
+    reproduction; exact-head/main CI pass 2,002 tests. A separate live repeat has
+    40 actual warm HTTP 200 reads (client p95 1,630 ms) and three natural-TTL
+    four-reader waves, all twelve HTTP 200 with one leader/three waiters per wave.
+    Twenty matched native pairs show 37.246% refresh p95 reduction in unchanged
+    projection components, not HTTP or whole-application improvement. Keep the
+    initial 500, earlier warm misses and all scheduler/publication conflicts.
+    Histories, sixty migration checksums, authority/cursors, nullable attendance
+    and VND semantics remain intact. Temporary SSH/telemetry controls are removed;
+    production stays NO_GO and PERF-13 stays open. Next evidence focus: PERF-09.
   - 2026-10-17 [instrumented live verification](../docs/backend-performance-analytics-closure-2026-10-17.md):
     PRs #55/#56 merged, exact-head and final merge CI pass (1,996 tests).
     Twenty matched native incremental pairs show 37.246% p95 improvement with
