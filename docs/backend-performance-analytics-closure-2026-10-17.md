@@ -68,6 +68,33 @@ full-suite result, and no coverage configuration or threshold was weakened.
    source-ready, revocation, unknown-attendance and money correctness gates pass.
    An unmet target remains open; do not lower it or call every API faster.
 
+## Native runner boundary
+
+The operator-only runner transports two immutable Analytics modules from
+`3c6e8984c547d92f25dc4959c44503321e5f5528` over the authorized temporary SSH
+connection. It does not replace the serving application, expose a baseline HTTP
+switch, persist credentials remotely, or modify service startup commands. Both
+variants use the same current real owner readers, database, scope and one additional
+bounded pool. This compares the incremental projector/repository implementation,
+not an old whole-application deployment or HTTP refresh latency.
+
+A single native process keeps its pool and module imports warm. An unmeasured
+pair zero precedes twenty alternating-order matched pairs. Each pair waits for a
+new READY publication with checkpoint age below ten seconds; the scheduler remains
+enabled. Refreshes have a 25-second observation budget, pairs a 45-second budget,
+and publication waits a 130-second cap. These checks stop subsequent work; they
+do not cancel or retry an in-flight publication. Every completed/failed attempt
+is emitted immediately. Any conflict, source-fence change, fact mismatch or budget
+failure stops the campaign and remains in the evidence. Post-hoc application logs
+must independently exclude scheduler/HTTP refresh overlap from qualifying pairs.
+
+Each native sample records actual per-owner source calls, READY checkpoints,
+projection-row count, canonical fact digest, request ID and generation ID without
+source DTOs or raw failures. The runner rechecks the active Manager before each
+phase. It must pass exact-head CI/review before live execution; contract tests
+validate configuration/provenance, rendering and syntax without calling Railway
+or a live database.
+
 ## Preservation
 
 The five successful rebuilds followed by `409 ANALYTICS_REFRESH_CONFLICT` remain
