@@ -60,6 +60,12 @@ Acceptance: explain at least one slow request in each measured high-priority fam
 measure instrumentation overhead; protected metrics remain protected. Container-local
 DB ping must be explicitly identified as such; desktop ping cannot substitute.
 
+2026-10-17 completed measurement: [actual request/container attribution](../docs/backend-performance-03-attribution-2026-10-17.md)
+records sixteen read families, exact request/log correlation, paired overhead,
+runtime RTT and bounded DB wait snapshots. Distinguish lock-command/network elapsed
+from pure server lock wait; the earlier Seating 500 remains unresolved PERF-13
+evidence. Diagnostics/key cleanup and exact-source CI are recorded separately.
+
 ### PERF-04 — Test application location with the DB unchanged
 
 Dependencies: PERF-03. Scope: authorized staging deployment configuration plus receipts

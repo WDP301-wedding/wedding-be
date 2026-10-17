@@ -55,3 +55,27 @@ Do not subtract summed parallel durations from wall time to invent execution tim
 
 PERF-03 closes only after actual family attribution, overhead, container RTT and
 protected-metrics evidence have been recorded. A prepared script is not a pass.
+
+## Reproduce the fixed probe
+
+The exported worker is [performance-diagnostics-runtime-worker.mjs](../scripts/performance-diagnostics-runtime-worker.mjs).
+It requires a built `dist/` and an explicitly supplied private `DATABASE_URL`.
+For a disposable loopback PostgreSQL, run from the repository root:
+
+```powershell
+node --input-type=module -e "import('./scripts/performance-diagnostics-runtime-worker.mjs').then(m => m.runDiagnosticsRuntimeWorker({mode:'operator',deploymentId:null,region:null,pairs:20,sharedPool:true}))"
+```
+
+Operator mode refuses a non-loopback database and labels its output accordingly.
+Runtime mode requires an exact pinned deployment ID matching Railway metadata and
+region `sfo`; use `operation: 'waits'` for 180 bounded database-wait snapshots or
+`operation: 'explain'` for twenty fixed SELECT execution observations. The default
+operation compares two probe pools; `sharedPool: true` controls connection latency
+while measuring active aggregation over an inactive installed proxy.
+
+The current runtime image does not package this new worker. For the recorded
+experiment its source was streamed to `node --input-type=module` through the
+dedicated authorized SSH channel, with the export removed, a JSON configuration
+and explicit awaited invocation appended. Program hashes and configuration are
+retained in the receipt's native provenance. No remote file, worker scheduler or
+second full application process is installed by that procedure.

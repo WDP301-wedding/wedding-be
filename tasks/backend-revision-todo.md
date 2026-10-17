@@ -367,7 +367,18 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
 
 - [x] PERF-01: Published 380 successful samples across 19 route/role cases, all 380 matched to exact-deployment logs; schema inventory and coverage/token-expiry limits are in the [live audit](../docs/railway-api-performance-audit-2026-10-16.md). No optimization/deployment/deletion is implied.
 - [x] PERF-02: Arrange initialized authorized booking/assigned Staff fixtures; complete booking-specific timings without manufacturing settlement/access. The original seven Couple families and the owner-authorized historical fixture's 21 actual-window Staff reads are recorded in the [acceptance follow-up](../docs/backend-performance-acceptance-2026-10-17.md); synthetic manual accounting is not provider settlement, and no FULL grant was inserted directly.
-- [ ] PERF-03: Attribute request DB round trips, pool/lock wait and container-to-DB latency with secret-safe instrumentation.
+- [x] PERF-03: Attribute request DB round trips, pool/lock wait and container-to-DB latency with secret-safe instrumentation.
+  - 2026-10-17 [request attribution and container evidence](../docs/backend-performance-03-attribution-2026-10-17.md)
+    closes measurement scope: 64/64 read responses across sixteen families returned
+    200; all 71 diagnostic operations match exact-deployment logs. Twenty-pair
+    on/off overhead trials, actual SFO-to-DB RTT (median 148–156 ms) and 180 DB-wait
+    snapshots are retained with their limits. Lock-command RTT is not pure blocking;
+    no sampled lock waiter does not prove zero brief waits. Exact-source Linux CI
+    passes 2,037 tests and unchanged coverage gates; Windows failures remain visible.
+    Same-image diagnostics is restored false, dedicated SSH key revoked, business
+    digests/migration checksums/OpenAPI unchanged. Preserve the earlier Seating 500
+    as unresolved PERF-13 evidence; no fix, global deadline rollout, region change
+    or production readiness is inferred. [Sanitized receipt](evidence/perf03-db-attribution-2026-10-17.json).
 - [ ] PERF-04: Compare current US West and APAC application placement with the DB unchanged in an authorized test environment.
 - [ ] PERF-05: Reduce Identity/Couple overview read work while preserving current authorization and revocation semantics.
 - 2026-10-16 implementation checkpoint for PERF-02–05:
