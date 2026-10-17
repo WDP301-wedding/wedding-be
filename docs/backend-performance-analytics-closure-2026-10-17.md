@@ -90,6 +90,35 @@ expiry waves. Do not silently raise pool, timeout or freshness budgets. No furth
 optimization is included in this evidence checkpoint. PERF-10 and PERF-13 remain
 open, and production remains `NO_GO`.
 
+## Authorized contention fix — pending live re-verification
+
+After the failed wave, the owner explicitly chose reproduction, a minimal
+Analytics fix, CI/review and another live campaign. The preceding result and its
+machine receipt remain immutable; they are not replaced with a passing retry.
+
+A disposable native PostgreSQL regression reproduces `P2028` when four identical
+HTTP snapshot loads compete for the unchanged three-connection pool. The harness
+holds each bounded-read transaction for 2.5 seconds, independently of the serving
+demo; no live sleep, injected failure or timeout/pool increase is used. This
+establishes the acquisition-contention failure mechanism, not the unavailable
+exact error code/stack of the earlier live request.
+
+The minimal service-only change shares an **in-flight bounded projection load**
+only when Manager scope, normalized read filter and load phase match. Initial
+loads cannot join post-refresh loads (or vice versa), so a post-publication read
+does not reuse an older pending snapshot. Settled success/failure is immediately
+evicted. Responses, authority, sessions and completed warm snapshots are not
+cached; every request retains its own freshness/invalidation and final authority
+rechecks. Different scopes, filters and report-owner sets never share work.
+
+Regression tests cover four readers, separate scopes/filters, rejection fan-out
+and recovery, the pre-/post-publication race, and revocation of all four requesting
+sessions while the shared load is pending. The real-pool contention test and
+unchanged Analytics/private-reporting suite must pass, followed by exact-head CI
+and review before merge/deployment. The native projector/repository/source-reader
+code is unchanged, so the earlier native comparison remains scoped to those
+identical modules; HTTP warm/TTL measurements must be repeated on the new runtime.
+
 ## Instrumentation slice
 
 `ANALYTICS_DIAGNOSTICS_ENABLED` is strictly `true` or `false`, defaults to `false`,
