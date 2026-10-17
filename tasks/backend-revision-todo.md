@@ -435,7 +435,7 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
 - 2026-10-16 PERF-06–10 implementation: [backend changes, native-owner tests,
   controlled measurements and remaining live gates](../docs/backend-performance-06-10.md).
   These checkboxes retain full Railway acceptance, separate from delivered code.
-- [ ] PERF-11: Budget aggregate pools and safe read cancellation; preserve money/provider UNKNOWN and idempotency.
+- [x] PERF-11: Budget aggregate pools and safe read cancellation; preserve money/provider UNKNOWN and idempotency.
   - [x] 2026-10-17 actual inventory and bounded verification: two observed old/new
     overlaps, 33/33 correlated HTTP 200, bounded queue timeout, server cancellation,
     small-pool regressions and full cleanup. [Report and sealed receipts](../docs/backend-performance-11-verification-2026-10-17.md).
@@ -445,10 +445,15 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
     gain. [Final result and sealed receipts](../docs/backend-performance-11-pool-result-2026-10-17.md).
     Source `6c08b1e` exact-head CI passes,68/68 focused cases pass,450 request IDs
     correlate, current three-report coverage proves six READY sources; deadline off.
-  - [ ] Provider allocation acceptance: 33 ordinary slots remain after two selected
-    app processes; current Auth/PostgREST maxima20 and operator/migration allocation2
-    leave11 for other providers/spare. Storage/other aggregate ceilings, hosted
-    multiplicity/historical peak and endpoint decision remain **HOLD**. No PERF-09 rerun.
+  - [x] Provider allocation and endpoint decision for the current dedicated demo:
+    owner changed provider Pool size15 ->5, client200 unchanged; exporter confirms.
+    App24/Auth10/PostgREST10/Storage5/operator1/migration1/reserved3/utility2/admin2/
+    spare2 =60. Two matched Storage cohorts return60/60 HTTP200; no investigation
+    threshold breached, server57014/reuse verified; six Analytics sources READY.
+    [Closure, admission conditions and sealed evidence](../docs/backend-performance-11-closure-2026-10-17.md).
+    Keep DB deadline OFF (HTTP timeout30s stays active). No new process/pool/provider
+    workload without rebudgeting. Missing historical peak remains a capacity limit,
+    not an added indefinite gate. No PERF-09 rerun; production remains NO_GO.
 - [x] PERF-12: Review table/rehearsal-schema cleanup with ownership, dependency and retention proof; deletion remains separately authorized.
 - [ ] PERF-13: Repeat matched live measurements, verify relevant correctness gates and set supported regression budgets.
 - 2026-10-16 PERF-11–13: [pool budget, opt-in safe-read deadlines, retention review,

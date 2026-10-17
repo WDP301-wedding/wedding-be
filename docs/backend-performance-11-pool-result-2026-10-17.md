@@ -3,7 +3,9 @@
 **Keep Venue/Catalog=3, Analytics=2 and the six other owner pools=1 for the verified
 bounded demo scope.** Readiness remains a separate max-1 pool. This profile is live
 on Railway, with endpoint deadlines and global DB diagnostics still false.
-Production remains NO_GO; full provider allocation acceptance remains open.
+Production remains NO_GO. Provider allocation acceptance was open at this checkpoint;
+the later [provider allocation closure](backend-performance-11-closure-2026-10-17.md)
+records Pool size5/client200 and closes PERF-11 for the admitted demo topology.
 
 The [sealed evidence bundle](../tasks/evidence/perf11-pool-allocation-2026-10-17.json)
 contains every trial, sampled DB/deployment state, native results, failed receipts,
