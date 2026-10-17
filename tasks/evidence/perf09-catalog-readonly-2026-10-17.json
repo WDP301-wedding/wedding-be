@@ -1,0 +1,3089 @@
+{
+  "at": "2026-10-17T05:18:05.490Z",
+  "status": "PERF-09 OPEN: read-only 1–3 Hall scope only; twenty returned items not available or authorized",
+  "productionReadiness": "NO_GO unchanged",
+  "release": {
+    "pr": 58,
+    "merge": "6a7722bca0ff0e06a0b151c250478b38ace6b0eb",
+    "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+    "imageDigest": "sha256:54861ef48762e114b26b54f8fcef1a7f7169b9c22c1520f89b9be551da32f99a",
+    "region": "sfo",
+    "replicas": 1,
+    "headCi": 39004306507,
+    "mainCi": 39004857351,
+    "fullTests": 2002
+  },
+  "native": {
+    "scope": "Isolated loopback HTTP routers in the serving container, not production ingress or a whole-app rollback; real database and Supabase signing; one additional unchanged max3 pool",
+    "baseline": {
+      "commit": "3c6e8984c547d92f25dc4959c44503321e5f5528",
+      "modules": [
+        {
+          "path": "src/modules/venue-catalog/http/venue-catalog.router.ts",
+          "sourceSha256": "b420c68ed6cbbf2da4f36c15e9ea372e41c82a24a529218d0931abe9cd022dc7",
+          "compiledSha256": "5f13f7f82d7a72e9ba635525835e3d0a942d6466f149e51813f46ca04a27401c"
+        },
+        {
+          "path": "src/modules/venue-catalog/application/catalog-media.service.ts",
+          "sourceSha256": "93c5ffe772cbafb79c05c3d9e8d8180712b779aa43fa259b99bc993996d3c2d1",
+          "compiledSha256": "817fb9d8fcf4eac1193e52959db5e3fd5ea0d11fab25bc849b21e9cdfd1a4723"
+        },
+        {
+          "path": "src/modules/venue-catalog/application/catalog-query.service.ts",
+          "sourceSha256": "41974955a723ce808990c1875e8910f4d238ea192be3a2771ab31cfa43104937",
+          "compiledSha256": "73390f935510fea574a946b149f2fa4f696fb5617a1b931c284609ad1cac9b57"
+        }
+      ]
+    },
+    "cardinality": {
+      "activeHalls": 3,
+      "attachedHallAssets": 1,
+      "twentyReturnedItemsAvailable": false
+    },
+    "cases": [
+      {
+        "name": "one-no-assets",
+        "query": {
+          "limit": 1
+        },
+        "expectedItems": 1,
+        "hasFixture": false,
+        "baseline": {
+          "n": 20,
+          "p50Ms": 460.7959220000048,
+          "p95Ms": 463.85878100000264,
+          "maxMs": 464.4766260000033,
+          "queries": {
+            "min": 3,
+            "max": 3
+          },
+          "queryRoundTripP95Ms": 458.0636139999988,
+          "acquireP95Ms": 0.24132000000099652,
+          "signingCalls": {
+            "min": 0,
+            "max": 0
+          },
+          "signingP95Ms": 0
+        },
+        "candidate": {
+          "n": 20,
+          "p50Ms": 460.62155200000416,
+          "p95Ms": 462.9616939999978,
+          "maxMs": 463.52994300000137,
+          "queries": {
+            "min": 3,
+            "max": 3
+          },
+          "queryRoundTripP95Ms": 457.40979599999264,
+          "acquireP95Ms": 0.2544120000093244,
+          "signingCalls": {
+            "min": 0,
+            "max": 0
+          },
+          "signingP95Ms": 0
+        },
+        "p95ReductionPercent": 0.19339657601627372,
+        "pairedLatencyChangeP50Ms": -0.024363000004086643,
+        "http": {
+          "n": 20,
+          "clientP50Ms": 685.0963999999949,
+          "clientP95Ms": 693.5365999999995,
+          "backendP50Ms": 460.147,
+          "backendP95Ms": 462.306
+        }
+      },
+      {
+        "name": "one-real-asset",
+        "query": {
+          "limit": 1,
+          "cursor": "10000000-0000-4000-8000-000000000011"
+        },
+        "expectedItems": 1,
+        "hasFixture": true,
+        "baseline": {
+          "n": 20,
+          "p50Ms": 673.7697690000059,
+          "p95Ms": 1008.9662050000043,
+          "maxMs": 1407.6539570000023,
+          "queries": {
+            "min": 3,
+            "max": 3
+          },
+          "queryRoundTripP95Ms": 457.59710800000175,
+          "acquireP95Ms": 0.23150799999712035,
+          "signingCalls": {
+            "min": 1,
+            "max": 1
+          },
+          "signingP95Ms": 547.9424780000118
+        },
+        "candidate": {
+          "n": 20,
+          "p50Ms": 822.4728539999924,
+          "p95Ms": 846.5805809999874,
+          "maxMs": 861.3135280000006,
+          "queries": {
+            "min": 4,
+            "max": 4
+          },
+          "queryRoundTripP95Ms": 610.2293359999894,
+          "acquireP95Ms": 0.3497879999995348,
+          "signingCalls": {
+            "min": 1,
+            "max": 1
+          },
+          "signingP95Ms": 230.72470299999986
+        },
+        "p95ReductionPercent": 16.09425798359779,
+        "pairedLatencyChangeP50Ms": 156.28551499999594,
+        "http": {
+          "n": 20,
+          "clientP50Ms": 1061.6612000000023,
+          "clientP95Ms": 1389.0161000000007,
+          "backendP50Ms": 834.093,
+          "backendP95Ms": 1166.369
+        }
+      },
+      {
+        "name": "page-no-assets",
+        "query": {
+          "limit": 2
+        },
+        "expectedItems": 2,
+        "hasFixture": false,
+        "baseline": {
+          "n": 20,
+          "p50Ms": 460.7443740000017,
+          "p95Ms": 465.45500699999684,
+          "maxMs": 467.7586139999985,
+          "queries": {
+            "min": 5,
+            "max": 5
+          },
+          "queryRoundTripP95Ms": 764.8761650000088,
+          "acquireP95Ms": 0.7452400000001944,
+          "signingCalls": {
+            "min": 0,
+            "max": 0
+          },
+          "signingP95Ms": 0
+        },
+        "candidate": {
+          "n": 20,
+          "p50Ms": 460.7284039999995,
+          "p95Ms": 462.4466559999855,
+          "maxMs": 466.8824809999933,
+          "queries": {
+            "min": 3,
+            "max": 3
+          },
+          "queryRoundTripP95Ms": 458.29098600000725,
+          "acquireP95Ms": 0.19552300000214018,
+          "signingCalls": {
+            "min": 0,
+            "max": 0
+          },
+          "signingP95Ms": 0
+        },
+        "p95ReductionPercent": 0.6463247692620346,
+        "pairedLatencyChangeP50Ms": -0.097302000001946,
+        "http": {
+          "n": 20,
+          "clientP50Ms": 679.8411999999953,
+          "clientP95Ms": 698.5081000000064,
+          "backendP50Ms": 460.156,
+          "backendP95Ms": 461.374
+        }
+      },
+      {
+        "name": "page-real-asset",
+        "query": {
+          "limit": 20
+        },
+        "expectedItems": 3,
+        "hasFixture": true,
+        "baseline": {
+          "n": 20,
+          "p50Ms": 682.9998570000025,
+          "p95Ms": 1020.5898950000119,
+          "maxMs": 1050.1301680000033,
+          "queries": {
+            "min": 7,
+            "max": 7
+          },
+          "queryRoundTripP95Ms": 1069.874834000002,
+          "acquireP95Ms": 1.3754100000078324,
+          "signingCalls": {
+            "min": 1,
+            "max": 1
+          },
+          "signingP95Ms": 560.1737830000056
+        },
+        "candidate": {
+          "n": 20,
+          "p50Ms": 690.8428570000033,
+          "p95Ms": 1022.2224129999959,
+          "maxMs": 1435.9006630000003,
+          "queries": {
+            "min": 3,
+            "max": 3
+          },
+          "queryRoundTripP95Ms": 457.6457819999923,
+          "acquireP95Ms": 0.2511320000048727,
+          "signingCalls": {
+            "min": 1,
+            "max": 1
+          },
+          "signingP95Ms": 560.9932830000034
+        },
+        "p95ReductionPercent": -0.15995827589337006,
+        "pairedLatencyChangeP50Ms": -9.151725999981863,
+        "http": {
+          "n": 20,
+          "clientP50Ms": 903.4660999999905,
+          "clientP95Ms": 1227.457599999998,
+          "backendP50Ms": 685.261,
+          "backendP95Ms": 993.264
+        }
+      }
+    ],
+    "measuredSamples": 160,
+    "unmeasuredSamples": 8,
+    "matchedMeasuredPairs": 80,
+    "catalogBeforeSha256": "ce2929611fc8d6f79d12789bb5905bc10c2e0acbc028cc593179e3bbca32b4f7",
+    "catalogAfterSha256": "ce2929611fc8d6f79d12789bb5905bc10c2e0acbc028cc593179e3bbca32b4f7",
+    "controls": [
+      {
+        "case": "malformed-cursor",
+        "variant": "baseline",
+        "status": 422,
+        "errorCode": "VALIDATION_ERROR",
+        "database": {
+          "queries": 0,
+          "errors": 0,
+          "queryRoundTripMs": 0,
+          "lockRoundTripMs": 0,
+          "acquires": 0,
+          "acquireMs": 0,
+          "maxActive": 0,
+          "maxIdle": 0,
+          "maxWaiting": 0
+        },
+        "items": null,
+        "nextCursor": null
+      },
+      {
+        "case": "missing-cursor",
+        "variant": "baseline",
+        "status": 422,
+        "errorCode": "VALIDATION_ERROR",
+        "database": {
+          "queries": 1,
+          "errors": 0,
+          "queryRoundTripMs": 152.27607299998635,
+          "lockRoundTripMs": 0,
+          "acquires": 1,
+          "acquireMs": 0.04393300000810996,
+          "maxActive": 1,
+          "maxIdle": 2,
+          "maxWaiting": 1
+        },
+        "items": null,
+        "nextCursor": null
+      },
+      {
+        "case": "empty-final-page",
+        "variant": "baseline",
+        "status": 200,
+        "errorCode": null,
+        "database": {
+          "queries": 1,
+          "errors": 0,
+          "queryRoundTripMs": 152.20401700001094,
+          "lockRoundTripMs": 0,
+          "acquires": 1,
+          "acquireMs": 0.04126599998562597,
+          "maxActive": 1,
+          "maxIdle": 2,
+          "maxWaiting": 1
+        },
+        "items": 0,
+        "nextCursor": null
+      },
+      {
+        "case": "malformed-cursor",
+        "variant": "candidate",
+        "status": 422,
+        "errorCode": "VALIDATION_ERROR",
+        "database": {
+          "queries": 0,
+          "errors": 0,
+          "queryRoundTripMs": 0,
+          "lockRoundTripMs": 0,
+          "acquires": 0,
+          "acquireMs": 0,
+          "maxActive": 0,
+          "maxIdle": 0,
+          "maxWaiting": 0
+        },
+        "items": null,
+        "nextCursor": null
+      },
+      {
+        "case": "missing-cursor",
+        "variant": "candidate",
+        "status": 422,
+        "errorCode": "VALIDATION_ERROR",
+        "database": {
+          "queries": 1,
+          "errors": 0,
+          "queryRoundTripMs": 152.00854099998833,
+          "lockRoundTripMs": 0,
+          "acquires": 1,
+          "acquireMs": 0.03825599999981932,
+          "maxActive": 1,
+          "maxIdle": 2,
+          "maxWaiting": 1
+        },
+        "items": null,
+        "nextCursor": null
+      },
+      {
+        "case": "empty-final-page",
+        "variant": "candidate",
+        "status": 200,
+        "errorCode": null,
+        "database": {
+          "queries": 2,
+          "errors": 0,
+          "queryRoundTripMs": 304.54045900001074,
+          "lockRoundTripMs": 0,
+          "acquires": 2,
+          "acquireMs": 0.08009100001072511,
+          "maxActive": 1,
+          "maxIdle": 2,
+          "maxWaiting": 1
+        },
+        "items": 0,
+        "nextCursor": null
+      },
+      {
+        "case": "expired-short-signed-read",
+        "status": 400
+      },
+      {
+        "case": "unsigned-private-bucket-read",
+        "status": 400
+      }
+    ]
+  },
+  "http": {
+    "samples": [
+      {
+        "at": "2026-10-17T05:15:19.011Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "57cd4e61-dec1-4ff1-82b8-b38fbe359580",
+        "status": 200,
+        "ms": 1782.9821000000002,
+        "errorCode": null,
+        "index": 0,
+        "measured": false,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 1553.691,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:15:27.294Z"
+      },
+      {
+        "at": "2026-10-17T05:15:21.554Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "fe6e758e-596e-463a-8ae7-70b93b255c5d",
+        "status": 200,
+        "ms": 1418.2042000000001,
+        "errorCode": null,
+        "index": 0,
+        "measured": false,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 1181.375,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:15:29.481Z"
+      },
+      {
+        "at": "2026-10-17T05:15:23.728Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "b886fe49-430f-46b0-9e86-1f6aeb675fbd",
+        "status": 200,
+        "ms": 687.1474000000007,
+        "errorCode": null,
+        "index": 0,
+        "measured": false,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 461.388,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:15:30.927Z"
+      },
+      {
+        "at": "2026-10-17T05:15:25.168Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "03a38d6f-56d2-43f5-bd8f-dfab93c3ad99",
+        "status": 200,
+        "ms": 1208.6064999999999,
+        "errorCode": null,
+        "index": 0,
+        "measured": false,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 984.887,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:15:32.882Z"
+      },
+      {
+        "at": "2026-10-17T05:15:27.137Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "c72a9ed1-7dad-415c-afd7-42aa6353837e",
+        "status": 200,
+        "ms": 693.5365999999995,
+        "errorCode": null,
+        "index": 1,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 463.981,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:15:34.330Z"
+      },
+      {
+        "at": "2026-10-17T05:15:28.584Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "064866d5-a83b-4ba2-bdbf-f1fe9d8fcd52",
+        "status": 200,
+        "ms": 1344.2405999999992,
+        "errorCode": null,
+        "index": 1,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 1127.712,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:15:36.441Z"
+      },
+      {
+        "at": "2026-10-17T05:15:30.695Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "462bc744-8a2a-448c-92bc-faa57c0648a2",
+        "status": 200,
+        "ms": 695.0070000000014,
+        "errorCode": null,
+        "index": 1,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 461.503,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:15:37.895Z"
+      },
+      {
+        "at": "2026-10-17T05:15:32.155Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "2c1f1c50-65e7-4503-b179-eb4c5da7c11c",
+        "status": 200,
+        "ms": 1230.9022000000004,
+        "errorCode": null,
+        "index": 1,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 991.34,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:15:39.887Z"
+      },
+      {
+        "at": "2026-10-17T05:15:35.338Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "2133bcb0-1d19-4e62-ab3e-1694fc03dcc0",
+        "status": 200,
+        "ms": 678.1663000000008,
+        "errorCode": null,
+        "index": 2,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 460.246,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:15:42.524Z"
+      },
+      {
+        "at": "2026-10-17T05:15:36.784Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "b8980e12-72c9-4193-8626-82693e3bf344",
+        "status": 200,
+        "ms": 1389.0161000000007,
+        "errorCode": null,
+        "index": 2,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 1166.369,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:15:44.687Z"
+      },
+      {
+        "at": "2026-10-17T05:15:38.929Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "bb22993d-6022-44a2-9318-4f22336a8cf2",
+        "status": 200,
+        "ms": 676.2122000000018,
+        "errorCode": null,
+        "index": 2,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 460.714,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:15:46.119Z"
+      },
+      {
+        "at": "2026-10-17T05:15:40.362Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "edc6c38c-d056-466f-8235-4f0b559afd68",
+        "status": 200,
+        "ms": 882.8610000000008,
+        "errorCode": null,
+        "index": 2,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 664.64,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:15:47.757Z"
+      },
+      {
+        "at": "2026-10-17T05:15:42.776Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "6fd09d33-64ad-49f2-8aed-effb432dc00b",
+        "status": 200,
+        "ms": 693.1160000000018,
+        "errorCode": null,
+        "index": 3,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 460.036,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:15:49.975Z"
+      },
+      {
+        "at": "2026-10-17T05:15:44.236Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "4be41321-bb78-4d15-87d5-5fa5d671faaf",
+        "status": 200,
+        "ms": 1024.375,
+        "errorCode": null,
+        "index": 3,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 803.796,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:15:51.774Z"
+      },
+      {
+        "at": "2026-10-17T05:15:46.027Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "1ca3eed1-17e0-4f6e-81ac-fb0d12f0b335",
+        "status": 200,
+        "ms": 678.677499999998,
+        "errorCode": null,
+        "index": 3,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 460.985,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:15:53.218Z"
+      },
+      {
+        "at": "2026-10-17T05:15:47.471Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "a3cbe509-c35a-4b37-bd24-dd5fd3a1f3c2",
+        "status": 200,
+        "ms": 1227.457599999998,
+        "errorCode": null,
+        "index": 3,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 1005.649,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:15:55.210Z"
+      },
+      {
+        "at": "2026-10-17T05:15:49.876Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "374e8a2d-6fa2-4418-9a8c-f362b45992aa",
+        "status": 200,
+        "ms": 672.1838999999964,
+        "errorCode": null,
+        "index": 4,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 460.049,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:15:57.062Z"
+      },
+      {
+        "at": "2026-10-17T05:15:51.308Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "6361ecd7-5db8-4b2d-9b1f-d5bab8490274",
+        "status": 200,
+        "ms": 1047.2667999999976,
+        "errorCode": null,
+        "index": 4,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 834.093,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:15:58.869Z"
+      },
+      {
+        "at": "2026-10-17T05:15:53.121Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "4ebb30e2-14ee-4321-a04d-db8e59b76222",
+        "status": 200,
+        "ms": 672.7602999999945,
+        "errorCode": null,
+        "index": 4,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 459.648,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:00.305Z"
+      },
+      {
+        "at": "2026-10-17T05:15:54.551Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "5cf9342b-fd44-42a6-a467-337f33011e4f",
+        "status": 200,
+        "ms": 1210.4127000000008,
+        "errorCode": null,
+        "index": 4,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 993.264,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:02.272Z"
+      },
+      {
+        "at": "2026-10-17T05:15:57.450Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "aa611d60-44da-4361-b471-95db1a4f7aec",
+        "status": 200,
+        "ms": 690.7911999999997,
+        "errorCode": null,
+        "index": 5,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 461.148,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:04.645Z"
+      },
+      {
+        "at": "2026-10-17T05:15:58.893Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "30ff67bc-2805-4529-a6c3-cb901d7aae34",
+        "status": 200,
+        "ms": 1030.0728000000017,
+        "errorCode": null,
+        "index": 5,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 814.851,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:06.434Z"
+      },
+      {
+        "at": "2026-10-17T05:16:00.685Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "25802c8f-2be2-4639-ac9b-8b0837243fc3",
+        "status": 200,
+        "ms": 731.2425000000003,
+        "errorCode": null,
+        "index": 5,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 461.152,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:07.924Z"
+      },
+      {
+        "at": "2026-10-17T05:16:02.184Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "4e9fb8eb-6493-4769-9983-c8d08548afe3",
+        "status": 200,
+        "ms": 883.0337999999974,
+        "errorCode": null,
+        "index": 5,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 655.378,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:09.574Z"
+      },
+      {
+        "at": "2026-10-17T05:16:04.673Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "e42e55c2-3e27-4cbd-b978-22bda9e3b19a",
+        "status": 200,
+        "ms": 685.4354999999996,
+        "errorCode": null,
+        "index": 6,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 460.509,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:11.865Z"
+      },
+      {
+        "at": "2026-10-17T05:16:06.119Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "4b1e7a0d-8aa6-4407-8c0a-d4ffa524ae97",
+        "status": 200,
+        "ms": 1063.7165999999997,
+        "errorCode": null,
+        "index": 6,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 817.186,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:13.694Z"
+      },
+      {
+        "at": "2026-10-17T05:16:07.937Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "17b5e163-bfeb-4075-8d39-f260fd338730",
+        "status": 200,
+        "ms": 679.8411999999953,
+        "errorCode": null,
+        "index": 6,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 460.056,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:15.131Z"
+      },
+      {
+        "at": "2026-10-17T05:16:09.370Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "2fa2b071-6a89-49f4-91ac-29eca8bdab48",
+        "status": 200,
+        "ms": 883.5923000000039,
+        "errorCode": null,
+        "index": 6,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 652.083,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:16.768Z"
+      },
+      {
+        "at": "2026-10-17T05:16:11.796Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "84c703c5-a5f3-49f7-96dc-c34c5844b58b",
+        "status": 200,
+        "ms": 702.4423999999999,
+        "errorCode": null,
+        "index": 7,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 459.702,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:18.988Z"
+      },
+      {
+        "at": "2026-10-17T05:16:13.254Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "c7e87d34-e0c1-469b-a0ee-ba814315a055",
+        "status": 200,
+        "ms": 1343.6579999999958,
+        "errorCode": null,
+        "index": 7,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 1127.569,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:21.108Z"
+      },
+      {
+        "at": "2026-10-17T05:16:15.368Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "53d7c0b2-cef6-4e8c-a956-8ce0b4857b72",
+        "status": 200,
+        "ms": 679.4985000000015,
+        "errorCode": null,
+        "index": 7,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 460.225,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:22.557Z"
+      },
+      {
+        "at": "2026-10-17T05:16:16.811Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "0ff4c478-bec5-4acd-aa60-e37ed23c5f26",
+        "status": 200,
+        "ms": 909.0302999999985,
+        "errorCode": null,
+        "index": 7,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 691.664,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:24.234Z"
+      },
+      {
+        "at": "2026-10-17T05:16:19.319Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "90187f51-5513-4b3b-9359-3dd649403fab",
+        "status": 200,
+        "ms": 679.0453999999954,
+        "errorCode": null,
+        "index": 8,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 460.925,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:26.510Z"
+      },
+      {
+        "at": "2026-10-17T05:16:20.751Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "d19ad43b-d013-4fb7-a357-18df5192de6f",
+        "status": 200,
+        "ms": 1335.5632999999943,
+        "errorCode": null,
+        "index": 8,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 1119.844,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:28.596Z"
+      },
+      {
+        "at": "2026-10-17T05:16:22.848Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "068bbf10-ff2e-4e9f-98d0-6a606fefa144",
+        "status": 200,
+        "ms": 693.3237000000081,
+        "errorCode": null,
+        "index": 8,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 459.817,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:30.037Z"
+      },
+      {
+        "at": "2026-10-17T05:16:24.296Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "7cbd2b21-7663-4fbe-bfb9-ad2d51e0aecb",
+        "status": 200,
+        "ms": 899.9158999999927,
+        "errorCode": null,
+        "index": 8,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 672.313,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:31.709Z"
+      },
+      {
+        "at": "2026-10-17T05:16:26.742Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "a23876ac-cf37-4dfe-ab2e-cc088b4805c0",
+        "status": 200,
+        "ms": 679.6977999999945,
+        "errorCode": null,
+        "index": 9,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 460.547,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:33.933Z"
+      },
+      {
+        "at": "2026-10-17T05:16:28.187Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "a118a6eb-ab73-437e-89ae-34369e32d048",
+        "status": 200,
+        "ms": 1019.2347999999911,
+        "errorCode": null,
+        "index": 9,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 801.42,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:35.719Z"
+      },
+      {
+        "at": "2026-10-17T05:16:29.966Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "a4a46839-1535-4955-8e54-b7a1dbca49e8",
+        "status": 200,
+        "ms": 679.1573999999964,
+        "errorCode": null,
+        "index": 9,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 459.819,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:37.156Z"
+      },
+      {
+        "at": "2026-10-17T05:16:31.411Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "b8d340ad-50a5-4323-b68f-66931e21a50f",
+        "status": 200,
+        "ms": 1189.4507000000012,
+        "errorCode": null,
+        "index": 9,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 966.892,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:39.106Z"
+      },
+      {
+        "at": "2026-10-17T05:16:34.214Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "2f04b2dd-fb1c-4a6f-921d-22eca7517999",
+        "status": 200,
+        "ms": 682.534799999994,
+        "errorCode": null,
+        "index": 10,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 460.147,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:41.404Z"
+      },
+      {
+        "at": "2026-10-17T05:16:35.662Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "d26d0c24-f6c1-458e-9e42-3bf7ee384dd4",
+        "status": 200,
+        "ms": 1365.880400000009,
+        "errorCode": null,
+        "index": 10,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 1142.973,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:43.535Z"
+      },
+      {
+        "at": "2026-10-17T05:16:37.793Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "d9f4f297-e194-4bd0-a4ef-3af07b68e0b3",
+        "status": 200,
+        "ms": 698.1321000000025,
+        "errorCode": null,
+        "index": 10,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 460.554,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:44.982Z"
+      },
+      {
+        "at": "2026-10-17T05:16:39.253Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "7fca3795-2f99-4c70-96e7-807f56355424",
+        "status": 200,
+        "ms": 917.0491000000038,
+        "errorCode": null,
+        "index": 10,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 698.179,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:46.683Z"
+      },
+      {
+        "at": "2026-10-17T05:16:41.423Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "8c23dc27-7a93-420f-9f56-d6c1bef6da00",
+        "status": 200,
+        "ms": 686.6562999999878,
+        "errorCode": null,
+        "index": 11,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 461.091,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:48.624Z"
+      },
+      {
+        "at": "2026-10-17T05:16:42.870Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "39d0d498-79fa-430b-8ed0-08eba0ed3f0b",
+        "status": 200,
+        "ms": 1403.764599999995,
+        "errorCode": null,
+        "index": 11,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 1188.163,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:50.787Z"
+      },
+      {
+        "at": "2026-10-17T05:16:45.037Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "a134d568-71a8-4e7c-872d-fd2aa4bc2746",
+        "status": 200,
+        "ms": 677.7193999999872,
+        "errorCode": null,
+        "index": 11,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 459.996,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:52.229Z"
+      },
+      {
+        "at": "2026-10-17T05:16:46.483Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "5b7ccadb-31ed-4e4a-8af8-d5ef65ed8bc1",
+        "status": 200,
+        "ms": 1205.379700000005,
+        "errorCode": null,
+        "index": 11,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 979.565,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:54.201Z"
+      },
+      {
+        "at": "2026-10-17T05:16:49.299Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "6c15dead-6b5e-405a-b375-99d19efa4073",
+        "status": 200,
+        "ms": 685.0644999999931,
+        "errorCode": null,
+        "index": 12,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 460.259,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:56.491Z"
+      },
+      {
+        "at": "2026-10-17T05:16:50.748Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "9bec685c-b0a4-4179-8aa7-0418b2d2b296",
+        "status": 200,
+        "ms": 1076.3225999999995,
+        "errorCode": null,
+        "index": 12,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 863.165,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:58.338Z"
+      },
+      {
+        "at": "2026-10-17T05:16:52.580Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "c3537e94-9446-4e0e-b60f-92984de7ae0a",
+        "status": 200,
+        "ms": 682.9959999999992,
+        "errorCode": null,
+        "index": 12,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 460.156,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:16:59.778Z"
+      },
+      {
+        "at": "2026-10-17T05:16:54.032Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "6940ea79-63cf-43b8-9939-aa0465f4a94f",
+        "status": 200,
+        "ms": 887.9011000000028,
+        "errorCode": null,
+        "index": 12,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 652.533,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:01.425Z"
+      },
+      {
+        "at": "2026-10-17T05:16:56.152Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "93c31dc8-03d5-4287-9418-380e5ceb50a1",
+        "status": 200,
+        "ms": 685.0963999999949,
+        "errorCode": null,
+        "index": 13,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 459.906,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:03.347Z"
+      },
+      {
+        "at": "2026-10-17T05:16:57.598Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "6f2ea105-0898-49d2-a3bb-e6533377f38b",
+        "status": 200,
+        "ms": 1351.1635000000097,
+        "errorCode": null,
+        "index": 13,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 1133.847,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:05.464Z"
+      },
+      {
+        "at": "2026-10-17T05:16:59.708Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "72a02497-8ac8-44b9-b141-555b676ca001",
+        "status": 200,
+        "ms": 687.9468000000052,
+        "errorCode": null,
+        "index": 13,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 461.374,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:06.897Z"
+      },
+      {
+        "at": "2026-10-17T05:17:01.166Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "4a320f93-20d0-43fa-98d8-7c20598e5833",
+        "status": 200,
+        "ms": 903.4660999999905,
+        "errorCode": null,
+        "index": 13,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 685.261,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:08.577Z"
+      },
+      {
+        "at": "2026-10-17T05:17:03.622Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "dc7b67b4-6475-4794-a0e4-524107fce591",
+        "status": 200,
+        "ms": 689.2774999999965,
+        "errorCode": null,
+        "index": 14,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 460.047,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:10.822Z"
+      },
+      {
+        "at": "2026-10-17T05:17:05.079Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "644bd40e-32da-4548-bfa5-c5564e050857",
+        "status": 200,
+        "ms": 1061.6612000000023,
+        "errorCode": null,
+        "index": 14,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 832.282,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:12.655Z"
+      },
+      {
+        "at": "2026-10-17T05:17:06.907Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "75fd8dd0-0b21-4b0a-a523-ef44f55b0d81",
+        "status": 200,
+        "ms": 672.0754000000015,
+        "errorCode": null,
+        "index": 14,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 460.681,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:14.094Z"
+      },
+      {
+        "at": "2026-10-17T05:17:08.335Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "9b25c8ee-4b80-4451-9aab-89860280573c",
+        "status": 200,
+        "ms": 903.7112000000052,
+        "errorCode": null,
+        "index": 14,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 686.13,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:15.752Z"
+      },
+      {
+        "at": "2026-10-17T05:17:10.793Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "f79b5fb3-0465-4871-a6db-fa782f9221fd",
+        "status": 200,
+        "ms": 677.3236000000034,
+        "errorCode": null,
+        "index": 15,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 459.774,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:17.983Z"
+      },
+      {
+        "at": "2026-10-17T05:17:12.225Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "20cbf9eb-8745-4a3b-b06a-c4d676973983",
+        "status": 200,
+        "ms": 1040.5608999999968,
+        "errorCode": null,
+        "index": 15,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 824.325,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:19.780Z"
+      },
+      {
+        "at": "2026-10-17T05:17:14.027Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "4133db64-9696-40a0-8289-f1427418e0ce",
+        "status": 200,
+        "ms": 674.1277999999875,
+        "errorCode": null,
+        "index": 15,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 459.906,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:21.212Z"
+      },
+      {
+        "at": "2026-10-17T05:17:15.457Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "2cf3fdb5-971a-4018-8f81-ebdde9ae8a2c",
+        "status": 200,
+        "ms": 882.4872999999934,
+        "errorCode": null,
+        "index": 15,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 658.869,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:22.846Z"
+      },
+      {
+        "at": "2026-10-17T05:17:18.049Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "0fe693fa-647a-4bfd-b0e5-1c2cf59b0cc3",
+        "status": 200,
+        "ms": 688.3441000000021,
+        "errorCode": null,
+        "index": 16,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 462.306,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:25.254Z"
+      },
+      {
+        "at": "2026-10-17T05:17:19.499Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "8834c597-7283-4bbb-9449-e974e155638e",
+        "status": 200,
+        "ms": 1044.4765999999945,
+        "errorCode": null,
+        "index": 16,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 825.275,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:27.053Z"
+      },
+      {
+        "at": "2026-10-17T05:17:21.308Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "a7d87a9c-5b49-47dc-9e3d-8e1f82d5a9da",
+        "status": 200,
+        "ms": 698.5081000000064,
+        "errorCode": null,
+        "index": 16,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 461.143,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:28.509Z"
+      },
+      {
+        "at": "2026-10-17T05:17:22.770Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "dca42a88-1477-4fa4-9634-7a638db65c96",
+        "status": 200,
+        "ms": 875.9690000000119,
+        "errorCode": null,
+        "index": 16,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 657.897,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:30.159Z"
+      },
+      {
+        "at": "2026-10-17T05:17:24.843Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "b1022bc9-9e3f-4669-a6f8-79833c03f680",
+        "status": 200,
+        "ms": 678.9829000000027,
+        "errorCode": null,
+        "index": 17,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 460.206,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:32.037Z"
+      },
+      {
+        "at": "2026-10-17T05:17:26.284Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "900ae22c-b95b-489e-8f34-b4b2d9b6eee8",
+        "status": 200,
+        "ms": 1021.2208999999857,
+        "errorCode": null,
+        "index": 17,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 798.052,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:33.814Z"
+      },
+      {
+        "at": "2026-10-17T05:17:28.061Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "b5839a08-649e-43eb-abf4-320de841fd83",
+        "status": 200,
+        "ms": 677.8657999999996,
+        "errorCode": null,
+        "index": 17,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 460.883,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:35.249Z"
+      },
+      {
+        "at": "2026-10-17T05:17:29.502Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "d9666ee8-42e6-4483-b031-29e4e2293af6",
+        "status": 200,
+        "ms": 973.2574000000022,
+        "errorCode": null,
+        "index": 17,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 730.791,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:36.978Z"
+      },
+      {
+        "at": "2026-10-17T05:17:32.033Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "e581ad79-e7af-4139-8a31-6cdf7119f5c1",
+        "status": 200,
+        "ms": 676.4034999999858,
+        "errorCode": null,
+        "index": 18,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 459.481,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:39.222Z"
+      },
+      {
+        "at": "2026-10-17T05:17:33.468Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "56725ff8-4f32-4916-87c7-f2311e064088",
+        "status": 200,
+        "ms": 1061.6487999999954,
+        "errorCode": null,
+        "index": 18,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 837.637,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:41.037Z"
+      },
+      {
+        "at": "2026-10-17T05:17:35.288Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "88ab5a8b-80d1-4bfc-800f-75aec394067e",
+        "status": 200,
+        "ms": 682.9832999999926,
+        "errorCode": null,
+        "index": 18,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 459.545,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:42.482Z"
+      },
+      {
+        "at": "2026-10-17T05:17:36.738Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "3e31fafa-2072-46b4-aab6-2eaa60251127",
+        "status": 200,
+        "ms": 878.602200000023,
+        "errorCode": null,
+        "index": 18,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 646.511,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:44.131Z"
+      },
+      {
+        "at": "2026-10-17T05:17:39.178Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "959037af-2ace-4654-8221-8fb6c81f2595",
+        "status": 200,
+        "ms": 685.8822999999975,
+        "errorCode": null,
+        "index": 19,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 459.483,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:46.380Z"
+      },
+      {
+        "at": "2026-10-17T05:17:40.621Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "8692e99c-5f16-4039-88d7-ebe60b5f812c",
+        "status": 200,
+        "ms": 1040.285200000013,
+        "errorCode": null,
+        "index": 19,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 811.344,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:48.172Z"
+      },
+      {
+        "at": "2026-10-17T05:17:42.426Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "a56dc1c5-fc41-4786-a92e-aa34529d94a8",
+        "status": 200,
+        "ms": 687.2931000000099,
+        "errorCode": null,
+        "index": 19,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 459.612,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:49.626Z"
+      },
+      {
+        "at": "2026-10-17T05:17:43.872Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "d177fab7-fa79-4c0a-8cf3-362632663ea8",
+        "status": 200,
+        "ms": 1198.201000000001,
+        "errorCode": null,
+        "index": 19,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 960.536,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:51.578Z"
+      },
+      {
+        "at": "2026-10-17T05:17:46.608Z",
+        "route": "/api/v1/catalog/halls?limit=1",
+        "label": "one-no-assets",
+        "method": "GET",
+        "requestId": "05b9aaf7-6fef-4257-89cb-ce288c6fccd7",
+        "status": 200,
+        "ms": 691.1908000000112,
+        "errorCode": null,
+        "index": 20,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000010",
+        "factsSha256": "5a4433f1c90e254d5e33dc4995549305bbc9de3e997daccabc173bf9f75d5682",
+        "backendMs": 460.032,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:53.813Z"
+      },
+      {
+        "at": "2026-10-17T05:17:48.067Z",
+        "route": "/api/v1/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "label": "one-real-asset",
+        "method": "GET",
+        "requestId": "ee255572-59c3-4bf7-aa68-cea1d873abce",
+        "status": 200,
+        "ms": 1341.2511999999988,
+        "errorCode": null,
+        "index": 20,
+        "measured": true,
+        "itemCount": 1,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "e34a23984cf5c7fc73c0f799c57f1130f4cb5c6da569fdb7f9262fce7f87993b",
+        "backendMs": 1123.746,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:55.922Z"
+      },
+      {
+        "at": "2026-10-17T05:17:50.173Z",
+        "route": "/api/v1/catalog/halls?limit=2",
+        "label": "page-no-assets",
+        "method": "GET",
+        "requestId": "1bd7c797-5f18-47bb-9073-325f04dbc6ab",
+        "status": 200,
+        "ms": 686.6435000000056,
+        "errorCode": null,
+        "index": 20,
+        "measured": true,
+        "itemCount": 2,
+        "mediaCount": 0,
+        "hasFixture": false,
+        "nextCursor": "10000000-0000-4000-8000-000000000011",
+        "factsSha256": "aaab1fc913f80fe51f51cfe592988c88df3e9f6ffad3fd769bbf71aaabec2835",
+        "backendMs": 459.551,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:57.369Z"
+      },
+      {
+        "at": "2026-10-17T05:17:51.625Z",
+        "route": "/api/v1/catalog/halls?limit=20",
+        "label": "page-real-asset",
+        "method": "GET",
+        "requestId": "be7a8a71-09bd-4ab2-853d-c1ec6e8a504b",
+        "status": 200,
+        "ms": 865.381000000023,
+        "errorCode": null,
+        "index": 20,
+        "measured": true,
+        "itemCount": 3,
+        "mediaCount": 1,
+        "hasFixture": true,
+        "nextCursor": null,
+        "factsSha256": "dbb9c70c08208589c40f057902445c32a44531ba6608fdd1ea3ec6bcb8da61e1",
+        "backendMs": 637.802,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:17:59.004Z"
+      },
+      {
+        "at": "2026-10-17T05:17:54.089Z",
+        "route": "/api/v1/catalog/halls?cursor=invalid",
+        "label": "malformed-cursor",
+        "method": "GET",
+        "requestId": "8889f869-afdf-4cad-8582-17548d08620c",
+        "status": 422,
+        "ms": 221.773199999996,
+        "errorCode": "VALIDATION_ERROR",
+        "backendMs": 5.694,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:18:00.826Z"
+      },
+      {
+        "at": "2026-10-17T05:17:54.315Z",
+        "route": "/api/v1/catalog/halls?cursor=7f4e1dce-47c6-4cdc-80c1-30f8cc6c9372",
+        "label": "missing-cursor",
+        "method": "GET",
+        "requestId": "a429d25b-beb8-40b0-b5a5-f1d6a15a6b68",
+        "status": 422,
+        "ms": 533.2812000000267,
+        "errorCode": "VALIDATION_ERROR",
+        "backendMs": 154.764,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:18:01.356Z"
+      },
+      {
+        "at": "2026-10-17T05:17:54.850Z",
+        "route": "/api/v1/catalog/halls?cursor=be5d4496-de6a-4666-8d17-3202b1f873ed",
+        "label": "empty-final-page",
+        "method": "GET",
+        "requestId": "849c0783-0d69-4938-92a4-41d11d1f9a76",
+        "status": 200,
+        "ms": 520.5734999999986,
+        "errorCode": null,
+        "backendMs": 308.078,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:18:01.885Z"
+      },
+      {
+        "at": "2026-10-17T05:17:55.374Z",
+        "route": "/api/v1/management/catalog/halls/be5d4496-de6a-4666-8d17-3202b1f873ed/media",
+        "label": "anonymous-management-denied",
+        "method": "GET",
+        "requestId": "292b4571-fe42-43f1-94e1-0381df9a7841",
+        "status": 401,
+        "ms": 223.82380000001285,
+        "errorCode": "AUTHENTICATION_REQUIRED",
+        "backendMs": 1.808,
+        "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+        "serverCompletedAt": "2026-10-17T05:18:02.109Z"
+      }
+    ],
+    "allCatalogReads200": true,
+    "measured": 80,
+    "unmeasured": 4,
+    "controls": [
+      {
+        "route": "/health/live",
+        "status": 200,
+        "sha256": "f9950b3a3f425947476de8ee663f80eb5b21538f0bf60a6e90a7cd49265a96ae"
+      },
+      {
+        "route": "/health/ready",
+        "status": 200,
+        "sha256": "638c4066fcb381602160a2a997f4751bf66eb267f4d9def4a49e5b4615541cce"
+      },
+      {
+        "route": "/api/v1/openapi.json",
+        "status": 200,
+        "sha256": "e07edcf4b61783ceaaf08b7f1ba5f7d8b2dc1ad2d8a885f53ab020c94836c88a"
+      },
+      {
+        "name": "malformed-cursor",
+        "status": 422,
+        "errorCode": "VALIDATION_ERROR"
+      },
+      {
+        "name": "missing-cursor",
+        "status": 422,
+        "errorCode": "VALIDATION_ERROR"
+      },
+      {
+        "name": "empty-final-page",
+        "status": 200,
+        "errorCode": null
+      },
+      {
+        "name": "anonymous-management-denied",
+        "status": 401,
+        "errorCode": "AUTHENTICATION_REQUIRED"
+      }
+    ],
+    "freshSigningObserved": true
+  },
+  "provider": {
+    "nativeReads": [
+      {
+        "pair": 1,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 537.7365850000006,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 1,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 642.6647940000003,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 2,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 538.4084810000022,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 2,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 595.4357610000006,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 3,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 1035.7784380000012,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 3,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 649.5583820000029,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 4,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 230.94660999999905,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 4,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 689.0479210000049,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 5,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 689.9828149999958,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 5,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 571.7371100000018,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 6,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 539.3841549999997,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 6,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 580.4751830000023,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 7,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 634.8004979999969,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 7,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 584.7106490000006,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 8,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 667.9116150000045,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 8,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 649.1664650000021,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 9,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 227.0380470000091,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 9,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 646.1211940000067,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 10,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 754.3938199999975,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 10,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 527.0534279999993,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 11,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 539.6036929999973,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 11,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 693.6387949999917,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 12,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 572.8675019999937,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 12,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 666.1838439999992,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 13,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 718.7010850000079,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 13,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 528.8630930000072,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 14,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 677.3021530000115,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 14,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 525.9953830000013,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 15,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 567.6876769999944,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 15,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 541.0812189999997,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 16,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 550.9208399999916,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 16,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 269.91887999999744,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 17,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 702.4892640000035,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 17,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 556.1172499999811,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 18,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 261.60909600000014,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 18,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 649.796782999998,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 19,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 624.118060000008,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 19,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 565.5289420000045,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 20,
+        "case": "one-real-asset",
+        "status": 200,
+        "ms": 588.9489060000051,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "pair": 20,
+        "case": "page-real-asset",
+        "status": 200,
+        "ms": 586.5769919999875,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      }
+    ],
+    "httpReads": [
+      {
+        "index": 1,
+        "status": 200,
+        "ms": 1194.274599999997,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 2,
+        "status": 200,
+        "ms": 768.4336000000003,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 3,
+        "status": 200,
+        "ms": 410.7073999999993,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 4,
+        "status": 200,
+        "ms": 921.0031000000017,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 5,
+        "status": 200,
+        "ms": 846.1036999999997,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 6,
+        "status": 200,
+        "ms": 784.8744999999981,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 7,
+        "status": 200,
+        "ms": 835.2287999999971,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 8,
+        "status": 200,
+        "ms": 776.2635000000009,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 9,
+        "status": 200,
+        "ms": 841.1705999999976,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 10,
+        "status": 200,
+        "ms": 498.20269999999437,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 11,
+        "status": 200,
+        "ms": 841.784799999994,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 12,
+        "status": 200,
+        "ms": 475.04419999998936,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 13,
+        "status": 200,
+        "ms": 791.2027999999991,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 14,
+        "status": 200,
+        "ms": 796.0377000000008,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 15,
+        "status": 200,
+        "ms": 949.2305999999953,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 16,
+        "status": 200,
+        "ms": 432.8978999999963,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 17,
+        "status": 200,
+        "ms": 788.1698000000033,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 18,
+        "status": 200,
+        "ms": 804.0357000000076,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 19,
+        "status": 200,
+        "ms": 772.7187000000267,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      {
+        "index": 20,
+        "status": 200,
+        "ms": 840.3481000000029,
+        "sizeBytes": 237,
+        "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      }
+    ],
+    "totalVerifiedReads": 60,
+    "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d",
+    "sizeBytes": 237
+  },
+  "limitations": [
+    "No live 20-item cardinality proof; limit=20 returns three, never relabelled twenty",
+    "Single real Hall media object, not twenty media-rich resources or load-test saturation",
+    "No retired Hall exists; live retirement/publication mutation tests are not run under read-only authorization",
+    "Native variants exclude Railway ingress/production middleware; HTTP current-version timings are independent observations, not baseline HTTP improvement",
+    "All cohorts retained even when neutral or regressing; no public cache, runtime tuning or optimization change added"
+  ],
+  "failures": {
+    "nativePilot": null,
+    "nativeCampaign": null,
+    "http": null
+  },
+  "logs": {
+    "requested": 88,
+    "matched": 88,
+    "rawObservedSha256": "9c13fe057098509e317b1627a749f6b3e8c45b95be96458b2951d19d6b258278",
+    "privateOrUnrelatedLogsPublished": false
+  },
+  "recordedAt": "2026-10-17T05:19:35.147Z",
+  "authorization": [
+    "Direct human: gỡ chặn CI, merge #58 rồi chuyển sang PERF-09",
+    "Direct human: Đồng ý dùng key tạm cho PERF-09; revoke after measurement",
+    "Direct human: Giữ chỉ đọc, đo 1–3 item; no additional Hall fixtures"
+  ],
+  "acceptance": {
+    "closed": false,
+    "targetP95ReductionPercent": 30,
+    "liveTwentyReturnedItems": false,
+    "actualReturnedCardinalities": [
+      1,
+      2,
+      3
+    ],
+    "anyMeasuredCohortReachesThirtyPercent": false,
+    "next": "Keep PERF-09 open; await a separately authorized representative twenty-item cohort or explicit deferral. Do not assume new fixture or optimization permission."
+  },
+  "completedPerf": [
+    "PERF-01",
+    "PERF-02",
+    "PERF-10",
+    "PERF-12"
+  ],
+  "openPerf": [
+    "PERF-03",
+    "PERF-04",
+    "PERF-05",
+    "PERF-06",
+    "PERF-07",
+    "PERF-08",
+    "PERF-09",
+    "PERF-11",
+    "PERF-13"
+  ],
+  "retention": {
+    "catalogSourceDigestBefore": "ec74798736d32b444ce3e783fc20df5dd5b60d1bc5ee2f3360d7e6a38f9fbc01",
+    "catalogSourceDigestAfter": "ec74798736d32b444ce3e783fc20df5dd5b60d1bc5ee2f3360d7e6a38f9fbc01",
+    "countsBefore": {
+      "Hall": 3,
+      "Dish": 5,
+      "MenuPackage": 2,
+      "CatalogMediaAsset": 4
+    },
+    "countsAfter": {
+      "Hall": 3,
+      "Dish": 5,
+      "MenuPackage": 2,
+      "CatalogMediaAsset": 4
+    },
+    "business": {
+      "at": "2026-10-17T05:18:16.275Z",
+      "readOnly": true,
+      "originalBookingId": "e80c6f1b-a4fc-4674-a4dd-13ef2601206b",
+      "originalFixture": {
+        "Booking": {
+          "count": 1,
+          "sha256": "20dcee6f97394382004b58c32131e5a6dba355b4191a6ade60ad6a7a3354cd99"
+        },
+        "GuestWorkspace": {
+          "count": 1,
+          "sha256": "740e1cfad05084d31b75caee13d7e3321381bd9f6d637403bc187266e8bf5444"
+        },
+        "GuestPlanRevision": {
+          "count": 1,
+          "sha256": "1d999c357118e047bbf2b054d4a62f233b7d5211a3df379e06720d89e3089a7e"
+        },
+        "Guest": {
+          "count": 8,
+          "sha256": "2fab9d7948048ad7f8ee99add51ceb1057e8bd75463d1d0209b0e8f5f2616661"
+        },
+        "GuestGroup": {
+          "count": 4,
+          "sha256": "4c16cb980d31b569683ca79ef4423e7519226c8c5bf831c5855312b0c4dfe395"
+        },
+        "GuestHistory": {
+          "count": 12,
+          "sha256": "b00ccae7b401b0e1f61f0247de74f671965cee799482fe1adddead565ccea544"
+        },
+        "SeatingPlan": {
+          "count": 1,
+          "sha256": "21324fbb0909ebe7b7847d5c123df7988539e163ae938e3873f0c07ef3cba10b"
+        },
+        "SeatingPlanRevision": {
+          "count": 2,
+          "sha256": "d3d9236f4ce95da45b5c26ee86e743bdd3a16ae2495caeefde36b123d16c58f8"
+        },
+        "StaffConfiguration": {
+          "count": 1,
+          "sha256": "c2069094393ddd40b16a802f3594d61fa05097fb29e3f765fc3c2031e45b524c"
+        },
+        "StaffAssignment": {
+          "count": 1,
+          "sha256": "7138dcfec52bee5e751fa90552a061e70e6cf464f0a5d0fa114f7e27096ee185"
+        },
+        "StaffHistory": {
+          "count": 3,
+          "sha256": "547f6018665f82fe9a9a84603e3faed5d49b237c3ae9cf872ebef2deb89a18f0"
+        },
+        "StaffCheckInRecord": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "CommercialContractRevision": {
+          "count": 1,
+          "sha256": "9826bab0f0440ef1e4bd62f5a6a731073359e734d2aa8cc0f6707ffa96bab600"
+        },
+        "FinalInvoiceRevision": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "BillingLedgerEntry": {
+          "count": 2,
+          "sha256": "4c31f36bde988dd800fcb73c6823f1c8e026cef32cf991a0e9b5f3eeee7c6c8d"
+        }
+      },
+      "newFixture": {
+        "hall": [
+          {
+            "id": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+            "lifecycle": "ACTIVE",
+            "revision": 1
+          }
+        ],
+        "media": [
+          {
+            "id": "a45d3971-6743-49d3-a38e-d6dd7ff623d7",
+            "resourceId": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+            "checksumSha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d",
+            "contentType": "image/png",
+            "sizeBytes": 237,
+            "detachedAt": null
+          }
+        ],
+        "booking": [
+          {
+            "id": "984bd852-462f-4ede-854a-436b108a1851",
+            "eventDate": "2026-10-15T17:00:00.000Z",
+            "phase": "CONFIRMED",
+            "shiftStartTime": "17:00:00",
+            "shiftEndTime": "22:00:00",
+            "databaseNow": "2026-10-17T05:18:29.704Z"
+          }
+        ],
+        "checkInRecords": 0,
+        "notificationAllowlisted": false
+      },
+      "originalUnchanged": true,
+      "migrations": {
+        "tracked": 60,
+        "applied": 60,
+        "allChecksumsMatch": true
+      },
+      "publicTables": 145
+    },
+    "providerBefore": {
+      "at": "2026-10-17T05:10:50.547Z",
+      "analyticsDiagnostics": null,
+      "controls": {
+        "BACKEND_REPLICA_COUNT": "1",
+        "DB_DIAGNOSTICS_ENABLED": "false",
+        "DB_POOL_MAX": "3",
+        "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+        "PERF_READONLY_DB_PROBE": "false",
+        "DB_POOL_ACQUIRE_TIMEOUT_MS": "2000",
+        "DB_PLANNED_PROCESSES": "2",
+        "DB_MAX_CONNECTIONS": "60",
+        "DB_CONNECTION_RESERVE": "10",
+        "DB_SAFE_READ_DEADLINE_ENABLED": "false",
+        "RAILWAY_DEPLOYMENT_OVERLAP_SECONDS": "0",
+        "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": "35"
+      },
+      "providerSha256ExcludingTemporaryAnalyticsFlag": "0360ba04dc6ac1e37617f90f33a850809e78589f7587de63cdd4c4b619006507",
+      "matchesRetainedProviderConfig": true
+    },
+    "providerAfter": {
+      "at": "2026-10-17T05:18:26.442Z",
+      "analyticsDiagnostics": null,
+      "controls": {
+        "BACKEND_REPLICA_COUNT": "1",
+        "DB_DIAGNOSTICS_ENABLED": "false",
+        "DB_POOL_MAX": "3",
+        "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+        "PERF_READONLY_DB_PROBE": "false",
+        "DB_POOL_ACQUIRE_TIMEOUT_MS": "2000",
+        "DB_PLANNED_PROCESSES": "2",
+        "DB_MAX_CONNECTIONS": "60",
+        "DB_CONNECTION_RESERVE": "10",
+        "DB_SAFE_READ_DEADLINE_ENABLED": "false",
+        "RAILWAY_DEPLOYMENT_OVERLAP_SECONDS": "0",
+        "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": "35"
+      },
+      "providerSha256ExcludingTemporaryAnalyticsFlag": "0360ba04dc6ac1e37617f90f33a850809e78589f7587de63cdd4c4b619006507",
+      "matchesRetainedProviderConfig": true
+    },
+    "analyticsEvidence": {
+      "at": "2026-10-17T05:14:20.175Z",
+      "checked": 96,
+      "allUnchanged": true,
+      "originalEvidence": [
+        {
+          "path": "tasks/evidence/perf10-analytics-verification-2026-10-17.json",
+          "sha256": "62d25fb1d78c956c16ba96bb79a3993fe2451ae2b089f310a5216219f7c9592c"
+        },
+        {
+          "path": "tasks/evidence/perf10-analytics-closure-2026-10-17.json",
+          "sha256": "2de1663a7fcff558e530d7157b6a38b3ca8496c8f00793fa92e2eaacb42cbcd0"
+        }
+      ]
+    }
+  },
+  "cleanup": {
+    "at": "2026-10-17T05:15:16.020Z",
+    "fingerprint": "SHA256:D6NbUFUI3GwU8q/UiR63SQodHRRWPyNhRpmOXLozRy0",
+    "revoked": true,
+    "revokedTransportDenied": true,
+    "ownedDiscoveryAndIgnoredKeysRemoved": true,
+    "noOtherKeysTouched": true,
+    "remoteFilesWritten": false
+  },
+  "postflight": {
+    "at": "2026-10-17T05:18:08.302Z",
+    "deploymentId": "387ee7d4-1f43-45de-b45b-b97dfdd0f137",
+    "commit": "6a7722bca0ff0e06a0b151c250478b38ace6b0eb",
+    "imageDigest": "sha256:54861ef48762e114b26b54f8fcef1a7f7169b9c22c1520f89b9be551da32f99a",
+    "region": {
+      "sfo": {
+        "numReplicas": 1
+      }
+    },
+    "startCommand": "node --enable-source-maps --import ./dist/instrumentation.js dist/server.js",
+    "openapi": {
+      "status": 200,
+      "sha256": "68a47cb4d43a0ea185ce3cd7c28928011c705bc6aa101f2f92a6261ec5cda694",
+      "unchanged": true
+    },
+    "catalogMutationCommands": 0,
+    "providerObjectMutationCommands": 0,
+    "loginCommands": 0
+  },
+  "operatorVerification": {
+    "tests": "9/9 local node:test, including private-artifact false-positive red/green regression; no live calls or application-CI claim",
+    "review": "Self-review across correctness, readability, architecture, security and performance. Strict configuration/provenance, real read-only connection, GET Hall-only loopback guard and forbidden Storage writes; exact fixture/cardinality/TTL/fact checks, per-attempt retention and fail-stop behavior. No application code or public contract changes. No independent external reviewer is asserted.",
+    "limits": "Twenty samples are small descriptive cohorts, not significance/SLA proof; background scheduler remains enabled and provider jitter is retained."
+  },
+  "retainedOperatorArtifacts": [
+    {
+      "path": "output/perf09-catalog-20261017/analytics-preservation.json",
+      "sha256": "aaf121af61a37bf275594bd6ea2e5488e799cc01a43fefa61ea7f4219d3fbd6f"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/artifact-security-red.log",
+      "sha256": "b09977f5ac5917491f011d7f034bd0f389cf593cfd7432fa6de6ecdb1faffb33"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/artifact-security.mjs",
+      "sha256": "1bb4ba0add1ad08c00cf5db6b4bed69b2530d7f640667b8ffa96b8ebebc15c72"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/artifact-security.test.mjs",
+      "sha256": "1274e526dc5fe605dd9a42531e0e1d58fdf71b77b5b9ffe3c4ae6ab48ae587f6"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/capture-summary.mjs",
+      "sha256": "d0e0673691b12a1bb306830e09b774b549bac86d56b0d21aa0f564729e58d8fe"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/ci-contract-red.log",
+      "sha256": "8471c400afac7127a7a47c2d5f7632d390500bb5aa7e28a05860dd76ee40e2a8"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/ci-gate-mutation.log",
+      "sha256": "3e50ffa14b1de1caccf54c36b5bd4280f58575804c75e423e73f8b6f22fa9bd3"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/ci-image-manifest.json",
+      "sha256": "29801adcd98dc72e39b2188537f4ed688c8db08e7c6d4a97e6ebe7023e49563c"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/ci-image-verify.mjs",
+      "sha256": "937bbc1b81e3e81534af322bb3eba8f5f49c2d6da7dbb1b974a0c1c1a75c6061"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/ci-normalized-diff-review.json",
+      "sha256": "8b2f2a7afe05c1342432e732aa69b42fbafab7d9de121334824fd4e6728ec077"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/ci-update-pr.mjs",
+      "sha256": "f5b278cbef0024e5f749953948f61d834690a0ec182a37bf3729766f90a1e32e"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/http-matched-logs.json",
+      "sha256": "c22f73099f0f4e4bfc70b6ecbc13ed358fcd46b47d9adf849c23eac739b67b58"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/http-readonly.json",
+      "sha256": "dba4c3770378851c7fae25a3a5fc5165ace4d945d1d9b64d2c15a3239d44e4b6"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/http-readonly.mjs",
+      "sha256": "bbd78cec83e96bc13aea15d43f58d07f6f16fdc26fc45b3a92370e6d37b59d04"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/inventory-after.json",
+      "sha256": "8c01e2481e869086b24bb3a6eeb0b9f05fafe32b37c8e4e05425db3426958f3e"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/inventory-before.json",
+      "sha256": "32421bd9be3b987345f1fe4ba0e9d7fd7821d8b45f8bf6b2d826f8f9f430cd22"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/inventory.mjs",
+      "sha256": "efa50356f38d3c5cc9fdd5bde34e484e75b349a0f33904247783d5d76af80c85"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/key-lifecycle.mjs",
+      "sha256": "45cf797234814a32503f40c8b341e244247b9913a3bf05f17e835d1793aafaf3"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/native-builder.mjs",
+      "sha256": "04b62e44855fb121d22a5fa19c3fb0aff6454efd81c9410ada7512aa413cd854"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/native-builder.test.mjs",
+      "sha256": "9b55997da7461bc8dc08c3e5fe1db2f365ce72a223f3236ac3a6f8e6db65ed0c"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/native-campaign-provenance.json",
+      "sha256": "88dcefafffc4ecb654ae7d22c4a2d38f4953424353b921b0e20dd9dbcb76f649"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/native-campaign-transport.json",
+      "sha256": "accbc03143001a81b641f8e48034dbf191baf03e985ead4ced00853985c0184d"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/native-campaign.ndjson",
+      "sha256": "dd786ee1f67cdc6c632d507554bdf96ad624fc93be5b88e909b6478db3a37d29"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/native-launch.mjs",
+      "sha256": "2c59d7414ad2474e94139e1536e4dbb8c949ce8dbed601f1fdbb1b94049b59e9"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/native-pilot-provenance.json",
+      "sha256": "824f4fc1135bed838bd0eba049396b139c421e116a1ebdeba855e095fadaf7e8"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/native-pilot-transport.json",
+      "sha256": "99bd5e9e7d3138e677477b8180ea93c6fdd722ae51b3e88c82ef81db219fff8c"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/native-pilot.ndjson",
+      "sha256": "4ed114d58a17fdd4730690a0abebf0990cb36f84803101ae73c506a57422b9f6"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/native-worker.mjs",
+      "sha256": "75fd1127ca96b953078a82b82f4f86537e0ade3b46f85c8331c7042446bda8ff"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/operator-tests-final.log",
+      "sha256": "33784cbc8d00d6f6ee24eba3523d1d1abefec7e09a8347ad7563093592ea5b1c"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/operator-tests.log",
+      "sha256": "61542516a4376fa868d32c4c4148bc2ca7b770b90bae0f650e1a089c9e314b6d"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/postflight.json",
+      "sha256": "4b71b212a3a690901831f57f3db21634b397723454283807b57fe10bfb6f6b10"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/postflight.mjs",
+      "sha256": "03a3df312145dbf155122d9883c076e4fd87dfb86d50425da9f8ba84e0bf4afa"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/publication-first-attempt-failure.json",
+      "sha256": "67a0df0067994703181642d9286a913f54d08e4e65c251c904d0505dbce965e8"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/publish.mjs",
+      "sha256": "25e834445aee90eaa28532ed394684f0ff21586ba4196370015a29efef4fc894"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/report58-pr-before-ci-recovery.json",
+      "sha256": "e4c61daa63a1bcecc005f9d055ee9f5033d934e44b3325eea3595b4118b35b2f"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/report58-reviewed-recovery-head.json",
+      "sha256": "659ac7e914bab193a87a22562cd4259f665cdaacbe7fb53d19dfcedd808266bb"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/retention-after.json",
+      "sha256": "8303ffd5ffb2f70dc99bf8212937b98268aed1c2f3398ff549d01553b004b3b4"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/retention-before.json",
+      "sha256": "15a11591ed0772d8bfbf28af5cbab23e19da3c6479e9225367c64313a9d0d1aa"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/ssh-key-registration.json",
+      "sha256": "e9a9b6c8b46594163374658a7caccc3c888b5a67f89825c260812bdeaae7e33d"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/ssh-key-revocation.json",
+      "sha256": "9da0058c632f993ef6d083739a832a75fb13288568ba4e27bcb5edee8143a318"
+    },
+    {
+      "path": "output/perf09-catalog-20261017/summary.json",
+      "sha256": "7069133c79ee1b3068d0809c8dd10970c8aaa0a636cdcd20fad6c5491f78a3e5"
+    },
+    {
+      "path": "output/perf-followup-20261017/ci-39004306507-receipt.json",
+      "sha256": "028abdebbee4c74739b1431659da0469e418aad402923eae468ce99e9b07ac1e"
+    },
+    {
+      "path": "output/perf-followup-20261017/ci-39004857351-receipt.json",
+      "sha256": "65b09d50088c8a6355df3a4becf878732ebdf4a6bce0d591cd566ce119b26e0c"
+    },
+    {
+      "path": "output/perf10-analytics-20261017/closure-merge.json",
+      "sha256": "c67991bdcd4fea028b2d4fb252b4199ac286887b211ed752a7fb9ac307f8a784"
+    },
+    {
+      "path": "output/perf10-analytics-20261017/closure-serving.json",
+      "sha256": "f0426932889546052bd6fc79a789e9e0d3315d89963244aaaf1f42c7d74301fc"
+    },
+    {
+      "path": "output/perf10-analytics-20261017/provider-perf09-before.json",
+      "sha256": "717b745ae4b837f2543200e6354acd996fc44dc624ff8e411d2262567ef3da0b"
+    },
+    {
+      "path": "output/perf10-analytics-20261017/provider-perf09-after.json",
+      "sha256": "f9bc29eba18aa7108bc2875529dd6f8567b232ff12130d1c2bafcc4987d57523"
+    }
+  ],
+  "publicationGuardRecovery": {
+    "phase": "Offline evidence publication after all live measurements and key revocation",
+    "failure": "Private artifact content rejected",
+    "cause": "Publisher scans its own source; an exact private-key header detection literal falsely matches as a key file",
+    "affectedArtifact": "output/perf09-catalog-20261017/publish.mjs",
+    "liveMeasurementFailure": false,
+    "evidenceReceiptWritten": false,
+    "privateKeyExposed": false,
+    "recovery": "Require a real line-start PEM header followed by a newline, retain signed-URL/JWT checks, add red/green regression; no live repeat or sample removal"
+  }
+}
