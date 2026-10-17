@@ -49,7 +49,7 @@ export type VenueCatalogRuntime = Readonly<{
 }>;
 
 export async function createVenueCatalogRuntime(config: Config): Promise<VenueCatalogRuntime> {
-  const prisma = createPrismaClient(config.database.url);
+  const prisma = createPrismaClient(config.database.url, undefined, 'venue-catalog');
   try {
     await prisma.$connect();
     const storage = createStorage(config);

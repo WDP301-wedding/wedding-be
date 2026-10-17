@@ -5,6 +5,7 @@ describe('aggregate runtime pool budget', () => {
   it('includes eight owners, readiness, overlapping processes and provider reserve', () => {
     expect(parsePoolBudget({})).toEqual({
       max: 3,
+      venueCatalogMax: 3,
       connectionTimeoutMillis: 2000,
       idleTimeoutMillis: 10000,
       plannedProcesses: 2,
@@ -15,6 +16,30 @@ describe('aggregate runtime pool budget', () => {
     });
     expect(parsePoolBudget({ DB_POOL_MAX: '1', DB_PLANNED_PROCESSES: '4' }).aggregate).toBe(46);
   });
+  it('budgets the catalog override instead of charging every owner the same maximum', () => {
+    const budget = parsePoolBudget({
+      DB_POOL_MAX: '2',
+      DB_POOL_MAX_VENUE_CATALOG: '3',
+      DB_CONNECTION_RESERVE: '24',
+    });
+    expect(budget.venueCatalogMax).toBe(3);
+    expect(budget.perProcess).toBe(18);
+    expect(budget.aggregate).toBe(60);
+    expect(() =>
+      parsePoolBudget({
+        DB_POOL_MAX: '2',
+        DB_POOL_MAX_VENUE_CATALOG: '4',
+        DB_CONNECTION_RESERVE: '24',
+      }),
+    ).toThrow('budget');
+  });
+  it.each(['0', '-1', '1.5', 'x', '', '100001'])(
+    'rejects an invalid catalog pool maximum %s',
+    (value) =>
+      expect(() => parsePoolBudget({ DB_POOL_MAX_VENUE_CATALOG: value })).toThrow(
+        'DB_POOL_MAX_VENUE_CATALOG',
+      ),
+  );
   it('allows bounded idle reuse without increasing aggregate connections', () => {
     const idle = parsePoolBudget({ DB_POOL_IDLE_TIMEOUT_MS: '60000' });
     expect(idle.idleTimeoutMillis).toBe(60000);
