@@ -8,6 +8,10 @@ No region, service variable, deployed code or applied migration is changed here.
 
 ## PERF-11: connection budget and explicit read deadlines
 
+Subsequent [2026-10-17 actual verification](backend-performance-11-verification-2026-10-17.md)
+records observed overlap, queue/cancellation and authenticated provider findings.
+Verification is complete; aggregate provider headroom acceptance remains HOLD.
+
 Every runtime `createPrismaClient` now supplies `max` and
 `connectionTimeoutMillis` to the normal and diagnostic PostgreSQL adapters.
 Defaults are **3 connections per owner pool** and **2 seconds for acquisition**.

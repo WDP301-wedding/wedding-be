@@ -436,6 +436,13 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
   controlled measurements and remaining live gates](../docs/backend-performance-06-10.md).
   These checkboxes retain full Railway acceptance, separate from delivered code.
 - [ ] PERF-11: Budget aggregate pools and safe read cancellation; preserve money/provider UNKNOWN and idempotency.
+  - [x] 2026-10-17 actual inventory and bounded verification: two observed old/new
+    overlaps, 33/33 correlated HTTP 200, bounded queue timeout, server cancellation,
+    small-pool regressions and full cleanup. [Report and sealed receipts](../docs/backend-performance-11-verification-2026-10-17.md).
+  - [ ] Provider allocation acceptance: 57 ordinary DB slots minus 50 for two app
+    processes leaves 7; authenticated Auth maximum is 10. No supported aggregate
+    concurrency bound established. Verification disposition **HOLD**; deadline
+    remains false. Resolve this allocation before closing PERF-11; do not rerun PERF-09.
 - [x] PERF-12: Review table/rehearsal-schema cleanup with ownership, dependency and retention proof; deletion remains separately authorized.
 - [ ] PERF-13: Repeat matched live measurements, verify relevant correctness gates and set supported regression budgets.
 - 2026-10-16 PERF-11–13: [pool budget, opt-in safe-read deadlines, retention review,

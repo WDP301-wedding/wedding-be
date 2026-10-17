@@ -164,6 +164,12 @@ small-pool reader/writer regression proof, and deadline behavior that stops safe
 work. Preserve payment/provider UNKNOWN, reconciliation and idempotency: HTTP timeout
 does not prove a transaction or external effect was canceled.
 
+2026-10-17 [actual verification and sealed evidence](../docs/backend-performance-11-verification-2026-10-17.md):
+inventory/overlap/queue/cancellation/regression verification is complete; acceptance
+is HOLD because two full app processes leave seven ordinary slots while Auth's
+configured maximum is ten. Resolve aggregate provider allocation separately;
+deadline remains disabled and no PERF-09 cohort is repeated.
+
 ### PERF-12 — Review schema cleanup separately
 
 Dependencies: PERF-01, PERF-03. Scope: 145-table inventory, owner/dependency/retention
