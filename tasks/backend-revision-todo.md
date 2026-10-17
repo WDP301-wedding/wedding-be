@@ -366,7 +366,7 @@ Live evidence: [API performance audit](../docs/railway-api-performance-audit-202
 Measurement authorizes no database deletion, business-rule reduction or deployment change.
 
 - [x] PERF-01: Published 380 successful samples across 19 route/role cases, all 380 matched to exact-deployment logs; schema inventory and coverage/token-expiry limits are in the [live audit](../docs/railway-api-performance-audit-2026-10-16.md). No optimization/deployment/deletion is implied.
-- [ ] PERF-02: Arrange initialized authorized booking/assigned Staff fixtures; complete booking-specific timings without manufacturing settlement/access.
+- [x] PERF-02: Arrange initialized authorized booking/assigned Staff fixtures; complete booking-specific timings without manufacturing settlement/access. The original seven Couple families and the owner-authorized historical fixture's 21 actual-window Staff reads are recorded in the [acceptance follow-up](../docs/backend-performance-acceptance-2026-10-17.md); synthetic manual accounting is not provider settlement, and no FULL grant was inserted directly.
 - [ ] PERF-03: Attribute request DB round trips, pool/lock wait and container-to-DB latency with secret-safe instrumentation.
 - [ ] PERF-04: Compare current US West and APAC application placement with the DB unchanged in an authorized test environment.
 - [ ] PERF-05: Reduce Identity/Couple overview read work while preserving current authorization and revocation semantics.
@@ -426,6 +426,20 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
   may replace derived projections. No business-history or rehearsal cleanup is
   authorized. The report records complete measurements, final configuration and
   remaining acceptance limits; the earlier rollout above remains historical.
+
+- 2026-10-17 remaining-evidence follow-up:
+  [PR #53 and natural-TTL/Storage/Staff verification](../docs/backend-performance-acceptance-2026-10-17.md)
+  records the merged report, preserves merge-CI failures, and adds real Storage
+  checks on a separate synthetic hall (42 API reads and 21 verified provider reads).
+  Analytics now retains 20 single-reader and 12 concurrent natural-stale HTTP 200
+  reads, all correlated to exact deployment logs; the old rebuild 409 is unchanged.
+  Natural-TTL Analytics cohorts remain
+  distinct from full rebuild and warm reads. After the owner's explicit choice,
+  a separate audited historical synthetic fixture supplies 21 successful Staff
+  reads in its actual event window, with zero check-in commands and unchanged
+  original business digests. PERF-02 fixture/read coverage is complete, not a
+  Staff speed-improvement claim. PERF-09/10/13 remain open where comparative,
+  publisher-attribution or broader live-scope evidence is missing.
 
 ## Verification Record
 
