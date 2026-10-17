@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-17",
+  "timezone": "Asia/Saigon",
+  "task": "PERF-09",
+  "status": "CLOSED_BY_EXPLICIT_OWNER_ACCEPTANCE_OF_LIMITED_SCOPE",
+  "decisionSource": "Direct human message in this task after the read-only results and unmet gates were reported",
+  "ownerMessageVerbatim": "Có và hãy coi như PERF-09 đã hoàn tất  dù chưa giữ phép đo 20 item. tiếp theo là làm phần nào?",
+  "authorization": {
+    "commitReport": true,
+    "openReportPullRequest": true,
+    "mergeAfterExactHeadCiAndReview": true,
+    "additionalFixtures": false,
+    "newOptimizationOrRuntimeConfigurationChange": false
+  },
+  "acceptedScope": "Existing read-only 1–3 Hall demo evidence; owner accepts closure without live twenty-item measurement and with the reported unmet 30% result retained",
+  "originalMeasurementReceipt": {
+    "path": "tasks/evidence/perf09-catalog-readonly-2026-10-17.json",
+    "sha256": "f3cd2360935dae011cd46f35312328d72285b841ad76c0ad78ded13b7240793e",
+    "historicalStatus": "OPEN",
+    "preserveBytes": true,
+    "retainedOperatorArtifacts": 47,
+    "supersededDimension": "Task disposition only; no sample, metric, failure or evidence claim changed"
+  },
+  "unchangedObservedResults": {
+    "nativeMeasuredSamples": 160,
+    "matchedNativeComparisons": 80,
+    "publicCatalogHttp200Reads": 84,
+    "verifiedStorageHttp200Reads": 60,
+    "threeItemDriverCommands": { "baseline": 7, "current": 3 },
+    "threeItemNativeP95Ms": { "baseline": 1020.5898950000119, "current": 1022.2224129999959 },
+    "anyCohortReachesOriginalThirtyPercentTarget": false,
+    "liveTwentyReturnedItemsMeasured": false,
+    "safeReadDeadlineEnabled": false,
+    "temporarySshKeyRevokedAndRemoved": true
+  },
+  "residualLimitations": [
+    "Twenty-item live cardinality and media-rich page are not measured",
+    "No measured cohort meets the original 30% p95 improvement target",
+    "Large-catalog scan cost, saturation and live retirement/publication transitions are unproven",
+    "Native loopback comparisons are not public HTTP baseline improvement",
+    "Closure is owner acceptance, not evidence-complete original-gate acceptance"
+  ],
+  "completedPerf": ["PERF-01", "PERF-02", "PERF-09", "PERF-10", "PERF-12"],
+  "ownerAcceptedExceptionPerf": ["PERF-09"],
+  "openPerf": ["PERF-03", "PERF-04", "PERF-05", "PERF-06", "PERF-07", "PERF-08", "PERF-11", "PERF-13"],
+  "recommendedNext": {
+    "task": "PERF-11",
+    "firstSlice": "Connection-budget verification against actual serving pools, readiness, workers, rollout overlap and provider reserve; retain PERF-03 attribution gaps",
+    "deadlineRollout": "Deferred and disabled; separate endpoint-specific safety/evidence decision required",
+    "apacComparison": "Deferred PERF-04; no region move authorized",
+    "implementationStartedByThisReport": false
+  },
+  "productionReadiness": "NO_GO unchanged",
+  "qualityGateWaiver": "None: required CI, migrations, integration, coverage, audit, OpenAPI and review remain mandatory for merge"
+}

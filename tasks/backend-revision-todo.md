@@ -392,7 +392,25 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
 - [ ] PERF-06: Batch invitation-template versions; preserve version ownership, cursor and authority rechecks.
 - [ ] PERF-07: Batch print-order lines/commercial revisions/proposals without changing immutable monetary facts.
 - [ ] PERF-08: Reduce notification authority/booking-scope round trips for inbox and unread counts.
-- [ ] PERF-09: Bound catalog SQL pagination and batch media facts; preserve publication and signed-URL rules.
+- [x] PERF-09: Bound catalog SQL pagination and batch media facts; preserve publication and signed-URL rules. Closed by explicit owner acceptance of the limited 1–3 Hall scope, not a pass of the original twenty-item/30% live gates.
+  - 2026-10-17 owner-selected [read-only 1–3 Hall comparison](../docs/backend-performance-catalog-readonly-2026-10-17.md):
+    PR #58 is merged after exact-head/main CI pass 2,002 tests. Eighty matched
+    native comparisons retain all 160 measured HTTP 200 samples; 84 public
+    catalog reads and 60 checksum-verified Storage reads also return 200.
+    Three-item query work falls 7 → 3, but p95 is effectively unchanged
+    (1,020.590 → 1,022.222 ms); no measured cohort reaches the 30% target.
+    The owner declines additional fixtures: limit 20 returns three, not twenty.
+    This initial checkpoint kept the task open; the later owner decision below
+    supersedes task status only, not the unmet gates or measurements.
+    No source/provider mutations or new optimization; the dedicated SSH key is
+    revoked/removed and histories, migrations, configuration and deadlines remain intact.
+  - 2026-10-17 [explicit owner acceptance](evidence/perf09-owner-acceptance-2026-10-17.json):
+    the owner requests treating PERF-09 as complete without the twenty-item live
+    measurement and authorizes report commit/PR/CI-gated merge. Close in this limited
+    scope; retain the unmet 30% result and immutable initial OPEN receipt.
+    Five PERF tasks are now closed (01/02/09/10/12), with 09 owner-accepted rather
+    than original-gate-complete. Recommended next: PERF-11 connection-budget proof
+    first; deadline remains off and PERF-03/04/05/06/07/08/11/13 remain open.
 - [x] PERF-10: Measure and optimize analytics warm reads versus projection refresh with freshness/cursor/source semantics intact.
   - 2026-10-17 final [Analytics acceptance and preserved failures](../docs/backend-performance-analytics-closure-2026-10-17.md):
     PR #57 fixes scoped in-flight snapshot contention after a real PostgreSQL P2028
