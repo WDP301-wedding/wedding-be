@@ -1,11 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Config } from '../../config/config.js';
+import { createPrismaClient } from '../../core/database/prisma.js';
 const f = vi.hoisted(() => ({
   prisma: { $connect: vi.fn(), $disconnect: vi.fn(), analyticsHead: { findMany: vi.fn() } },
   services: { projector: { refresh: vi.fn() }, service: {}, resolver: {}, audit: vi.fn() },
   router: vi.fn(),
 }));
-vi.mock('../../core/database/prisma.js', () => ({ createPrismaClient: () => f.prisma }));
+vi.mock('../../core/database/prisma.js', () => ({ createPrismaClient: vi.fn(() => f.prisma) }));
 vi.mock('./infrastructure/analytics.composition.js', () => ({
   createAnalyticsServices: () => f.services,
 }));
@@ -22,6 +23,11 @@ describe('SPEC-10 scheduled projection lifecycle', () => {
     f.services.projector.refresh.mockResolvedValue('generation');
   });
   afterEach(() => vi.useRealTimers());
+  it('selects the separately budgeted analytics owner', async () => {
+    const runtime = await createAnalyticsRuntime(config);
+    expect(createPrismaClient).toHaveBeenCalledWith(config.database.url, undefined, 'analytics');
+    await runtime.resource.close();
+  });
   it('refreshes every 60 seconds, starts once and drains before database shutdown', async () => {
     const runtime = await createAnalyticsRuntime(config);
     runtime.start();

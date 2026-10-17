@@ -5,7 +5,7 @@ import { createAnalyticsServices } from './infrastructure/analytics.composition.
 import { createAnalyticsRouter } from './http/analytics.router.js';
 import { createAnalyticsObserver } from './infrastructure/analytics-observer.js';
 export async function createAnalyticsRuntime(config: Config) {
-  const prisma = createPrismaClient(config.database.url);
+  const prisma = createPrismaClient(config.database.url, undefined, 'analytics');
   try {
     await prisma.$connect();
     const services = createAnalyticsServices(prisma, undefined, createAnalyticsObserver(config));

@@ -21,6 +21,7 @@ export class DatabaseConfigurationError extends Error {
 export function createPrismaClient(
   databaseUrl = config.database.url,
   diagnosticsEnabled = process.env.DB_DIAGNOSTICS_ENABLED === 'true',
+  poolOwner: 'default' | 'venue-catalog' | 'analytics' = 'default',
 ): PrismaClient {
   const connectionString = databaseUrl?.trim();
 
@@ -29,7 +30,15 @@ export function createPrismaClient(
   }
 
   const url = new URL(connectionString);
-  const { max, connectionTimeoutMillis, idleTimeoutMillis } = parsePoolBudget(process.env);
+  const budget = parsePoolBudget(process.env);
+  const { connectionTimeoutMillis, idleTimeoutMillis } = budget;
+  const maxima = {
+    default: budget.max,
+    'venue-catalog': budget.venueCatalogMax,
+    analytics: budget.analyticsMax,
+  };
+  if (!Object.hasOwn(maxima, poolOwner)) throw new Error('Invalid database pool owner.');
+  const max = maxima[poolOwner];
   const poolConfig = { max, connectionTimeoutMillis, idleTimeoutMillis };
   const schema = url.searchParams.get('schema')?.trim();
   // Prisma's PostgreSQL adapter serializes and parses timestamps as UTC.

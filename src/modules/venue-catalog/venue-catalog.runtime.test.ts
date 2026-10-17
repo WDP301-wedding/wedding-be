@@ -35,7 +35,11 @@ describe('VenueCatalogRuntime', () => {
 
     expect(runtime.router).toBeTypeOf('function');
     expect(runtime.resource.name).toBe('venue-catalog-database');
-    expect(createPrismaClient).toHaveBeenCalledWith('postgresql://test:test@127.0.0.1:5432/test');
+    expect(createPrismaClient).toHaveBeenCalledWith(
+      'postgresql://test:test@127.0.0.1:5432/test',
+      undefined,
+      'venue-catalog',
+    );
     await runtime.resource.close();
     expect(prisma.$disconnect).toHaveBeenCalledOnce();
   });

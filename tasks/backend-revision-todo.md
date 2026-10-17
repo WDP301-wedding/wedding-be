@@ -436,6 +436,19 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
   controlled measurements and remaining live gates](../docs/backend-performance-06-10.md).
   These checkboxes retain full Railway acceptance, separate from delivered code.
 - [ ] PERF-11: Budget aggregate pools and safe read cancellation; preserve money/provider UNKNOWN and idempotency.
+  - [x] 2026-10-17 actual inventory and bounded verification: two observed old/new
+    overlaps, 33/33 correlated HTTP 200, bounded queue timeout, server cancellation,
+    small-pool regressions and full cleanup. [Report and sealed receipts](../docs/backend-performance-11-verification-2026-10-17.md).
+  - [x] 2026-10-17 authorized pool trial and adjustment: keep Catalog3/Analytics2/
+    six others1, readiness1; app overlap maximum50 →24, reserve36. Rejected uniform2
+    catalog tradeoff and Analytics1 regression; Analytics3 bought no meaningful
+    gain. [Final result and sealed receipts](../docs/backend-performance-11-pool-result-2026-10-17.md).
+    Source `6c08b1e` exact-head CI passes,68/68 focused cases pass,450 request IDs
+    correlate, current three-report coverage proves six READY sources; deadline off.
+  - [ ] Provider allocation acceptance: 33 ordinary slots remain after two selected
+    app processes; current Auth/PostgREST maxima20 and operator/migration allocation2
+    leave11 for other providers/spare. Storage/other aggregate ceilings, hosted
+    multiplicity/historical peak and endpoint decision remain **HOLD**. No PERF-09 rerun.
 - [x] PERF-12: Review table/rehearsal-schema cleanup with ownership, dependency and retention proof; deletion remains separately authorized.
 - [ ] PERF-13: Repeat matched live measurements, verify relevant correctness gates and set supported regression budgets.
 - 2026-10-16 PERF-11–13: [pool budget, opt-in safe-read deadlines, retention review,
