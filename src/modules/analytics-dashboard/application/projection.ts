@@ -8,6 +8,11 @@ import {
   type ReportingFences,
 } from '../../../core/reporting/reporting-feed.js';
 import type { ContractContext } from '../../../core/database/booking-boundary.js';
+import {
+  AnalyticsRefreshObservation,
+  type AnalyticsEntryPoint,
+  type AnalyticsObserver,
+} from './analytics-observation.js';
 export const checkpointSchema = z.strictObject({
   owner: z.enum(reportingOwners),
   throughSequence: z.int().nonnegative(),
@@ -47,8 +52,32 @@ export class AnalyticsProjector {
     readonly store: ProjectionStore,
     readonly now: () => Date = () => new Date(),
     readonly fences?: () => Promise<ReportingFences>,
+    readonly observe?: AnalyticsObserver,
   ) {}
-  async refresh(scope: string, context: ContractContext, rebuild = false) {
+  async refresh(
+    scope: string,
+    context: ContractContext,
+    rebuild = false,
+    entryPoint: AnalyticsEntryPoint = 'cli',
+  ) {
+    const observation = this.observe
+      ? new AnalyticsRefreshObservation(this.observe, scope, context, entryPoint, rebuild)
+      : undefined;
+    try {
+      const generationId = await this.refreshSources(scope, context, rebuild, observation);
+      observation?.complete(generationId);
+      return generationId;
+    } catch (error) {
+      observation?.complete(null, { error });
+      throw error;
+    }
+  }
+  private async refreshSources(
+    scope: string,
+    context: ContractContext,
+    rebuild: boolean,
+    observation?: AnalyticsRefreshObservation,
+  ) {
     const previous = await this.store.load(scope);
     // One owner-head observation forms the common committed cut; sequences remain owner-local.
     const sourceFences = await this.fences?.();
@@ -57,6 +86,8 @@ export class AnalyticsProjector {
     );
     const readOwner = async (owner: ReportingOwner): Promise<Checkpoint> => {
       const checkpoint = previous?.checkpoints.find((c) => c.owner === owner);
+      const observed = observation?.owner(owner);
+      const startedAt = observed ? performance.now() : 0;
       const afterSequence = rebuild ? 0 : (checkpoint?.throughSequence ?? 0);
       const staged = new Map<string, ProjectionRow>();
       try {
@@ -66,6 +97,7 @@ export class AnalyticsProjector {
         let pages = 0;
         do {
           if (++pages > 2000) throw new Error('Source refresh page budget exceeded.');
+          if (observed) observed.pages++;
           const page = await this.sources[owner].readPage(
             {
               afterSequence,
@@ -75,6 +107,7 @@ export class AnalyticsProjector {
             },
             context,
           );
+          if (observed) observed.rows += page.rows.length;
           if (
             !Number.isSafeInteger(page.throughSequence) ||
             page.throughSequence < afterSequence ||
@@ -100,6 +133,7 @@ export class AnalyticsProjector {
           if (cursor !== undefined) seenCursors.add(cursor);
         } while (cursor !== undefined);
         for (const [key, row] of staged) rows.set(key, row);
+        if (observed) observed.status = 'READY';
         return {
           owner,
           throughSequence: fence,
@@ -107,6 +141,7 @@ export class AnalyticsProjector {
           status: 'READY',
         };
       } catch (error) {
+        if (observed) observed.status = checkpoint?.refreshedAt ? 'STALE' : 'SOURCE_NOT_READY';
         if (rebuild)
           throw new AppError({
             status: 503,
@@ -120,6 +155,8 @@ export class AnalyticsProjector {
           refreshedAt: checkpoint?.refreshedAt ?? null,
           status: checkpoint?.refreshedAt ? 'STALE' : 'SOURCE_NOT_READY',
         };
+      } finally {
+        if (observed) observed.durationMs = performance.now() - startedAt;
       }
     };
     const checkpoints: Checkpoint[] = [];

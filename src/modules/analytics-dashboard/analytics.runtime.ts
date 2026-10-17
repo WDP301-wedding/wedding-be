@@ -3,11 +3,12 @@ import type { Config } from '../../config/config.js';
 import { createPrismaClient } from '../../core/database/prisma.js';
 import { createAnalyticsServices } from './infrastructure/analytics.composition.js';
 import { createAnalyticsRouter } from './http/analytics.router.js';
+import { createAnalyticsObserver } from './infrastructure/analytics-observer.js';
 export async function createAnalyticsRuntime(config: Config) {
   const prisma = createPrismaClient(config.database.url);
   try {
     await prisma.$connect();
-    const services = createAnalyticsServices(prisma);
+    const services = createAnalyticsServices(prisma, undefined, createAnalyticsObserver(config));
     let timer: ReturnType<typeof setInterval> | undefined, pending: Promise<void> | undefined;
     let stopping = false;
     const tick = async () => {
@@ -22,12 +23,17 @@ export async function createAnalyticsRuntime(config: Config) {
           if (stopping) break;
           const requestId = randomUUID();
           await services.projector
-            .refresh(head.scope, {
-              authority: 'AUTHENTICATED',
-              actorAccountId: head.scope,
-              requestId,
-              causationId: requestId,
-            })
+            .refresh(
+              head.scope,
+              {
+                authority: 'AUTHENTICATED',
+                actorAccountId: head.scope,
+                requestId,
+                causationId: requestId,
+              },
+              false,
+              'scheduler',
+            )
             .catch(() => undefined);
         }
         if (heads.length < 100) break;

@@ -15,6 +15,7 @@ import {
 import { analyticsResultSchemas } from '../http/analytics.schemas.js';
 import type { BookingAnalyticsRow } from '../../booking-lifecycle/application/analytics-reporting.js';
 import type { BillingAnalyticsRow } from '../../payments-billing/application/analytics-reporting.js';
+import type { AnalyticsObserver } from './analytics-observation.js';
 const now = '2026-10-13T00:00:00.000Z',
   hall = randomUUID(),
   menu = randomUUID(),
@@ -182,6 +183,104 @@ function fixture() {
   return { b, b2, p, store, api, projector, add };
 }
 describe('ANL-W1/W3 deterministic source formulas and bounded queries', () => {
+  it('observes one actual HTTP refresh leader and three waiters separately from warm reads', async () => {
+    const state = fixture();
+    state.p.checkpoints[0]!.status = 'STALE';
+    const observe = vi.fn<AnalyticsObserver>();
+    const service = new AnalyticsService(
+      state.projector,
+      state.store,
+      () => new Date(now),
+      undefined,
+      observe,
+    );
+    let release!: () => void;
+    const blocked = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const refresh = vi.spyOn(state.projector, 'refresh').mockImplementation(async () => {
+      await blocked;
+      state.p.checkpoints[0]!.status = 'READY';
+      return state.p.generationId;
+    });
+    const requests = Array.from({ length: 4 }, () => ({ ...ctx, requestId: randomUUID() }));
+    const reads = requests.map((context) => service.query('revenue', query, context));
+    await vi.waitFor(() => expect(observe).toHaveBeenCalledTimes(4));
+    const decisions = observe.mock.calls
+      .map(([event]) => event)
+      .filter((event) => event.event === 'analytics_query_decision');
+    expect(decisions).toHaveLength(4);
+    expect(decisions.map((event) => event.path).sort()).toEqual([
+      'refresh-joined',
+      'refresh-joined',
+      'refresh-joined',
+      'refresh-started',
+    ]);
+    expect(new Set(decisions.map((event) => event.requestId)).size).toBe(4);
+    release();
+    await Promise.all(reads);
+    expect(refresh).toHaveBeenCalledExactlyOnceWith(ctx.actorAccountId, requests[0], false, 'http');
+    await service.query('revenue', query, { ...ctx, requestId: randomUUID() });
+    expect(observe).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        event: 'analytics_query_decision',
+        path: 'warm',
+        report: 'revenue',
+        entryPoint: 'http',
+      }),
+    );
+    expect(refresh).toHaveBeenCalledOnce();
+  });
+
+  it('distinguishes TTL, source failure, invalidation and missing generation without refreshing a pinned cursor', async () => {
+    const state = fixture();
+    const observe = vi.fn<AnalyticsObserver>();
+    const invalidated = vi.fn(() => Promise.resolve(false));
+    const service = new AnalyticsService(
+      state.projector,
+      state.store,
+      () => new Date(now),
+      invalidated,
+      observe,
+    );
+    const refresh = vi.spyOn(state.projector, 'refresh').mockResolvedValue(state.p.generationId);
+    state.p.checkpoints[0]!.refreshedAt = '2026-10-12T00:00:00.000Z';
+    await service.query('revenue', query, ctx);
+    expect(observe).toHaveBeenLastCalledWith(
+      expect.objectContaining({ path: 'refresh-started', reason: 'ttl' }),
+    );
+    state.p.checkpoints[0]!.status = 'SOURCE_NOT_READY';
+    await service.query('revenue', query, ctx);
+    expect(observe).toHaveBeenLastCalledWith(
+      expect.objectContaining({ reason: 'source-not-ready' }),
+    );
+    state.p.checkpoints[0]!.status = 'READY';
+    state.p.checkpoints[0]!.refreshedAt = now;
+    invalidated.mockResolvedValueOnce(true);
+    await service.query('revenue', query, ctx);
+    expect(observe).toHaveBeenLastCalledWith(expect.objectContaining({ reason: 'invalidated' }));
+    const extra = booking();
+    state.add('booking', extra.bookingId, extra);
+    const first = analyticsResultSchemas.bookings.parse(
+      await service.query('bookings', { ...query, pageSize: 1 }, ctx),
+    );
+    expect(first.nextCursor).not.toBeNull();
+    const refreshes = refresh.mock.calls.length;
+    state.p.checkpoints[0]!.status = 'STALE';
+    await service.query('bookings', { ...query, pageSize: 1, cursor: first.nextCursor }, ctx);
+    expect(observe).toHaveBeenLastCalledWith(
+      expect.objectContaining({ path: 'pinned', reason: 'source-not-ready' }),
+    );
+    expect(refresh).toHaveBeenCalledTimes(refreshes);
+    state.store.load = () => Promise.resolve(null);
+    await expect(service.query('revenue', query, ctx)).rejects.toMatchObject({
+      code: 'ANALYTICS_NOT_READY',
+    });
+    expect(observe).toHaveBeenLastCalledWith(
+      expect.objectContaining({ path: 'refresh-started', reason: 'missing' }),
+    );
+  });
+
   it('coalesces concurrent automatic refreshes by actor scope without caching warm responses', async () => {
     const f = fixture();
     f.p.checkpoints.forEach((c) => {

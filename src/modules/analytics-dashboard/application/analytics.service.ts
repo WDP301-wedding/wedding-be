@@ -21,6 +21,12 @@ import {
 } from '../http/analytics.schemas.js';
 import { availabilitySchema } from '../../venue-catalog/application/analytics-reporting.js';
 import { printAnalyticsSchema } from '../../invitation-studio/application/analytics-reporting.js';
+import {
+  analyticsObservationContext,
+  observeAnalytics,
+  type AnalyticsObserver,
+  type AnalyticsObservation,
+} from './analytics-observation.js';
 const guestSchema = z.strictObject({
   bookingId: z.uuid(),
   planningHeadcount: z.int().nonnegative(),
@@ -51,6 +57,7 @@ export class AnalyticsService {
     readonly store: ProjectionStore,
     readonly now: () => Date = () => new Date(),
     readonly invalidated: (p: Projection) => Promise<boolean> = () => Promise.resolve(false),
+    readonly observe?: AnalyticsObserver,
   ) {}
   async query(report: AnalyticsReport, value: unknown, context: ContractContext) {
     const parsed = analyticsQuerySchema.safeParse(value);
@@ -84,16 +91,38 @@ export class AnalyticsService {
         c.refreshedAt !== null &&
         this.now().getTime() - Date.parse(c.refreshedAt) < 60000,
     );
-    if (
-      (!fresh || (projection && (await this.invalidated(projection)))) &&
-      q.cursor === undefined
-    ) {
+    const invalidated = fresh && projection ? await this.invalidated(projection) : false;
+    const observe = (
+      path: Extract<AnalyticsObservation, { event: 'analytics_query_decision' }>['path'],
+    ) => {
+      if (!this.observe) return;
+      observeAnalytics(this.observe, {
+        ...analyticsObservationContext(scope, context, 'http'),
+        event: 'analytics_query_decision',
+        report,
+        path,
+        reason: fresh
+          ? invalidated
+            ? 'invalidated'
+            : null
+          : !projection
+            ? 'missing'
+            : projection.checkpoints.some(
+                  (checkpoint) => checkpoint.status !== 'READY' || checkpoint.refreshedAt === null,
+                )
+              ? 'source-not-ready'
+              : 'ttl',
+        generationId: projection?.generationId ?? null,
+      });
+    };
+    if ((!fresh || invalidated) && q.cursor === undefined) {
       try {
         let pending = this.refreshing.get(scope);
         if (pending === undefined) {
-          pending = this.projector.refresh(scope, context);
+          observe('refresh-started');
+          pending = this.projector.refresh(scope, context, false, 'http');
           this.refreshing.set(scope, pending);
-        }
+        } else observe('refresh-joined');
         try {
           await pending;
         } finally {
@@ -104,7 +133,7 @@ export class AnalyticsService {
           throw error;
       }
       projection = await this.store.load(scope, true, filter);
-    }
+    } else observe(q.cursor === undefined ? 'warm' : 'pinned');
     if (!projection)
       throw new AppError({
         status: 503,

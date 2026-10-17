@@ -13,14 +13,18 @@ import {
 } from './venue-catalog/catalog-test-database.js';
 import { studioFixture } from './invitation-studio/studio-fixture.js';
 import { bookingAnalyticsSchema } from '../../src/modules/booking-lifecycle/application/analytics-reporting.js';
+import type {
+  AnalyticsObservation,
+  AnalyticsObserver,
+} from '../../src/modules/analytics-dashboard/application/analytics-observation.js';
 
 (catalogMigrationDatabaseUrl ? describe : describe.skip)('SPEC-10 real owners and HTTP', () => {
   const db = new CatalogTestDatabase('analytics');
   beforeAll(() => db.connect(), 60000);
   afterAll(() => db.disconnect());
-  async function fixture() {
+  async function fixture(observe?: AnalyticsObserver) {
     const f = await studioFixture(db.prisma),
-      s = createAnalyticsServices(db.prisma),
+      s = createAnalyticsServices(db.prisma, undefined, observe),
       b = await db.prisma.booking.findUniqueOrThrow({ where: { id: f.bookingId } });
     const date = b.eventDate.toISOString().slice(0, 10),
       filter = `dateFrom=${date}&dateTo=${date}&hallId=${b.hallId}`;
@@ -41,6 +45,62 @@ import { bookingAnalyticsSchema } from '../../src/modules/booking-lifecycle/appl
         .auth(token, { type: 'bearer' });
     return { f, s, b, context, app, get, filter, date };
   }
+  it('PERF-10 correlates four real HTTP reads to one refresh and keeps subsequent warm reads separate', async () => {
+    const observations: AnalyticsObservation[] = [];
+    const { f, s, get } = await fixture((event) => {
+      observations.push(event);
+    });
+    const read = s.sources.booking.readPage.bind(s.sources.booking);
+    let release!: () => void;
+    const blocked = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const original = vi
+      .spyOn(s.sources.booking, 'readPage')
+      .mockImplementationOnce(async (query, context) => {
+        const page = await read(query, context);
+        await blocked;
+        return page;
+      });
+    const requests = Promise.all(
+      Array.from({ length: 4 }, () => get('overview').then((response) => response)),
+    );
+    try {
+      await vi.waitFor(
+        () =>
+          expect(
+            observations.filter(
+              (event) =>
+                event.event === 'analytics_query_decision' && event.path === 'refresh-joined',
+            ),
+          ).toHaveLength(3),
+        { timeout: 10000 },
+      );
+    } finally {
+      release();
+    }
+    const responses = await requests;
+    original.mockRestore();
+    expect(responses.map((response) => response.status)).toEqual([200, 200, 200, 200]);
+    const starts = observations.filter((event) => event.event === 'analytics_refresh_started');
+    const completed = observations.filter((event) => event.event === 'analytics_refresh_completed');
+    expect(starts).toHaveLength(1);
+    expect(starts[0]).toMatchObject({ entryPoint: 'http', mode: 'incremental' });
+    expect(completed).toHaveLength(1);
+    expect(completed[0]).toMatchObject({ outcome: 'published', sourcePageCount: 6 });
+    const decisions = observations.filter((event) => event.event === 'analytics_query_decision');
+    expect(new Set(decisions.map((event) => event.requestId))).toEqual(
+      new Set(responses.map((response) => response.headers['x-request-id'] as string)),
+    );
+    expect((await get('overview')).status).toBe(200);
+    expect(observations.at(-1)).toMatchObject({ event: 'analytics_query_decision', path: 'warm' });
+    expect(
+      observations.filter((event) => event.event === 'analytics_refresh_started'),
+    ).toHaveLength(1);
+    expect(JSON.stringify(observations)).not.toContain(f.manager.accessToken);
+    expect(JSON.stringify(observations)).not.toContain(f.manager.actorId);
+  }, 30000);
+
   it('PERF-10 rechecks the requesting session after waiting for projection refresh', async () => {
     const { f, s, get } = await fixture();
     const read = s.sources.booking.readPage.bind(s.sources.booking);
