@@ -394,6 +394,15 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
 - [ ] PERF-08: Reduce notification authority/booking-scope round trips for inbox and unread counts.
 - [ ] PERF-09: Bound catalog SQL pagination and batch media facts; preserve publication and signed-URL rules.
 - [ ] PERF-10: Measure and optimize analytics warm reads versus projection refresh with freshness/cursor/source semantics intact.
+  - 2026-10-17 [instrumented live verification](../docs/backend-performance-analytics-closure-2026-10-17.md):
+    PRs #55/#56 merged, exact-head and final merge CI pass (1,996 tests).
+    Twenty matched native incremental pairs show 37.246% p95 improvement with
+    unchanged facts/fences; 40 actual warm reads retain both a passing cohort and
+    a client-p95 miss. The first natural-expiry four-reader wave has three 200 and
+    one pre-decision Prisma 500, so the campaign stops and PERF-10 stays open.
+    Temporary SSH key revoked/removed and Analytics flag restored to unset;
+    deadline/DB diagnostics stay off. Establish and fix the concurrent failure
+    before repeating the three-wave acceptance gate; do not infer production readiness.
 - 2026-10-16 PERF-06–10 implementation: [backend changes, native-owner tests,
   controlled measurements and remaining live gates](../docs/backend-performance-06-10.md).
   These checkboxes retain full Railway acceptance, separate from delivered code.
