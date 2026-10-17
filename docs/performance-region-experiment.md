@@ -1,6 +1,17 @@
 # PERF-04: reviewed application-region experiment
 
-Executed 2026-10-17 in the owner-authorized synthetic demo. **Aborted at the
+Latest acceptance: the [fresh matched comparison](backend-performance-04-rerun-2026-10-17.md)
+completed six cohorts / three pairs with 2,016 successful business reads. The
+owner explicitly accepted a different final Singapore image digest after all
+27,115 application files and listed runtime fingerprints matched, and extended
+the total ceiling to 150 minutes. This is an artifact-equivalence exception to
+the same-image procedure below; the first five cohorts retain the original
+comparison digest. DB, source, configuration, placement, samples, fail-stop and
+cleanup gates remain intact. Keep the original US West service. The
+[rerun receipt](../tasks/evidence/perf04-region-rerun-2026-10-17.json) records the
+approval, limits and completed cleanup. PERF-13 and production NO_GO stay open.
+
+Historical first execution: executed 2026-10-17 in the owner-authorized synthetic demo. **Aborted at the
 required fail-stop gate after a Singapore Seating 500.** The full three-pair
 acceptance was not achieved. [Results, limits and completed cleanup](backend-performance-04-region-2026-10-17.md)
 and the [sealed receipt](../tasks/evidence/perf04-region-comparison-2026-10-17.json)

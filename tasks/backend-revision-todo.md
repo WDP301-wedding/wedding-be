@@ -379,7 +379,7 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
     digests/migration checksums/OpenAPI unchanged. Preserve the earlier Seating 500
     as unresolved PERF-13 evidence; no fix, global deadline rollout, region change
     or production readiness is inferred. [Sanitized receipt](evidence/perf03-db-attribution-2026-10-17.json).
-- [ ] PERF-04: Compare current US West and APAC application placement with the DB unchanged in an authorized test environment.
+- [x] PERF-04: Compare current US West and APAC application placement with the DB unchanged in an authorized test environment. Completed in the synthetic scope, with an explicit owner-approved artifact-equivalence exception for the final image.
   - 2026-10-17 [read-only preflight](../docs/performance-region-experiment.md#read-only-preflight--2026-10-17)
     confirms Sydney via Supabase provider metadata and pins the current SFO
     deployment/image. Only one temporary app may run alongside the original:
@@ -396,6 +396,19 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
     and sixty migration checksums match. The owner explicitly keeps PERF-04 open:
     investigate/fix pool and Seating contention, then repeat the comparison.
     PERF-13 retains the acquisition failure and earlier US West 500.
+  - 2026-10-18 Asia/Saigon [completed fresh comparison](../docs/backend-performance-04-rerun-2026-10-17.md):
+    six cohorts / three pairs, sixteen families, twenty steady samples per family
+    per cohort; all 2,016 business reads returned 200 and all selected operations
+    match deployment logs. Seating and Notifications schedulers were disabled
+    explicitly, without changing the original service or pool settings. First five
+    cohorts used one digest; final Singapore used a different digest only after
+    full application-artifact/runtime-fingerprint comparison and explicit owner
+    approval extending the cap to 150 minutes. Both actual placement checks passed.
+    Retain US West; no blanket latency SLA or enabled-worker capacity claim.
+    Both temporary runtimes stopped, credentials/source removed, five SSH keys
+    revoked, fifteen business digests and sixty migration checksums unchanged.
+    [Sealed receipt](evidence/perf04-region-rerun-2026-10-17.json).
+    Historical failures stay preserved, PERF-13 open and production NO_GO unchanged.
 - [ ] PERF-05: Reduce Identity/Couple overview read work while preserving current authorization and revocation semantics.
 - 2026-10-16 implementation checkpoint for PERF-02–05:
   [local fixture, instrumentation, Identity comparison and remaining live gates](../docs/backend-performance-02-05.md).

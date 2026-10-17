@@ -1,7 +1,7 @@
 # PERF-04 Seating reconciliation isolation
 
-The owner keeps PERF-04 open and requested investigation before a fresh region
-comparison. The [aborted experiment](backend-performance-04-region-2026-10-17.md)
+The owner kept PERF-04 open after the first failure and requested investigation
+before a fresh region comparison. The [aborted experiment](backend-performance-04-region-2026-10-17.md)
 and its sealed receipt remain historical evidence. The original serving service
 is unchanged.
 
@@ -56,8 +56,12 @@ wiring and manifest reporting. Disposable databases are removed by the existing
 test fixture and wrapper cleanup. No production lock or business mutation was
 used to reproduce the failure.
 
-Follow-up acceptance still requires a fresh complete live comparison, exact-image
-placement verification and cleanup. Pool capacity under enabled background work
+The [fresh live comparison](backend-performance-04-rerun-2026-10-17.md) now
+completes three pairs with 2,016 successful business reads and verified cleanup.
+The owner explicitly accepted a different final Singapore image digest after
+application-artifact/runtime-fingerprint equivalence checks; source/config and
+actual native/upstream placement gates remained mandatory. This closes PERF-04
+in its measured synthetic scope. Pool capacity under enabled background work
 remains a separate PERF-13 gate. The [node-postgres pool contract](https://node-postgres.com/apis/pool)
 documents acquisition timeouts and release; the implementation uses the locked
 local pg 8.23.0 and Prisma adapter 7.10.1 sources as well.

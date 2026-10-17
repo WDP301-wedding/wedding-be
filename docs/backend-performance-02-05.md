@@ -14,7 +14,7 @@ and the product NO_GO decision are unchanged.
 | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | PERF-02 | Native-owner synthetic fixture, initialized Group/Guest/Seating/settings, assigned Staff, eight-family HTTP measurement and private-config runner        | Owner subsequently authorized a Railway synthetic fixture. See the follow-up receipt; successful assigned-Staff reads still require a valid event window.                           |
 | PERF-03 | Opt-in request-correlated driver/acquire/lock-command timing, pool observations, event-loop observation, safe DB probe and pool-context regression tests | Deploy approved instrumentation to a test target; measure container→DB RTT and attribute real slow request families. Pure server execution and lock wait require DB-side evidence.  |
-| PERF-04 | Two matching region profiles, controlled experiment and rollback runbook                                                                                 | Provider-confirmed DB region, authorized temporary services and repeated matched US West/APAC receipts. No region winner is claimed.                                                |
+| PERF-04 | Three complete region pairs, 2,016 successful business reads and verified cleanup                                                                        | Complete in authorized synthetic scope, with owner-approved final image artifact equivalence; keep US West. PERF-13 and NO_GO unchanged.                                            |
 | PERF-05 | Joined/narrow Identity authority reads and narrow/empty-grant Couple overview reads; revocation and concurrency tests                                    | PR #46 is merged/deployed; observed same-topology backend p95 improved 75% for Identity and 43% for overview. Live driver attribution and remaining dependency gates stay separate. |
 
 These are partial implementation receipts, not four completed live-performance
@@ -188,6 +188,17 @@ lint passed. The local `output/` directory contains pre-existing throwaway sourc
 archives and is excluded from local lint selection, never from committed CI source.
 
 ## PERF-04 and next live checkpoint
+
+2026-10-18 Asia/Saigon acceptance: [the fresh comparison](backend-performance-04-rerun-2026-10-17.md)
+completed all six cohorts / three pairs and 2,016 successful business reads. The
+owner accepted byte-equivalent application artifacts for the final Singapore
+image despite its different digest, and extended the ceiling to 150 minutes.
+The report retains the full comparison and this explicit limitation. Both
+schedulers were disabled only on temporary apps; the original service, selected
+business digests and migrations are unchanged. All temporary runtime/credential
+and SSH cleanup passed. Keep US West; PERF-04 is complete in this measured
+synthetic scope, while PERF-13 and production NO_GO remain open. Earlier pending
+checkpoints below are historical.
 
 2026-10-17 update: the [controlled same-image region experiment](backend-performance-04-region-2026-10-17.md)
 confirms provider Sydney metadata and runtime-container RTT, then stops on a
