@@ -14,7 +14,12 @@ import { createProjectionRepository } from './projection.repository.js';
 import { AnalyticsProjector } from '../application/projection.js';
 import { AnalyticsService } from '../application/analytics.service.js';
 import { reportingFencesSchema } from '../../../core/reporting/reporting-feed.js';
-export function createAnalyticsServices(prisma: PrismaClient, now: () => Date = () => new Date()) {
+import type { AnalyticsObserver } from '../application/analytics-observation.js';
+export function createAnalyticsServices(
+  prisma: PrismaClient,
+  now: () => Date = () => new Date(),
+  observe?: AnalyticsObserver,
+) {
   const sources = {
     booking: createBookingAnalyticsReader(prisma),
     billing: createBillingAnalyticsReader(prisma),
@@ -24,19 +29,30 @@ export function createAnalyticsServices(prisma: PrismaClient, now: () => Date = 
     venue: createVenueAnalyticsReader(prisma),
   };
   const store = createProjectionRepository(prisma),
-    projector = new AnalyticsProjector(sources, store, now, async () =>
-      reportingFencesSchema.parse(
-        Object.fromEntries(
-          (await prisma.reportingSequence.findMany()).map((h) => [h.owner, h.value]),
+    projector = new AnalyticsProjector(
+      sources,
+      store,
+      now,
+      async () =>
+        reportingFencesSchema.parse(
+          Object.fromEntries(
+            (await prisma.reportingSequence.findMany()).map((h) => [h.owner, h.value]),
+          ),
         ),
-      ),
+      observe,
     );
-  const service = new AnalyticsService(projector, store, now, async (p) => {
-    const heads = await prisma.reportingSequence.findMany();
-    return heads.some(
-      (h) => p.checkpoints.find((c) => c.owner === h.owner)?.throughSequence !== h.value,
-    );
-  });
+  const service = new AnalyticsService(
+    projector,
+    store,
+    now,
+    async (p) => {
+      const heads = await prisma.reportingSequence.findMany();
+      return heads.some(
+        (h) => p.checkpoints.find((c) => c.owner === h.owner)?.throughSequence !== h.value,
+      );
+    },
+    observe,
+  );
   const resolver = createScopedIdentityReaders(
     prisma,
     new PrismaBookingBoundary(prisma),

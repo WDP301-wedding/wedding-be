@@ -30,6 +30,8 @@ describe('SPEC-10 scheduled projection lifecycle', () => {
     expect(f.services.projector.refresh).toHaveBeenCalledWith(
       'manager',
       expect.objectContaining({ authority: 'AUTHENTICATED', actorAccountId: 'manager' }),
+      false,
+      'scheduler',
     );
     expect(f.services.projector.refresh).toHaveBeenCalledTimes(1);
     await runtime.resource.close();

@@ -108,7 +108,7 @@ export function createAnalyticsRouter(
     async (req, res) => {
       const c = context(req, res),
         input = validatedRequest(res, { body: rebuildBodySchema }).body;
-      const generationId = await service.projector.refresh(c.actorAccountId!, c, true);
+      const generationId = await service.projector.refresh(c.actorAccountId!, c, true, 'http');
       await audit(c, 'analytics.rebuilt', { reason: input.reason, generationId });
       res.json({ data: projectionResultSchema.parse({ generationId }) });
     },
