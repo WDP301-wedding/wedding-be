@@ -77,6 +77,15 @@ connectivity results; review any VNPAY egress-IP, TLS, cookies or callback conse
 No DB migration or production region switch is part of this audit. A deployment
 change requires its own reviewed rollout and authorization.
 
+2026-10-17 execution: [same-image regional experiment](../docs/backend-performance-04-region-2026-10-17.md)
+stopped at the required Singapore Seating 500 gate after a complete US West cohort
+and a partial Singapore cohort. Full three-pair acceptance is not achieved.
+Provider Sydney metadata, twenty runtime RTT samples per region, all 541 selected
+HTTP/log matches and complete cleanup/retention are retained. Runtime stopped
+within the owner's extended 120-minute ceiling. Canonical backlog disposition
+remains in backend-revision-todo.md; the original acceptance and failures are not
+rewritten by an owner decision about task closure.
+
 Checkpoint after PERF-03/04: choose whether geography or query count is the larger
 measured contributor. Do not combine the region switch and code optimization into
 one un-attributable before/after result.
@@ -297,3 +306,16 @@ normal owner APIs then established the confirmed named-Guest context. The
 DB-clock window checks, separate initial/steady reads, unchanged original fixture
 digests and session cleanup. This supplies the missing PERF-02 role/window cohort,
 not a matched Staff speed-improvement baseline or production readiness.
+
+## Execution checkpoint — PERF-04 matched region decision
+
+The owner requested correction of the aborted Seating/pool experiment and a fresh
+comparison, then explicitly accepted the byte-equivalent final Singapore image
+and extended the total ceiling to 150 minutes. The [final report](../docs/backend-performance-04-rerun-2026-10-17.md)
+records six complete cohorts / three pairs, sixteen families and 2,016 successful
+business reads with exact request/log matching. Retain the original US West
+service. Both temporary runtimes are stopped and scrubbed, source detached and
+five temporary SSH keys revoked; selected business history and migrations match.
+PERF-04 is complete in this synthetic scope. The earlier failed campaign remains
+immutable; historical acquisition holder, enabled-worker capacity and production
+readiness are not closed by scheduler isolation. PERF-13 and NO_GO remain.

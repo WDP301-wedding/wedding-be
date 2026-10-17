@@ -4,6 +4,16 @@ import { config } from './config.js';
 import { EnvironmentConfigurationError, parseEnvironment } from './env.js';
 
 describe('Public invitation origin configuration', () => {
+  it('controls Seating reconciliation independently of notification delivery', () => {
+    expect(parseEnvironment({ NODE_ENV: 'test' }).invitationStudio.reconcilerEnabled).toBe(true);
+    expect(
+      parseEnvironment({ NODE_ENV: 'test', SEATING_RECONCILER_ENABLED: 'false' }).invitationStudio
+        .reconcilerEnabled,
+    ).toBe(false);
+    expect(() => parseEnvironment({ SEATING_RECONCILER_ENABLED: 'invalid' })).toThrow(
+      EnvironmentConfigurationError,
+    );
+  });
   it('defaults publication to unavailable and accepts explicit HTTPS or loopback test origins', () => {
     expect(parseEnvironment({ NODE_ENV: 'test' }).invitationStudio.publicOrigin).toBeNull();
     for (const origin of ['https://wedding.example.test', 'http://127.0.0.1:3000'])
@@ -128,7 +138,7 @@ describe('parseEnvironment', () => {
     const parsed = parseEnvironment({});
 
     expect(parsed).toEqual({
-      invitationStudio: { publicOrigin: null },
+      invitationStudio: { publicOrigin: null, reconcilerEnabled: true },
       runtime: {
         environment: 'development',
         port: 3001,

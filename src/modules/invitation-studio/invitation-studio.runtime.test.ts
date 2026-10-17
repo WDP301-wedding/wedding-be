@@ -4,6 +4,7 @@ import { createPrismaClient } from '../../core/database/prisma.js';
 import { createInvitationStudioServices } from './infrastructure/studio.composition.js';
 import { createInvitationStudioRuntime } from './invitation-studio.runtime.js';
 import type { StorageProvider } from '../../integrations/storage/storage-provider.js';
+import { startSeatingReconciler } from '../seating-plan/infrastructure/seating-reconciler.js';
 
 const prisma = vi.hoisted(() => ({ $connect: vi.fn(), $disconnect: vi.fn() }));
 vi.mock('../../core/database/prisma.js', () => ({ createPrismaClient: vi.fn(() => prisma) }));
@@ -13,10 +14,14 @@ vi.mock('./infrastructure/studio.composition.js', () => ({
 vi.mock('../seating-plan/infrastructure/seating.composition.js', () => ({
   createSeatingServices: vi.fn(() => ({ seating: {}, resolver: {} })),
 }));
+vi.mock('../seating-plan/infrastructure/seating-reconciler.js', () => ({
+  startSeatingReconciler: vi.fn(() => ({ close: vi.fn().mockResolvedValue(undefined) })),
+}));
 
 function config(storage: Config['storage'] = { enabled: false }): Config {
   return {
     database: { url: 'postgresql://local/test' },
+    invitationStudio: { publicOrigin: null, reconcilerEnabled: true },
     storage,
     runtime: { environment: 'test' },
   } as Config;
@@ -30,6 +35,18 @@ describe('InvitationStudioRuntime', () => {
     vi.clearAllMocks();
     prisma.$connect.mockResolvedValue(undefined);
     prisma.$disconnect.mockResolvedValue(undefined);
+  });
+  it.each([true, false])('forwards the explicit Seating scheduler mode %s', async (enabled) => {
+    const runtime = await createInvitationStudioRuntime({
+      ...config(),
+      invitationStudio: { publicOrigin: null, reconcilerEnabled: enabled },
+    });
+    expect(startSeatingReconciler).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Function),
+      enabled,
+    );
+    await runtime.resource.close();
   });
   it('uses native composition and rejects disabled Storage instead of persisting fake success', async () => {
     const runtime = await createInvitationStudioRuntime(config());

@@ -379,7 +379,36 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
     digests/migration checksums/OpenAPI unchanged. Preserve the earlier Seating 500
     as unresolved PERF-13 evidence; no fix, global deadline rollout, region change
     or production readiness is inferred. [Sanitized receipt](evidence/perf03-db-attribution-2026-10-17.json).
-- [ ] PERF-04: Compare current US West and APAC application placement with the DB unchanged in an authorized test environment.
+- [x] PERF-04: Compare current US West and APAC application placement with the DB unchanged in an authorized test environment. Completed in the synthetic scope, with an explicit owner-approved artifact-equivalence exception for the final image.
+  - 2026-10-17 [read-only preflight](../docs/performance-region-experiment.md#read-only-preflight--2026-10-17)
+    confirms Sydney via Supabase provider metadata and pins the current SFO
+    deployment/image. Only one temporary app may run alongside the original:
+    two would exceed the unchanged connection budget (72 > 60). Environment
+    selection and temporary-runtime authorization were pending at that historical
+    checkpoint.
+  - 2026-10-17 [controlled experiment and cleanup](../docs/backend-performance-04-region-2026-10-17.md):
+    original service preserved; same-image US West 336/336 successful reads;
+    Singapore 172 successful reads then a Current Seating 500. All 541 selected
+    HTTP operations match logs. The campaign stopped at the required fail-stop
+    gate; no complete three-pair acceptance or region winner is claimed. DB RTT
+    medians were 147.973 ms versus 200.578 ms. Both temporary resources are stopped,
+    credentials/source removed and the SSH key revoked; fifteen business digests
+    and sixty migration checksums match. The owner explicitly keeps PERF-04 open:
+    investigate/fix pool and Seating contention, then repeat the comparison.
+    PERF-13 retains the acquisition failure and earlier US West 500.
+  - 2026-10-18 Asia/Saigon [completed fresh comparison](../docs/backend-performance-04-rerun-2026-10-17.md):
+    six cohorts / three pairs, sixteen families, twenty steady samples per family
+    per cohort; all 2,016 business reads returned 200 and all selected operations
+    match deployment logs. Seating and Notifications schedulers were disabled
+    explicitly, without changing the original service or pool settings. First five
+    cohorts used one digest; final Singapore used a different digest only after
+    full application-artifact/runtime-fingerprint comparison and explicit owner
+    approval extending the cap to 150 minutes. Both actual placement checks passed.
+    Retain US West; no blanket latency SLA or enabled-worker capacity claim.
+    Both temporary runtimes stopped, credentials/source removed, five SSH keys
+    revoked, fifteen business digests and sixty migration checksums unchanged.
+    [Sealed receipt](evidence/perf04-region-rerun-2026-10-17.json).
+    Historical failures stay preserved, PERF-13 open and production NO_GO unchanged.
 - [ ] PERF-05: Reduce Identity/Couple overview read work while preserving current authorization and revocation semantics.
 - 2026-10-16 implementation checkpoint for PERF-02–05:
   [local fixture, instrumentation, Identity comparison and remaining live gates](../docs/backend-performance-02-05.md).
@@ -467,6 +496,13 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
     not an added indefinite gate. No PERF-09 rerun; production remains NO_GO.
 - [x] PERF-12: Review table/rehearsal-schema cleanup with ownership, dependency and retention proof; deletion remains separately authorized.
 - [ ] PERF-13: Repeat matched live measurements, verify relevant correctness gates and set supported regression budgets.
+  - 2026-10-17 [PERF-04 fail-stop evidence](../docs/backend-performance-04-region-2026-10-17.md#failed-acquisition-and-follow-up):
+    retain Singapore Current Seating request `8c8206ee-8adf-46c9-8080-f70644ddf56b`,
+    HTTP 500, backend 2004.191 ms / acquire 2001.050 ms, zero submitted SQL,
+    pool max active 1 / idle 0 / waiting 1. Exact holder/root cause is unproved;
+    generic Error logs contain no Prisma/driver code. Investigate acquisition
+    ownership/lifecycle alongside the earlier US West Seating 500; do not claim
+    a Singapore-only fault, increase caps/deadlines or erase the failed run.
 - 2026-10-16 PERF-11–13: [pool budget, opt-in safe-read deadlines, retention review,
   regression measurements and remaining rollout gates](../docs/backend-performance-11-13.md).
   PERF-12 review retains 145 public tables and 363 rehearsal tables, with zero

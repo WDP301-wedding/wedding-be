@@ -218,7 +218,7 @@ describe('backend release evidence gates', () => {
         activeKeyVersion: 'v1',
         credentialKeys: { v1: Buffer.alloc(32).toString('base64') },
       },
-      invitationStudio: { publicOrigin: plan.apiOrigin },
+      invitationStudio: { publicOrigin: plan.apiOrigin, reconcilerEnabled: true },
     };
     expect(validateReleaseEnvironment(configured, plan)).toEqual({ valid: true, issues: [] });
     expect(validateReleaseEnvironment(configured, demoPlan)).toEqual({ valid: true, issues: [] });

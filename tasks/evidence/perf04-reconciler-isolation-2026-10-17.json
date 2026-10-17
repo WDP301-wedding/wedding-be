@@ -1,0 +1,247 @@
+{
+  "recordedAt": "2026-10-17T16:42:47.482Z",
+  "task": "PERF-04 reconciliation isolation",
+  "status": "IMPLEMENTED AND CI VERIFIED; LIVE REGION COMPARISON PENDING",
+  "testedHead": "11a0d8cf3846e292b9b35373ad6af338cfd4d463",
+  "priorSourceLocalValidation": {
+    "at": "2026-10-17T16:07:51.886Z",
+    "head": "b23a420da9ef908eb144225f06afd53305059d36",
+    "workingTreeSourceMatchesHead": true,
+    "scope": "Explicit control of the shared-pool Seating scheduler for isolated read-only measurements; no claim of proven historical holder or leak repair.",
+    "sourceChanges": [
+      ".env.example",
+      "docs/backend-performance-04-reconciler-2026-10-17.md",
+      "src/config/env.test.ts",
+      "src/config/env.ts",
+      "src/config/runtime-manifest.test.ts",
+      "src/config/runtime-manifest.ts",
+      "src/modules/invitation-studio/invitation-studio.runtime.test.ts",
+      "src/modules/invitation-studio/invitation-studio.runtime.ts",
+      "src/modules/release-demo/release-policy.test.ts",
+      "src/modules/seating-plan/infrastructure/seating-reconciler.test.ts",
+      "src/modules/seating-plan/infrastructure/seating-reconciler.ts",
+      "tests/integration/seating-reconciler-pool.test.ts"
+    ],
+    "tdd": {
+      "focusedBefore": {
+        "failed": 5
+      },
+      "focusedAfter": {
+        "files": 4,
+        "passed": 133
+      },
+      "nativeBefore": {
+        "passed": 1,
+        "failed": 1,
+        "rawLog": "native-red-excerpt.log",
+        "limitation": "Excerpt captured from tool output, not full redirected stdout."
+      },
+      "nativeAfter": {
+        "files": 1,
+        "passed": 2,
+        "skipped": 0
+      },
+      "simulatedContention": true,
+      "historicalLiveHolderProven": false
+    },
+    "local": {
+      "unit": {
+        "files": 162,
+        "passed": 1440
+      },
+      "contract": {
+        "files": 20,
+        "passed": 58
+      },
+      "typecheck": "passed",
+      "lint": "passed; untracked operator output excluded from local invocation",
+      "build": "passed",
+      "openapiGenerationAndCheck": "passed; artifact unchanged",
+      "dependencyAudit": "passed; no high/critical advisories"
+    },
+    "unchanged": {
+      "poolMax": 1,
+      "catalogMax": 3,
+      "analyticsMax": 2,
+      "acquireMs": 2000,
+      "idleMs": 60000,
+      "reserve": 36,
+      "connectionBudget": 60,
+      "migrations": true,
+      "originalService": true,
+      "foregroundAuthorizationAndRevalidation": true
+    },
+    "artifacts": {
+      "red.log": {
+        "bytes": 3695,
+        "sha256": "99ffbf74db9b132d8f4191f2338b95effb3d0199dda2f822323064006f678528"
+      },
+      "runtime-red.log": {
+        "bytes": 2238,
+        "sha256": "26860f7605dc1ff24902fd21c4078a68e76070acba78f5970ab31e71061f44ba"
+      },
+      "config-green.log": {
+        "bytes": 401,
+        "sha256": "dd5164fd211dde02a99846373a63cdb42f63f799d1d92817f08719df4a0905b0"
+      },
+      "green-final.log": {
+        "bytes": 447,
+        "sha256": "7d5363725651a290e123231fd6871a8e1d0901724dc2340a4afccd2a00e3bc7d"
+      },
+      "native-red-excerpt.log": {
+        "bytes": 1172,
+        "sha256": "c540b3b3d3a50a2c3cafe8896dd9b009c860146b2596beaa7f343daaa4590609"
+      },
+      "native-green-final.log": {
+        "bytes": 9266,
+        "sha256": "dee677d941f17184bb05855a3813a0750fb087f330abd1ccfdb79bef8fb3c655"
+      },
+      "unit.log": {
+        "bytes": 7827,
+        "sha256": "cd2f0cffc771c5adef3e77eff9b16fd4dcb2167684e7e6ea2d378deb27340d24"
+      },
+      "contract.log": {
+        "bytes": 5274,
+        "sha256": "4669c431690b2dcbe71ca039070847fabccd7bce6ba1118572332dc292bab24a"
+      },
+      "typecheck-final.log": {
+        "bytes": 74,
+        "sha256": "8a3885c0b4bdc3f4315b31f0a33220911c9052ab8905eeb38fe9640c014cf757"
+      },
+      "lint.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "build.log": {
+        "bytes": 67,
+        "sha256": "9da60e6347ecbf56e4adb742adc1dc16ec0ef7a2219f213e9aab5297b95bd9d3"
+      },
+      "api-generate.log": {
+        "bytes": 63,
+        "sha256": "783c8f1a09bcf9323e2ccfc3eada770fde0e15c2b92e2163b4c6adbfe906d005"
+      },
+      "api-check.log": {
+        "bytes": 68,
+        "sha256": "9cd79de9bdeb62405fc628f2c978e81cc5d8b51af6940a141ea1c472b6974b7d"
+      },
+      "audit.log": {
+        "bytes": 127,
+        "sha256": "c1168f5fd33f37fb3d55a48d8999e7c17d84667c7ed16770e190fab608218ac6"
+      },
+      "historical-scheduler-logs.json": {
+        "bytes": 477,
+        "sha256": "fbb18dbdfb31c39246da495a64932bce5f6e400769fce830580dac2665d88c29"
+      }
+    }
+  },
+  "followup": {
+    "change": "Replace incomplete Staff integration fixture cast with actual environment parser",
+    "focusedNativeRuntime": "passed; targeted selection1passed/11notselected",
+    "exactHeadCi": {
+      "at": "2026-10-17T16:18:31.276Z",
+      "head": "11a0d8cf3846e292b9b35373ad6af338cfd4d463",
+      "runs": [
+        {
+          "id": 39048233109,
+          "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39048233109",
+          "head": "11a0d8cf3846e292b9b35373ad6af338cfd4d463",
+          "status": "completed",
+          "conclusion": "success",
+          "jobs": [
+            {
+              "id": 117441203100,
+              "name": "PostgreSQL migration and integration gates",
+              "status": "completed",
+              "conclusion": "success",
+              "failedSteps": []
+            },
+            {
+              "id": 117441203417,
+              "name": "Static, test, build, and audit gates",
+              "status": "completed",
+              "conclusion": "success",
+              "failedSteps": []
+            }
+          ]
+        }
+      ]
+    },
+    "counts": {
+      "unit": 1440,
+      "contract": 58,
+      "integration": 546,
+      "fullSuite": 2044,
+      "fullSuiteFiles": 286,
+      "skippedInFullSuite": 0
+    },
+    "qualityGatesUnchanged": true,
+    "firstCiFailure": {
+      "at": "2026-10-17T16:09:18.880Z",
+      "head": "b23a420da9ef908eb144225f06afd53305059d36",
+      "runs": [
+        {
+          "id": 39047853231,
+          "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39047853231",
+          "head": "b23a420da9ef908eb144225f06afd53305059d36",
+          "status": "completed",
+          "conclusion": "failure",
+          "jobs": [
+            {
+              "id": 117440098661,
+              "name": "Static, test, build, and audit gates",
+              "status": "completed",
+              "conclusion": "success",
+              "failedSteps": []
+            },
+            {
+              "id": 117440098932,
+              "name": "PostgreSQL migration and integration gates",
+              "status": "completed",
+              "conclusion": "failure",
+              "failedSteps": [
+                "Run PostgreSQL integration tests"
+              ]
+            }
+          ]
+        }
+      ],
+      "reason": "Staff runtime integration fixture used an incomplete Config cast and lacked invitationStudio. Replaced by parseEnvironment, preserving test assertions and gates.",
+      "failedTests": 1,
+      "passedIntegrationBeforeCorrection": 545
+    }
+  },
+  "historicalFailurePreserved": "tasks/evidence/perf04-region-comparison-2026-10-17.json",
+  "productionServingDeploymentUnchanged": true,
+  "historicalLiveHolderProven": false,
+  "productionConcurrencyCapacityProven": false,
+  "review": {
+    "recordedAt": "2026-10-17T18:35:49.611Z",
+    "axes": [
+      "correctness",
+      "readability",
+      "architecture",
+      "security",
+      "performance"
+    ],
+    "scope": "Scheduler control, strict env/default, runtime/manifest forwarding and real native pool regression. No provider/API/schema/dependency changes.",
+    "findings": [],
+    "mutation": {
+      "at": "2026-10-17T18:26:52.654Z",
+      "mutation": "Invert enabled condition before interval registration",
+      "exitCode": 1,
+      "caughtBy": "does no background database work when explicitly disabled",
+      "sourceRestored": true,
+      "outputSha256": "cd97fa0c4839b1ed42b33b481356a6b5c097a74d2c1f1c635c809addb5af224a"
+    },
+    "postRestoreFocusedUnit": {
+      "files": 1,
+      "passed": 3,
+      "skipped": 0
+    },
+    "limits": [
+      "Default enabled preserves normal scheduling; experiment isolation is not an enabled-worker capacity fix.",
+      "Historical live transaction holder was not proved; controlled latch demonstrates one possible mechanism.",
+      "Final region acceptance is recorded separately in perf04-region-rerun-2026-10-17.json."
+    ]
+  }
+}

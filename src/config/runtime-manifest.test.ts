@@ -3,6 +3,18 @@ import { parseEnvironment } from './env.js';
 import { createRuntimeFeatureManifest } from './runtime-manifest.js';
 
 describe('runtime feature manifest', () => {
+  it('declares the Seating scheduler separately from notification workers', () => {
+    for (const enabled of [false, true]) {
+      const manifest = createRuntimeFeatureManifest(
+        parseEnvironment({ SEATING_RECONCILER_ENABLED: String(enabled) }),
+      );
+      expect(manifest.features.seatingReconciliation).toMatchObject({
+        mode: enabled ? 'seating-reconciliation-300s' : 'disabled',
+        configuration: enabled ? 'configured' : 'unconfigured',
+        liveVerification: enabled ? 'pending' : 'optional-disabled',
+      });
+    }
+  });
   it('reports configured FCM separately from live proof and never publishes its service credentials', () => {
     const config = parseEnvironment({ NODE_ENV: 'test' });
     const manifest = createRuntimeFeatureManifest({

@@ -1,0 +1,70 @@
+{
+  "recordedAt": "2026-10-17T13:17:22.902Z",
+  "status": "PREFLIGHT_ONLY_AWAITING_OWNER_ENVIRONMENT_SELECTION",
+  "accepted": false,
+  "providerDatabase": {
+    "recordedAt": "2026-10-17T13:15:29.432Z",
+    "source": "Supabase connected Management API list_projects",
+    "projectRef": "zjibuegbbwzvdqrnujjf",
+    "region": "ap-southeast-2",
+    "status": "ACTIVE_HEALTHY",
+    "databaseHost": "db.zjibuegbbwzvdqrnujjf.supabase.co",
+    "databaseVersion": "17.6.1.166"
+  },
+  "railway": {
+    "projectId": "1c56721d-021a-442c-9e01-bb91abe73adb",
+    "environmentName": "production",
+    "environmentId": "08a2899c-b0d6-4200-a505-604965a4b3fc",
+    "serviceId": "0f70d648-8c59-48bd-84f3-29a86d2e2d38",
+    "deploymentId": "e12f82d4-c247-41ac-9b46-7417c260254a",
+    "commit": "f2012acfba830adc2704f60b5b561eabe867eda1",
+    "imageDigest": "sha256:a029e36681f1b24950eabe022bd2a0cdc9c6b8d866658fd8a5faf516d6518460",
+    "runtimeRegion": "sfo",
+    "replicas": 1,
+    "stagedChanges": false
+  },
+  "poolBudget": {
+    "commonPoolMax": 1,
+    "catalogPoolMax": 3,
+    "analyticsPoolMax": 2,
+    "readinessConnections": 1,
+    "perApplication": 12,
+    "databaseMax": 60,
+    "reserve": 36,
+    "activePlusOneTemporary": 60,
+    "activePlusTwoTemporary": 72,
+    "simultaneousTemporaryApplicationsAllowed": false,
+    "requiredControl": "Run at most one temporary application at a time; verify the other has stopped before activation. Do not raise pool caps, lower reserve or stop the original application."
+  },
+  "originalControls": {
+    "diagnostics": false,
+    "safeReadDeadline": false,
+    "startupProbe": false,
+    "notificationWorker": true
+  },
+  "authorizationRequired": {
+    "source": "docs/performance-region-experiment.md, Preconditions 1",
+    "question": "Select production synthetic demo or spec11-staging and authorize the temporary Railway runtime, up to 60 minutes with possible hosting/build/network charges.",
+    "received": false
+  },
+  "performed": {
+    "providerMetadataRead": true,
+    "railwayConfigurationRead": true,
+    "temporaryServicesCreated": false,
+    "deploymentsTriggered": false,
+    "sshKeysRegistered": false,
+    "databaseOrBusinessWrites": false
+  },
+  "remainingAcceptance": [
+    "Owner-selected synthetic environment and bounded temporary deployment authorization",
+    "Verify immutable matching image and effective configuration in both actual runtime containers",
+    "Three repeated matched US West/APAC pairs with 20 steady samples per selected route and separate initial probes",
+    "Container-to-DB RTT, request/log correlation, errors, pool/lock/event-loop observations",
+    "Read-only Storage/TLS/connectivity and callback/cookie/CORS/VNPay egress consequences",
+    "Stop temporary runtimes, revoke sessions/temporary access and verify original configuration and business/migration digests"
+  ],
+  "operatorArtifacts": [
+    "output/perf04-20261017/preflight.mjs",
+    "output/perf04-20261017/preflight.json"
+  ]
+}
