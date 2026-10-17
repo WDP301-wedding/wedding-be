@@ -1,6 +1,14 @@
 # PERF-10 Analytics live verification — 2026-10-17
 
-Status: measured, but **PERF-10 remains open**: the first natural-expiry
+Status: **PERF-10 accepted in the measured backend demo scope** after the
+owner-authorized contention fix and a separate successful live campaign.
+[Final machine evidence](../tasks/evidence/perf10-analytics-closure-2026-10-17.json)
+supersedes the initial open decision, not its preserved measurements/failures.
+Production remains `NO_GO`; PERF-13 and other open PERF tasks remain open.
+
+## Initial checkpoint — historical, preserved
+
+The initial decision left **PERF-10 open**: the first natural-expiry
 four-reader wave returned three HTTP 200 and one HTTP 500. The campaign stopped;
 the failed request was not retried and the remaining two waves were not executed.
 Earlier evidence and the production
@@ -90,7 +98,7 @@ expiry waves. Do not silently raise pool, timeout or freshness budgets. No furth
 optimization is included in this evidence checkpoint. PERF-10 and PERF-13 remain
 open, and production remains `NO_GO`.
 
-## Authorized contention fix — pending live re-verification
+## Authorized contention fix — verified live
 
 After the failed wave, the owner explicitly chose reproduction, a minimal
 Analytics fix, CI/review and another live campaign. The preceding result and its
@@ -113,11 +121,84 @@ rechecks. Different scopes, filters and report-owner sets never share work.
 
 Regression tests cover four readers, separate scopes/filters, rejection fan-out
 and recovery, the pre-/post-publication race, and revocation of all four requesting
-sessions while the shared load is pending. The real-pool contention test and
-unchanged Analytics/private-reporting suite must pass, followed by exact-head CI
-and review before merge/deployment. The native projector/repository/source-reader
+sessions while the shared load is pending. All 41 Analytics unit cases and nine
+native PostgreSQL integration/privacy cases pass. PR
+[#57](https://github.com/WDP301-wedding/wedding-be/pull/57) merged after exact-head
+CI/review; its merge also passes 2,002 tests and the existing coverage, migration,
+audit and OpenAPI gates. No gate was weakened. The native projector/repository/source-reader
 code is unchanged, so the earlier native comparison remains scoped to those
-identical modules; HTTP warm/TTL measurements must be repeated on the new runtime.
+identical modules; HTTP warm/TTL measurements were independently repeated on the new runtime.
+
+## Final acceptance after the fix
+
+The independent repeat serves merge `0cb4621965b525b6b4c6bc07df5be81e0f264116`,
+deployment `5e3ce740-edec-41b0-908c-354edb35cb71`, image
+`sha256:54861ef48762e114b26b54f8fcef1a7f7169b9c22c1520f89b9be551da32f99a`.
+SFO placement, one replica, max-3 pools, 2,000-ms acquisition, 60,000-ms idle,
+85-row projection and source fences stay unchanged. The scheduler remains enabled;
+no checkpoint date was edited and no rebuild POST or failed-request retry ran.
+
+| Final gate                             | Result                                                                                                                                                                   |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Native incremental refresh             | Earlier **37.246%** p95 reduction, twenty matched pairs per variant; the measured projector/repository/current-reader source blobs are identical after the HTTP-only fix |
+| Warm cohort 1                          | 20/20 same-generation READY HTTP 200; client p95 **1,500.705 ms**                                                                                                        |
+| Warm cohort 2                          | 20/20 same-generation READY HTTP 200; client p95 **1,642.353 ms**                                                                                                        |
+| All 40 warm reads                      | Client/backend p95 **1,630.269 / 1,405.169 ms**; all actual query decisions are `warm`                                                                                   |
+| Three natural-expiry four-reader waves | **12/12 HTTP 200**, each wave one actual HTTP leader, three waiters and one six-owner-page HTTP refresh; all four reads return the same new READY generation             |
+| Serial correctness and retention       | Role/session denial, cursor/filter binding, unknown attendance, integer VND, selected business digests, sixty migration checksums and zero Staff check-ins pass again    |
+
+Each new TTL HTTP refresh loses its publication race to the existing scheduler
+and records `ANALYTICS_REFRESH_CONFLICT`; these **three observed conflicts remain
+in the evidence**. They are not HTTP errors: all twelve GETs recover the winning
+READY generation. The important coalescing observation is six HTTP source pages
+per wave, not four separate refreshes/twenty-four pages. Independent scheduler
+work is separately attributed, never counted as absent. This is bounded HTTP
+herd protection for the measured single replica, not cross-replica coordination.
+
+The twelve TTL reads have client/backend p95 **14,011.302 / 8,094.306 ms**
+(nearest rank with twelve samples includes the maximum). The client tail remains
+visible; a two-second warm target is not a two-second refresh promise. The native
+37.246% comparison belongs to the earlier deployment and unchanged projection
+components, not a newly measured whole-application or HTTP improvement percentage.
+
+After measurements, the Analytics flag is restored to its original **unset**
+state. A normal same-image redeployment
+`55cdfdb1-2239-468f-b57f-d44ab3ac5cd5` applies default-off behavior: READY generations
+advance across two natural scheduler intervals, independent info logs are observed
+and no Analytics telemetry is emitted. Health/readiness return 200 and served
+OpenAPI bytes retain SHA-256
+`68a47cb4d43a0ea185ce3cd7c28928011c705bc6aa101f2f92a6261ec5cda694`.
+The provider hash is restored, the temporary SSH key remains revoked/removed,
+and general DB diagnostics/deadlines stay off. Source/business histories and
+provider funds remain untouched; local test delays run only in disposable databases.
+
+PERF-10 is now closed for the stated synthetic/backend measurement scope.
+Completed PERF tasks are **01, 02, 10 and 12**. No other checkbox is closed here.
+The next focused evidence task is **PERF-09**, a matched catalog comparison using
+the retained real Storage-media fixture. APAC comparison, endpoint deadline rollout,
+broader PERF-13 budgets and external-provider/production readiness remain separate.
+
+## Report publication infrastructure recovery
+
+PR #58's first three CI attempts stop before checkout/tests when the ECR public
+mirror reports `toomanyrequests: Data limit exceeded`. Static/test/build/audit gates
+pass, but this does not replace the missing PostgreSQL integration/coverage job.
+The owner subsequently authorizes unblocking CI, merging #58 after its required
+checks and moving to PERF-09.
+
+Only the CI service-image reference changes: use Google's
+[official Docker Hub cache](https://docs.cloud.google.com/artifact-registry/docs/pull-cached-dockerhub-images)
+and pin PostgreSQL 17 to digest
+`sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3`.
+That is the exact manifest digest pulled by successful main CI job
+`117304741020`, not a database-version downgrade. A read-only registry request
+returns 200 with matching `Docker-Content-Digest` and SHA-256 of the manifest body;
+the linux/amd64 child manifest is
+`sha256:3cec7eb015ba8adb28139fa5c83b8489cdf0e666e53dfdf20f598ae0cc8739e3`.
+Both required jobs, migration commands, integration tests, coverage thresholds,
+timeouts, health checks and dependency audit stay unchanged. The three original
+failures and both Analytics evidence receipts remain immutable. Passing fresh
+exact-head CI is still required before merge; mirror availability alone is not CI.
 
 ## Instrumentation slice
 
