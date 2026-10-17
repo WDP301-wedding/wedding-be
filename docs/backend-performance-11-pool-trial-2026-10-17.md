@@ -70,3 +70,32 @@ deployments. Stop on unexpected status or 45 observed client backends; wait for
 the prior runtime to exit. Reuse bounded queue/cancellation proof and validate the
 new allocation; do not rerun PERF-09's 20-item cohort. Preserve all failed attempts,
 source/variable hashes and cleanup. The final trial result is recorded separately.
+
+## Subsequent allocation findings and Analytics guard
+
+Authenticated provider metrics also expose `pgrst_db_pool_max=10`, in addition to
+Auth max=10. The 3/2 catalog/default proposal above was not deployed: its 21 ordinary
+slots do not cover those two maxima plus observer and migration together.
+
+An exact-CI-verified trial at catalog=3/default=1 restored four-reader halls p95 to
+850.08 ms, but Analytics regressed severely: a post-initial single read took
+8,934.05 ms and the first four-reader wave 9,349.28–9,812.14 ms. Fixture data
+hashes remained unchanged, and the trial retained its failed acceptance receipt.
+The runner restored the original uniform-3 configuration and source after cleanup;
+the candidate was not retained just because catalog improved.
+
+The next candidate therefore also budgets Analytics independently:
+
+```text
+(6 × DB_POOL_MAX + DB_POOL_MAX_VENUE_CATALOG + DB_POOL_MAX_ANALYTICS + 1)
+  × DB_PLANNED_PROCESSES + DB_CONNECTION_RESERVE <= DB_MAX_CONNECTIONS
+```
+
+Default=1, catalog=3, Analytics=2 and reserve=36 allocate 12 per process, 24 during
+two-process overlap, leaving 33 ordinary slots. Known Auth/PostgREST maxima use 20;
+one observer and one migration leave 11 for other provider consumers and spare
+headroom. This is a declared allocation, not discovery of Storage's maximum or a
+production capacity guarantee. New tests cover independent owner selection for
+both adapters, max1/2/3 forwarding and budget rejection of an oversized Analytics
+override. Full exact-head CI precedes its pinned trial; compare Analytics against
+the retained passing uniform-2 cohort and preserve money/nullable facts unchanged.

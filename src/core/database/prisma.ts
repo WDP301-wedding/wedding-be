@@ -21,7 +21,7 @@ export class DatabaseConfigurationError extends Error {
 export function createPrismaClient(
   databaseUrl = config.database.url,
   diagnosticsEnabled = process.env.DB_DIAGNOSTICS_ENABLED === 'true',
-  poolOwner: 'default' | 'venue-catalog' = 'default',
+  poolOwner: 'default' | 'venue-catalog' | 'analytics' = 'default',
 ): PrismaClient {
   const connectionString = databaseUrl?.trim();
 
@@ -32,7 +32,11 @@ export function createPrismaClient(
   const url = new URL(connectionString);
   const budget = parsePoolBudget(process.env);
   const { connectionTimeoutMillis, idleTimeoutMillis } = budget;
-  const max = poolOwner === 'venue-catalog' ? budget.venueCatalogMax : budget.max;
+  const max = {
+    default: budget.max,
+    'venue-catalog': budget.venueCatalogMax,
+    analytics: budget.analyticsMax,
+  }[poolOwner];
   const poolConfig = { max, connectionTimeoutMillis, idleTimeoutMillis };
   const schema = url.searchParams.get('schema')?.trim();
   // Prisma's PostgreSQL adapter serializes and parses timestamps as UTC.

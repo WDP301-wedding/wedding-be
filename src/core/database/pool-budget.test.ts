@@ -6,6 +6,7 @@ describe('aggregate runtime pool budget', () => {
     expect(parsePoolBudget({})).toEqual({
       max: 3,
       venueCatalogMax: 3,
+      analyticsMax: 3,
       connectionTimeoutMillis: 2000,
       idleTimeoutMillis: 10000,
       plannedProcesses: 2,
@@ -33,6 +34,35 @@ describe('aggregate runtime pool budget', () => {
       }),
     ).toThrow('budget');
   });
+  it('leaves provider headroom with one connection per other owner and three for catalog', () => {
+    const budget = parsePoolBudget({
+      DB_POOL_MAX: '1',
+      DB_POOL_MAX_VENUE_CATALOG: '3',
+      DB_CONNECTION_RESERVE: '38',
+    });
+    expect(budget.perProcess).toBe(11);
+    expect(budget.aggregate).toBe(60);
+  });
+  it('counts the analytics override and rejects a larger unbudgeted analytics pool', () => {
+    const source = {
+      DB_POOL_MAX: '1',
+      DB_POOL_MAX_VENUE_CATALOG: '3',
+      DB_POOL_MAX_ANALYTICS: '2',
+      DB_CONNECTION_RESERVE: '36',
+    };
+    const budget = parsePoolBudget(source);
+    expect(budget.analyticsMax).toBe(2);
+    expect(budget.perProcess).toBe(12);
+    expect(budget.aggregate).toBe(60);
+    expect(() => parsePoolBudget({ ...source, DB_POOL_MAX_ANALYTICS: '3' })).toThrow('budget');
+  });
+  it.each(['0', '-1', '1.5', 'x', '', '100001'])(
+    'rejects an invalid analytics pool maximum %s',
+    (value) =>
+      expect(() => parsePoolBudget({ DB_POOL_MAX_ANALYTICS: value })).toThrow(
+        'DB_POOL_MAX_ANALYTICS',
+      ),
+  );
   it.each(['0', '-1', '1.5', 'x', '', '100001'])(
     'rejects an invalid catalog pool maximum %s',
     (value) =>

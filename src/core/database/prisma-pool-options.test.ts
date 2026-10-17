@@ -21,6 +21,37 @@ afterEach(() => {
 });
 describe('runtime driver pool options', () => {
   it.each([false, true])(
+    'routes each measured owner maximum with diagnostics=%s',
+    async (enabled) => {
+      vi.stubEnv('DB_POOL_MAX', '1');
+      vi.stubEnv('DB_POOL_MAX_VENUE_CATALOG', '3');
+      vi.stubEnv('DB_POOL_MAX_ANALYTICS', '2');
+      vi.stubEnv('DB_CONNECTION_RESERVE', '36');
+      const clients = [
+        createPrismaClient(
+          'postgresql://runtime:secret@localhost:5432/wedding',
+          enabled,
+          'venue-catalog',
+        ),
+        createPrismaClient(
+          'postgresql://runtime:secret@localhost:5432/wedding',
+          enabled,
+          'analytics',
+        ),
+        createPrismaClient('postgresql://runtime:secret@localhost:5432/wedding', enabled),
+      ];
+      try {
+        expect(
+          captured.map((input) =>
+            input instanceof DiagnosticPool ? input.options.max : (input as { max: number }).max,
+          ),
+        ).toEqual([3, 2, 1]);
+      } finally {
+        await Promise.all(clients.map((client) => client.$disconnect()));
+      }
+    },
+  );
+  it.each([false, true])(
     'uses the budgeted catalog maximum only for that owner, diagnostics=%s',
     async (enabled) => {
       vi.stubEnv('DB_POOL_MAX', '2');
@@ -47,6 +78,8 @@ describe('runtime driver pool options', () => {
     },
   );
   it.each([
+    { enabled: false, max: 1 },
+    { enabled: true, max: 1 },
     { enabled: false, max: 2 },
     { enabled: true, max: 2 },
     { enabled: false, max: 3 },
@@ -56,6 +89,7 @@ describe('runtime driver pool options', () => {
     async ({ enabled, max }) => {
       vi.stubEnv('DB_POOL_MAX', String(max));
       vi.stubEnv('DB_POOL_MAX_VENUE_CATALOG', undefined);
+      vi.stubEnv('DB_POOL_MAX_ANALYTICS', undefined);
       vi.stubEnv('DB_POOL_ACQUIRE_TIMEOUT_MS', '2000');
       vi.stubEnv('DB_PLANNED_PROCESSES', '2');
       vi.stubEnv('DB_MAX_CONNECTIONS', '60');
