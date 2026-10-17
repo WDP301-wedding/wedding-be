@@ -183,6 +183,98 @@ function fixture() {
   return { b, b2, p, store, api, projector, add };
 }
 describe('ANL-W1/W3 deterministic source formulas and bounded queries', () => {
+  it('shares only identical pending snapshots, then performs a new warm read', async () => {
+    const state = fixture();
+    let release!: (projection: Projection) => void;
+    const pending = new Promise<Projection>((resolve) => {
+      release = resolve;
+    });
+    const load = vi.spyOn(state.store, 'load').mockReturnValueOnce(pending);
+    const reads = Array.from({ length: 4 }, () => state.api.query('revenue', query, ctx));
+    expect(load).toHaveBeenCalledTimes(1);
+    release(state.p);
+    await Promise.all(reads);
+    await state.api.query('revenue', query, ctx);
+    expect(load).toHaveBeenCalledTimes(2);
+  });
+  it('does not share snapshots across scope or filters and evicts a rejected load', async () => {
+    const state = fixture();
+    let release!: (projection: Projection) => void;
+    const pending = new Promise<Projection>((resolve) => {
+      release = resolve;
+    });
+    const load = vi.spyOn(state.store, 'load').mockReturnValue(pending);
+    const reads = [
+      state.api.query('revenue', query, ctx),
+      state.api.query('revenue', query, { ...ctx, actorAccountId: randomUUID() }),
+      state.api.query('revenue', { ...query, hallId: randomUUID() }, ctx),
+      state.api.query('attendance', query, ctx),
+    ];
+    expect(load).toHaveBeenCalledTimes(4);
+    release(state.p);
+    await Promise.all(reads);
+    const failure = new Error('snapshot unavailable');
+    load.mockRejectedValueOnce(failure).mockResolvedValue(state.p);
+    await expect(state.api.query('revenue', query, ctx)).rejects.toBe(failure);
+    await expect(state.api.query('revenue', query, ctx)).resolves.toBeDefined();
+    expect(load).toHaveBeenCalledTimes(6);
+  });
+  it('propagates a shared snapshot rejection to all readers without retaining the failure', async () => {
+    const state = fixture();
+    let reject!: (error: Error) => void;
+    const pending = new Promise<Projection>((_resolve, rejectPromise) => {
+      reject = rejectPromise;
+    });
+    const load = vi
+      .spyOn(state.store, 'load')
+      .mockReturnValueOnce(pending)
+      .mockResolvedValue(state.p);
+    const reads = Array.from({ length: 4 }, () => state.api.query('revenue', query, ctx));
+    const settled = Promise.allSettled(reads);
+    const failure = new Error('pool unavailable');
+    reject(failure);
+    expect(
+      (await settled).every((result) => result.status === 'rejected' && result.reason === failure),
+    ).toBe(true);
+    expect(load).toHaveBeenCalledTimes(1);
+    await expect(state.api.query('revenue', query, ctx)).resolves.toBeDefined();
+    expect(load).toHaveBeenCalledTimes(2);
+  });
+  it('does not join a pre-publication snapshot when reloading after refresh', async () => {
+    const state = fixture();
+    const stale: Projection = {
+      ...state.p,
+      checkpoints: state.p.checkpoints.map((checkpoint) => ({ ...checkpoint, status: 'STALE' })),
+    };
+    let releaseLoad!: (projection: Projection) => void;
+    const loading = new Promise<Projection>((resolve) => {
+      releaseLoad = resolve;
+    });
+    let releaseRefresh!: (generation: string) => void;
+    const refreshing = new Promise<string>((resolve) => {
+      releaseRefresh = resolve;
+    });
+    const load = vi
+      .spyOn(state.store, 'load')
+      .mockResolvedValueOnce(stale)
+      .mockReturnValueOnce(loading)
+      .mockResolvedValue(state.p);
+    const refresh = vi
+      .spyOn(state.projector, 'refresh')
+      .mockReturnValueOnce(refreshing)
+      .mockResolvedValue(state.p.generationId);
+    const first = state.api.query('revenue', query, ctx);
+    await vi.waitFor(() => expect(refresh).toHaveBeenCalledTimes(1));
+    const second = state.api.query('revenue', query, ctx);
+    expect(load).toHaveBeenCalledTimes(2);
+    releaseRefresh(state.p.generationId);
+    try {
+      await vi.waitFor(() => expect(load).toHaveBeenCalledTimes(3), { timeout: 1000 });
+    } finally {
+      releaseLoad(stale);
+      await Promise.all([first, second]);
+    }
+  });
   it('observes one actual HTTP refresh leader and three waiters separately from warm reads', async () => {
     const state = fixture();
     state.p.checkpoints[0]!.status = 'STALE';

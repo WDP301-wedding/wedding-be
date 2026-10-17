@@ -1,6 +1,9 @@
-# PERF-10 Analytics verification plan — 2026-10-17
+# PERF-10 Analytics live verification — 2026-10-17
 
-Status: in progress; PERF-10 is not closed. Earlier evidence and the production
+Status: measured, but **PERF-10 remains open**: the first natural-expiry
+four-reader wave returned three HTTP 200 and one HTTP 500. The campaign stopped;
+the failed request was not retried and the remaining two waves were not executed.
+Earlier evidence and the production
 `NO_GO` decision remain unchanged. This work is backend-only and does not authorize
 paid generation, real-money transactions, business-history cleanup, an APAC move
 or enabling endpoint deadlines.
@@ -10,6 +13,111 @@ commit/PR and Railway/demo deployment after exact-head CI/review. The owner also
 authorized a dedicated temporary Railway SSH key for native runtime measurement,
 with mandatory revocation afterwards. Its private key remains in ignored operator
 configuration; only its public discovery file is placed in the local SSH directory.
+
+The dedicated key has now been revoked. A subsequent SSH command fails, Railway
+lists no registered keys, and the owned public discovery file and ignored key pair
+have been removed. No remote worker file was written. The temporary Analytics flag
+has been restored to its original unset state; general DB diagnostics and read
+deadlines remain off.
+
+## Results and decision
+
+Sanitized machine receipt:
+[PERF-10 live evidence](../tasks/evidence/perf10-analytics-verification-2026-10-17.json).
+PRs [#55](https://github.com/WDP301-wedding/wedding-be/pull/55) and
+[#56](https://github.com/WDP301-wedding/wedding-be/pull/56) are merged after
+exact-head CI/review. Their heads pass 1,992 and 1,996 tests respectively; the
+runner merge also passes 1,996 tests and unchanged coverage, migration, audit and
+OpenAPI gates. The telemetry merge first failed while pulling PostgreSQL from the
+registry (`toomanyrequests: Data limit exceeded`), before checkout/tests. Its
+unchanged-SHA rerun passed; that infrastructure failure is preserved.
+
+Measured deployment `3fdf33f8-75ee-470e-a178-eea1b6a7257f` serves merge
+`619c82d05cd84d09c03645b3fd21d890fa8f92d0`, image
+`sha256:585178e09d695674d7af7ac26793abcd437d96a17466a20e16f1fade5e6cf475`,
+on one SFO replica. Pools stay max 3/acquire 2,000 ms/idle 60,000 ms. The two
+existing scopes remain; the measured Manager projection has **85 rows**:
+20 each booking/billing/guest/staff, three invitation and two venue. The native
+comparison reads unchanged source fences and returns zero changed source rows
+on six actual owner pages per refresh. It is not a large mutation-feed benchmark.
+
+| Gate                                                        | Observed result                                                         | Decision                                         |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------ |
+| Native incremental refresh, 20 matched pairs per variant    | Baseline p95 10,081.847 ms; current 6,326.750 ms; **37.246% reduction** | Meets 30% target in this measured scope          |
+| Warm HTTP, cohort 1, 20 same-generation READY reads         | Client/backend p95 2,152.607 / 1,446.739 ms                             | Client target **miss**, retained                 |
+| Warm HTTP, cohort 2, 20 same-generation READY reads         | Client/backend p95 1,703.021 / 1,447.729 ms                             | Meets 2,000 ms target                            |
+| All 40 warm reads, not a replacement for individual cohorts | Client/backend p95 1,940.448 / 1,447.222 ms                             | Aggregate meets target; no uniform-latency claim |
+| Natural-expiry wave 1, four simultaneous readers            | Three 200; one 500 `INTERNAL_ERROR`                                     | **Fails** concurrent acceptance; stopped         |
+
+All warm reads correlate to actual `warm` decisions and exact request logs.
+Initial reads and unmeasured native pilot/warmup pairs are separate. Native
+baseline/current ordering alternates; all twenty pairs preserve the same canonical
+facts digest and source fences, remain READY, and have no overlapping application
+scheduler/HTTP refresh interval. Native timings compare only the two pinned
+projector/repository implementations with the same current real source readers;
+they are not HTTP end-to-end refresh improvement or a whole-application rollback.
+
+The failed TTL wave observed one HTTP refresh leader and **two** joined readers,
+not three. The actual HTTP projector ran once, read six owner pages, then lost the
+publication race to the already running scheduler and reported
+`ANALYTICS_REFRESH_CONFLICT`; its three surviving GETs returned the scheduler's
+new READY generation. The fourth request failed before an Analytics query
+decision, with `PrismaClientKnownRequestError`, backend duration 2,365.202 ms,
+request ID `3fddfc58-261b-4831-949c-99e2e83cad02`. Pool/interactive-transaction
+acquisition contention is a **hypothesis**, not a proven error code or root cause:
+existing secret-safe error logs record only the exception name. Do not call this
+a four-reader coalescing pass or discard the failure because three reads succeeded.
+
+Independent serial correctness checks pass: Manager access; Couple/Staff 403;
+anonymous/revoked session 401; distinct pinned cursor pages and rejection after
+filter changes; disabled check-in remains `NOT_RECORDED` with null attendance;
+VND fields remain integers or null. Full CI also preserves post-refresh session
+revocation, source-fence/cursor/failure fallback and private reporting boundaries.
+These are not live fault injection, nonempty-delta throughput or provider proof.
+
+The fifteen retained original business-table digests remain identical, all sixty
+applied migration checksums match, 145 public tables remain, and the separately
+approved historical Staff fixture still has zero check-ins. No source/business
+history, provider funds, paid generation, startup command, region or deadline was
+changed. Excluding only the intentionally temporary Analytics flag, the provider
+configuration hash remains
+`0360ba04dc6ac1e37617f90f33a850809e78589f7587de63cdd4c4b619006507`.
+
+**Next:** reproduce the pre-decision concurrent Prisma failure with safe stage and
+allowlisted error-code attribution; establish the root cause, add its regression
+test, then review/CI a minimal fix before repeating all three four-reader natural-
+expiry waves. Do not silently raise pool, timeout or freshness budgets. No further
+optimization is included in this evidence checkpoint. PERF-10 and PERF-13 remain
+open, and production remains `NO_GO`.
+
+## Authorized contention fix — pending live re-verification
+
+After the failed wave, the owner explicitly chose reproduction, a minimal
+Analytics fix, CI/review and another live campaign. The preceding result and its
+machine receipt remain immutable; they are not replaced with a passing retry.
+
+A disposable native PostgreSQL regression reproduces `P2028` when four identical
+HTTP snapshot loads compete for the unchanged three-connection pool. The harness
+holds each bounded-read transaction for 2.5 seconds, independently of the serving
+demo; no live sleep, injected failure or timeout/pool increase is used. This
+establishes the acquisition-contention failure mechanism, not the unavailable
+exact error code/stack of the earlier live request.
+
+The minimal service-only change shares an **in-flight bounded projection load**
+only when Manager scope, normalized read filter and load phase match. Initial
+loads cannot join post-refresh loads (or vice versa), so a post-publication read
+does not reuse an older pending snapshot. Settled success/failure is immediately
+evicted. Responses, authority, sessions and completed warm snapshots are not
+cached; every request retains its own freshness/invalidation and final authority
+rechecks. Different scopes, filters and report-owner sets never share work.
+
+Regression tests cover four readers, separate scopes/filters, rejection fan-out
+and recovery, the pre-/post-publication race, and revocation of all four requesting
+sessions while the shared load is pending. The real-pool contention test and
+unchanged Analytics/private-reporting suite must pass, followed by exact-head CI
+and review before merge/deployment. The native projector/repository/source-reader
+code is unchanged, so the earlier native comparison remains scoped to those
+identical modules; HTTP warm/TTL measurements must be repeated on the new runtime.
 
 ## Instrumentation slice
 

@@ -13,7 +13,12 @@ import {
 } from '../../payments-billing/application/analytics-reporting.js';
 import { attendanceSchema } from '../../staff-operations/application/attendance-readers.js';
 import { cashWindow, sumVnd, attendanceResult } from '../domain/metrics.js';
-import { type AnalyticsProjector, type Projection, type ProjectionStore } from './projection.js';
+import {
+  type AnalyticsProjector,
+  type Projection,
+  type ProjectionStore,
+  type ProjectionReadFilter,
+} from './projection.js';
 import {
   analyticsQuerySchema,
   type AnalyticsQuery,
@@ -52,6 +57,7 @@ const dependencies: Record<AnalyticsReport, ReportingOwner[]> = {
 export class AnalyticsService {
   // Only in-flight work is shared; responses and authority are never cached.
   private readonly refreshing = new Map<string, Promise<string>>();
+  private readonly loading = new Map<string, Promise<Projection | null>>();
   constructor(
     readonly projector: AnalyticsProjector,
     readonly store: ProjectionStore,
@@ -84,7 +90,7 @@ export class AnalyticsService {
       includeUtilization: report === 'overview' || report === 'bookings',
       owners: dependencies[report],
     };
-    let projection = await this.store.load(scope, true, filter);
+    let projection = await this.load(scope, filter, 'initial');
     const fresh = projection?.checkpoints.every(
       (c) =>
         c.status === 'READY' &&
@@ -132,7 +138,7 @@ export class AnalyticsService {
         if (!(error instanceof AppError && error.code === 'ANALYTICS_REFRESH_CONFLICT'))
           throw error;
       }
-      projection = await this.store.load(scope, true, filter);
+      projection = await this.load(scope, filter, 'after-refresh');
     } else observe(q.cursor === undefined ? 'warm' : 'pinned');
     if (!projection)
       throw new AppError({
@@ -234,6 +240,20 @@ export class AnalyticsService {
       ),
       statusCounts: this.counts(prints.map((r) => r.status)),
     };
+  }
+  private load(
+    scope: string,
+    filter: ProjectionReadFilter,
+    phase: 'initial' | 'after-refresh',
+  ): Promise<Projection | null> {
+    const key = JSON.stringify({ scope, filter, phase });
+    const existing = this.loading.get(key);
+    if (existing) return existing;
+    const pending = this.store.load(scope, true, filter).finally(() => {
+      if (this.loading.get(key) === pending) this.loading.delete(key);
+    });
+    this.loading.set(key, pending);
+    return pending;
   }
   private meta(p: Projection, report: AnalyticsReport, q: AnalyticsQuery) {
     const checkpoints = p.checkpoints

@@ -22,7 +22,7 @@ import type {
   const db = new CatalogTestDatabase('analytics');
   beforeAll(() => db.connect(), 60000);
   afterAll(() => db.disconnect());
-  async function fixture(observe?: AnalyticsObserver) {
+  async function fixture(observe?: AnalyticsObserver, onAuthorized?: () => void) {
     const f = await studioFixture(db.prisma),
       s = createAnalyticsServices(db.prisma, undefined, observe),
       b = await db.prisma.booking.findUniqueOrThrow({ where: { id: f.bookingId } });
@@ -37,7 +37,20 @@ import type {
     const app = createApp({
       logger: createLogger({ level: 'silent', runtimeEnvironment: 'test' }),
       registerRoutes: (a) =>
-        a.use('/api/v1', createAnalyticsRouter(s.service, s.resolver, s.audit)),
+        a.use(
+          '/api/v1',
+          createAnalyticsRouter(
+            s.service,
+            {
+              async resolve(token) {
+                const actor = await s.resolver.resolve(token);
+                onAuthorized?.();
+                return actor;
+              },
+            },
+            s.audit,
+          ),
+        ),
     });
     const get = (report: string, token = f.manager.accessToken, query = filter) =>
       request(app)
@@ -118,6 +131,74 @@ import type {
       pending.mockRestore();
     }
   });
+  it('PERF-10 shares identical in-flight snapshot reads before pool transaction acquisition', async () => {
+    const { s, get } = await fixture();
+    const load = s.store.load.bind(s.store);
+    const failureCodes: unknown[] = [];
+    const bounded = vi
+      .spyOn(s.store, 'load')
+      .mockImplementation(async (scope, budgeted, filter) => {
+        try {
+          if (budgeted)
+            await db.prisma.$transaction(
+              (transaction) => transaction.$queryRaw`SELECT 1::int AS held FROM pg_sleep(2.5)`,
+            );
+          return await load(scope, budgeted, filter);
+        } catch (error) {
+          failureCodes.push(
+            error !== null && typeof error === 'object' && 'code' in error ? error.code : null,
+          );
+          throw error;
+        }
+      });
+    try {
+      const responses = await Promise.all(Array.from({ length: 4 }, () => get('overview')));
+      expect(failureCodes).toEqual([]);
+      expect(responses.map((response) => response.status)).toEqual([200, 200, 200, 200]);
+      expect(
+        new Set(
+          responses.map(
+            (response) =>
+              (response.body as { data: { meta: { generationId: string } } }).data.meta
+                .generationId,
+          ),
+        ).size,
+      ).toBe(1);
+    } finally {
+      bounded.mockRestore();
+    }
+  }, 30000);
+  it('PERF-10 rechecks each requesting session after a shared snapshot load', async () => {
+    let authorized = 0;
+    const { f, s, get } = await fixture(undefined, () => {
+      authorized++;
+    });
+    const load = s.store.load.bind(s.store);
+    let release!: () => void;
+    const pending = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const loading = vi.spyOn(s.store, 'load').mockImplementation(async (scope, bounded, filter) => {
+      if (bounded) await pending;
+      return load(scope, bounded, filter);
+    });
+    const responses = Promise.all(Array.from({ length: 4 }, () => get('overview')));
+    try {
+      await vi.waitFor(() => expect(authorized).toBe(4), { timeout: 10000 });
+      expect(loading).toHaveBeenCalledTimes(1);
+      await db.prisma.session.update({
+        where: { id: f.manager.sessionId },
+        data: { status: 'REVOKED' },
+      });
+    } finally {
+      release();
+    }
+    try {
+      expect((await responses).map((response) => response.status)).toEqual([401, 401, 401, 401]);
+    } finally {
+      loading.mockRestore();
+    }
+  }, 30000);
   it('mounts five strict reports, rechecks roles, minimizes data, and supports no names/NONE', async () => {
     const { f, s, b, context, app, get } = await fixture();
     for (const report of Object.keys(
