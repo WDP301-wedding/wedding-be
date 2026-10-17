@@ -32,11 +32,13 @@ export function createPrismaClient(
   const url = new URL(connectionString);
   const budget = parsePoolBudget(process.env);
   const { connectionTimeoutMillis, idleTimeoutMillis } = budget;
-  const max = {
+  const maxima = {
     default: budget.max,
     'venue-catalog': budget.venueCatalogMax,
     analytics: budget.analyticsMax,
-  }[poolOwner];
+  };
+  if (!Object.hasOwn(maxima, poolOwner)) throw new Error('Invalid database pool owner.');
+  const max = maxima[poolOwner];
   const poolConfig = { max, connectionTimeoutMillis, idleTimeoutMillis };
   const schema = url.searchParams.get('schema')?.trim();
   // Prisma's PostgreSQL adapter serializes and parses timestamps as UTC.

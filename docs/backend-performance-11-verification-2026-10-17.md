@@ -1,5 +1,8 @@
 # PERF-11: live verification and budget disposition — 2026-10-17
 
+Later checkpoint: [authorized pool allocation trials and selected profile](backend-performance-11-pool-result-2026-10-17.md).
+The unchanged-pool inventory below predates those separately authorized changes.
+
 **Verification is complete for the authorized inventory and bounded demo campaign.
 PERF-11 acceptance remains HOLD: provider headroom at simultaneous configured caps
 is not established. Keep endpoint deadlines disabled. Production remains NO_GO.**

@@ -1,5 +1,8 @@
 # PERF-11 pool allocation trial — 2026-10-17
 
+Final [selected allocation and full evidence](backend-performance-11-pool-result-2026-10-17.md):
+Catalog 3/Analytics 2/six others1 is live. This document preserves the trial ledger.
+
 The owner authorized trying pool 2 and adjusting the allocation if results worsened.
 This supersedes the earlier inventory-only restriction for this bounded experiment;
 region and endpoint deadlines remain unchanged. Production remains NO_GO.
@@ -96,6 +99,6 @@ two-process overlap, leaving 33 ordinary slots. Known Auth/PostgREST maxima use 
 one observer and one migration leave 11 for other provider consumers and spare
 headroom. This is a declared allocation, not discovery of Storage's maximum or a
 production capacity guarantee. New tests cover independent owner selection for
-both adapters, max1/2/3 forwarding and budget rejection of an oversized Analytics
+both adapters, max 1/2/3 forwarding and budget rejection of an oversized Analytics
 override. Full exact-head CI precedes its pinned trial; compare Analytics against
 the retained passing uniform-2 cohort and preserve money/nullable facts unchanged.

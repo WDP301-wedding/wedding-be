@@ -170,6 +170,11 @@ is HOLD because two full app processes leave seven ordinary slots while Auth's
 configured maximum is ten. Resolve aggregate provider allocation separately;
 deadline remains disabled and no PERF-09 cohort is repeated.
 
+Subsequent authorized [pool allocation trial and adjustment](../docs/backend-performance-11-pool-result-2026-10-17.md)
+keeps Catalog3/Analytics2/six others1, reducing two-process app allocation50 →24.
+Source `6c08b1e` passes exact-head CI and bounded demo verification;68 focused tests
+pass. Other provider allocation and endpoint decision remain open; deadline stays off.
+
 ### PERF-12 — Review schema cleanup separately
 
 Dependencies: PERF-01, PERF-03. Scope: 145-table inventory, owner/dependency/retention
