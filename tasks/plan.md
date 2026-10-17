@@ -77,6 +77,15 @@ connectivity results; review any VNPAY egress-IP, TLS, cookies or callback conse
 No DB migration or production region switch is part of this audit. A deployment
 change requires its own reviewed rollout and authorization.
 
+2026-10-17 execution: [same-image regional experiment](../docs/backend-performance-04-region-2026-10-17.md)
+stopped at the required Singapore Seating 500 gate after a complete US West cohort
+and a partial Singapore cohort. Full three-pair acceptance is not achieved.
+Provider Sydney metadata, twenty runtime RTT samples per region, all 541 selected
+HTTP/log matches and complete cleanup/retention are retained. Runtime stopped
+within the owner's extended 120-minute ceiling. Canonical backlog disposition
+remains in backend-revision-todo.md; the original acceptance and failures are not
+rewritten by an owner decision about task closure.
+
 Checkpoint after PERF-03/04: choose whether geography or query count is the larger
 measured contributor. Do not combine the region switch and code optimization into
 one un-attributable before/after result.

@@ -63,6 +63,12 @@ export function createRuntimeFeatureManifest(config: BackendConfig, revision?: s
         'durable-notifications-60s',
         'implemented',
       ),
+      seatingReconciliation: feature(
+        config.invitationStudio.reconcilerEnabled,
+        config.invitationStudio.reconcilerEnabled ? 'seating-reconciliation-300s' : 'disabled',
+        'implemented',
+        true,
+      ),
       androidDeviceRegistry: feature(Boolean(config.database.url), 'account-session-bound'),
       androidPush: feature(
         config.notifications.fcm.enabled,

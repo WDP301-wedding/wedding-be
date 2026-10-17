@@ -287,6 +287,10 @@ const rawEnvironmentSchema = z
       .default('false')
       .transform((value) => value === 'true'),
     PUBLIC_INVITATION_ORIGIN: optionalString.pipe(corsOrigin.optional()),
+    SEATING_RECONCILER_ENABLED: z
+      .enum(['true', 'false'])
+      .transform((value) => value === 'true')
+      .default(true),
     OTEL_EXPORTER_OTLP_ENDPOINT: optionalString.pipe(httpUrl.optional()),
   })
   .superRefine((environment, context) => {
@@ -513,7 +517,7 @@ export type BackendConfig = Readonly<{
   metrics: MetricsConfig;
   vnpay: DisabledProvider | (Readonly<{ enabled: true }> & VnpaySettings);
   openApi: Readonly<{ enabledInProduction: boolean }>;
-  invitationStudio: Readonly<{ publicOrigin: string | null }>;
+  invitationStudio: Readonly<{ publicOrigin: string | null; reconcilerEnabled: boolean }>;
   telemetry: Readonly<{ otlpEndpoint: string | undefined }>;
   notifications: NotificationConfiguration;
 }>;
@@ -603,6 +607,7 @@ function pickEnvironment(source: EnvironmentSource): EnvironmentSource {
     MIGRATION_DATABASE_URL: source.MIGRATION_DATABASE_URL,
     SUPABASE_URL: source.SUPABASE_URL,
     PUBLIC_INVITATION_ORIGIN: source.PUBLIC_INVITATION_ORIGIN,
+    SEATING_RECONCILER_ENABLED: source.SEATING_RECONCILER_ENABLED,
     SUPABASE_SERVICE_ROLE_KEY: source.SUPABASE_SERVICE_ROLE_KEY,
     SUPABASE_STORAGE_BUCKET: source.SUPABASE_STORAGE_BUCKET,
     RESEND_API_KEY: source.RESEND_API_KEY,
@@ -855,7 +860,10 @@ function createConfig(environment: RawEnvironment): Omit<BackendConfig, 'notific
     openApi: Object.freeze({
       enabledInProduction: environment.OPENAPI_ENABLED,
     }),
-    invitationStudio: Object.freeze({ publicOrigin: environment.PUBLIC_INVITATION_ORIGIN ?? null }),
+    invitationStudio: Object.freeze({
+      publicOrigin: environment.PUBLIC_INVITATION_ORIGIN ?? null,
+      reconcilerEnabled: environment.SEATING_RECONCILER_ENABLED,
+    }),
     telemetry: Object.freeze({
       otlpEndpoint: environment.OTEL_EXPORTER_OTLP_ENDPOINT,
     }),

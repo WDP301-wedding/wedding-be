@@ -68,8 +68,10 @@ export async function createInvitationStudioRuntime(
     router.use(createSeatingRouter(seating.seating, seating.resolver));
     router.use(createStaffRouter(staff));
     const logger = createLogger({ level: 'warn', runtimeEnvironment: config.runtime.environment });
-    const reconciler = startSeatingReconciler(seating.seating, (failures) =>
-      logger.warn({ failures }, 'Seating reconciliation needs retry'),
+    const reconciler = startSeatingReconciler(
+      seating.seating,
+      (failures) => logger.warn({ failures }, 'Seating reconciliation needs retry'),
+      config.invitationStudio.reconcilerEnabled,
     );
     return Object.freeze({
       router,

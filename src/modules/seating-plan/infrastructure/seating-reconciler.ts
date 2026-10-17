@@ -3,6 +3,7 @@ import type { SeatingService } from '../application/seating.service.js';
 export function startSeatingReconciler(
   service: SeatingService,
   report: (failures: readonly string[]) => void,
+  enabled = true,
 ) {
   let cursor: string | undefined, active: Promise<void> | undefined;
   const tick = () => {
@@ -19,8 +20,10 @@ export function startSeatingReconciler(
         active = undefined;
       });
   };
-  const timer = setInterval(tick, 300000);
-  timer.unref();
+  // Explicitly disabled experiments must not perform background reads or repairs.
+  // Foreground confirmation, print and read revalidation remain independent.
+  const timer = enabled ? setInterval(tick, 300000) : undefined;
+  timer?.unref();
   return {
     async close() {
       clearInterval(timer);

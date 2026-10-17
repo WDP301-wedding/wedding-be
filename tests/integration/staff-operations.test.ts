@@ -14,7 +14,7 @@ import {
 import { errorResponseSchema } from '../../src/core/http/common.schemas.js';
 import { createLogger } from '../../src/core/logging/logger.js';
 import { createInvitationStudioRuntime } from '../../src/modules/invitation-studio/invitation-studio.runtime.js';
-import type { Config } from '../../src/config/config.js';
+import { parseEnvironment } from '../../src/config/env.js';
 import {
   CatalogTestDatabase,
   catalogMigrationDatabaseUrl,
@@ -691,11 +691,7 @@ import { createStaffServices } from '../../src/modules/staff-operations/infrastr
     const { f } = await enabledFixture();
     const url = new URL(catalogMigrationDatabaseUrl!);
     url.pathname = '/' + db.databaseName;
-    const config = {
-      database: { url: url.toString() },
-      storage: { enabled: false },
-      runtime: { environment: 'test' },
-    } as Config;
+    const config = parseEnvironment({ NODE_ENV: 'test', DATABASE_URL: url.toString() });
     const runtime = await createInvitationStudioRuntime(config);
     try {
       const app = createApp({
