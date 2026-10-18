@@ -290,17 +290,17 @@ warm/initial conditions, all statuses and p50/p95, rather than only the fastest 
 Acceptance: regression thresholds from measured stable results; no correctness or
 security regression; rollback and unresolved provider/readiness gates recorded.
 
-2026-10-18 [PERF-13 verification checkpoint](../docs/backend-performance-13-verification-2026-10-18.md):
-runner accounting/negative controls, native1120 matched samples, unchanged command
-ceilings and all nine observational latency bands pass. The preceding runner-only
-checkpoint passes CI599 integration/2128 coverage tests. Three bounded live
-campaigns remain preserved; the owner-approved sustained-backlog guard stops the
-third at cap4, after a full399/399 baseline and complete caps1/2. All1437 submitted
-reads return200; scoped data/configuration remains unchanged. A billing read-lock
-candidate passes17 focused local tests, retaining DB-enforced read-only/shared
-views and the original exclusive command fence. PERF-13 stays open pending exact
-candidate CI, separately authorized rollout and a complete fresh live cohort.
-Production NO_GO/provider gates remain separate; no merge/deployment is performed.
+2026-10-18 [PERF-13 verification closure](../docs/backend-performance-13-verification-2026-10-18.md):
+PR 73 is merged/deployed as224ac20b with unchanged configuration/fixtures. Billing
+views retain DB-enforced READ ONLY/shared fencing and exclusive commands. Both
+candidate/main CI pass602 integration/2131 coverage tests; native 1120 matched
+samples, unchanged command ceilings and nine observational bands pass. The fresh
+original baseline399/399 and complete capped1/2/4 cohort378/378 return200, actual
+HTTP peaks1/2/4. All 818 operation IDs correlate and scoped data/configuration
+remain unchanged; same-token revocation is verified for all three selected roles.
+PERF-13 is complete for selected verification scope. Four stopped campaigns, rollback/Storage control,
+earlier failures, unproved SLO/saturation/holder limits and provider/RV gates remain
+recorded. Production NO_GO is unchanged.
 
 ## Verification for implementation
 

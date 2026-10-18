@@ -598,20 +598,19 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
     workload without rebudgeting. Missing historical peak remains a capacity limit,
     not an added indefinite gate. No PERF-09 rerun; production remains NO_GO.
 - [x] PERF-12: Review table/rehearsal-schema cleanup with ownership, dependency and retention proof; deletion remains separately authorized.
-- [ ] PERF-13: Repeat matched live measurements, verify relevant correctness gates and set supported regression budgets.
-  - 2026-10-18 [verification/runtime checkpoint](../docs/backend-performance-13-verification-2026-10-18.md):
-    Native1120 matched samples and all nine investigation bands pass; command
-    ceilings are unchanged. The preceding runner checkpoint passes full CI599
-    integration/2128 coverage tests. Three capped live campaigns preserve fail-stop
-    evidence. The owner accepts the sustained-backlog guard; the third baseline
-    passes399/399 and caps1/2 complete, but cap4 stops at a2105ms advisory wait.
-    Across all campaigns1437 submitted reads return200; scoped data/configuration
-    remains unchanged. A local regression reproduces exclusive billing-read
-    contention against shared booking readers. The candidate adds a DB-enforced
-    read-only/shared facade for billing views while retaining exclusive commands.
-    All17 focused local cases pass. Keep open pending exact candidate CI, separate
-    authorized rollout and a fresh complete live cohort; no merge/deployment or
-    production GO. Earlier failures and unknown historical holder limits remain.
+- [x] PERF-13: Repeat matched live measurements, verify relevant correctness gates and set supported regression budgets.
+  - 2026-10-18 [verification closure](../docs/backend-performance-13-verification-2026-10-18.md):
+    PR 73 is merged/deployed as224ac20b on03cc633c; configuration/fixtures unchanged.
+    Billing views use DB-enforced READ ONLY/shared scope; commands retain exclusive
+    fences. Candidate and merged CI pass602 integration/2131 coverage tests.
+    Native 1120 matched samples, unchanged command ceilings and all nine investigation
+    bands pass. Fresh original baseline399/399 and capped1/2/4 cohort378/378 return200;
+    actual peaks1/2/4. All 818 operation IDs correlate;47 scoped/19 fixture-table
+    digests,61 migration checksums and runtime/configuration match. Revoked same
+    tokens return401 for Couple/Manager/Staff; every owned session revokes204.
+    Four stopped campaigns, rollback, Storage control and earlier failures stay preserved. No absolute live
+    SLO, saturation capacity or historical holder attribution; production NO_GO and
+    provider/RV gates remain separate.
   - 2026-10-18 [PERF-07 retained limits](../docs/backend-performance-07-closure-2026-10-18.md):
     the selected three-order native page improves 32.579%, but one requested order
     regresses 19.568% (5 -> 6 HTTP commands) and the cursor page improves only
