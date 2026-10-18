@@ -445,7 +445,16 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
     61 migration checksums match; temporary pool/servers/key and local DB close.
     One requested order regresses 19.568% native; cursor improves 21.940%, below
     30%. Retain both under PERF-13; no blanket latency/SLO or production GO claim.
-- [ ] PERF-08: Reduce notification authority/booking-scope round trips for inbox and unread counts.
+- [x] PERF-08: Reduce notification authority/booking-scope round trips for inbox and unread counts.
+  - 2026-10-18 [reviewed rollout closure](../docs/backend-performance-08-rollout-2026-10-18.md):
+    Owner authorizes PR #68 merge, Railway rollout and evidence/checklist closure.
+    Exact-head and main CI pass 2,106 tests. The sole deployment serves the merged
+    measured source; prior deployment stops. All 84 after reads and 99 correlated
+    operations pass, including both revoked sessions on Identity/inbox/unread.
+    All 32 scoped digests, 61 migration checksums and deployment controls match.
+    Key revoked, no replacement key, and local cluster stopped with zero test DBs.
+    This supersedes the historical pending release gate below. Empty-live and
+    populated-local limits remain; PERF-13 and production NO_GO stay unchanged.
   - 2026-10-18 [captured audience/data verification](../docs/backend-performance-08-verification-2026-10-18.md):
     Booking supplies its audience SQL predicate; Notifications capture that audience
     and a bounded page/count in one statement, then recheck current Identity and

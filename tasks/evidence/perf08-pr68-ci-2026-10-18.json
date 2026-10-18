@@ -1,0 +1,287 @@
+{
+  "schemaVersion": 1,
+  "task": "PERF-08",
+  "at": "2026-10-18T07:27:26.255Z",
+  "pr": {
+    "number": 68,
+    "url": "https://github.com/WDP301-wedding/wedding-be/pull/68",
+    "head": "81369e61c68870a7a57c9d307ef66be15e78d114",
+    "base": "873aa4c56eca6ef80563768554d726e5bae9eb46",
+    "draft": false,
+    "mergeable": true
+  },
+  "ci": {
+    "at": "2026-10-18T07:26:40.024Z",
+    "pr": "https://github.com/WDP301-wedding/wedding-be/pull/68",
+    "head": "81369e61c68870a7a57c9d307ef66be15e78d114",
+    "id": 39107116787,
+    "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39107116787",
+    "attempt": 1,
+    "conclusion": "success",
+    "jobs": [
+      {
+        "id": 117615291987,
+        "name": "Static, test, build, and audit gates",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Generate Prisma client",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check formatting",
+            "conclusion": "success"
+          },
+          {
+            "name": "Lint",
+            "conclusion": "success"
+          },
+          {
+            "name": "Typecheck",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run unit tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run contract tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Verify generated OpenAPI artifact",
+            "conclusion": "success"
+          },
+          {
+            "name": "Build production output",
+            "conclusion": "success"
+          },
+          {
+            "name": "Audit locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "summaries": [
+          "found 0 vulnerabilities",
+          " Test Files  162 passed (162)",
+          "      Tests  1461 passed (1461)",
+          " Test Files  20 passed (20)",
+          "      Tests  59 passed (59)"
+        ]
+      },
+      {
+        "id": 117615292155,
+        "name": "PostgreSQL migration and integration gates",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Initialize containers",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Generate Prisma client",
+            "conclusion": "success"
+          },
+          {
+            "name": "Deploy migrations to empty PostgreSQL",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run PostgreSQL integration tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Enforce full-suite coverage with PostgreSQL",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Stop containers",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "summaries": [
+          "found 0 vulnerabilities",
+          " Test Files  106 passed (106)",
+          "      Tests  586 passed (586)",
+          " Test Files  288 passed (288)",
+          "      Tests  2106 passed (2106)",
+          "All files          |   96.66 |    93.52 |   98.45 |   97.57 |                   "
+        ]
+      }
+    ]
+  },
+  "review": {
+    "at": "2026-10-18T07:26:43.541Z",
+    "head": "81369e61c68870a7a57c9d307ef66be15e78d114",
+    "base": "873aa4c56eca6ef80563768554d726e5bae9eb46",
+    "state": "open",
+    "draft": true,
+    "mergeable": true,
+    "files": [
+      {
+        "path": "docs/backend-performance-08-verification-2026-10-18.md",
+        "status": "added",
+        "additions": 170,
+        "deletions": 0
+      },
+      {
+        "path": "src/modules/booking-lifecycle/infrastructure/notification-context.reader.ts",
+        "status": "modified",
+        "additions": 16,
+        "deletions": 8
+      },
+      {
+        "path": "src/modules/notifications-automation/application/notification-settings.ts",
+        "status": "modified",
+        "additions": 35,
+        "deletions": 28
+      },
+      {
+        "path": "src/modules/notifications-automation/infrastructure/notification-inbox.reader.ts",
+        "status": "added",
+        "additions": 78,
+        "deletions": 0
+      },
+      {
+        "path": "tasks/backend-revision-todo.md",
+        "status": "modified",
+        "additions": 15,
+        "deletions": 0
+      },
+      {
+        "path": "tasks/evidence/perf08-verification-2026-10-18.json",
+        "status": "added",
+        "additions": 15699,
+        "deletions": 0
+      },
+      {
+        "path": "tasks/evidence/performance-regression-budgets.json",
+        "status": "modified",
+        "additions": 6,
+        "deletions": 5
+      },
+      {
+        "path": "tasks/plan.md",
+        "status": "modified",
+        "additions": 10,
+        "deletions": 0
+      },
+      {
+        "path": "tests/integration/notification-http.test.ts",
+        "status": "modified",
+        "additions": 19,
+        "deletions": 23
+      },
+      {
+        "path": "tests/integration/notification-read-performance.test.ts",
+        "status": "added",
+        "additions": 426,
+        "deletions": 0
+      },
+      {
+        "path": "tests/integration/performance-extension-measurement.test.ts",
+        "status": "modified",
+        "additions": 4,
+        "deletions": 0
+      }
+    ],
+    "sealedArtifactsChecked": 77,
+    "sealedArtifactChanges": 0,
+    "credentialPatternFound": false,
+    "unresolvedThreads": 0,
+    "reviews": [],
+    "fiveAxisSelfReview": {
+      "kind": "five-axis self-review",
+      "independentHumanOrAgentReviewClaimed": false,
+      "correctness": "Complete DTOs, 0/1/20 and cursor budgets, quoted schemas, read flags, all final revocations and existing command/delivery invariants pass",
+      "readability": "Small owned reader and existing predicate reused; no generic permission cache or new framework",
+      "architecture": "Booking supplies its own SQL predicate; Notifications read only owned tables; Identity remains owner of current actor",
+      "security": "All values bound, schemas quoted from constructed client, fresh actor/audience checks before return; real read-only max-one pool and revoked key",
+      "performance": "Initial live miss retained; twenty matched candidate triplets exceed original target; incremental unread gain and public tails reported separately"
+    },
+    "ownerMergeApproval": "Not yet granted for PR #68; existing approval covers read-only campaign"
+  },
+  "runtimeStillUnchanged": {
+    "deploymentId": "f100e2bd-1ad5-497b-989b-28f2f2e2f705",
+    "source": "873aa4c56eca6ef80563768554d726e5bae9eb46",
+    "image": "sha256:cb99729e156b0d563c2463a92589cc65597bdb6f449092a353b67fa442dc0388",
+    "configurationDigest": "5bb1f835c3514bca7e8db5d8c01d34fb92be34b82742eed21ad2dc30a41aceb5",
+    "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+    "controls": {
+      "DB_POOL_MAX": "1",
+      "DB_POOL_MAX_VENUE_CATALOG": "3",
+      "DB_POOL_MAX_ANALYTICS": "2",
+      "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000",
+      "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+      "DB_CONNECTION_RESERVE": "36",
+      "DB_MAX_CONNECTIONS": "60",
+      "DB_DIAGNOSTICS_ENABLED": "false",
+      "DB_SAFE_READ_DEADLINE_ENABLED": "false"
+    }
+  },
+  "verificationReceipt": {
+    "path": "tasks/evidence/perf08-verification-2026-10-18.json",
+    "sha256": "8a72ef9dd16bf6a76b7dd4c6d75f5123c5f78c1dbb594b35a3d355bde2f608a5"
+  },
+  "mergeAndAutomaticRailwayRollout": "AWAITING_EXPLICIT_OWNER_APPROVAL",
+  "approvalRule": {
+    "path": ".github/pull_request_template.md",
+    "quote": "The change has been reviewed, any conversations are resolved, and merge is authorized by the project owner; teammate approval is optional."
+  }
+}

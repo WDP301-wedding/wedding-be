@@ -151,6 +151,14 @@ coverage. All 71 focused tests, 84 public baseline reads and 128 log correlation
 pass; 32 table digests and 61 migrations are unchanged. Keep open pending exact-head
 CI, owner-authorized rollout and after probes; PERF-13 and production NO_GO remain.
 
+2026-10-18 [PERF-08 rollout closure](../docs/backend-performance-08-rollout-2026-10-18.md):
+owner-authorized PR #68 and main CI pass 2,106 tests. Railway serves the exact
+merged/measured source. All 84 after reads and 99 log correlations pass; revoked
+sessions are denied on Identity and both notification endpoints. All 32 scoped
+digests, 61 migration checksums and controls match. PERF-08 is complete; the
+historical pending gate above is superseded. Empty-live/populated-local scope,
+incremental unread limits, PERF-13 and production NO_GO remain unchanged.
+
 ### PERF-09 — Bound catalog pagination and media lookup work
 
 Dependencies: PERF-03. Proposed files: catalog query/media readers, router and tests
