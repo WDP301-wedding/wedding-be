@@ -1,0 +1,3663 @@
+{
+  "schemaVersion": 1,
+  "task": "PERF-09",
+  "date": "2026-10-18",
+  "timezone": "Asia/Saigon",
+  "status": "ORIGINAL_GATES_AND_RUNTIME_VERIFIED_CLOSURE_DOCUMENTATION_READY",
+  "pr": "https://github.com/WDP301-wedding/wedding-be/pull/70",
+  "authorization": {
+    "at": "2026-10-18T08:40:48.382Z",
+    "humanInstruction": "Cho phép merge, triển khai, kiểm tra và đóng PERF-09",
+    "scope": "Merge reviewed PR70 head4f945d6; automatic Railway demo rollout; read-only catalog/signed URL and scoped data verification with maximum one additional connection; update and merge evidence/checklist after green CI. No new fixture/key, migration, pool, region or provider configuration changes."
+  },
+  "merge": {
+    "at": "2026-10-18T08:41:21.661Z",
+    "sha": "14aebab69e28982dbeece7c5dc4da3dc5b645ea1",
+    "merged": true,
+    "message": "Pull Request successfully merged",
+    "head": "4f945d6c9966c018a7117c0a9a427baf814996fc",
+    "base": "45f72aeadf205ed81cd991b59259f4ca3942a831",
+    "authorization": {
+      "at": "2026-10-18T08:40:48.382Z",
+      "humanInstruction": "Cho phép merge, triển khai, kiểm tra và đóng PERF-09",
+      "scope": "Merge reviewed PR70 head4f945d6; automatic Railway demo rollout; read-only catalog/signed URL and scoped data verification with maximum one additional connection; update and merge evidence/checklist after green CI. No new fixture/key, migration, pool, region or provider configuration changes."
+    }
+  },
+  "exactHeadCi": {
+    "at": "2026-10-18T08:35:24.068Z",
+    "pr": "https://github.com/WDP301-wedding/wedding-be/pull/70",
+    "head": "4f945d6c9966c018a7117c0a9a427baf814996fc",
+    "id": 39111634444,
+    "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39111634444",
+    "attempt": 1,
+    "conclusion": "success",
+    "jobs": [
+      {
+        "id": 117628844926,
+        "name": "Static, test, build, and audit gates",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Generate Prisma client",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check formatting",
+            "conclusion": "success"
+          },
+          {
+            "name": "Lint",
+            "conclusion": "success"
+          },
+          {
+            "name": "Typecheck",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run unit tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run contract tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Verify generated OpenAPI artifact",
+            "conclusion": "success"
+          },
+          {
+            "name": "Build production output",
+            "conclusion": "success"
+          },
+          {
+            "name": "Audit locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "summaries": [
+          "found 0 vulnerabilities",
+          " Test Files  162 passed (162)",
+          "      Tests  1461 passed (1461)",
+          " Test Files  20 passed (20)",
+          "      Tests  59 passed (59)"
+        ]
+      },
+      {
+        "id": 117628845095,
+        "name": "PostgreSQL migration and integration gates",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Initialize containers",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Generate Prisma client",
+            "conclusion": "success"
+          },
+          {
+            "name": "Deploy migrations to empty PostgreSQL",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run PostgreSQL integration tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Enforce full-suite coverage with PostgreSQL",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Stop containers",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "summaries": [
+          "found 0 vulnerabilities",
+          " Test Files  107 passed (107)",
+          "      Tests  599 passed (599)",
+          " Test Files  289 passed (289)",
+          "      Tests  2119 passed (2119)",
+          "All files          |   96.67 |    93.54 |   98.48 |   97.58 |                   "
+        ]
+      }
+    ]
+  },
+  "mergeCi": {
+    "id": 39112412854,
+    "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39112412854",
+    "head": "14aebab69e28982dbeece7c5dc4da3dc5b645ea1",
+    "status": "completed",
+    "conclusion": "success",
+    "attempt": 1,
+    "jobs": [
+      {
+        "id": 117631149292,
+        "name": "Static, test, build, and audit gates",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39112412854/job/117631149292",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Generate Prisma client",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check formatting",
+            "conclusion": "success"
+          },
+          {
+            "name": "Lint",
+            "conclusion": "success"
+          },
+          {
+            "name": "Typecheck",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run unit tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run contract tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Verify generated OpenAPI artifact",
+            "conclusion": "success"
+          },
+          {
+            "name": "Build production output",
+            "conclusion": "success"
+          },
+          {
+            "name": "Audit locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "counts": [
+          "2026-10-18T08:41:45.5758366Z found 0 vulnerabilities",
+          "2026-10-18T08:43:33.5677080Z  Test Files  162 passed (162)",
+          "2026-10-18T08:43:33.5686245Z       Tests  1461 passed (1461)",
+          "2026-10-18T08:43:39.8938086Z  Test Files  20 passed (20)",
+          "2026-10-18T08:43:39.8939186Z       Tests  59 passed (59)"
+        ],
+        "sha256": "7a916e103135e92558cf06cee30c936bccd4aa531f6a16f928a495128c27206b"
+      },
+      {
+        "id": 117631149473,
+        "name": "PostgreSQL migration and integration gates",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39112412854/job/117631149473",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Initialize containers",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Generate Prisma client",
+            "conclusion": "success"
+          },
+          {
+            "name": "Deploy migrations to empty PostgreSQL",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run PostgreSQL integration tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Enforce full-suite coverage with PostgreSQL",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Stop containers",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "counts": [
+          "2026-10-18T08:42:02.9952135Z found 0 vulnerabilities",
+          "2026-10-18T08:45:11.4799160Z  Test Files  107 passed (107)",
+          "2026-10-18T08:45:11.4802979Z       Tests  599 passed (599)",
+          "2026-10-18T08:49:32.8979418Z  Test Files  289 passed (289)",
+          "2026-10-18T08:49:32.9004232Z       Tests  2119 passed (2119)",
+          "2026-10-18T08:49:32.9337392Z All files          |   96.67 |    93.54 |   98.48 |   97.58 |                   "
+        ],
+        "sha256": "b69ced114b44f2a8a6affbb53fb6e733b58baa0b9edeee6d1a1f96478d8b121e"
+      }
+    ]
+  },
+  "treeIdentical": true,
+  "unchangedSourceContinuity": [
+    {
+      "path": "src/modules/venue-catalog/application/venue.service.ts",
+      "before": "a10b1663cfc5b2d60b04576082c652358bf66e04",
+      "after": "a10b1663cfc5b2d60b04576082c652358bf66e04",
+      "equal": true
+    },
+    {
+      "path": "src/modules/venue-catalog/http",
+      "before": "4826909d11eb1ece115e2172be6b2df52845b06f",
+      "after": "4826909d11eb1ece115e2172be6b2df52845b06f",
+      "equal": true
+    },
+    {
+      "path": "src/integrations/storage",
+      "before": "c1e1351c65565829172160a42427958b4f691f6d",
+      "after": "c1e1351c65565829172160a42427958b4f691f6d",
+      "equal": true
+    },
+    {
+      "path": "src/core/database",
+      "before": "5b5d555b0f5abc24cd2d08ff5ad3dcefd6c0f787",
+      "after": "5b5d555b0f5abc24cd2d08ff5ad3dcefd6c0f787",
+      "equal": true
+    },
+    {
+      "path": "prisma",
+      "before": "a6a0f1b7a141117f9370ea5f922c974375b81833",
+      "after": "a6a0f1b7a141117f9370ea5f922c974375b81833",
+      "equal": true
+    },
+    {
+      "path": "openapi",
+      "before": "160c3bb09a500367c7fa43f050301b444ce83e04",
+      "after": "160c3bb09a500367c7fa43f050301b444ce83e04",
+      "equal": true
+    },
+    {
+      "path": "package.json",
+      "before": "a165f63c0e251eee65d56fc31684b4827765e13e",
+      "after": "a165f63c0e251eee65d56fc31684b4827765e13e",
+      "equal": true
+    },
+    {
+      "path": "package-lock.json",
+      "before": "661f3c1edaadcaeaca5612c2f2e2f06450cf4fe7",
+      "after": "661f3c1edaadcaeaca5612c2f2e2f06450cf4fe7",
+      "equal": true
+    },
+    {
+      "path": ".node-version",
+      "before": "df6ae3370f9f89272d88629c442cf554d6c1f9fb",
+      "after": "df6ae3370f9f89272d88629c442cf554d6c1f9fb",
+      "equal": true
+    },
+    {
+      "path": "railway.json",
+      "before": "75164716ec20a78fc6ed72ac53cb9927866a0b82",
+      "after": "75164716ec20a78fc6ed72ac53cb9927866a0b82",
+      "equal": true
+    },
+    {
+      "path": ".railway",
+      "before": "d662f9b7b914565b2f45b4a0abbbc00d6914ae60",
+      "after": "d662f9b7b914565b2f45b4a0abbbc00d6914ae60",
+      "equal": true
+    },
+    {
+      "path": ".github/workflows",
+      "before": "5e937b867a64a4e182cea0369118ba69190ee25d",
+      "after": "5e937b867a64a4e182cea0369118ba69190ee25d",
+      "equal": true
+    },
+    {
+      "path": "Dockerfile",
+      "before": "aa33d79c03ffc349380167295db50b3ee8002047",
+      "after": "aa33d79c03ffc349380167295db50b3ee8002047",
+      "equal": true
+    },
+    {
+      "path": "tsconfig.build.json",
+      "before": "588c2458d87d500adea3b91de433b15a5cd29127",
+      "after": "588c2458d87d500adea3b91de433b15a5cd29127",
+      "equal": true
+    }
+  ],
+  "measuredModules": [
+    {
+      "key": "candidateReader",
+      "path": "src/modules/venue-catalog/infrastructure/catalog-hall-page.reader.ts",
+      "sourceSha256": "ee25076578642e43bbd0c565e980e06feca602b66dbe44243c210c774149734a",
+      "compiledSha256": "3335ca80327e99b079a45248d096b47731a502834e952336a467158cd8a8e87a",
+      "mergedSourceMatchesMeasuredCandidate": true
+    },
+    {
+      "key": "candidateMedia",
+      "path": "src/modules/venue-catalog/application/catalog-media.service.ts",
+      "sourceSha256": "2613d3164e25a6fd54807562baa8ea683ecf96d5b9679d5339d22861ab599410",
+      "compiledSha256": "27c11849c4bf24ed124ac65b9468924dfc8f0d1d157eb3c0afa631895e2918a1",
+      "mergedSourceMatchesMeasuredCandidate": true
+    },
+    {
+      "key": "candidateQueries",
+      "path": "src/modules/venue-catalog/application/catalog-query.service.ts",
+      "sourceSha256": "4ae64a0992faa26fe646674052a4188a9bf01d8c8e547779c2d3224dd1582f9c",
+      "compiledSha256": "7b7e140e4faf58da46c323eae0ea7b76f67312bb51b2871dce36af04dc4258a5",
+      "mergedSourceMatchesMeasuredCandidate": true
+    }
+  ],
+  "acceptance": {
+    "scope": {
+      "backendOnly": true,
+      "liveMeasurement": "Same current SFO container/provider, isolated schema and real private Storage; native loopback HTTP excludes public ingress",
+      "returnedCardinalities": [
+        1,
+        20
+      ],
+      "assets": [
+        "none",
+        "one per Hall;20 real objects per rich page"
+      ],
+      "syntheticFixtures": {
+        "halls": 41,
+        "active": 40,
+        "retired": 1,
+        "objects": 20,
+        "bytes": 1920
+      },
+      "publicCatalog": "Existing three real demo Halls only; no twenty-item public-ingress claim",
+      "additionalConnectionsMaximum": 1,
+      "existingBusinessMutations": false,
+      "providerConfigurationChange": false,
+      "cacheAdded": false
+    },
+    "nativeSummary": [
+      {
+        "case": "one-no-assets",
+        "returned": 1,
+        "media": 0,
+        "variants": {
+          "baseline": {
+            "n": 20,
+            "p50Ms": 470.13350500003435,
+            "p95Ms": 473.3913160000084,
+            "commands": [
+              3
+            ]
+          },
+          "deployed": {
+            "n": 20,
+            "p50Ms": 469.9377679999743,
+            "p95Ms": 474.3518380000023,
+            "commands": [
+              3
+            ]
+          },
+          "candidate": {
+            "n": 20,
+            "p50Ms": 158.30122299998766,
+            "p95Ms": 160.02460299999802,
+            "commands": [
+              1
+            ]
+          }
+        },
+        "originalToCandidateP95ReductionPercent": 66.1961262086195,
+        "deployedToCandidateP95ReductionPercent": 66.26457616888221
+      },
+      {
+        "case": "twenty-no-assets",
+        "returned": 20,
+        "media": 0,
+        "variants": {
+          "baseline": {
+            "n": 20,
+            "p50Ms": 6373.236850000016,
+            "p95Ms": 6393.686277000001,
+            "commands": [
+              41
+            ]
+          },
+          "deployed": {
+            "n": 20,
+            "p50Ms": 470.1404340000008,
+            "p95Ms": 472.9314430000086,
+            "commands": [
+              3
+            ]
+          },
+          "candidate": {
+            "n": 20,
+            "p50Ms": 158.43046000000322,
+            "p95Ms": 161.13912299997173,
+            "commands": [
+              1
+            ]
+          }
+        },
+        "originalToCandidateP95ReductionPercent": 97.47971489343108,
+        "deployedToCandidateP95ReductionPercent": 65.92759365336408
+      },
+      {
+        "case": "one-with-assets",
+        "returned": 1,
+        "media": 1,
+        "variants": {
+          "baseline": {
+            "n": 20,
+            "p50Ms": 684.5364139999729,
+            "p95Ms": 1002.8221190000186,
+            "commands": [
+              3
+            ]
+          },
+          "deployed": {
+            "n": 20,
+            "p50Ms": 817.5592990000005,
+            "p95Ms": 1147.5688549999613,
+            "commands": [
+              4
+            ]
+          },
+          "candidate": {
+            "n": 20,
+            "p50Ms": 362.208060999983,
+            "p95Ms": 660.9099869999918,
+            "commands": [
+              1
+            ]
+          }
+        },
+        "originalToCandidateP95ReductionPercent": 34.09499307224798,
+        "deployedToCandidateP95ReductionPercent": 42.40781421346485
+      },
+      {
+        "case": "twenty-with-assets",
+        "returned": 20,
+        "media": 20,
+        "variants": {
+          "baseline": {
+            "n": 20,
+            "p50Ms": 6573.679787000001,
+            "p95Ms": 6724.4778440000955,
+            "commands": [
+              41
+            ]
+          },
+          "deployed": {
+            "n": 20,
+            "p50Ms": 1170.8697989999782,
+            "p95Ms": 1941.1705930000026,
+            "commands": [
+              4
+            ]
+          },
+          "candidate": {
+            "n": 20,
+            "p50Ms": 864.2700550000009,
+            "p95Ms": 1011.9272580000106,
+            "commands": [
+              1
+            ]
+          }
+        },
+        "originalToCandidateP95ReductionPercent": 84.95158610860915,
+        "deployedToCandidateP95ReductionPercent": 47.870256140851744
+      }
+    ],
+    "allFourOriginalNativeP95TargetsPassed": true,
+    "local": {
+      "broad": {
+        "tests": 159,
+        "overlappingNewCases": 12
+      },
+      "final": {
+        "tests": 14,
+        "newCases": 13,
+        "includesExistingBudgetMeasurement": true
+      },
+      "distinctFocusedTests": 160,
+      "model": {
+        "additionalMsPerDriverCommand": 40,
+        "poolMaximum": 1,
+        "notProviderLatency": true,
+        "summary": [
+          {
+            "case": "catalog-halls-no-assets",
+            "variants": {
+              "before": {
+                "n": 20,
+                "p95Ms": 1921.219299999997,
+                "commands": [
+                  41
+                ]
+              },
+              "current": {
+                "n": 20,
+                "p95Ms": 48.62720000000081,
+                "commands": [
+                  1
+                ]
+              }
+            },
+            "p95ReductionPercent": 97.46894068782252
+          },
+          {
+            "case": "catalog-halls-with-assets",
+            "variants": {
+              "before": {
+                "n": 20,
+                "p95Ms": 1918.8637000000017,
+                "commands": [
+                  41
+                ]
+              },
+              "current": {
+                "n": 20,
+                "p95Ms": 49.62740000001213,
+                "commands": [
+                  1
+                ]
+              }
+            },
+            "p95ReductionPercent": 97.4137089570243
+          }
+        ]
+      },
+      "queryPlans": {
+        "at": "2026-10-18T08:22:43.620Z",
+        "hallRows": 5000,
+        "isolatedClonedTables": true,
+        "businessTriggersNotCloned": true,
+        "publicReadOrWriteBenchmark": false,
+        "plans": [
+          {
+            "input": {
+              "limit": 1
+            },
+            "returned": 2,
+            "explain": [
+              {
+                "QUERY PLAN": [
+                  {
+                    "Plan": {
+                      "Node Type": "Result",
+                      "Parallel Aware": false,
+                      "Async Capable": false,
+                      "Startup Cost": 16.82,
+                      "Total Cost": 16.83,
+                      "Plan Rows": 1,
+                      "Plan Width": 33,
+                      "Actual Startup Time": 0.069,
+                      "Actual Total Time": 0.07,
+                      "Actual Rows": 1,
+                      "Actual Loops": 1,
+                      "Disabled": false,
+                      "Shared Hit Blocks": 7,
+                      "Shared Read Blocks": 0,
+                      "Shared Dirtied Blocks": 0,
+                      "Shared Written Blocks": 0,
+                      "Local Hit Blocks": 0,
+                      "Local Read Blocks": 0,
+                      "Local Dirtied Blocks": 0,
+                      "Local Written Blocks": 0,
+                      "Temp Read Blocks": 0,
+                      "Temp Written Blocks": 0,
+                      "Plans": [
+                        {
+                          "Node Type": "Result",
+                          "Parent Relationship": "InitPlan",
+                          "Subplan Name": "CTE anchor",
+                          "Parallel Aware": false,
+                          "Async Capable": false,
+                          "Startup Cost": 0,
+                          "Total Cost": 0,
+                          "Plan Rows": 0,
+                          "Plan Width": 0,
+                          "Actual Startup Time": 0,
+                          "Actual Total Time": 0,
+                          "Actual Rows": 0,
+                          "Actual Loops": 0,
+                          "Disabled": false,
+                          "One-Time Filter": "false",
+                          "Shared Hit Blocks": 0,
+                          "Shared Read Blocks": 0,
+                          "Shared Dirtied Blocks": 0,
+                          "Shared Written Blocks": 0,
+                          "Local Hit Blocks": 0,
+                          "Local Read Blocks": 0,
+                          "Local Dirtied Blocks": 0,
+                          "Local Written Blocks": 0,
+                          "Temp Read Blocks": 0,
+                          "Temp Written Blocks": 0
+                        },
+                        {
+                          "Node Type": "Limit",
+                          "Parent Relationship": "InitPlan",
+                          "Subplan Name": "CTE page",
+                          "Parallel Aware": false,
+                          "Async Capable": false,
+                          "Startup Cost": 0.28,
+                          "Total Cost": 0.43,
+                          "Plan Rows": 2,
+                          "Plan Width": 34,
+                          "Actual Startup Time": 0.021,
+                          "Actual Total Time": 0.022,
+                          "Actual Rows": 2,
+                          "Actual Loops": 1,
+                          "Disabled": false,
+                          "Shared Hit Blocks": 3,
+                          "Shared Read Blocks": 0,
+                          "Shared Dirtied Blocks": 0,
+                          "Shared Written Blocks": 0,
+                          "Local Hit Blocks": 0,
+                          "Local Read Blocks": 0,
+                          "Local Dirtied Blocks": 0,
+                          "Local Written Blocks": 0,
+                          "Temp Read Blocks": 0,
+                          "Temp Written Blocks": 0,
+                          "Plans": [
+                            {
+                              "Node Type": "Index Scan",
+                              "Parent Relationship": "Outer",
+                              "Parallel Aware": false,
+                              "Async Capable": false,
+                              "Scan Direction": "Forward",
+                              "Index Name": "Hall_lifecycle_displayOrder_id_idx",
+                              "Relation Name": "Hall",
+                              "Alias": "h",
+                              "Startup Cost": 0.28,
+                              "Total Cost": 375.53,
+                              "Plan Rows": 5000,
+                              "Plan Width": 34,
+                              "Actual Startup Time": 0.02,
+                              "Actual Total Time": 0.021,
+                              "Actual Rows": 2,
+                              "Actual Loops": 1,
+                              "Disabled": false,
+                              "Index Cond": "(lifecycle = 'ACTIVE'::\"CatalogLifecycle\")",
+                              "Rows Removed by Index Recheck": 0,
+                              "Index Searches": 1,
+                              "Shared Hit Blocks": 3,
+                              "Shared Read Blocks": 0,
+                              "Shared Dirtied Blocks": 0,
+                              "Shared Written Blocks": 0,
+                              "Local Hit Blocks": 0,
+                              "Local Read Blocks": 0,
+                              "Local Dirtied Blocks": 0,
+                              "Local Written Blocks": 0,
+                              "Temp Read Blocks": 0,
+                              "Temp Written Blocks": 0
+                            }
+                          ]
+                        },
+                        {
+                          "Node Type": "Aggregate",
+                          "Strategy": "Plain",
+                          "Partial Mode": "Simple",
+                          "Parent Relationship": "InitPlan",
+                          "Subplan Name": "InitPlan 4",
+                          "Parallel Aware": false,
+                          "Async Capable": false,
+                          "Startup Cost": 16.38,
+                          "Total Cost": 16.39,
+                          "Plan Rows": 1,
+                          "Plan Width": 32,
+                          "Actual Startup Time": 0.068,
+                          "Actual Total Time": 0.068,
+                          "Actual Rows": 1,
+                          "Actual Loops": 1,
+                          "Disabled": false,
+                          "Shared Hit Blocks": 7,
+                          "Shared Read Blocks": 0,
+                          "Shared Dirtied Blocks": 0,
+                          "Shared Written Blocks": 0,
+                          "Local Hit Blocks": 0,
+                          "Local Read Blocks": 0,
+                          "Local Dirtied Blocks": 0,
+                          "Local Written Blocks": 0,
+                          "Temp Read Blocks": 0,
+                          "Temp Written Blocks": 0,
+                          "Plans": [
+                            {
+                              "Node Type": "CTE Scan",
+                              "Parent Relationship": "Outer",
+                              "Parallel Aware": false,
+                              "Async Capable": false,
+                              "CTE Name": "page",
+                              "Alias": "p",
+                              "Startup Cost": 0,
+                              "Total Cost": 0.04,
+                              "Plan Rows": 2,
+                              "Plan Width": 88,
+                              "Actual Startup Time": 0.023,
+                              "Actual Total Time": 0.025,
+                              "Actual Rows": 2,
+                              "Actual Loops": 1,
+                              "Disabled": false,
+                              "Storage": "Memory",
+                              "Maximum Storage": 17,
+                              "Shared Hit Blocks": 3,
+                              "Shared Read Blocks": 0,
+                              "Shared Dirtied Blocks": 0,
+                              "Shared Written Blocks": 0,
+                              "Local Hit Blocks": 0,
+                              "Local Read Blocks": 0,
+                              "Local Dirtied Blocks": 0,
+                              "Local Written Blocks": 0,
+                              "Temp Read Blocks": 0,
+                              "Temp Written Blocks": 0
+                            },
+                            {
+                              "Node Type": "Aggregate",
+                              "Strategy": "Plain",
+                              "Partial Mode": "Simple",
+                              "Parent Relationship": "SubPlan",
+                              "Subplan Name": "SubPlan 3",
+                              "Parallel Aware": false,
+                              "Async Capable": false,
+                              "Startup Cost": 8.15,
+                              "Total Cost": 8.16,
+                              "Plan Rows": 1,
+                              "Plan Width": 32,
+                              "Actual Startup Time": 0.006,
+                              "Actual Total Time": 0.006,
+                              "Actual Rows": 1,
+                              "Actual Loops": 2,
+                              "Disabled": false,
+                              "Shared Hit Blocks": 4,
+                              "Shared Read Blocks": 0,
+                              "Shared Dirtied Blocks": 0,
+                              "Shared Written Blocks": 0,
+                              "Local Hit Blocks": 0,
+                              "Local Read Blocks": 0,
+                              "Local Dirtied Blocks": 0,
+                              "Local Written Blocks": 0,
+                              "Temp Read Blocks": 0,
+                              "Temp Written Blocks": 0,
+                              "Plans": [
+                                {
+                                  "Node Type": "Index Scan",
+                                  "Parent Relationship": "Outer",
+                                  "Parallel Aware": false,
+                                  "Async Capable": false,
+                                  "Scan Direction": "Forward",
+                                  "Index Name": "CatalogMediaAsset_resourceType_resourceId_displayOrder_idx",
+                                  "Relation Name": "CatalogMediaAsset",
+                                  "Alias": "m",
+                                  "Startup Cost": 0.12,
+                                  "Total Cost": 8.14,
+                                  "Plan Rows": 1,
+                                  "Plan Width": 172,
+                                  "Actual Startup Time": 0.005,
+                                  "Actual Total Time": 0.005,
+                                  "Actual Rows": 0,
+                                  "Actual Loops": 2,
+                                  "Disabled": false,
+                                  "Index Cond": "((\"resourceType\" = 'HALL'::\"CatalogMediaResourceType\") AND (\"resourceId\" = p.id))",
+                                  "Rows Removed by Index Recheck": 0,
+                                  "Index Searches": 2,
+                                  "Shared Hit Blocks": 4,
+                                  "Shared Read Blocks": 0,
+                                  "Shared Dirtied Blocks": 0,
+                                  "Shared Written Blocks": 0,
+                                  "Local Hit Blocks": 0,
+                                  "Local Read Blocks": 0,
+                                  "Local Dirtied Blocks": 0,
+                                  "Local Written Blocks": 0,
+                                  "Temp Read Blocks": 0,
+                                  "Temp Written Blocks": 0
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "Planning": {
+                      "Shared Hit Blocks": 4,
+                      "Shared Read Blocks": 0,
+                      "Shared Dirtied Blocks": 0,
+                      "Shared Written Blocks": 0,
+                      "Local Hit Blocks": 0,
+                      "Local Read Blocks": 0,
+                      "Local Dirtied Blocks": 0,
+                      "Local Written Blocks": 0,
+                      "Temp Read Blocks": 0,
+                      "Temp Written Blocks": 0
+                    },
+                    "Planning Time": 0.403,
+                    "Triggers": [],
+                    "Execution Time": 0.118
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "input": {
+              "limit": 20
+            },
+            "returned": 21,
+            "explain": [
+              {
+                "QUERY PLAN": [
+                  {
+                    "Plan": {
+                      "Node Type": "Result",
+                      "Parallel Aware": false,
+                      "Async Capable": false,
+                      "Startup Cost": 173.81,
+                      "Total Cost": 173.82,
+                      "Plan Rows": 1,
+                      "Plan Width": 33,
+                      "Actual Startup Time": 0.255,
+                      "Actual Total Time": 0.256,
+                      "Actual Rows": 1,
+                      "Actual Loops": 1,
+                      "Disabled": false,
+                      "Shared Hit Blocks": 45,
+                      "Shared Read Blocks": 0,
+                      "Shared Dirtied Blocks": 0,
+                      "Shared Written Blocks": 0,
+                      "Local Hit Blocks": 0,
+                      "Local Read Blocks": 0,
+                      "Local Dirtied Blocks": 0,
+                      "Local Written Blocks": 0,
+                      "Temp Read Blocks": 0,
+                      "Temp Written Blocks": 0,
+                      "Plans": [
+                        {
+                          "Node Type": "Result",
+                          "Parent Relationship": "InitPlan",
+                          "Subplan Name": "CTE anchor",
+                          "Parallel Aware": false,
+                          "Async Capable": false,
+                          "Startup Cost": 0,
+                          "Total Cost": 0,
+                          "Plan Rows": 0,
+                          "Plan Width": 0,
+                          "Actual Startup Time": 0,
+                          "Actual Total Time": 0,
+                          "Actual Rows": 0,
+                          "Actual Loops": 0,
+                          "Disabled": false,
+                          "One-Time Filter": "false",
+                          "Shared Hit Blocks": 0,
+                          "Shared Read Blocks": 0,
+                          "Shared Dirtied Blocks": 0,
+                          "Shared Written Blocks": 0,
+                          "Local Hit Blocks": 0,
+                          "Local Read Blocks": 0,
+                          "Local Dirtied Blocks": 0,
+                          "Local Written Blocks": 0,
+                          "Temp Read Blocks": 0,
+                          "Temp Written Blocks": 0
+                        },
+                        {
+                          "Node Type": "Limit",
+                          "Parent Relationship": "InitPlan",
+                          "Subplan Name": "CTE page",
+                          "Parallel Aware": false,
+                          "Async Capable": false,
+                          "Startup Cost": 0.28,
+                          "Total Cost": 1.86,
+                          "Plan Rows": 21,
+                          "Plan Width": 34,
+                          "Actual Startup Time": 0.026,
+                          "Actual Total Time": 0.037,
+                          "Actual Rows": 21,
+                          "Actual Loops": 1,
+                          "Disabled": false,
+                          "Shared Hit Blocks": 3,
+                          "Shared Read Blocks": 0,
+                          "Shared Dirtied Blocks": 0,
+                          "Shared Written Blocks": 0,
+                          "Local Hit Blocks": 0,
+                          "Local Read Blocks": 0,
+                          "Local Dirtied Blocks": 0,
+                          "Local Written Blocks": 0,
+                          "Temp Read Blocks": 0,
+                          "Temp Written Blocks": 0,
+                          "Plans": [
+                            {
+                              "Node Type": "Index Scan",
+                              "Parent Relationship": "Outer",
+                              "Parallel Aware": false,
+                              "Async Capable": false,
+                              "Scan Direction": "Forward",
+                              "Index Name": "Hall_lifecycle_displayOrder_id_idx",
+                              "Relation Name": "Hall",
+                              "Alias": "h",
+                              "Startup Cost": 0.28,
+                              "Total Cost": 375.53,
+                              "Plan Rows": 5000,
+                              "Plan Width": 34,
+                              "Actual Startup Time": 0.025,
+                              "Actual Total Time": 0.034,
+                              "Actual Rows": 21,
+                              "Actual Loops": 1,
+                              "Disabled": false,
+                              "Index Cond": "(lifecycle = 'ACTIVE'::\"CatalogLifecycle\")",
+                              "Rows Removed by Index Recheck": 0,
+                              "Index Searches": 1,
+                              "Shared Hit Blocks": 3,
+                              "Shared Read Blocks": 0,
+                              "Shared Dirtied Blocks": 0,
+                              "Shared Written Blocks": 0,
+                              "Local Hit Blocks": 0,
+                              "Local Read Blocks": 0,
+                              "Local Dirtied Blocks": 0,
+                              "Local Written Blocks": 0,
+                              "Temp Read Blocks": 0,
+                              "Temp Written Blocks": 0
+                            }
+                          ]
+                        },
+                        {
+                          "Node Type": "Aggregate",
+                          "Strategy": "Plain",
+                          "Partial Mode": "Simple",
+                          "Parent Relationship": "InitPlan",
+                          "Subplan Name": "InitPlan 4",
+                          "Parallel Aware": false,
+                          "Async Capable": false,
+                          "Startup Cost": 171.94,
+                          "Total Cost": 171.95,
+                          "Plan Rows": 1,
+                          "Plan Width": 32,
+                          "Actual Startup Time": 0.253,
+                          "Actual Total Time": 0.253,
+                          "Actual Rows": 1,
+                          "Actual Loops": 1,
+                          "Disabled": false,
+                          "Shared Hit Blocks": 45,
+                          "Shared Read Blocks": 0,
+                          "Shared Dirtied Blocks": 0,
+                          "Shared Written Blocks": 0,
+                          "Local Hit Blocks": 0,
+                          "Local Read Blocks": 0,
+                          "Local Dirtied Blocks": 0,
+                          "Local Written Blocks": 0,
+                          "Temp Read Blocks": 0,
+                          "Temp Written Blocks": 0,
+                          "Plans": [
+                            {
+                              "Node Type": "CTE Scan",
+                              "Parent Relationship": "Outer",
+                              "Parallel Aware": false,
+                              "Async Capable": false,
+                              "CTE Name": "page",
+                              "Alias": "p",
+                              "Startup Cost": 0,
+                              "Total Cost": 0.42,
+                              "Plan Rows": 21,
+                              "Plan Width": 88,
+                              "Actual Startup Time": 0.029,
+                              "Actual Total Time": 0.049,
+                              "Actual Rows": 21,
+                              "Actual Loops": 1,
+                              "Disabled": false,
+                              "Storage": "Memory",
+                              "Maximum Storage": 18,
+                              "Shared Hit Blocks": 3,
+                              "Shared Read Blocks": 0,
+                              "Shared Dirtied Blocks": 0,
+                              "Shared Written Blocks": 0,
+                              "Local Hit Blocks": 0,
+                              "Local Read Blocks": 0,
+                              "Local Dirtied Blocks": 0,
+                              "Local Written Blocks": 0,
+                              "Temp Read Blocks": 0,
+                              "Temp Written Blocks": 0
+                            },
+                            {
+                              "Node Type": "Aggregate",
+                              "Strategy": "Plain",
+                              "Partial Mode": "Simple",
+                              "Parent Relationship": "SubPlan",
+                              "Subplan Name": "SubPlan 3",
+                              "Parallel Aware": false,
+                              "Async Capable": false,
+                              "Startup Cost": 8.15,
+                              "Total Cost": 8.16,
+                              "Plan Rows": 1,
+                              "Plan Width": 32,
+                              "Actual Startup Time": 0.002,
+                              "Actual Total Time": 0.002,
+                              "Actual Rows": 1,
+                              "Actual Loops": 21,
+                              "Disabled": false,
+                              "Shared Hit Blocks": 42,
+                              "Shared Read Blocks": 0,
+                              "Shared Dirtied Blocks": 0,
+                              "Shared Written Blocks": 0,
+                              "Local Hit Blocks": 0,
+                              "Local Read Blocks": 0,
+                              "Local Dirtied Blocks": 0,
+                              "Local Written Blocks": 0,
+                              "Temp Read Blocks": 0,
+                              "Temp Written Blocks": 0,
+                              "Plans": [
+                                {
+                                  "Node Type": "Index Scan",
+                                  "Parent Relationship": "Outer",
+                                  "Parallel Aware": false,
+                                  "Async Capable": false,
+                                  "Scan Direction": "Forward",
+                                  "Index Name": "CatalogMediaAsset_resourceType_resourceId_displayOrder_idx",
+                                  "Relation Name": "CatalogMediaAsset",
+                                  "Alias": "m",
+                                  "Startup Cost": 0.12,
+                                  "Total Cost": 8.14,
+                                  "Plan Rows": 1,
+                                  "Plan Width": 172,
+                                  "Actual Startup Time": 0.001,
+                                  "Actual Total Time": 0.001,
+                                  "Actual Rows": 0,
+                                  "Actual Loops": 21,
+                                  "Disabled": false,
+                                  "Index Cond": "((\"resourceType\" = 'HALL'::\"CatalogMediaResourceType\") AND (\"resourceId\" = p.id))",
+                                  "Rows Removed by Index Recheck": 0,
+                                  "Index Searches": 21,
+                                  "Shared Hit Blocks": 42,
+                                  "Shared Read Blocks": 0,
+                                  "Shared Dirtied Blocks": 0,
+                                  "Shared Written Blocks": 0,
+                                  "Local Hit Blocks": 0,
+                                  "Local Read Blocks": 0,
+                                  "Local Dirtied Blocks": 0,
+                                  "Local Written Blocks": 0,
+                                  "Temp Read Blocks": 0,
+                                  "Temp Written Blocks": 0
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "Planning": {
+                      "Shared Hit Blocks": 4,
+                      "Shared Read Blocks": 0,
+                      "Shared Dirtied Blocks": 0,
+                      "Shared Written Blocks": 0,
+                      "Local Hit Blocks": 0,
+                      "Local Read Blocks": 0,
+                      "Local Dirtied Blocks": 0,
+                      "Local Written Blocks": 0,
+                      "Temp Read Blocks": 0,
+                      "Temp Written Blocks": 0
+                    },
+                    "Planning Time": 1.01,
+                    "Triggers": [],
+                    "Execution Time": 0.314
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "input": {
+              "limit": 20,
+              "cursor": "eea6d768-b032-49d3-9ad9-6a7dd847bbf9"
+            },
+            "returned": 21,
+            "explain": [
+              {
+                "QUERY PLAN": [
+                  {
+                    "Plan": {
+                      "Node Type": "Result",
+                      "Parallel Aware": false,
+                      "Async Capable": false,
+                      "Startup Cost": 183.4,
+                      "Total Cost": 183.41,
+                      "Plan Rows": 1,
+                      "Plan Width": 33,
+                      "Actual Startup Time": 0.275,
+                      "Actual Total Time": 0.277,
+                      "Actual Rows": 1,
+                      "Actual Loops": 1,
+                      "Disabled": false,
+                      "Shared Hit Blocks": 48,
+                      "Shared Read Blocks": 0,
+                      "Shared Dirtied Blocks": 0,
+                      "Shared Written Blocks": 0,
+                      "Local Hit Blocks": 0,
+                      "Local Read Blocks": 0,
+                      "Local Dirtied Blocks": 0,
+                      "Local Written Blocks": 0,
+                      "Temp Read Blocks": 0,
+                      "Temp Written Blocks": 0,
+                      "Plans": [
+                        {
+                          "Node Type": "Index Scan",
+                          "Parent Relationship": "InitPlan",
+                          "Subplan Name": "CTE anchor",
+                          "Parallel Aware": false,
+                          "Async Capable": false,
+                          "Scan Direction": "Forward",
+                          "Index Name": "Hall_pkey",
+                          "Relation Name": "Hall",
+                          "Alias": "h",
+                          "Startup Cost": 0.28,
+                          "Total Cost": 8.3,
+                          "Plan Rows": 1,
+                          "Plan Width": 20,
+                          "Actual Startup Time": 0.023,
+                          "Actual Total Time": 0.024,
+                          "Actual Rows": 1,
+                          "Actual Loops": 1,
+                          "Disabled": false,
+                          "Index Cond": "(id = 'eea6d768-b032-49d3-9ad9-6a7dd847bbf9'::uuid)",
+                          "Rows Removed by Index Recheck": 0,
+                          "Filter": "(lifecycle = 'ACTIVE'::\"CatalogLifecycle\")",
+                          "Rows Removed by Filter": 0,
+                          "Index Searches": 1,
+                          "Shared Hit Blocks": 3,
+                          "Shared Read Blocks": 0,
+                          "Shared Dirtied Blocks": 0,
+                          "Shared Written Blocks": 0,
+                          "Local Hit Blocks": 0,
+                          "Local Read Blocks": 0,
+                          "Local Dirtied Blocks": 0,
+                          "Local Written Blocks": 0,
+                          "Temp Read Blocks": 0,
+                          "Temp Written Blocks": 0
+                        },
+                        {
+                          "Node Type": "Limit",
+                          "Parent Relationship": "InitPlan",
+                          "Subplan Name": "CTE page",
+                          "Parallel Aware": false,
+                          "Async Capable": false,
+                          "Startup Cost": 0.3,
+                          "Total Cost": 3.13,
+                          "Plan Rows": 21,
+                          "Plan Width": 34,
+                          "Actual Startup Time": 0.031,
+                          "Actual Total Time": 0.041,
+                          "Actual Rows": 21,
+                          "Actual Loops": 1,
+                          "Disabled": false,
+                          "Shared Hit Blocks": 3,
+                          "Shared Read Blocks": 0,
+                          "Shared Dirtied Blocks": 0,
+                          "Shared Written Blocks": 0,
+                          "Local Hit Blocks": 0,
+                          "Local Read Blocks": 0,
+                          "Local Dirtied Blocks": 0,
+                          "Local Written Blocks": 0,
+                          "Temp Read Blocks": 0,
+                          "Temp Written Blocks": 0,
+                          "Plans": [
+                            {
+                              "Node Type": "CTE Scan",
+                              "Parent Relationship": "InitPlan",
+                              "Subplan Name": "InitPlan 2",
+                              "Parallel Aware": false,
+                              "Async Capable": false,
+                              "CTE Name": "anchor",
+                              "Alias": "a",
+                              "Startup Cost": 0,
+                              "Total Cost": 0.02,
+                              "Plan Rows": 1,
+                              "Plan Width": 20,
+                              "Actual Startup Time": 0.001,
+                              "Actual Total Time": 0.002,
+                              "Actual Rows": 1,
+                              "Actual Loops": 1,
+                              "Disabled": false,
+                              "Storage": "Memory",
+                              "Maximum Storage": 17,
+                              "Shared Hit Blocks": 0,
+                              "Shared Read Blocks": 0,
+                              "Shared Dirtied Blocks": 0,
+                              "Shared Written Blocks": 0,
+                              "Local Hit Blocks": 0,
+                              "Local Read Blocks": 0,
+                              "Local Dirtied Blocks": 0,
+                              "Local Written Blocks": 0,
+                              "Temp Read Blocks": 0,
+                              "Temp Written Blocks": 0
+                            },
+                            {
+                              "Node Type": "Index Scan",
+                              "Parent Relationship": "Outer",
+                              "Parallel Aware": false,
+                              "Async Capable": false,
+                              "Scan Direction": "Forward",
+                              "Index Name": "Hall_lifecycle_displayOrder_id_idx",
+                              "Relation Name": "Hall",
+                              "Alias": "h_1",
+                              "Startup Cost": 0.28,
+                              "Total Cost": 224.69,
+                              "Plan Rows": 1667,
+                              "Plan Width": 34,
+                              "Actual Startup Time": 0.031,
+                              "Actual Total Time": 0.038,
+                              "Actual Rows": 21,
+                              "Actual Loops": 1,
+                              "Disabled": false,
+                              "Index Cond": "((lifecycle = 'ACTIVE'::\"CatalogLifecycle\") AND (ROW(\"displayOrder\", id) > ROW((InitPlan 2).col1, (InitPlan 2).col2)))",
+                              "Rows Removed by Index Recheck": 0,
+                              "Index Searches": 1,
+                              "Shared Hit Blocks": 3,
+                              "Shared Read Blocks": 0,
+                              "Shared Dirtied Blocks": 0,
+                              "Shared Written Blocks": 0,
+                              "Local Hit Blocks": 0,
+                              "Local Read Blocks": 0,
+                              "Local Dirtied Blocks": 0,
+                              "Local Written Blocks": 0,
+                              "Temp Read Blocks": 0,
+                              "Temp Written Blocks": 0
+                            }
+                          ]
+                        },
+                        {
+                          "Node Type": "CTE Scan",
+                          "Parent Relationship": "InitPlan",
+                          "Subplan Name": "InitPlan 4",
+                          "Parallel Aware": false,
+                          "Async Capable": false,
+                          "CTE Name": "anchor",
+                          "Alias": "anchor",
+                          "Startup Cost": 0,
+                          "Total Cost": 0.02,
+                          "Plan Rows": 1,
+                          "Plan Width": 0,
+                          "Actual Startup Time": 0.026,
+                          "Actual Total Time": 0.026,
+                          "Actual Rows": 1,
+                          "Actual Loops": 1,
+                          "Disabled": false,
+                          "Storage": "Memory",
+                          "Maximum Storage": 17,
+                          "Shared Hit Blocks": 3,
+                          "Shared Read Blocks": 0,
+                          "Shared Dirtied Blocks": 0,
+                          "Shared Written Blocks": 0,
+                          "Local Hit Blocks": 0,
+                          "Local Read Blocks": 0,
+                          "Local Dirtied Blocks": 0,
+                          "Local Written Blocks": 0,
+                          "Temp Read Blocks": 0,
+                          "Temp Written Blocks": 0
+                        },
+                        {
+                          "Node Type": "Aggregate",
+                          "Strategy": "Plain",
+                          "Partial Mode": "Simple",
+                          "Parent Relationship": "InitPlan",
+                          "Subplan Name": "InitPlan 6",
+                          "Parallel Aware": false,
+                          "Async Capable": false,
+                          "Startup Cost": 171.94,
+                          "Total Cost": 171.95,
+                          "Plan Rows": 1,
+                          "Plan Width": 32,
+                          "Actual Startup Time": 0.244,
+                          "Actual Total Time": 0.244,
+                          "Actual Rows": 1,
+                          "Actual Loops": 1,
+                          "Disabled": false,
+                          "Shared Hit Blocks": 45,
+                          "Shared Read Blocks": 0,
+                          "Shared Dirtied Blocks": 0,
+                          "Shared Written Blocks": 0,
+                          "Local Hit Blocks": 0,
+                          "Local Read Blocks": 0,
+                          "Local Dirtied Blocks": 0,
+                          "Local Written Blocks": 0,
+                          "Temp Read Blocks": 0,
+                          "Temp Written Blocks": 0,
+                          "Plans": [
+                            {
+                              "Node Type": "CTE Scan",
+                              "Parent Relationship": "Outer",
+                              "Parallel Aware": false,
+                              "Async Capable": false,
+                              "CTE Name": "page",
+                              "Alias": "p",
+                              "Startup Cost": 0,
+                              "Total Cost": 0.42,
+                              "Plan Rows": 21,
+                              "Plan Width": 88,
+                              "Actual Startup Time": 0.033,
+                              "Actual Total Time": 0.051,
+                              "Actual Rows": 21,
+                              "Actual Loops": 1,
+                              "Disabled": false,
+                              "Storage": "Memory",
+                              "Maximum Storage": 18,
+                              "Shared Hit Blocks": 3,
+                              "Shared Read Blocks": 0,
+                              "Shared Dirtied Blocks": 0,
+                              "Shared Written Blocks": 0,
+                              "Local Hit Blocks": 0,
+                              "Local Read Blocks": 0,
+                              "Local Dirtied Blocks": 0,
+                              "Local Written Blocks": 0,
+                              "Temp Read Blocks": 0,
+                              "Temp Written Blocks": 0
+                            },
+                            {
+                              "Node Type": "Aggregate",
+                              "Strategy": "Plain",
+                              "Partial Mode": "Simple",
+                              "Parent Relationship": "SubPlan",
+                              "Subplan Name": "SubPlan 5",
+                              "Parallel Aware": false,
+                              "Async Capable": false,
+                              "Startup Cost": 8.15,
+                              "Total Cost": 8.16,
+                              "Plan Rows": 1,
+                              "Plan Width": 32,
+                              "Actual Startup Time": 0.001,
+                              "Actual Total Time": 0.001,
+                              "Actual Rows": 1,
+                              "Actual Loops": 21,
+                              "Disabled": false,
+                              "Shared Hit Blocks": 42,
+                              "Shared Read Blocks": 0,
+                              "Shared Dirtied Blocks": 0,
+                              "Shared Written Blocks": 0,
+                              "Local Hit Blocks": 0,
+                              "Local Read Blocks": 0,
+                              "Local Dirtied Blocks": 0,
+                              "Local Written Blocks": 0,
+                              "Temp Read Blocks": 0,
+                              "Temp Written Blocks": 0,
+                              "Plans": [
+                                {
+                                  "Node Type": "Index Scan",
+                                  "Parent Relationship": "Outer",
+                                  "Parallel Aware": false,
+                                  "Async Capable": false,
+                                  "Scan Direction": "Forward",
+                                  "Index Name": "CatalogMediaAsset_resourceType_resourceId_displayOrder_idx",
+                                  "Relation Name": "CatalogMediaAsset",
+                                  "Alias": "m",
+                                  "Startup Cost": 0.12,
+                                  "Total Cost": 8.14,
+                                  "Plan Rows": 1,
+                                  "Plan Width": 172,
+                                  "Actual Startup Time": 0.001,
+                                  "Actual Total Time": 0.001,
+                                  "Actual Rows": 0,
+                                  "Actual Loops": 21,
+                                  "Disabled": false,
+                                  "Index Cond": "((\"resourceType\" = 'HALL'::\"CatalogMediaResourceType\") AND (\"resourceId\" = p.id))",
+                                  "Rows Removed by Index Recheck": 0,
+                                  "Index Searches": 21,
+                                  "Shared Hit Blocks": 42,
+                                  "Shared Read Blocks": 0,
+                                  "Shared Dirtied Blocks": 0,
+                                  "Shared Written Blocks": 0,
+                                  "Local Hit Blocks": 0,
+                                  "Local Read Blocks": 0,
+                                  "Local Dirtied Blocks": 0,
+                                  "Local Written Blocks": 0,
+                                  "Temp Read Blocks": 0,
+                                  "Temp Written Blocks": 0
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "Planning": {
+                      "Shared Hit Blocks": 4,
+                      "Shared Read Blocks": 0,
+                      "Shared Dirtied Blocks": 0,
+                      "Shared Written Blocks": 0,
+                      "Local Hit Blocks": 0,
+                      "Local Read Blocks": 0,
+                      "Local Dirtied Blocks": 0,
+                      "Local Written Blocks": 0,
+                      "Temp Read Blocks": 0,
+                      "Temp Written Blocks": 0
+                    },
+                    "Planning Time": 0.487,
+                    "Triggers": [],
+                    "Execution Time": 0.374
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "mutation": {
+        "at": "2026-10-18T08:17:56.593Z",
+        "results": [
+          {
+            "mutation": "retirement",
+            "failedAsExpected": 1,
+            "output": "test-results/perf09-mutation-retirement-2026-10-18.json"
+          },
+          {
+            "mutation": "ownership",
+            "failedAsExpected": 1,
+            "output": "test-results/perf09-mutation-ownership-2026-10-18.json"
+          }
+        ],
+        "sourceRestoredByteForByte": true,
+        "sourceSha256": "ee25076578642e43bbd0c565e980e06feca602b66dbe44243c210c774149734a"
+      },
+      "types": true,
+      "focusedLint": true,
+      "focusedFormat": true,
+      "productionBuild": true,
+      "openapiCheck": true,
+      "exactHeadCi": "Required before merge"
+    },
+    "originalReceiptPath": "tasks/evidence/perf09-original-verification-2026-10-18.json",
+    "originalReceiptUnchanged": true,
+    "all87OriginalOperatorArtifactsUnchanged": true
+  },
+  "serving": {
+    "at": "2026-10-18T08:52:49.953Z",
+    "runtime": {
+      "deploymentId": "fcfb17ed-f14b-4a6c-bb3c-f330616e7616",
+      "source": "14aebab69e28982dbeece7c5dc4da3dc5b645ea1",
+      "image": "sha256:2236f991eebb147e6a31d3000f0cc422fdc987b0b335e22e777365ebc5a72285",
+      "configurationDigest": "5bb1f835c3514bca7e8db5d8c01d34fb92be34b82742eed21ad2dc30a41aceb5",
+      "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+      "controls": {
+        "DB_POOL_MAX": "1",
+        "DB_POOL_MAX_VENUE_CATALOG": "3",
+        "DB_POOL_MAX_ANALYTICS": "2",
+        "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000",
+        "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+        "DB_CONNECTION_RESERVE": "36",
+        "DB_MAX_CONNECTIONS": "60",
+        "DB_DIAGNOSTICS_ENABLED": "false",
+        "DB_SAFE_READ_DEADLINE_ENABLED": "false"
+      }
+    },
+    "oldStopped": true,
+    "onlyNewDeploymentActive": true,
+    "configurationUnchanged": true,
+    "ci": [
+      {
+        "id": 39112412854,
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39112412854",
+        "head": "14aebab69e28982dbeece7c5dc4da3dc5b645ea1",
+        "status": "completed",
+        "conclusion": "success",
+        "attempt": 1
+      }
+    ],
+    "smoke": [
+      {
+        "path": "/health/live",
+        "method": "GET",
+        "status": 200,
+        "requestId": "3d680abd-964f-48fa-9659-88615bfb9e22"
+      },
+      {
+        "path": "/health/ready",
+        "method": "GET",
+        "status": 200,
+        "requestId": "c6923251-2429-4d00-98f0-3f23b5836431"
+      },
+      {
+        "path": "/api/v1/openapi.json",
+        "method": "GET",
+        "status": 200,
+        "requestId": "015a3474-f8d8-4d89-93dd-b9497de22465",
+        "sha256": "19da7dafc991d316f7f048a58c6446deabb2e724edb3a49d55e4709ce14d04e2"
+      },
+      {
+        "path": "/api/v1/management/catalog/halls",
+        "method": "GET",
+        "status": 401,
+        "requestId": "dfdca9b6-888a-49a0-9a38-d7debd525fb2"
+      }
+    ]
+  },
+  "finalPostflight": {
+    "at": "2026-10-18T08:55:24.905Z",
+    "runtime": {
+      "deploymentId": "fcfb17ed-f14b-4a6c-bb3c-f330616e7616",
+      "source": "14aebab69e28982dbeece7c5dc4da3dc5b645ea1",
+      "image": "sha256:2236f991eebb147e6a31d3000f0cc422fdc987b0b335e22e777365ebc5a72285",
+      "configurationDigest": "5bb1f835c3514bca7e8db5d8c01d34fb92be34b82742eed21ad2dc30a41aceb5",
+      "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+      "controls": {
+        "DB_POOL_MAX": "1",
+        "DB_POOL_MAX_VENUE_CATALOG": "3",
+        "DB_POOL_MAX_ANALYTICS": "2",
+        "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000",
+        "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+        "DB_CONNECTION_RESERVE": "36",
+        "DB_MAX_CONNECTIONS": "60",
+        "DB_DIAGNOSTICS_ENABLED": "false",
+        "DB_SAFE_READ_DEADLINE_ENABLED": "false"
+      }
+    },
+    "inventory": {
+      "business": {
+        "tables": {
+          "Booking": {
+            "count": 11,
+            "sha256": "151c9ddd6eb3065d2b38cb23046e291337e797b319184e2c23983c966cc02fdc"
+          },
+          "Consultation": {
+            "count": 16,
+            "sha256": "80af80dbc83bec32a0a018ee0ec8c16e557dc0f47daa1a2fff3f1e8cbf848dc0"
+          },
+          "ConsultationAccess": {
+            "count": 10,
+            "sha256": "47776976566192a28c4c8cce053ef0ec5edde4e67880a55fe469456952fe059d"
+          },
+          "GuestWorkspace": {
+            "count": 5,
+            "sha256": "21e162844e736902ced6fe71397b56522ed4d670283c8a3d84ba59b400673723"
+          },
+          "GuestPlanRevision": {
+            "count": 5,
+            "sha256": "302c9c38d76e44bf147e24ffb6a2141dc865b096e7caa379b7f2d4b13234204d"
+          },
+          "Guest": {
+            "count": 16,
+            "sha256": "c5f235cbe2bb3230a03760c8defded7307e66de64e9a59f862db0e08bae5e540"
+          },
+          "GuestGroup": {
+            "count": 20,
+            "sha256": "946e1fa84f3306c8dc063899a8378699ce4e21984a2d5519b328d4f3c48a458b"
+          },
+          "GuestHistory": {
+            "count": 36,
+            "sha256": "8e1cb71151e6624c6fa8e9e7a04954d0e21aa55a849cd9a4e9e1b142b9cafdfc"
+          },
+          "SeatingPlan": {
+            "count": 2,
+            "sha256": "473f2ab8e72b063df8e9d3045fa5095f615e2ba8b5002f733e364a82e90c8245"
+          },
+          "SeatingPlanRevision": {
+            "count": 4,
+            "sha256": "45de2e2833ed87c4c91d1e29d3b6113321d5ff82290498a38a333024b1ab7d55"
+          },
+          "StaffConfiguration": {
+            "count": 5,
+            "sha256": "7c014320c7b7e955caf0de7bef4331d7c0e1f7983a6a56c30728c07070451d9c"
+          },
+          "StaffAssignment": {
+            "count": 2,
+            "sha256": "2f5b76d1861c2685aac6c9a2b1c5dd1d37a920bf8d40785f9bfeead744a15622"
+          },
+          "StaffHistory": {
+            "count": 9,
+            "sha256": "8216e344eeb2e353de13a17b7130516d00917c623b63a9033eefc06afea274d2"
+          },
+          "StaffCheckInRecord": {
+            "count": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "CommercialContractRevision": {
+            "count": 2,
+            "sha256": "214f4da445aa0f3fefaea669bc42006b70afee422250d6ab1f4a7d046a9a908a"
+          },
+          "FinalInvoiceRevision": {
+            "count": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "BillingLedgerEntry": {
+            "count": 11,
+            "sha256": "d091b189fa3a6c6ad1b79fc1050ea799a52aec989595712d8671e71760ee65ff"
+          },
+          "InvitationPrintOrder": {
+            "count": 1,
+            "sha256": "b678300081034c67c7d698fe7248fd7b7f386e5b412ce53c42958bff74248203"
+          },
+          "InvitationPrintLine": {
+            "count": 1,
+            "sha256": "eee25413e140edcd488b8253e23fb5b1fb7ba509a5bd922882da057916e33baf"
+          },
+          "InvitationCommercialRevision": {
+            "count": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "InvitationPrintAudit": {
+            "count": 1,
+            "sha256": "84d96d6aff780101a03b1fd707dfd9dcb402cad2ca96d8180aabb83993132196"
+          },
+          "AccountRole": {
+            "count": 2,
+            "sha256": "9703dfea70d4dab1556c1fd72d18b7f06dcffa4b252d7faef4eb555112db2c6b"
+          },
+          "NotificationRecipient": {
+            "count": 1,
+            "sha256": "a0e5d426b4d77648d8edf76afad9444d57115878f699f9a4f13f56a998d4c14c"
+          },
+          "NotificationInbox": {
+            "count": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "NotificationPreference": {
+            "count": 1,
+            "sha256": "5c6ddff6a17cf2c3ee968907f4969da8d56636dcb841780e45efce626cbf33e3"
+          },
+          "NotificationInstallation": {
+            "count": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "NotificationCommand": {
+            "count": 1,
+            "sha256": "e771d6bffdb9950e9bc0d6a4d9701d4c406b1f9a824d87f9aab4cced3d8ff481"
+          },
+          "NotificationIntent": {
+            "count": 41,
+            "sha256": "2e3c3d4026723494ae1af4b1947aa3134d149444880c71c51ee51a76dd02959e"
+          },
+          "NotificationAttempt": {
+            "count": 82,
+            "sha256": "eed801d69916dd20d8b271cb9349487edfc9441e32b0d13e2f8bddbef1a2fcc8"
+          },
+          "NotificationCredential": {
+            "count": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "NotificationPushDelivery": {
+            "count": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "NotificationEventReceipt": {
+            "count": 16,
+            "sha256": "9a25f5dc1d43c2c8b77dfc1df8a66331179ffde12cd8d81ec0aded25459395de"
+          }
+        },
+        "migrations": {
+          "count": 61,
+          "sha256": "b7d90da8b39b7db5f6ef24ec1084f4ea2d4e4915664ebfccd00345c18fbf910e",
+          "allChecksumsMatch": true
+        },
+        "scope": {
+          "accounts": 2,
+          "consultations": 16,
+          "bookings": 11,
+          "recipients": 1,
+          "intents": 41
+        }
+      },
+      "catalog": {
+        "CatalogMediaAsset": {
+          "count": 4,
+          "sha256": "fcfcec0a8c4be49e3215058d899c6f0c5ebacd5f0ea10f5b3c8ac60b43b3a525"
+        },
+        "Dish": {
+          "count": 5,
+          "sha256": "3c6d6a3890e4b9e9db32200797047643b9a87aff5e15dd291ce76cca758e7c44"
+        },
+        "DishVersion": {
+          "count": 7,
+          "sha256": "45d4f5b8e1609b6af30da2af6150c4265a70788e578a5a457b2969430dd9de8c"
+        },
+        "Hall": {
+          "count": 3,
+          "sha256": "af7a69758699aa88092943596984d2c2ad3b295ebcd666d36fe31d7be2c195bc"
+        },
+        "LayoutTableGeometry": {
+          "count": 15,
+          "sha256": "26504c6d98f5ea4cd1adebe23d3ddddf0623dbd7b85430a496eefaf2da459b6c"
+        },
+        "LayoutTableIdentity": {
+          "count": 15,
+          "sha256": "58e6481bcffa159e53da848540eb92c668975d814f98f3490f723954773530fb"
+        },
+        "LayoutTemplate": {
+          "count": 4,
+          "sha256": "7415f8a65a3151aa2f35bed3855ec588ed261049e7f3ef1579650ef287e2404f"
+        },
+        "LayoutTemplateVersion": {
+          "count": 4,
+          "sha256": "d1c93f9e35e9b2ca39fc27068163028a2a56591d5ea04b4a63506fe05fe949d6"
+        },
+        "MenuPackage": {
+          "count": 2,
+          "sha256": "42c9198febdaeda79a301f97f96784bc7fa52c66148eb5739dd4c4e668bc0d31"
+        },
+        "MenuPackageItem": {
+          "count": 5,
+          "sha256": "6734abf2e3245690f71abb6e637f2108ef2b530bfa8bfe060de88b205a442f47"
+        },
+        "MenuPackageVersion": {
+          "count": 2,
+          "sha256": "650ac095779abadd27e48dcac287e6fcc0829e15d46651b7e86d5124d59003be"
+        },
+        "RestaurantProfile": {
+          "count": 1,
+          "sha256": "5a82b462f0c394aef1fa0b15704409c4d4f14aaf46a920fb19e866b1ef9dd9bc"
+        },
+        "TimelineTemplate": {
+          "count": 1,
+          "sha256": "dd6b78e908ffc4daf08c74785442ca9f78068b881100b52143c0d87ce1630cb1"
+        },
+        "TimelineTemplateItem": {
+          "count": 2,
+          "sha256": "24e0358615a754b17cfa76c76f1d8e6680fe00246bad03a1f294a082f2856534"
+        },
+        "TimelineTemplateVersion": {
+          "count": 1,
+          "sha256": "68ad9e4a42b91269b298ad8cd8ded1a33c35f94ee5ef836efd0cb0734cb96a6c"
+        }
+      }
+    },
+    "businessAndCatalogUnchanged": true,
+    "migrationsUnchanged": true,
+    "configurationUnchanged": true,
+    "correlated": [
+      {
+        "path": "/health/live",
+        "method": "GET",
+        "status": 200,
+        "requestId": "3d680abd-964f-48fa-9659-88615bfb9e22",
+        "matched": true,
+        "backendMs": 2.011,
+        "route": "/health/live"
+      },
+      {
+        "path": "/health/ready",
+        "method": "GET",
+        "status": 200,
+        "requestId": "c6923251-2429-4d00-98f0-3f23b5836431",
+        "matched": true,
+        "backendMs": 1122.751,
+        "route": "/health/ready"
+      },
+      {
+        "path": "/api/v1/openapi.json",
+        "method": "GET",
+        "status": 200,
+        "requestId": "015a3474-f8d8-4d89-93dd-b9497de22465",
+        "sha256": "19da7dafc991d316f7f048a58c6446deabb2e724edb3a49d55e4709ce14d04e2",
+        "matched": true,
+        "backendMs": 26.911,
+        "route": "/api/v1/openapi.json"
+      },
+      {
+        "path": "/api/v1/management/catalog/halls",
+        "method": "GET",
+        "status": 401,
+        "requestId": "dfdca9b6-888a-49a0-9a38-d7debd525fb2",
+        "matched": true,
+        "backendMs": 3.192,
+        "route": "/management/catalog/halls"
+      },
+      {
+        "label": "discovery",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 0,
+        "status": 200,
+        "ms": 2508.3304,
+        "requestId": "48238bb4-1e9e-410e-8b0a-51ce4706ac5d",
+        "at": "2026-10-18T08:52:59.429Z",
+        "matched": true,
+        "backendMs": 2035.064,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 0,
+        "status": 200,
+        "ms": 382.616,
+        "requestId": "9a936cd4-de50-44c5-93d4-f38300001c30",
+        "at": "2026-10-18T08:52:59.813Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 141.682,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 0,
+        "status": 200,
+        "ms": 894.0127000000002,
+        "requestId": "aa0a1342-1540-41eb-8843-0711c418aeb2",
+        "at": "2026-10-18T08:53:00.724Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 652.82,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 0,
+        "status": 200,
+        "ms": 392.9834000000001,
+        "requestId": "d6044509-5c8e-4674-b41b-b0d30a2e8605",
+        "at": "2026-10-18T08:53:02.540Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 141.06,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 0,
+        "status": 200,
+        "ms": 591.6359999999995,
+        "requestId": "efe09828-f898-4719-b7ae-9334a4410ccd",
+        "at": "2026-10-18T08:53:03.136Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 352.146,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 1,
+        "status": 200,
+        "ms": 383.3680000000004,
+        "requestId": "da0e4c69-ea32-4e59-bb5c-ef155e836f6b",
+        "at": "2026-10-18T08:53:04.176Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.891,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 1,
+        "status": 200,
+        "ms": 636.9080999999996,
+        "requestId": "cb044926-e083-4961-bec2-33b77dfd44da",
+        "at": "2026-10-18T08:53:04.815Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 382.282,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 1,
+        "status": 200,
+        "ms": 381.33240000000023,
+        "requestId": "3465d217-1b70-43cd-98c7-45df06f11c44",
+        "at": "2026-10-18T08:53:05.199Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.608,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 1,
+        "status": 200,
+        "ms": 580.5223000000005,
+        "requestId": "8594796c-c5b1-440c-9135-efb400a9f072",
+        "at": "2026-10-18T08:53:05.783Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 328.782,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 2,
+        "status": 200,
+        "ms": 377.0653999999995,
+        "requestId": "3a6b5f3a-5be1-4a31-ab74-14de5b5e09a6",
+        "at": "2026-10-18T08:53:06.163Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.606,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 2,
+        "status": 200,
+        "ms": 579.4683000000005,
+        "requestId": "2b7b2e08-a25b-4a3e-9283-95bcff54cb88",
+        "at": "2026-10-18T08:53:06.745Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 323.025,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 2,
+        "status": 200,
+        "ms": 384.90560000000005,
+        "requestId": "8623b715-0941-497e-9edc-a7f146a4082f",
+        "at": "2026-10-18T08:53:07.132Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.881,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 2,
+        "status": 200,
+        "ms": 563.741,
+        "requestId": "96cea4d9-a7a2-4936-ba69-a66fb76da9a0",
+        "at": "2026-10-18T08:53:07.699Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 320.671,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 3,
+        "status": 200,
+        "ms": 381.9472999999998,
+        "requestId": "3fb8f948-e196-4695-9505-7eba89a9f427",
+        "at": "2026-10-18T08:53:08.085Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.459,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 3,
+        "status": 200,
+        "ms": 581.994999999999,
+        "requestId": "59477ffb-e813-4386-ad54-749de7e4f795",
+        "at": "2026-10-18T08:53:08.669Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 340.413,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 3,
+        "status": 200,
+        "ms": 382.3848999999991,
+        "requestId": "25e3d00b-32e2-4942-8db2-24656e2b984f",
+        "at": "2026-10-18T08:53:09.054Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.477,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 3,
+        "status": 200,
+        "ms": 901.4002,
+        "requestId": "b0ccbe31-31bf-479a-a933-84f4a41b169b",
+        "at": "2026-10-18T08:53:09.957Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 662.015,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 4,
+        "status": 200,
+        "ms": 380.8294999999998,
+        "requestId": "3b5270df-81db-4000-a5f9-f23c5324b2cd",
+        "at": "2026-10-18T08:53:10.340Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.438,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 4,
+        "status": 200,
+        "ms": 569.5667000000012,
+        "requestId": "bf5cbaa1-8625-4ba1-bb52-9495ebda4c6d",
+        "at": "2026-10-18T08:53:10.912Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 321.253,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 4,
+        "status": 200,
+        "ms": 514.6052999999993,
+        "requestId": "b5140871-f0b8-41d3-a15f-09f3ec189df3",
+        "at": "2026-10-18T08:53:11.428Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.789,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 4,
+        "status": 200,
+        "ms": 567.3552,
+        "requestId": "b841234e-ac81-44b3-b679-6bd82563eb73",
+        "at": "2026-10-18T08:53:11.999Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 327.508,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 5,
+        "status": 200,
+        "ms": 382.91949999999997,
+        "requestId": "9c4929c1-11d2-4f69-99a4-63a75000f96e",
+        "at": "2026-10-18T08:53:12.383Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.672,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 5,
+        "status": 200,
+        "ms": 587.4094999999998,
+        "requestId": "e805d97b-8380-442b-9512-94b8df73ff74",
+        "at": "2026-10-18T08:53:12.973Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 336.039,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 5,
+        "status": 200,
+        "ms": 381.27679999999964,
+        "requestId": "0ee6d898-d502-4ad4-8653-c2e4bf4712e8",
+        "at": "2026-10-18T08:53:13.356Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.661,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 5,
+        "status": 200,
+        "ms": 882.0331000000006,
+        "requestId": "80f5c5a7-d73f-4b37-810a-97bce4be68e0",
+        "at": "2026-10-18T08:53:14.240Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 631.009,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 6,
+        "status": 200,
+        "ms": 384.5887999999977,
+        "requestId": "d5f4c74f-a18a-47f6-ac2f-b81e177905df",
+        "at": "2026-10-18T08:53:14.626Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.709,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 6,
+        "status": 200,
+        "ms": 600.2898999999998,
+        "requestId": "299149f3-9684-4d42-a523-89acd7b77b57",
+        "at": "2026-10-18T08:53:15.229Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 322.963,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 6,
+        "status": 200,
+        "ms": 378.1916000000019,
+        "requestId": "a27b77b3-a558-4c54-ae5d-05813a2c837f",
+        "at": "2026-10-18T08:53:15.609Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.642,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 6,
+        "status": 200,
+        "ms": 590.3917000000001,
+        "requestId": "6a462fc1-c5cb-4f6a-a114-6fdc2eaf909f",
+        "at": "2026-10-18T08:53:16.202Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 335.47,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 7,
+        "status": 200,
+        "ms": 390.1186000000016,
+        "requestId": "87e8a0b1-3908-4a7c-9d6c-a0cb5a4eeb2e",
+        "at": "2026-10-18T08:53:16.596Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.592,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 7,
+        "status": 200,
+        "ms": 565.3462,
+        "requestId": "0e016cb7-b28d-431f-82b7-7bb329f3c4db",
+        "at": "2026-10-18T08:53:17.163Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 325.492,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 7,
+        "status": 200,
+        "ms": 395.4252000000015,
+        "requestId": "0d4ca0d5-48da-4860-9e6f-ebf2f650350b",
+        "at": "2026-10-18T08:53:17.561Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.691,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 7,
+        "status": 200,
+        "ms": 605.0000999999975,
+        "requestId": "eaeba4f2-3088-47ef-9ade-a77b071d4d7c",
+        "at": "2026-10-18T08:53:18.169Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 347.014,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 8,
+        "status": 200,
+        "ms": 390.4192000000003,
+        "requestId": "330a8102-5dd0-4b99-8124-ff298067f0fe",
+        "at": "2026-10-18T08:53:18.564Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.447,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 8,
+        "status": 200,
+        "ms": 570.607,
+        "requestId": "45ca926f-e84a-416d-a400-fdc08af26dd6",
+        "at": "2026-10-18T08:53:19.137Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 332.886,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 8,
+        "status": 200,
+        "ms": 389.9006999999983,
+        "requestId": "89f45c94-3657-419b-8a11-bf71cbf3f98c",
+        "at": "2026-10-18T08:53:19.530Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.699,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 8,
+        "status": 200,
+        "ms": 575.2327000000005,
+        "requestId": "246ad83c-6d8f-49fd-a3d2-eb8fb9085b54",
+        "at": "2026-10-18T08:53:20.108Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 325.286,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 9,
+        "status": 200,
+        "ms": 379.9877000000015,
+        "requestId": "cc268d5a-47d9-4614-b787-c3a85f6a9a09",
+        "at": "2026-10-18T08:53:20.491Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.387,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 9,
+        "status": 200,
+        "ms": 564.5190000000002,
+        "requestId": "345a0556-ef3a-4a41-86cf-16f880ab2340",
+        "at": "2026-10-18T08:53:21.058Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 322.128,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 9,
+        "status": 200,
+        "ms": 381.7500999999975,
+        "requestId": "0ed5b1ce-550b-447d-8317-bca508810fe1",
+        "at": "2026-10-18T08:53:21.442Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.353,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 9,
+        "status": 200,
+        "ms": 583.6743999999999,
+        "requestId": "52301ecc-3d71-4f73-80a0-48722edf4358",
+        "at": "2026-10-18T08:53:22.030Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 334.279,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 10,
+        "status": 200,
+        "ms": 506.2573999999986,
+        "requestId": "fcfef21e-37d4-4268-85a3-afcec47281c8",
+        "at": "2026-10-18T08:53:22.538Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.306,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 10,
+        "status": 200,
+        "ms": 555.5714999999982,
+        "requestId": "5a4c0b80-2ce4-491b-8838-57c65d3ed09b",
+        "at": "2026-10-18T08:53:23.097Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 315.921,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 10,
+        "status": 200,
+        "ms": 381.89559999999983,
+        "requestId": "2057f9cb-dfe1-4b78-a48d-ccb55e151c7c",
+        "at": "2026-10-18T08:53:23.481Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.709,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 10,
+        "status": 200,
+        "ms": 587.4809999999998,
+        "requestId": "8a219d4a-c55b-4174-863c-754a584a02f2",
+        "at": "2026-10-18T08:53:24.071Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 346.813,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 11,
+        "status": 200,
+        "ms": 383.5214999999989,
+        "requestId": "b755427d-9087-4ed8-ab7e-32046ce63d4d",
+        "at": "2026-10-18T08:53:24.457Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.716,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 11,
+        "status": 200,
+        "ms": 589.2789000000012,
+        "requestId": "9ab2d5fe-5be3-40b2-bc6d-b49aa0492ad7",
+        "at": "2026-10-18T08:53:25.049Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 340.149,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 11,
+        "status": 200,
+        "ms": 810.4125000000022,
+        "requestId": "492f5fb1-82bc-4b4a-a19b-bff2030b0689",
+        "at": "2026-10-18T08:53:25.864Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 139.986,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 11,
+        "status": 200,
+        "ms": 591.9527999999991,
+        "requestId": "1e03d961-6846-4888-a229-90f783712fb6",
+        "at": "2026-10-18T08:53:26.458Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 335.853,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 12,
+        "status": 200,
+        "ms": 378.3035000000018,
+        "requestId": "1a3f0148-a452-4aa2-8398-8b04f8ff7e85",
+        "at": "2026-10-18T08:53:26.841Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.225,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 12,
+        "status": 200,
+        "ms": 567.9467000000004,
+        "requestId": "d2f05784-5f10-4e47-9419-5a0977f396be",
+        "at": "2026-10-18T08:53:27.412Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 327.784,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 12,
+        "status": 200,
+        "ms": 381.8724000000002,
+        "requestId": "f0b26725-cae1-412e-a5ba-7ab64b213a6e",
+        "at": "2026-10-18T08:53:27.797Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.932,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 12,
+        "status": 200,
+        "ms": 581.1059000000023,
+        "requestId": "a86a81b7-c877-4025-b7e2-3f29d59b3048",
+        "at": "2026-10-18T08:53:28.381Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 336.441,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 13,
+        "status": 200,
+        "ms": 381.41829999999754,
+        "requestId": "8af49f7e-6a98-4b49-bd6a-75c0dbeed123",
+        "at": "2026-10-18T08:53:28.765Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.646,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 13,
+        "status": 200,
+        "ms": 553.4785999999986,
+        "requestId": "27166012-7ca5-42bd-99ab-e41a949fcd14",
+        "at": "2026-10-18T08:53:29.320Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 318.189,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 13,
+        "status": 200,
+        "ms": 379.6342999999979,
+        "requestId": "4087b77a-abcc-4040-bbba-9dc9e927feae",
+        "at": "2026-10-18T08:53:29.702Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.572,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 13,
+        "status": 200,
+        "ms": 558.2181999999957,
+        "requestId": "b5888487-d08d-455e-a276-9a2801bc7e86",
+        "at": "2026-10-18T08:53:30.262Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 319.009,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 14,
+        "status": 200,
+        "ms": 379.0938000000024,
+        "requestId": "def6bff2-b5ce-4ca4-8584-2580c3fa19de",
+        "at": "2026-10-18T08:53:30.644Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.401,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 14,
+        "status": 200,
+        "ms": 554.6194000000032,
+        "requestId": "2fb691e3-feb5-4565-8439-2b4b90933b00",
+        "at": "2026-10-18T08:53:31.201Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 322.214,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 14,
+        "status": 200,
+        "ms": 377.5237999999954,
+        "requestId": "6d3f0261-7690-43fa-9320-0e9fa46cf8e9",
+        "at": "2026-10-18T08:53:31.583Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.532,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 14,
+        "status": 200,
+        "ms": 569.7612000000008,
+        "requestId": "5bf7837b-caed-4c60-af7c-eca7b1908998",
+        "at": "2026-10-18T08:53:32.155Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 324.847,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 15,
+        "status": 200,
+        "ms": 392.9953999999998,
+        "requestId": "f2b0cdf9-e83d-4113-bc81-82c5bea44b2e",
+        "at": "2026-10-18T08:53:32.552Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.256,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 15,
+        "status": 200,
+        "ms": 646.0823000000019,
+        "requestId": "c2fb23fb-d6a1-471f-93e0-bb5f76e896df",
+        "at": "2026-10-18T08:53:33.200Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 396.641,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 15,
+        "status": 200,
+        "ms": 419.9265000000014,
+        "requestId": "fe55be91-93e1-4c5f-b4b1-f55561b0790f",
+        "at": "2026-10-18T08:53:33.624Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.564,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 15,
+        "status": 200,
+        "ms": 552.7356999999975,
+        "requestId": "d8f5c828-e2c8-4558-a04c-c622f83b1199",
+        "at": "2026-10-18T08:53:34.180Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 316.117,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 16,
+        "status": 200,
+        "ms": 381.2101999999941,
+        "requestId": "9a40c9ce-eea0-4bee-9ac6-0997761e91a3",
+        "at": "2026-10-18T08:53:34.563Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.848,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 16,
+        "status": 200,
+        "ms": 589.5708000000013,
+        "requestId": "ed534474-f3ad-4657-a5eb-fe1aebae1795",
+        "at": "2026-10-18T08:53:35.155Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 335.753,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 16,
+        "status": 200,
+        "ms": 378.9412999999986,
+        "requestId": "b7a93648-38bb-4c97-a80f-649cf5499257",
+        "at": "2026-10-18T08:53:35.537Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.58,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 16,
+        "status": 200,
+        "ms": 558.1088000000018,
+        "requestId": "d752b123-fc86-4ba3-9ce8-1526bfb8d857",
+        "at": "2026-10-18T08:53:36.098Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 319.798,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 17,
+        "status": 200,
+        "ms": 379.99759999999515,
+        "requestId": "ff9921b1-90f3-4705-bfbd-8b7f07b54b32",
+        "at": "2026-10-18T08:53:36.482Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.907,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 17,
+        "status": 200,
+        "ms": 623.6898999999976,
+        "requestId": "41e06a81-0a8d-4b65-8755-94ececd52235",
+        "at": "2026-10-18T08:53:37.108Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 371.513,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 17,
+        "status": 200,
+        "ms": 387.37370000000374,
+        "requestId": "ec0e7d08-d9cf-467e-806b-5ddf7fabb54b",
+        "at": "2026-10-18T08:53:37.498Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.656,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 17,
+        "status": 200,
+        "ms": 576.9952000000048,
+        "requestId": "c04709ff-5b06-4511-b23b-f49c13a98158",
+        "at": "2026-10-18T08:53:38.078Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 339.424,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 18,
+        "status": 200,
+        "ms": 377.20790000000125,
+        "requestId": "569ef1a1-fcc7-4dbf-b540-51ebda21bf33",
+        "at": "2026-10-18T08:53:38.458Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.561,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 18,
+        "status": 200,
+        "ms": 889.670100000003,
+        "requestId": "de55fd2a-a321-4691-86b6-ea95ae1e3979",
+        "at": "2026-10-18T08:53:39.351Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 645.097,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 18,
+        "status": 200,
+        "ms": 378.6392000000051,
+        "requestId": "50091a14-eced-411a-a1fd-ea8b3d1da2ff",
+        "at": "2026-10-18T08:53:39.732Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.709,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 18,
+        "status": 200,
+        "ms": 878.0763999999981,
+        "requestId": "fa5d9b74-ac8b-4be1-a433-968c1e37e09c",
+        "at": "2026-10-18T08:53:40.613Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 643.687,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 19,
+        "status": 200,
+        "ms": 391.4366999999984,
+        "requestId": "6e8e696f-a15a-413e-aa54-4d6055ecab5e",
+        "at": "2026-10-18T08:53:41.006Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.698,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 19,
+        "status": 200,
+        "ms": 875.9106000000029,
+        "requestId": "60f15f86-44dc-4560-b072-60a05f5586e2",
+        "at": "2026-10-18T08:53:41.884Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 638.643,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 19,
+        "status": 200,
+        "ms": 378.12430000000313,
+        "requestId": "50cf84d4-422b-46e1-8cae-0a89e3567f61",
+        "at": "2026-10-18T08:53:42.265Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.685,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 19,
+        "status": 200,
+        "ms": 564.8479000000007,
+        "requestId": "d5669879-a37d-48cd-b382-b9311d8b0585",
+        "at": "2026-10-18T08:53:42.833Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 326.865,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-no-assets",
+        "path": "/catalog/halls?limit=1",
+        "method": "GET",
+        "round": 20,
+        "status": 200,
+        "ms": 375.6866999999984,
+        "requestId": "556d8fe0-e2b1-47d2-84a5-6b961ae24966",
+        "at": "2026-10-18T08:53:43.212Z",
+        "factsSha256": "f0686013dd47c45078c04cd650bfa7d1cc82eec21e1271ac935a090ece838828",
+        "itemCount": 1,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.445,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "one-real-asset",
+        "path": "/catalog/halls?limit=1&cursor=10000000-0000-4000-8000-000000000011",
+        "method": "GET",
+        "round": 20,
+        "status": 200,
+        "ms": 585.4288000000015,
+        "requestId": "39ced6ef-431f-42e3-b92d-fbb7a2bffb10",
+        "at": "2026-10-18T08:53:43.800Z",
+        "factsSha256": "06cb171a31a8556d38909d5a50499b67a6467f428ac4cdaf5a3e820455a60aa2",
+        "itemCount": 1,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 332.87,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-no-assets",
+        "path": "/catalog/halls?limit=2",
+        "method": "GET",
+        "round": 20,
+        "status": 200,
+        "ms": 717.6339999999982,
+        "requestId": "35fb121e-8169-4f1e-9655-7b57c9fe9b32",
+        "at": "2026-10-18T08:53:45.346Z",
+        "factsSha256": "e878c1fd1372daa0fa5c39fb2d8838254d667ebb513529e18b9b5fb5f0fa921e",
+        "itemCount": 2,
+        "mediaCount": 0,
+        "matched": true,
+        "backendMs": 140.521,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "page-real-asset",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "round": 20,
+        "status": 200,
+        "ms": 666.2955000000002,
+        "requestId": "35652aed-9ae2-429b-80ee-1bd6aba10037",
+        "at": "2026-10-18T08:53:46.016Z",
+        "factsSha256": "34ad7998265dd26a3f3ff103cbadaf0d527fd324ff7cb4734d9de7dbef871f7d",
+        "itemCount": 3,
+        "mediaCount": 1,
+        "matched": true,
+        "backendMs": 327.824,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "invalid-cursor",
+        "path": "/catalog/halls?cursor=malformed",
+        "method": "GET",
+        "round": 0,
+        "status": 422,
+        "ms": 242.69740000000456,
+        "requestId": "0284d701-2744-4a06-9249-035003cf153b",
+        "at": "2026-10-18T08:53:46.942Z",
+        "matched": true,
+        "backendMs": 2.714,
+        "route": "/catalog/halls"
+      },
+      {
+        "label": "missing-cursor",
+        "path": "/catalog/halls?cursor=1c9a8bfa-edab-40c9-8b34-5dde710c55b1",
+        "method": "GET",
+        "round": 0,
+        "status": 422,
+        "ms": 395.09419999999955,
+        "requestId": "0c645a51-0a97-4ba1-830c-0bc931ef5dc1",
+        "at": "2026-10-18T08:53:47.338Z",
+        "matched": true,
+        "backendMs": 140.885,
+        "route": "/catalog/halls"
+      },
+      {
+        "label": "end-cursor",
+        "path": "/catalog/halls?cursor=be5d4496-de6a-4666-8d17-3202b1f873ed",
+        "method": "GET",
+        "round": 0,
+        "status": 200,
+        "ms": 395.04060000000027,
+        "requestId": "12e7fdef-6348-4751-85ff-0302315ad58d",
+        "at": "2026-10-18T08:53:47.735Z",
+        "matched": true,
+        "backendMs": 140.567,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "anonymous-management",
+        "path": "/management/catalog/halls",
+        "method": "GET",
+        "round": 0,
+        "status": 401,
+        "ms": 250.916999999994,
+        "requestId": "7a4bc903-5350-4ea2-bbbd-e4d22e4c1773",
+        "at": "2026-10-18T08:53:47.988Z",
+        "matched": true,
+        "backendMs": 0.999,
+        "route": "/management/catalog/halls"
+      },
+      {
+        "label": "signed-url-freshness",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "status": 200,
+        "requestId": "5da66782-3ca6-469e-9bb7-6fbaa659b2ac",
+        "ms": 1206.2454000000002,
+        "matched": true,
+        "backendMs": 681.479,
+        "route": "/api/v1/catalog/halls"
+      },
+      {
+        "label": "signed-url-freshness",
+        "path": "/catalog/halls?limit=20",
+        "method": "GET",
+        "status": 200,
+        "requestId": "8d6a5e42-9596-4e53-8288-60de3cd8da60",
+        "ms": 592.9281000000001,
+        "matched": true,
+        "backendMs": 350.712,
+        "route": "/api/v1/catalog/halls"
+      }
+    ],
+    "summary": [
+      {
+        "case": "one-no-assets",
+        "returned": 1,
+        "before": {
+          "case": "one-no-assets",
+          "returned": 1,
+          "n": 20,
+          "backendP50Ms": 468.391,
+          "backendP95Ms": 472.322,
+          "clientP50Ms": 706.3671999999933,
+          "clientP95Ms": 744.3061000000016
+        },
+        "after": {
+          "n": 20,
+          "backendP50Ms": 140.561,
+          "backendP95Ms": 140.891,
+          "clientP50Ms": 381.41829999999754,
+          "clientP95Ms": 392.9953999999998
+        },
+        "backendP95ReductionPercent": 70.17056160839428,
+        "clientP95ReductionPercent": 47.199760958562756
+      },
+      {
+        "case": "one-real-asset",
+        "returned": 1,
+        "before": {
+          "case": "one-real-asset",
+          "returned": 1,
+          "n": 20,
+          "backendP50Ms": 810.984,
+          "backendP95Ms": 1146.471,
+          "clientP50Ms": 1049.126599999996,
+          "clientP95Ms": 1379.9386000000013
+        },
+        "after": {
+          "n": 20,
+          "backendP50Ms": 332.87,
+          "backendP95Ms": 638.643,
+          "clientP50Ms": 581.994999999999,
+          "clientP95Ms": 875.9106000000029
+        },
+        "backendP95ReductionPercent": 44.29488403980562,
+        "clientP95ReductionPercent": 36.52539323126391
+      },
+      {
+        "case": "page-no-assets",
+        "returned": 2,
+        "before": {
+          "case": "page-no-assets",
+          "returned": 2,
+          "n": 20,
+          "backendP50Ms": 468.476,
+          "backendP95Ms": 469.433,
+          "clientP50Ms": 704.0365999999995,
+          "clientP95Ms": 715.4262000000017
+        },
+        "after": {
+          "n": 20,
+          "backendP50Ms": 140.642,
+          "backendP95Ms": 140.881,
+          "clientP50Ms": 381.8724000000002,
+          "clientP95Ms": 717.6339999999982
+        },
+        "backendP95ReductionPercent": 69.98911452752577,
+        "clientP95ReductionPercent": -0.30859926572390783
+      },
+      {
+        "case": "page-real-asset",
+        "returned": 3,
+        "before": {
+          "case": "page-real-asset",
+          "returned": 3,
+          "n": 20,
+          "backendP50Ms": 676.341,
+          "backendP95Ms": 992.11,
+          "clientP50Ms": 913.6747000000032,
+          "clientP95Ms": 1241.1203999999998
+        },
+        "after": {
+          "n": 20,
+          "backendP50Ms": 328.782,
+          "backendP95Ms": 643.687,
+          "clientP50Ms": 580.5223000000005,
+          "clientP95Ms": 882.0331000000006
+        },
+        "backendP95ReductionPercent": 35.119392002902906,
+        "clientP95ReductionPercent": 28.932511301884922
+      }
+    ],
+    "publicReadsAfter": 84,
+    "matchedAfter": 95,
+    "allCanonicalResponseHashesMatchBefore": true,
+    "providerReads": [
+      {
+        "case": "one-real-asset",
+        "round": 0,
+        "resourceId": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+        "status": 200,
+        "bytes": 237,
+        "sha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d",
+        "ms": 1419.0683
+      },
+      {
+        "case": "page-real-asset",
+        "round": 0,
+        "resourceId": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+        "status": 200,
+        "bytes": 237,
+        "sha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d",
+        "ms": 652.4762000000001
+      },
+      {
+        "case": "one-real-asset",
+        "round": 20,
+        "resourceId": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+        "status": 200,
+        "bytes": 237,
+        "sha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d",
+        "ms": 823.7874999999985
+      },
+      {
+        "case": "page-real-asset",
+        "round": 20,
+        "resourceId": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+        "status": 200,
+        "bytes": 237,
+        "sha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d",
+        "ms": 680.7922000000035
+      }
+    ],
+    "controls": {
+      "at": "2026-10-18T08:54:30.795Z",
+      "samples": [
+        {
+          "label": "signed-url-freshness",
+          "path": "/catalog/halls?limit=20",
+          "method": "GET",
+          "status": 200,
+          "requestId": "5da66782-3ca6-469e-9bb7-6fbaa659b2ac",
+          "ms": 1206.2454000000002
+        },
+        {
+          "label": "signed-url-freshness",
+          "path": "/catalog/halls?limit=20",
+          "method": "GET",
+          "status": 200,
+          "requestId": "8d6a5e42-9596-4e53-8288-60de3cd8da60",
+          "ms": 592.9281000000001
+        }
+      ],
+      "providerReads": [
+        {
+          "status": 200,
+          "bytes": 237,
+          "sha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d",
+          "ms": 1034.4566999999997
+        },
+        {
+          "status": 200,
+          "bytes": 237,
+          "sha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d",
+          "ms": 829.8863000000001
+        }
+      ],
+      "controls": [
+        {
+          "kind": "expired-signed-url",
+          "status": 400
+        },
+        {
+          "kind": "unsigned-private-object",
+          "status": 400
+        }
+      ],
+      "freshSignedUrlHashes": {
+        "first": "82e86c59300f54c483e309ecae46a71b78779d4532e7a476e2ad19b854bc279f",
+        "last": "2b0592b5eb18e413f26b9d6ac0f50ff8f0570f7927aabb95b288d2d53e79d3d1",
+        "changed": true
+      },
+      "passed": true,
+      "finishedAt": "2026-10-18T08:54:43.562Z"
+    },
+    "passed": true
+  },
+  "cleanup": {
+    "fixture": {
+      "at": "2026-10-18T08:27:38.440Z",
+      "schemaRemoved": true,
+      "ownedTablesRemoved": 2,
+      "ownedHallRowsRemoved": 41,
+      "ownedMediaRowsRemoved": 20,
+      "ownedStorageObjectsRemoved": 20,
+      "deletedObjectReadDenials": [
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400
+      ],
+      "existingPublicRowsDeleted": 0,
+      "destructiveCascadeUsed": false
+    },
+    "key": {
+      "at": "2026-10-18T08:27:33.136Z",
+      "fingerprint": "SHA256:Jlh/pVP5aumxtQmER1G0FypwmccH3e6Kumeffru1fpk",
+      "revoked": true,
+      "revokedTransportDenied": true,
+      "ownedKeysRemoved": true,
+      "otherKeysUntouched": true,
+      "remoteFilesWritten": false
+    },
+    "local": {
+      "at": "2026-10-18T08:25:35.241Z",
+      "testDatabasesRemaining": 0,
+      "clusterStopped": true,
+      "clusterPort": 55441,
+      "sharedDatabaseCleanup": false
+    },
+    "noNewFixtureOrSshKeyForRollout": true
+  },
+  "preservation": {
+    "scopedBusinessDigestsUnchanged": 32,
+    "publicCatalogDigestsUnchanged": 15,
+    "appliedMigrationChecksumsUnchanged": 61,
+    "configurationAndControlsUnchanged": true,
+    "onlyMergedSourceDeploymentActive": true,
+    "precedingDeploymentStopped": true,
+    "noExistingPublicCatalogOrBusinessWrites": true
+  },
+  "limits": [
+    "The twenty-item original-gate comparison uses an owner-authorized isolated real-provider schema and real private objects in the serving SFO container. Native loopback HTTP excludes public ingress.",
+    "The authorized native pool is maximum one, shared by all three variants; the application Venue pool remains three. Results do not establish multi-reader capacity or production SLO.",
+    "The existing public demo contains three Halls. After probes verify the exact merged code, body facts, fresh TTL900 URLs, expected expiry/private-access denials and unchanged data; no twenty-item public-ingress cohort is claimed.",
+    "Original, deployed-incremental and public client/backend comparisons stay distinct, with all tails retained. The two-plain public client p95 worsens 0.309%, and three-rich client gain is only 28.933%, below30%; retain these under PERF13 without causal attribution.",
+    "The original limited-scope acceptance and verification pending statuses remain historical evidence; this runtime receipt supersedes runtime status only, and the follow-up documentation PR records canonical original-criteria closure after green CI.",
+    "Provider acceptance and production NO_GO remain unchanged; no frontend, paid generation, money operation, live business fixture, replacement SSH key or configuration change."
+  ],
+  "productionReadiness": "NO_GO_UNCHANGED",
+  "perf13": "OPEN",
+  "artifacts": [
+    {
+      "path": "output/perf09-original-20261018/rollout-authorization.json",
+      "sha256": "c85d66730f26f86b401afe5a6c45bb120197f920edb451332949037a310c667e"
+    },
+    {
+      "path": "output/perf09-original-20261018/premerge.json",
+      "sha256": "39393e129f7dd9ae2a056b50adebfde9711be05f8ec53cce4422fb5a299a37bc"
+    },
+    {
+      "path": "output/perf09-original-20261018/merge.json",
+      "sha256": "b140aec561facffb83bcf016c70f470d6d43bff1224475cdabb6f92d0728713f"
+    },
+    {
+      "path": "output/perf09-original-20261018/serving.json",
+      "sha256": "b2db1bc1cd0b17d9d6ac62fc06c8acb320860e000227cbbd69601178a5cf5fc5"
+    },
+    {
+      "path": "output/perf09-original-20261018/public-after.json",
+      "sha256": "714b877e895c4fef281d7316c3de38aac94d153c3cc8f88061437d7df2a83194"
+    },
+    {
+      "path": "output/perf09-original-20261018/signed-controls.json",
+      "sha256": "626691eea9b9f9fcdb34f90da67a73ce637923f4bc368480d193f5ba119a11a9"
+    },
+    {
+      "path": "output/perf09-original-20261018/final-postflight.json",
+      "sha256": "950cfedf82676b6d6345befe438eed18a1466fe1527b030e17c9cfa8dc4e58cd"
+    },
+    {
+      "path": "output/perf09-original-20261018/ci-final.json",
+      "sha256": "8d73f95a49509f7046bf1c959033783389a67f81ae313bb358f6390f57677d01"
+    },
+    {
+      "path": "output/perf09-original-20261018/review.json",
+      "sha256": "2a7490263e26017ce557b06af28724789ff711b7bb551dfb6b7c7bd8ae999384"
+    },
+    {
+      "path": "output/perf09-original-20261018/local-cleanup.json",
+      "sha256": "c8efbe155ba5b0cc0dbd945b8ee0ff93e8aa2dad9fbcbeac07dfba72eb56a0a4"
+    },
+    {
+      "path": "output/perf09-original-20261018/fixture-cleanup.json",
+      "sha256": "b6ce8907154d600a54d7809db2d1cc1d65551db09d4e2e1ae0a155f1bc09f91e"
+    },
+    {
+      "path": "output/perf09-original-20261018/key-revocation.json",
+      "sha256": "ad6cda9421cc64cdec4a74169ceecf693fd0f5f5c3641bc2d1693e95950fd75d"
+    },
+    {
+      "path": "output/perf09-original-20261018/merge.mjs",
+      "sha256": "07391b88678bdde27620fd0bd80316ecd3454d04ab6669bbaf0a537713791ca1"
+    },
+    {
+      "path": "output/perf09-original-20261018/serving.mjs",
+      "sha256": "ac6793b2304c0f73c2b2e23f518bcc5e8c347ac1055c1590c609b24a74ab99f1"
+    },
+    {
+      "path": "output/perf09-original-20261018/public.mjs",
+      "sha256": "0cd8871067cd835942d5664159053d4146392a5cb24598ded14ae06fa4beb03c"
+    },
+    {
+      "path": "output/perf09-original-20261018/signed-controls.ts",
+      "sha256": "f7f2880b99489ab1aa21f5cc23d9bde64e2e9acecc2c7972a4a1162e59875d19"
+    },
+    {
+      "path": "output/perf09-original-20261018/final-postflight.mjs",
+      "sha256": "570cffd19715f50f354556f3167dae5f741808cfffb92d902d2ab278d642ffc6"
+    },
+    {
+      "path": "output/perf09-original-20261018/close-rollout.mjs",
+      "sha256": "95d21d5d570148f410397a2a3178fb17353a4139f9833a52e3da099ee812850b"
+    },
+    {
+      "path": "tasks/evidence/perf09-original-verification-2026-10-18.json",
+      "sha256": "dc532ee9a2368c43373d68180606b51107d23468e6019725a270b1480945b784"
+    },
+    {
+      "path": "tasks/evidence/perf09-pr70-ci-2026-10-18.json",
+      "sha256": "2a5191bd656ed3b336f6be01a37f4d8155ad118b13d4b938afcd0430d815e167"
+    }
+  ]
+}

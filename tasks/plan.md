@@ -193,6 +193,15 @@ public three-Hall baseline, provider body reads and incremental gains stay separ
 All 47 scoped digests/61 migrations/configuration match and owned fixtures/key close.
 Keep open pending exact-head CI, reviewed rollout and after checks; PERF-13/NO_GO remain.
 
+2026-10-18 [PERF-09 original rollout closure](../docs/backend-performance-09-rollout-2026-10-18.md):
+all four actual 1/20 plain/rich native cohorts exceed original 30% target with one
+driver command per page. Owner-authorized PR #70 and main CI pass 2,119 tests. Railway
+serves exact merged/measured source; all 84 public after reads, 95 log correlations,
+fresh/private/expiry URL controls and 47 scoped digests/61 migrations match. PERF-09
+is complete under the original criteria, superseding historical limited-scope and
+pending notes above. Two-plain public client p95 worsens 0.309%; three-rich client
+gain is 28.933%, below 30%. Native/public and capacity limits, PERF-13/NO_GO remain.
+
 ### PERF-10 — Separate analytics read and refresh cost
 
 Dependencies: PERF-03. Proposed files: analytics service, projector/store and focused

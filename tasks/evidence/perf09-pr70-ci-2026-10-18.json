@@ -1,0 +1,293 @@
+{
+  "schemaVersion": 1,
+  "task": "PERF-09",
+  "at": "2026-10-18T08:35:36.316Z",
+  "pr": {
+    "number": 70,
+    "url": "https://github.com/WDP301-wedding/wedding-be/pull/70",
+    "head": "4f945d6c9966c018a7117c0a9a427baf814996fc",
+    "base": "45f72aeadf205ed81cd991b59259f4ca3942a831",
+    "draft": false,
+    "mergeable": true
+  },
+  "ci": {
+    "at": "2026-10-18T08:35:24.068Z",
+    "pr": "https://github.com/WDP301-wedding/wedding-be/pull/70",
+    "head": "4f945d6c9966c018a7117c0a9a427baf814996fc",
+    "id": 39111634444,
+    "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39111634444",
+    "attempt": 1,
+    "conclusion": "success",
+    "jobs": [
+      {
+        "id": 117628844926,
+        "name": "Static, test, build, and audit gates",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Generate Prisma client",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check formatting",
+            "conclusion": "success"
+          },
+          {
+            "name": "Lint",
+            "conclusion": "success"
+          },
+          {
+            "name": "Typecheck",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run unit tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run contract tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Verify generated OpenAPI artifact",
+            "conclusion": "success"
+          },
+          {
+            "name": "Build production output",
+            "conclusion": "success"
+          },
+          {
+            "name": "Audit locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "summaries": [
+          "found 0 vulnerabilities",
+          " Test Files  162 passed (162)",
+          "      Tests  1461 passed (1461)",
+          " Test Files  20 passed (20)",
+          "      Tests  59 passed (59)"
+        ]
+      },
+      {
+        "id": 117628845095,
+        "name": "PostgreSQL migration and integration gates",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Initialize containers",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Generate Prisma client",
+            "conclusion": "success"
+          },
+          {
+            "name": "Deploy migrations to empty PostgreSQL",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run PostgreSQL integration tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Enforce full-suite coverage with PostgreSQL",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Stop containers",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "summaries": [
+          "found 0 vulnerabilities",
+          " Test Files  107 passed (107)",
+          "      Tests  599 passed (599)",
+          " Test Files  289 passed (289)",
+          "      Tests  2119 passed (2119)",
+          "All files          |   96.67 |    93.54 |   98.48 |   97.58 |                   "
+        ]
+      }
+    ]
+  },
+  "review": {
+    "at": "2026-10-18T08:35:27.683Z",
+    "head": "4f945d6c9966c018a7117c0a9a427baf814996fc",
+    "base": "45f72aeadf205ed81cd991b59259f4ca3942a831",
+    "state": "open",
+    "draft": true,
+    "mergeable": true,
+    "files": [
+      {
+        "path": "docs/backend-performance-09-original-2026-10-18.md",
+        "status": "added",
+        "additions": 116,
+        "deletions": 0
+      },
+      {
+        "path": "src/modules/venue-catalog/application/catalog-media.service.ts",
+        "status": "modified",
+        "additions": 28,
+        "deletions": 0
+      },
+      {
+        "path": "src/modules/venue-catalog/application/catalog-query.service.test.ts",
+        "status": "modified",
+        "additions": 8,
+        "deletions": 1
+      },
+      {
+        "path": "src/modules/venue-catalog/application/catalog-query.service.ts",
+        "status": "modified",
+        "additions": 4,
+        "deletions": 46
+      },
+      {
+        "path": "src/modules/venue-catalog/infrastructure/catalog-hall-page.reader.ts",
+        "status": "added",
+        "additions": 66,
+        "deletions": 0
+      },
+      {
+        "path": "tasks/backend-revision-todo.md",
+        "status": "modified",
+        "additions": 17,
+        "deletions": 1
+      },
+      {
+        "path": "tasks/evidence/perf09-original-verification-2026-10-18.json",
+        "status": "added",
+        "additions": 12376,
+        "deletions": 0
+      },
+      {
+        "path": "tasks/evidence/performance-regression-budgets.json",
+        "status": "modified",
+        "additions": 4,
+        "deletions": 3
+      },
+      {
+        "path": "tasks/plan.md",
+        "status": "modified",
+        "additions": 13,
+        "deletions": 0
+      },
+      {
+        "path": "tests/integration/catalog-hall-page.test.ts",
+        "status": "added",
+        "additions": 310,
+        "deletions": 0
+      },
+      {
+        "path": "tests/integration/catalog-read-performance.test.ts",
+        "status": "modified",
+        "additions": 18,
+        "deletions": 29
+      },
+      {
+        "path": "tests/integration/pool-deadline.test.ts",
+        "status": "modified",
+        "additions": 6,
+        "deletions": 2
+      }
+    ],
+    "sealedArtifactsChecked": 87,
+    "sealedArtifactChanges": 0,
+    "credentialPatternFound": false,
+    "unresolvedThreads": 0,
+    "reviews": [],
+    "fiveAxisSelfReview": {
+      "kind": "five-axis self-review",
+      "independentReviewerClaimed": false,
+      "correctness": "Strict 1/20 DTOs, tied order, end/missing/retired cursors, detached/wrong-type media, configured quoted schema, fresh reads and blocked-read timeout verified",
+      "readability": "Small Venue-owned bounded reader; existing asset signer reused",
+      "architecture": "All changes remain within Venue, using existing Storage port and deadline helper; no module ownership breach",
+      "security": "Bound values and quoted configured schema; attached HALL filter, DTO projection, private URL TTL/expiry controls; fixture schema RLS and no anon/authenticated usage; no secrets in evidence",
+      "performance": "One actual command and indexed 2/21-row lookahead on 5000-row local clone; 20 matched live triplets per case, no sample removal; original versus incremental/public observations kept separate"
+    },
+    "ownerMergeApproval": "Not yet granted for PR70; current approval covers isolated fixture campaign and cleanup"
+  },
+  "runtimeStillUnchanged": {
+    "deploymentId": "9d257687-0fec-484d-ba17-ae4845ee33f9",
+    "source": "45f72aeadf205ed81cd991b59259f4ca3942a831",
+    "image": "sha256:21c946494ca273f22e82a9d948c1db4270789d718b555854a2c74ea8e2599683",
+    "configurationDigest": "5bb1f835c3514bca7e8db5d8c01d34fb92be34b82742eed21ad2dc30a41aceb5",
+    "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+    "controls": {
+      "DB_POOL_MAX": "1",
+      "DB_POOL_MAX_VENUE_CATALOG": "3",
+      "DB_POOL_MAX_ANALYTICS": "2",
+      "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000",
+      "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+      "DB_CONNECTION_RESERVE": "36",
+      "DB_MAX_CONNECTIONS": "60",
+      "DB_DIAGNOSTICS_ENABLED": "false",
+      "DB_SAFE_READ_DEADLINE_ENABLED": "false"
+    }
+  },
+  "verificationReceipt": {
+    "path": "tasks/evidence/perf09-original-verification-2026-10-18.json",
+    "sha256": "dc532ee9a2368c43373d68180606b51107d23468e6019725a270b1480945b784"
+  },
+  "mergeAndAutomaticRailwayRollout": "AWAITING_EXPLICIT_OWNER_APPROVAL",
+  "approvalRule": {
+    "path": ".github/pull_request_template.md",
+    "quote": "The change has been reviewed, any conversations are resolved, and merge is authorized by the project owner; teammate approval is optional."
+  }
+}
