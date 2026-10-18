@@ -1,4 +1,5 @@
 import type { MenuPackageSnapshot } from '../../venue-catalog/application/menu.service.js';
+import { z } from 'zod';
 import type { HallSnapshot, ShiftSnapshot } from '../../venue-catalog/application/venue.service.js';
 
 export type BookingPhase = 'DRAFT' | 'AWAITING_DEPOSIT' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
@@ -7,6 +8,7 @@ export type BookingTransition = 'REQUEST_DEPOSIT' | 'RECORD_DEPOSIT' | 'CANCEL' 
 
 export type BookingPolicyErrorCode =
   | 'BOOKING_TABLE_COUNT_INVALID'
+  | 'BOOKING_MENU_SELECTION_INVALID'
   | 'BOOKING_HEADCOUNT_INVALID'
   | 'BOOKING_EVENT_DATE_INVALID'
   | 'BOOKING_COMMERCIAL_VALUE_INVALID'
@@ -25,17 +27,55 @@ export class BookingPolicyError extends Error {
   }
 }
 
+export const proposalMenuSnapshotSchema = z.strictObject({
+  versionId: z.uuid(),
+  packageId: z.uuid(),
+  versionNumber: z.int().positive(),
+  name: z.string(),
+  description: z.string(),
+  priceVndPerTable: z.int().nonnegative(),
+});
+export const proposalMenuLineSchema = proposalMenuSnapshotSchema.extend({
+  tableCount: z.int().min(1).max(500),
+  lineTotalVnd: z.int().nonnegative(),
+});
+export const proposalMenuLinesSchema = z.array(proposalMenuLineSchema).min(1).max(50);
+export type ProposalMenuSnapshot = Readonly<z.infer<typeof proposalMenuSnapshotSchema>>;
+export type ProposalMenuLine = Readonly<z.infer<typeof proposalMenuLineSchema>>;
+export type ProposalMenuSelection = Readonly<{ menuPackageVersionId: string; tableCount: number }>;
+export type ProposalMenuInput = Readonly<{
+  menuPackageVersionId?: string | undefined;
+  tableCount?: number | undefined;
+  menus?: readonly ProposalMenuSelection[] | undefined;
+}>;
+
+export function proposalMenuSelections(input: ProposalMenuInput): readonly ProposalMenuSelection[] {
+  if (
+    input.menus !== undefined &&
+    input.menuPackageVersionId === undefined &&
+    input.tableCount === undefined
+  ) {
+    return input.menus;
+  }
+  if (
+    input.menus === undefined &&
+    input.menuPackageVersionId !== undefined &&
+    input.tableCount !== undefined
+  ) {
+    return [{ menuPackageVersionId: input.menuPackageVersionId, tableCount: input.tableCount }];
+  }
+  throw new BookingPolicyError(
+    'BOOKING_MENU_SELECTION_INVALID',
+    'Supply menus or the legacy menu and table count, exclusively.',
+  );
+}
+
 export type ProposalSnapshot = Readonly<{
   hall: HallSnapshot;
   shift: ShiftSnapshot;
-  menu: Readonly<{
-    versionId: string;
-    packageId: string;
-    versionNumber: number;
-    name: string;
-    description: string;
-    priceVndPerTable: number;
-  }>;
+  /** Compatibility preview of the first menu; use menus for the complete selection. */
+  menu: ProposalMenuSnapshot;
+  menus?: readonly ProposalMenuLine[];
   eventDate: string;
   tableCount: number;
   planningHeadcount: number;
@@ -46,14 +86,42 @@ export type ProposalSnapshot = Readonly<{
 export type CreateProposalSnapshotInput = Readonly<{
   hall: HallSnapshot;
   shift: ShiftSnapshot;
-  menu: MenuPackageSnapshot;
   eventDate: string;
-  tableCount: number;
   planningHeadcount: number;
-}>;
+}> &
+  (
+    | Readonly<{ menu: MenuPackageSnapshot; tableCount: number }>
+    | Readonly<{ menus: readonly Readonly<{ menu: MenuPackageSnapshot; tableCount: number }>[] }>
+  );
 
 export function createProposalSnapshot(input: CreateProposalSnapshotInput): ProposalSnapshot {
-  requireIntegerRange('tableCount', input.tableCount, 1, 500, 'BOOKING_TABLE_COUNT_INVALID');
+  const selections =
+    'menus' in input ? input.menus : [{ menu: input.menu, tableCount: input.tableCount }];
+  if (
+    selections.length < 1 ||
+    selections.length > 50 ||
+    new Set(selections.map(({ menu }) => menu.menuPackageId)).size !== selections.length
+  ) {
+    throw new BookingPolicyError(
+      'BOOKING_MENU_SELECTION_INVALID',
+      'Select 1–50 distinct menu packages.',
+    );
+  }
+  const menus = selections.map(({ menu, tableCount }) => {
+    requireIntegerRange('tableCount', tableCount, 1, 500, 'BOOKING_TABLE_COUNT_INVALID');
+    return {
+      versionId: menu.id,
+      packageId: menu.menuPackageId,
+      versionNumber: menu.versionNumber,
+      name: menu.name,
+      description: menu.description,
+      priceVndPerTable: menu.priceVndPerTable,
+      tableCount,
+      lineTotalVnd: multiplyVnd(menu.priceVndPerTable, tableCount),
+    };
+  });
+  const tableCount = menus.reduce((sum, line) => sum + line.tableCount, 0);
+  requireIntegerRange('tableCount', tableCount, 1, 500, 'BOOKING_TABLE_COUNT_INVALID');
   requireIntegerRange(
     'planningHeadcount',
     input.planningHeadcount,
@@ -62,22 +130,24 @@ export function createProposalSnapshot(input: CreateProposalSnapshotInput): Prop
     'BOOKING_HEADCOUNT_INVALID',
   );
   requireLocalDate(input.eventDate);
-  const baseChargeVnd = multiplyVnd(input.menu.priceVndPerTable, input.tableCount);
+  const baseChargeVnd = toSafeVnd(menus.reduce((sum, line) => sum + BigInt(line.lineTotalVnd), 0n));
   const depositAmountVnd = toSafeVnd((BigInt(baseChargeVnd) * 30n + 99n) / 100n);
+  const first = menus[0]!;
 
   return deepFreeze({
     hall: structuredClone(input.hall),
     shift: structuredClone(input.shift),
     menu: {
-      versionId: input.menu.id,
-      packageId: input.menu.menuPackageId,
-      versionNumber: input.menu.versionNumber,
-      name: input.menu.name,
-      description: input.menu.description,
-      priceVndPerTable: input.menu.priceVndPerTable,
+      versionId: first.versionId,
+      packageId: first.packageId,
+      versionNumber: first.versionNumber,
+      name: first.name,
+      description: first.description,
+      priceVndPerTable: first.priceVndPerTable,
     },
+    menus,
     eventDate: input.eventDate,
-    tableCount: input.tableCount,
+    tableCount,
     planningHeadcount: input.planningHeadcount,
     baseChargeVnd,
     depositAmountVnd,

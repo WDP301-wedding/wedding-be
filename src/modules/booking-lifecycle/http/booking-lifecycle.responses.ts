@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { proposalMenuSnapshotSchema, proposalMenuLinesSchema } from '../domain/booking-policy.js';
 
 const uuid = z.uuid();
 const revision = z.int().positive();
@@ -42,14 +43,11 @@ export const proposalResponseSchema = z.strictObject({
         maxGuests: z.int(),
       }),
       shift: z.strictObject({ code: z.enum(['LUNCH', 'DINNER']), startTime: time, endTime: time }),
-      menu: z.strictObject({
-        versionId: uuid,
-        packageId: uuid,
-        versionNumber: revision,
-        name: z.string(),
-        description: z.string(),
-        priceVndPerTable: z.int().nonnegative(),
+      menu: proposalMenuSnapshotSchema.meta({
+        description:
+          'Compatibility preview of the first menu only. Use menus for all menu quantities and line totals.',
       }),
+      menus: proposalMenuLinesSchema,
       tableCount: z.int().min(1).max(500),
       baseChargeVnd: z.int().nonnegative(),
       depositAmountVnd: z.int().nonnegative(),

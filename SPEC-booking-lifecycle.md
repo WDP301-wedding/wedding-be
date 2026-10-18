@@ -1,5 +1,9 @@
 # Specification: Booking Lifecycle
 
+2026-10-18 owner extension: initial proposals support several menu versions with
+per-menu table quantities, preserving legacy input and immutable history. See
+[the additive API/migration contract](./docs/booking-multi-menu-proposals.md).
+
 > Current amendment: [confirmed backend scope](./docs/backend-scope-2026-10-10.md) and [commercial extensions](./SPEC-commercial-contracts.md). Completed implementation evidence below is historical; new names/catalog/contract/invoice rules are separate backend extension tasks. The 2026-10-10 amendment governs conflicts with older access, pricing and client requirements.
 
 - Status: **ACCEPTED — SPEC-03 implementation complete; BK-C4 passed**

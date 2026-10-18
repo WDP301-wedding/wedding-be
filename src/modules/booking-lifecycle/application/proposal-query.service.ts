@@ -1,6 +1,7 @@
 import type { PrismaClient } from '../../../generated/prisma/client.js';
 import type { ConsultationAccessReader } from '../../identity-access/authorization/authorization.service.js';
 import { BookingLifecycleNotFoundError } from '../infrastructure/consultation.repository.js';
+import { proposalMenuLinesSchema } from '../domain/booking-policy.js';
 
 type ProposalActor = Readonly<{
   accountId: string;
@@ -23,6 +24,24 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
           });
       const snapshot = booking.proposalSnapshot;
       if (snapshot === null) throw new BookingLifecycleNotFoundError();
+      const menu = {
+        versionId: snapshot.menuPackageVersionId,
+        packageId: snapshot.menuPackageId,
+        versionNumber: snapshot.menuVersionNumber,
+        name: snapshot.menuName,
+        description: snapshot.menuDescription,
+        priceVndPerTable: decimalNumber(snapshot.menuPriceVndPerTable),
+      };
+      const menus =
+        snapshot.menus == null
+          ? [
+              {
+                ...menu,
+                tableCount: snapshot.tableCount,
+                lineTotalVnd: decimalNumber(snapshot.baseChargeVnd),
+              },
+            ]
+          : proposalMenuLinesSchema.parse(snapshot.menus);
       return immutable({
         bookingId: booking.id,
         consultationId: booking.consultationId,
@@ -47,14 +66,8 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
             startTime: timeText(snapshot.shiftStartTime),
             endTime: timeText(snapshot.shiftEndTime),
           },
-          menu: {
-            versionId: snapshot.menuPackageVersionId,
-            packageId: snapshot.menuPackageId,
-            versionNumber: snapshot.menuVersionNumber,
-            name: snapshot.menuName,
-            description: snapshot.menuDescription,
-            priceVndPerTable: decimalNumber(snapshot.menuPriceVndPerTable),
-          },
+          menu,
+          menus,
           tableCount: snapshot.tableCount,
           baseChargeVnd: decimalNumber(snapshot.baseChargeVnd),
           depositAmountVnd: decimalNumber(snapshot.depositAmountVnd),

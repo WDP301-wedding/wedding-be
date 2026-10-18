@@ -1342,6 +1342,7 @@ model BookingProposalSnapshot {
   menuName             String
   menuDescription      String
   menuPriceVndPerTable Decimal             @db.Decimal(18, 0)
+  menus                Json?               @db.JsonB
   tableCount           Int
   planningHeadcount    Int
   baseChargeVnd        Decimal             @db.Decimal(18, 0)

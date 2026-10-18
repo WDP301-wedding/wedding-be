@@ -5,6 +5,53 @@ import type { VenueCatalogReader } from '../../venue-catalog/application/venue-c
 import { createProposalCatalogAdapter } from './proposal-catalog.adapter.js';
 
 describe('ProposalCatalogAdapter', () => {
+  it('resolves every selected exact menu version and calculates their combined total', async () => {
+    const menu = {
+      id: 'classic-v1',
+      menuPackageId: 'classic',
+      versionNumber: 1,
+      state: 'PUBLISHED',
+      revision: 1,
+      name: 'Classic',
+      description: '',
+      priceVndPerTable: 5_000_000,
+      items: [],
+    };
+    const catalog = {
+      requireActiveHallSnapshot: vi
+        .fn()
+        .mockResolvedValue({ id: 'hall', name: 'Hall', description: '', maxGuests: 1000 }),
+      requireActiveShiftSnapshot: vi
+        .fn()
+        .mockResolvedValue({ code: 'DINNER', startTime: '17:30', endTime: '22:00' }),
+      resolveMenuPackageVersion: vi
+        .fn()
+        .mockImplementation((id: string) =>
+          Promise.resolve(
+            id === 'classic-v1'
+              ? menu
+              : { ...menu, id, menuPackageId: 'premium', priceVndPerTable: 7_000_000 },
+          ),
+        ),
+    } as unknown as VenueCatalogReader;
+    const proposal = await createProposalCatalogAdapter(catalog).resolveProposal({
+      hallId: 'hall',
+      eventDate: '2026-12-20',
+      shiftCode: 'DINNER',
+      planningHeadcount: 550,
+      menus: [
+        { menuPackageVersionId: 'classic-v1', tableCount: 20 },
+        { menuPackageVersionId: 'premium-v2', tableCount: 40 },
+      ],
+    });
+    expect(proposal).toMatchObject({
+      tableCount: 60,
+      baseChargeVnd: 380_000_000,
+      depositAmountVnd: 114_000_000,
+    });
+    expect(proposal.menus?.map((line) => line.versionId)).toEqual(['classic-v1', 'premium-v2']);
+    expect(catalog.resolveMenuPackageVersion).toHaveBeenCalledTimes(2);
+  });
   it('resolves active venue facts and an exact immutable menu version', async () => {
     const catalog = {
       requireActiveHallSnapshot: vi.fn().mockResolvedValue({

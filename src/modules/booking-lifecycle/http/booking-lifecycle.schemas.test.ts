@@ -13,6 +13,33 @@ const input = {
   expectedRevision: 1,
 };
 
+describe('initial proposal menu selections', () => {
+  const common = { ...input, menuPackageVersionId: undefined, tableCount: undefined };
+  const menus = [
+    { menuPackageVersionId: id, tableCount: 20 },
+    { menuPackageVersionId: '00000000-0000-4000-8000-000000000102', tableCount: 40 },
+  ];
+  it('accepts several menu quantities and preserves the legacy single-menu payload', () => {
+    expect(createBookingBodySchema.safeParse({ ...common, menus }).success).toBe(true);
+    expect(createBookingBodySchema.safeParse(input).success).toBe(true);
+  });
+  it.each([
+    { menus: [] },
+    { menus: [menus[0], menus[0]] },
+    { menus: [{ ...menus[0], tableCount: 0 }] },
+    { menus: [{ ...menus[0], tableCount: 1.5 }] },
+    { menus: [{ ...menus[0], tableCount: 500 }, menus[1]] },
+    { menus, tableCount: 60 },
+    { menus, menuPackageVersionId: id },
+    { menus: [{ ...menus[0], unitPriceVnd: 1 }] },
+    { menuPackageVersionId: id },
+    { tableCount: 20 },
+    {},
+  ])('rejects ambiguous, invalid or client-priced selections: %j', (selection) => {
+    expect(createBookingBodySchema.safeParse({ ...common, ...selection }).success).toBe(false);
+  });
+});
+
 describe('booking event date boundary', () => {
   afterEach(() => vi.useRealTimers());
   it.each([

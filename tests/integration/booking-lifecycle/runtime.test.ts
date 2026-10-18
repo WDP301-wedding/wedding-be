@@ -407,6 +407,87 @@ describeWithDatabase('booking runtime with real identity, venue, and PostgreSQL'
     }
   });
 
+  it('creates, replays and reads a persisted multi-menu proposal with Manager-only creation', async () => {
+    const consultation = await post('/management/consultations', {
+      intendedEmail: `multi-${randomUUID()}@example.com`,
+      displayName: 'Multi-menu Couple',
+    });
+    expect(consultation.status).toBe(201);
+    const created = consultationResponseSchema.parse(consultation.body as unknown).data;
+    const menus = [
+      { menuPackageVersionId: CATALOG_SEED_IDS.classicMenuVersion, tableCount: 20 },
+      { menuPackageVersionId: CATALOG_SEED_IDS.premiumMenuVersion, tableCount: 40 },
+    ];
+    const body = {
+      consultationId: created.consultationId,
+      hallId: CATALOG_SEED_IDS.lotusHall,
+      eventDate: '2026-12-21',
+      shiftCode: 'DINNER',
+      planningHeadcount: 350,
+      expectedRevision: 1,
+      menus,
+    };
+    await database.prisma.consultationAccess.create({
+      data: { consultationId: created.consultationId, accountId: coupleId, level: 'RESTRICTED' },
+    });
+    expect((await post('/bookings', body, coupleToken)).status).toBe(403);
+    expect((await post('/bookings', { ...body, menus: [menus[0], menus[0]] })).status).toBe(422);
+    const key = randomUUID();
+    const result = await post('/bookings', body, managerToken, key);
+    expect(result.status, JSON.stringify(result.body)).toBe(201);
+    const bookingId = bookingResponseSchema.parse(result.body as unknown).data.bookingId;
+    const replay = await post('/bookings', body, managerToken, key);
+    expect(replay.status).toBe(201);
+    expect(replay.body).toEqual(result.body);
+    const mismatch = await post('/bookings', { ...body, menus: [menus[0]] }, managerToken, key);
+    expect(mismatch.status).toBe(422);
+    expect(mismatch.body).toMatchObject({ error: { code: 'IDEMPOTENCY_KEY_REUSED' } });
+    const managerView = await getProposal(bookingId);
+    const coupleResponse = await request(app)
+      .get(`/api/v1/bookings/${bookingId}/proposal`)
+      .set('Authorization', `Bearer ${coupleToken}`);
+    expect(coupleResponse.status).toBe(200);
+    const coupleView = proposalResponseSchema.parse(coupleResponse.body as unknown).data;
+    expect(coupleView.proposal).toEqual(managerView.proposal);
+    expect(
+      (
+        await request(app)
+          .get(`/api/v1/bookings/${bookingId}/proposal`)
+          .set('Authorization', `Bearer ${outsiderToken}`)
+      ).status,
+    ).toBe(404);
+    const lines = managerView.proposal.menus;
+    expect(lines.map((line) => [line.versionId, line.tableCount])).toEqual(
+      menus.map((line) => [line.menuPackageVersionId, line.tableCount]),
+    );
+    const total = lines.reduce((sum, line) => sum + line.priceVndPerTable * line.tableCount, 0);
+    expect(managerView.proposal).toMatchObject({
+      tableCount: 60,
+      baseChargeVnd: total,
+      depositAmountVnd: Math.ceil(total * 0.3),
+    });
+    expect(managerView.planningHeadcount).toBe(350);
+    const stored = await database.prisma.bookingProposalSnapshot.findUniqueOrThrow({
+      where: { bookingId },
+    });
+    expect(stored.menus).toEqual(lines);
+    const dbChecks = await database.prisma.$queryRaw<
+      { valid: boolean; wrongTotal: boolean; wrongCount: boolean }[]
+    >`
+      SELECT booking_proposal_menu_totals_valid(${JSON.stringify(lines)}::jsonb, 60, ${total}::numeric) AS valid,
+        booking_proposal_menu_totals_valid(${JSON.stringify(lines)}::jsonb, 60, ${total + 1}::numeric) AS "wrongTotal",
+        booking_proposal_menu_totals_valid(${JSON.stringify(lines)}::jsonb, 61, ${total}::numeric) AS "wrongCount"
+    `;
+    expect(dbChecks).toEqual([{ valid: true, wrongTotal: false, wrongCount: false }]);
+    await expect(
+      database.prisma.bookingProposalSnapshot.update({ where: { bookingId }, data: { menus: [] } }),
+    ).rejects.toThrow();
+    expect((await getProposal(bookingId)).proposal.menus).toEqual(lines);
+    expect(
+      await database.prisma.booking.count({ where: { consultationId: created.consultationId } }),
+    ).toBe(1);
+  });
+
   it('collaborates before deposit and retains the effective timeline until both replacement approvals commit', async () => {
     const consultation = await post('/management/consultations', {
       intendedEmail: `${coupleId}@example.com`,
