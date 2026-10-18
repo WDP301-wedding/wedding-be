@@ -1,0 +1,6040 @@
+{
+  "schemaVersion": 1,
+  "task": "PERF-07",
+  "at": "2026-10-18T06:09:19.776Z",
+  "status": "ACCEPTANCE_COMPLETE_IN_OWNER_AUTHORIZED_SCOPE",
+  "scope": {
+    "backendOnly": true,
+    "endpoint": "GET /api/v1/management/print-orders",
+    "liveExistingOrders": 3,
+    "liveStatuses": [
+      "REQUESTED",
+      "IN_PRODUCTION",
+      "CANCELLED"
+    ],
+    "livePendingProposals": 0,
+    "localRequestedCardinalities": [
+      1,
+      3,
+      20
+    ],
+    "localApprovedWithProposalCardinalities": [
+      1,
+      3,
+      20
+    ],
+    "runtimeSourceChanged": false,
+    "liveFixtureWrites": false,
+    "paidOrRealMoneyOperations": false
+  },
+  "authorization": {
+    "humanInstruction": "Cho phép 3 đơn live, đầy đủ local",
+    "windowStartedAt": "2026-10-18T05:57:07.754Z",
+    "expiresAt": "2026-10-18T06:42:07.754Z",
+    "maximumMinutes": 45,
+    "maximumAdditionalConnections": 1,
+    "noLiveOrderQuoteChargeOrPaymentWrites": true
+  },
+  "runtime": {
+    "deploymentId": "f0332652-cf57-4b46-807a-d0d92e75d5e3",
+    "source": "df945b6f4ad10a44f37134e76a662f041283325b",
+    "image": "sha256:cb99729e156b0d563c2463a92589cc65597bdb6f449092a353b67fa442dc0388",
+    "configurationDigest": "5bb1f835c3514bca7e8db5d8c01d34fb92be34b82742eed21ad2dc30a41aceb5",
+    "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+    "controls": {
+      "DB_POOL_MAX": "1",
+      "DB_POOL_MAX_VENUE_CATALOG": "3",
+      "DB_POOL_MAX_ANALYTICS": "2",
+      "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000",
+      "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+      "DB_CONNECTION_RESERVE": "36",
+      "DB_MAX_CONNECTIONS": "60",
+      "DB_DIAGNOSTICS_ENABLED": "false",
+      "DB_SAFE_READ_DEADLINE_ENABLED": "false"
+    }
+  },
+  "runtimeSourceContinuity": [
+    {
+      "path": "src",
+      "local": "77b8f2db2af6e56609995e2e99b1a78f4351beb4",
+      "deployed": "77b8f2db2af6e56609995e2e99b1a78f4351beb4",
+      "equal": true
+    },
+    {
+      "path": "prisma",
+      "local": "a6a0f1b7a141117f9370ea5f922c974375b81833",
+      "deployed": "a6a0f1b7a141117f9370ea5f922c974375b81833",
+      "equal": true
+    },
+    {
+      "path": "package.json",
+      "local": "a165f63c0e251eee65d56fc31684b4827765e13e",
+      "deployed": "a165f63c0e251eee65d56fc31684b4827765e13e",
+      "equal": true
+    },
+    {
+      "path": "package-lock.json",
+      "local": "661f3c1edaadcaeaca5612c2f2e2f06450cf4fe7",
+      "deployed": "661f3c1edaadcaeaca5612c2f2e2f06450cf4fe7",
+      "equal": true
+    },
+    {
+      "path": ".node-version",
+      "local": "df6ae3370f9f89272d88629c442cf554d6c1f9fb",
+      "deployed": "df6ae3370f9f89272d88629c442cf554d6c1f9fb",
+      "equal": true
+    },
+    {
+      "path": "tsconfig.build.json",
+      "local": "588c2458d87d500adea3b91de433b15a5cd29127",
+      "deployed": "588c2458d87d500adea3b91de433b15a5cd29127",
+      "equal": true
+    }
+  ],
+  "budget": {
+    "databaseCapacity": 60,
+    "existingAllocation": 60,
+    "ordinarySpareBefore": 2,
+    "nativeAllocationFromSpare": 1,
+    "ordinarySpareRemaining": 1,
+    "utilityProviderAllocationUnchanged": true,
+    "operatorAndNativeNotConcurrent": true,
+    "applicationPoolsUnchanged": true
+  },
+  "method": {
+    "baseline": "3c6e8984c547d92f25dc4959c44503321e5f5528",
+    "variants": [
+      "pinned pre-optimization print+authority+editor",
+      "deployed container modules"
+    ],
+    "notSqlOnlyIsolation": true,
+    "nativeHttp": "same-container loopback; public ingress excluded",
+    "poolMaximum": 1,
+    "pairsPerCase": 20,
+    "initialPairsPerCase": 1,
+    "alternating": true,
+    "spacingMs": 750,
+    "p95": "nearest rank",
+    "retries": 0,
+    "discardedSamples": 0
+  },
+  "nativeSummary": [
+    {
+      "case": "one",
+      "returnedItems": 1,
+      "variants": {
+        "baseline": {
+          "n": 20,
+          "p50Ms": 749.0875220000162,
+          "p95Ms": 754.7659339999955,
+          "commands": [
+            5
+          ]
+        },
+        "deployed": {
+          "n": 20,
+          "p50Ms": 897.3143920000002,
+          "p95Ms": 902.4588760000042,
+          "commands": [
+            6
+          ]
+        }
+      },
+      "p95ReductionPercent": -19.56804558166634
+    },
+    {
+      "case": "three",
+      "returnedItems": 3,
+      "variants": {
+        "baseline": {
+          "n": 20,
+          "p50Ms": 1343.422921999998,
+          "p95Ms": 1348.201006999996,
+          "commands": [
+            9
+          ]
+        },
+        "deployed": {
+          "n": 20,
+          "p50Ms": 897.0266600000032,
+          "p95Ms": 908.9671399999934,
+          "commands": [
+            6
+          ]
+        }
+      },
+      "p95ReductionPercent": 32.57925670723104
+    },
+    {
+      "case": "cursor",
+      "returnedItems": 2,
+      "variants": {
+        "baseline": {
+          "n": 20,
+          "p50Ms": 1344.7758269999904,
+          "p95Ms": 1350.9839599999905,
+          "commands": [
+            9
+          ]
+        },
+        "deployed": {
+          "n": 20,
+          "p50Ms": 1047.3812909999979,
+          "p95Ms": 1054.5790740000011,
+          "commands": [
+            7
+          ]
+        }
+      },
+      "p95ReductionPercent": 21.939926363003703
+    }
+  ],
+  "native": {
+    "event": "perf07_native_receipt",
+    "startedAt": "2026-10-18T06:01:07.544Z",
+    "deploymentId": "f0332652-cf57-4b46-807a-d0d92e75d5e3",
+    "replicaId": "11fc3598-ffa2-4253-8640-43f566084673",
+    "region": "sfo",
+    "node": "v24.21.0",
+    "poolMaximum": 1,
+    "readOnly": true,
+    "nativeLoopbackHttp": true,
+    "publicIngress": false,
+    "modules": [
+      {
+        "key": "baselinePrint",
+        "path": "src/modules/invitation-studio/infrastructure/print-order.service.ts",
+        "sourceSha256": "c3e0d1b9d60001414d92f865984b166f940b1a191588daac272c4848fa85694a",
+        "compiledSha256": "5f7807e4a24da93717161a14f7ceb2970178e40c2eacda57385b21a3e485d18e"
+      },
+      {
+        "key": "baselineAuthority",
+        "path": "src/modules/invitation-studio/infrastructure/studio-authorization.ts",
+        "sourceSha256": "008c7d1395446ec8d03ed252b3aef1e70ac7dfaaff86e0ae0fb2c1b99b819b4b",
+        "compiledSha256": "accf62a0b73e009239d84e6108dc43c12403a7ef27da310ace637260572c2591"
+      },
+      {
+        "key": "baselineEditor",
+        "path": "src/modules/identity-access/authorization/invitation-editor.reader.ts",
+        "sourceSha256": "5b991234dc3f3747a32244fcd13386e190efa0cf67050294176ba217573ab2f5",
+        "compiledSha256": "7ce0b448485af93f1ee5e3ccc32e722aacc74aadee19cbe8c8098723212b3b0a"
+      }
+    ],
+    "samples": [
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 0,
+        "measured": false,
+        "requestId": "a526a3d8-d983-4ffb-8945-41080301c318",
+        "at": "2026-10-18T06:01:09.571Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 750.1296269999998,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.614657000000534,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 826.5889520000001,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 0,
+        "measured": false,
+        "requestId": "c9e0b6c6-c123-4c84-98f6-514b1e761a20",
+        "at": "2026-10-18T06:01:11.148Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 897.4973839999993,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.5881999999983236,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 916.8729750000002,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 0,
+        "measured": false,
+        "requestId": "841e562a-c9e5-4ecc-8620-ee9019a3d506",
+        "at": "2026-10-18T06:01:12.817Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1335.5010839999986,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.7934610000002067,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1355.3743590000004,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 0,
+        "measured": false,
+        "requestId": "59e6834a-e55a-48b0-af65-d232d9db7ab3",
+        "at": "2026-10-18T06:01:14.923Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 891.2147619999987,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.42088499999681517,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 901.9548559999994,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 0,
+        "measured": false,
+        "requestId": "40399c27-5f42-435e-9afc-08648576bde6",
+        "at": "2026-10-18T06:01:16.576Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1336.155252999999,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.6361889999989216,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1353.6193309999999,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 0,
+        "measured": false,
+        "requestId": "07e867db-b300-477a-b257-64b0972ae59e",
+        "at": "2026-10-18T06:01:18.681Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1038.968343999999,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.454422999997405,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1049.9195130000007,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 1,
+        "measured": true,
+        "requestId": "3376a4e1-90c9-4ab3-a24b-28541808b5ba",
+        "at": "2026-10-18T06:01:20.482Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 893.0768470000003,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.41432000000349944,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 901.8814650000004,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 1,
+        "measured": true,
+        "requestId": "64633c77-c1aa-47ac-b2f2-38b85322a804",
+        "at": "2026-10-18T06:01:22.134Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 741.7428340000024,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.31334699999752047,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 752.3496569999988,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 1,
+        "measured": true,
+        "requestId": "38411147-bfad-4db5-b8eb-1205b4db1724",
+        "at": "2026-10-18T06:01:23.637Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 895.6172730000035,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.44925899999725516,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 914.2860870000004,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 1,
+        "measured": true,
+        "requestId": "36b202b5-3b46-45bf-abe6-ff962d730481",
+        "at": "2026-10-18T06:01:25.302Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1335.0865739999972,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.597250000002532,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1347.3475440000002,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 1,
+        "measured": true,
+        "requestId": "d807f59b-a57b-41e4-85e3-255d5e125d19",
+        "at": "2026-10-18T06:01:27.400Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1044.948307000006,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.5290549999990617,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1054.5790740000011,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 1,
+        "measured": true,
+        "requestId": "2078b2f6-8177-40ff-98c2-42e72894b9b3",
+        "at": "2026-10-18T06:01:29.204Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1338.1818449999992,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.5301349999936065,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1347.9008939999985,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 2,
+        "measured": true,
+        "requestId": "0d10a163-dbad-4e4b-9f8d-2a591b4af8f4",
+        "at": "2026-10-18T06:01:31.303Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 741.1069870000028,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.291944999997213,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 746.6901450000005,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 2,
+        "measured": true,
+        "requestId": "eaee3b99-ac47-41f0-8685-db2ee9c2133c",
+        "at": "2026-10-18T06:01:32.800Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 890.1125840000059,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.3571869999941555,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 897.8743910000012,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 2,
+        "measured": true,
+        "requestId": "faf1ba01-9099-48f7-bf4e-b257e877aaed",
+        "at": "2026-10-18T06:01:34.449Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1334.4764279999908,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.5708620000041265,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1343.5532939999975,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 2,
+        "measured": true,
+        "requestId": "e63e2a59-cc0a-4b0a-808b-6047bd90b456",
+        "at": "2026-10-18T06:01:36.542Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 890.344514999997,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.3716549999990093,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 897.1871629999987,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 2,
+        "measured": true,
+        "requestId": "0bc1076f-2d4e-451f-9439-9fd8cce543cb",
+        "at": "2026-10-18T06:01:38.190Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1334.4719799999984,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.5140519999986282,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1346.4953309999983,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 2,
+        "measured": true,
+        "requestId": "01de6349-7bef-40c3-966e-c04214f1616c",
+        "at": "2026-10-18T06:01:40.287Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1038.2343770000007,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.3443830000105663,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1045.1526870000016,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 3,
+        "measured": true,
+        "requestId": "230bbe0e-c77d-48ed-9c9c-99b6c387e225",
+        "at": "2026-10-18T06:01:42.083Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 892.2692989999996,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.35694800000055693,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 898.1142120000004,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 3,
+        "measured": true,
+        "requestId": "f950ec22-0571-4c2a-8c3b-3a0f89b667ef",
+        "at": "2026-10-18T06:01:43.732Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 743.0661890000047,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.8290909999996074,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 750.0511009999973,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 3,
+        "measured": true,
+        "requestId": "f433d99e-abd2-4621-9e89-407fa15a4260",
+        "at": "2026-10-18T06:01:45.233Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 889.7185050000116,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.3208809999996447,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 896.9011079999982,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 3,
+        "measured": true,
+        "requestId": "39154659-d48d-4e9c-bf92-697e4872f2a9",
+        "at": "2026-10-18T06:01:46.881Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1336.7396390000067,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.5649840000114636,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1348.201006999996,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 3,
+        "measured": true,
+        "requestId": "1bac95e3-ada4-497c-a204-f80a79058340",
+        "at": "2026-10-18T06:01:48.980Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1038.2201200000054,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.447941999991599,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1049.8011620000034,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 3,
+        "measured": true,
+        "requestId": "023f37a7-5fbd-4937-b3f0-8b20963ac341",
+        "at": "2026-10-18T06:01:50.781Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1334.6662690000012,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.62836199998128,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1345.2636889999994,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 4,
+        "measured": true,
+        "requestId": "e41e4a3c-2817-43f7-8d66-a9b965348f8b",
+        "at": "2026-10-18T06:01:52.877Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 741.973482999987,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 3.120197999989614,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 757.480383999995,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 4,
+        "measured": true,
+        "requestId": "b82f1a70-5a46-4c15-a079-60d4f65c2f38",
+        "at": "2026-10-18T06:01:54.386Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 892.3862229999868,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.3882180000000517,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 900.4282800000001,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 4,
+        "measured": true,
+        "requestId": "23ff771d-4b45-4492-ac2c-73932c6e37a1",
+        "at": "2026-10-18T06:01:56.037Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1335.9349569999904,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.7553809999953955,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1349.2787289999978,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 4,
+        "measured": true,
+        "requestId": "f2effec3-a784-48d2-b48e-312c75960881",
+        "at": "2026-10-18T06:01:58.137Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 893.5784640000056,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.4541300000055344,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 903.3896610000011,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 4,
+        "measured": true,
+        "requestId": "4bb4f17b-d491-4231-af39-a1b5d246ca2e",
+        "at": "2026-10-18T06:01:59.790Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1337.9882240000006,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.8180839999986347,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1349.8955329999953,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 4,
+        "measured": true,
+        "requestId": "9b3f0f9b-e15a-4ea5-b203-46384e256ef9",
+        "at": "2026-10-18T06:02:01.891Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1038.9949009999982,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.45651400000497233,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1047.3812909999979,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 5,
+        "measured": true,
+        "requestId": "94215914-a55a-425c-94e1-7c9c66e1ede0",
+        "at": "2026-10-18T06:02:03.689Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 894.4279500000048,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.33334600002126535,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 902.4588760000042,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 5,
+        "measured": true,
+        "requestId": "3cf855e1-0017-416e-998b-620d5b58d976",
+        "at": "2026-10-18T06:02:05.341Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 742.4760669999887,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.4795330000051763,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 750.4895160000015,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 5,
+        "measured": true,
+        "requestId": "e332a57a-1768-469b-a585-a9737308c2ad",
+        "at": "2026-10-18T06:02:06.843Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 890.6243049999975,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.4097780000010971,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 899.3600589999987,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 5,
+        "measured": true,
+        "requestId": "809bdcf5-c9eb-42ae-b338-a8ff7d39bd49",
+        "at": "2026-10-18T06:02:08.493Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1338.7189290000097,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.608594000004814,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1347.2168019999954,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 5,
+        "measured": true,
+        "requestId": "67c364e7-3cd6-4614-8fbb-6adf3d879653",
+        "at": "2026-10-18T06:02:10.591Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1039.2412130000012,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.35672100000374485,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1047.8271669999958,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 5,
+        "measured": true,
+        "requestId": "e8acf0fe-e0d7-483c-bb8a-e667744e63cd",
+        "at": "2026-10-18T06:02:12.390Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1339.4169109999712,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.6328159999902709,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1350.9839599999905,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 6,
+        "measured": true,
+        "requestId": "5865d86e-3faa-4b63-9482-cc8c461feec6",
+        "at": "2026-10-18T06:02:14.492Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 742.0580850000115,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.3882570000132546,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 749.5275649999967,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 6,
+        "measured": true,
+        "requestId": "58412ac9-7074-4ca3-b57f-d1007515a03f",
+        "at": "2026-10-18T06:02:15.992Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 890.2390560000204,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.6909929999965243,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 897.6242459999921,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 6,
+        "measured": true,
+        "requestId": "9d57b6ab-9285-4b19-beb3-5db94a350298",
+        "at": "2026-10-18T06:02:17.641Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1336.7876509999915,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.4781479999946896,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1346.5476900000067,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 6,
+        "measured": true,
+        "requestId": "26b9200b-3dc9-4ab1-b330-507d19c564dc",
+        "at": "2026-10-18T06:02:19.737Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 890.9971870000445,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.9437520000210498,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 908.9671399999934,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 6,
+        "measured": true,
+        "requestId": "4e673db6-4cc5-498f-b58f-b103b14bc256",
+        "at": "2026-10-18T06:02:21.397Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1336.6990309999965,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.4509109999926295,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1348.6367249999894,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 6,
+        "measured": true,
+        "requestId": "72c15756-741f-4d5d-892d-e835fc01f22b",
+        "at": "2026-10-18T06:02:23.497Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1043.1206200000306,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.6677450000133831,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1052.6785539999983,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 7,
+        "measured": true,
+        "requestId": "e46ea547-1ab0-4eb4-94c4-28d5151fbf76",
+        "at": "2026-10-18T06:02:25.301Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 890.4648829999933,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.47422900001402013,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 899.3742820000043,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 7,
+        "measured": true,
+        "requestId": "dbdf0616-d29e-4cfc-bd7d-0863b2a824b6",
+        "at": "2026-10-18T06:02:26.951Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 744.4914819999831,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.5789350000268314,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 754.7659339999955,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 7,
+        "measured": true,
+        "requestId": "4f6a4f3e-1726-404a-924e-b16e035965c7",
+        "at": "2026-10-18T06:02:28.456Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 893.5268099999957,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.3888650000008056,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 903.7278740000038,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 7,
+        "measured": true,
+        "requestId": "a0cdeb7d-c050-4271-98d9-e1ac52fde06c",
+        "at": "2026-10-18T06:02:30.110Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1334.1430239999609,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.4079459999775281,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1343.422921999998,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 7,
+        "measured": true,
+        "requestId": "66be3944-5e44-4331-bfe1-d46a7a82cad7",
+        "at": "2026-10-18T06:02:32.205Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1040.6716549999983,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.3392149999999674,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1049.0769100000034,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 7,
+        "measured": true,
+        "requestId": "023a812b-8128-4b30-8340-0bbb55e957dc",
+        "at": "2026-10-18T06:02:34.004Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1337.1253059999872,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.6394029999937629,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1351.2994279999984,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 8,
+        "measured": true,
+        "requestId": "ad0b8d0d-d492-4b4a-aa1f-6759571b6ee2",
+        "at": "2026-10-18T06:02:36.107Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 742.5449560000125,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.21925099997315556,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 747.7867470000056,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 8,
+        "measured": true,
+        "requestId": "356da989-6049-4e62-a0fd-44be1a16f194",
+        "at": "2026-10-18T06:02:37.606Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 900.2355359999929,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.3672180000139633,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 908.2150959999999,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 8,
+        "measured": true,
+        "requestId": "daa4ac3c-4866-4ab1-abf9-8100a89117e2",
+        "at": "2026-10-18T06:02:39.265Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1335.0696999999927,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.41253400000277907,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1345.0117290000053,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 8,
+        "measured": true,
+        "requestId": "b375f0cc-74ca-4321-9d42-4a767d35a7a5",
+        "at": "2026-10-18T06:02:41.361Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 890.2217380000075,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.32901200000196695,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 897.8108290000091,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 8,
+        "measured": true,
+        "requestId": "c510e267-3d80-4f8a-a6f0-cbc75846c327",
+        "at": "2026-10-18T06:02:43.010Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1336.5020179999701,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.6007749999844236,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1348.3497600000119,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 8,
+        "measured": true,
+        "requestId": "fbfa5351-2773-42e2-9eda-9a00a3c1cefb",
+        "at": "2026-10-18T06:02:45.108Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1044.0366980000108,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.40781299998343457,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1055.027436000004,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 9,
+        "measured": true,
+        "requestId": "a2b95f8d-a8f8-42d5-a2fa-0da713de5305",
+        "at": "2026-10-18T06:02:46.913Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 893.4200450000499,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.3223779999971157,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 901.6024439999892,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 9,
+        "measured": true,
+        "requestId": "c39c429b-2cf0-43e3-b450-2dc853f54d7e",
+        "at": "2026-10-18T06:02:48.565Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 745.6080680000014,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.473431000020355,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 753.4571169999981,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 9,
+        "measured": true,
+        "requestId": "72a6a16c-4336-4158-8a5e-d64e3b302abe",
+        "at": "2026-10-18T06:02:50.070Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 890.0803379999852,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.4116219999996247,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 896.5645870000008,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 9,
+        "measured": true,
+        "requestId": "7ff07ada-baac-4d02-a7fe-a838803ea7f9",
+        "at": "2026-10-18T06:02:51.718Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1334.525428000008,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.46575500001199543,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1342.5910139999905,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 9,
+        "measured": true,
+        "requestId": "18a5ee74-464a-40e9-bc33-221c0f8a653e",
+        "at": "2026-10-18T06:02:53.811Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1038.0018909999926,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.3610239999979967,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1045.528038000004,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 9,
+        "measured": true,
+        "requestId": "f775686e-657d-4722-81c5-21b64607f571",
+        "at": "2026-10-18T06:02:55.607Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1334.453594000006,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.434385000000475,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1343.908499000012,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 10,
+        "measured": true,
+        "requestId": "fe18ab09-32b9-4040-88d3-463bbea6618a",
+        "at": "2026-10-18T06:02:57.702Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 741.0023769999971,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.21284600002400111,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 745.928568000003,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 10,
+        "measured": true,
+        "requestId": "d949993b-de98-40d4-9881-437aefcaf1d0",
+        "at": "2026-10-18T06:02:59.199Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 890.328125,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.24305699997057673,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 896.8343579999928,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 10,
+        "measured": true,
+        "requestId": "09e9e6c6-3306-4ba0-85e6-96cf25448f1f",
+        "at": "2026-10-18T06:03:00.846Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1333.819421000022,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.5426189999852795,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1342.4386539999978,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 10,
+        "measured": true,
+        "requestId": "4843cafc-9df1-4cff-af7d-68746ae7a851",
+        "at": "2026-10-18T06:03:02.938Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 889.9076949999871,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.31366799998795614,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 895.9767270000011,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 10,
+        "measured": true,
+        "requestId": "44a3d1d5-b1d0-4ca9-8752-5d4ea287eae6",
+        "at": "2026-10-18T06:03:04.585Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1333.8251080000045,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.38087600003927946,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1341.5542940000014,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 10,
+        "measured": true,
+        "requestId": "12e5ef6b-8ece-485c-8991-cbc9453862a7",
+        "at": "2026-10-18T06:03:06.678Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1039.0805269999692,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.5356329999922309,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1047.7212080000027,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 11,
+        "measured": true,
+        "requestId": "2632faa8-713a-483d-a151-d4926bdbc119",
+        "at": "2026-10-18T06:03:08.475Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 890.4968959999969,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.4071220000041649,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 896.9586659999914,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 11,
+        "measured": true,
+        "requestId": "c594ab85-9a18-4d38-a670-0ed3fcd430a4",
+        "at": "2026-10-18T06:03:10.123Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 740.8799330000184,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.18889399999170564,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 745.8752640000021,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 11,
+        "measured": true,
+        "requestId": "d76f89af-1805-499f-b8af-20cab8168766",
+        "at": "2026-10-18T06:03:11.619Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 889.4023149999848,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.32026500000210945,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 895.7845779999916,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 11,
+        "measured": true,
+        "requestId": "615ddee1-3a95-4021-a74c-2cac14f86afb",
+        "at": "2026-10-18T06:03:13.266Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1334.9984440000408,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.4430030000075931,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1343.4845250000071,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 11,
+        "measured": true,
+        "requestId": "86abd6ec-33f9-45e9-a955-3cbf360ec8a5",
+        "at": "2026-10-18T06:03:15.362Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1037.9760419999948,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.33140600002661813,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1044.7912579999975,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 11,
+        "measured": true,
+        "requestId": "459e484e-14b5-4c29-9676-0d951dea9a53",
+        "at": "2026-10-18T06:03:17.157Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1335.3682130000088,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.43532399999094196,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1344.7758269999904,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 12,
+        "measured": true,
+        "requestId": "5d238497-1a7c-407a-b38f-b52722dad7a7",
+        "at": "2026-10-18T06:03:19.252Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 742.9750159999239,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.42191600005025975,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 750.24565300002,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 12,
+        "measured": true,
+        "requestId": "fd651912-c2b6-4c17-8cf4-81c3afd09095",
+        "at": "2026-10-18T06:03:20.752Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 889.5654539999668,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.2508570000063628,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 895.4067960000248,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 12,
+        "measured": true,
+        "requestId": "ab4b2a1a-3c1c-48c0-8636-3b1ff8411630",
+        "at": "2026-10-18T06:03:22.399Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1333.309024999966,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.3941249999916181,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1342.6444860000047,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 12,
+        "measured": true,
+        "requestId": "c2cb01f0-dba7-4368-9635-dceaf1429dd6",
+        "at": "2026-10-18T06:03:24.493Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 891.7866339999891,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.28124900002148934,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 897.5782879999897,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 12,
+        "measured": true,
+        "requestId": "b95b4241-68b6-4fc5-849b-930f3456cd4b",
+        "at": "2026-10-18T06:03:26.141Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1337.0743429999857,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.4392660000594333,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1345.881017000007,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 12,
+        "measured": true,
+        "requestId": "4b147547-277f-4011-8d00-6fa661528302",
+        "at": "2026-10-18T06:03:28.238Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1039.0813979999512,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.3266710000461899,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1049.093846999982,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 13,
+        "measured": true,
+        "requestId": "fc03c356-3696-437e-9d94-15980054bf55",
+        "at": "2026-10-18T06:03:30.037Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 889.5399689999467,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.2508490000036545,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 895.112546999997,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 13,
+        "measured": true,
+        "requestId": "a2b45ceb-3977-4a99-8501-43045a7c9ebe",
+        "at": "2026-10-18T06:03:31.683Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 741.23137699996,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.3133690000104252,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 748.3812820000167,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 13,
+        "measured": true,
+        "requestId": "d4100b30-ba35-47b5-9c7e-4615aa46368d",
+        "at": "2026-10-18T06:03:33.182Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 890.3744069999957,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.3285589999577496,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 897.0266600000032,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 13,
+        "measured": true,
+        "requestId": "700d566b-3e2f-4387-9a27-2a660838c782",
+        "at": "2026-10-18T06:03:34.830Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1334.5938949999982,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.4651869999652263,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1342.266541000019,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 13,
+        "measured": true,
+        "requestId": "db53f9f4-2c4a-4cef-88b5-3f0537c6c53f",
+        "at": "2026-10-18T06:03:36.923Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1037.8011869999755,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.28160799996112473,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1046.1692430000112,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 13,
+        "measured": true,
+        "requestId": "dfb050c5-3d81-4be4-a36d-4407be67daca",
+        "at": "2026-10-18T06:03:38.720Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1332.911858000065,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.33629899998777546,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1340.9974400000065,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 14,
+        "measured": true,
+        "requestId": "fb3f4cf0-4630-448a-8833-918f1731e5aa",
+        "at": "2026-10-18T06:03:40.812Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 740.7870469999907,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.18236999999498948,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 745.3186420000275,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 14,
+        "measured": true,
+        "requestId": "41f5430f-a7b7-414b-ad5a-90f81f8f1cd7",
+        "at": "2026-10-18T06:03:42.308Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 888.9374430000025,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.22658699998282827,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 894.8337649999885,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 14,
+        "measured": true,
+        "requestId": "e8dab8cf-6f2f-42a9-bc85-145fb035f1cb",
+        "at": "2026-10-18T06:03:43.954Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1334.793776000035,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.3139129999326542,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1342.0819550000015,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 14,
+        "measured": true,
+        "requestId": "ce67afa6-3cf0-4f82-bd4b-1b78780fe001",
+        "at": "2026-10-18T06:03:46.045Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 889.1154130000505,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.24612399999750778,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 894.7719109999889,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 14,
+        "measured": true,
+        "requestId": "a41cc718-66da-44d6-8a85-0c150350b610",
+        "at": "2026-10-18T06:03:47.691Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1334.0938619999797,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.3896150000509806,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1342.2253870000131,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 14,
+        "measured": true,
+        "requestId": "1e1c2e74-5c9e-4df9-86a6-d46731254b14",
+        "at": "2026-10-18T06:03:49.784Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1041.3168749999604,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.26153500002692454,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1047.2083890000067,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 15,
+        "measured": true,
+        "requestId": "1f9ffabd-125a-4525-9fd8-ee11416fd68d",
+        "at": "2026-10-18T06:03:51.581Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 889.2269999999844,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.33316400001058355,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 896.1128570000001,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 15,
+        "measured": true,
+        "requestId": "f1ac9144-7164-4a5c-9111-a2ef86b9da8f",
+        "at": "2026-10-18T06:03:53.228Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 740.7605960000074,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.1853490000066813,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 745.702289000008,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 15,
+        "measured": true,
+        "requestId": "d462e4b7-d138-4572-935d-4ec80a5bb7cc",
+        "at": "2026-10-18T06:03:54.726Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 889.6834370000288,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.28008799999952316,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 894.8960799999768,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 15,
+        "measured": true,
+        "requestId": "e5c27749-9485-4f87-ade1-a2aa4680d123",
+        "at": "2026-10-18T06:03:56.372Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1335.2174369999848,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.34799199999542907,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1345.019643000007,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 15,
+        "measured": true,
+        "requestId": "9261ed89-6f9d-4435-859f-c945ba77c1bf",
+        "at": "2026-10-18T06:03:58.466Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1037.5533470000373,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.3243089999887161,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1044.4162439999927,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 15,
+        "measured": true,
+        "requestId": "bc5281da-822c-4f13-8a68-93868ae17935",
+        "at": "2026-10-18T06:04:00.262Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1334.4352119999821,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.34460899999248795,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1343.6284129999985,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 16,
+        "measured": true,
+        "requestId": "d3c25ccc-06b3-4e2b-92cc-5529bc714039",
+        "at": "2026-10-18T06:04:02.357Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 741.9307899999549,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.19753200002014637,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 747.5457499999902,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 16,
+        "measured": true,
+        "requestId": "ba3a7dae-cbda-4ac7-ab4d-8a7cff8c9118",
+        "at": "2026-10-18T06:04:03.855Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 890.0406930000172,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.2922589999216143,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 897.1012869999977,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 16,
+        "measured": true,
+        "requestId": "e7a8a891-a78d-4f71-a198-c2f757826092",
+        "at": "2026-10-18T06:04:05.503Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1334.3756290001038,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.29945500000030734,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1342.8325699999987,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 16,
+        "measured": true,
+        "requestId": "984bd208-c277-479b-8d2e-deb3746356dd",
+        "at": "2026-10-18T06:04:07.596Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 889.3459359999979,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.2514719999744557,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 894.6850620000041,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 16,
+        "measured": true,
+        "requestId": "aedd2ebe-b5c4-4bf7-b753-f7ce234f7d19",
+        "at": "2026-10-18T06:04:09.241Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1333.3698740000254,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.2989289999823086,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1341.0003239999933,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 16,
+        "measured": true,
+        "requestId": "685be01d-aee1-40cb-853c-e6c58944fdc5",
+        "at": "2026-10-18T06:04:11.333Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1039.7182229999453,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.2811449999862816,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1048.1351569999824,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 17,
+        "measured": true,
+        "requestId": "892dcca1-8731-4a9c-8933-c18fb32cd86f",
+        "at": "2026-10-18T06:04:13.132Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 889.7919970000221,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.23842199999489821,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 896.8752860000241,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 17,
+        "measured": true,
+        "requestId": "be9bf8aa-b470-4933-a3e4-e717dbb857f3",
+        "at": "2026-10-18T06:04:14.780Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 743.8239950000134,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.18334599997615442,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 750.1001969999925,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 17,
+        "measured": true,
+        "requestId": "de4869c5-78f6-46f7-a9ea-936ffac3f35f",
+        "at": "2026-10-18T06:04:16.281Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 889.9858419999946,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.34546200005570427,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 898.9525509999949,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 17,
+        "measured": true,
+        "requestId": "1ea8b843-f6e8-4ec4-8127-54db064a0237",
+        "at": "2026-10-18T06:04:17.930Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1334.8414400000474,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.40225099999224767,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1342.4565060000168,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 17,
+        "measured": true,
+        "requestId": "3d58f51f-cf8e-4af0-ac0b-3827b78839a1",
+        "at": "2026-10-18T06:04:20.023Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1037.179237000033,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.24551399998017587,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1043.450937000016,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 17,
+        "measured": true,
+        "requestId": "2d378cf4-4101-4dcc-b6af-d9973c2e3ec3",
+        "at": "2026-10-18T06:04:21.817Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1334.8855609999446,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.3165909999515861,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1345.6106909999799,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 18,
+        "measured": true,
+        "requestId": "bdd6c978-9ed9-477c-842b-1f500bd6cfee",
+        "at": "2026-10-18T06:04:23.914Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 743.216209999955,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.1841019999992568,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 748.1590549999964,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 18,
+        "measured": true,
+        "requestId": "564909e4-bed1-46e4-a225-08d88e5c998b",
+        "at": "2026-10-18T06:04:25.412Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 891.168599000026,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.20855099998880178,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 897.3143920000002,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 18,
+        "measured": true,
+        "requestId": "9ef7294c-2707-49ef-85b2-fe925095ea2a",
+        "at": "2026-10-18T06:04:27.060Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1333.3922500000335,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.33333000002312474,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1341.0656989999989,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 18,
+        "measured": true,
+        "requestId": "93ae44ea-266f-4d18-97d9-a019727c1977",
+        "at": "2026-10-18T06:04:29.152Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 889.6676060000027,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.2575460000371095,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 895.5492329999979,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 18,
+        "measured": true,
+        "requestId": "83b1765d-27cb-4f17-932f-051c73a0c09e",
+        "at": "2026-10-18T06:04:30.797Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1335.1746900000435,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.34133000002475455,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1342.7942200000107,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 18,
+        "measured": true,
+        "requestId": "4211288e-7721-4958-8293-584d7d941fcd",
+        "at": "2026-10-18T06:04:32.891Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1038.7695809999423,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.7559900000342168,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1048.5073590000102,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 19,
+        "measured": true,
+        "requestId": "4a7c9c43-49b4-466f-a09d-fb6679f9c1ba",
+        "at": "2026-10-18T06:04:34.690Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 891.9624810000241,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.21719099997426383,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 897.146372999996,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 19,
+        "measured": true,
+        "requestId": "1b0ebb92-6e13-40f3-b683-1d833d7328ed",
+        "at": "2026-10-18T06:04:36.338Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 744.8672110000043,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.21018399996683002,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 750.5080320000125,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 19,
+        "measured": true,
+        "requestId": "b8a291fe-feee-4125-a97c-2046d46dc431",
+        "at": "2026-10-18T06:04:37.839Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 889.5878429999866,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.21500700002070516,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 895.0362939999904,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 19,
+        "measured": true,
+        "requestId": "04e4fed9-8562-43ce-950e-d228cc368d1b",
+        "at": "2026-10-18T06:04:39.484Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1333.821775999968,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.3604879999766126,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1341.5945439999923,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 19,
+        "measured": true,
+        "requestId": "dbe3961f-19c7-4426-89f5-553b8aadc0c8",
+        "at": "2026-10-18T06:04:41.577Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1038.4754830000456,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.3344509999733418,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1046.1317209999834,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 19,
+        "measured": true,
+        "requestId": "4c7f844a-83bb-488d-a3cf-532e5f1907e1",
+        "at": "2026-10-18T06:04:43.374Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1336.7616250000137,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.3089160000672564,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1344.6551589999872,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "one",
+        "pair": 20,
+        "measured": true,
+        "requestId": "b74359ea-5a63-4067-ad35-d1ff082ed5d3",
+        "at": "2026-10-18T06:04:45.469Z",
+        "database": {
+          "queries": 5,
+          "errors": 0,
+          "queryRoundTripMs": 741.9838879999588,
+          "lockRoundTripMs": 0,
+          "acquires": 5,
+          "acquireMs": 0.2190549999650102,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 749.0875220000162,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "one",
+        "pair": 20,
+        "measured": true,
+        "requestId": "1a13b9d1-758c-42fe-9cd5-4994d8d8c50c",
+        "at": "2026-10-18T06:04:46.968Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 890.8821619999944,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.2474279999441933,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 901.7452140000241,
+        "status": 200,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "three",
+        "pair": 20,
+        "measured": true,
+        "requestId": "54b77cee-9d5c-4b2b-be44-acf98a85da19",
+        "at": "2026-10-18T06:04:48.621Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1338.431799999962,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.3930720000353176,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1347.2135359999957,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "three",
+        "pair": 20,
+        "measured": true,
+        "requestId": "1a5ba5d6-2665-4668-bb33-1a5eb7bb8199",
+        "at": "2026-10-18T06:04:50.719Z",
+        "database": {
+          "queries": 6,
+          "errors": 0,
+          "queryRoundTripMs": 889.446620999981,
+          "lockRoundTripMs": 0,
+          "acquires": 6,
+          "acquireMs": 0.31907299999147654,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 897.3771609999822,
+        "status": 200,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "noStore": true
+      },
+      {
+        "variant": "baseline",
+        "case": "cursor",
+        "pair": 20,
+        "measured": true,
+        "requestId": "f2c4e867-48e2-4a5f-aa75-614b3e2fcc75",
+        "at": "2026-10-18T06:04:52.367Z",
+        "database": {
+          "queries": 9,
+          "errors": 0,
+          "queryRoundTripMs": 1333.6473900000274,
+          "lockRoundTripMs": 0,
+          "acquires": 9,
+          "acquireMs": 0.3290300000808202,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1342.8590280000062,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      },
+      {
+        "variant": "deployed",
+        "case": "cursor",
+        "pair": 20,
+        "measured": true,
+        "requestId": "6825f617-8bf6-4c74-a16d-1548f7ff1104",
+        "at": "2026-10-18T06:04:54.460Z",
+        "database": {
+          "queries": 7,
+          "errors": 0,
+          "queryRoundTripMs": 1038.2648340000014,
+          "lockRoundTripMs": 0,
+          "acquires": 7,
+          "acquireMs": 0.27855799993267283,
+          "maxActive": 1,
+          "maxIdle": 0,
+          "maxWaiting": 1
+        },
+        "ms": 1045.647037000017,
+        "status": 200,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "noStore": true
+      }
+    ],
+    "comparisons": [
+      {
+        "case": "one",
+        "pair": 0,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 0,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 0,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 1,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 1,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 1,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 2,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 2,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 2,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 3,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 3,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 3,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 4,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 4,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 4,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 5,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 5,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 5,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 6,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 6,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 6,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 7,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 7,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 7,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 8,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 8,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 8,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 9,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 9,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 9,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 10,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 10,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 10,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 11,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 11,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 11,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 12,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 12,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 12,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 13,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 13,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 13,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 14,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 14,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 14,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 15,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 15,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 15,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 16,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 16,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 16,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 17,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 17,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 17,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 18,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 18,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 18,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 19,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 19,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 19,
+        "matched": true
+      },
+      {
+        "case": "one",
+        "pair": 20,
+        "matched": true
+      },
+      {
+        "case": "three",
+        "pair": 20,
+        "matched": true
+      },
+      {
+        "case": "cursor",
+        "pair": 20,
+        "matched": true
+      }
+    ],
+    "ordersBeforeSha256": "58a30a44d06fcaa054c6789a7fd9527ec4a15de840b34ef4f3c99216f0319628",
+    "cases": [
+      {
+        "name": "one",
+        "query": {
+          "limit": 1
+        },
+        "expected": 1
+      },
+      {
+        "name": "three",
+        "query": {
+          "limit": 3
+        },
+        "expected": 3
+      },
+      {
+        "name": "cursor",
+        "query": {
+          "limit": 3,
+          "cursor": "9df50a53-c5e0-4772-9cfd-31391b1c1e95"
+        },
+        "expected": 2
+      }
+    ],
+    "ordersAfterSha256": "58a30a44d06fcaa054c6789a7fd9527ec4a15de840b34ef4f3c99216f0319628",
+    "poolClosed": true,
+    "serversClosed": true,
+    "finishedAt": "2026-10-18T06:04:56.709Z"
+  },
+  "publicSummary": [
+    {
+      "case": "one",
+      "n": 20,
+      "clientP50Ms": 1137.1005000000005,
+      "clientP95Ms": 1160.2265000000043,
+      "backendP50Ms": 895.878,
+      "backendP95Ms": 901.526
+    },
+    {
+      "case": "three",
+      "n": 20,
+      "clientP50Ms": 1147.8073999999979,
+      "clientP95Ms": 1197.1303000000007,
+      "backendP50Ms": 896.944,
+      "backendP95Ms": 901.436
+    },
+    {
+      "case": "cursor",
+      "n": 20,
+      "clientP50Ms": 1291.2199000000037,
+      "clientP95Ms": 1306.5609999999997,
+      "backendP50Ms": 1045.223,
+      "backendP95Ms": 1047.617
+    }
+  ],
+  "publicOperations": [
+    {
+      "path": "/auth/web-sessions",
+      "method": "POST",
+      "status": 201,
+      "requestId": "d05ee632-159f-42ad-8974-e85a15040184",
+      "matched": true,
+      "backendMs": 3149.935
+    },
+    {
+      "path": "/management/print-orders?bookingId=e80c6f1b-a4fc-4674-a4dd-13ef2601206b&limit=100",
+      "method": "GET",
+      "status": 200,
+      "requestId": "0efb61bc-bc72-4497-baf2-5d7653dcfa70",
+      "matched": true,
+      "backendMs": 1982.813
+    },
+    {
+      "path": "/auth/sessions/current",
+      "method": "DELETE",
+      "status": 204,
+      "requestId": "06de7db5-2533-41f8-8962-c3bdf7a8a546",
+      "matched": true,
+      "backendMs": 1206.318
+    },
+    {
+      "path": "/auth/me",
+      "method": "GET",
+      "status": 401,
+      "requestId": "33f6d16a-29a5-4eec-a541-872e01eb1683",
+      "matched": true,
+      "backendMs": 151.265
+    },
+    {
+      "path": "/auth/web-sessions",
+      "method": "POST",
+      "status": 201,
+      "requestId": "1400a125-924e-4964-a163-23f8cef09820",
+      "matched": true,
+      "backendMs": 1951.992
+    },
+    {
+      "path": "/management/print-orders?limit=100",
+      "method": "GET",
+      "status": 200,
+      "requestId": "f50f8f8a-73f3-4805-b17f-966b62d9f443",
+      "matched": true,
+      "backendMs": 908.159
+    },
+    {
+      "path": "/auth/sessions/current",
+      "method": "DELETE",
+      "status": 204,
+      "requestId": "f097f297-3157-4ca3-aa3a-31aa810f31cf",
+      "matched": true,
+      "backendMs": 1196.058
+    },
+    {
+      "path": "/auth/me",
+      "method": "GET",
+      "status": 401,
+      "requestId": "064bd2de-2732-4d50-89b0-6bfe6643de36",
+      "matched": true,
+      "backendMs": 150.766
+    },
+    {
+      "at": "2026-10-18T06:00:34.125Z",
+      "path": "/auth/web-sessions",
+      "method": "POST",
+      "status": 201,
+      "requestId": "4e076374-4f2b-4d33-8f3f-01f2ad7de43f",
+      "matched": true,
+      "backendMs": 3076.162
+    },
+    {
+      "at": "2026-10-18T06:00:53.128Z",
+      "path": "/auth/sessions/current",
+      "method": "DELETE",
+      "status": 204,
+      "requestId": "9099dd77-c87c-4920-8f1e-44b9be2b7fc9",
+      "matched": true,
+      "backendMs": 1200.43
+    },
+    {
+      "at": "2026-10-18T06:00:53.640Z",
+      "path": "/auth/me",
+      "method": "GET",
+      "status": 401,
+      "requestId": "6348b48d-5903-4c52-bbfc-7f42eeadb703",
+      "matched": true,
+      "backendMs": 150.683
+    },
+    {
+      "at": "2026-10-18T06:01:04.305Z",
+      "path": "/auth/web-sessions",
+      "method": "POST",
+      "status": 201,
+      "requestId": "6eb52ed6-0960-4b5a-ab4f-f9f44c53f56c",
+      "matched": true,
+      "backendMs": 2056.372
+    },
+    {
+      "at": "2026-10-18T06:05:00.290Z",
+      "path": "/auth/sessions/current",
+      "method": "DELETE",
+      "status": 204,
+      "requestId": "c432609c-1c0d-496b-b545-cd368c044eac",
+      "matched": true,
+      "backendMs": 2265.686
+    },
+    {
+      "at": "2026-10-18T06:05:00.837Z",
+      "path": "/auth/me",
+      "method": "GET",
+      "status": 401,
+      "requestId": "7892434d-f75e-4477-b44b-838af129ff38",
+      "matched": true,
+      "backendMs": 150.834
+    },
+    {
+      "label": "login",
+      "path": "/auth/web-sessions",
+      "method": "POST",
+      "round": 0,
+      "requestId": "a0d4cc0a-968f-4e4b-98ea-8cf6557895d6",
+      "at": "2026-10-18T06:05:13.757Z",
+      "status": 201,
+      "ms": 2569.3512,
+      "noStore": true,
+      "matched": true,
+      "backendMs": 1962.337
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 0,
+      "requestId": "e08c07a9-dd25-4f6b-a36c-28f0e835cf70",
+      "at": "2026-10-18T06:05:16.330Z",
+      "status": 200,
+      "ms": 2194.3426000000004,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 1954.584
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 0,
+      "requestId": "9ad0a8f1-9f85-4d8b-b698-082dd1949ddb",
+      "at": "2026-10-18T06:05:18.529Z",
+      "status": 200,
+      "ms": 1139.8846000000003,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 898.455
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 0,
+      "requestId": "698b61f9-a51c-44c0-a41e-b48953348a6b",
+      "at": "2026-10-18T06:05:19.670Z",
+      "status": 200,
+      "ms": 1297.0782,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1047.802
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 1,
+      "requestId": "3436b62a-4337-40bc-b43a-4e68cb939cb0",
+      "at": "2026-10-18T06:05:20.969Z",
+      "status": 200,
+      "ms": 1137.5762000000013,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 897.03
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 1,
+      "requestId": "8962405a-329b-4d59-a94c-7550242425fe",
+      "at": "2026-10-18T06:05:22.110Z",
+      "status": 200,
+      "ms": 1197.1303000000007,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 898.584
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 1,
+      "requestId": "1dacb72f-9643-4762-bc2d-5c59384c3073",
+      "at": "2026-10-18T06:05:23.311Z",
+      "status": 200,
+      "ms": 1284.3264,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1046.079
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 2,
+      "requestId": "b3e66014-f9db-4876-947a-8b9b650476ff",
+      "at": "2026-10-18T06:05:24.597Z",
+      "status": 200,
+      "ms": 1145.2531,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 894.637
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 2,
+      "requestId": "241d0e1d-a23b-4c87-9c82-bfc185ac89e8",
+      "at": "2026-10-18T06:05:25.746Z",
+      "status": 200,
+      "ms": 1145.241,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 898.77
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 2,
+      "requestId": "02c756fd-2afb-45cb-b9a1-10d146006699",
+      "at": "2026-10-18T06:05:26.893Z",
+      "status": 200,
+      "ms": 1306.5609999999997,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1046.419
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 3,
+      "requestId": "eda3bd4a-73a4-4ee0-b343-28ec106d2570",
+      "at": "2026-10-18T06:05:28.201Z",
+      "status": 200,
+      "ms": 1152.6643999999997,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 895.223
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 3,
+      "requestId": "e8cb8b52-a324-4d79-a443-d74535e3951d",
+      "at": "2026-10-18T06:05:29.355Z",
+      "status": 200,
+      "ms": 1148.9344999999994,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 896.605
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 3,
+      "requestId": "ba83d3b5-7e5a-4685-b9aa-cdc5d4c4663c",
+      "at": "2026-10-18T06:05:30.506Z",
+      "status": 200,
+      "ms": 1298.6940000000031,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1044.853
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 4,
+      "requestId": "cfc5cfda-5101-4652-a3fe-fce3187c563a",
+      "at": "2026-10-18T06:05:31.807Z",
+      "status": 200,
+      "ms": 1133.4484000000011,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 896.748
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 4,
+      "requestId": "e3857149-c65d-4d44-8be2-6dc0ca0f239f",
+      "at": "2026-10-18T06:05:32.943Z",
+      "status": 200,
+      "ms": 1173.5397000000012,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 898.223
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 4,
+      "requestId": "29b333f2-ebc9-4c40-b921-1701d752c0d8",
+      "at": "2026-10-18T06:05:34.120Z",
+      "status": 200,
+      "ms": 1282.7366000000002,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1047.617
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 5,
+      "requestId": "036cf7fe-e5ef-4f80-845f-c135a6c3df81",
+      "at": "2026-10-18T06:05:35.405Z",
+      "status": 200,
+      "ms": 1134.858500000002,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 895.965
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 5,
+      "requestId": "471b655f-f820-4a69-af13-3848c7095000",
+      "at": "2026-10-18T06:05:36.541Z",
+      "status": 200,
+      "ms": 1136.5660000000025,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 896.091
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 5,
+      "requestId": "d39b2d5a-c6f1-4cfc-b1a6-d9daeba517c1",
+      "at": "2026-10-18T06:05:37.680Z",
+      "status": 200,
+      "ms": 1283.2901999999995,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1046.3
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 6,
+      "requestId": "b05f97da-5a6c-4763-b3f3-a60211a71f09",
+      "at": "2026-10-18T06:05:38.965Z",
+      "status": 200,
+      "ms": 1133.4548000000032,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 894.291
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 6,
+      "requestId": "39fbd1dc-940f-4398-a4f6-906e963c96e1",
+      "at": "2026-10-18T06:05:40.099Z",
+      "status": 200,
+      "ms": 1153.2158999999992,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 901.436
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 6,
+      "requestId": "f6d53112-65f0-43b0-a100-b6452387725b",
+      "at": "2026-10-18T06:05:41.255Z",
+      "status": 200,
+      "ms": 1281.872199999998,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1044.251
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 7,
+      "requestId": "0f6725dd-699c-4924-8c33-5a5434f3c6e4",
+      "at": "2026-10-18T06:05:42.539Z",
+      "status": 200,
+      "ms": 1132.8790000000008,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 894.844
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 7,
+      "requestId": "27695faa-72b2-4b6b-bf7f-c1cc0490c47f",
+      "at": "2026-10-18T06:05:43.675Z",
+      "status": 200,
+      "ms": 1134.5962999999974,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 895.429
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 7,
+      "requestId": "0ffc3b9b-c04e-4b6e-b7d3-9978695a1435",
+      "at": "2026-10-18T06:05:44.811Z",
+      "status": 200,
+      "ms": 1296.2044999999998,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1045.272
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 8,
+      "requestId": "6ca383a0-1c63-4308-a411-f46605f13a3f",
+      "at": "2026-10-18T06:05:46.110Z",
+      "status": 200,
+      "ms": 1132.044600000001,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 896.804
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 8,
+      "requestId": "14fb864f-62c4-4eca-9c6e-7911d743e628",
+      "at": "2026-10-18T06:05:47.244Z",
+      "status": 200,
+      "ms": 1136.232799999998,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 895.134
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 8,
+      "requestId": "72cf0afa-5460-43be-b0c5-2152ce32d2d3",
+      "at": "2026-10-18T06:05:48.382Z",
+      "status": 200,
+      "ms": 1547.3884000000035,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1046.411
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 9,
+      "requestId": "b429e4d8-b75e-4bb0-a694-9c203000de92",
+      "at": "2026-10-18T06:05:49.931Z",
+      "status": 200,
+      "ms": 1140.6644000000015,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 894.406
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 9,
+      "requestId": "eee9864e-67ec-428f-b8ab-dcbc6d17ec54",
+      "at": "2026-10-18T06:05:51.073Z",
+      "status": 200,
+      "ms": 1149.4809999999998,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 900.627
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 9,
+      "requestId": "b3ed9e87-4b85-4bfb-8d9c-6582dfec459d",
+      "at": "2026-10-18T06:05:52.223Z",
+      "status": 200,
+      "ms": 1279.9586999999956,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1044.669
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 10,
+      "requestId": "a6d4f504-2628-4391-8716-2f13f72eaca2",
+      "at": "2026-10-18T06:05:53.505Z",
+      "status": 200,
+      "ms": 1133.582100000007,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 897.811
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 10,
+      "requestId": "8b8759f3-8c09-4632-881e-2ca5ccddc47e",
+      "at": "2026-10-18T06:05:54.639Z",
+      "status": 200,
+      "ms": 1137.6526999999987,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 896.942
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 10,
+      "requestId": "a4658c34-c295-4a00-8c2a-0aee0036dbb8",
+      "at": "2026-10-18T06:05:55.778Z",
+      "status": 200,
+      "ms": 1279.0408000000025,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1043.947
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 11,
+      "requestId": "1e5a173c-8d1c-4bae-9d1d-75154fa5b100",
+      "at": "2026-10-18T06:05:57.059Z",
+      "status": 200,
+      "ms": 1133.086900000002,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 896.054
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 11,
+      "requestId": "9fa0bd60-1bc3-41b5-a12e-abaf8430dec7",
+      "at": "2026-10-18T06:05:58.193Z",
+      "status": 200,
+      "ms": 1136.3641000000061,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 897.147
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 11,
+      "requestId": "0d81e256-a622-4763-b16c-0c2dc08a2f16",
+      "at": "2026-10-18T06:05:59.331Z",
+      "status": 200,
+      "ms": 1291.2199000000037,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1045.637
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 12,
+      "requestId": "004ad9a2-ab1a-4665-8b1e-120dc4f87238",
+      "at": "2026-10-18T06:06:00.623Z",
+      "status": 200,
+      "ms": 1142.047400000003,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 901.526
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 12,
+      "requestId": "db07e2a9-0fee-4900-9b5d-95492e49d71f",
+      "at": "2026-10-18T06:06:01.766Z",
+      "status": 200,
+      "ms": 1147.346900000004,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 894.822
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 12,
+      "requestId": "003a8f19-a17c-44cd-a542-2dc0dd0c29c3",
+      "at": "2026-10-18T06:06:02.915Z",
+      "status": 200,
+      "ms": 1282.4386000000013,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1045.117
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 13,
+      "requestId": "398cb48e-81bb-4c0d-ae61-6ef0a15bbf53",
+      "at": "2026-10-18T06:06:04.198Z",
+      "status": 200,
+      "ms": 1133.284799999994,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 895.878
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 13,
+      "requestId": "fb93cfdf-f4ca-4456-b92d-374ac711f32c",
+      "at": "2026-10-18T06:06:05.333Z",
+      "status": 200,
+      "ms": 1147.8073999999979,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 897.247
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 13,
+      "requestId": "ee1ccc2f-7c42-4da4-ab6e-ef30207abe89",
+      "at": "2026-10-18T06:06:06.482Z",
+      "status": 200,
+      "ms": 1298.3108999999968,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1045.989
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 14,
+      "requestId": "426550cb-bdc3-4e5d-9d8b-3ac60728f32f",
+      "at": "2026-10-18T06:06:07.781Z",
+      "status": 200,
+      "ms": 1244.8721000000005,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 894.441
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 14,
+      "requestId": "ec709120-963c-4de5-b8a3-2a5adc8286b6",
+      "at": "2026-10-18T06:06:09.027Z",
+      "status": 200,
+      "ms": 1134.3983999999982,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 896.965
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 14,
+      "requestId": "9cc24abc-87b3-449a-b775-efe3b81e4d3d",
+      "at": "2026-10-18T06:06:10.163Z",
+      "status": 200,
+      "ms": 1291.3554000000004,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1045.223
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 15,
+      "requestId": "51436e8e-b154-4539-a088-f8bedb7de739",
+      "at": "2026-10-18T06:06:11.455Z",
+      "status": 200,
+      "ms": 1137.1005000000005,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 894.199
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 15,
+      "requestId": "94b21bf0-fa37-41cc-bcb8-9c3628ee7ddd",
+      "at": "2026-10-18T06:06:12.594Z",
+      "status": 200,
+      "ms": 1149.372199999998,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 897.808
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 15,
+      "requestId": "5ad08694-ba7a-4a6f-a8f2-9e522795a8fe",
+      "at": "2026-10-18T06:06:13.745Z",
+      "status": 200,
+      "ms": 1293.3747999999978,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1047.979
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 16,
+      "requestId": "b0161c94-25e8-4425-853c-a2ad7c750dfc",
+      "at": "2026-10-18T06:06:15.041Z",
+      "status": 200,
+      "ms": 1142.4061000000002,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 905.783
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 16,
+      "requestId": "4740c970-9dec-43cb-ad97-2585ce1f1ad2",
+      "at": "2026-10-18T06:06:16.185Z",
+      "status": 200,
+      "ms": 1150.3467000000019,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 902.325
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 16,
+      "requestId": "b36c9abc-fe45-441a-bb06-3d287ee73977",
+      "at": "2026-10-18T06:06:17.337Z",
+      "status": 200,
+      "ms": 1283.1167999999961,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1046.116
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 17,
+      "requestId": "01660a84-611c-4e1e-9a45-cf42b0fda82a",
+      "at": "2026-10-18T06:06:18.622Z",
+      "status": 200,
+      "ms": 1160.2265000000043,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 897.27
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 17,
+      "requestId": "018a5de4-acf4-41ea-93f1-ee77cd1d0189",
+      "at": "2026-10-18T06:06:19.784Z",
+      "status": 200,
+      "ms": 1216.028099999996,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 894.289
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 17,
+      "requestId": "21f7bc66-53c0-4629-bbe0-ea85fc6b728e",
+      "at": "2026-10-18T06:06:21.002Z",
+      "status": 200,
+      "ms": 1295.881699999998,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1045.095
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 18,
+      "requestId": "42d05106-6fee-489a-90b6-77d767e54545",
+      "at": "2026-10-18T06:06:22.302Z",
+      "status": 200,
+      "ms": 1132.6243000000104,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 896.823
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 18,
+      "requestId": "58806051-9aa1-46b6-865c-56dc41652f4b",
+      "at": "2026-10-18T06:06:23.436Z",
+      "status": 200,
+      "ms": 1149.4807,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 896.944
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 18,
+      "requestId": "e79af656-7eb8-4f1a-9a04-f6bf0510f53e",
+      "at": "2026-10-18T06:06:24.589Z",
+      "status": 200,
+      "ms": 1281.4428000000044,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1044.24
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 19,
+      "requestId": "c73fa0a9-d945-4803-85f2-37c95a675372",
+      "at": "2026-10-18T06:06:25.873Z",
+      "status": 200,
+      "ms": 1146.9949000000051,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 895.299
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 19,
+      "requestId": "b1141724-e4da-446d-8be5-eb8133e4734a",
+      "at": "2026-10-18T06:06:27.022Z",
+      "status": 200,
+      "ms": 1147.1294000000053,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 895.708
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 19,
+      "requestId": "1deeb57f-5297-4ae1-8b2f-15f0c8363c98",
+      "at": "2026-10-18T06:06:28.171Z",
+      "status": 200,
+      "ms": 1294.7072000000044,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1044.183
+    },
+    {
+      "label": "one",
+      "path": "/management/print-orders?limit=1",
+      "method": "GET",
+      "round": 20,
+      "requestId": "2a3e0d0f-9017-4e30-a308-957732db4d0f",
+      "at": "2026-10-18T06:06:29.468Z",
+      "status": 200,
+      "ms": 1142.6475000000064,
+      "noStore": true,
+      "items": 1,
+      "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+      "matched": true,
+      "backendMs": 894.789
+    },
+    {
+      "label": "three",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 20,
+      "requestId": "99b8cba7-392e-46cc-b1ff-2d656876cd75",
+      "at": "2026-10-18T06:06:30.612Z",
+      "status": 200,
+      "ms": 1150.1670999999915,
+      "noStore": true,
+      "items": 3,
+      "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+      "matched": true,
+      "backendMs": 895.816
+    },
+    {
+      "label": "cursor",
+      "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+      "method": "GET",
+      "round": 20,
+      "requestId": "7f7a4010-1541-409e-a922-98a65db9f9f9",
+      "at": "2026-10-18T06:06:31.764Z",
+      "status": 200,
+      "ms": 1295.0587999999989,
+      "noStore": true,
+      "items": 2,
+      "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+      "matched": true,
+      "backendMs": 1044.428
+    },
+    {
+      "label": "logout",
+      "path": "/auth/sessions/current",
+      "method": "DELETE",
+      "round": 0,
+      "requestId": "c4a79beb-d22f-4a45-bebc-9147ad40771d",
+      "at": "2026-10-18T06:06:33.060Z",
+      "status": 204,
+      "ms": 2521.567200000005,
+      "noStore": true,
+      "matched": true,
+      "backendMs": 2273.229
+    },
+    {
+      "label": "revoked",
+      "path": "/auth/me",
+      "method": "GET",
+      "round": 0,
+      "requestId": "7374d093-976e-4424-a708-fd211d3bac97",
+      "at": "2026-10-18T06:06:35.583Z",
+      "status": 401,
+      "ms": 391.7899000000034,
+      "noStore": true,
+      "matched": true,
+      "backendMs": 150.84
+    },
+    {
+      "label": "revoked-print",
+      "path": "/management/print-orders?limit=3",
+      "method": "GET",
+      "round": 0,
+      "requestId": "851ab682-ebc7-4caa-8eb9-a0c0aacd2f85",
+      "at": "2026-10-18T06:06:35.976Z",
+      "status": 401,
+      "ms": 398.99529999999504,
+      "noStore": false,
+      "matched": true,
+      "backendMs": 153.024
+    }
+  ],
+  "publicBeforeAfterComparison": false,
+  "publicPassed": true,
+  "localModel": {
+    "node": "v24.21.0",
+    "modelMs": 40,
+    "poolMax": 1,
+    "readers": 1,
+    "sampleCount": 20,
+    "summary": [
+      {
+        "limit": 1,
+        "variants": {
+          "before": {
+            "n": 20,
+            "p50Ms": 186.76090000000113,
+            "p95Ms": 202.16700000000128,
+            "commands": [
+              4
+            ]
+          },
+          "current": {
+            "n": 20,
+            "p50Ms": 233.91330000000016,
+            "p95Ms": 250.4620000000068,
+            "commands": [
+              5
+            ]
+          }
+        },
+        "p95ReductionPercent": -23.88866630063522
+      },
+      {
+        "limit": 3,
+        "variants": {
+          "before": {
+            "n": 20,
+            "p50Ms": 279.75940000000264,
+            "p95Ms": 282.11939999999595,
+            "commands": [
+              6
+            ]
+          },
+          "current": {
+            "n": 20,
+            "p50Ms": 233.8876999999993,
+            "p95Ms": 249.98309999999765,
+            "commands": [
+              5
+            ]
+          }
+        },
+        "p95ReductionPercent": 11.391028054078788
+      },
+      {
+        "limit": 20,
+        "variants": {
+          "before": {
+            "n": 20,
+            "p50Ms": 1073.871500000001,
+            "p95Ms": 1096.0856999999996,
+            "commands": [
+              23
+            ]
+          },
+          "current": {
+            "n": 20,
+            "p50Ms": 234.23519999999917,
+            "p95Ms": 244.31550000000425,
+            "commands": [
+              5
+            ]
+          }
+        },
+        "p95ReductionPercent": 77.71018269830505
+      }
+    ],
+    "samples": [
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1103.6363999999994,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 247.45460000000094,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 233.34019999999873,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1069.2022999999972,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1073.871500000001,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 234.09839999999895,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 235.22949999999764,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1096.0856999999996,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1075.7255000000005,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 233.97470000000249,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 234.23519999999917,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1075.3459000000003,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1073.8530000000028,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 235.53060000000187,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 232.6742000000013,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1070.9635999999991,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1070.400099999999,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 243.6330999999991,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 238.57700000000114,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1073.1140000000014,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1067.023199999996,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 237.11019999999553,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 230.23719999999594,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1072.2871000000014,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1075.119700000003,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 235.8379000000059,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 230.3649000000005,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1087.288099999998,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1090.1896000000052,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 238.9878000000026,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 244.31550000000425,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1091.802499999998,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1068.1408999999985,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 232.96880000000237,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 233.1088000000018,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1071.5736000000034,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1075.3364999999976,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 235.43569999999454,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "current",
+        "ms": 232.14719999999943,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-20",
+        "variant": "before",
+        "ms": 1073.9873000000007,
+        "queries": 23
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 184.17540000000008,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 433.097400000006,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 240.5751999999993,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 186.90840000000026,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 187.36849999999686,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 235.77880000000005,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 234.1504999999961,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 185.86009999999806,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 184.06840000000375,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 235.84290000000328,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 235.69859999999608,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 186.6065000000017,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 204.4858000000022,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 229.0124999999971,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 250.4620000000068,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 185.57069999999658,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 191.26180000000022,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 231.9994000000006,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 232.1313999999984,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 186.017399999997,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 185.6964999999982,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 235.39500000000407,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 233.91330000000016,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 185.17689999999857,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 186.76090000000113,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 233.8272999999972,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 234.23819999999978,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 202.16700000000128,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 187.63029999999708,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 234.585699999996,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 230.1851999999999,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 186.87540000000445,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 188.5966000000044,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 233.2022999999972,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 232.95009999999456,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 190.13790000000154,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 200.24840000000404,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 229.99529999999504,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "current",
+        "ms": 231.0720999999976,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-1",
+        "variant": "before",
+        "ms": 186.00920000000042,
+        "queries": 4
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 279.633799999996,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 233.97580000000016,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 233.8876999999993,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 278.97899999999936,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 281.37050000000454,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 234.78409999999712,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 233.0960999999952,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 282.11939999999595,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 280.4455999999991,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 232.3573999999935,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 232.5144999999975,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 280.76220000000467,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 278.19199999999546,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 234.41410000000178,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 234.58740000000398,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 279.75940000000264,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 279.4763000000021,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 230.98909999999887,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 233.07620000000315,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 279.45730000000185,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 282.3860999999961,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 233.20729999999458,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 249.98309999999765,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 275.999699999993,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 281.29670000000624,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 235.54699999999866,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 232.99989999999525,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 279.08759999999893,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 281.50709999999526,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 236.32590000000346,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 231.26280000000406,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 280.5308999999979,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 281.5601999999999,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 265.96689999999944,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 235.87659999999596,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 277.63880000000063,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 280.8318999999974,
+        "queries": 6
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 234.07670000000508,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "current",
+        "ms": 231.3235999999888,
+        "queries": 5
+      },
+      {
+        "name": "print-orders-3",
+        "variant": "before",
+        "ms": 278.89319999999134,
+        "queries": 6
+      }
+    ]
+  },
+  "preservation": {
+    "unchanged": true,
+    "before": {
+      "tables": {
+        "Booking": {
+          "count": 3,
+          "sha256": "a43ba82e180ffdd0c90b8ab958b0d05010d19a2bc03c56cfc71e2af3655fd132"
+        },
+        "Consultation": {
+          "count": 3,
+          "sha256": "ddba007d1269769e228d194a9b5c9a3e43e71e787a37703d6de8a3a07552ccff"
+        },
+        "ConsultationAccess": {
+          "count": 3,
+          "sha256": "3db4a854e3e87ef83eaf5f1fedfa97aa98f4c1864eeb39378be9c346b2646556"
+        },
+        "GuestWorkspace": {
+          "count": 3,
+          "sha256": "2adc74581205b0a91b183da144979700032100d02b8e1428ce5645365380fded"
+        },
+        "GuestPlanRevision": {
+          "count": 3,
+          "sha256": "3bb6ad2d1e99fb796950dd546d88dabdb6c93731d09172ad436fe2a2f6999638"
+        },
+        "Guest": {
+          "count": 8,
+          "sha256": "b2b586adc5cbb9b291e0efab771009f86f2cb76fa1f76dc3a4b64f06aef13ee7"
+        },
+        "GuestGroup": {
+          "count": 12,
+          "sha256": "5dd8e10dc95c46c70ade7f392905792271b842869761f94e41a7e25f65a16340"
+        },
+        "GuestHistory": {
+          "count": 20,
+          "sha256": "04e0f0ac96082eee960325b4b61ed279d0e1571997e6c64ba3afab78417c9598"
+        },
+        "SeatingPlan": {
+          "count": 1,
+          "sha256": "9c1ec53ea1d901487d515a638f848e0523c35e36c905a2b54d8bff196b759270"
+        },
+        "SeatingPlanRevision": {
+          "count": 2,
+          "sha256": "afc6805271c1530347d10b0683fbad7463008dbef27f19cb38796cf9f2167f6b"
+        },
+        "StaffConfiguration": {
+          "count": 2,
+          "sha256": "3bba552bab58a4f01d405cb702850a3a16f272802eedc6a2dccf0233be80ef46"
+        },
+        "StaffAssignment": {
+          "count": 1,
+          "sha256": "7467e6b94d7fe8965caa7c6dd3e5d333464782c8cd7316fba5e871d0dd897bb1"
+        },
+        "StaffHistory": {
+          "count": 4,
+          "sha256": "72c3786aa33411335a48a4ea25276828d458cab1816fd5800b47eca52fb1f673"
+        },
+        "StaffCheckInRecord": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "CommercialContractRevision": {
+          "count": 2,
+          "sha256": "58cfa68d5865370ed2743bc79e3d625619a0a9df0a9acd8164bcdde31df5c229"
+        },
+        "FinalInvoiceRevision": {
+          "count": 1,
+          "sha256": "a5cc65388d67284b4648a16d9e6a453e456f252d40798ce7318b68cf0807e082"
+        },
+        "BillingLedgerEntry": {
+          "count": 11,
+          "sha256": "315b6f976aa3ed6a13e50d9cabd71b052f810a5ad81d1f07550146201560330b"
+        },
+        "InvitationPrintOrder": {
+          "count": 3,
+          "sha256": "633fb1c5ac2acc4b00af373e6ee6eb61ea501a4ace0540c30fd1db6e64617314"
+        },
+        "InvitationPrintLine": {
+          "count": 3,
+          "sha256": "91a712aedc8f7e6b4db697ec00dea5d61078370aba2206b9e100380679dfc087"
+        },
+        "InvitationCommercialRevision": {
+          "count": 2,
+          "sha256": "8963e49013da8746128e019681dedf98aef52fd9da239ba7314899061257efa2"
+        },
+        "InvitationPrintAudit": {
+          "count": 10,
+          "sha256": "55990bebaafa30e4e86995fb46b4cec7b45747ec8783ac592be51ef49cd7e0a7"
+        }
+      },
+      "selectedOrders": 3,
+      "selectedBookings": 3,
+      "migrations": {
+        "count": 61,
+        "sha256": "b7d90da8b39b7db5f6ef24ec1084f4ea2d4e4915664ebfccd00345c18fbf910e",
+        "allChecksumsMatch": true
+      }
+    },
+    "after": {
+      "tables": {
+        "Booking": {
+          "count": 3,
+          "sha256": "a43ba82e180ffdd0c90b8ab958b0d05010d19a2bc03c56cfc71e2af3655fd132"
+        },
+        "Consultation": {
+          "count": 3,
+          "sha256": "ddba007d1269769e228d194a9b5c9a3e43e71e787a37703d6de8a3a07552ccff"
+        },
+        "ConsultationAccess": {
+          "count": 3,
+          "sha256": "3db4a854e3e87ef83eaf5f1fedfa97aa98f4c1864eeb39378be9c346b2646556"
+        },
+        "GuestWorkspace": {
+          "count": 3,
+          "sha256": "2adc74581205b0a91b183da144979700032100d02b8e1428ce5645365380fded"
+        },
+        "GuestPlanRevision": {
+          "count": 3,
+          "sha256": "3bb6ad2d1e99fb796950dd546d88dabdb6c93731d09172ad436fe2a2f6999638"
+        },
+        "Guest": {
+          "count": 8,
+          "sha256": "b2b586adc5cbb9b291e0efab771009f86f2cb76fa1f76dc3a4b64f06aef13ee7"
+        },
+        "GuestGroup": {
+          "count": 12,
+          "sha256": "5dd8e10dc95c46c70ade7f392905792271b842869761f94e41a7e25f65a16340"
+        },
+        "GuestHistory": {
+          "count": 20,
+          "sha256": "04e0f0ac96082eee960325b4b61ed279d0e1571997e6c64ba3afab78417c9598"
+        },
+        "SeatingPlan": {
+          "count": 1,
+          "sha256": "9c1ec53ea1d901487d515a638f848e0523c35e36c905a2b54d8bff196b759270"
+        },
+        "SeatingPlanRevision": {
+          "count": 2,
+          "sha256": "afc6805271c1530347d10b0683fbad7463008dbef27f19cb38796cf9f2167f6b"
+        },
+        "StaffConfiguration": {
+          "count": 2,
+          "sha256": "3bba552bab58a4f01d405cb702850a3a16f272802eedc6a2dccf0233be80ef46"
+        },
+        "StaffAssignment": {
+          "count": 1,
+          "sha256": "7467e6b94d7fe8965caa7c6dd3e5d333464782c8cd7316fba5e871d0dd897bb1"
+        },
+        "StaffHistory": {
+          "count": 4,
+          "sha256": "72c3786aa33411335a48a4ea25276828d458cab1816fd5800b47eca52fb1f673"
+        },
+        "StaffCheckInRecord": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "CommercialContractRevision": {
+          "count": 2,
+          "sha256": "58cfa68d5865370ed2743bc79e3d625619a0a9df0a9acd8164bcdde31df5c229"
+        },
+        "FinalInvoiceRevision": {
+          "count": 1,
+          "sha256": "a5cc65388d67284b4648a16d9e6a453e456f252d40798ce7318b68cf0807e082"
+        },
+        "BillingLedgerEntry": {
+          "count": 11,
+          "sha256": "315b6f976aa3ed6a13e50d9cabd71b052f810a5ad81d1f07550146201560330b"
+        },
+        "InvitationPrintOrder": {
+          "count": 3,
+          "sha256": "633fb1c5ac2acc4b00af373e6ee6eb61ea501a4ace0540c30fd1db6e64617314"
+        },
+        "InvitationPrintLine": {
+          "count": 3,
+          "sha256": "91a712aedc8f7e6b4db697ec00dea5d61078370aba2206b9e100380679dfc087"
+        },
+        "InvitationCommercialRevision": {
+          "count": 2,
+          "sha256": "8963e49013da8746128e019681dedf98aef52fd9da239ba7314899061257efa2"
+        },
+        "InvitationPrintAudit": {
+          "count": 10,
+          "sha256": "55990bebaafa30e4e86995fb46b4cec7b45747ec8783ac592be51ef49cd7e0a7"
+        }
+      },
+      "selectedOrders": 3,
+      "selectedBookings": 3,
+      "migrations": {
+        "count": 61,
+        "sha256": "b7d90da8b39b7db5f6ef24ec1084f4ea2d4e4915664ebfccd00345c18fbf910e",
+        "allChecksumsMatch": true
+      }
+    },
+    "operationalException": "Session lifecycle/audit writes; no live business command submitted"
+  },
+  "validation": {
+    "focused": {
+      "files": 8,
+      "passed": 27,
+      "failed": 0
+    },
+    "commercialPrintCases": {
+      "passed": 3,
+      "selectedApiSuitePassed": 14,
+      "unselectedTests": 30
+    },
+    "authorityMutation": {
+      "failedAsExpected": 4,
+      "sourceRestoredByteForByte": true
+    },
+    "typecheck": true,
+    "focusedLint": true,
+    "focusedFormatting": true,
+    "newRegressionExactHeadCi": "Required PR checks before merge; not claimed by this pre-PR receipt",
+    "deployedSourceCi": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39099474660",
+    "deployedSourceCiTests": 2076
+  },
+  "preservedFailures": [
+    {
+      "file": "output/perf07-20261018/focused.log",
+      "cause": "New race fixture omitted the mandatory cancellation reason; corrected to existing schema"
+    },
+    {
+      "file": "output/perf07-20261018/final-focused.log",
+      "cause": "Tied-createdAt fixture also changed Prisma updatedAt; fixture now explicitly sets both; complete equality retained"
+    },
+    {
+      "file": "output/perf07-20261018/mutation.log",
+      "cause": "Expected four failures with final Manager recheck removed; original source restored"
+    }
+  ],
+  "cleanup": {
+    "key": {
+      "at": "2026-10-18T06:05:21.863Z",
+      "fingerprint": "SHA256:zT+LjL/g9/8KavTzM+ajDxvZyPjgtVb/KgKC+UuxSTU",
+      "revoked": true,
+      "revokedTransportDenied": true,
+      "ownedKeysRemoved": true,
+      "otherKeysUntouched": true,
+      "remoteFilesWritten": false
+    },
+    "nativePoolClosed": true,
+    "nativeServersClosed": true,
+    "local": {
+      "at": "2026-10-18T06:08:11.093Z",
+      "testDatabasesRemaining": 0,
+      "clusterStopped": true,
+      "clusterPort": 55441,
+      "sharedDatabaseCleanup": false
+    }
+  },
+  "review": {
+    "kind": "five-axis self-review",
+    "independentHumanOrAgentReviewClaimed": false,
+    "correctness": "Complete snapshots, ties/cursors, expiry/newest proposals, ownership, four revocations and one-winner monetary race verified",
+    "readability": "Existing fixture/service patterns; tests and evidence only",
+    "architecture": "Manager read owner retained; public contracts and applied migrations unchanged",
+    "security": "Read-only max-one pool, no secrets/payloads in receipt, revocation probes, dedicated key removed",
+    "performance": "Bounded cardinality and matched measurements; regressions retained"
+  },
+  "disposition": {
+    "threeOrderNativeTargetPassed": true,
+    "nativeThreeOrderP95ReductionPercent": 32.57925670723104,
+    "oneOrderRegressionPercent": 19.56804558166634,
+    "cursorTargetPassed": false,
+    "noTwentyOrderLiveClaim": true,
+    "noBlanketPerCaseOrPublicGainClaim": true,
+    "perf13": "OPEN",
+    "productionReadiness": "NO_GO_UNCHANGED",
+    "newRuntimeRolloutRequired": false
+  },
+  "operatorArtifacts": [
+    {
+      "path": "output/perf07-20261018/before.log",
+      "bytes": 3009,
+      "sha256": "3fd4a7e619feeb6ea1ff6f7c408c5bafe2ce78bc6271234058d41c5783c68cc4"
+    },
+    {
+      "path": "output/perf07-20261018/campaign-provenance.json",
+      "bytes": 1310,
+      "sha256": "72e48cf26782134fde6e9556bd120296334867d31a8c0ff2e4ede28176a710a9"
+    },
+    {
+      "path": "output/perf07-20261018/campaign-sessions.json",
+      "bytes": 532,
+      "sha256": "fba9ac3880dbb2cdf6454e6155ea44107507727e26eff97255d14268657eb89d"
+    },
+    {
+      "path": "output/perf07-20261018/campaign-transport.json",
+      "bytes": 205,
+      "sha256": "d1d3a20240c292883b53ceb1fc03294f8a8a9d4a68467a373f78d3995fbdffc8"
+    },
+    {
+      "path": "output/perf07-20261018/campaign.log",
+      "bytes": 181,
+      "sha256": "ddb7bd120ae1f3bae39cde3e2bd02ac1a9dbd0b6915fa13131fbe9428b22ef9e"
+    },
+    {
+      "path": "output/perf07-20261018/campaign.ndjson",
+      "bytes": 125708,
+      "sha256": "38745524b0798372b70cdf85767b666407b3ea20f87b8b9ef3a39ebae7b5db00"
+    },
+    {
+      "path": "output/perf07-20261018/common.mjs",
+      "bytes": 2820,
+      "sha256": "fce417ed7f3e05d819d957c2f1aa3350fa610254845bd7039a38f4160999fb45"
+    },
+    {
+      "path": "output/perf07-20261018/complete.log",
+      "bytes": 2590,
+      "sha256": "26b3fbb71ae080a1fdbcf5b6b338b12e0809a50885509f06cb1a75d19d4ae547"
+    },
+    {
+      "path": "output/perf07-20261018/final-fixed.log",
+      "bytes": 4343,
+      "sha256": "1c1e526b6a9a50bb1481dbafdc9eb08434dc4750c6aaa7d55bae2e0b5cf95609"
+    },
+    {
+      "path": "output/perf07-20261018/final-focused.log",
+      "bytes": 5931,
+      "sha256": "23c09fdb7fd8679d7ed3c775fc79ee478928e1cedfd01b36a63c5025ace2d6c8"
+    },
+    {
+      "path": "output/perf07-20261018/final-format.log",
+      "bytes": 68,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+    },
+    {
+      "path": "output/perf07-20261018/final-lint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "output/perf07-20261018/focused-fixed.log",
+      "bytes": 4587,
+      "sha256": "0d971b88bee18517292ea3a5e1053d975c5fa73bdda04b93a0fb382e06323766"
+    },
+    {
+      "path": "output/perf07-20261018/focused.log",
+      "bytes": 5535,
+      "sha256": "b134a77ea99216329a7d4c53cbbd0cde9ac7edb720fddcb448365638c75fd6cb"
+    },
+    {
+      "path": "output/perf07-20261018/format.log",
+      "bytes": 166,
+      "sha256": "f38650d8f3b155765d944e3dcd2e878277f587be93469dde2452077088b6966f"
+    },
+    {
+      "path": "output/perf07-20261018/key-registration.json",
+      "bytes": 266,
+      "sha256": "978eb2f3ea51104f5cbd6f6a810fb323ab3720e3712207eb592e37858aef5218"
+    },
+    {
+      "path": "output/perf07-20261018/key-revocation.json",
+      "bytes": 252,
+      "sha256": "fb77c2e50fd258381878677b434f6c97834a63c35867525bf903f1981556a481"
+    },
+    {
+      "path": "output/perf07-20261018/key.mjs",
+      "bytes": 2899,
+      "sha256": "c395a369377e99c74295f8f2926601eb200b1b47156f0c73f38dc4f387a53a0b"
+    },
+    {
+      "path": "output/perf07-20261018/lint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "output/perf07-20261018/local-cleanup.json",
+      "bytes": 154,
+      "sha256": "b18df64f9133726afa49dfa3b54468ee729f96e507716fc70de92b5be3542686"
+    },
+    {
+      "path": "output/perf07-20261018/local-cleanup.mjs",
+      "bytes": 1174,
+      "sha256": "f92e22ae9ec6cfc9bdb5cab2f659008e29e27cbf684ef15023e68170f6e7c33d"
+    },
+    {
+      "path": "output/perf07-20261018/local-measurement.json",
+      "bytes": 15004,
+      "sha256": "bc16e9112029b36f61c1631574fe672b4a5049d263feafebb375d765b5239ca9"
+    },
+    {
+      "path": "output/perf07-20261018/local-measurement.log",
+      "bytes": 475,
+      "sha256": "de59f1a25ba1254ca0fa637ad1eb0b7d744b7357f07a98a5a2b7ec3855af0ce8"
+    },
+    {
+      "path": "output/perf07-20261018/local.mjs",
+      "bytes": 2840,
+      "sha256": "9d52548e618d6c400f3d789c2d5a7e26c586b3c3a2979f0ddc6c9d900ff4442b"
+    },
+    {
+      "path": "output/perf07-20261018/mutation.log",
+      "bytes": 442,
+      "sha256": "a4a3b9f4f5bba5903d76e28052c9fe40a0ee1194001a2fa0b7ae205a3741cf77"
+    },
+    {
+      "path": "output/perf07-20261018/mutation.mjs",
+      "bytes": 1383,
+      "sha256": "70f67bab28a7d0812a98a413e841020c9656eac60621c43d501641f95a0903d1"
+    },
+    {
+      "path": "output/perf07-20261018/native-worker.mjs",
+      "bytes": 7249,
+      "sha256": "ca8637aec220b0355658766c6227b8d794c181d67ec4c80039a68e6fd9c3cf72"
+    },
+    {
+      "path": "output/perf07-20261018/native.mjs",
+      "bytes": 4775,
+      "sha256": "7451e96e51d94f6c8879aace1f51b8c03511c053f7edc543f8d69f9c9de538c0"
+    },
+    {
+      "path": "output/perf07-20261018/pilot-provenance.json",
+      "bytes": 1309,
+      "sha256": "52d493e7aefe177170c8f604734438c6456b91f94f61bb0b69e8ba173da677af"
+    },
+    {
+      "path": "output/perf07-20261018/pilot-sessions.json",
+      "bytes": 532,
+      "sha256": "d604b12df76a39433a679a548f4e655fe7ab94a2d32894f46ce2924caa54cd01"
+    },
+    {
+      "path": "output/perf07-20261018/pilot-transport.json",
+      "bytes": 205,
+      "sha256": "aa8e75a173022a185d2c637acb3d39ff2d3818f16cbecae79f60d67d7299bd82"
+    },
+    {
+      "path": "output/perf07-20261018/pilot.ndjson",
+      "bytes": 7485,
+      "sha256": "bc7718e6834af241a3175728e117a30e0d4645b385a7e9815c7d128b955f16ee"
+    },
+    {
+      "path": "output/perf07-20261018/postflight.json",
+      "bytes": 141488,
+      "sha256": "5256cc6c1828103e8036095e6249a37305ed64617f364708a2bf6d1af9234705"
+    },
+    {
+      "path": "output/perf07-20261018/postflight.log",
+      "bytes": 2023,
+      "sha256": "9681ca446b4de59473345e6a714ae01106fe17a6a30de06d7c26ae9fa836ce35"
+    },
+    {
+      "path": "output/perf07-20261018/postflight.mjs",
+      "bytes": 3616,
+      "sha256": "4495d2d6836830eb91e94c9bb4b93b4077bec54e073be86604288cd64046fc4c"
+    },
+    {
+      "path": "output/perf07-20261018/preflight-http.json",
+      "bytes": 620,
+      "sha256": "99ffd5e1712b218f1e06668445553bd2146a68a400754e6cabcba42f5ac38644"
+    },
+    {
+      "path": "output/perf07-20261018/preflight-unfiltered-http.json",
+      "bytes": 573,
+      "sha256": "261a755e7863f34666fecb2ed287178545a9b7d60a1d57fd49fe3f51999c1dd4"
+    },
+    {
+      "path": "output/perf07-20261018/preflight.json",
+      "bytes": 4693,
+      "sha256": "59ffeb687f7981f90367084cc46d2f4f5b4c39ea8b193407b8299ee8858e5bd7"
+    },
+    {
+      "path": "output/perf07-20261018/preflight.log",
+      "bytes": 1085,
+      "sha256": "4e11d4f15275c45043a66f3f328bfee7966d6fe8dc29e42290dbd085594664d3"
+    },
+    {
+      "path": "output/perf07-20261018/preflight.mjs",
+      "bytes": 876,
+      "sha256": "a40623f164927831debb04d6256231100a96acdc1724a9060579b3fc0284f185"
+    },
+    {
+      "path": "output/perf07-20261018/prepare-harness.mjs",
+      "bytes": 3572,
+      "sha256": "35352d7b0f830506c07d1b47c030e9aba48102678a5c9c66e880513cee1fdb5f"
+    },
+    {
+      "path": "output/perf07-20261018/public-after.json",
+      "bytes": 28165,
+      "sha256": "e57e21bc593b55dd277a4e337532dd3878b352251f814a6cdd306bfdb76d0ae7"
+    },
+    {
+      "path": "output/perf07-20261018/public.log",
+      "bytes": 52,
+      "sha256": "fcf898f12b8cb159ae998a3b3ae5a66f743861de93aaf0685a16ab207b129f2c"
+    },
+    {
+      "path": "output/perf07-20261018/public.mjs",
+      "bytes": 3172,
+      "sha256": "e79b7ee123fca0b1577293cf78568f04c76e80153ee9844673bf4c0e0c471155"
+    },
+    {
+      "path": "output/perf07-20261018/seal.mjs",
+      "bytes": 5464,
+      "sha256": "903842f2ee264cfce9f6a9c6a4215c8a4086ef5b2e2b2b1efda947315f4c3945"
+    },
+    {
+      "path": "output/perf07-20261018/typecheck.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}
