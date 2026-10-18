@@ -10,17 +10,18 @@ and the product NO_GO decision are unchanged.
 
 ## Acceptance boundaries
 
-| Task    | Delivered locally                                                                                                                                        | Remaining acceptance                                                                                                                                                                |
-| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PERF-02 | Native-owner synthetic fixture, initialized Group/Guest/Seating/settings, assigned Staff, eight-family HTTP measurement and private-config runner        | Owner subsequently authorized a Railway synthetic fixture. See the follow-up receipt; successful assigned-Staff reads still require a valid event window.                           |
-| PERF-03 | Opt-in request-correlated driver/acquire/lock-command timing, pool observations, event-loop observation, safe DB probe and pool-context regression tests | Deploy approved instrumentation to a test target; measure container→DB RTT and attribute real slow request families. Pure server execution and lock wait require DB-side evidence.  |
-| PERF-04 | Three complete region pairs, 2,016 successful business reads and verified cleanup                                                                        | Complete in authorized synthetic scope, with owner-approved final image artifact equivalence; keep US West. PERF-13 and NO_GO unchanged.                                            |
-| PERF-05 | Joined/narrow Identity authority reads and narrow/empty-grant Couple overview reads; revocation and concurrency tests                                    | PR #46 is merged/deployed; observed same-topology backend p95 improved 75% for Identity and 43% for overview. Live driver attribution and remaining dependency gates stay separate. |
+| Task    | Delivered locally                                                                                                                                        | Remaining acceptance                                                                                                                                                                               |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PERF-02 | Native-owner synthetic fixture, initialized Group/Guest/Seating/settings, assigned Staff, eight-family HTTP measurement and private-config runner        | Owner subsequently authorized a Railway synthetic fixture. See the follow-up receipt; successful assigned-Staff reads still require a valid event window.                                          |
+| PERF-03 | Opt-in request-correlated driver/acquire/lock-command timing, pool observations, event-loop observation, safe DB probe and pool-context regression tests | Deploy approved instrumentation to a test target; measure container→DB RTT and attribute real slow request families. Pure server execution and lock wait require DB-side evidence.                 |
+| PERF-04 | Three complete region pairs, 2,016 successful business reads and verified cleanup                                                                        | Complete in authorized synthetic scope, with owner-approved final image artifact equivalence; keep US West. PERF-13 and NO_GO unchanged.                                                           |
+| PERF-05 | Joined/narrow Identity authority reads and narrow/empty-grant Couple overview reads; revocation and concurrency tests                                    | Complete 2026-10-18: historical matched p95 target and subsequent live driver attribution pass; fresh 61-test correctness and 46-operation Railway verification are recorded in the closure below. |
 
-These are partial implementation receipts, not four completed live-performance
-tasks. Canonical PERF checkboxes remain open until their full acceptance evidence
-exists. The former plan's “measurement only” status describes its earlier audit;
-the owner's current request authorizes this backend implementation.
+These original implementation receipts describe partial checkpoints. As of
+2026-10-18, PERF-02/03/04 and the [PERF-05 closure](backend-performance-05-closure-2026-10-18.md)
+have their corresponding acceptance evidence in the canonical backlog. Earlier
+pending notes below remain historical; full production readiness and PERF-13 remain
+separate. The former plan's “measurement only” status describes its earlier audit.
 
 ## PERF-02 fixture and runner
 

@@ -102,6 +102,13 @@ Acceptance: lower driver round trips and authenticated p95 by a meaningful amoun
 revocation and role changes still deny correctly, including concurrent revocation.
 Never remove authoritative post-lock rechecks or reduce password security settings.
 
+2026-10-18 completion: [PERF-05 closure](../docs/backend-performance-05-closure-2026-10-18.md)
+reconciles PR #46's observed 75.2%/42.8% same-topology backend p95 reductions with
+completed PERF-03 driver attribution. Fresh native verification passes 61 tests;
+all 46 current Railway operations correlate, including both post-logout denials.
+Relevant source and business/migration histories remain unchanged. No new rollout
+or production-readiness claim; PERF-13 retains broader repeat/capacity gates.
+
 ### PERF-06 — Batch invitation template versions
 
 Dependencies: PERF-03; remeasure after PERF-05 if Identity changes land first.
@@ -112,6 +119,14 @@ retain both authority checks and immutable version semantics.
 Acceptance: version lookup work remains bounded for 1/4/20 templates, same JSON and
 cursor behavior, and revocation/archive/concurrent revision tests pass. Target ≥30%
 p95 reduction on an identical fixture, with no authorization response cache.
+
+2026-10-18 [PERF-06 completion](../docs/backend-performance-06-closure-2026-10-18.md):
+PR #66 is merged/deployed after owner approval and exact-head/merge CI each pass
+2,076 tests. Native original-source comparison meets the target in the approved
+four-template live scope; 1/4/20 and revocation coverage is native local. All 63
+after-rollout public reads return 200 and backend p95 improves 17.2–17.5% over the
+already optimized version. Client-tail regressions remain explicitly in PERF-13;
+histories, migrations, configuration and production NO_GO remain unchanged.
 
 ### PERF-07 — Batch print-order detail reads
 
