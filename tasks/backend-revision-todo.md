@@ -470,7 +470,23 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
     32 table digests/61 migrations/configuration match. Temporary native/local pools
     and SSH key are closed/revoked. Exact-head CI and reviewed owner-authorized
     rollout/after probes remain required; PERF-08 stays open. PERF-13/NO_GO unchanged.
-- [x] PERF-09: Bound catalog SQL pagination and batch media facts; preserve publication and signed-URL rules. Closed by explicit owner acceptance of the limited 1–3 Hall scope, not a pass of the original twenty-item/30% live gates.
+- [ ] PERF-09: Bound catalog SQL pagination and batch media facts; preserve publication and signed-URL rules. Reopened on 2026-10-18 for the original acceptance criteria.
+  - 2026-10-18 owner requests full original acceptance: actual 1/20 live items,
+    with/without assets, fresh private signed URLs, bounded query work and >=30%
+    matched p95 improvement. The prior scope exception remains historical evidence.
+    Authorized experiment uses only one isolated schema with 41 synthetic Halls
+    and 20 tiny private PNGs, at most one additional connection for 45 minutes;
+    no existing public/business fixture changes. Review, CI and rollout remain required.
+  - 2026-10-18 [original criteria verification](../docs/backend-performance-09-original-2026-10-18.md):
+    One captured Hall/page/media statement retains visibility, cursors and fresh TTL900
+    signing; all 1/20 plain/rich service and HTTP reads use one command. Twenty matched
+    live native triplets per case pass the original 30% target on an owner-authorized
+    isolated 41-Hall/20-object fixture. All 252 initial/measured responses and 189
+    pilot/campaign Storage body reads pass. Original/incremental/public results remain
+    separate. All 47 scoped business/catalog digests and 61 migration checksums match;
+    fixture removed, key revoked, local cluster stopped. Prior failures are preserved.
+    Exact-head CI and reviewed owner-authorized rollout/after probes remain required.
+    PERF-09 stays open until those gates pass; PERF-13/NO_GO unchanged.
   - 2026-10-17 owner-selected [read-only 1–3 Hall comparison](../docs/backend-performance-catalog-readonly-2026-10-17.md):
     PR #58 is merged after exact-head/main CI pass 2,002 tests. Eighty matched
     native comparisons retain all 160 measured HTTP 200 samples; 84 public

@@ -171,6 +171,12 @@ Benchmark with/without assets separately; real Storage timings remain provider e
 Add public catalog caching only if this result still needs it, with explicit TTL,
 invalidation and signed-URL expiry rules. Target ≥30% p95 reduction.
 
+2026-10-18 owner reopens PERF-09 for full original acceptance, superseding the
+limited-scope closure below. Measure actual 1/20 returned items with/without media
+on one isolated schema in the selected provider; keep real Storage and public
+ingress observations separate. Preserve original targets, failed cohorts and all
+prior acceptance receipts. No existing public catalog/business rows may change.
+
 2026-10-17 owner disposition: PERF-09 is closed by explicit acceptance of the
 read-only 1–3 Hall demo scope, without a twenty-item live measurement. No measured
 cohort reaches the original 30% target. Preserve both original targets above,
@@ -179,6 +185,13 @@ the [initial evidence](evidence/perf09-catalog-readonly-2026-10-17.json) and the
 an accepted scope exception, not proof that those gates passed or a waiver for
 other PERF tasks. No new fixture, cache, pool/region change or deadline rollout
 is authorized by this disposition.
+
+2026-10-18 [PERF-09 original verification](../docs/backend-performance-09-original-2026-10-18.md):
+actual 1/20 plain/rich live native pages pass original p95 targets in twenty matched
+triplets per case. All 252 responses match; driver work is one command. Existing
+public three-Hall baseline, provider body reads and incremental gains stay separate.
+All 47 scoped digests/61 migrations/configuration match and owned fixtures/key close.
+Keep open pending exact-head CI, reviewed rollout and after checks; PERF-13/NO_GO remain.
 
 ### PERF-10 — Separate analytics read and refresh cost
 
