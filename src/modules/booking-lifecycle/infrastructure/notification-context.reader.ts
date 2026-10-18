@@ -4,6 +4,16 @@ import { prismaSchema } from '../../../core/database/prisma.js';
 
 /** Booking-owned audience facts; no notification delivery becomes business authority. */
 export function createNotificationBookingReader(prisma: PrismaClient) {
+  function notificationBookingIdsQuery(accountId: string, currentManager: boolean) {
+    const schema = Prisma.raw('"' + prismaSchema(prisma).replaceAll('"', '""') + '"');
+    return Prisma.sql`
+      SELECT b.id FROM ${schema}."Booking" b
+      WHERE EXISTS (SELECT 1 FROM ${schema}."ConsultationAccess" a
+        WHERE a."consultationId"=b."consultationId" AND a."accountId"=${accountId}::uuid)
+      OR (${currentManager} AND EXISTS (SELECT 1 FROM ${schema}."Consultation" c
+        WHERE c.id=b."consultationId" AND c."managerAccountId"=${accountId}::uuid))
+    `;
+  }
   async function read(bookingId: string) {
     const row = await prisma.booking.findUnique({
       where: { id: z.uuid().parse(bookingId) },
@@ -36,15 +46,13 @@ export function createNotificationBookingReader(prisma: PrismaClient) {
   }
   return {
     read,
+    // Booking owns this audience predicate even when a consumer composes its
+    // captured audience and owned data into one read-only database statement.
+    notificationBookingIdsQuery,
     async notificationBookingIds(accountId: string, currentManager: boolean) {
-      const schema = Prisma.raw('"' + prismaSchema(prisma).replaceAll('"', '""') + '"');
-      const rows = await prisma.$queryRaw<{ id: string }[]>(Prisma.sql`
-        SELECT b.id FROM ${schema}."Booking" b
-        WHERE EXISTS (SELECT 1 FROM ${schema}."ConsultationAccess" a
-          WHERE a."consultationId"=b."consultationId" AND a."accountId"=${accountId}::uuid)
-        OR (${currentManager} AND EXISTS (SELECT 1 FROM ${schema}."Consultation" c
-          WHERE c.id=b."consultationId" AND c."managerAccountId"=${accountId}::uuid))
-      `);
+      const rows = await prisma.$queryRaw<{ id: string }[]>(
+        notificationBookingIdsQuery(accountId, currentManager),
+      );
       return rows.map((r) => r.id);
     },
     async fromConsultation(consultationId: string) {

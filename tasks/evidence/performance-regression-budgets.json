@@ -3,17 +3,18 @@
   "basis": [
     "perf06-10-local-comparison-2026-10-16.json",
     "PERF-13 repeated 20-sample matched run, pool maximum 3, 40ms per submitted command",
-    "2026-10-18 PERF-06 joined snapshot: native 1/4/20/empty service reads assert three actual commands; other ceilings and modeled bands unchanged"
+    "2026-10-18 PERF-06 joined snapshot: native 1/4/20/empty service reads assert three actual commands; other ceilings and modeled bands unchanged",
+    "2026-10-18 PERF-08 captured Booking audience plus owned inbox/count snapshot: inbox ceiling 6 -> 4, unread 5 -> 4; initial/final authority and final audience checks retained; modeled bands unchanged"
   ],
   "queryCeilings": {
     "templates-20": 3,
     "print-orders-20": 5,
-    "inbox-empty": 6,
-    "unread-empty": 5,
+    "inbox-empty": 4,
+    "unread-empty": 4,
     "catalog-halls-no-assets": 3,
     "catalog-halls-with-assets": 3,
-    "inbox-populated": 6,
-    "unread-populated": 5,
+    "inbox-populated": 4,
+    "unread-populated": 4,
     "analytics-warm": 6,
     "analytics-refresh": 58
   },
