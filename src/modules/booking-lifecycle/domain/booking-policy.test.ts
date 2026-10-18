@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   BookingPolicyError,
   createProposalSnapshot,
+  proposalMenuSelections,
   transitionBookingPhase,
 } from './booking-policy.js';
 
@@ -28,6 +29,131 @@ const menu = {
 } as const;
 
 describe('booking proposal policy', () => {
+  it('requires an unambiguous legacy or multi-menu selection', () => {
+    expect(proposalMenuSelections({ menuPackageVersionId: menu.id, tableCount: 3 })).toEqual([
+      { menuPackageVersionId: menu.id, tableCount: 3 },
+    ]);
+    for (const input of [
+      {},
+      { menuPackageVersionId: menu.id },
+      { tableCount: 3 },
+      { menus: [], tableCount: 3 },
+    ]) {
+      expect(() => proposalMenuSelections(input)).toThrow(
+        expect.objectContaining({ code: 'BOOKING_MENU_SELECTION_INVALID' }),
+      );
+    }
+  });
+  it.each([
+    { menus: [] },
+    {
+      menus: Array.from({ length: 51 }, (_, i) => ({
+        menu: { ...menu, menuPackageId: String(i) },
+        tableCount: 1,
+      })),
+    },
+  ])('rejects an empty or oversized menu list', ({ menus }) => {
+    expect(() =>
+      createProposalSnapshot({ hall, shift, eventDate: '2026-11-15', planningHeadcount: 1, menus }),
+    ).toThrow(expect.objectContaining({ code: 'BOOKING_MENU_SELECTION_INVALID' }));
+  });
+  it('rejects aggregate table counts above 500', () => {
+    expect(() =>
+      createProposalSnapshot({
+        hall,
+        shift,
+        eventDate: '2026-11-15',
+        planningHeadcount: 1,
+        menus: [
+          { menu, tableCount: 500 },
+          { menu: { ...menu, menuPackageId: 'another-package' }, tableCount: 1 },
+        ],
+      }),
+    ).toThrow(expect.objectContaining({ code: 'BOOKING_TABLE_COUNT_INVALID' }));
+  });
+  it('snapshots 20 and 40 tables at different menu prices with independently entered headcount', () => {
+    const snapshot = createProposalSnapshot({
+      hall,
+      shift,
+      eventDate: '2026-11-15',
+      planningHeadcount: 350,
+      menus: [
+        { menu, tableCount: 20 },
+        {
+          menu: {
+            ...menu,
+            id: 'premium-version',
+            menuPackageId: 'premium',
+            priceVndPerTable: 7_000_002,
+          },
+          tableCount: 40,
+        },
+      ],
+    });
+    expect(snapshot.tableCount).toBe(60);
+    expect(snapshot.planningHeadcount).toBe(350);
+    expect(snapshot.baseChargeVnd).toBe(390_000_100);
+    expect(snapshot.depositAmountVnd).toBe(117_000_030);
+    expect(snapshot.menus?.map((line) => [line.tableCount, line.lineTotalVnd])).toEqual([
+      [20, 110_000_020],
+      [40, 280_000_080],
+    ]);
+    expect(Object.isFrozen(snapshot.menus)).toBe(true);
+    expect(Object.isFrozen(snapshot.menus?.[1])).toBe(true);
+  });
+  it('rejects aggregate overflow even when each menu line is individually safe', () => {
+    expect(() =>
+      createProposalSnapshot({
+        hall,
+        shift,
+        eventDate: '2026-11-15',
+        planningHeadcount: 20,
+        menus: [
+          { menu: { ...menu, priceVndPerTable: Number.MAX_SAFE_INTEGER }, tableCount: 1 },
+          {
+            menu: {
+              ...menu,
+              id: 'another-version',
+              menuPackageId: 'another-menu',
+              priceVndPerTable: 1,
+            },
+            tableCount: 1,
+          },
+        ],
+      }),
+    ).toThrow(expect.objectContaining({ code: 'BOOKING_COMMERCIAL_VALUE_INVALID' }));
+  });
+  it('rounds the deposit once on the combined total rather than on each menu', () => {
+    const snapshot = createProposalSnapshot({
+      hall,
+      shift,
+      eventDate: '2026-11-15',
+      planningHeadcount: 1,
+      menus: [
+        { menu: { ...menu, priceVndPerTable: 1 }, tableCount: 1 },
+        {
+          menu: { ...menu, id: 'other-version', menuPackageId: 'other-menu', priceVndPerTable: 1 },
+          tableCount: 1,
+        },
+      ],
+    });
+    expect(snapshot.baseChargeVnd).toBe(2);
+    expect(snapshot.depositAmountVnd).toBe(1);
+  });
+  it('rejects two versions of the same menu package', () => {
+    expect(() =>
+      createProposalSnapshot({
+        hall,
+        shift,
+        eventDate: '2026-11-15',
+        planningHeadcount: 20,
+        menus: [
+          { menu, tableCount: 1 },
+          { menu: { ...menu, id: 'another-version' }, tableCount: 1 },
+        ],
+      }),
+    ).toThrow(expect.objectContaining({ code: 'BOOKING_MENU_SELECTION_INVALID' }));
+  });
   it('creates an immutable commercial snapshot and rounds the 30 percent deposit upward', () => {
     const snapshot = createProposalSnapshot({
       hall,

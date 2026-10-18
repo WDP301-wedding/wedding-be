@@ -561,3 +561,14 @@ test is not migration/integration proof. Do not tick future commercial/guest tas
 merely because this requirements amendment was confirmed.
 
 ANL-W1–W4: [backend integration evidence](evidence/analytics-spec09-integration-2026-10-13.md). Runtime and release evidence remain separate.
+
+## Initial proposal multi-menu extension — 2026-10-18
+
+- [ ] BE-18: Manager selects multiple menus with per-menu table quantities at initial
+  Booking creation. Preserve legacy payloads/history, independently entered planning
+  headcount, immutable integer-price snapshots, role/idempotency rules, commercial
+  approvals and deposit semantics. Deliver forward migration, strict OpenAPI, native
+  persistence/upgrade/race regression checks and [frontend hand-off](../docs/booking-multi-menu-proposals.md).
+  [Implementation and bounded verification evidence](evidence/booking-multi-menu-proposals-2026-10-18.md)
+  records completed feature checks and the still-open whole-repository coverage gate.
+  This new task does not reopen SPEC-01–05 or establish live deployment/provider proof.

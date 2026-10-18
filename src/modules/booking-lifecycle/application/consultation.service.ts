@@ -3,7 +3,7 @@ import { coupleNameSchema } from '../domain/couple-profile.js';
 import { AppError } from '../../../core/errors/app-error.js';
 
 import type { RestaurantShiftCode } from '../../venue-catalog/application/venue.service.js';
-import type { ProposalSnapshot } from '../domain/booking-policy.js';
+import type { ProposalMenuInput, ProposalSnapshot } from '../domain/booking-policy.js';
 
 export type ConsultationRecord = Readonly<{
   consultationId: string;
@@ -43,14 +43,13 @@ export interface ConsultationRepository {
 
 export interface ProposalCatalogPort {
   resolveProposal(
-    input: Readonly<{
-      hallId: string;
-      eventDate: string;
-      shiftCode: RestaurantShiftCode;
-      menuPackageVersionId: string;
-      tableCount: number;
-      planningHeadcount: number;
-    }>,
+    input: ProposalMenuInput &
+      Readonly<{
+        hallId: string;
+        eventDate: string;
+        shiftCode: RestaurantShiftCode;
+        planningHeadcount: number;
+      }>,
   ): Promise<ProposalSnapshot>;
 }
 
@@ -66,21 +65,20 @@ export interface BookingIdentityPort {
   ): Promise<Readonly<{ invitationId: string }>>;
 }
 
-export type CreateConsultationInput = Readonly<{
-  intendedEmail: string;
-  displayName: string;
-  brideName?: string | undefined;
-  groomName?: string | undefined;
-  note: string | null;
-  hallId: string;
-  eventDate: string;
-  shiftCode: RestaurantShiftCode;
-  menuPackageVersionId: string;
-  tableCount: number;
-  planningHeadcount: number;
-  managerAccountId: string;
-  requestId: string;
-}>;
+export type CreateConsultationInput = ProposalMenuInput &
+  Readonly<{
+    intendedEmail: string;
+    displayName: string;
+    brideName?: string | undefined;
+    groomName?: string | undefined;
+    note: string | null;
+    hallId: string;
+    eventDate: string;
+    shiftCode: RestaurantShiftCode;
+    planningHeadcount: number;
+    managerAccountId: string;
+    requestId: string;
+  }>;
 
 export type RequestWorkspaceInvitationInput = Readonly<{
   consultationId: string;
@@ -113,6 +111,7 @@ export function createConsultationService(
         shiftCode: input.shiftCode,
         menuPackageVersionId: input.menuPackageVersionId,
         tableCount: input.tableCount,
+        menus: input.menus,
         planningHeadcount: input.planningHeadcount,
       });
       return immutable(

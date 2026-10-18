@@ -89,6 +89,9 @@ export function createPrismaConsultationRepository(
                 bookingId: record.bookingId,
                 hallId: record.proposal.hall.id,
                 menuPackageVersionId: record.proposal.menu.versionId,
+                menuPackageVersionIds: record.proposal.menus?.map((line) => line.versionId) ?? [
+                  record.proposal.menu.versionId,
+                ],
               },
             },
           });
@@ -315,6 +318,9 @@ export function createPrismaConsultationWorkspaceRepository(
                 consultationId: record.consultationId,
                 hallId: record.proposal.hall.id,
                 menuPackageVersionId: record.proposal.menu.versionId,
+                menuPackageVersionIds: record.proposal.menus?.map((line) => line.versionId) ?? [
+                  record.proposal.menu.versionId,
+                ],
               },
             },
           });
@@ -349,6 +355,7 @@ function proposalSnapshotData(proposal: ConsultationRecord['proposal']) {
     menuName: proposal.menu.name,
     menuDescription: proposal.menu.description,
     menuPriceVndPerTable: proposal.menu.priceVndPerTable,
+    ...(proposal.menus === undefined ? {} : { menus: proposal.menus.map((line) => ({ ...line })) }),
     tableCount: proposal.tableCount,
     planningHeadcount: proposal.planningHeadcount,
     baseChargeVnd: proposal.baseChargeVnd,

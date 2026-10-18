@@ -4,6 +4,23 @@ import { createOpenApiDocument } from '../../src/core/openapi/generate.js';
 import { bookingLifecycleOpenApiPaths } from '../../src/modules/booking-lifecycle/http/booking-lifecycle.openapi.js';
 
 describe('BK-C3 immutable booking lifecycle contract', () => {
+  it('publishes initial multi-menu selections and retained proposal menu lines', () => {
+    const document = createOpenApiDocument();
+    const create = JSON.stringify(document.components?.schemas?.BookingCreateBody);
+    expect(create).toContain('menus');
+    expect(create).toContain('menuPackageVersionId');
+    expect(create).toContain('500 tables in total');
+    expect(document.components?.schemas?.BookingCreateBody).toHaveProperty('oneOf', [
+      {
+        required: ['menus'],
+        not: { anyOf: [{ required: ['menuPackageVersionId'] }, { required: ['tableCount'] }] },
+      },
+      { required: ['menuPackageVersionId', 'tableCount'], not: { required: ['menus'] } },
+    ]);
+    const read = JSON.stringify(document.components?.schemas?.BookingProposalResponse);
+    expect(read).toContain('menus');
+    expect(read).toContain('lineTotalVnd');
+  });
   it('publishes every approved consultation, timeline, and lifecycle route', () => {
     const paths = createOpenApiDocument().paths ?? {};
     const operations = [

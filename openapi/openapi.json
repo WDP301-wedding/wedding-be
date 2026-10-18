@@ -1046,6 +1046,38 @@
       },
       "BookingCreateBody": {
         "additionalProperties": false,
+        "oneOf": [
+          {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "menuPackageVersionId"
+                  ]
+                },
+                {
+                  "required": [
+                    "tableCount"
+                  ]
+                }
+              ]
+            },
+            "required": [
+              "menus"
+            ]
+          },
+          {
+            "not": {
+              "required": [
+                "menus"
+              ]
+            },
+            "required": [
+              "menuPackageVersionId",
+              "tableCount"
+            ]
+          }
+        ],
         "properties": {
           "consultationId": {
             "format": "uuid",
@@ -1067,9 +1099,36 @@
             "type": "string"
           },
           "menuPackageVersionId": {
+            "description": "Legacy single-menu input. Requires tableCount and excludes menus.",
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
             "type": "string"
+          },
+          "menus": {
+            "description": "Preferred selection: 1–50 distinct menu versions, positive table quantity per menu, at most 500 tables in total. Excludes top-level menuPackageVersionId and tableCount. Prices and totals are resolved by the server.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "menuPackageVersionId": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "tableCount": {
+                  "maximum": 500,
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "menuPackageVersionId",
+                "tableCount"
+              ],
+              "type": "object"
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "type": "array"
           },
           "planningHeadcount": {
             "maximum": 10000,
@@ -1084,6 +1143,7 @@
             "type": "string"
           },
           "tableCount": {
+            "description": "Legacy single-menu table quantity. For multiple menus, supply only menus[].tableCount.",
             "maximum": 500,
             "minimum": 1,
             "type": "integer"
@@ -1094,8 +1154,6 @@
           "hallId",
           "eventDate",
           "shiftCode",
-          "menuPackageVersionId",
-          "tableCount",
           "planningHeadcount",
           "expectedRevision"
         ],
@@ -1345,6 +1403,7 @@
                   },
                   "menu": {
                     "additionalProperties": false,
+                    "description": "Compatibility preview of the first menu only. Use menus for all menu quantities and line totals.",
                     "properties": {
                       "description": {
                         "type": "string"
@@ -1383,6 +1442,63 @@
                     ],
                     "type": "object"
                   },
+                  "menus": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "description": {
+                          "type": "string"
+                        },
+                        "lineTotalVnd": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "packageId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "priceVndPerTable": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "tableCount": {
+                          "maximum": 500,
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "versionId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "versionNumber": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "versionId",
+                        "packageId",
+                        "versionNumber",
+                        "name",
+                        "description",
+                        "priceVndPerTable",
+                        "tableCount",
+                        "lineTotalVnd"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 50,
+                    "minItems": 1,
+                    "type": "array"
+                  },
                   "shift": {
                     "additionalProperties": false,
                     "properties": {
@@ -1419,6 +1535,7 @@
                   "hall",
                   "shift",
                   "menu",
+                  "menus",
                   "tableCount",
                   "baseChargeVnd",
                   "depositAmountVnd"

@@ -133,6 +133,13 @@ remain post-deposit.
 
 ## 5. Commercial Contract and Deposit
 
+Initial-proposal extension requested by the owner on **2026-10-18**: Manager may
+select multiple menu versions with a separate table quantity for each when creating
+the first Booking proposal. Preserve legacy one-menu input and historical snapshots;
+calculate aggregate tables/prices on the server. This does not change Couple/Manager
+contract approval, actual deposit authority, or post-deposit appendix rules. See
+[API and migration hand-off](./booking-multi-menu-proposals.md).
+
 Booking owns the commercial contract alongside the timeline lifecycle. A contract
 contains separate bride/groom names, venue/date/shift, exact timeline revision
 and immutable item lines:

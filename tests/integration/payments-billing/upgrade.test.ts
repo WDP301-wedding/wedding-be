@@ -112,6 +112,14 @@ databaseDescribe('PB-W2 forward migration over the current Booking baseline', ()
         }
       }, mainBeforeBillingMigrations);
       expect(JSON.stringify(await readHistory(database.prisma))).toBe(historical);
+      expect(
+        (
+          await database.prisma.bookingProposalSnapshot.findUniqueOrThrow({
+            where: { bookingId },
+            select: { menus: true },
+          })
+        ).menus,
+      ).toBeNull();
       expect(await database.prisma.billingLedgerEntry.count()).toBe(0);
       expect(await database.prisma.billingPaymentAttempt.count()).toBe(0);
       expect(await database.prisma.billingInvoice.count()).toBe(0);
@@ -130,7 +138,9 @@ databaseDescribe('PB-W2 forward migration over the current Booking baseline', ()
       return {
         booking: await prisma.booking.findUniqueOrThrow({
           where: { id: bookingId },
-          include: { proposalSnapshot: true },
+          // Compare every retained historical field; menus did not exist at the
+          // pre-billing checkpoint and is separately asserted NULL after upgrade.
+          include: { proposalSnapshot: { omit: { menus: true } } },
         }),
         audit: await prisma.auditLog.findUniqueOrThrow({ where: { id: auditId } }),
         outbox: await prisma.bookingOutboxEvent.findUniqueOrThrow({ where: { id: eventId } }),

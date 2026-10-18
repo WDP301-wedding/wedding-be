@@ -118,6 +118,9 @@ describe('proposal workspace query', () => {
     expect(draft.capabilities.canWithdrawApproval).toBe(true);
     expect(draft.proposal.depositAmountVnd).toBe(3000000);
     expect(draft.proposal.baseChargeVnd).toBe(10000000);
+    expect(draft.proposal.menus).toEqual([
+      { ...draft.proposal.menu, tableCount: 10, lineTotalVnd: 10000000 },
+    ]);
     expect(access.requireAccess).toHaveBeenCalledOnce();
 
     prisma.booking.findUnique.mockResolvedValue({ ...booking, phase: 'CANCELLED' });

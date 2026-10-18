@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { coupleNameSchema } from '../domain/couple-profile.js';
 
 import type { RestaurantShiftCode } from '../../venue-catalog/application/venue.service.js';
-import type { ProposalSnapshot } from '../domain/booking-policy.js';
+import type { ProposalMenuInput, ProposalSnapshot } from '../domain/booking-policy.js';
 import type { ProposalCatalogPort } from './consultation.service.js';
 
 export type { ProposalCatalogPort } from './consultation.service.js';
@@ -75,18 +75,17 @@ export function createConsultationWorkspaceService(
     },
 
     async createBooking(
-      input: Readonly<{
-        consultationId: string;
-        hallId: string;
-        eventDate: string;
-        shiftCode: RestaurantShiftCode;
-        menuPackageVersionId: string;
-        tableCount: number;
-        planningHeadcount: number;
-        expectedRevision: number;
-        managerAccountId: string;
-        requestId: string;
-      }>,
+      input: ProposalMenuInput &
+        Readonly<{
+          consultationId: string;
+          hallId: string;
+          eventDate: string;
+          shiftCode: RestaurantShiftCode;
+          planningHeadcount: number;
+          expectedRevision: number;
+          managerAccountId: string;
+          requestId: string;
+        }>,
     ) {
       const proposal = await options.catalog.resolveProposal({
         hallId: input.hallId,
@@ -94,6 +93,7 @@ export function createConsultationWorkspaceService(
         shiftCode: input.shiftCode,
         menuPackageVersionId: input.menuPackageVersionId,
         tableCount: input.tableCount,
+        menus: input.menus,
         planningHeadcount: input.planningHeadcount,
       });
       return options.repository.createBooking({

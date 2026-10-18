@@ -127,6 +127,7 @@ describeWithDatabase('booking forward upgrade with existing business data', () =
       });
       expect(snapshot.hallName).toBe('Historic hall');
       expect(snapshot.baseChargeVnd.toNumber()).toBe(35000000);
+      expect(snapshot.menus).toBeNull();
       expect(snapshot.commercialRevisionId).toBe(snapshot.id);
       expect(snapshot.commercialAcceptedAt?.toISOString()).toBe('2026-10-06T01:00:00.000Z');
       expect(await database.prisma.bookingReportingSnapshot.count({ where: { bookingId } })).toBe(

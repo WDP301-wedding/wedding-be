@@ -10,6 +10,7 @@ import {
 import { validateRequest, validatedRequest } from '../../../core/http/validate.js';
 import { AppError } from '../../../core/errors/app-error.js';
 import { BookingPolicyError } from '../domain/booking-policy.js';
+import type { ProposalMenuInput } from '../domain/booking-policy.js';
 import { BookingTimelinePolicyError } from '../domain/timeline.policy.js';
 import { BookingSlotPolicyError } from '../domain/slot-hold.policy.js';
 import { BookingLifecyclePolicyError } from '../domain/lifecycle.policy.js';
@@ -91,18 +92,17 @@ export interface BookingLifecycleHttpServices {
     }>
   >;
   createBooking(
-    input: Readonly<{
-      consultationId: string;
-      hallId: string;
-      eventDate: string;
-      shiftCode: RestaurantShiftCode;
-      menuPackageVersionId: string;
-      tableCount: number;
-      planningHeadcount: number;
-      expectedRevision: number;
-      managerAccountId: string;
-      requestId: string;
-    }>,
+    input: ProposalMenuInput &
+      Readonly<{
+        consultationId: string;
+        hallId: string;
+        eventDate: string;
+        shiftCode: RestaurantShiftCode;
+        planningHeadcount: number;
+        expectedRevision: number;
+        managerAccountId: string;
+        requestId: string;
+      }>,
   ): Promise<
     Readonly<{ bookingId: string; bookingRevision: number; consultationRevision: number }>
   >;
