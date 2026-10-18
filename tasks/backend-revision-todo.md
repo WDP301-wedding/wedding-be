@@ -476,10 +476,11 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
     serves the exact merged/measured source; preceding deployment stops. All four
     actual 1/20 plain/rich native cohorts pass the original 30% p95 target, one command
     per page. All 84 after public reads, 95 log correlations and signed-URL controls
-    pass. All47 scoped digests, 61 migration checksums and controls match. Owned
+    pass. All 47 scoped digests, 61 migration checksums and controls match. Owned
     fixtures/key were already removed; no replacement is created. This supersedes
     both the earlier limited-scope exception and subsequent pending release gate.
-    Native/public and capacity limits remain explicit; PERF-13/NO_GO unchanged.
+    Public client p95 for two plain Halls worsens 0.309%; three-rich gain is 28.933%,
+    below 30%. Retain both under PERF-13 without causal attribution; NO_GO unchanged.
   - 2026-10-18 owner requests full original acceptance: actual 1/20 live items,
     with/without assets, fresh private signed URLs, bounded query work and >=30%
     matched p95 improvement. The prior scope exception remains historical evidence.
