@@ -409,7 +409,21 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
     revoked, fifteen business digests and sixty migration checksums unchanged.
     [Sealed receipt](evidence/perf04-region-rerun-2026-10-17.json).
     Historical failures stay preserved, PERF-13 open and production NO_GO unchanged.
-- [ ] PERF-05: Reduce Identity/Couple overview read work while preserving current authorization and revocation semantics.
+- [x] PERF-05: Reduce Identity/Couple overview read work while preserving current authorization and revocation semantics.
+  - 2026-10-18 [closure and fresh verification](../docs/backend-performance-05-closure-2026-10-18.md):
+    PR #46's same-topology twenty-sample comparison meets the initial 30% target
+    (Identity 75.2%, populated overview 42.8%); subsequent PERF-03 attribution
+    independently observes one Identity driver command and five overview commands.
+    PERF-02/03/04 dependency checkpoints are complete in their recorded scopes.
+    Fresh native verification passes 61/61 tests, including expiry, role removal
+    and actual lock-wait/concurrent revocation; preserve two failed local setup runs.
+    Current Railway verification returns 40/40 steady and 2/2 initial HTTP 200;
+    logout/reuse returns 204/401 on both routes and all 46 operations match logs.
+    Seventeen business/profile digests and 61 migration checksums are unchanged;
+    relevant source matches PR #46. No new implementation/deployment/configuration
+    change; current timings are separate from the historical improvement pair.
+    [Sealed receipt](evidence/perf05-closure-2026-10-18.json).
+    PERF-13 and production NO_GO remain open/unchanged.
 - 2026-10-16 implementation checkpoint for PERF-02–05:
   [local fixture, instrumentation, Identity comparison and remaining live gates](../docs/backend-performance-02-05.md).
   Initially the owner confirmed no live fixture was available. The owner later
@@ -429,7 +443,32 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
   disabled; PERF-02 assigned-Staff success, PERF-03 live driver/container evidence
   and PERF-04 region comparison remain open, so the dependency checkboxes above
   are not closed solely by the PERF-05 latency result.
-- [ ] PERF-06: Batch invitation-template versions; preserve version ownership, cursor and authority rechecks.
+- [x] PERF-06: Batch invitation-template versions; preserve version ownership, cursor and authority rechecks.
+  - 2026-10-18 [reviewed rollout and closure](../docs/backend-performance-06-closure-2026-10-18.md):
+    PR #66 merges as `df945b6`; exact-head/main CI each pass 2,076 tests first attempt.
+    Sole active Railway deployment serves that merge with source/controls pinned;
+    old deployment stopped, configuration/19 selected table digests/61 migration
+    checksums unchanged. All 60 steady and three initial public reads return 200,
+    both revoked-token routes deny, and all 71 after operations match new logs.
+    Original-source native target passes at 43.9–44.3% in the owner-approved four
+    live-template/1-4-20 local scope. Incremental public backend p95 improves
+    17.2–17.5%; client p95 worsens 7.4–26.8%, retained under PERF-13 with no causal
+    network attribution or blanket client/SLO claim. Native/local resources and
+    dedicated key are closed/revoked. [Sealed receipt](evidence/perf06-closure-2026-10-18.json).
+    Earlier pending notes below are historical; PERF-13 and production NO_GO stay open/unchanged.
+  - 2026-10-18 [joined snapshot and live verification](../docs/backend-performance-06-verification-2026-10-18.md),
+    [PR #66](https://github.com/WDP301-wedding/wedding-be/pull/66): service work
+    4 -> 3 commands and management HTTP 6 -> 5, both fresh authority checks retained.
+    Native 1/4/20/empty/ownership/schema/revocation checks pass in the 64-test focused
+    suite; the quoted-schema case also passes independently. Owner-authorized
+    20 live triplets per case use four existing templates, no live fixture writes:
+    all 180 steady samples return 200 with matching responses; original-baseline
+    p95 decreases 43.9-44.3%, incremental deployed-to-candidate gain 16-16.5%.
+    All 66 current-public baseline operations correlate, 19 table digests and 61
+    migration checksums match; pool/servers closed and temporary SSH key revoked.
+    [Sealed receipt](evidence/perf06-verification-2026-10-18.json).
+    Keep open pending exact-head CI, owner-approved reviewed rollout and after probes;
+    native loopback timings do not establish public-ingress gains. PERF-13/NO_GO unchanged.
 - [x] PERF-07: Batch print-order lines/commercial revisions/proposals without changing immutable monetary facts.
   - 2026-10-18 [read acceptance](../docs/backend-performance-07-closure-2026-10-18.md),
     [sealed receipt](evidence/perf07-closure-2026-10-18.json): the existing deployed
@@ -560,6 +599,13 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
     not an added indefinite gate. No PERF-09 rerun; production remains NO_GO.
 - [x] PERF-12: Review table/rehearsal-schema cleanup with ownership, dependency and retention proof; deletion remains separately authorized.
 - [ ] PERF-13: Repeat matched live measurements, verify relevant correctness gates and set supported regression budgets.
+  - 2026-10-18 [PERF-06 after-rollout comparison](../docs/backend-performance-06-closure-2026-10-18.md):
+    all 63 template reads return 200 and backend p95 falls 17.2–17.5%, while client
+    p95 increases 7.4%, 26.8% and 9.9% across one/four/cursor-selected cases. Preserve
+    every sample and exact-deployment correlation. No specific network/ingress
+    cause is established; investigate end-to-end tails without changing pools,
+    deadlines or production NO_GO by assumption. PERF-06 closes only its stated
+    backend query/authority and owner-approved live/local scope.
   - 2026-10-18 [PERF-07 retained limits](../docs/backend-performance-07-closure-2026-10-18.md):
     the selected three-order native page improves 32.579%, but one requested order
     regresses 19.568% (5 -> 6 HTTP commands) and the cursor page improves only

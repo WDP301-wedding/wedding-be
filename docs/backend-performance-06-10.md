@@ -14,6 +14,14 @@ ownership, schema and revocation checks pass. The report keeps native/public tim
 and the pending reviewed rollout gate separate; the original experiments below
 remain unchanged.
 
+Subsequent [PERF-06 closure](backend-performance-06-closure-2026-10-18.md): PR #66
+is merged/deployed after owner authorization and both exact-head/merge CI pass
+2,076 tests. All 63 after-rollout public reads return 200, revoked-token checks
+pass and all 71 operations correlate. Backend p95 improves 17.2–17.5% over the
+already optimized deployed version; client p95 worsens in this cohort and stays
+visible under PERF-13. Histories/configuration remain unchanged; production NO_GO
+is not lifted.
+
 ## Implementation and contracts
 
 | Task    | Implementation                                                                                                              | Preserved behavior                                                                                                                                           |

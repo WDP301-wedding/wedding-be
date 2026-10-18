@@ -1,5 +1,11 @@
 # PERF-06: bounded template snapshots and live comparison
 
+Subsequent acceptance: [reviewed rollout and completion](backend-performance-06-closure-2026-10-18.md)
+records merged PR #66, both green 2,076-test CI runs, the new active deployment,
+successful public reads/revocation and preserved client-tail regressions. PERF-06
+is complete in the selected scope; pending notes below describe this earlier
+checkpoint and the original sealed receipt remains unchanged.
+
 2026-10-18 (Asia/Saigon). Backend implementation and native Railway comparison;
 merge/deployment and after-rollout verification remain separate gates. The owner
 authorizes a temporary SSH key, one read-only connection and the existing four

@@ -1,0 +1,484 @@
+{
+  "schemaVersion": 1,
+  "task": "PERF-05/06 documentation synchronization",
+  "at": "2026-10-18T09:35:27.339Z",
+  "timezone": "Asia/Saigon",
+  "status": "EXISTING_ACCEPTANCE_VERIFIED_DOCUMENTATION_SYNC_READY",
+  "base": "1bf777a18dd98517f24d38ee36399941f2643766",
+  "authorization": {
+    "humanInstruction": "vậy hãy đồng bộ hồ sơ/checklist trước đi",
+    "scope": "Publish and merge the verified PERF-05/06 closure records and canonical checklist after exact-head green CI and review. Documentation only; no new live measurement, fixture, key, deployment configuration or provider operation."
+  },
+  "cause": {
+    "perf05": "Completed closure report/receipt and checklist updates remained in the local working tree.",
+    "perf06": "Completed closure commit b54acd6518d383572c363a0badce9de84ff5199b was not published or merged; runtime PR #66 was already merged and verified."
+  },
+  "perf05": {
+    "completedAt": "2026-10-18T04:25:19.762Z",
+    "status": "COMPLETE IN MEASURED SYNTHETIC BACKEND SCOPE",
+    "implementationPr": "https://github.com/WDP301-wedding/wedding-be/pull/46",
+    "nativeTests": 61,
+    "publicOperations": 46,
+    "historicalMatchedP95": {
+      "receipt": "perf46-railway-comparison-2026-10-16.json",
+      "samplesPerRoutePerSide": 20,
+      "identity": {
+        "beforeMs": 616,
+        "afterMs": 153,
+        "reductionPercent": 75.2
+      },
+      "populatedOverview": {
+        "beforeMs": 1097,
+        "afterMs": 627,
+        "reductionPercent": 42.8
+      },
+      "targetPercent": 30,
+      "topology": "Same US West application placement, fixture and unchanged database/configuration; diagnostics disabled on both sides",
+      "limitation": "One before/after pair on a shared service at different times, not capacity/SLO or causal isolation of traffic/load variance."
+    },
+    "closureReceipt": {
+      "path": "tasks/evidence/perf05-closure-2026-10-18.json",
+      "sha256": "e4a41b002d2fc71fb9537070972cc741f092f1c7f75e16ba85b6ac8831ee3018"
+    }
+  },
+  "perf06": {
+    "completedAt": "2026-10-18T05:20:25.612Z",
+    "status": "COMPLETE IN OWNER-AUTHORIZED FOUR-TEMPLATE LIVE AND 1/4/20 LOCAL BACKEND SCOPE",
+    "implementationPr": "https://github.com/WDP301-wedding/wedding-be/pull/66",
+    "merge": "df945b6f4ad10a44f37134e76a662f041283325b",
+    "closureCommit": "b54acd6518d383572c363a0badce9de84ff5199b",
+    "exactHeadCi": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39098978173",
+    "mergeCi": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39099474660",
+    "ciPassedTests": 2076,
+    "publicReads": 63,
+    "publicOperations": 71,
+    "liveScope": "Four existing templates; 1/4/20 local correctness",
+    "originalNativeP95Reduction": "43.9–44.3%",
+    "incrementalPublicBackendP95Reduction": "17.2–17.5%",
+    "clientP95RegressionsRetainedUnderPerf13": "7.4%, 26.8%, 9.9%",
+    "closureReceipt": {
+      "path": "tasks/evidence/perf06-closure-2026-10-18.json",
+      "sha256": "8c6cb5d1143a48ecad753f1559055d8473800838f2f65278658112dfffed10e8"
+    }
+  },
+  "sourceContinuity": [
+    {
+      "task": "PERF-05",
+      "path": "src/modules/identity-access/authorization/access-credential.reader.ts",
+      "accepted": "03b9a6be46bc11488b3de5bb56270cb008dd884e",
+      "acceptedBlob": "516f562af82c4ad1e9e702d75c0e421c15414bbf",
+      "mainBlob": "516f562af82c4ad1e9e702d75c0e421c15414bbf",
+      "matches": true
+    },
+    {
+      "task": "PERF-05",
+      "path": "src/modules/identity-access/authorization/scoped-identity.reader.ts",
+      "accepted": "03b9a6be46bc11488b3de5bb56270cb008dd884e",
+      "acceptedBlob": "d775ce83394ef963fa2081395216ac3b904e919f",
+      "mainBlob": "d775ce83394ef963fa2081395216ac3b904e919f",
+      "matches": true
+    },
+    {
+      "task": "PERF-05",
+      "path": "src/modules/identity-access/session/session.repository.ts",
+      "accepted": "03b9a6be46bc11488b3de5bb56270cb008dd884e",
+      "acceptedBlob": "9108691612beca01080ca1b4f5e9f8ef528c16c5",
+      "mainBlob": "9108691612beca01080ca1b4f5e9f8ef528c16c5",
+      "matches": true
+    },
+    {
+      "task": "PERF-05",
+      "path": "src/modules/booking-lifecycle/http/experience.router.ts",
+      "accepted": "03b9a6be46bc11488b3de5bb56270cb008dd884e",
+      "acceptedBlob": "56d2a7bdfcbd7b319d2c62efb8f0b089b21b3dcf",
+      "mainBlob": "56d2a7bdfcbd7b319d2c62efb8f0b089b21b3dcf",
+      "matches": true
+    },
+    {
+      "task": "PERF-06",
+      "path": "src/modules/invitation-studio/infrastructure/design.service.ts",
+      "accepted": "df945b6f4ad10a44f37134e76a662f041283325b",
+      "acceptedBlob": "bb42f815d43d19e17e84993b38e646dbf8c130ab",
+      "mainBlob": "bb42f815d43d19e17e84993b38e646dbf8c130ab",
+      "matches": true
+    },
+    {
+      "task": "PERF-06",
+      "path": "src/modules/invitation-studio/infrastructure/studio.repository.ts",
+      "accepted": "df945b6f4ad10a44f37134e76a662f041283325b",
+      "acceptedBlob": "717126d12cfc06d73e19a129f4529d96606d10b4",
+      "mainBlob": "717126d12cfc06d73e19a129f4529d96606d10b4",
+      "matches": true
+    }
+  ],
+  "artifactChecks": [
+    {
+      "receipt": "tasks/evidence/perf05-closure-2026-10-18.json",
+      "sha256": "e4a41b002d2fc71fb9537070972cc741f092f1c7f75e16ba85b6ac8831ee3018",
+      "artifacts": [
+        {
+          "path": "tasks/evidence/perf46-railway-comparison-2026-10-16.json",
+          "sha256": "35cf7f031018bc569dc3020feefadd41f8c1aada1db49c8d888e4a5c60bc0927",
+          "matches": true
+        },
+        {
+          "path": "tasks/evidence/perf03-db-attribution-2026-10-17.json",
+          "sha256": "9bfd2833b15c7969547604c1448cd331b9dadd060a4ce4ed106daa88bc103cfa",
+          "matches": true
+        },
+        {
+          "path": "tasks/evidence/perf04-region-rerun-2026-10-17.json",
+          "sha256": "343a7e57f282afcdbf232012a4d90b279a6446e876b348328bb9d90250d4805d",
+          "matches": true
+        },
+        {
+          "path": "tasks/evidence/perf-acceptance-followup-2026-10-17.json",
+          "sha256": "b71d3c661b71fa2206fa88a5d7172a7e39361854e52cd7cec3de3cd87b2f4fa9",
+          "matches": true
+        },
+        {
+          "path": "output/perf05-closure-20261018/live.json",
+          "sha256": "7a6bf2f6ddfa0737d2b738f52d4f65277aa7c63a229d15a6bb8decbdd6c3ebcc",
+          "matches": true
+        },
+        {
+          "path": "output/perf05-closure-20261018/verify-live.mjs",
+          "sha256": "7c2095da75fe5aa02fee73e38094536339ea0d3a3da01d6ed1a6f124ef4879b5",
+          "matches": true
+        },
+        {
+          "path": "output/perf05-closure-20261018/focused.log",
+          "sha256": "4dcd39b95563019071b6461a0ccd82e43a3a5eac9411da00e275d161fab21730",
+          "matches": true
+        },
+        {
+          "path": "output/perf05-closure-20261018/focused-rerun.log",
+          "sha256": "3c8b53ff26bbc731b4ac972d44221c6365ce8a48d1fe06c20f4226ecb75c8b23",
+          "matches": true
+        },
+        {
+          "path": "output/perf05-closure-20261018/focused-final.log",
+          "sha256": "d592a9f028d0bccf8c16b88877ba664ae3db7ff2171723362a72a597a72b79c1",
+          "matches": true
+        },
+        {
+          "path": "output/perf05-closure-20261018/local-cleanup.json",
+          "sha256": "f12512e89772ce7ca905515ca83514e947efafa4f5e1cece19a4327403403fd3",
+          "matches": true
+        },
+        {
+          "path": "test-results/perf05-focused-2026-10-18.json",
+          "sha256": "323d9b4b683b968474465bf29b0c2944fdeb40a704e8e4928cb2f15de3cc8865",
+          "matches": true
+        },
+        {
+          "path": "test-results/perf05-focused-rerun-2026-10-18.json",
+          "sha256": "1ac6e42ec9e1cb422676a7e3c32ec9a10199da7bf32b579c072bd8c7d482e47b",
+          "matches": true
+        },
+        {
+          "path": "test-results/perf05-focused-final-2026-10-18.json",
+          "sha256": "0ccb18fae6eb6c4f683a04bda9af9067382e5e825f93055cc37eeb2dddfee605",
+          "matches": true
+        }
+      ]
+    },
+    {
+      "receipt": "tasks/evidence/perf06-closure-2026-10-18.json",
+      "sha256": "8c6cb5d1143a48ecad753f1559055d8473800838f2f65278658112dfffed10e8",
+      "artifacts": [
+        {
+          "path": "output/perf06-20261018/pr.json",
+          "sha256": "13874c5015765648cf7cc7573b7602da397d774c43ecbcba2c048982d74ac02e",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/ci.json",
+          "sha256": "b1cbb6b5be12b037b19aaccfb1d6563da0d13021f06bab2a43e4f41730a25a05",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/ci-counts.json",
+          "sha256": "5a916e1239074b4adffbdd12ffc1d8d2181c867c66ba0260d9e8101d25abdb0f",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/review.json",
+          "sha256": "9dcdf2aa5e3ccd7c738f61367211ee89232a9bbafa8e06c7b3bc2bb09ccc01ee",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/review-threads.json",
+          "sha256": "ff0e4a923b0f198a5c34053ca8ec4d18db74946fede502322212918091236e16",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/rollout-authorization.json",
+          "sha256": "5d8be78ca91880e689aece75000361d971f75f3d8c0716dbd6eaf707c86607ee",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/premerge.json",
+          "sha256": "af997a0013570fdbd8a26e6d3e1eb8d5461b7d502a9231929c68a5262ccb46a0",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/merge.json",
+          "sha256": "f2b920601d9becf57afb08aeee4441fc160b4c6c33c21f5242c1df3b4f98e9dc",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/serving.json",
+          "sha256": "6c2af7f3523fb14170bb5d7e7aeef4e8b50ef13dbde3e90103b3da9642acd462",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/public-before.json",
+          "sha256": "6e49eabab279d21bea1f77e300b5a8f44a3340873ee1b7d8ef78b451fccdd821",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/public-after.json",
+          "sha256": "88dcf71c1d1c61d237123f5e61784b75938ed36f483f8408294073837caecaca",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/final-postflight.json",
+          "sha256": "cf164fdb1b386b39aa28e4de5293c20f17e4ebeb13c8b1659bf009e537e3ae88",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/local-cleanup.json",
+          "sha256": "e16eba1cf68cc553208933fb1ec3feec52327fb75d22b98425c635189946dd1c",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/public.mjs",
+          "sha256": "c088d61e38bfde4d6d1e9669681e98acb6c62b2e294a1ef60a18940cb2e39e14",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/serving.mjs",
+          "sha256": "692e04441d913f002adce715ca3b66f14dae0a3e7d545e210db75d8cb4bd87d7",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/final-postflight.mjs",
+          "sha256": "f5afeca51270ae0a6c4373e79160ce88ba233467350e4f01f90f0bd74fa7c325",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/close.mjs",
+          "sha256": "18aae2d666248325e8867a5a9c8a31c8b4fec4c91f4704159f01095e757d45c9",
+          "matches": true
+        },
+        {
+          "path": "tasks/evidence/perf06-verification-2026-10-18.json",
+          "sha256": "7557c1ac573a6c361b3082d7f7541633d0a8db851327359ebd8d005be77482d1",
+          "matches": true
+        }
+      ]
+    },
+    {
+      "receipt": "tasks/evidence/perf06-verification-2026-10-18.json",
+      "sha256": "7557c1ac573a6c361b3082d7f7541633d0a8db851327359ebd8d005be77482d1",
+      "artifacts": [
+        {
+          "path": "output/perf06-20261018/preflight.json",
+          "sha256": "ab46d89b82b17e1a5d46250a87a73f972b4f1d593432c977d9cf6f1dd2bd2599",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/preflight-http.json",
+          "sha256": "40eee28ce6920e8bb01ccd1add695b3ead82cf53b2658a1390e9c02ac4fb29f4",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/pilot-provenance.json",
+          "sha256": "7e6b244b903021d4e931a9f254e2f76de0475b83827f97c7b88b8362e9abac05",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/pilot-transport.json",
+          "sha256": "cf473d17afee0965c8407ef6e576d22be1be919b0c4ece07c19046c2f29d9488",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/pilot.ndjson",
+          "sha256": "e858189c9145c4d6cde5f882bc34c7133efa14e165e02465022ef0e19f9e4660",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/pilot-sessions.json",
+          "sha256": "44697441fef8269d949b7b8d191b88c03a492d96803064f8edbedeece79820c6",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/campaign-provenance.json",
+          "sha256": "8863c0a4f73d4549bf828e0e8ef24ce86d33ed5f2da851ccc00cf16ad5e05ad3",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/campaign-transport.json",
+          "sha256": "19369e455fe0c5a18a88aa920865061ee893b0847f6c314d89c79f015448785a",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/campaign.ndjson",
+          "sha256": "440984f9fcbdaac34b67ba4c549d5dc68942fdcc5c6bd22a1d20e5e546f1ef70",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/campaign-sessions.json",
+          "sha256": "90df880f9e182e92d678c1011d535d7a1dcf39bc8f84ce491456418aaf54b735",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/postflight.json",
+          "sha256": "c85cb3a284ec094cf05290d1fb5dd7d63081cd786c1b937be9d250ce28553c41",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/key-registration.json",
+          "sha256": "ef5f39381654e1fbae1dbde422bdc3c38c3f7f509c79f1df3558a6a597c50e1a",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/key-revocation.json",
+          "sha256": "99610319e6ccb7e4fe031beae6855a977fa002b20037def475554fd8a53c84e4",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/before.log",
+          "sha256": "a0980ad36e176bcbe0df95c75eeabe9da00e0fe071b9abbae030a65fd49f7a75",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/red.log",
+          "sha256": "d1876840218732ca9fe690f8263d5c530f40546cf3b3392e799b8d3ead782c61",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/green.log",
+          "sha256": "7fca048b432283c386c9085fc38ec418b2cce0d27bfb4ecd1f394520683f3cbc",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/focused.log",
+          "sha256": "5f3f8efa412525ee910b27525dd733361c69fcfc025be3a3ffd0a34d70aa39ba",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/focused-final.log",
+          "sha256": "17fc0d8d15f7ce32238dd5cb7e0ce7e7b775c5396ce0a884bdc54a074167f118",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/schema-isolated.log",
+          "sha256": "0045f6ba2d4188feead9dacd889ce925a81670ae814c7df66c95bbe734555cba",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/typecheck.log",
+          "sha256": "ebea9ade1ad99a4d0002f2841fedeb8f3aca03dde1cb219a637296a8ae7aa86e",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/typecheck-collector-partial.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/quality.json",
+          "sha256": "9cfe90bab626086db9514c4bda49bc6256081f39648047de3082d4e92f1a7115",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/quality-verified.json",
+          "sha256": "bf33581bc8c9f391486bacfefddc69eff142ee84ee05ea9a4a445a40b916aaa1",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/audit-verified.log",
+          "sha256": "467699106faa4924e642ddb9c20be9e23713e655ba09a521664e7b407a985bc7",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/audit-final.log",
+          "sha256": "c1168f5fd33f37fb3d55a48d8999e7c17d84667c7ed16770e190fab608218ac6",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/public-before.json",
+          "sha256": "6e49eabab279d21bea1f77e300b5a8f44a3340873ee1b7d8ef78b451fccdd821",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/native.mjs",
+          "sha256": "252bdae599ff035de19b6626c71a29d1f35cbe18e04417f5b63d069c07d3a321",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/native-worker.mjs",
+          "sha256": "ff2fdd3c3ce50e0b1123d2558f1f0ea147ba7520d9321c3e8afe375d7ee271f5",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/key.mjs",
+          "sha256": "cf4ae0f68d09a3a5d724e02a8cb0f807fd55565eb08365734d2af672b1636a36",
+          "matches": true
+        },
+        {
+          "path": "output/perf06-20261018/postflight.mjs",
+          "sha256": "d8a48de6328bea3f061e9476e9c216f8b5eaa56462c590543865f7dbb656a7d7",
+          "matches": true
+        },
+        {
+          "path": "test-results/perf06-before-2026-10-18.json",
+          "sha256": "bf2e519478e4ae53330b77a4da9b4b0e34c6eff12318949abcf2c1312b84f9d9",
+          "matches": true
+        },
+        {
+          "path": "test-results/perf06-green-2026-10-18.json",
+          "sha256": "2b4aba57c94048ebead3703b258636db3b9fdf77a3b72a3ac60406358f3c5c8f",
+          "matches": true
+        },
+        {
+          "path": "test-results/perf06-focused-2026-10-18.json",
+          "sha256": "65db3f768a247f8afdafa5f0c9f0c9c621ca2aaa36ed45c7a9b0c4314a0356c2",
+          "matches": true
+        },
+        {
+          "path": "test-results/perf06-focused-final-2026-10-18.json",
+          "sha256": "6e09e630c3277a1feca590764f4590add5865f3055740c32f2479a0e0d8f545e",
+          "matches": true
+        },
+        {
+          "path": "test-results/perf06-schema-isolated-2026-10-18.json",
+          "sha256": "a089b63ea64bae904b1755d3e7a553b4868f5dd4aae20fc6600eb2671f6e0cc1",
+          "matches": true
+        }
+      ]
+    }
+  ],
+  "boundaries": {
+    "newRuntimeChange": false,
+    "newLiveMeasurements": false,
+    "originalReceiptsUnchanged": true,
+    "originalFailuresAndPendingCheckpointsRetained": true,
+    "perf13": "OPEN",
+    "productionReadiness": "NO_GO_UNCHANGED",
+    "canonicalOpenPerfAfterMerge": [
+      "PERF-13"
+    ]
+  },
+  "review": {
+    "kind": "five-axis self-review",
+    "correctness": "Close only accepted PERF-05/06 scopes using original immutable receipts and captured rollout checks.",
+    "readability": "Link historical pending checkpoints to subsequent acceptance; preserve sample bases and limits.",
+    "architecture": "Documentation only; no runtime/API/migration/configuration/dependency change.",
+    "security": "No credentials or response payloads added; original sanitized receipts retained.",
+    "performance": "Keep native/public and original/incremental comparisons separate and retain PERF-06 client regressions under PERF-13.",
+    "independentReviewClaimed": false
+  }
+}

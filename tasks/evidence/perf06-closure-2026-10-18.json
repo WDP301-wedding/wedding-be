@@ -1,0 +1,2971 @@
+{
+  "version": 1,
+  "task": "PERF-06",
+  "date": "2026-10-18",
+  "timezone": "Asia/Saigon",
+  "status": "COMPLETE IN OWNER-AUTHORIZED FOUR-TEMPLATE LIVE AND 1/4/20 LOCAL BACKEND SCOPE",
+  "productionReadiness": "NO_GO unchanged; PERF-13 open",
+  "authorization": {
+    "at": "2026-10-18T05:07:17.615Z",
+    "humanInstruction": "Cho phép merge, deploy và kiểm tra sau rollout",
+    "scope": "PR66 reviewed head 834398f; existing Railway demo automatic main rollout; read-only template/public revocation verification. No migration/pool/region/provider setting change."
+  },
+  "pr": "https://github.com/WDP301-wedding/wedding-be/pull/66",
+  "merge": {
+    "at": "2026-10-18T05:07:38.541Z",
+    "sha": "df945b6f4ad10a44f37134e76a662f041283325b",
+    "merged": true,
+    "message": "Pull Request successfully merged",
+    "head": "834398f4d9569e849460c89c762086cacb118d78",
+    "base": "d9c41b7f12e89d62721f47242cd7345f17072b3c",
+    "authorization": {
+      "at": "2026-10-18T05:07:17.615Z",
+      "humanInstruction": "Cho phép merge, deploy và kiểm tra sau rollout",
+      "scope": "PR66 reviewed head 834398f; existing Railway demo automatic main rollout; read-only template/public revocation verification. No migration/pool/region/provider setting change."
+    }
+  },
+  "exactHeadCi": {
+    "at": "2026-10-18T05:05:50.140Z",
+    "head": "834398f4d9569e849460c89c762086cacb118d78",
+    "checks": [
+      {
+        "id": 117591156982,
+        "name": "Static, test, build, and audit gates",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39098978173/job/117591156982"
+      },
+      {
+        "id": 117591156925,
+        "name": "PostgreSQL migration and integration gates",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39098978173/job/117591156925"
+      }
+    ],
+    "runs": [
+      {
+        "id": 39098978173,
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39098978173",
+        "head": "834398f4d9569e849460c89c762086cacb118d78",
+        "status": "completed",
+        "conclusion": "success",
+        "attempt": 1
+      }
+    ]
+  },
+  "mergeCi": {
+    "runs": [
+      {
+        "id": 39099474660,
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39099474660",
+        "head": "df945b6f4ad10a44f37134e76a662f041283325b",
+        "status": "completed",
+        "conclusion": "success",
+        "attempt": 1
+      }
+    ],
+    "jobs": [
+      {
+        "id": 117592601520,
+        "name": "PostgreSQL migration and integration gates",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39099474660/job/117592601520",
+        "conclusion": "success",
+        "counts": [
+          "2026-10-18T05:11:07.3467662Z  Test Files  105 passed (105)",
+          "2026-10-18T05:11:07.3471560Z       Tests  556 passed (556)",
+          "2026-10-18T05:15:11.2356648Z  Test Files  287 passed (287)",
+          "2026-10-18T05:15:11.2366465Z       Tests  2076 passed (2076)",
+          "2026-10-18T05:15:11.2643191Z All files          |   96.65 |    93.51 |   98.45 |   97.56 |                   "
+        ],
+        "sha256": "3edfa949ee7402628fc3bd1832dd1b00868ff1fcb22caa1d8da186b24827df83"
+      },
+      {
+        "id": 117592601813,
+        "name": "Static, test, build, and audit gates",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39099474660/job/117592601813",
+        "conclusion": "success",
+        "counts": [
+          "2026-10-18T05:09:42.6451799Z  Test Files  162 passed (162)",
+          "2026-10-18T05:09:42.6459695Z       Tests  1461 passed (1461)",
+          "2026-10-18T05:09:48.9780527Z  Test Files  20 passed (20)",
+          "2026-10-18T05:09:48.9781819Z       Tests  59 passed (59)",
+          "2026-10-18T05:10:08.5513513Z Dependency audit passed with no high/critical advisories."
+        ],
+        "sha256": "cc1f166d23d1c1533b56eafee3c9ac5c8fe82c632081e20b18cdd3ae783181a5"
+      }
+    ]
+  },
+  "sourceContinuity": [
+    {
+      "path": "src/modules/invitation-studio/infrastructure/design.service.ts",
+      "sourceSha256": "74c02ad413dd9b92660b6c15b160c6c25d01e1999694bc07da2edcb85f7557e5",
+      "deployedMergeBlob": "bb42f815d43d19e17e84993b38e646dbf8c130ab"
+    },
+    {
+      "path": "src/modules/invitation-studio/infrastructure/studio.repository.ts",
+      "sourceSha256": "0985aa8934f39068d1392f354c94e49df14381e25e9b8a0bb40672a13cf1a961",
+      "deployedMergeBlob": "717126d12cfc06d73e19a129f4529d96606d10b4"
+    }
+  ],
+  "treeIdentical": true,
+  "implementation": {
+    "serviceCommands": {
+      "prePerf06": 6,
+      "previousDeployed": 4,
+      "new": 3
+    },
+    "managementHttpCommands": {
+      "prePerf06": 9,
+      "previousDeployed": 6,
+      "new": 5
+    },
+    "initialAndFinalAuthorityPreserved": true,
+    "queryBudgetTightenedFrom": 4,
+    "queryBudget": 3,
+    "noMigrationOrOpenapiChange": true
+  },
+  "nativeComparison": {
+    "summary": [
+      {
+        "case": "one",
+        "returnedItems": 1,
+        "variants": {
+          "baseline": {
+            "n": 20,
+            "p50Ms": 1346.1193559999956,
+            "p95Ms": 1356.7558169999975,
+            "commands": [
+              9
+            ]
+          },
+          "deployed": {
+            "n": 20,
+            "p50Ms": 899.639771999995,
+            "p95Ms": 904.3619190000027,
+            "commands": [
+              6
+            ]
+          },
+          "candidate": {
+            "n": 20,
+            "p50Ms": 751.1615359999996,
+            "p95Ms": 756.2464890000119,
+            "commands": [
+              5
+            ]
+          }
+        },
+        "baselineToCandidateP95ReductionPercent": 44.26067833840632,
+        "deployedToCandidateP95ReductionPercent": 16.377893284556833
+      },
+      {
+        "case": "four",
+        "returnedItems": 4,
+        "variants": {
+          "baseline": {
+            "n": 20,
+            "p50Ms": 1347.0290990000067,
+            "p95Ms": 1350.9833500000022,
+            "commands": [
+              9
+            ]
+          },
+          "deployed": {
+            "n": 20,
+            "p50Ms": 899.7291490000061,
+            "p95Ms": 901.8368499999924,
+            "commands": [
+              6
+            ]
+          },
+          "candidate": {
+            "n": 20,
+            "p50Ms": 750.4840850000037,
+            "p95Ms": 757.5420740000118,
+            "commands": [
+              5
+            ]
+          }
+        },
+        "baselineToCandidateP95ReductionPercent": 43.92661656414859,
+        "deployedToCandidateP95ReductionPercent": 16.00009757862321
+      },
+      {
+        "case": "cursor",
+        "returnedItems": 1,
+        "variants": {
+          "baseline": {
+            "n": 20,
+            "p50Ms": 1347.2723890000052,
+            "p95Ms": 1353.0768099999987,
+            "commands": [
+              9
+            ]
+          },
+          "deployed": {
+            "n": 20,
+            "p50Ms": 899.1099550000217,
+            "p95Ms": 902.460676000017,
+            "commands": [
+              6
+            ]
+          },
+          "candidate": {
+            "n": 20,
+            "p50Ms": 749.5336039999966,
+            "p95Ms": 753.5521720000033,
+            "commands": [
+              5
+            ]
+          }
+        },
+        "baselineToCandidateP95ReductionPercent": 44.3082486943218,
+        "deployedToCandidateP95ReductionPercent": 16.500276184888396
+      }
+    ],
+    "steadySamples": 180,
+    "warmups": 9,
+    "pilotSamples": 9,
+    "matchedSteadyTriplets": 60,
+    "methodology": "20 alternating matched triplets per case, same actual container/database/session/pool. Native loopback HTTP includes auth/router/service and excludes public ingress. Original source baseline is pinned 3c6e898; additional patch is compared separately with the previously deployed batching implementation."
+  },
+  "nativeCorrectness": {
+    "command": "TEST_MIGRATION_DATABASE_URL=<dedicated loopback admin> node node_modules/vitest/vitest.mjs run tests/integration/template-read-performance.test.ts tests/integration/invitation-studio/studio-waves.test.ts tests/integration/identity-read-performance.test.ts --maxWorkers=1 --pool=forks",
+    "passed": 64,
+    "skipped": 0,
+    "files": [
+      {
+        "path": "C:/Ki_9/WDP301/wedding-be/tests/integration/identity-read-performance.test.ts",
+        "status": "passed",
+        "tests": [
+          {
+            "name": "Identity driver budget and fresh authority resolves all authority fields in one driver query and observes role removal immediately",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rejects changed credential on the next read without cached authority",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rejects changed session on the next read without cached authority",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rejects changed disabled on the next read without cached authority",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rejects changed accessExpiry on the next read without cached authority",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rejects changed idleExpiry on the next read without cached authority",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rejects changed absoluteExpiry on the next read without cached authority",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rechecks authority after a concurrent Account writer wins the lock",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rechecks authority after a concurrent AccountRole writer wins the lock",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rechecks authority after a concurrent Session writer wins the lock",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rechecks authority after a concurrent AccessCredential writer wins the lock",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority counts transaction control commands and callback-pool waiting without losing request scope",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "path": "C:/Ki_9/WDP301/wedding-be/tests/integration/template-read-performance.test.ts",
+        "status": "passed",
+        "tests": [
+          {
+            "name": "PERF-06 captured template versions uses three actual driver commands for both authority checks and a bounded page",
+            "status": "passed"
+          },
+          {
+            "name": "PERF-06 captured template versions quotes the constructed schema and binds archive, cursor and page boundaries",
+            "status": "passed"
+          },
+          {
+            "name": "PERF-06 captured template versions bounds version reads for 1/4/20 templates and preserves pages and captured revisions",
+            "status": "passed"
+          },
+          {
+            "name": "PERF-06 captured template versions rechecks empty-page authority after session revocation",
+            "status": "passed"
+          },
+          {
+            "name": "PERF-06 captured template versions rechecks populated-page authority after session revocation",
+            "status": "passed"
+          },
+          {
+            "name": "PERF-06 captured template versions rechecks empty-page authority after role revocation",
+            "status": "passed"
+          },
+          {
+            "name": "PERF-06 captured template versions rechecks populated-page authority after role revocation",
+            "status": "passed"
+          },
+          {
+            "name": "PERF-06 captured template versions rejects a captured row with wrong owner",
+            "status": "passed"
+          },
+          {
+            "name": "PERF-06 captured template versions rejects a captured row with missing version",
+            "status": "passed"
+          },
+          {
+            "name": "PERF-06 captured template versions returns the captured version if its head is revised and archived during the batch read",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "path": "C:/Ki_9/WDP301/wedding-be/tests/integration/invitation-studio/studio-waves.test.ts",
+        "status": "passed",
+        "tests": [
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries creates immutable design history and durable replay, rejects body reuse and stale CAS",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries has one CAS winner under simultaneous design edits",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries enforces authoritative Android text-only editing and denies missing/other ownership",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries Manager templates version/archive/CAS/history; Couple can only select current active templates",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries AI persists one private output and never calls a paid provider again for the same successful intent",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries native runtime uses production Gemini/Storage adapters with controlled SDKs through HTTP",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries blocks native opaque credentials from AI and public design text before provider I/O",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries reauthorizes archived template lists after a native Manager role is revoked and persists redacted denial",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries audits denied Manager template access without retaining resource guesses or credentials",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries shared outbox serializers preserve exact frozen print envelopes, explicit causation=false",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries shared outbox serializers preserve exact frozen print envelopes, explicit causation=true",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries recovers a journaled AI image after acceptance rollback without a second paid generation",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries Manager reconciliation HTTP is scoped, strict, durable and cannot regenerate an abandoned intent",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries a storage acceptance error after successful AI output remains recoverable and does not repeat generation",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries AI unknown timeout survives rollback and retry cannot generate a second output",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries pending recovery fails closed when the journaled image is absent or server reads are unavailable",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries pending Manager pages are bounded and stale/missing reconciliation cannot alter intent history",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries AI rejects sensitive prompts and untrusted mismatching pixels without persisting media",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries private originals become separately derived assets; unpublished assets remain concealed; ownership is exact",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries publication stable identity spans variants, CAS/outbox atomicity, removed fact keeps frozen event meaning",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries registry equal-number invalidation wins in CONFIRM_FIRST order, replay/higher reconfirm/delayed lower are safe",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries registry equal-number invalidation wins in INVALIDATE_FIRST order, replay/higher reconfirm/delayed lower are safe",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries registry requires live proof, exact immutable geometry/digest; owner work rolls back on rejection",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries captures immutable generic-QR printable with explicit null seating and exact reader fields",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries print rejects zero/out-of-range pending invalidation, but accepts current in-range headcount after reconfirmed source",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries retired layout is read historically but cannot enter a new printable",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries trusted scope validation blocks HTTP-style SYSTEM forgery and cross-book enlistment",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries HTTP strict bodies/queries/auth, publication JSON/render/generic PNG and no-store are executable",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries publication and outbox rollback together under enlisted owner failure",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries disabled AI/origin fail closed; refusal is durable; cutoff and quota prevent provider calls",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries AI quota is checked before calling provider",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries HTTP executes template lifecycle, private lists/revisions, generation, derived asset and unpublication",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries equal registration/invalidation in one transaction checks the final high-water head",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries Identity editor denies missing bearer, actor mismatch, unavailable session and disabled trusted account",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries native Venue eligibility conceals absent/draft versions, retains active superseded layout eligibility",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries template/design pagination preserves cursors and rejects wrong-role/history/resource reads",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries publication rejects stale exact design, wrong unpublish variant/revision and absent histories",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries derived intent survives owner rollback, safely retries the exact object and rejects stale/unavailable reads",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries Manager exception allows range override within physical capacity and rejects stale revision/count",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries historical null-proof snapshot and stale design cannot authorize a new print",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries Venue retirement waits for registry/print shared lifecycle locks through owner commit",
+            "status": "passed"
+          },
+          {
+            "name": "SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries timeline activation/headcount writer waits for print capture; old snapshot stays unchanged",
+            "status": "passed"
+          }
+        ]
+      }
+    ],
+    "isolatedSchemaRerun": {
+      "passed": 1,
+      "selectedOtherTests": 9,
+      "reason": "Schema/cursor fixture also creates its own second template, so it passes independently of other tests."
+    },
+    "retainedFailures": [
+      "Intentional TDD failure: actual four driver commands versus required three",
+      "Schema fixture bypassed immutable revision guard; repaired using saveTemplate owner, no guard change",
+      "Initial exactOptionalPropertyTypes compile error; signature corrected",
+      "Local log collector stalled/overlapped output and then refused an existing output file; rerun with direct file descriptors and unique files",
+      "Audit invoked outside npm lacked npm_execpath; rerun through the pinned npm run audit:ci"
+    ],
+    "noQualityGateWeakened": true
+  },
+  "serving": {
+    "at": "2026-10-18T05:18:45.407Z",
+    "runtime": {
+      "deploymentId": "f0332652-cf57-4b46-807a-d0d92e75d5e3",
+      "source": "df945b6f4ad10a44f37134e76a662f041283325b",
+      "image": "sha256:cb99729e156b0d563c2463a92589cc65597bdb6f449092a353b67fa442dc0388",
+      "configurationDigest": "5bb1f835c3514bca7e8db5d8c01d34fb92be34b82742eed21ad2dc30a41aceb5",
+      "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+      "controls": {
+        "DB_POOL_MAX": "1",
+        "DB_POOL_MAX_VENUE_CATALOG": "3",
+        "DB_POOL_MAX_ANALYTICS": "2",
+        "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000",
+        "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+        "DB_CONNECTION_RESERVE": "36",
+        "DB_MAX_CONNECTIONS": "60",
+        "DB_DIAGNOSTICS_ENABLED": "false",
+        "DB_SAFE_READ_DEADLINE_ENABLED": "false"
+      }
+    },
+    "oldStopped": true,
+    "onlyNewDeploymentActive": true,
+    "configurationUnchanged": true,
+    "ci": [
+      {
+        "id": 39099474660,
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39099474660",
+        "head": "df945b6f4ad10a44f37134e76a662f041283325b",
+        "status": "completed",
+        "conclusion": "success",
+        "attempt": 1
+      }
+    ],
+    "smoke": [
+      {
+        "path": "/health/live",
+        "method": "GET",
+        "status": 200,
+        "requestId": "ce63b94a-5b54-48fa-b67d-851572d40fd9"
+      },
+      {
+        "path": "/health/ready",
+        "method": "GET",
+        "status": 200,
+        "requestId": "cdbcaf9c-caad-4dd6-9d43-db746afe81d3"
+      },
+      {
+        "path": "/api/v1/openapi.json",
+        "method": "GET",
+        "status": 200,
+        "requestId": "18e7787b-9081-4fcc-9fe4-ad3ab8666188",
+        "sha256": "19da7dafc991d316f7f048a58c6446deabb2e724edb3a49d55e4709ce14d04e2"
+      },
+      {
+        "path": "/api/v1/management/invitation-templates",
+        "method": "GET",
+        "status": 401,
+        "requestId": "a2659b6e-5ee4-4f9c-adbb-70b0fb177509"
+      }
+    ]
+  },
+  "finalPostflight": {
+    "at": "2026-10-18T05:20:25.612Z",
+    "runtime": {
+      "deploymentId": "f0332652-cf57-4b46-807a-d0d92e75d5e3",
+      "source": "df945b6f4ad10a44f37134e76a662f041283325b",
+      "image": "sha256:cb99729e156b0d563c2463a92589cc65597bdb6f449092a353b67fa442dc0388",
+      "configurationDigest": "5bb1f835c3514bca7e8db5d8c01d34fb92be34b82742eed21ad2dc30a41aceb5",
+      "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+      "controls": {
+        "DB_POOL_MAX": "1",
+        "DB_POOL_MAX_VENUE_CATALOG": "3",
+        "DB_POOL_MAX_ANALYTICS": "2",
+        "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000",
+        "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+        "DB_CONNECTION_RESERVE": "36",
+        "DB_MAX_CONNECTIONS": "60",
+        "DB_DIAGNOSTICS_ENABLED": "false",
+        "DB_SAFE_READ_DEADLINE_ENABLED": "false"
+      }
+    },
+    "inventory": {
+      "tables": {
+        "Booking": {
+          "count": 1,
+          "sha256": "4c4c2f575556f03261cd3a5a0a190f19c9a65cada728ba1616cb16215e723208"
+        },
+        "GuestWorkspace": {
+          "count": 1,
+          "sha256": "96388fdfb6c0cb76f5b4ba384f14fc93db844222a1a20bf4533037b88e95b12d"
+        },
+        "GuestPlanRevision": {
+          "count": 1,
+          "sha256": "7cd3122165cb67c4cdcaa430d7c895cb95942ad35a83bfc933d37df99e20804d"
+        },
+        "Guest": {
+          "count": 8,
+          "sha256": "b2b586adc5cbb9b291e0efab771009f86f2cb76fa1f76dc3a4b64f06aef13ee7"
+        },
+        "GuestGroup": {
+          "count": 4,
+          "sha256": "43da72db9deab54cb3d6d7e7e81b61ab59841e88fd87a5ac18be2f8dc3fa5eaa"
+        },
+        "GuestHistory": {
+          "count": 12,
+          "sha256": "aea3a3b7a8adc761e8720777c31b1e76128d60e433378dc399d9cbeeb732fcc5"
+        },
+        "SeatingPlan": {
+          "count": 1,
+          "sha256": "9c1ec53ea1d901487d515a638f848e0523c35e36c905a2b54d8bff196b759270"
+        },
+        "SeatingPlanRevision": {
+          "count": 2,
+          "sha256": "afc6805271c1530347d10b0683fbad7463008dbef27f19cb38796cf9f2167f6b"
+        },
+        "StaffConfiguration": {
+          "count": 1,
+          "sha256": "034f11ef5605b519154fe7612189557cde39fbf0296f6bbc5478a17869e6d5cb"
+        },
+        "StaffAssignment": {
+          "count": 1,
+          "sha256": "7467e6b94d7fe8965caa7c6dd3e5d333464782c8cd7316fba5e871d0dd897bb1"
+        },
+        "StaffHistory": {
+          "count": 3,
+          "sha256": "0b45bd0ff60f61172375fe1f86a7f6a8d0c9be542b84ff789045b2a6072e53ab"
+        },
+        "StaffCheckInRecord": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "CommercialContractRevision": {
+          "count": 1,
+          "sha256": "6e9ab27802ea39a595178575b26ef3cbc244a42a2264539b770704e7a2f38d8b"
+        },
+        "FinalInvoiceRevision": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "BillingLedgerEntry": {
+          "count": 2,
+          "sha256": "c3e10fe0d068362606967596ff14aa980ec43bc85cf8a763c1cc4936c25f9f57"
+        },
+        "Consultation": {
+          "count": 1,
+          "sha256": "d0ad11435d1e0ea5e933814c9a6e153a26861a7dfffdc888dcd6a1ab27359d3e"
+        },
+        "ConsultationAccess": {
+          "count": 1,
+          "sha256": "428338c837e20b9f7aded8b818a8f1b5a9a84526ab42b15af12a335e68605278"
+        },
+        "InvitationTemplate": {
+          "count": 5,
+          "sha256": "b3b833de4c0b289094e88edf9195757c2b0818a948c06a84a182f31f74c377f2"
+        },
+        "InvitationTemplateVersion": {
+          "count": 6,
+          "sha256": "0c8fec5b1fa1dec362ea5d673a4dcd6134dd7bdf175e30ea6d60b69397fe95bd"
+        }
+      },
+      "migrations": {
+        "count": 61,
+        "sha256": "b7d90da8b39b7db5f6ef24ec1084f4ea2d4e4915664ebfccd00345c18fbf910e",
+        "allChecksumsMatch": true
+      }
+    },
+    "businessUnchanged": true,
+    "migrationsUnchanged": true,
+    "configurationUnchanged": true,
+    "correlated": [
+      {
+        "path": "/health/live",
+        "method": "GET",
+        "status": 200,
+        "requestId": "ce63b94a-5b54-48fa-b67d-851572d40fd9",
+        "matched": true,
+        "backendMs": 2.573,
+        "route": "/health/live"
+      },
+      {
+        "path": "/health/ready",
+        "method": "GET",
+        "status": 200,
+        "requestId": "cdbcaf9c-caad-4dd6-9d43-db746afe81d3",
+        "matched": true,
+        "backendMs": 1213.388,
+        "route": "/health/ready"
+      },
+      {
+        "path": "/api/v1/openapi.json",
+        "method": "GET",
+        "status": 200,
+        "requestId": "18e7787b-9081-4fcc-9fe4-ad3ab8666188",
+        "sha256": "19da7dafc991d316f7f048a58c6446deabb2e724edb3a49d55e4709ce14d04e2",
+        "matched": true,
+        "backendMs": 23.877,
+        "route": "/api/v1/openapi.json"
+      },
+      {
+        "path": "/api/v1/management/invitation-templates",
+        "method": "GET",
+        "status": 401,
+        "requestId": "a2659b6e-5ee4-4f9c-adbb-70b0fb177509",
+        "matched": true,
+        "backendMs": 1227.55,
+        "route": "<unmatched>"
+      },
+      {
+        "label": "login",
+        "path": "/auth/web-sessions",
+        "method": "POST",
+        "round": 0,
+        "requestId": "f1d74bb2-1008-41cd-bedf-658cc6976531",
+        "at": "2026-10-18T05:18:45.640Z",
+        "status": 201,
+        "ms": 3572.4278999999997,
+        "noStore": true,
+        "matched": true,
+        "backendMs": 3088.23,
+        "route": "/api/v1/auth/web-sessions"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 0,
+        "requestId": "4878de4f-4842-4bc1-b5a9-deaa56eb4a13",
+        "at": "2026-10-18T05:18:49.212Z",
+        "status": 200,
+        "ms": 1014.4319,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 775.975,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 0,
+        "requestId": "2f6c96d1-b636-42ab-9e8b-b36f92ccc847",
+        "at": "2026-10-18T05:18:50.228Z",
+        "status": 200,
+        "ms": 2550.0419999999995,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 750.041,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 0,
+        "requestId": "7a1d33fa-5801-4535-9e1e-e2815ba6b39c",
+        "at": "2026-10-18T05:18:52.780Z",
+        "status": 200,
+        "ms": 993.5102999999999,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 754.789,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 1,
+        "requestId": "d97841e9-47e5-4169-95b9-7b57340526ae",
+        "at": "2026-10-18T05:18:53.775Z",
+        "status": 200,
+        "ms": 1831.9135999999999,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 747.555,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 1,
+        "requestId": "09dbb53a-6e70-4537-a930-1ea031d9ebe2",
+        "at": "2026-10-18T05:18:55.608Z",
+        "status": 200,
+        "ms": 993.9784,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 748.492,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 1,
+        "requestId": "b6120da4-b939-4761-a20c-f49ae5136e94",
+        "at": "2026-10-18T05:18:56.604Z",
+        "status": 200,
+        "ms": 2229.1098,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 746.962,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 2,
+        "requestId": "59cf0e5d-48c2-412a-bffd-bf1f896c22a3",
+        "at": "2026-10-18T05:18:58.834Z",
+        "status": 200,
+        "ms": 1002.5257999999994,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 749.898,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 2,
+        "requestId": "e5fde791-9b4d-4180-8cc4-c56f9169146b",
+        "at": "2026-10-18T05:18:59.839Z",
+        "status": 200,
+        "ms": 1594.4863000000005,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 747.676,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 2,
+        "requestId": "b0ecc199-e0c8-42b3-90be-5154cfb8f0ae",
+        "at": "2026-10-18T05:19:01.435Z",
+        "status": 200,
+        "ms": 1001.0434000000023,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 748.06,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 3,
+        "requestId": "15ec75a6-475b-4001-84b0-e3d86f0d9d5d",
+        "at": "2026-10-18T05:19:02.437Z",
+        "status": 200,
+        "ms": 1166.532900000002,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 747.349,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 3,
+        "requestId": "b41b5438-0b32-4c08-8780-3cc2db3dd8e6",
+        "at": "2026-10-18T05:19:03.607Z",
+        "status": 200,
+        "ms": 1076.1232999999993,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 748.182,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 3,
+        "requestId": "32aa8456-6efe-4c16-a415-7719b8f7f655",
+        "at": "2026-10-18T05:19:04.685Z",
+        "status": 200,
+        "ms": 1056.202400000002,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 748.545,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 4,
+        "requestId": "7604481c-f9d8-4425-938d-6d3ce7468130",
+        "at": "2026-10-18T05:19:05.743Z",
+        "status": 200,
+        "ms": 1015.3287000000018,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 747.916,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 4,
+        "requestId": "0b02d6e8-d403-4d69-8a5a-b75b4882affe",
+        "at": "2026-10-18T05:19:06.760Z",
+        "status": 200,
+        "ms": 1006.1420999999973,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 748.274,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 4,
+        "requestId": "9befa3a9-78b1-4311-95ce-1680c96aadba",
+        "at": "2026-10-18T05:19:07.767Z",
+        "status": 200,
+        "ms": 987.0507999999973,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 750.58,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 5,
+        "requestId": "604d6145-7939-4e7a-9ec1-fe74386d5eec",
+        "at": "2026-10-18T05:19:08.755Z",
+        "status": 200,
+        "ms": 1030.5993000000017,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 747.336,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 5,
+        "requestId": "115dc9aa-7946-4731-81a8-80eb23423846",
+        "at": "2026-10-18T05:19:09.788Z",
+        "status": 200,
+        "ms": 984.5394000000015,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 745.916,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 5,
+        "requestId": "a87c77c8-90dc-48a7-b818-2f6fd4a6c208",
+        "at": "2026-10-18T05:19:10.774Z",
+        "status": 200,
+        "ms": 1223.7474000000002,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 746.479,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 6,
+        "requestId": "9a35de4c-c0e4-4593-96a0-d745eec4ee7c",
+        "at": "2026-10-18T05:19:12.000Z",
+        "status": 200,
+        "ms": 1054.3238999999994,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 754.401,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 6,
+        "requestId": "60a7f036-27df-44e1-ae2b-c3a083006c75",
+        "at": "2026-10-18T05:19:13.055Z",
+        "status": 200,
+        "ms": 1014.9825999999994,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 747.013,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 6,
+        "requestId": "fa4acfd5-3717-4bf9-bded-13035d83fb43",
+        "at": "2026-10-18T05:19:14.072Z",
+        "status": 200,
+        "ms": 1034.2271999999975,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 749.735,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 7,
+        "requestId": "9687814f-e523-477f-b52c-022a44d92a5b",
+        "at": "2026-10-18T05:19:15.107Z",
+        "status": 200,
+        "ms": 982.0017000000007,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 746.27,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 7,
+        "requestId": "0f0e0804-9e62-486b-91eb-96d8f62b048e",
+        "at": "2026-10-18T05:19:16.090Z",
+        "status": 200,
+        "ms": 1066.2265999999981,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 746.783,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 7,
+        "requestId": "e7f5a191-b9e6-4432-b276-fc52ab140117",
+        "at": "2026-10-18T05:19:17.158Z",
+        "status": 200,
+        "ms": 1114.3759000000027,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 747.611,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 8,
+        "requestId": "533907c3-f094-4d12-88a2-2355227371ab",
+        "at": "2026-10-18T05:19:18.273Z",
+        "status": 200,
+        "ms": 1223.4645999999993,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 746.326,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 8,
+        "requestId": "cd78fc54-430e-4e64-9240-79b68e1ccba5",
+        "at": "2026-10-18T05:19:19.499Z",
+        "status": 200,
+        "ms": 987.3736999999965,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 747.415,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 8,
+        "requestId": "9c7a4e49-a2cd-4815-8d3b-7bef13113b7a",
+        "at": "2026-10-18T05:19:20.487Z",
+        "status": 200,
+        "ms": 1033.7785000000003,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 745.314,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 9,
+        "requestId": "95d2c380-5249-479e-8f6d-3313e6efab0a",
+        "at": "2026-10-18T05:19:21.522Z",
+        "status": 200,
+        "ms": 1212.1569000000018,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 746.838,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 9,
+        "requestId": "4e427d58-fa7c-487f-9c35-77c8b836478b",
+        "at": "2026-10-18T05:19:22.735Z",
+        "status": 200,
+        "ms": 997.5938000000024,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 747.202,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 9,
+        "requestId": "80d54721-abd6-464b-a990-6b1016c22d40",
+        "at": "2026-10-18T05:19:23.735Z",
+        "status": 200,
+        "ms": 1024.242299999998,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 746.711,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 10,
+        "requestId": "448f0d62-462a-4684-b3f5-2d0d08b62983",
+        "at": "2026-10-18T05:19:24.760Z",
+        "status": 200,
+        "ms": 1024.4974000000002,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 745.572,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 10,
+        "requestId": "70b1a316-8db1-4878-9965-a11e23f50d5c",
+        "at": "2026-10-18T05:19:25.786Z",
+        "status": 200,
+        "ms": 1264.2607999999964,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 757.508,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 10,
+        "requestId": "d355409a-328d-466e-ba73-4659a25cee7d",
+        "at": "2026-10-18T05:19:27.051Z",
+        "status": 200,
+        "ms": 1272.2148000000016,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 747.424,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 11,
+        "requestId": "3e7de0f3-b847-4cda-9798-7260ca7073a8",
+        "at": "2026-10-18T05:19:28.327Z",
+        "status": 200,
+        "ms": 1011.3266000000003,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 748.226,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 11,
+        "requestId": "b8e852b4-4920-473e-9c61-883d1ef2783f",
+        "at": "2026-10-18T05:19:29.339Z",
+        "status": 200,
+        "ms": 982.1044000000038,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 748.005,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 11,
+        "requestId": "a75a9878-72c2-4463-aa57-14d1f5818a42",
+        "at": "2026-10-18T05:19:30.323Z",
+        "status": 200,
+        "ms": 1028.3410000000003,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 750.565,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 12,
+        "requestId": "b941a1de-2c23-4926-a8ce-481d8cbc3b8b",
+        "at": "2026-10-18T05:19:31.353Z",
+        "status": 200,
+        "ms": 989.0676000000021,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 748.047,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 12,
+        "requestId": "731e3e66-61eb-4e16-8edb-b0fcf9d4fa0e",
+        "at": "2026-10-18T05:19:32.343Z",
+        "status": 200,
+        "ms": 1461.8394999999946,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 747.236,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 12,
+        "requestId": "9bb57f31-8714-4e68-a80a-ff76a1b0c7ba",
+        "at": "2026-10-18T05:19:33.806Z",
+        "status": 200,
+        "ms": 1034.8681999999972,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 748.474,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 13,
+        "requestId": "69f04fdc-fb2d-46f2-8012-64dd26f8b74f",
+        "at": "2026-10-18T05:19:34.842Z",
+        "status": 200,
+        "ms": 1239.130799999999,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 745.748,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 13,
+        "requestId": "b3b3792b-1a47-4f5d-acfa-c80b9bc64be0",
+        "at": "2026-10-18T05:19:36.083Z",
+        "status": 200,
+        "ms": 978.5584999999992,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 747.197,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 13,
+        "requestId": "8deae06d-b589-4324-b71d-5aeec62c5293",
+        "at": "2026-10-18T05:19:37.065Z",
+        "status": 200,
+        "ms": 999.7873999999938,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 766.705,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 14,
+        "requestId": "3b277091-dc66-4dc4-ab4a-5edf72a6260a",
+        "at": "2026-10-18T05:19:38.066Z",
+        "status": 200,
+        "ms": 979.9493999999977,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 745.446,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 14,
+        "requestId": "8c46a247-5623-45ab-8862-332d59d05ea5",
+        "at": "2026-10-18T05:19:39.047Z",
+        "status": 200,
+        "ms": 980.9755999999979,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 745.415,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 14,
+        "requestId": "493d303b-7331-492b-a14b-e0fcfd11f713",
+        "at": "2026-10-18T05:19:40.030Z",
+        "status": 200,
+        "ms": 978.3867000000027,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 744.81,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 15,
+        "requestId": "8755f99a-d0a1-4342-a0c4-ea850323a2df",
+        "at": "2026-10-18T05:19:41.010Z",
+        "status": 200,
+        "ms": 978.1347999999998,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 746.138,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 15,
+        "requestId": "5734a656-0d95-47a9-b5c2-1a2556c0c6ec",
+        "at": "2026-10-18T05:19:41.990Z",
+        "status": 200,
+        "ms": 974.7849999999962,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 744.697,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 15,
+        "requestId": "acdecd10-50c6-4093-8c7f-3e3b91d84aff",
+        "at": "2026-10-18T05:19:42.966Z",
+        "status": 200,
+        "ms": 982.4735999999975,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 748.966,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 16,
+        "requestId": "74cfe0ef-078b-4247-b285-6815d24ff1b9",
+        "at": "2026-10-18T05:19:43.950Z",
+        "status": 200,
+        "ms": 989.6136000000042,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 746.204,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 16,
+        "requestId": "3182e631-92e6-4ee0-a592-152319159d6d",
+        "at": "2026-10-18T05:19:44.942Z",
+        "status": 200,
+        "ms": 975.958000000006,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 746.16,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 16,
+        "requestId": "b4596be2-152d-4f79-98c3-837de2f02105",
+        "at": "2026-10-18T05:19:45.920Z",
+        "status": 200,
+        "ms": 978.4305000000022,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 745.21,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 17,
+        "requestId": "9e8f103a-b2be-421e-ae5c-c9cd1be65a3d",
+        "at": "2026-10-18T05:19:46.899Z",
+        "status": 200,
+        "ms": 977.7669999999998,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 745.732,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 17,
+        "requestId": "6ea168a5-0106-4bc1-9919-c9824f9835ba",
+        "at": "2026-10-18T05:19:47.878Z",
+        "status": 200,
+        "ms": 976.0246999999945,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 745.698,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 17,
+        "requestId": "c4b0b4de-3672-4b1d-96c1-0cfef626ac37",
+        "at": "2026-10-18T05:19:48.857Z",
+        "status": 200,
+        "ms": 980.1213999999964,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 748.236,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 18,
+        "requestId": "c1a00e9d-9350-4939-ba70-177445753117",
+        "at": "2026-10-18T05:19:49.839Z",
+        "status": 200,
+        "ms": 980.1010999999999,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 745.37,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 18,
+        "requestId": "4b35e912-e0b8-4901-a9cf-75bb7451f29d",
+        "at": "2026-10-18T05:19:50.822Z",
+        "status": 200,
+        "ms": 982.716800000002,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 747.013,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 18,
+        "requestId": "43200114-a851-4f1b-bcf9-123920322362",
+        "at": "2026-10-18T05:19:51.807Z",
+        "status": 200,
+        "ms": 982.062300000005,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 745.879,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 19,
+        "requestId": "1502652c-7fbc-4561-bf38-a5731245b2c1",
+        "at": "2026-10-18T05:19:52.791Z",
+        "status": 200,
+        "ms": 974.2357999999949,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 745.206,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 19,
+        "requestId": "27da9365-dfdd-4b21-a1fa-4cd3e62e8868",
+        "at": "2026-10-18T05:19:53.767Z",
+        "status": 200,
+        "ms": 980.0641000000032,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 745.782,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 19,
+        "requestId": "2dace77a-eb78-4243-a1b7-601c5fbf7edf",
+        "at": "2026-10-18T05:19:54.750Z",
+        "status": 200,
+        "ms": 982.7415000000037,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 744.589,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 20,
+        "requestId": "cfc9ec31-58e7-4be5-8d58-050b1ff871f1",
+        "at": "2026-10-18T05:19:55.734Z",
+        "status": 200,
+        "ms": 975.3141000000032,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 746.52,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 20,
+        "requestId": "f82c7e86-1fe8-4637-80d4-47dc66e2a383",
+        "at": "2026-10-18T05:19:56.711Z",
+        "status": 200,
+        "ms": 978.8938999999955,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 744.71,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 20,
+        "requestId": "43baa17b-eab9-4584-a6e9-80ed518e6a8a",
+        "at": "2026-10-18T05:19:57.692Z",
+        "status": 200,
+        "ms": 977.4216000000015,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 747.402,
+        "route": "/api/v1/management/invitation-templates"
+      },
+      {
+        "label": "logout",
+        "path": "/auth/sessions/current",
+        "method": "DELETE",
+        "round": 0,
+        "requestId": "1f8f1f1f-b708-4a45-afa5-40e1c6f107a4",
+        "at": "2026-10-18T05:19:58.671Z",
+        "status": 204,
+        "ms": 2505.582699999999,
+        "noStore": true,
+        "matched": true,
+        "backendMs": 2272.486,
+        "route": "/api/v1/auth/sessions/current"
+      },
+      {
+        "label": "revoked",
+        "path": "/auth/me",
+        "method": "GET",
+        "round": 0,
+        "requestId": "83d35a20-25dd-4462-bd53-dcff873fd0e8",
+        "at": "2026-10-18T05:20:01.178Z",
+        "status": 401,
+        "ms": 384.0827999999892,
+        "noStore": true,
+        "matched": true,
+        "backendMs": 150.174,
+        "route": "/auth/me"
+      },
+      {
+        "label": "revoked-template",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 0,
+        "requestId": "4a788036-ec3e-4cbd-9641-08222aaba771",
+        "at": "2026-10-18T05:20:01.563Z",
+        "status": 401,
+        "ms": 537.335500000001,
+        "noStore": false,
+        "matched": true,
+        "backendMs": 302.375,
+        "route": "<unmatched>"
+      }
+    ],
+    "beforeCorrelated": [
+      {
+        "label": "login",
+        "path": "/auth/web-sessions",
+        "method": "POST",
+        "round": 0,
+        "requestId": "1655c87a-f4ed-4670-963d-f4e7d82af932",
+        "at": "2026-10-18T04:53:21.641Z",
+        "status": 201,
+        "ms": 3671.3932,
+        "noStore": true,
+        "matched": true,
+        "backendMs": 3088.281
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 0,
+        "requestId": "7dbf9abf-e394-48d6-8558-89507f210909",
+        "at": "2026-10-18T04:53:25.315Z",
+        "status": 200,
+        "ms": 2266.9235,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 1973.339
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 0,
+        "requestId": "ffd24d5e-44e8-4551-89a6-0e3be007996d",
+        "at": "2026-10-18T04:53:27.584Z",
+        "status": 200,
+        "ms": 1125.6221999999998,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 899.585
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 0,
+        "requestId": "5c51ad24-43f2-4c17-9c91-91056bf205b4",
+        "at": "2026-10-18T04:53:28.714Z",
+        "status": 200,
+        "ms": 1168.2531,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 904.234
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 1,
+        "requestId": "a3b0dd55-ed56-40c7-9b58-a7e653151d30",
+        "at": "2026-10-18T04:53:29.886Z",
+        "status": 200,
+        "ms": 1159.0880000000016,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 903.595
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 1,
+        "requestId": "88c026ab-9c77-4c45-915f-56382198c713",
+        "at": "2026-10-18T04:53:31.046Z",
+        "status": 200,
+        "ms": 1152.5324,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 897.024
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 1,
+        "requestId": "15b02431-f7d8-403c-8f21-3d46c4594f60",
+        "at": "2026-10-18T04:53:32.200Z",
+        "status": 200,
+        "ms": 1124.2387999999992,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 895.685
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 2,
+        "requestId": "5b8c5223-be3f-491b-afe2-15ea7f24c749",
+        "at": "2026-10-18T04:53:33.326Z",
+        "status": 200,
+        "ms": 1117.501400000001,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 898.829
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 2,
+        "requestId": "ec40148c-c508-4f2a-9ad4-a0ddae2ba902",
+        "at": "2026-10-18T04:53:34.445Z",
+        "status": 200,
+        "ms": 1124.3048,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 896.881
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 2,
+        "requestId": "0c2943ad-4d4f-40e4-9566-31a7a206999a",
+        "at": "2026-10-18T04:53:35.571Z",
+        "status": 200,
+        "ms": 1125.3781999999992,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 894.014
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 3,
+        "requestId": "f429cfff-122e-4c0c-b522-425c72fa3578",
+        "at": "2026-10-18T04:53:36.698Z",
+        "status": 200,
+        "ms": 1118.1314999999995,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 895.197
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 3,
+        "requestId": "8ca87976-2218-40aa-9342-7dbfc30a98e7",
+        "at": "2026-10-18T04:53:37.818Z",
+        "status": 200,
+        "ms": 1126.4376999999986,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 897.249
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 3,
+        "requestId": "5af61825-99d0-4b0b-8902-7f5239c770b0",
+        "at": "2026-10-18T04:53:38.947Z",
+        "status": 200,
+        "ms": 1135.729900000002,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 901.593
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 4,
+        "requestId": "b442e275-03e8-47cd-b8f2-03cf14f1f583",
+        "at": "2026-10-18T04:53:40.085Z",
+        "status": 200,
+        "ms": 1132.813000000002,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 901.612
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 4,
+        "requestId": "3507a737-ef74-42f0-b8ce-fe3200a2b371",
+        "at": "2026-10-18T04:53:41.219Z",
+        "status": 200,
+        "ms": 1149.6568000000007,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 897.61
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 4,
+        "requestId": "ea5836e1-f1f5-4bec-84a7-fc358a625640",
+        "at": "2026-10-18T04:53:42.370Z",
+        "status": 200,
+        "ms": 1121.8174,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 899.483
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 5,
+        "requestId": "b7c56d8e-7441-4d25-b360-76a832bbc0a4",
+        "at": "2026-10-18T04:53:43.494Z",
+        "status": 200,
+        "ms": 1126.0894000000008,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 895.425
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 5,
+        "requestId": "6e34318a-5d46-4979-90d4-279248d006b1",
+        "at": "2026-10-18T04:53:44.624Z",
+        "status": 200,
+        "ms": 1120.0322000000015,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 898.311
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 5,
+        "requestId": "1bb88200-3e20-4fec-9211-9754db6ed1f2",
+        "at": "2026-10-18T04:53:45.747Z",
+        "status": 200,
+        "ms": 1164.8811999999998,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 899.081
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 6,
+        "requestId": "b8e3c776-144b-4326-b4ce-5df5b3b49683",
+        "at": "2026-10-18T04:53:46.914Z",
+        "status": 200,
+        "ms": 1153.442500000001,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 899.61
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 6,
+        "requestId": "fd137992-a29e-4911-b2f1-cd8a677d9e9d",
+        "at": "2026-10-18T04:53:48.069Z",
+        "status": 200,
+        "ms": 1123.2429999999986,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 895.711
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 6,
+        "requestId": "b7f1505c-7472-43e9-80c9-eaca4576badf",
+        "at": "2026-10-18T04:53:49.194Z",
+        "status": 200,
+        "ms": 1143.775099999999,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 920.95
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 7,
+        "requestId": "8bdde03d-6ae4-4a2e-9705-b2aa00f4efd5",
+        "at": "2026-10-18T04:53:50.340Z",
+        "status": 200,
+        "ms": 1138.244999999999,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 911.301
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 7,
+        "requestId": "2a9fd0d1-8349-43d4-894b-b5332d3199cb",
+        "at": "2026-10-18T04:53:51.479Z",
+        "status": 200,
+        "ms": 1129.062600000001,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 900.376
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 7,
+        "requestId": "984f72e4-bf86-49d0-bf6e-c3ce30b49277",
+        "at": "2026-10-18T04:53:52.611Z",
+        "status": 200,
+        "ms": 1124.5796999999984,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 902.767
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 8,
+        "requestId": "5e0dd3ef-ed82-45ce-9312-b864c17f0503",
+        "at": "2026-10-18T04:53:53.737Z",
+        "status": 200,
+        "ms": 1126.6918000000042,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 903.136
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 8,
+        "requestId": "d9ede3fd-5058-40c6-a247-b0d5917f154b",
+        "at": "2026-10-18T04:53:54.865Z",
+        "status": 200,
+        "ms": 1139.9665999999997,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 909.49
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 8,
+        "requestId": "a8bb556f-5b19-4e5d-9bbe-92c2b4e6a0de",
+        "at": "2026-10-18T04:53:56.008Z",
+        "status": 200,
+        "ms": 1146.9262999999992,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 893.934
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 9,
+        "requestId": "fdc86d3f-414b-475a-92a3-f39f5e1718cd",
+        "at": "2026-10-18T04:53:57.156Z",
+        "status": 200,
+        "ms": 1149.9495000000024,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 908.412
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 9,
+        "requestId": "1f5d6ae1-9fdd-4324-9718-b84ca042600b",
+        "at": "2026-10-18T04:53:58.308Z",
+        "status": 200,
+        "ms": 1137.643600000003,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 907.372
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 9,
+        "requestId": "1457c1a5-f914-40c9-be0d-bdd3b2b605de",
+        "at": "2026-10-18T04:53:59.448Z",
+        "status": 200,
+        "ms": 1132.4680000000008,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 906.535
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 10,
+        "requestId": "4d7ea320-f028-4ae6-8896-9db85b27566c",
+        "at": "2026-10-18T04:54:00.582Z",
+        "status": 200,
+        "ms": 1127.153099999996,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 896.176
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 10,
+        "requestId": "670e730b-d0d2-4b31-bc25-035fe78abe69",
+        "at": "2026-10-18T04:54:01.711Z",
+        "status": 200,
+        "ms": 1152.9295999999958,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 897.047
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 10,
+        "requestId": "5a23f502-f877-48db-9240-b7db71ead261",
+        "at": "2026-10-18T04:54:02.866Z",
+        "status": 200,
+        "ms": 1157.2878000000055,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 896.78
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 11,
+        "requestId": "d110ee45-963e-4942-8de3-b14c993d289f",
+        "at": "2026-10-18T04:54:04.025Z",
+        "status": 200,
+        "ms": 1141.1839999999938,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 894.512
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 11,
+        "requestId": "22556137-9f45-4063-8898-09571b76aacb",
+        "at": "2026-10-18T04:54:05.168Z",
+        "status": 200,
+        "ms": 1121.7814999999973,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 894.909
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 11,
+        "requestId": "b6bb56f4-3c90-487b-a76c-be240646657d",
+        "at": "2026-10-18T04:54:06.292Z",
+        "status": 200,
+        "ms": 1122.1952999999994,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 894.791
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 12,
+        "requestId": "60b9d28f-e926-4f57-8855-3b2e1e3a716e",
+        "at": "2026-10-18T04:54:07.416Z",
+        "status": 200,
+        "ms": 1122.2840999999971,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 898.317
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 12,
+        "requestId": "f6b0b54f-facd-4b51-8546-c01bd5a6a07a",
+        "at": "2026-10-18T04:54:08.540Z",
+        "status": 200,
+        "ms": 1126.8234000000011,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 900.908
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 12,
+        "requestId": "ea76fdde-bfc8-45ab-8ab6-242ba889a208",
+        "at": "2026-10-18T04:54:09.668Z",
+        "status": 200,
+        "ms": 1153.6546000000017,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 899.639
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 13,
+        "requestId": "36a45ea0-9660-46c4-8dc9-95acdf7251d6",
+        "at": "2026-10-18T04:54:10.824Z",
+        "status": 200,
+        "ms": 1124.3596999999936,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 896.213
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 13,
+        "requestId": "f69511e6-1eae-479c-b622-85602d60d52c",
+        "at": "2026-10-18T04:54:11.950Z",
+        "status": 200,
+        "ms": 1116.0025000000023,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 894.921
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 13,
+        "requestId": "0e050de2-d895-48c7-931e-d99cbdf794d5",
+        "at": "2026-10-18T04:54:13.068Z",
+        "status": 200,
+        "ms": 1124.8392999999996,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 895.648
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 14,
+        "requestId": "dd446518-8bf2-472f-a916-b93a8f3ec114",
+        "at": "2026-10-18T04:54:14.197Z",
+        "status": 200,
+        "ms": 1116.8151999999973,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 895.053
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 14,
+        "requestId": "8c1cedc5-f524-4727-ac2b-ea487476bf47",
+        "at": "2026-10-18T04:54:15.315Z",
+        "status": 200,
+        "ms": 1121.926099999997,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 896.647
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 14,
+        "requestId": "0fda132f-f482-42c9-b11f-c0d99634ebb6",
+        "at": "2026-10-18T04:54:16.440Z",
+        "status": 200,
+        "ms": 1120.719600000004,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 897.324
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 15,
+        "requestId": "26ae614e-6c10-40e1-b1d5-301e1fa476da",
+        "at": "2026-10-18T04:54:17.563Z",
+        "status": 200,
+        "ms": 1124.660100000001,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 896.31
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 15,
+        "requestId": "862a6aca-2625-42e8-ba65-1b698a2e22e6",
+        "at": "2026-10-18T04:54:18.690Z",
+        "status": 200,
+        "ms": 1123.3867000000027,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 902.385
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 15,
+        "requestId": "5ddd36b5-b8ca-4154-a1a1-c1ab72b5abbc",
+        "at": "2026-10-18T04:54:19.816Z",
+        "status": 200,
+        "ms": 1126.9484000000011,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 900.958
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 16,
+        "requestId": "32c0a25a-acc0-4266-bcec-2f2a18b0d3d0",
+        "at": "2026-10-18T04:54:20.945Z",
+        "status": 200,
+        "ms": 1119.1382999999987,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 893.792
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 16,
+        "requestId": "87ca8d77-3b6f-48e0-81af-a5c51f113000",
+        "at": "2026-10-18T04:54:22.066Z",
+        "status": 200,
+        "ms": 1127.0495999999985,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 899.752
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 16,
+        "requestId": "55a2b12e-da80-43a0-9fd0-c17d029e705e",
+        "at": "2026-10-18T04:54:23.195Z",
+        "status": 200,
+        "ms": 1116.260699999999,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 896.055
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 17,
+        "requestId": "7461dbb4-2ce6-4bda-87dc-c93213803675",
+        "at": "2026-10-18T04:54:24.313Z",
+        "status": 200,
+        "ms": 1122.4618999999948,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 896.031
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 17,
+        "requestId": "c33e595f-0560-4571-aff5-644b90c07936",
+        "at": "2026-10-18T04:54:25.437Z",
+        "status": 200,
+        "ms": 1122.6448000000019,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 897.372
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 17,
+        "requestId": "a36936c1-e450-4228-b867-438b4739134d",
+        "at": "2026-10-18T04:54:26.562Z",
+        "status": 200,
+        "ms": 1121.2160000000003,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 898.112
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 18,
+        "requestId": "1a540ea3-e159-4ea5-bab7-021bf61fe347",
+        "at": "2026-10-18T04:54:27.686Z",
+        "status": 200,
+        "ms": 1129.2955000000075,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 901.824
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 18,
+        "requestId": "e397113d-fa7f-4755-84d6-e21805d35aad",
+        "at": "2026-10-18T04:54:28.819Z",
+        "status": 200,
+        "ms": 1129.6479999999865,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 901.981
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 18,
+        "requestId": "42c1231c-6ff3-4aff-942b-d6568345b266",
+        "at": "2026-10-18T04:54:29.951Z",
+        "status": 200,
+        "ms": 1126.881699999998,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 894.565
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 19,
+        "requestId": "b1ea8906-b86e-48d4-bfaa-77c36009273b",
+        "at": "2026-10-18T04:54:31.081Z",
+        "status": 200,
+        "ms": 1120.930800000002,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 895.58
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 19,
+        "requestId": "42f84e25-2871-4005-84ca-643c135410f8",
+        "at": "2026-10-18T04:54:32.205Z",
+        "status": 200,
+        "ms": 1113.5504999999976,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 894.224
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 19,
+        "requestId": "07d30fa7-d18e-425e-b347-918fa2a98dc2",
+        "at": "2026-10-18T04:54:33.320Z",
+        "status": 200,
+        "ms": 1121.5889000000025,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 894.427
+      },
+      {
+        "label": "one",
+        "path": "/management/invitation-templates?limit=1",
+        "method": "GET",
+        "round": 20,
+        "requestId": "f4213978-7594-4696-a6a5-9121113d8655",
+        "at": "2026-10-18T04:54:34.446Z",
+        "status": 200,
+        "ms": 1113.686600000001,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15",
+        "matched": true,
+        "backendMs": 894.521
+      },
+      {
+        "label": "four",
+        "path": "/management/invitation-templates?limit=4",
+        "method": "GET",
+        "round": 20,
+        "requestId": "b4995143-dafc-44f0-91dd-59c983337062",
+        "at": "2026-10-18T04:54:35.562Z",
+        "status": 200,
+        "ms": 1124.2021999999997,
+        "noStore": true,
+        "items": 4,
+        "responseSha256": "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3",
+        "matched": true,
+        "backendMs": 900.853
+      },
+      {
+        "label": "cursor",
+        "path": "/management/invitation-templates?limit=1&cursor=6a996bc6-f2e5-8cc0-ad4e-7822dd6550d0",
+        "method": "GET",
+        "round": 20,
+        "requestId": "f34acb6b-030a-460e-a955-3584b588610c",
+        "at": "2026-10-18T04:54:36.689Z",
+        "status": 200,
+        "ms": 1112.3193000000028,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808",
+        "matched": true,
+        "backendMs": 895.985
+      },
+      {
+        "label": "logout",
+        "path": "/auth/sessions/current",
+        "method": "DELETE",
+        "round": 0,
+        "requestId": "97b22a0f-e40e-4a7d-a386-1b1c61bf02e6",
+        "at": "2026-10-18T04:54:37.804Z",
+        "status": 204,
+        "ms": 2509.334799999997,
+        "noStore": true,
+        "matched": true,
+        "backendMs": 2281.411
+      },
+      {
+        "label": "revoked",
+        "path": "/auth/me",
+        "method": "GET",
+        "round": 0,
+        "requestId": "373c301e-a2e4-4a3d-9b24-47e31328bcca",
+        "at": "2026-10-18T04:54:40.315Z",
+        "status": 401,
+        "ms": 381.9970999999932,
+        "noStore": true,
+        "matched": true,
+        "backendMs": 151.251
+      }
+    ],
+    "summary": [
+      {
+        "case": "one",
+        "before": {
+          "n": 20,
+          "backendP50Ms": 896.213,
+          "backendP95Ms": 908.412,
+          "clientP50Ms": 1124.660100000001,
+          "clientP95Ms": 1153.442500000001,
+          "responseHashes": [
+            "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15"
+          ]
+        },
+        "after": {
+          "n": 20,
+          "backendP50Ms": 746.326,
+          "backendP95Ms": 749.898,
+          "clientP50Ms": 1002.5257999999994,
+          "clientP95Ms": 1239.130799999999,
+          "responseHashes": [
+            "410831f4f7c2819c8886bb3f590814e397eafa33fa8c2830f3047bdcf34a9c15"
+          ]
+        },
+        "backendP95ReductionPercent": 17.449571339876623,
+        "clientP95ReductionPercent": -7.428918216555913
+      },
+      {
+        "case": "four",
+        "before": {
+          "n": 20,
+          "backendP50Ms": 897.372,
+          "backendP95Ms": 907.372,
+          "clientP50Ms": 1124.3048,
+          "clientP95Ms": 1152.5324,
+          "responseHashes": [
+            "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3"
+          ]
+        },
+        "after": {
+          "n": 20,
+          "backendP50Ms": 747.013,
+          "backendP95Ms": 748.492,
+          "clientP50Ms": 984.5394000000015,
+          "clientP95Ms": 1461.8394999999946,
+          "responseHashes": [
+            "ace78fb8d6924e1f5464fd08a3345b4e767f10fb6fe790d5aad77170972543b3"
+          ]
+        },
+        "backendP95ReductionPercent": 17.509907733542583,
+        "clientP95ReductionPercent": -26.837171779291815
+      },
+      {
+        "case": "cursor",
+        "before": {
+          "n": 20,
+          "backendP50Ms": 896.78,
+          "backendP95Ms": 906.535,
+          "clientP50Ms": 1124.8392999999996,
+          "clientP95Ms": 1157.2878000000055,
+          "responseHashes": [
+            "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808"
+          ]
+        },
+        "after": {
+          "n": 20,
+          "backendP50Ms": 747.424,
+          "backendP95Ms": 750.58,
+          "clientP50Ms": 1001.0434000000023,
+          "clientP95Ms": 1272.2148000000016,
+          "responseHashes": [
+            "249c8c1cd5cda3c572725802728edfc05fd88f07a8a1659441d0035fc8aca808"
+          ]
+        },
+        "backendP95ReductionPercent": 17.20341740804271,
+        "clientP95ReductionPercent": -9.930719048450642
+      }
+    ],
+    "publicReadsAfter": 63,
+    "matchedAfter": 71,
+    "matchedBefore": 66,
+    "sessionRevoked": true,
+    "passed": true
+  },
+  "keyCleanup": {
+    "at": "2026-10-18T04:52:36.151Z",
+    "fingerprint": "SHA256:e8VGwbJJrv+ch0cZY9hvtvSoSKRu/+FzWI5J+xVMWtU",
+    "revoked": true,
+    "revokedTransportDenied": true,
+    "ownedKeysRemoved": true,
+    "otherKeysUntouched": true,
+    "remoteFilesWritten": false
+  },
+  "localCleanup": {
+    "testDatabasesRemaining": 0,
+    "testSchemasRemaining": 0,
+    "clusterStopped": true
+  },
+  "preservation": {
+    "nineteenTableDigestsUnchanged": true,
+    "sixtyOneMigrationChecksumsUnchanged": true,
+    "applicationAndServiceConfigurationUnchanged": true,
+    "oldDeploymentStopped": true,
+    "onlyNewDeploymentActive": true,
+    "originalVerificationReceiptAndAll35ArtifactsUnchanged": true
+  },
+  "limits": [
+    "The owner explicitly selects four existing live templates and 1/4/20-item local tests. No twenty-item live measurement is claimed.",
+    "The original ≥30% target is met in the native same-container original-source comparison (43.9–44.3%); incremental native deployed-to-new gain is 16–16.5%.",
+    "Current public before/after measurements use the newer six-command versus five-command implementations. Their observed percentages are reported separately, with one before/after pair under normal shared-service load, not a capacity/SLO claim.",
+    "The original verification receipt retains its historical rollout-pending status and failure records. This closure supersedes status only.",
+    "No paid generation, live template fixture write, monetary/check-in mutation, migration rewrite or frontend work. Provider acceptance and production NO_GO remain separate."
+  ],
+  "artifacts": [
+    {
+      "path": "output/perf06-20261018/pr.json",
+      "sha256": "13874c5015765648cf7cc7573b7602da397d774c43ecbcba2c048982d74ac02e"
+    },
+    {
+      "path": "output/perf06-20261018/ci.json",
+      "sha256": "b1cbb6b5be12b037b19aaccfb1d6563da0d13021f06bab2a43e4f41730a25a05"
+    },
+    {
+      "path": "output/perf06-20261018/ci-counts.json",
+      "sha256": "5a916e1239074b4adffbdd12ffc1d8d2181c867c66ba0260d9e8101d25abdb0f"
+    },
+    {
+      "path": "output/perf06-20261018/review.json",
+      "sha256": "9dcdf2aa5e3ccd7c738f61367211ee89232a9bbafa8e06c7b3bc2bb09ccc01ee"
+    },
+    {
+      "path": "output/perf06-20261018/review-threads.json",
+      "sha256": "ff0e4a923b0f198a5c34053ca8ec4d18db74946fede502322212918091236e16"
+    },
+    {
+      "path": "output/perf06-20261018/rollout-authorization.json",
+      "sha256": "5d8be78ca91880e689aece75000361d971f75f3d8c0716dbd6eaf707c86607ee"
+    },
+    {
+      "path": "output/perf06-20261018/premerge.json",
+      "sha256": "af997a0013570fdbd8a26e6d3e1eb8d5461b7d502a9231929c68a5262ccb46a0"
+    },
+    {
+      "path": "output/perf06-20261018/merge.json",
+      "sha256": "f2b920601d9becf57afb08aeee4441fc160b4c6c33c21f5242c1df3b4f98e9dc"
+    },
+    {
+      "path": "output/perf06-20261018/serving.json",
+      "sha256": "6c2af7f3523fb14170bb5d7e7aeef4e8b50ef13dbde3e90103b3da9642acd462"
+    },
+    {
+      "path": "output/perf06-20261018/public-before.json",
+      "sha256": "6e49eabab279d21bea1f77e300b5a8f44a3340873ee1b7d8ef78b451fccdd821"
+    },
+    {
+      "path": "output/perf06-20261018/public-after.json",
+      "sha256": "88dcf71c1d1c61d237123f5e61784b75938ed36f483f8408294073837caecaca"
+    },
+    {
+      "path": "output/perf06-20261018/final-postflight.json",
+      "sha256": "cf164fdb1b386b39aa28e4de5293c20f17e4ebeb13c8b1659bf009e537e3ae88"
+    },
+    {
+      "path": "output/perf06-20261018/local-cleanup.json",
+      "sha256": "e16eba1cf68cc553208933fb1ec3feec52327fb75d22b98425c635189946dd1c"
+    },
+    {
+      "path": "output/perf06-20261018/public.mjs",
+      "sha256": "c088d61e38bfde4d6d1e9669681e98acb6c62b2e294a1ef60a18940cb2e39e14"
+    },
+    {
+      "path": "output/perf06-20261018/serving.mjs",
+      "sha256": "692e04441d913f002adce715ca3b66f14dae0a3e7d545e210db75d8cb4bd87d7"
+    },
+    {
+      "path": "output/perf06-20261018/final-postflight.mjs",
+      "sha256": "f5afeca51270ae0a6c4373e79160ce88ba233467350e4f01f90f0bd74fa7c325"
+    },
+    {
+      "path": "output/perf06-20261018/close.mjs",
+      "sha256": "18aae2d666248325e8867a5a9c8a31c8b4fec4c91f4704159f01095e757d45c9"
+    },
+    {
+      "path": "tasks/evidence/perf06-verification-2026-10-18.json",
+      "sha256": "7557c1ac573a6c361b3082d7f7541633d0a8db851327359ebd8d005be77482d1"
+    }
+  ]
+}

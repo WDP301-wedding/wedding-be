@@ -1,0 +1,1701 @@
+{
+  "version": 1,
+  "task": "PERF-05",
+  "date": "2026-10-18",
+  "timezone": "Asia/Saigon",
+  "status": "COMPLETE IN MEASURED SYNTHETIC BACKEND SCOPE",
+  "productionReadiness": "NO_GO unchanged; PERF-13 remains open",
+  "authorization": {
+    "humanInstruction": "hãy thực hiện và hoàn thành PERF-05",
+    "scope": "Verify the already implemented backend optimization and close its original acceptance criteria using preserved evidence plus current native/live checks. Existing initialized synthetic fixture; GETs and session login/logout only. No new deployment/configuration, paid generation, payment, shared-data deletion or frontend changes."
+  },
+  "implementation": {
+    "pr": "https://github.com/WDP301-wedding/wedding-be/pull/46",
+    "merge": "03b9a6be46bc11488b3de5bb56270cb008dd884e",
+    "locallyTestedSource": "9b1ecc56b6fd0e8d97d8d791bf8d75b89c28148c",
+    "sourceContinuity": [
+      {
+        "path": "src/modules/identity-access/authorization/access-credential.reader.ts",
+        "implementationBlob": "516f562af82c4ad1e9e702d75c0e421c15414bbf",
+        "deployedBlob": "516f562af82c4ad1e9e702d75c0e421c15414bbf",
+        "testedBlob": "516f562af82c4ad1e9e702d75c0e421c15414bbf"
+      },
+      {
+        "path": "src/modules/identity-access/authorization/scoped-identity.reader.ts",
+        "implementationBlob": "d775ce83394ef963fa2081395216ac3b904e919f",
+        "deployedBlob": "d775ce83394ef963fa2081395216ac3b904e919f",
+        "testedBlob": "d775ce83394ef963fa2081395216ac3b904e919f"
+      },
+      {
+        "path": "src/modules/identity-access/session/session.repository.ts",
+        "implementationBlob": "9108691612beca01080ca1b4f5e9f8ef528c16c5",
+        "deployedBlob": "9108691612beca01080ca1b4f5e9f8ef528c16c5",
+        "testedBlob": "9108691612beca01080ca1b4f5e9f8ef528c16c5"
+      },
+      {
+        "path": "src/modules/booking-lifecycle/http/experience.router.ts",
+        "implementationBlob": "56d2a7bdfcbd7b319d2c62efb8f0b089b21b3dcf",
+        "deployedBlob": "56d2a7bdfcbd7b319d2c62efb8f0b089b21b3dcf",
+        "testedBlob": "56d2a7bdfcbd7b319d2c62efb8f0b089b21b3dcf"
+      }
+    ],
+    "changesThisTask": "Evidence, acceptance reconciliation and backlog only. Relevant implementation is unchanged."
+  },
+  "acceptance": {
+    "identityDriverCommands": {
+      "legacy": 4,
+      "joined": 1,
+      "freshNativeAssertion": "One query and one acquisition"
+    },
+    "historicalMatchedBackendP95": {
+      "receipt": "perf46-railway-comparison-2026-10-16.json",
+      "samplesPerRoutePerSide": 20,
+      "identity": {
+        "beforeMs": 616,
+        "afterMs": 153,
+        "reductionPercent": 75.2
+      },
+      "populatedOverview": {
+        "beforeMs": 1097,
+        "afterMs": 627,
+        "reductionPercent": 42.8
+      },
+      "targetPercent": 30,
+      "topology": "Same US West application placement, fixture and unchanged database/configuration; diagnostics disabled on both sides",
+      "limitation": "One before/after pair on a shared service at different times, not capacity/SLO or causal isolation of traffic/load variance."
+    },
+    "liveDriverAttribution": {
+      "receipt": "perf03-db-attribution-2026-10-17.json",
+      "identity": 1,
+      "populatedOverview": 5
+    },
+    "dependencies": {
+      "PERF02": "Assigned-Staff/fixture read coverage complete in perf-acceptance-followup-2026-10-17.json",
+      "PERF03": "Complete request/driver attribution in perf03-db-attribution-2026-10-17.json; the formal PERF-05 dependency",
+      "PERF04": "Complete measured region comparison in perf04-region-rerun-2026-10-17.json, with explicit final-image artifact-equivalence exception; keep US West"
+    }
+  },
+  "nativeVerification": {
+    "node": "v24.21.0",
+    "pg": "8.23.0",
+    "prismaAndAdapter": "7.10.1",
+    "database": "Dedicated PostgreSQL 18.6 cluster, loopback 127.0.0.1:55441; newly initialized with explicit perf05_admin trust-auth test role",
+    "command": "& 'output/node-v24.21.0-win-x64/node.exe' node_modules/vitest/vitest.mjs run tests/integration/identity-access-persistence.test.ts tests/integration/identity-access-runtime.test.ts tests/integration/identity-access-session.test.ts tests/integration/identity-read-performance.test.ts src/modules/booking-lifecycle/http/experience.router.test.ts src/modules/identity-access/authorization/access-credential.reader.test.ts src/modules/identity-access/authorization/scoped-identity.reader.test.ts src/modules/identity-access/session/session.repository.test.ts --maxWorkers=1 --pool=forks --reporter=default --reporter=json --outputFile=test-results/perf05-focused-final-2026-10-18.json",
+    "environment": {
+      "TEST_MIGRATION_DATABASE_URL": "postgresql://perf05_admin@127.0.0.1:55441/postgres"
+    },
+    "passedTests": 61,
+    "failedTests": 0,
+    "skippedTests": 0,
+    "passedFiles": 8,
+    "testFiles": [
+      {
+        "path": "tests/integration/identity-access-persistence.test.ts",
+        "status": "passed",
+        "tests": [
+          {
+            "name": "identity access persistence deploys cleanly and enforces identity concurrency and normalization invariants",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "path": "tests/integration/identity-access-runtime.test.ts",
+        "status": "passed",
+        "tests": [
+          {
+            "name": "IA-08 identity runtime composition composes the real login, actor resolver, audit, and session routes",
+            "status": "passed"
+          },
+          {
+            "name": "IA-08 identity runtime composition locks profile and OTP mutations inside the configured schema",
+            "status": "passed"
+          },
+          {
+            "name": "IA-08 identity runtime composition disconnects the database when runtime initialization fails",
+            "status": "passed"
+          },
+          {
+            "name": "IA-08 identity runtime composition composes brevo with the local notification origin fallback",
+            "status": "passed"
+          },
+          {
+            "name": "IA-08 identity runtime composition composes resend with the local notification origin fallback",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "path": "tests/integration/identity-access-session.test.ts",
+        "status": "passed",
+        "tests": [
+          {
+            "name": "identity session persistence persists only hashes and clamps rotation to the absolute session lifetime",
+            "status": "passed"
+          },
+          {
+            "name": "identity session persistence allows one concurrent rotation winner and contains replay by compromising the family",
+            "status": "passed"
+          },
+          {
+            "name": "identity session persistence lists safe summaries and makes owned revocation idempotent without cross-account access",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "path": "tests/integration/identity-read-performance.test.ts",
+        "status": "passed",
+        "tests": [
+          {
+            "name": "Identity driver budget and fresh authority resolves all authority fields in one driver query and observes role removal immediately",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rejects changed credential on the next read without cached authority",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rejects changed session on the next read without cached authority",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rejects changed disabled on the next read without cached authority",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rejects changed accessExpiry on the next read without cached authority",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rejects changed idleExpiry on the next read without cached authority",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rejects changed absoluteExpiry on the next read without cached authority",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rechecks authority after a concurrent Account writer wins the lock",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rechecks authority after a concurrent AccountRole writer wins the lock",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rechecks authority after a concurrent Session writer wins the lock",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority rechecks authority after a concurrent AccessCredential writer wins the lock",
+            "status": "passed"
+          },
+          {
+            "name": "Identity driver budget and fresh authority counts transaction control commands and callback-pool waiting without losing request scope",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "path": "src/modules/booking-lifecycle/http/experience.router.test.ts",
+        "status": "passed",
+        "tests": [
+          {
+            "name": "booking intake and couple overview HTTP contract returns an empty overview without querying bookings when the actor has no grants",
+            "status": "passed"
+          },
+          {
+            "name": "booking intake and couple overview HTTP contract acknowledges a new intake privately and records one system audit",
+            "status": "passed"
+          },
+          {
+            "name": "booking intake and couple overview HTTP contract accepts identical retries without duplicating audit and rejects a changed payload",
+            "status": "passed"
+          },
+          {
+            "name": "booking intake and couple overview HTTP contract does not expose management intake to a couple",
+            "status": "passed"
+          },
+          {
+            "name": "booking intake and couple overview HTTP contract paginates intake and preserves stored preferred dates and consultation revisions",
+            "status": "passed"
+          },
+          {
+            "name": "booking intake and couple overview HTTP contract returns null optional intake details and no cursor at the end of a list",
+            "status": "passed"
+          },
+          {
+            "name": "booking intake and couple overview HTTP contract rejects conversion of an intake that is missing",
+            "status": "passed"
+          },
+          {
+            "name": "booking intake and couple overview HTTP contract rejects conversion of an intake that is expired",
+            "status": "passed"
+          },
+          {
+            "name": "booking intake and couple overview HTTP contract rejects conversion of an intake that is closed",
+            "status": "passed"
+          },
+          {
+            "name": "booking intake and couple overview HTTP contract rejects conversion of an intake that is owned by another manager",
+            "status": "passed"
+          },
+          {
+            "name": "booking intake and couple overview HTTP contract rejects conversion of an intake that is without an owning consultation",
+            "status": "passed"
+          },
+          {
+            "name": "booking intake and couple overview HTTP contract returns the existing consultation on a conversion retry by its owner",
+            "status": "passed"
+          },
+          {
+            "name": "booking intake and couple overview HTTP contract converts new intake and preserves note \"\"",
+            "status": "passed"
+          },
+          {
+            "name": "booking intake and couple overview HTTP contract converts new intake and preserves note \"Tư vấn sảnh\"",
+            "status": "passed"
+          },
+          {
+            "name": "booking intake and couple overview HTTP contract audits closure only when one open intake changed (count 0)",
+            "status": "passed"
+          },
+          {
+            "name": "booking intake and couple overview HTTP contract audits closure only when one open intake changed (count 1)",
+            "status": "passed"
+          },
+          {
+            "name": "booking intake and couple overview HTTP contract scopes WEB overview to actor grants and paginates bookings",
+            "status": "passed"
+          },
+          {
+            "name": "booking intake and couple overview HTTP contract scopes ANDROID overview to actor grants and paginates bookings",
+            "status": "passed"
+          },
+          {
+            "name": "booking intake and couple overview HTTP contract handles absent snapshot and timeline while exposing approval states only when present",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "path": "src/modules/identity-access/authorization/access-credential.reader.test.ts",
+        "status": "passed",
+        "tests": [
+          {
+            "name": "Identity joined credential reader quotes the configured schema and binds credential hashes as parameters",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "path": "src/modules/identity-access/authorization/scoped-identity.reader.test.ts",
+        "status": "passed",
+        "tests": [
+          {
+            "name": "Identity scoped authority follows only the locked immutable references rejects a concurrent reparenting of session between lookup and lock",
+            "status": "passed"
+          },
+          {
+            "name": "Identity scoped authority follows only the locked immutable references rejects a concurrent reparenting of account between lookup and lock",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "path": "src/modules/identity-access/session/session.repository.test.ts",
+        "status": "passed",
+        "tests": [
+          {
+            "name": "Prisma session repository creates one session family with only credential hashes",
+            "status": "passed"
+          },
+          {
+            "name": "Prisma session repository rotates an active refresh and clamps both successors to absolute expiry",
+            "status": "passed"
+          },
+          {
+            "name": "Prisma session repository keeps requested expiries when they are earlier than the absolute limit",
+            "status": "passed"
+          },
+          {
+            "name": "Prisma session repository retries a serializable transaction conflict once",
+            "status": "passed"
+          },
+          {
+            "name": "Prisma session repository does not retry a non-transaction error",
+            "status": "passed"
+          },
+          {
+            "name": "Prisma session repository revokes the active family when a consumed refresh is replayed",
+            "status": "passed"
+          },
+          {
+            "name": "Prisma session repository rejects missing or stale refresh state",
+            "status": "passed"
+          },
+          {
+            "name": "Prisma session repository rejects missing or stale refresh state",
+            "status": "passed"
+          },
+          {
+            "name": "Prisma session repository rejects missing or stale refresh state",
+            "status": "passed"
+          },
+          {
+            "name": "Prisma session repository rejects missing or stale refresh state",
+            "status": "passed"
+          },
+          {
+            "name": "Prisma session repository rejects missing or stale refresh state",
+            "status": "passed"
+          },
+          {
+            "name": "Prisma session repository rejects missing or stale refresh state",
+            "status": "passed"
+          },
+          {
+            "name": "Prisma session repository rejects missing or stale refresh state",
+            "status": "passed"
+          },
+          {
+            "name": "Prisma session repository treats a lost consume race as replay and compromises the session",
+            "status": "passed"
+          },
+          {
+            "name": "Prisma session repository revokes only an owned session and keeps the operation idempotent",
+            "status": "passed"
+          },
+          {
+            "name": "Prisma session repository revokes all active sessions and returns the affected count",
+            "status": "passed"
+          },
+          {
+            "name": "Prisma session repository does no credential work when an account has no active sessions",
+            "status": "passed"
+          },
+          {
+            "name": "Prisma session repository returns safe summaries and current actor state without credential material",
+            "status": "passed"
+          }
+        ]
+      }
+    ],
+    "cleanup": {
+      "databases": [
+        "postgres",
+        "template0",
+        "template1"
+      ],
+      "testSchemasRemaining": 0,
+      "testDatabasesRemaining": 0,
+      "temporaryClusterStopped": true,
+      "olderClusterRestoredToStopped": true
+    },
+    "retainedFailedAttempts": [
+      {
+        "log": "output/perf05-closure-20261018/focused.log",
+        "reason": "Configured loopback 55432 unavailable (ECONNREFUSED), with dependent cleanup failures; 4 files failed, 2 passed; 1 failed test, 21 passed, 20 skipped."
+      },
+      {
+        "log": "output/perf05-closure-20261018/focused-rerun.log",
+        "reason": "Older loopback cluster has no postgres role, with dependent cleanup failures; 4 files failed, 4 passed; 1 failed test, 40 passed, 20 skipped."
+      }
+    ],
+    "thresholdsAndTestsUnchanged": true,
+    "wholeRepositoryCoverageRerun": false
+  },
+  "currentLiveVerification": {
+    "startedAt": "2026-10-18T04:24:12.366Z",
+    "samples": [
+      {
+        "at": "2026-10-18T04:24:27.232Z",
+        "label": "login",
+        "method": "POST",
+        "phase": "session",
+        "round": 0,
+        "requestId": "15ce11ed-813d-47a4-8f86-c3fd1ad5b72e",
+        "status": 201,
+        "clientMs": 3717.0023999999994,
+        "cacheControl": "no-store",
+        "bytes": 404
+      },
+      {
+        "at": "2026-10-18T04:24:30.952Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "initial",
+        "round": 0,
+        "requestId": "dd989fb4-61fc-4f6b-aa00-68333446f962",
+        "status": 200,
+        "clientMs": 386.6251000000011,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:31.340Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "initial",
+        "round": 0,
+        "requestId": "ecba747d-0da2-4535-83f2-d260a0ce4ffa",
+        "status": 200,
+        "clientMs": 2071.6846000000005,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:33.413Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 1,
+        "requestId": "53a19462-e383-4c8d-8e9e-0733110ab0b5",
+        "status": 200,
+        "clientMs": 562.0406000000003,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:33.977Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 1,
+        "requestId": "9a08f93a-b17d-4247-b5b1-5565b472bbcb",
+        "status": 200,
+        "clientMs": 987.0964000000022,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:34.965Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 2,
+        "requestId": "7e4aa859-88cf-4477-a412-02fd440f8854",
+        "status": 200,
+        "clientMs": 388.6755000000012,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:35.355Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 2,
+        "requestId": "58b6e09e-fe78-46a6-afa0-54ad2983f309",
+        "status": 200,
+        "clientMs": 976.923899999998,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:36.333Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 3,
+        "requestId": "dd0cbee4-75ef-4964-8ff6-03604266fe54",
+        "status": 200,
+        "clientMs": 389.59730000000127,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:36.724Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 3,
+        "requestId": "e92ac0c9-17b8-4326-a01b-5f3f2fc3e1d8",
+        "status": 200,
+        "clientMs": 985.6624999999985,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:37.713Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 4,
+        "requestId": "928061ff-34e5-4b4e-a4d7-48e37c7e10c2",
+        "status": 200,
+        "clientMs": 390.72989999999845,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:38.105Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 4,
+        "requestId": "879f66ae-8650-4f3f-90c8-ae938de12ec9",
+        "status": 200,
+        "clientMs": 984.9612000000016,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:39.092Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 5,
+        "requestId": "786c1e0f-718a-46bd-8090-ac1607301f69",
+        "status": 200,
+        "clientMs": 390.47999999999956,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:39.485Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 5,
+        "requestId": "bf403a57-27a5-46b9-b081-81fa97c51e37",
+        "status": 200,
+        "clientMs": 976.768799999998,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:40.463Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 6,
+        "requestId": "d344ba69-2b5b-4369-bf82-946531728c8e",
+        "status": 200,
+        "clientMs": 383.02470000000176,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:40.848Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 6,
+        "requestId": "f89f07a7-6035-4473-b422-863dbfae40be",
+        "status": 200,
+        "clientMs": 982.8529000000017,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:41.832Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 7,
+        "requestId": "79cdb504-9013-4940-ad0b-73888c003362",
+        "status": 200,
+        "clientMs": 385.2108999999982,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:42.218Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 7,
+        "requestId": "42d118c8-0d51-48b9-b7e8-9adff04ac715",
+        "status": 200,
+        "clientMs": 991.8790999999983,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:43.213Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 8,
+        "requestId": "3028870b-83aa-4b18-a0f8-b8b545b59aa4",
+        "status": 200,
+        "clientMs": 382.84119999999893,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:43.597Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 8,
+        "requestId": "2d3521bc-9d51-46b3-b0b5-5c2becf7f304",
+        "status": 200,
+        "clientMs": 984.3248000000021,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:44.582Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 9,
+        "requestId": "453f1ea6-e94d-46ef-aa7a-e5428106caa4",
+        "status": 200,
+        "clientMs": 518.5267999999996,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:45.102Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 9,
+        "requestId": "6e90bc44-ad8e-47e7-b5a2-a0671ca60984",
+        "status": 200,
+        "clientMs": 975.7417999999961,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:46.079Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 10,
+        "requestId": "8bbcc747-0c39-4364-8c2b-a8f87e28c848",
+        "status": 200,
+        "clientMs": 382.26340000000346,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:46.462Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 10,
+        "requestId": "c5e9ae3e-a6a5-4a6d-8da4-7e12d2f89dec",
+        "status": 200,
+        "clientMs": 978.466800000002,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:47.442Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 11,
+        "requestId": "c8284d23-9e40-493c-b24d-443856668a8f",
+        "status": 200,
+        "clientMs": 379.30479999999807,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:47.822Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 11,
+        "requestId": "1950c2ab-02f0-44d4-8a2a-fb7e0a23fdc4",
+        "status": 200,
+        "clientMs": 983.1013000000021,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:48.807Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 12,
+        "requestId": "3448fc31-0fbb-410e-a3e2-b24404249005",
+        "status": 200,
+        "clientMs": 386.0515000000014,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:49.194Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 12,
+        "requestId": "2930210d-c855-4208-9a70-f93881621cf6",
+        "status": 200,
+        "clientMs": 983.5938000000024,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:50.179Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 13,
+        "requestId": "34ca92bb-a930-47ad-8957-6201b9e23751",
+        "status": 200,
+        "clientMs": 483.20410000000265,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:50.664Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 13,
+        "requestId": "14438a00-e443-4f98-a230-ab0f13455649",
+        "status": 200,
+        "clientMs": 974.6755000000048,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:51.640Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 14,
+        "requestId": "af5abb90-5973-470d-8535-def5e344c5e6",
+        "status": 200,
+        "clientMs": 379.73099999999977,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:52.021Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 14,
+        "requestId": "2a6c5bd0-f206-43e2-af06-60cbf12e375d",
+        "status": 200,
+        "clientMs": 972.9012000000002,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:52.996Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 15,
+        "requestId": "26babf7c-6f60-480c-820f-fe8217147019",
+        "status": 200,
+        "clientMs": 391.2974000000031,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:53.389Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 15,
+        "requestId": "2d5bdd64-82b8-4963-bbd5-d18eac9b249f",
+        "status": 200,
+        "clientMs": 979.9209000000046,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:54.370Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 16,
+        "requestId": "6cc9bd4c-f394-4b7f-8f35-0b4caa0accdb",
+        "status": 200,
+        "clientMs": 398.25620000000345,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:54.769Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 16,
+        "requestId": "c807862c-3c77-4dc6-9304-d7529d3a4bc3",
+        "status": 200,
+        "clientMs": 983.7487000000037,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:55.754Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 17,
+        "requestId": "ee1554d3-a5d5-41f3-b859-e8973cddc409",
+        "status": 200,
+        "clientMs": 385.1551000000036,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:56.141Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 17,
+        "requestId": "5d2513c8-82d7-4769-b8bd-db9d4003457f",
+        "status": 200,
+        "clientMs": 972.5892999999996,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:57.115Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 18,
+        "requestId": "09b3e69a-0771-4db4-a341-4126c43ca748",
+        "status": 200,
+        "clientMs": 389.85749999999825,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:57.506Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 18,
+        "requestId": "954ff537-266f-4908-8660-f92b5fb1a6bb",
+        "status": 200,
+        "clientMs": 977.6449999999968,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:58.486Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 19,
+        "requestId": "b16c18d4-83d0-4d38-93a1-6fb12d8ddc48",
+        "status": 200,
+        "clientMs": 385.2862000000023,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:24:58.872Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 19,
+        "requestId": "b56d1e53-3c90-41be-b290-14778826b18b",
+        "status": 200,
+        "clientMs": 985.0139000000054,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:24:59.859Z",
+        "label": "Identity",
+        "method": "GET",
+        "phase": "steady",
+        "round": 20,
+        "requestId": "8407207b-7ffe-4f6c-8549-bb28e3308c37",
+        "status": 200,
+        "clientMs": 403.4461999999985,
+        "cacheControl": "no-store",
+        "bytes": 171
+      },
+      {
+        "at": "2026-10-18T04:25:00.264Z",
+        "label": "Couple overview",
+        "method": "GET",
+        "phase": "steady",
+        "round": 20,
+        "requestId": "57edb7d3-71bc-41f3-876b-d19d74874e99",
+        "status": 200,
+        "clientMs": 1025.2612999999983,
+        "cacheControl": "no-store",
+        "bytes": 666,
+        "itemCount": 2,
+        "fixturePresent": true
+      },
+      {
+        "at": "2026-10-18T04:25:01.290Z",
+        "label": "logout",
+        "method": "DELETE",
+        "phase": "session",
+        "round": 0,
+        "requestId": "af66d4d4-2699-42eb-84ff-f9d0b5acd274",
+        "status": 204,
+        "clientMs": 1450.777399999999,
+        "cacheControl": "no-store",
+        "bytes": 0
+      },
+      {
+        "at": "2026-10-18T04:25:02.743Z",
+        "label": "revoked Identity",
+        "method": "GET",
+        "phase": "session",
+        "round": 0,
+        "requestId": "33658a80-17ce-40fc-9621-828d087a703b",
+        "status": 401,
+        "clientMs": 380.96860000000015,
+        "cacheControl": "no-store",
+        "bytes": 135
+      },
+      {
+        "at": "2026-10-18T04:25:03.127Z",
+        "label": "revoked overview",
+        "method": "GET",
+        "phase": "session",
+        "round": 0,
+        "requestId": "d7c97871-3d61-4839-8eae-f082eeaa66ee",
+        "status": 401,
+        "clientMs": 382.4297000000006,
+        "cacheControl": null,
+        "bytes": 135
+      }
+    ],
+    "scope": "Read-only Identity/Couple overview verification; session login/logout only. No deployment or configuration mutation. Historical matched PR46 comparison remains the improvement evidence.",
+    "before": {
+      "deploymentId": "ba3a5b90-fa14-4ff6-9f30-5f364af57b6e",
+      "source": "d9c41b7f12e89d62721f47242cd7345f17072b3c",
+      "image": "sha256:66c09298ba527f19c7773ad1d29e46a5cec92886cd4a4774e4dedede6fe84e76",
+      "configurationDigest": "5bb1f835c3514bca7e8db5d8c01d34fb92be34b82742eed21ad2dc30a41aceb5",
+      "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+      "controls": {
+        "DB_DIAGNOSTICS_ENABLED": "false",
+        "DB_SAFE_READ_DEADLINE_ENABLED": "false",
+        "DB_POOL_MAX": "1",
+        "DB_POOL_MAX_VENUE_CATALOG": "3",
+        "DB_POOL_MAX_ANALYTICS": "2",
+        "DB_CONNECTION_RESERVE": "36",
+        "DB_MAX_CONNECTIONS": "60"
+      }
+    },
+    "inventoryBefore": {
+      "tables": {
+        "Booking": {
+          "count": 1,
+          "sha256": "4c4c2f575556f03261cd3a5a0a190f19c9a65cada728ba1616cb16215e723208"
+        },
+        "GuestWorkspace": {
+          "count": 1,
+          "sha256": "96388fdfb6c0cb76f5b4ba384f14fc93db844222a1a20bf4533037b88e95b12d"
+        },
+        "GuestPlanRevision": {
+          "count": 1,
+          "sha256": "7cd3122165cb67c4cdcaa430d7c895cb95942ad35a83bfc933d37df99e20804d"
+        },
+        "Guest": {
+          "count": 8,
+          "sha256": "b2b586adc5cbb9b291e0efab771009f86f2cb76fa1f76dc3a4b64f06aef13ee7"
+        },
+        "GuestGroup": {
+          "count": 4,
+          "sha256": "43da72db9deab54cb3d6d7e7e81b61ab59841e88fd87a5ac18be2f8dc3fa5eaa"
+        },
+        "GuestHistory": {
+          "count": 12,
+          "sha256": "aea3a3b7a8adc761e8720777c31b1e76128d60e433378dc399d9cbeeb732fcc5"
+        },
+        "SeatingPlan": {
+          "count": 1,
+          "sha256": "9c1ec53ea1d901487d515a638f848e0523c35e36c905a2b54d8bff196b759270"
+        },
+        "SeatingPlanRevision": {
+          "count": 2,
+          "sha256": "afc6805271c1530347d10b0683fbad7463008dbef27f19cb38796cf9f2167f6b"
+        },
+        "StaffConfiguration": {
+          "count": 1,
+          "sha256": "034f11ef5605b519154fe7612189557cde39fbf0296f6bbc5478a17869e6d5cb"
+        },
+        "StaffAssignment": {
+          "count": 1,
+          "sha256": "7467e6b94d7fe8965caa7c6dd3e5d333464782c8cd7316fba5e871d0dd897bb1"
+        },
+        "StaffHistory": {
+          "count": 3,
+          "sha256": "0b45bd0ff60f61172375fe1f86a7f6a8d0c9be542b84ff789045b2a6072e53ab"
+        },
+        "StaffCheckInRecord": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "CommercialContractRevision": {
+          "count": 1,
+          "sha256": "6e9ab27802ea39a595178575b26ef3cbc244a42a2264539b770704e7a2f38d8b"
+        },
+        "FinalInvoiceRevision": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "BillingLedgerEntry": {
+          "count": 2,
+          "sha256": "c3e10fe0d068362606967596ff14aa980ec43bc85cf8a763c1cc4936c25f9f57"
+        },
+        "Consultation": {
+          "count": 1,
+          "sha256": "d0ad11435d1e0ea5e933814c9a6e153a26861a7dfffdc888dcd6a1ab27359d3e"
+        },
+        "ConsultationAccess": {
+          "count": 1,
+          "sha256": "428338c837e20b9f7aded8b818a8f1b5a9a84526ab42b15af12a335e68605278"
+        }
+      },
+      "migrations": {
+        "count": 61,
+        "sha256": "b7d90da8b39b7db5f6ef24ec1084f4ea2d4e4915664ebfccd00345c18fbf910e",
+        "allChecksumsMatch": true
+      }
+    },
+    "sessionRevoked": true,
+    "inventoryAfter": {
+      "tables": {
+        "Booking": {
+          "count": 1,
+          "sha256": "4c4c2f575556f03261cd3a5a0a190f19c9a65cada728ba1616cb16215e723208"
+        },
+        "GuestWorkspace": {
+          "count": 1,
+          "sha256": "96388fdfb6c0cb76f5b4ba384f14fc93db844222a1a20bf4533037b88e95b12d"
+        },
+        "GuestPlanRevision": {
+          "count": 1,
+          "sha256": "7cd3122165cb67c4cdcaa430d7c895cb95942ad35a83bfc933d37df99e20804d"
+        },
+        "Guest": {
+          "count": 8,
+          "sha256": "b2b586adc5cbb9b291e0efab771009f86f2cb76fa1f76dc3a4b64f06aef13ee7"
+        },
+        "GuestGroup": {
+          "count": 4,
+          "sha256": "43da72db9deab54cb3d6d7e7e81b61ab59841e88fd87a5ac18be2f8dc3fa5eaa"
+        },
+        "GuestHistory": {
+          "count": 12,
+          "sha256": "aea3a3b7a8adc761e8720777c31b1e76128d60e433378dc399d9cbeeb732fcc5"
+        },
+        "SeatingPlan": {
+          "count": 1,
+          "sha256": "9c1ec53ea1d901487d515a638f848e0523c35e36c905a2b54d8bff196b759270"
+        },
+        "SeatingPlanRevision": {
+          "count": 2,
+          "sha256": "afc6805271c1530347d10b0683fbad7463008dbef27f19cb38796cf9f2167f6b"
+        },
+        "StaffConfiguration": {
+          "count": 1,
+          "sha256": "034f11ef5605b519154fe7612189557cde39fbf0296f6bbc5478a17869e6d5cb"
+        },
+        "StaffAssignment": {
+          "count": 1,
+          "sha256": "7467e6b94d7fe8965caa7c6dd3e5d333464782c8cd7316fba5e871d0dd897bb1"
+        },
+        "StaffHistory": {
+          "count": 3,
+          "sha256": "0b45bd0ff60f61172375fe1f86a7f6a8d0c9be542b84ff789045b2a6072e53ab"
+        },
+        "StaffCheckInRecord": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "CommercialContractRevision": {
+          "count": 1,
+          "sha256": "6e9ab27802ea39a595178575b26ef3cbc244a42a2264539b770704e7a2f38d8b"
+        },
+        "FinalInvoiceRevision": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "BillingLedgerEntry": {
+          "count": 2,
+          "sha256": "c3e10fe0d068362606967596ff14aa980ec43bc85cf8a763c1cc4936c25f9f57"
+        },
+        "Consultation": {
+          "count": 1,
+          "sha256": "d0ad11435d1e0ea5e933814c9a6e153a26861a7dfffdc888dcd6a1ab27359d3e"
+        },
+        "ConsultationAccess": {
+          "count": 1,
+          "sha256": "428338c837e20b9f7aded8b818a8f1b5a9a84526ab42b15af12a335e68605278"
+        }
+      },
+      "migrations": {
+        "count": 61,
+        "sha256": "b7d90da8b39b7db5f6ef24ec1084f4ea2d4e4915664ebfccd00345c18fbf910e",
+        "allChecksumsMatch": true
+      }
+    },
+    "after": {
+      "deploymentId": "ba3a5b90-fa14-4ff6-9f30-5f364af57b6e",
+      "source": "d9c41b7f12e89d62721f47242cd7345f17072b3c",
+      "image": "sha256:66c09298ba527f19c7773ad1d29e46a5cec92886cd4a4774e4dedede6fe84e76",
+      "configurationDigest": "5bb1f835c3514bca7e8db5d8c01d34fb92be34b82742eed21ad2dc30a41aceb5",
+      "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+      "controls": {
+        "DB_DIAGNOSTICS_ENABLED": "false",
+        "DB_SAFE_READ_DEADLINE_ENABLED": "false",
+        "DB_POOL_MAX": "1",
+        "DB_POOL_MAX_VENUE_CATALOG": "3",
+        "DB_POOL_MAX_ANALYTICS": "2",
+        "DB_CONNECTION_RESERVE": "36",
+        "DB_MAX_CONNECTIONS": "60"
+      }
+    },
+    "businessUnchanged": true,
+    "migrationsUnchanged": true,
+    "runtimeUnchanged": true,
+    "logCorrelation": [
+      {
+        "requestId": "15ce11ed-813d-47a4-8f86-c3fd1ad5b72e",
+        "label": "login",
+        "phase": "session",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 3207.189,
+        "route": "/api/v1/auth/web-sessions"
+      },
+      {
+        "requestId": "dd989fb4-61fc-4f6b-aa00-68333446f962",
+        "label": "Identity",
+        "phase": "initial",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 152.689,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "ecba747d-0da2-4535-83f2-d260a0ce4ffa",
+        "label": "Couple overview",
+        "phase": "initial",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 1830.365,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "53a19462-e383-4c8d-8e9e-0733110ab0b5",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 150.403,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "9a08f93a-b17d-4247-b5b1-5565b472bbcb",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 743.916,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "7e4aa859-88cf-4477-a412-02fd440f8854",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 155.349,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "58b6e09e-fe78-46a6-afa0-54ad2983f309",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 743.63,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "dd0cbee4-75ef-4964-8ff6-03604266fe54",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 150.777,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "e92ac0c9-17b8-4326-a01b-5f3f2fc3e1d8",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 750.632,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "928061ff-34e5-4b4e-a4d7-48e37c7e10c2",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 150.119,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "879f66ae-8650-4f3f-90c8-ae938de12ec9",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 745.491,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "786c1e0f-718a-46bd-8090-ac1607301f69",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 155.976,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "bf403a57-27a5-46b9-b081-81fa97c51e37",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 744.138,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "d344ba69-2b5b-4369-bf82-946531728c8e",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 150.11,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "f89f07a7-6035-4473-b422-863dbfae40be",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 745.353,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "79cdb504-9013-4940-ad0b-73888c003362",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 151.007,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "42d118c8-0d51-48b9-b7e8-9adff04ac715",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 754.491,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "3028870b-83aa-4b18-a0f8-b8b545b59aa4",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 150.515,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "2d3521bc-9d51-46b3-b0b5-5c2becf7f304",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 749.142,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "453f1ea6-e94d-46ef-aa7a-e5428106caa4",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 150.712,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "6e90bc44-ad8e-47e7-b5a2-a0671ca60984",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 745.172,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "8bbcc747-0c39-4364-8c2b-a8f87e28c848",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 151.629,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "c5e9ae3e-a6a5-4a6d-8da4-7e12d2f89dec",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 744.067,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "c8284d23-9e40-493c-b24d-443856668a8f",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 150.566,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "1950c2ab-02f0-44d4-8a2a-fb7e0a23fdc4",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 747.814,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "3448fc31-0fbb-410e-a3e2-b24404249005",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 150.724,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "2930210d-c855-4208-9a70-f93881621cf6",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 747.416,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "34ca92bb-a930-47ad-8957-6201b9e23751",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 150.163,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "14438a00-e443-4f98-a230-ab0f13455649",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 744.579,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "af5abb90-5973-470d-8535-def5e344c5e6",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 150.226,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "2a6c5bd0-f206-43e2-af06-60cbf12e375d",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 744.325,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "26babf7c-6f60-480c-820f-fe8217147019",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 153.579,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "2d5bdd64-82b8-4963-bbd5-d18eac9b249f",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 744.581,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "6cc9bd4c-f394-4b7f-8f35-0b4caa0accdb",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 150.594,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "c807862c-3c77-4dc6-9304-d7529d3a4bc3",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 755.185,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "ee1554d3-a5d5-41f3-b859-e8973cddc409",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 150.502,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "5d2513c8-82d7-4769-b8bd-db9d4003457f",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 743.832,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "09b3e69a-0771-4db4-a341-4126c43ca748",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 151.647,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "954ff537-266f-4908-8660-f92b5fb1a6bb",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 744.052,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "b16c18d4-83d0-4d38-93a1-6fb12d8ddc48",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 150.416,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "b56d1e53-3c90-41be-b290-14778826b18b",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 748.327,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "8407207b-7ffe-4f6c-8549-bb28e3308c37",
+        "label": "Identity",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 151.217,
+        "route": "/api/v1/auth/me"
+      },
+      {
+        "requestId": "57edb7d3-71bc-41f3-876b-d19d74874e99",
+        "label": "Couple overview",
+        "phase": "steady",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 748.256,
+        "route": "/api/v1/couple/bookings"
+      },
+      {
+        "requestId": "af66d4d4-2699-42eb-84ff-f9d0b5acd274",
+        "label": "logout",
+        "phase": "session",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 1214.157,
+        "route": "/api/v1/auth/sessions/current"
+      },
+      {
+        "requestId": "33658a80-17ce-40fc-9621-828d087a703b",
+        "label": "revoked Identity",
+        "phase": "session",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 152.163,
+        "route": "/auth/me"
+      },
+      {
+        "requestId": "d7c97871-3d61-4839-8eae-f082eeaa66ee",
+        "label": "revoked overview",
+        "phase": "session",
+        "matched": true,
+        "matches": 1,
+        "backendMs": 151.271,
+        "route": "/couple/bookings"
+      }
+    ],
+    "summary": [
+      {
+        "label": "Identity",
+        "n": 20,
+        "statuses": [
+          200
+        ],
+        "clientP50Ms": 388.6755000000012,
+        "clientP95Ms": 518.5267999999996,
+        "backendP50Ms": 150.594,
+        "backendP95Ms": 155.349
+      },
+      {
+        "label": "Couple overview",
+        "n": 20,
+        "statuses": [
+          200
+        ],
+        "clientP50Ms": 982.8529000000017,
+        "clientP95Ms": 991.8790999999983,
+        "backendP50Ms": 745.172,
+        "backendP95Ms": 754.491
+      }
+    ],
+    "passed": true,
+    "finishedAt": "2026-10-18T04:25:19.762Z"
+  },
+  "boundaries": [
+    "Current timings are execution/revocation verification, not a new matched baseline/candidate improvement pair. Later pool/configuration/features prevent recomputing the October 16 improvement percentages from this run.",
+    "Diagnostics and safe-read DB deadline remain off. No current live query-count inference from elapsed time; the actual query counts use PERF-03.",
+    "No new implementation, OpenAPI, migration, provider setting or deployment change. No paid/provider generation, money/check-in mutation, fixture initialization or business-history rewrite.",
+    "Historical failures and receipts remain unchanged; no broader all-role/capacity/provider or production-readiness claim."
+  ],
+  "artifacts": [
+    {
+      "path": "tasks/evidence/perf46-railway-comparison-2026-10-16.json",
+      "sha256": "35cf7f031018bc569dc3020feefadd41f8c1aada1db49c8d888e4a5c60bc0927"
+    },
+    {
+      "path": "tasks/evidence/perf03-db-attribution-2026-10-17.json",
+      "sha256": "9bfd2833b15c7969547604c1448cd331b9dadd060a4ce4ed106daa88bc103cfa"
+    },
+    {
+      "path": "tasks/evidence/perf04-region-rerun-2026-10-17.json",
+      "sha256": "343a7e57f282afcdbf232012a4d90b279a6446e876b348328bb9d90250d4805d"
+    },
+    {
+      "path": "tasks/evidence/perf-acceptance-followup-2026-10-17.json",
+      "sha256": "b71d3c661b71fa2206fa88a5d7172a7e39361854e52cd7cec3de3cd87b2f4fa9"
+    },
+    {
+      "path": "output/perf05-closure-20261018/live.json",
+      "sha256": "7a6bf2f6ddfa0737d2b738f52d4f65277aa7c63a229d15a6bb8decbdd6c3ebcc"
+    },
+    {
+      "path": "output/perf05-closure-20261018/verify-live.mjs",
+      "sha256": "7c2095da75fe5aa02fee73e38094536339ea0d3a3da01d6ed1a6f124ef4879b5"
+    },
+    {
+      "path": "output/perf05-closure-20261018/focused.log",
+      "sha256": "4dcd39b95563019071b6461a0ccd82e43a3a5eac9411da00e275d161fab21730"
+    },
+    {
+      "path": "output/perf05-closure-20261018/focused-rerun.log",
+      "sha256": "3c8b53ff26bbc731b4ac972d44221c6365ce8a48d1fe06c20f4226ecb75c8b23"
+    },
+    {
+      "path": "output/perf05-closure-20261018/focused-final.log",
+      "sha256": "d592a9f028d0bccf8c16b88877ba664ae3db7ff2171723362a72a597a72b79c1"
+    },
+    {
+      "path": "output/perf05-closure-20261018/local-cleanup.json",
+      "sha256": "f12512e89772ce7ca905515ca83514e947efafa4f5e1cece19a4327403403fd3"
+    },
+    {
+      "path": "test-results/perf05-focused-2026-10-18.json",
+      "sha256": "323d9b4b683b968474465bf29b0c2944fdeb40a704e8e4928cb2f15de3cc8865"
+    },
+    {
+      "path": "test-results/perf05-focused-rerun-2026-10-18.json",
+      "sha256": "1ac6e42ec9e1cb422676a7e3c32ec9a10199da7bf32b579c072bd8c7d482e47b"
+    },
+    {
+      "path": "test-results/perf05-focused-final-2026-10-18.json",
+      "sha256": "0ccb18fae6eb6c4f683a04bda9af9067382e5e825f93055cc37eeb2dddfee605"
+    }
+  ]
+}
