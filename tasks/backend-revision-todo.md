@@ -470,7 +470,16 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
     32 table digests/61 migrations/configuration match. Temporary native/local pools
     and SSH key are closed/revoked. Exact-head CI and reviewed owner-authorized
     rollout/after probes remain required; PERF-08 stays open. PERF-13/NO_GO unchanged.
-- [ ] PERF-09: Bound catalog SQL pagination and batch media facts; preserve publication and signed-URL rules. Reopened on 2026-10-18 for the original acceptance criteria.
+- [x] PERF-09: Bound catalog SQL pagination and batch media facts; preserve publication and signed-URL rules. Completed original acceptance after reviewed rollout on 2026-10-18.
+  - 2026-10-18 [original-criteria rollout closure](../docs/backend-performance-09-rollout-2026-10-18.md):
+    Owner-authorized PR #70 and main CI pass 2,119 tests. The sole Railway deployment
+    serves the exact merged/measured source; preceding deployment stops. All four
+    actual 1/20 plain/rich native cohorts pass the original 30% p95 target, one command
+    per page. All 84 after public reads, 95 log correlations and signed-URL controls
+    pass. All47 scoped digests, 61 migration checksums and controls match. Owned
+    fixtures/key were already removed; no replacement is created. This supersedes
+    both the earlier limited-scope exception and subsequent pending release gate.
+    Native/public and capacity limits remain explicit; PERF-13/NO_GO unchanged.
   - 2026-10-18 owner requests full original acceptance: actual 1/20 live items,
     with/without assets, fresh private signed URLs, bounded query work and >=30%
     matched p95 improvement. The prior scope exception remains historical evidence.
