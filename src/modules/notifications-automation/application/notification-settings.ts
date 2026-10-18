@@ -17,6 +17,7 @@ import type { createNotificationBookingReader } from '../../booking-lifecycle/in
 import { digest, notificationConflict, parse } from '../domain/notification-policy.js';
 import { notificationTemplate } from '../domain/notification-template.js';
 import type { NotificationFoundation } from '../infrastructure/notification-foundation.js';
+import { createNotificationInboxReader } from '../infrastructure/notification-inbox.reader.js';
 import {
   preferencesBody,
   installationBody,
@@ -34,12 +35,18 @@ import {
 } from '../http/notification.schemas.js';
 
 export class NotificationSettings {
+  readonly inboxReader: ReturnType<typeof createNotificationInboxReader>;
   constructor(
     readonly foundation: NotificationFoundation,
     readonly resolver: AuthenticatedActorResolver,
     readonly booking: ReturnType<typeof createNotificationBookingReader>,
     readonly requestId: string = randomUUID(),
-  ) {}
+  ) {
+    this.inboxReader = createNotificationInboxReader(
+      foundation.prisma,
+      booking.notificationBookingIdsQuery,
+    );
+  }
   withRequestId(value: string) {
     return new NotificationSettings(this.foundation, this.resolver, this.booking, parse(id, value));
   }
@@ -372,6 +379,12 @@ export class NotificationSettings {
       actor.accountId,
       actor.roles.includes('MANAGER'),
     );
+    return this.capturedInboxScope(actor, bookingIds);
+  }
+  private capturedInboxScope(
+    actor: Awaited<ReturnType<NotificationSettings['actor']>>,
+    bookingIds: string[],
+  ) {
     return {
       actor,
       where: {
@@ -402,51 +415,45 @@ export class NotificationSettings {
       throw new NotFoundError();
   }
   async inbox(token: string, value: unknown) {
-    const scope = await this.inboxScope(token),
-      { where } = scope,
+    const actor = await this.actor(token),
       input = parse(listQuery, value);
-    if (
-      input.cursor &&
-      !(await this.foundation.prisma.notificationInbox.findFirst({
-        where: { id: input.cursor, ...where },
-      }))
-    )
-      throw new NotFoundError();
-    const rows = await this.foundation.prisma.notificationInbox.findMany({
-      where,
-      take: input.limit + 1,
-      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-      ...(input.cursor ? { cursor: { id: input.cursor }, skip: 1 } : {}),
-      include: { intent: true },
-    });
+    const snapshot = await this.inboxReader.page(
+      actor.accountId,
+      actor.roles.includes('MANAGER'),
+      input,
+    );
+    if (!snapshot.cursorVisible) throw new NotFoundError();
+    const scope = this.capturedInboxScope(actor, snapshot.bookingIds),
+      rows = snapshot.rows;
     await this.recheckInboxScope(token, scope);
     return {
       items: rows.slice(0, input.limit).map((row) => {
-        const purpose = parse(statusDto.shape.purpose, row.intent.purpose),
-          template = notificationTemplate(purpose, row.intent.data);
+        const purpose = parse(statusDto.shape.purpose, row.purpose),
+          template = notificationTemplate(purpose, row.intentData);
         return inboxDto.parse({
           id: row.id,
           notificationIntentId: row.intentId,
           purpose,
           title: template.subject,
           message: template.text,
-          createdAt: row.createdAt.toISOString(),
-          readAt: row.readAt?.toISOString() ?? null,
+          createdAt: new Date(row.createdAt).toISOString(),
+          readAt: row.readAt === null ? null : new Date(row.readAt).toISOString(),
           revision: row.revision,
-          resource: { bookingId: row.bookingId, owner: row.intent.owner, data: template.data },
+          resource: { bookingId: row.bookingId, owner: row.intentOwner, data: template.data },
         });
       }),
       nextCursor: rows.length > input.limit ? rows[input.limit - 1]!.id : null,
     };
   }
   async unread(token: string) {
-    const scope = await this.inboxScope(token),
-      { where } = scope;
-    const count = await this.foundation.prisma.notificationInbox.count({
-      where: { ...where, readAt: null },
-    });
+    const actor = await this.actor(token);
+    const snapshot = await this.inboxReader.unread(
+      actor.accountId,
+      actor.roles.includes('MANAGER'),
+    );
+    const scope = this.capturedInboxScope(actor, snapshot.bookingIds);
     await this.recheckInboxScope(token, scope);
-    return { count };
+    return { count: snapshot.count };
   }
   async markRead(token: string, idValue: string, value: unknown, key: string | undefined) {
     const inboxId = parse(id, idValue),

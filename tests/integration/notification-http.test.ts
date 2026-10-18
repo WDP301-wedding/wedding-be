@@ -59,18 +59,16 @@ import { createPrismaSessionRepository } from '../../src/modules/identity-access
     });
     expect((await settings.inbox(f.couple.accessToken, {})).items).toHaveLength(1);
     expect(await settings.unread(f.couple.accessToken)).toEqual({ count: 1 });
-    const read = db.prisma.notificationInbox.findMany.bind(db.prisma.notificationInbox);
-    const pending = vi
-      .spyOn(db.prisma.notificationInbox, 'findMany')
-      .mockImplementationOnce((args) => {
-        const result = read(args);
-        return result.then(async (rows) => {
-          await db.prisma.consultationAccess.deleteMany({
-            where: { consultationId: f.consultationId, accountId: f.couple.actorId },
-          });
-          return rows;
-        }) as typeof result;
+    const read = settings.inboxReader.page.bind(settings.inboxReader);
+    const pending = vi.spyOn(settings.inboxReader, 'page').mockImplementationOnce((...args) => {
+      const result = read(...args);
+      return result.then(async (rows) => {
+        await db.prisma.consultationAccess.deleteMany({
+          where: { consultationId: f.consultationId, accountId: f.couple.actorId },
+        });
+        return rows;
       });
+    });
     try {
       await expect(settings.inbox(f.couple.accessToken, {})).rejects.toMatchObject({ status: 404 });
     } finally {
@@ -107,19 +105,17 @@ import { createPrismaSessionRepository } from '../../src/modules/identity-access
     } finally {
       transaction.mockRestore();
     }
-    const read = db.prisma.notificationInbox.findMany.bind(db.prisma.notificationInbox);
-    const pending = vi
-      .spyOn(db.prisma.notificationInbox, 'findMany')
-      .mockImplementationOnce((args) => {
-        const result = read(args);
-        return result.then(async (rows) => {
-          await db.prisma.session.update({
-            where: { id: f.couple.sessionId },
-            data: { status: 'REVOKED' },
-          });
-          return rows;
-        }) as typeof result;
+    const read = settings.inboxReader.page.bind(settings.inboxReader);
+    const pending = vi.spyOn(settings.inboxReader, 'page').mockImplementationOnce((...args) => {
+      const result = read(...args);
+      return result.then(async (rows) => {
+        await db.prisma.session.update({
+          where: { id: f.couple.sessionId },
+          data: { status: 'REVOKED' },
+        });
+        return rows;
       });
+    });
     try {
       await expect(settings.inbox(f.couple.accessToken, {})).rejects.toMatchObject({ status: 401 });
     } finally {

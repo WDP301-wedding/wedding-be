@@ -74,6 +74,10 @@ const normalize = (value: unknown): unknown =>
       await db.connect();
       url.pathname = '/' + db.databaseName;
       url.searchParams.delete('schema');
+      url.searchParams.set(
+        'options',
+        `${url.searchParams.get('options') ?? ''} -c timezone=UTC`.trim(),
+      );
       const pool = new DiagnosticPool({
         connectionString: url.toString(),
         max: poolMax,

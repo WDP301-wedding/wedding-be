@@ -446,6 +446,21 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
     One requested order regresses 19.568% native; cursor improves 21.940%, below
     30%. Retain both under PERF-13; no blanket latency/SLO or production GO claim.
 - [ ] PERF-08: Reduce notification authority/booking-scope round trips for inbox and unread counts.
+  - 2026-10-18 [captured audience/data verification](../docs/backend-performance-08-verification-2026-10-18.md):
+    Booking supplies its audience SQL predicate; Notifications capture that audience
+    and a bounded page/count in one statement, then recheck current Identity and
+    Booking scope. Empty/populated inbox and unread ceilings tighten to four commands.
+    Initial 20 live pairs retain the earlier missed target (24.670–28.630%). The new
+    20 matched triplets per case pass the original-source target: inbox 49.607–49.843%,
+    unread 42.636–43.138% lower p95; all 240 steady/12 initial responses match.
+    Incremental deployed-to-candidate unread gain is 19.643–19.986%, below 30%.
+    The owner selects existing empty Manager/Couple live inboxes and full populated,
+    cursor, schema and revocation checks local; no live notification/send/read-state write.
+    Seventy-one local tests pass; all 14 final-authority mutations fail as intended.
+    All 84 public baseline reads succeed, 128 recorded operations correlate, and
+    32 table digests/61 migrations/configuration match. Temporary native/local pools
+    and SSH key are closed/revoked. Exact-head CI and reviewed owner-authorized
+    rollout/after probes remain required; PERF-08 stays open. PERF-13/NO_GO unchanged.
 - [x] PERF-09: Bound catalog SQL pagination and batch media facts; preserve publication and signed-URL rules. Closed by explicit owner acceptance of the limited 1–3 Hall scope, not a pass of the original twenty-item/30% live gates.
   - 2026-10-17 owner-selected [read-only 1–3 Hall comparison](../docs/backend-performance-catalog-readonly-2026-10-17.md):
     PR #58 is merged after exact-head/main CI pass 2,002 tests. Eighty matched

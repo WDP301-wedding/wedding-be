@@ -141,6 +141,16 @@ Acceptance: empty/populated inbox and unread count keep current visibility; revo
 session/access cannot return old inbox data; no cross-request permission cache.
 Target ≥30% p95 reduction for both endpoints.
 
+2026-10-18 [PERF-08 verification](../docs/backend-performance-08-verification-2026-10-18.md):
+capture Booking audience and Notification-owned page/count together, retaining both
+Identity checks and final audience revalidation. Query ceilings tighten to four.
+Twenty matched native triplets per case pass the original-source target: inbox
+49.607–49.843%, unread 42.636–43.138%. Incremental unread improvement is about 20%,
+reported separately. The owner selects empty live inboxes plus full populated local
+coverage. All 71 focused tests, 84 public baseline reads and 128 log correlations
+pass; 32 table digests and 61 migrations are unchanged. Keep open pending exact-head
+CI, owner-authorized rollout and after probes; PERF-13 and production NO_GO remain.
+
 ### PERF-09 — Bound catalog pagination and media lookup work
 
 Dependencies: PERF-03. Proposed files: catalog query/media readers, router and tests
