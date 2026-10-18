@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import type { Prisma, PrismaClient } from '../../../generated/prisma/client.js';
+import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
+import { prismaSchema } from '../../../core/database/prisma.js';
 import type {
   PrismaBookingBoundary,
   ContractContext,
@@ -32,6 +33,39 @@ export class StudioRepository {
     readonly prisma: PrismaClient,
     readonly boundary: PrismaBookingBoundary,
   ) {}
+  async templatePage(query: {
+    cursor?: string | undefined;
+    limit: number;
+    includeArchived: boolean;
+  }) {
+    const quote = (value: string) => `"${value.replaceAll('"', '""')}"`;
+    const schema = quote(prismaSchema(this.prisma));
+    // Bound the heads before joining immutable versions. A LEFT JOIN preserves
+    // broken references for the service's existing ownership/missing-version denial.
+    return this.prisma.$queryRaw<
+      {
+        id: string;
+        revision: number;
+        currentVersionId: string;
+        versionId: string | null;
+        versionTemplateId: string | null;
+        content: Prisma.JsonValue;
+      }[]
+    >(Prisma.sql`
+      SELECT h.id, h.revision, h."currentVersionId", v.id AS "versionId",
+        v."templateId" AS "versionTemplateId", v.content
+      FROM (
+        SELECT id, revision, "currentVersionId"
+        FROM ${Prisma.raw(`${schema}."InvitationTemplate"`)}
+        WHERE ${query.includeArchived ? Prisma.sql`TRUE` : Prisma.sql`active = TRUE`}
+          ${query.cursor === undefined ? Prisma.empty : Prisma.sql`AND id > ${query.cursor}::uuid`}
+        ORDER BY id ASC LIMIT ${query.limit + 1}
+      ) h
+      LEFT JOIN ${Prisma.raw(`${schema}."InvitationTemplateVersion"`)} v
+        ON v.id = h."currentVersionId"
+      ORDER BY h.id ASC
+    `);
+  }
   async command<T>(
     bookingValue: string,
     context: MediaRequestContext,
