@@ -1,5 +1,4 @@
-import { NotFoundError, ValidationError } from '../../../core/errors/app-error.js';
-import { safeReadQuery } from '../../../core/database/safe-read.js';
+import { NotFoundError } from '../../../core/errors/app-error.js';
 import type { Prisma, PrismaClient } from '../../../generated/prisma/client.js';
 import type { CatalogMediaService } from './catalog-media.service.js';
 
@@ -110,52 +109,11 @@ const menuAggregateSelect = {
 
 export function createCatalogQueryService(
   prisma: PrismaClient,
-  media: Pick<CatalogMediaService, 'listSigned' | 'listSignedBatch'>,
+  media: Pick<CatalogMediaService, 'listSigned' | 'listSignedBatch' | 'listSignedHallPage'>,
 ): CatalogAdminQueryService {
   const service: CatalogAdminQueryService = {
-    async listPublicHalls(input) {
-      const cursorId = input.cursor;
-      const cursor =
-        cursorId === undefined
-          ? null
-          : await safeReadQuery(prisma, (db) =>
-              db.hall.findFirst({
-                where: { id: cursorId, lifecycle: 'ACTIVE' },
-                select: { id: true, displayOrder: true },
-              }),
-            );
-      if (input.cursor !== undefined && cursor === null)
-        throw new ValidationError([
-          { path: 'cursor', code: 'invalid_value', message: 'The catalog cursor is invalid.' },
-        ]);
-      const rows = await safeReadQuery(prisma, (db) =>
-        db.hall.findMany({
-          where: {
-            lifecycle: 'ACTIVE',
-            ...(cursor === null
-              ? {}
-              : {
-                  OR: [
-                    { displayOrder: { gt: cursor.displayOrder } },
-                    { displayOrder: cursor.displayOrder, id: { gt: cursor.id } },
-                  ],
-                }),
-          },
-          orderBy: [{ displayOrder: 'asc' }, { id: 'asc' }],
-          take: input.limit + 1,
-          select: { id: true, name: true, description: true, maxGuests: true },
-        }),
-      );
-      const items = rows.slice(0, input.limit);
-      const assets = await media.listSignedBatch(
-        'HALL',
-        items.map((r) => r.id),
-      );
-      return page(
-        items.map((row) => ({ ...row, media: assets.get(row.id) ?? [] })),
-        rows,
-        input.limit,
-      );
+    listPublicHalls(input) {
+      return media.listSignedHallPage(input);
     },
     async findAggregateIdForVersion(kind, versionId) {
       const owner = await findVersionOwner(prisma, kind, versionId);

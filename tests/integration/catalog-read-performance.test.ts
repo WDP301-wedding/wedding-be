@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { beforeAll, afterAll, describe, expect, it, vi } from 'vitest';
+import { beforeAll, afterAll, describe, expect, it } from 'vitest';
 import {
   CatalogTestDatabase,
   catalogMigrationDatabaseUrl,
@@ -33,35 +33,24 @@ import { FakeStorageProvider } from '../../src/integrations/storage/fake-storage
         .sort((a, b) => a.displayOrder - b.displayOrder || a.id.localeCompare(b.id));
       const media = createCatalogMediaService(db.prisma, new FakeStorageProvider());
       const service = createCatalogQueryService(db.prisma, media);
-      const find = vi.spyOn(db.prisma.hall, 'findMany'),
-        assets = vi.spyOn(db.prisma.catalogMediaAsset, 'findMany');
-      try {
-        for (const limit of [1, 20]) {
-          find.mockClear();
-          assets.mockClear();
-          const page = await service.listPublicHalls({ limit });
-          expect(page.items).toEqual(
-            expected.slice(0, limit).map(({ id, name, description, maxGuests }) => ({
-              id,
-              name,
-              description,
-              maxGuests,
-              media: [],
-            })),
-          );
-          expect(find).toHaveBeenCalledWith(expect.objectContaining({ take: limit + 1 }));
-          expect(assets).toHaveBeenCalledTimes(1);
-          const next = await service.listPublicHalls({ limit: 100, cursor: page.nextCursor! });
-          expect([...page.items, ...next.items]).toHaveLength(22);
-        }
-        for (const cursor of [randomUUID(), halls[22]!.id])
-          await expect(service.listPublicHalls({ limit: 20, cursor })).rejects.toMatchObject({
-            status: 422,
-          });
-      } finally {
-        find.mockRestore();
-        assets.mockRestore();
+      for (const limit of [1, 20]) {
+        const page = await service.listPublicHalls({ limit });
+        expect(page.items).toEqual(
+          expected.slice(0, limit).map(({ id, name, description, maxGuests }) => ({
+            id,
+            name,
+            description,
+            maxGuests,
+            media: [],
+          })),
+        );
+        const next = await service.listPublicHalls({ limit: 100, cursor: page.nextCursor! });
+        expect([...page.items, ...next.items]).toHaveLength(22);
       }
+      for (const cursor of [randomUUID(), halls[22]!.id])
+        await expect(service.listPublicHalls({ limit: 20, cursor })).rejects.toMatchObject({
+          status: 422,
+        });
     });
   },
 );

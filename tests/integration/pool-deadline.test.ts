@@ -16,6 +16,8 @@ import { withRequestDeadline } from '../../src/core/http/request-deadline.js';
 import { createApp } from '../../src/app.js';
 import { defaultHttpSecurityConfig } from '../../src/core/http/security.js';
 import { createCatalogQueryService } from '../../src/modules/venue-catalog/application/catalog-query.service.js';
+import { createCatalogMediaService } from '../../src/modules/venue-catalog/application/catalog-media.service.js';
+import { FakeStorageProvider } from '../../src/integrations/storage/fake-storage-provider.js';
 import {
   CatalogTestDatabase,
   catalogMigrationDatabaseUrl,
@@ -144,7 +146,9 @@ import {
     });
     it('returns the existing HTTP timeout and skips media after a blocked hall read expires', async () => {
       vi.stubEnv('DB_SAFE_READ_DEADLINE_ENABLED', 'true');
-      const media = { listSigned: vi.fn(), listSignedBatch: vi.fn() };
+      const storage = new FakeStorageProvider();
+      const sign = vi.spyOn(storage, 'createSignedReadUrl');
+      const media = createCatalogMediaService(prisma, storage);
       const catalog = createCatalogQueryService(prisma, media);
       const app = createApp({
         runtimeEnvironment: 'test',
@@ -166,7 +170,7 @@ import {
           expect(response.status).toBe(408);
           expect(response.body as unknown).toMatchObject({ error: { code: 'REQUEST_TIMEOUT' } });
           await delay(100);
-          expect(media.listSignedBatch).not.toHaveBeenCalled();
+          expect(sign).not.toHaveBeenCalled();
         });
       } finally {
         vi.unstubAllEnvs();

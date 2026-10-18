@@ -12,6 +12,10 @@ import {
   validateMediaAlternativeText,
 } from '../domain/catalog-policy.js';
 import type { CatalogMutationContext } from '../infrastructure/catalog-version.repository.js';
+import {
+  readCatalogHallPage,
+  type HallPageInput,
+} from '../infrastructure/catalog-hall-page.reader.js';
 
 const catalogMediaResourceTypes = [
   'RESTAURANT_PROFILE',
@@ -47,6 +51,16 @@ export interface UploadCatalogMediaInput {
 }
 
 export interface CatalogMediaService {
+  listSignedHallPage(input: HallPageInput): Promise<{
+    items: readonly {
+      id: string;
+      name: string;
+      description: string;
+      maxGuests: number;
+      media: readonly CatalogMediaView[];
+    }[];
+    nextCursor: string | null;
+  }>;
   upload(input: UploadCatalogMediaInput): Promise<CatalogMediaView>;
   replace(
     input: UploadCatalogMediaInput & Readonly<{ oldAssetId: string }>,
@@ -106,6 +120,20 @@ export function createCatalogMediaService(
   storage: StorageProvider,
 ): CatalogMediaService {
   const service: CatalogMediaService = {
+    async listSignedHallPage(input) {
+      const snapshot = await readCatalogHallPage(prisma, input);
+      if (!snapshot.cursorValid)
+        throw new ValidationError([
+          { path: 'cursor', code: 'invalid_value', message: 'The catalog cursor is invalid.' },
+        ]);
+      const items = await Promise.all(
+        snapshot.rows.slice(0, input.limit).map(async ({ assets, ...hall }) => ({
+          ...hall,
+          media: Object.freeze(await Promise.all(assets.map((asset) => signAsset(storage, asset)))),
+        })),
+      );
+      return { items, nextCursor: snapshot.rows.length > input.limit ? items.at(-1)!.id : null };
+    },
     async upload(input) {
       const validated = validateUploadInput(input);
       await requireResource(prisma, validated.resourceType, validated.resourceId);

@@ -33,6 +33,7 @@ describe('CatalogQueryService', () => {
       },
     };
     const media = {
+      listSignedHallPage: vi.fn(),
       listSigned: vi.fn(() => Promise.resolve([])),
       listSignedBatch: vi.fn(() => Promise.resolve(new Map())),
     };
@@ -252,6 +253,7 @@ describe('CatalogQueryService', () => {
       },
     };
     const media = {
+      listSignedHallPage: vi.fn(),
       listSigned: vi.fn(),
       listSignedBatch: vi.fn(() => Promise.resolve(new Map([[versionId, [{ url: 'signed' }]]]))),
     };
@@ -334,7 +336,11 @@ describe('CatalogQueryService', () => {
           ),
         },
       } as never,
-      { listSigned: vi.fn(), listSignedBatch: vi.fn(() => Promise.resolve(new Map())) },
+      {
+        listSignedHallPage: vi.fn(),
+        listSigned: vi.fn(),
+        listSignedBatch: vi.fn(() => Promise.resolve(new Map())),
+      },
     );
     await expect(unsafe.listPublicDishes({ limit: 1 })).rejects.toBeInstanceOf(RangeError);
   });
@@ -357,6 +363,7 @@ describe('CatalogQueryService', () => {
       layoutTemplate: { findUnique: vi.fn(() => Promise.resolve(null)) },
     };
     const service = createCatalogQueryService(prisma as never, {
+      listSignedHallPage: vi.fn(),
       listSigned: vi.fn(),
       listSignedBatch: vi.fn(() => Promise.resolve(new Map())),
     });
