@@ -1,244 +1,210 @@
-# PERF-13 verification checkpoint
+# PERF-13 verification closure — 2026-10-18
 
-PERF-13 remains open. Three bounded live campaigns stop at their declared pressure
-guards; the latest completes caps1/2 and stops partway through cap4 under the
-owner-approved sustained-backlog rule. A billing read-lock candidate now passes
-local regression tests and awaits its own CI and authorized rollout/repeat.
-This is partial verification, without a production latency SLO or production GO.
-The existing production **NO_GO** and provider/RV gates remain unchanged.
+PERF-13 is complete for the selected backend verification scope. The deployed
+billing read-lock change, original 19-case baseline and complete six-case cohort
+at reader caps 1/2/4 pass. Native response/command regressions and full CI pass.
+The four earlier stopped campaigns, exercised rollback and isolated Storage control remain preserved. Production **NO_GO** and
+provider/RV gates remain unchanged; this establishes no absolute Railway latency
+SLO, saturation capacity or historical Seating 500 holder.
 
-## Scope and measurement contract
+## Implemented and deployed scope
 
-Backend measurement tooling, regression tests, evidence and a scoped billing
-read-lock candidate are changed.
-Existing frontend work, applied migrations, money history, runtime pool caps,
-provider reserve, deadlines and worker settings are preserved.
+[PR 73](https://github.com/WDP301-wedding/wedding-be/pull/73) is merged as
+`224ac20b798dbe607f3c04c1ca8de1d3db6c7254`; its tree matches reviewed candidate `21eb83d10a510837a70bb016d79093bc4141e0cb`.
+Serving deployment `03cc633c-4486-4473-a 41e-39141739531a` uses image
+`sha256:b2a4f38c806bd06a5d7ae039dbbd726b2a43470079384d562e69b301488cf4b2`. The preceding deployment 50960339 is stopped.
+Configuration and selected fixture identities match before/after. No frontend,
+applied migration, pool cap, deadline flag, worker setting or provider credential
+changes are included. No live business fixture, real payment or paid generation
+is created by this task.
 
-The runner retains the original 19-case baseline and selected 1/2/4-reader modes:
-one separate initial probe, then 20 steady samples per route/role/stage. Starts
-remain spaced by at least 750 ms. Unexpected status, 429, 5xx, transport failure
-or latency above 25 seconds stops subsequent dispatch; in-flight work drains and
-owned sessions are revoked. There is no automatic request retry.
+Billing views now select a database-only facade with SERIALIZABLE isolation,
+the existing opaque scope checks and transaction limits, a shared booking advisory
+lock and PostgreSQL READ ONLY. Enlisted ledger reads retain the shared fence
+without upgrading it. Commands retain the original exclusive fence and whole-unit
+retry policy. Existing authorization, history/total calculation, invoice/payment
+evidence and HTTP schemas are preserved. The implementation follows PostgreSQL's
+[advisory locking](https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS)
+and [read-only transactions](https://www.postgresql.org/docs/current/sql-set-transaction.html).
 
-New optional `expectedItemCount` values fence initialized list cardinality. A
-mismatch stops the campaign even when HTTP returns 200. Role/route labels must be
-unique, and cardinality expectations must be nonnegative integers.
+The repeatable CLI adds list-cardinality fencing, unique role/labels, authorization
+expiry and operator-stop checks before transport, complete status/sample accounting,
+successful-read p50/p95/min/max, null empty distributions and actual HTTP overlap
+through body consumption. Failures remain in raw evidence. A pass requires every
+cohort and owned-session cleanup. Native failure waves drain before cleanup.
 
-Evidence now records the selected case expectations, actual peak active HTTP
-reads per reader cap, steady status **counts**, successful sample counts and
-nearest-rank p50/p95/min/max. Failed samples remain in the raw evidence and status
-distribution; their timings are not mixed into successful-read percentiles. Empty
-successful distributions explicitly contain null timings. `passed` requires all
-20 successful steady samples in every selected case/stage and successful cleanup.
-The peak counts HTTP reads through response-body consumption, not SQL concurrency.
+## Live acceptance
 
-For an authorized repeat, put credentials and selected fixtures in an ignored
-private JSON file. Required fields are HTTPS `origin`, `synthetic: true`,
-`initialized: true`, pinned `deploymentId`, full40-character `commit`, credentials
-for each selected authenticated role, and `baselineCases`/`boundedCases` arrays.
-Each case has `role`, `path`, optional stable `label`, optional `expectedStatus`
-(default200) and optional `expectedItemCount`. Include verified `topology` and
-`fixture` metadata. `authorization.expiresAt` must be a valid UTC timestamp when
-present; expired authorization blocks dispatch while allowing session cleanup.
+The owner explicitly authorizes merge/deploy/demo repeat and the sustained-backlog
+guard. A fresh 45-minute window retains the same initialized accounts/fixtures and
+configuration. One read-only operator connection samples global client backends,
+lock waits and blocking edges every 10s. Dispatch stops above 57 clients, waiter age
+above 2000 ms, waiter/blocked backends in two consecutive samples, missing waiter age
+or observer failure. Actual wait duration uses pg_locks.waitstart, separate from
+query/transaction age. HTTP unexpected status, 429/5xx, transport failure or latency
+above 25000 ms also stops dispatch. Starts stay >=750 ms apart; no automatic retries.
+In-flight work drains and owned sessions revoke, including after expiry/stop.
 
-After reconfirming the target and the applicable pressure policy, run each mode
-with a new output path. Existing evidence is never overwritten:
+Post-rollout smoke verifies health/live and ready 200, 201 owned Couple login,
+billing GET 200 with integer totals, then 204 revocation. This confirms that this
+billing path executes through the selected pooler on the new code; health alone
+is not the acceptance result.
 
-```powershell
-$env:PERF_FIXTURE_CONFIG = '.local-demo/selected-perf-fixture.private.json'
-$env:PERF_MODE = 'baseline' # then bounded, with a different output file
-$env:PERF_OUTPUT = 'output/selected-perf-run/baseline.json'
-$env:PERF_STOP_FILE = 'output/selected-perf-run/pressure-stop'
-node scripts/performance-regression.mjs
-```
-
-Create the output parent directory first. A separately admitted read-only observer
-creates `PERF_STOP_FILE` on the declared pressure limit. The operator must inspect
-the runner's exit code, `passed`, complete cohorts, pressure/cleanup receipts,
-deployment correlation and before/after data hashes together. A passing HTTP
-runner alone does not establish those independent acceptance checks.
-
-## Verification and evidence
-
-The contract regression executes the real CLI in child processes with synthetic
-HTTPS transport and a controlled clock. No live credentials or network calls are
-used. It checks normal completion, 1/2/4-reader limits, HTTP 429/500 fail-stop,
-transport failure, cardinality mismatch, secret redaction and one successful
-revocation per created session, including renewal. All nine final cases pass;
-authorization expiry and operator-stop behavior are included. Operator stop has
-its own error code and timestamp, distinct from a transport failure. A negative
-control that inverts the cardinality condition fails five tests and is removed.
-
-Local/native results and exact artifact hashes are recorded in the
+The independent campaign completes **399/399 baseline reads** (19 initial,
+380 steady) and **378/378 bounded reads** (18 initial, 360 steady), all HTTP 200.
+Actual HTTP overlap peaks are 1/2/4 for caps 1/2/4. The cap 4 stage reaches four overlapping HTTP reads; this remains a bounded workload, not a saturation test.
+All 818/818 read/session/smoke/correctness operation IDs correlate with the exact
+deployment. Client and backend distributions, initial probes, cardinalities,
+statuses, Analytics generations and every sample remain in the
 [sanitized receipt](../tasks/evidence/perf13-verification-2026-10-18.json).
-The native harness uses a loopback disposable PostgreSQL database, immutable
-pre-change owner modules and identical fixtures. It retains response equivalence,
-actual submitted-command counts and every measured sample. Its 40 ms per-command
-model is separate from Railway/client/backend timing. Across 1/2/4 readers,
-**1,120 baseline/current samples** pass normalized-response equality. Each of the
-ten single-reader cases repeats 20 times and preserves its exact command ceiling:
-templates3, print5, inbox4, unread4, halls1, warm Analytics6 and refresh Analytics58.
-The empty/populated and plain/media cases stay separate in the receipt. The first
-two-reader attempt failed acquisition and remains preserved; only the separate
-diagnostic attempts establish successful native two/four-reader measurements.
 
-All nine existing single-reader latency investigation bands also remain within
-their declared limits. Each row uses20 current samples, pool maximum3 and the
-40ms-per-driver-command native model; none is a live Railway latency budget.
-Analytics refresh has no established latency band and is reported separately.
+The observer records 108 samples, peak 17 client backends,
+0 waiter samples and maximum sampled wait 0.00 ms.
+No accepted threshold is crossed; the observer closes. This is sampled pressure
+evidence, not proof that no unrelated traffic or shorter unsampled waits occurred.
+All 47 scoped table digests, 19 fixture-table digests and 61 applied migration
+checksums match. Runtime/configuration remain pinned throughout. Every runner
+session revokes 204. Independent Couple, Manager and Staff checks each verify
+201 login, 200 identity read, 204 revocation and 401 for the same revoked token.
+Staff event-window acceptance and whole-event attendance are not inferred.
 
-| Native case              | Driver commands | Current p95 ms | Existing investigation band ms |
-| ------------------------ | --------------: | -------------: | -----------------------------: |
-| Templates20              |               3 |         185.84 |                            240 |
-| Requested print orders20 |               5 |         294.38 |                            300 |
-| Empty inbox              |               4 |         182.50 |                            300 |
-| Empty unread             |               4 |         180.09 |                            245 |
-| Halls, no media          |               1 |          64.02 |                            185 |
-| Warm Analytics           |               6 |         319.55 |                            355 |
-| Halls with media         |               1 |          91.17 |                            185 |
-| Populated inbox          |               4 |         215.67 |                            300 |
-| Populated unread         |               4 |         160.46 |                            245 |
-| Analytics refresh        |              58 |        2148.23 |                Not established |
+Each row below contains 20 successful steady samples; initial distributions and
+min/max are separate in the receipt.
 
-An initial full coverage attempt overlapped static checks on the constrained
-local host. It observed an earlier version of the new bounded-runner test timing
-out, then was explicitly stopped along with the owned lint process. That run is
-not a completed full-suite or coverage pass. Early Windows preload-path, simulated
-clock and renewal-expectation mistakes are retained in the operator logs; the
-final runner test uses microtask scheduling rather than a real-time sleep.
-No existing timeout, coverage threshold, test or correctness assertion was relaxed.
-The second full local coverage attempt recorded two native-media 10-second and
-one commercial 60-second timeout before it was stopped. A fresh task-owned
-loopback PostgreSQL cluster is used to diagnose those cases under their original
-assertions/timeouts. All64 tests in the three selected modules pass in that
-cluster, including the three earlier timeout cases. That attempt does not establish
-local full-suite/coverage acceptance. Typecheck,
-tracked-source lint, OpenAPI check, build and `npm run audit:ci` pass; the first
-direct audit invocation omitted npm's required `npm_execpath` and is preserved.
+| Case              | Reader cap | Steady n | Client p50 ms | Client p95 ms | Backend p95 ms |
+| ----------------- | ---------: | -------: | ------------: | ------------: | -------------: |
+| Public halls      |          1 |       20 |        960.47 |       1102.01 |         760.92 |
+| Couple inbox      |          1 |       20 |        870.04 |       1156.80 |         611.96 |
+| Manager templates |          1 |       20 |       1022.71 |       1553.32 |         764.78 |
+| Guest groups      |          1 |       20 |       2946.39 |       2976.20 |        2694.52 |
+| Seating           |          1 |       20 |       4748.25 |       4860.87 |        4493.67 |
+| Billing           |          1 |       20 |       2494.21 |       2525.29 |        2253.97 |
+| Public halls      |          2 |       20 |        937.63 |       1062.04 |         703.79 |
+| Couple inbox      |          2 |       20 |        847.44 |       1253.72 |         988.51 |
+| Manager templates |          2 |       20 |       1005.28 |       1229.81 |         753.98 |
+| Guest groups      |          2 |       20 |       2919.93 |       2963.70 |        2689.78 |
+| Billing           |          2 |       20 |       2470.64 |       2513.73 |        2237.67 |
+| Seating           |          2 |       20 |       4738.11 |       5135.19 |        4488.26 |
+| Public halls      |          4 |       20 |        977.33 |       1628.15 |        1103.74 |
+| Couple inbox      |          4 |       20 |        863.80 |       1866.46 |         940.64 |
+| Manager templates |          4 |       20 |       1094.60 |       1287.25 |         754.39 |
+| Guest groups      |          4 |       20 |       2940.75 |       3233.80 |        2686.29 |
+| Billing           |          4 |       20 |       2615.83 |       3022.79 |        2241.49 |
+| Seating           |          4 |       20 |       4815.58 |       6193.47 |        4504.76 |
 
-The task-owned cluster's full coverage attempt later records a runtime-foundation
-30-second timeout and is stopped. Its independent follow-up passes all five test
-assertions but fails the original10-second cleanup hook; it remains a failed
-suite. The cluster is stopped and its owned temporary databases are dropped.
+Only complete before/after billing caps 1/2 are compared below. The old cap 4 cohort
+is partial and is not promoted to a 20-sample comparison. Timestamp, scheduler and
+shared-service variability remain; these observations establish no general ingress
+gain or stable live latency budget.
 
-[Draft PR73](https://github.com/WDP301-wedding/wedding-be/pull/73) isolates this work
-from pre-existing workspace changes. First-head CI passes all599 integration tests
-and2127/2128 full-suite cases. The remaining failure is a privacy-test fixture
-collision: CVV123 matches legitimate duration22.123. The fixture now uses a distinct
-CVV canary, preserving every leakage assertion. Both logging tests pass locally;
-deliberately injecting the canary into captured logs fails the privacy assertion.
-The original failed run is retained. The preceding runner-only code checkpoint
-`ec66037708aa603a03bb70417a1789602c67cd99` passes
-[exact-head CI](https://github.com/WDP301-wedding/wedding-be/actions/runs/39122692815),
-including all599 integration tests, all2128 full-suite/coverage tests and the
-unchanged per-file80% lines/branches threshold, static/unit/contract/OpenAPI/build
-and dependency-audit gates, including1461 unit and68 contract tests. The subsequent
-documentation checkpoint5999825c also passes all gates. Every failed local/first-CI
-attempt is preserved. These passes predate the billing runtime candidate, whose
-CI is required independently. PR73 remains a draft; no merge or deployment was
-performed by this task.
+| Billing cap | Before client p95 ms | After client p95 ms | Steady n each |
+| ----------: | -------------------: | ------------------: | ------------: |
+|           1 |              2566.36 |             2525.29 |            20 |
+|           2 |              3619.08 |             2513.73 |            20 |
 
-## Preserved live campaigns
+## Native regression budgets and correctness
 
-The original 19-case baseline completes **399/399 HTTP200** (19 initial and 380
-steady). The first bounded run completes the one-reader stage and part of the
-two-reader stage before its observer sees one blocked backend. All **555 actually
-submitted baseline/bounded reads return200**; a further dispatch is suppressed
-before transport. All575 GET/session operation IDs match exact-deployment logs.
-All47 scoped table digests, the separate19 single-booking digests,61 migration
-checksums, serving identity and configuration match before/after.
+Across the independent 1/2/4-reader native runs, 1120 baseline/current samples retain
+normalized response equality. The ten single-reader cases repeat 20 current samples
+each and preserve driver-command ceilings: templates 3, print 5, inbox 4, unread 4,
+halls 1, warm Analytics 6 and refresh 58. Empty/populated and plain/media variants
+remain separate. The model uses 40 ms per driver submission and pool maximum 3;
+it is not a Railway RTT model or SLO. All nine existing investigation bands pass;
+Analytics refresh has no established band. No ceiling or latency band is relaxed.
 
-The separate diagnostic run submits **177 reads, all200**, then suppresses the next
-dispatch at the same guard. All185 operation IDs match exact-deployment logs;
-the same retained-data/configuration checks pass. At the stop sample, one advisory
-waiter has query age517.252ms; its blocker is idle in a transaction aged3659.086ms.
-Sanitized SQL fingerprints and both backend IDs are retained. This establishes the
-observed wait edge, not the exact owner/request or the historical Seating500 cause.
-Thirty later metadata-only samples find no blocking edge.
+| Native case               | Current p95 ms | Existing investigation band ms |
+| ------------------------- | -------------: | -----------------------------: |
+| templates-20              |         185.84 |                            240 |
+| print-orders-20           |         294.38 |                            300 |
+| inbox-empty               |         182.50 |                            300 |
+| unread-empty              |         180.09 |                            245 |
+| catalog-halls-no-assets   |          64.02 |                            185 |
+| analytics-warm            |         319.55 |                            355 |
+| analytics-refresh         |        2148.23 |                Not established |
+| catalog-halls-with-assets |          91.17 |                            185 |
+| inbox-populated           |         215.67 |                            300 |
+| unread-populated          |         160.46 |                            245 |
 
-A separate240-sample passive observation, with no agent-generated business HTTP
-requests, finds zero sampled waiters and peak10 client backends. The observer
-closes. This is a sampled baseline, not proof of no unrelated traffic or proof
-that advisory serialization during the stopped workloads is a capacity failure.
+The billing regression first observes the original view waiting on a held shared
+reader. The candidate completes before that reader releases its fence. Native
+positive controls prove writers remain fenced, PostgreSQL rejects a write in the
+read facade, and normal exclusive commands still commit. All 17 focused local
+cases pass. Nine CLI contract cases cover caps, expiry/operator stop, 429/500,
+transport/cardinality failures, redaction and renewed-session cleanup. A reversed
+cardinality condition and a deliberately injected CVV leak fail their assertions.
 
-The original guard stops on any sampled lock waiter, regardless of duration.
-The owner explicitly accepts a sustained-backlog rule: stop on waiter age above
-2000ms or waiter/blocked backends in two consecutive10-second samples, above57
-client backends, missing waiter age, observer failure or the unchanged HTTP
-failure/25000ms limits. Wait age uses `pg_locks.waitstart`, separate from query age.
-Neither earlier run is resumed or combined into a successful full cohort.
+Both [candidate CI](https://github.com/WDP301-wedding/wedding-be/actions/runs/39125935743) and [merged-source CI](https://github.com/WDP301-wedding/wedding-be/actions/runs/39135268243) pass:
+1461 unit, 68 contract, 602 integration and 2131 full-suite/coverage tests, unchanged
+per-file 80% lines/branches, formatting/lint/typecheck/OpenAPI/build/audit. This
+includes the existing monetary, idempotency, revocation, reader/writer and immutable
+history suites. OpenAPI and migrations are unchanged.
 
-The fresh third campaign repeats399/399 baseline reads successfully, then submits
-306 bounded reads, all200. Caps1/2 complete126 samples each; cap4 remains partial.
-The next dispatch is suppressed before transport. Actual HTTP peaks are1/2/3 for
-caps1/2/4; four simultaneous reads are not established. Its99 pressure samples
-include advisory waits724.712ms and2105.337ms in consecutive samples. Both accepted
-backlog conditions trigger at the latter sample; the campaign correctly fails.
-All729 operation IDs correlate, scoped47-table/19-fixture digests and61 migration
-checksums match, and runtime/configuration stay unchanged. All owned sessions
-revoke204 and the observer closes. No correctness business HTTP is added after
-any safety stop. Across all three campaigns,1437 actually submitted reads return200;
-suppressed dispatches are retained separately and never counted as HTTP failures.
+## Preserved attempts and limits
 
-Metadata-only statement classification matches the waiter's exclusive advisory
-lock fingerprint and a blocker query against `LayoutTemplateVersion`. Both samples
-overlap the selected seating/billing GETs. This supports a read-contention hypothesis,
-without assigning a precise request to a backend PID or identifying the historical
-Seating500 holder. A disposable local regression independently demonstrates that
-the current billing view waits on a retained shared booking reader.
+- First campaign:399 baseline and 156 bounded reads return 200; a further dispatch
+  is suppressed by the any-waiter guard. All 575 operation IDs correlate.
+- Independent diagnostic:177 reads return 200; the same guard stops the next
+  dispatch. All 185 operation IDs correlate. A517 ms advisory wait is observed.
+- Owner-approved sustained-backlog repeat:399 baseline and 306 bounded reads
+  return 200; caps 1/2 complete and cap 4 stops at 2105.337 ms and two consecutive waiter
+  samples. One further dispatch is suppressed; all 729 operation IDs correlate.
+  Actual peak at cap 4 is3. All three pre-rollout attempts retain unchanged scoped data,
+  migration/configuration checks and successful session/observer cleanup.
 
-## Billing runtime candidate
+The first deployment of the candidate completes its health/billing smoke, then
+stops the baseline after 61 reads:60 return 200 and a Halls read returns504
+PROVIDER_TIMEOUT after 10426.84 ms. All 72 operation IDs correlate. Every owned
+session revokes 204, the observer closes, and 47/19-table digests, 61 migrations and
+configuration match. The exact old source/image is restored at deploymentb7c91437
+and independently verified healthy with unchanged data/configuration.
 
-The candidate adds a database-only read facade to the existing billing unit of
-work. It keeps SERIALIZABLE isolation, the same transaction limits and opaque scope
-validation, uses a shared booking advisory lock, and sets `TRANSACTION READ ONLY`.
-Only billing views select it. Enlisted ledger reads keep that existing shared fence
-without upgrading it. Commands keep the original exclusive boundary and whole-unit
-retry policy; no payment, invoice, ledger, authorization or HTTP schema is rewritten.
+Four Storage signing operations in the selected upstream log window return 200 in
+5–29 ms; no matching Storage log explains the failing request. The catalog/Storage
+source blobs are identical across the old and candidate commits. The exact
+transport failure remains unproved; it is not attributed to the billing change
+or declared a provider-wide outage. An independent restored-image Halls control
+then completes21/21 reads at one reader, with the same spacing/pressure limits.
+This is not a 19-case baseline and is not combined into the accepted cohort.
+The same exact reviewed candidate image is redeployed to 03cc633c for the fresh
+accepted cohort above. No timeout, guard or configuration is relaxed; the failed
+cohort and rollback remain part of acceptance history and the provider/RV limits.
 
-The local regression first observes the original reader waiting. After the fix,
-the billing view completes while another shared reader remains held. Native checks
-also prove competing writers cannot acquire the fence, PostgreSQL refuses a write
-inside the read facade, and the original writer commits normally with an exclusive
-fence. All17 cases across billing read-lock, existing billing views/operations and
-booking-read-boundary modules pass. An intermediate test fixture omitted required
-audit metadata; that failed attempt is retained and the fixture is corrected.
+Statement classification matches an exclusive-advisory waiter and a blocker
+query against LayoutTemplateVersion while selected seating/billing GETs overlap.
+The controlled local test proves the read-lock conflict. It does not assign an
+exact request to each sampled PID or establish the historical Seating 500 holder.
+Later successful reads do not erase earlier acquisition errors or public/client
+tails. Small-page and cursor PERF-07 limitations and earlier provider/RV evidence
+remain separate. Analytics generation changes are retained without attributing
+refresh exclusively to a request or scheduler.
 
-The implementation follows PostgreSQL's [advisory-lock semantics](https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS)
-and [read-only transaction rules](https://www.postgresql.org/docs/current/sql-set-transaction.html).
-Native safety and CI do not prove the selected live pooler or the full capped
-cohort on the new code. Exact candidate CI, separate owner authorization for rollout,
-same-token revocation, before/after digests and a fresh complete live cohort remain
-required. Preserve all three failed campaigns; do not loosen their guard.
+The first native two-reader acquisition failure, constrained-host full-suite
+timeouts, failed local cleanup hook and interrupted typecheck remain recorded.
+The first CI privacy failure is a CVV 123/duration 22.123 fixture collision; a distinct
+canary preserves all redaction assertions and the injected-leak control fails.
+An intermediate new-test fixture omitted required audit metadata; that failure is
+retained. Explicit generic parameters fix the facade's initial inference lint
+errors. No existing timeout, coverage bar, correctness assertion or security
+requirement is lowered. Task-owned local PostgreSQL is stopped and its disposable
+test databases are removed; unrelated workspace work is preserved.
 
-## Remaining live acceptance and rollback
+## Repeat and rollback
 
-The read-only runtime inspection pins deployment
-`50960339-9348-4e77-947e-f71232c606ba`, source
-`41a7824d271fbcd9e382f506adf6855b525f8cac` and image
-`sha256:2236f991eebb147e6a31d3000f0cc422fdc987b0b335e22e777365ebc5a72285`.
-It is an inspection checkpoint, not proof those identifiers are still serving at
-the start of a future campaign.
+Use an ignored private fixture JSON and a new output path for every campaign.
+Required metadata pins an initialized synthetic fixture, full source/deployment,
+topology, credentials, 19 baseline cases and six bounded cases. The optional
+authorization.expiresAt fences dispatch; the admitted pressure observer creates
+PERF_STOP_FILE on the declared limit. Execute scripts/performance-regression.mjs
+with PERF_FIXTURE_CONFIG, PERF_MODE=baseline|bounded and distinct PERF_OUTPUT.
+Inspect exit status, passed, complete samples, actual overlap, cleanup, deployment
+correlation and before/after hashes together. Never combine stopped cohorts into
+a successful run. Client/backend and initial/steady distributions stay separate.
 
-Reconfirm that identity before measurement. With explicitly authorized existing
-synthetic accounts/fixtures, rerun the exact baseline and bounded stages, capture
-fixture cardinalities and selected immutable-history/migration hashes before and
-after, correlate every operation with the exact deployment logs, and retain all
-initial/steady client and backend distributions. Keep Analytics warm/refresh
-generations separate, and distinguish Staff identity reads from event-window
-search/check-in acceptance. Earlier Seating acquisition failures and public/client
-tails remain evidence; later successful reads do not identify their exact cause.
-
-The owner explicitly authorized live and local verification. The campaign reuses
-the existing synthetic fixtures and records its 45-minute authorization boundary,
-one admitted read-only pressure observer and selected deployment/configuration.
-No fixture, provider effect or deployment is created by this task. Original service
-configuration is unchanged; no runtime rollback is needed. On probe failure, stop
-dispatch, drain/revoke and retain evidence.
-Any proposed runtime fix/rollout needs its own reviewed change and acceptance.
-
-Keep existing deterministic command ceilings. Historical modeled latency bands
-remain investigation-only until stable repeated measurements support an update.
-Shared-service observations cannot establish an absolute p95 SLO or saturation
-capacity. Preserve the separate [PERF-11 allocation](backend-performance-11-closure-2026-10-17.md)
-and [runtime/provider audit](../tasks/evidence/spec01-05-runtime-audit-2026-10-10.md).
+The earlier rollback was exercised; no further rollback is required after the final accepted cohort. If a
+future candidate regresses, stop/drain/revoke, retain evidence and restore the
+previous reviewed image/source without database restore or configuration changes.
+This task's rollback pin is deployment 50960339, source 41a7824d, image
+sha256:2236f991eebb147e6a31d3000f0cc422fdc987b0b335e22e777365ebc5a72285.
+Any new process/provider workload still needs the [PERF-11 allocation](backend-performance-11-closure-2026-10-17.md).
+Keep the [runtime/provider audit](../tasks/evidence/spec01-05-runtime-audit-2026-10-10.md),
+production NO_GO and external-integration acceptance separate from PERF-13 closure.
