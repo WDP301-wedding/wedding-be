@@ -430,7 +430,21 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
   and PERF-04 region comparison remain open, so the dependency checkboxes above
   are not closed solely by the PERF-05 latency result.
 - [ ] PERF-06: Batch invitation-template versions; preserve version ownership, cursor and authority rechecks.
-- [ ] PERF-07: Batch print-order lines/commercial revisions/proposals without changing immutable monetary facts.
+- [x] PERF-07: Batch print-order lines/commercial revisions/proposals without changing immutable monetary facts.
+  - 2026-10-18 [read acceptance](../docs/backend-performance-07-closure-2026-10-18.md),
+    [sealed receipt](evidence/perf07-closure-2026-10-18.json): the existing deployed
+    implementation meets the selected three-order live-page target: native p95
+    1,348.201 -> 908.967 ms (32.579%), HTTP driver work 9 -> 6. All 126 native
+    responses match; 63 public reads succeed and all 81 public/session operations
+    correlate. No runtime/schema/configuration changes or live fixture writes.
+    Local 1/3/20 requested and approved-with-proposal pages retain bounded work,
+    snapshots, cursor ties, immutable totals and fresh authority. Twenty requested
+    orders improve 77.710% in the separate 40-ms driver-delay model, 23 -> 5 commands.
+    The 27-test focused suite and three contract-print API cases pass; authority
+    mutation kills all four revocation cases. All 21 selected table digests and
+    61 migration checksums match; temporary pool/servers/key and local DB close.
+    One requested order regresses 19.568% native; cursor improves 21.940%, below
+    30%. Retain both under PERF-13; no blanket latency/SLO or production GO claim.
 - [ ] PERF-08: Reduce notification authority/booking-scope round trips for inbox and unread counts.
 - [x] PERF-09: Bound catalog SQL pagination and batch media facts; preserve publication and signed-URL rules. Closed by explicit owner acceptance of the limited 1–3 Hall scope, not a pass of the original twenty-item/30% live gates.
   - 2026-10-17 owner-selected [read-only 1–3 Hall comparison](../docs/backend-performance-catalog-readonly-2026-10-17.md):
@@ -496,6 +510,12 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
     not an added indefinite gate. No PERF-09 rerun; production remains NO_GO.
 - [x] PERF-12: Review table/rehearsal-schema cleanup with ownership, dependency and retention proof; deletion remains separately authorized.
 - [ ] PERF-13: Repeat matched live measurements, verify relevant correctness gates and set supported regression budgets.
+  - 2026-10-18 [PERF-07 retained limits](../docs/backend-performance-07-closure-2026-10-18.md):
+    the selected three-order native page improves 32.579%, but one requested order
+    regresses 19.568% (5 -> 6 HTTP commands) and the cursor page improves only
+    21.940%. Public results are current-only, with client/backend timings separated;
+    no ingress gain is inferred. Preserve the final Manager recheck and all raw
+    samples while investigating small-page work. No pool/deadline/production-GO change.
   - 2026-10-17 [PERF-04 fail-stop evidence](../docs/backend-performance-04-region-2026-10-17.md#failed-acquisition-and-follow-up):
     retain Singapore Current Seating request `8c8206ee-8adf-46c9-8080-f70644ddf56b`,
     HTTP 500, backend 2004.191 ms / acquire 2001.050 ms, zero submitted SQL,

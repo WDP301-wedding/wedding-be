@@ -122,6 +122,15 @@ Acceptance: bounded query-count growth for 1/3/20 orders; identical ordering/cur
 pending-proposal selection and immutable amounts. Preserve contract-linked once-only
 charges and concurrent replacement/cancellation semantics. Target ≥30% p95 reduction.
 
+2026-10-18 [PERF-07 acceptance](../docs/backend-performance-07-closure-2026-10-18.md):
+existing deployed batching passes the owner-authorized three-live-order comparison
+at 32.579% lower native p95 (9 -> 6 HTTP driver commands), with 1/3/20 requested
+and approved-with-proposal correctness/bounded-work checks local. All 126 native
+responses match, 63 public reads pass, 81 public operations correlate and histories
+are unchanged. One-order native p95 regresses 19.568%; the cursor case improves
+21.940% and misses 30%. Both stay under PERF-13. No new runtime rollout, provider
+write, configuration change or production GO is claimed.
+
 ### PERF-08 — Reduce repeated notification authority/scope reads
 
 Dependencies: PERF-03/05. Proposed files: notification settings, Identity/Booking
