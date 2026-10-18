@@ -54,7 +54,44 @@ all four Automation cases; it is stronger than the earlier named-case diagnostic
 No product/test logic patch is justified by this reproduction. The original
 interrupted failures are not erased or reclassified as successful.
 
+A second complete-file run with V8 coverage also passes **34/34 assertions**, zero
+skipped. It collects only MediaService, AndroidPushDispatcher and Scheduler for
+diagnosis. MediaService branch coverage is 75.75% because this subset omits its
+other unit/contract cases; the unchanged 80% threshold correctly makes that
+diagnostic command exit 1. This is not claimed as coverage acceptance. Only the
+complete repository test/coverage run can close the repository coverage gate.
+
 The candidate is submitted as a draft PR for Linux CI to run every repository
 test and the unchanged per-file coverage gates on the multi-menu extension.
 Candidate CI results will be retained separately after completion. A clean run
 would establish current candidate verification, not the cause of past failures.
+
+## Confirmed historical-fixture defect and fix
+
+The first candidate [CI run](https://github.com/WDP301-wedding/wedding-be/actions/runs/39092504565)
+on `b519cb8bd6496440c2786a3d47527c7fba3b6306` passes static/unit/contract/build/audit
+gates but fails seven populated-upgrade suites/cases with Prisma **P2022**:
+`BookingProposalSnapshot.menus` does not exist. The detailed CI stack traces
+identify six failures at `native-booking-fixture.ts` and one at the Billing
+upgrade's `readHistory`. These are verified regressions from adding the schema
+field, separate from the earlier interrupted Media/FCM/Automation runs.
+
+Those tests intentionally populate an older schema before subsequent migrations.
+The latest Prisma client's implicit scalar selection tries to read the new column
+too early. Fix the shared fixture's lookup/update to return only the proposal ID
+it needs. Billing's before/after history comparison explicitly omits the later
+`menus` field while retaining every pre-existing field; it additionally asserts
+that the fully upgraded historical row has NULL menus. All existing preservation,
+authorization, migration and settlement assertions stay in place. No applied
+migration, application money rule, timeout or threshold changes are needed.
+
+RED evidence is the complete failing candidate CI report: 540 integration tests
+passed, four failed and six skipped after three suite setup failures. The seven
+affected files are Analytics upgrade, Guest security, Staff upgrade, FCM upgrade,
+Notifications upgrade, Seating upgrade and Billing upgrade.
+
+GREEN after the two fixture changes: **10/10 tests across all seven affected
+files passed**, clean teardown and exit 0, on pinned Node/local PostgreSQL with
+all 61 migrations. Duration 96.56 seconds. Command uses the same disposable
+verification wrapper, all seven affected file paths, `--maxWorkers=1
+--pool=threads --reporter=verbose`. Final complete CI is still required.

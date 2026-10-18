@@ -146,10 +146,13 @@ export async function nativeBookingFixture(
   });
   const proposal = await prisma.bookingProposalSnapshot.findUniqueOrThrow({
     where: { bookingId: input.bookingId },
+    // This fixture also runs before later additive proposal columns exist.
+    select: { id: true },
   });
   await prisma.bookingProposalSnapshot.update({
     where: { bookingId: input.bookingId },
     data: { commercialRevisionId: proposal.id, commercialAcceptedAt: input.now },
+    select: { id: true },
   });
   await prisma.bookingDepositSettlement.create({
     data: {
