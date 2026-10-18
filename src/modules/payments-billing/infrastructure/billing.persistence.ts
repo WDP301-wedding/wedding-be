@@ -60,7 +60,10 @@ export function createPrismaBillingPersistence(
         try {
           return await client.$transaction(
             async (tx) => {
-              await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${bookingId}))`;
+              // A read-only outer boundary already holds the same booking's
+              // shared fence. Never upgrade it through an enlisted ledger read.
+              if (!scope.isReadScope())
+                await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${bookingId}))`;
               return work(tx);
             },
             { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },

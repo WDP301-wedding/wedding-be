@@ -1,13 +1,16 @@
 # PERF-13 verification checkpoint
 
-PERF-13 remains open. The exact baseline and two bounded live campaigns were run;
-both bounded campaigns stopped at the declared pressure guard before four readers.
+PERF-13 remains open. Three bounded live campaigns stop at their declared pressure
+guards; the latest completes caps1/2 and stops partway through cap4 under the
+owner-approved sustained-backlog rule. A billing read-lock candidate now passes
+local regression tests and awaits its own CI and authorized rollout/repeat.
 This is partial verification, without a production latency SLO or production GO.
 The existing production **NO_GO** and provider/RV gates remain unchanged.
 
 ## Scope and measurement contract
 
-Only backend measurement tooling, regression tests and evidence are changed.
+Backend measurement tooling, regression tests, evidence and a scoped billing
+read-lock candidate are changed.
 Existing frontend work, applied migrations, money history, runtime pool caps,
 provider reserve, deadlines and worker settings are preserved.
 
@@ -124,15 +127,16 @@ and2127/2128 full-suite cases. The remaining failure is a privacy-test fixture
 collision: CVV123 matches legitimate duration22.123. The fixture now uses a distinct
 CVV canary, preserving every leakage assertion. Both logging tests pass locally;
 deliberately injecting the canary into captured logs fails the privacy assertion.
-The original failed run is retained. Code verification is complete: commit
+The original failed run is retained. The preceding runner-only code checkpoint
 `ec66037708aa603a03bb70417a1789602c67cd99` passes
 [exact-head CI](https://github.com/WDP301-wedding/wedding-be/actions/runs/39122692815),
 including all599 integration tests, all2128 full-suite/coverage tests and the
 unchanged per-file80% lines/branches threshold, static/unit/contract/OpenAPI/build
-and dependency-audit gates, including1461 unit and68 contract tests. Every failed
-local/first-CI attempt is preserved. This does not close the
-separate live-cohort/guard decision or production/provider gates. PR73 remains a
-draft; no merge or deployment was performed by this task.
+and dependency-audit gates, including1461 unit and68 contract tests. The subsequent
+documentation checkpoint5999825c also passes all gates. Every failed local/first-CI
+attempt is preserved. These passes predate the billing runtime candidate, whose
+CI is required independently. PR73 remains a draft; no merge or deployment was
+performed by this task.
 
 ## Preserved live campaigns
 
@@ -158,10 +162,54 @@ closes. This is a sampled baseline, not proof of no unrelated traffic or proof
 that advisory serialization during the stopped workloads is a capacity failure.
 
 The original guard stops on any sampled lock waiter, regardless of duration.
-An explicit owner decision about distinguishing transient serialization from a
-sustained backlog is pending. Neither stopped run is resumed or combined into a
-successful full cohort. All owned campaign sessions revoke204; pressure observers
-close. No business HTTP correctness smoke is added after either safety stop.
+The owner explicitly accepts a sustained-backlog rule: stop on waiter age above
+2000ms or waiter/blocked backends in two consecutive10-second samples, above57
+client backends, missing waiter age, observer failure or the unchanged HTTP
+failure/25000ms limits. Wait age uses `pg_locks.waitstart`, separate from query age.
+Neither earlier run is resumed or combined into a successful full cohort.
+
+The fresh third campaign repeats399/399 baseline reads successfully, then submits
+306 bounded reads, all200. Caps1/2 complete126 samples each; cap4 remains partial.
+The next dispatch is suppressed before transport. Actual HTTP peaks are1/2/3 for
+caps1/2/4; four simultaneous reads are not established. Its99 pressure samples
+include advisory waits724.712ms and2105.337ms in consecutive samples. Both accepted
+backlog conditions trigger at the latter sample; the campaign correctly fails.
+All729 operation IDs correlate, scoped47-table/19-fixture digests and61 migration
+checksums match, and runtime/configuration stay unchanged. All owned sessions
+revoke204 and the observer closes. No correctness business HTTP is added after
+any safety stop. Across all three campaigns,1437 actually submitted reads return200;
+suppressed dispatches are retained separately and never counted as HTTP failures.
+
+Metadata-only statement classification matches the waiter's exclusive advisory
+lock fingerprint and a blocker query against `LayoutTemplateVersion`. Both samples
+overlap the selected seating/billing GETs. This supports a read-contention hypothesis,
+without assigning a precise request to a backend PID or identifying the historical
+Seating500 holder. A disposable local regression independently demonstrates that
+the current billing view waits on a retained shared booking reader.
+
+## Billing runtime candidate
+
+The candidate adds a database-only read facade to the existing billing unit of
+work. It keeps SERIALIZABLE isolation, the same transaction limits and opaque scope
+validation, uses a shared booking advisory lock, and sets `TRANSACTION READ ONLY`.
+Only billing views select it. Enlisted ledger reads keep that existing shared fence
+without upgrading it. Commands keep the original exclusive boundary and whole-unit
+retry policy; no payment, invoice, ledger, authorization or HTTP schema is rewritten.
+
+The local regression first observes the original reader waiting. After the fix,
+the billing view completes while another shared reader remains held. Native checks
+also prove competing writers cannot acquire the fence, PostgreSQL refuses a write
+inside the read facade, and the original writer commits normally with an exclusive
+fence. All17 cases across billing read-lock, existing billing views/operations and
+booking-read-boundary modules pass. An intermediate test fixture omitted required
+audit metadata; that failed attempt is retained and the fixture is corrected.
+
+The implementation follows PostgreSQL's [advisory-lock semantics](https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS)
+and [read-only transaction rules](https://www.postgresql.org/docs/current/sql-set-transaction.html).
+Native safety and CI do not prove the selected live pooler or the full capped
+cohort on the new code. Exact candidate CI, separate owner authorization for rollout,
+same-token revocation, before/after digests and a fresh complete live cohort remain
+required. Preserve all three failed campaigns; do not loosen their guard.
 
 ## Remaining live acceptance and rollback
 

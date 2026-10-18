@@ -291,14 +291,16 @@ Acceptance: regression thresholds from measured stable results; no correctness o
 security regression; rollback and unresolved provider/readiness gates recorded.
 
 2026-10-18 [PERF-13 verification checkpoint](../docs/backend-performance-13-verification-2026-10-18.md):
-the repeatable CLI now fences list cardinality, retains complete sample/status
-accounting and records actual HTTP overlap per reader cap. Local verification and
-preserved unsuccessful attempts are recorded separately. The owner authorized
-the live campaign; deterministic command ceilings and all nine observational
-latency bands pass. PR73 code head `ec660377` passes exact CI599 integration/2128
-full coverage tests. Both bounded live attempts preserve an any-waiter fail-stop;
-the owner decision on the pressure guard and a complete live1/2/4 cohort remain
-required. PERF-13 and production NO_GO remain open; no merge/deployment is performed.
+runner accounting/negative controls, native1120 matched samples, unchanged command
+ceilings and all nine observational latency bands pass. The preceding runner-only
+checkpoint passes CI599 integration/2128 coverage tests. Three bounded live
+campaigns remain preserved; the owner-approved sustained-backlog guard stops the
+third at cap4, after a full399/399 baseline and complete caps1/2. All1437 submitted
+reads return200; scoped data/configuration remains unchanged. A billing read-lock
+candidate passes17 focused local tests, retaining DB-enforced read-only/shared
+views and the original exclusive command fence. PERF-13 stays open pending exact
+candidate CI, separately authorized rollout and a complete fresh live cohort.
+Production NO_GO/provider gates remain separate; no merge/deployment is performed.
 
 ## Verification for implementation
 

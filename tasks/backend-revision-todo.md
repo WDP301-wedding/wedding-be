@@ -599,18 +599,19 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
     not an added indefinite gate. No PERF-09 rerun; production remains NO_GO.
 - [x] PERF-12: Review table/rehearsal-schema cleanup with ownership, dependency and retention proof; deletion remains separately authorized.
 - [ ] PERF-13: Repeat matched live measurements, verify relevant correctness gates and set supported regression budgets.
-  - 2026-10-18 [runner/local verification checkpoint](../docs/backend-performance-13-verification-2026-10-18.md):
-    Added cardinality fail-stop, complete status/sample accounting, explicit empty
-    percentiles and actual HTTP overlap peaks. Contract tests exercise capped
-    1/2/4 readers, overload/transport/cardinality failures and session renewal cleanup.
-    Native1120 matched samples and all nine investigation bands pass. PR #73 head
-    `ec660377` passes exact-head CI599 integration/2128 full coverage tests, with
-    original privacy assertions retained after fixing a CVV/duration fixture collision.
-    Baseline399/399 reads passes; two bounded campaigns stop on the declared
-    any-waiter guard. All732 submitted reads return200 and760 operation IDs match;
-    scoped data/configuration is unchanged. Keep open pending the owner decision
-    about transient advisory waits versus sustained backlog and a complete live
-    1/2/4 cohort. First local/CI failures remain; no latency SLO or production GO.
+  - 2026-10-18 [verification/runtime checkpoint](../docs/backend-performance-13-verification-2026-10-18.md):
+    Native1120 matched samples and all nine investigation bands pass; command
+    ceilings are unchanged. The preceding runner checkpoint passes full CI599
+    integration/2128 coverage tests. Three capped live campaigns preserve fail-stop
+    evidence. The owner accepts the sustained-backlog guard; the third baseline
+    passes399/399 and caps1/2 complete, but cap4 stops at a2105ms advisory wait.
+    Across all campaigns1437 submitted reads return200; scoped data/configuration
+    remains unchanged. A local regression reproduces exclusive billing-read
+    contention against shared booking readers. The candidate adds a DB-enforced
+    read-only/shared facade for billing views while retaining exclusive commands.
+    All17 focused local cases pass. Keep open pending exact candidate CI, separate
+    authorized rollout and a fresh complete live cohort; no merge/deployment or
+    production GO. Earlier failures and unknown historical holder limits remain.
   - 2026-10-18 [PERF-07 retained limits](../docs/backend-performance-07-closure-2026-10-18.md):
     the selected three-order native page improves 32.579%, but one requested order
     regresses 19.568% (5 -> 6 HTTP commands) and the cursor page improves only
