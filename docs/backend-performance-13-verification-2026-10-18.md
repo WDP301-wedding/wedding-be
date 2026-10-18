@@ -29,6 +29,32 @@ successful distributions explicitly contain null timings. `passed` requires all
 20 successful steady samples in every selected case/stage and successful cleanup.
 The peak counts HTTP reads through response-body consumption, not SQL concurrency.
 
+For an authorized repeat, put credentials and selected fixtures in an ignored
+private JSON file. Required fields are HTTPS `origin`, `synthetic: true`,
+`initialized: true`, pinned `deploymentId`, full40-character `commit`, credentials
+for each selected authenticated role, and `baselineCases`/`boundedCases` arrays.
+Each case has `role`, `path`, optional stable `label`, optional `expectedStatus`
+(default200) and optional `expectedItemCount`. Include verified `topology` and
+`fixture` metadata. `authorization.expiresAt` must be a valid UTC timestamp when
+present; expired authorization blocks dispatch while allowing session cleanup.
+
+After reconfirming the target and the applicable pressure policy, run each mode
+with a new output path. Existing evidence is never overwritten:
+
+```powershell
+$env:PERF_FIXTURE_CONFIG = '.local-demo/selected-perf-fixture.private.json'
+$env:PERF_MODE = 'baseline' # then bounded, with a different output file
+$env:PERF_OUTPUT = 'output/selected-perf-run/baseline.json'
+$env:PERF_STOP_FILE = 'output/selected-perf-run/pressure-stop'
+node scripts/performance-regression.mjs
+```
+
+Create the output parent directory first. A separately admitted read-only observer
+creates `PERF_STOP_FILE` on the declared pressure limit. The operator must inspect
+the runner's exit code, `passed`, complete cohorts, pressure/cleanup receipts,
+deployment correlation and before/after data hashes together. A passing HTTP
+runner alone does not establish those independent acceptance checks.
+
 ## Verification and evidence
 
 The contract regression executes the real CLI in child processes with synthetic
@@ -53,6 +79,24 @@ The empty/populated and plain/media cases stay separate in the receipt. The firs
 two-reader attempt failed acquisition and remains preserved; only the separate
 diagnostic attempts establish successful native two/four-reader measurements.
 
+All nine existing single-reader latency investigation bands also remain within
+their declared limits. Each row uses20 current samples, pool maximum3 and the
+40ms-per-driver-command native model; none is a live Railway latency budget.
+Analytics refresh has no established latency band and is reported separately.
+
+| Native case              | Driver commands | Current p95 ms | Existing investigation band ms |
+| ------------------------ | --------------: | -------------: | -----------------------------: |
+| Templates20              |               3 |         185.84 |                            240 |
+| Requested print orders20 |               5 |         294.38 |                            300 |
+| Empty inbox              |               4 |         182.50 |                            300 |
+| Empty unread             |               4 |         180.09 |                            245 |
+| Halls, no media          |               1 |          64.02 |                            185 |
+| Warm Analytics           |               6 |         319.55 |                            355 |
+| Halls with media         |               1 |          91.17 |                            185 |
+| Populated inbox          |               4 |         215.67 |                            300 |
+| Populated unread         |               4 |         160.46 |                            245 |
+| Analytics refresh        |              58 |        2148.23 |                Not established |
+
 An initial full coverage attempt overlapped static checks on the constrained
 local host. It observed an earlier version of the new bounded-runner test timing
 out, then was explicitly stopped along with the owned lint process. That run is
@@ -63,9 +107,32 @@ No existing timeout, coverage threshold, test or correctness assertion was relax
 The second full local coverage attempt recorded two native-media 10-second and
 one commercial 60-second timeout before it was stopped. A fresh task-owned
 loopback PostgreSQL cluster is used to diagnose those cases under their original
-assertions/timeouts. Full-suite/coverage acceptance remains pending. Typecheck,
+assertions/timeouts. All64 tests in the three selected modules pass in that
+cluster, including the three earlier timeout cases. That attempt does not establish
+local full-suite/coverage acceptance. Typecheck,
 tracked-source lint, OpenAPI check, build and `npm run audit:ci` pass; the first
 direct audit invocation omitted npm's required `npm_execpath` and is preserved.
+
+The task-owned cluster's full coverage attempt later records a runtime-foundation
+30-second timeout and is stopped. Its independent follow-up passes all five test
+assertions but fails the original10-second cleanup hook; it remains a failed
+suite. The cluster is stopped and its owned temporary databases are dropped.
+
+[Draft PR73](https://github.com/WDP301-wedding/wedding-be/pull/73) isolates this work
+from pre-existing workspace changes. First-head CI passes all599 integration tests
+and2127/2128 full-suite cases. The remaining failure is a privacy-test fixture
+collision: CVV123 matches legitimate duration22.123. The fixture now uses a distinct
+CVV canary, preserving every leakage assertion. Both logging tests pass locally;
+deliberately injecting the canary into captured logs fails the privacy assertion.
+The original failed run is retained. Code verification is complete: commit
+`ec66037708aa603a03bb70417a1789602c67cd99` passes
+[exact-head CI](https://github.com/WDP301-wedding/wedding-be/actions/runs/39122692815),
+including all599 integration tests, all2128 full-suite/coverage tests and the
+unchanged per-file80% lines/branches threshold, static/unit/contract/OpenAPI/build
+and dependency-audit gates, including1461 unit and68 contract tests. Every failed
+local/first-CI attempt is preserved. This does not close the
+separate live-cohort/guard decision or production/provider gates. PR73 remains a
+draft; no merge or deployment was performed by this task.
 
 ## Preserved live campaigns
 
@@ -84,6 +151,11 @@ waiter has query age517.252ms; its blocker is idle in a transaction aged3659.086
 Sanitized SQL fingerprints and both backend IDs are retained. This establishes the
 observed wait edge, not the exact owner/request or the historical Seating500 cause.
 Thirty later metadata-only samples find no blocking edge.
+
+A separate240-sample passive observation, with no agent-generated business HTTP
+requests, finds zero sampled waiters and peak10 client backends. The observer
+closes. This is a sampled baseline, not proof of no unrelated traffic or proof
+that advisory serialization during the stopped workloads is a capacity failure.
 
 The original guard stops on any sampled lock waiter, regardless of duration.
 An explicit owner decision about distinguishing transient serialization from a

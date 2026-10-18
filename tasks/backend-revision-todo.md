@@ -603,16 +603,14 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
     Added cardinality fail-stop, complete status/sample accounting, explicit empty
     percentiles and actual HTTP overlap peaks. Contract tests exercise capped
     1/2/4 readers, overload/transport/cardinality failures and session renewal cleanup.
-    Keep the task open pending the owner-authorized live campaign: the first
-    full local coverage run was interrupted, and no new latency SLO, production GO
-    or provider acceptance is claimed. See the receipt for exact local results.
-  - 2026-10-18 [PERF-06 after-rollout comparison](../docs/backend-performance-06-closure-2026-10-18.md):
-    all 63 template reads return 200 and backend p95 falls 17.2–17.5%, while client
-    p95 increases 7.4%, 26.8% and 9.9% across one/four/cursor-selected cases. Preserve
-    every sample and exact-deployment correlation. No specific network/ingress
-    cause is established; investigate end-to-end tails without changing pools,
-    deadlines or production NO_GO by assumption. PERF-06 closes only its stated
-    backend query/authority and owner-approved live/local scope.
+    Native1120 matched samples and all nine investigation bands pass. PR #73 head
+    `ec660377` passes exact-head CI599 integration/2128 full coverage tests, with
+    original privacy assertions retained after fixing a CVV/duration fixture collision.
+    Baseline399/399 reads passes; two bounded campaigns stop on the declared
+    any-waiter guard. All732 submitted reads return200 and760 operation IDs match;
+    scoped data/configuration is unchanged. Keep open pending the owner decision
+    about transient advisory waits versus sustained backlog and a complete live
+    1/2/4 cohort. First local/CI failures remain; no latency SLO or production GO.
   - 2026-10-18 [PERF-07 retained limits](../docs/backend-performance-07-closure-2026-10-18.md):
     the selected three-order native page improves 32.579%, but one requested order
     regresses 19.568% (5 -> 6 HTTP commands) and the cursor page improves only

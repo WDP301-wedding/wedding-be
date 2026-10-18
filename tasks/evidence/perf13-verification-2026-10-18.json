@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "task": "PERF-13",
-  "recordedAt": "2026-10-18T11:07:42.500Z",
+  "recordedAt": "2026-10-18T11:31:50.964Z",
   "timezone": "Asia/Saigon",
   "status": "VERIFICATION_IN_PROGRESS_NO_CLOSURE",
   "productionReadiness": "NO_GO unchanged",
@@ -30075,7 +30075,7 @@
   },
   "localVerification": {
     "path": "output/perf13-20261018/isolated-verification.json",
-    "sha256": "a112ea19542e5bdc1455849320e8819288c2e9b47238289204ea335ec484ed47",
+    "sha256": "0d07a2c73539c78dbfb0896536a1867765f92bf2d90fca2d1734ff880ac94e10",
     "receipt": {
       "startedAt": "2026-10-18T11:05:23.374Z",
       "node": "v24.15.0",
@@ -30086,8 +30086,22 @@
           "startedAt": "2026-10-18T11:05:24.795Z",
           "finishedAt": "2026-10-18T11:05:35.760Z",
           "code": 0
+        },
+        {
+          "name": "preserved-timeout-cases",
+          "startedAt": "2026-10-18T11:05:35.762Z",
+          "finishedAt": "2026-10-18T11:09:16.455Z",
+          "code": 0
+        },
+        {
+          "name": "full-coverage",
+          "startedAt": "2026-10-18T11:09:16.459Z",
+          "finishedAt": "2026-10-18T11:15:42.938Z",
+          "code": 1
         }
-      ]
+      ],
+      "createdDatabaseDropped": true,
+      "finishedAt": "2026-10-18T11:15:45.067Z"
     }
   },
   "staticChecks": {
@@ -30125,6 +30139,11 @@
       "finishedAt": "2026-10-18T11:03:30.280Z"
     }
   },
+  "correctedAudit": {
+    "path": "output/perf13-20261018/audit-npm.log",
+    "sha256": "c1168f5fd33f37fb3d55a48d8999e7c17d84667c7ed16770e190fab608218ac6",
+    "passed": true
+  },
   "budgets": {
     "scope": "Native PERF-06–13 fixture; single reader; driver commands including transaction control. No Railway latency SLO.",
     "basis": [
@@ -30160,6 +30179,1752 @@
     },
     "latencyPolicy": "Investigation bands include about 25% over the repeated measured p95. Observe only; do not fail shared Railway traffic or default CI wall-clock time. Concurrent reader stages have their own distributions and are not compared to single-reader bands."
   },
+  "localRuntimeFollowup": {
+    "path": "output/perf13-20261018/isolated-runtime-verification.json",
+    "sha256": "a01ad86efdca6142d9247fc6fc4c16b71420ed9840679a20369ad9eec2e725e8",
+    "receipt": {
+      "startedAt": "2026-10-18T11:15:45.879Z",
+      "node": "v24.15.0",
+      "scope": "Disposable loopback-only PostgreSQL18 on task-owned cluster; same tests, timeouts and per-file coverage thresholds. Reduced shared buffers and disabled durability only for disposable CI-like data.",
+      "steps": [
+        {
+          "name": "migrations",
+          "startedAt": "2026-10-18T11:15:47.510Z",
+          "finishedAt": "2026-10-18T11:15:56.269Z",
+          "code": 0
+        },
+        {
+          "name": "preserved-timeout-cases",
+          "startedAt": "2026-10-18T11:15:56.270Z",
+          "finishedAt": "2026-10-18T11:17:39.695Z",
+          "code": 1
+        }
+      ],
+      "failure": {
+        "name": "Error",
+        "message": "Focused correctness gate failed"
+      },
+      "createdDatabaseDropped": true,
+      "finishedAt": "2026-10-18T11:17:42.310Z"
+    }
+  },
+  "loggingNegativeControl": {
+    "path": "output/perf13-20261018/logging-negative-control.json",
+    "sha256": "7dde4e3c824da5a3cc1fc30a95b115d3a6298cacf9da0e11bc13e18ef4042a92",
+    "receipt": {
+      "at": "2026-10-18T11:17:39.774Z",
+      "fixtureChange": "Use a CVV canary that cannot occur in legitimate timestamps/durations",
+      "originalLeakageAssertionsUnchanged": true,
+      "injectedLeak": "Synthetic cvv field in captured log records",
+      "exitCode": 1,
+      "killed": true,
+      "temporaryTestRemoved": true,
+      "originalTestUnchanged": true
+    }
+  },
+  "canaryFix": {
+    "path": "output/perf13-20261018/canary-pr-update.json",
+    "sha256": "8a658f95906be267cde6e4e7e9c64c734a66424e543a6725e2f986a9ce010542",
+    "receipt": {
+      "at": "2026-10-18T11:18:13.913Z",
+      "priorHead": "3aca972f8cdc438e9426892f6ca975a31d7ca025",
+      "head": "ec66037708aa603a03bb70417a1789602c67cd99",
+      "path": "tests/integration/request-logging.test.ts",
+      "sha256": "41c672db3193de03c3c50dcb1372d2525fd5f381c2d419a467d46c4fcd0ffad2",
+      "runtimeChange": false,
+      "privacyAssertionsUnchanged": true,
+      "reason": "Exact-head CI logging-canary false positive, not a runtime redaction fix"
+    }
+  },
+  "canaryCI": {
+    "path": "output/perf13-20261018/ci-canary-current.json",
+    "sha256": "0fa502bd02e164e92215c97526cc48b319bb9dbdc72b32a86e7012c0fe98048b",
+    "receipt": {
+      "at": "2026-10-18T11:26:27.717Z",
+      "id": 39122692815,
+      "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39122692815",
+      "head": "ec66037708aa603a03bb70417a1789602c67cd99",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1,
+      "jobs": [
+        {
+          "id": 117661324102,
+          "name": "Static, test, build, and audit gates",
+          "status": "completed",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check out repository",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Set up Node.js",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Install locked dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Generate Prisma client",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check formatting",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Lint",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Typecheck",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run unit tests",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run contract tests",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify generated OpenAPI artifact",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Build production output",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Audit locked dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Set up Node.js",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Check out repository",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 117661324269,
+          "name": "PostgreSQL migration and integration gates",
+          "status": "completed",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Initialize containers",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check out repository",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Set up Node.js",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Install locked dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Generate Prisma client",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Deploy migrations to empty PostgreSQL",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run PostgreSQL integration tests",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Enforce full-suite coverage with PostgreSQL",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Set up Node.js",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Check out repository",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Stop containers",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "passiveObservation": {
+    "path": "output/perf13-20261018/idle-observation.json",
+    "sha256": "90d8bc3774a98434941fe6801b127a07e4aed67835eccbb6ae1a99065236a2f6",
+    "receipt": {
+      "startedAt": "2026-10-18T11:20:09.633Z",
+      "scope": "Four-minute passive read-only DB metadata observation, one admitted operator connection, no business HTTP workload or session creation; no inference about which earlier request held a historical lock.",
+      "samples": [
+        {
+          "at": "2026-10-18T11:20:12.445Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:13.784Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:15.104Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:16.440Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:17.761Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:19.082Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:20.410Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:21.740Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:23.057Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:24.374Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:25.715Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:27.029Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:28.344Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:29.656Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:30.970Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:32.306Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:33.630Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:34.943Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:36.256Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:37.581Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:38.902Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:40.221Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:41.538Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:42.856Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:44.173Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:45.502Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:46.818Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:48.138Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:49.457Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:50.783Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:52.101Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:53.416Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:54.739Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:56.066Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:57.382Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:20:58.706Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:00.028Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:01.347Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:02.669Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:03.986Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:05.307Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:06.628Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:07.941Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:09.265Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:10.584Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:11.907Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:13.228Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:14.548Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:15.870Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:17.194Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:18.509Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:19.831Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:21.142Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:22.456Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:23.783Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:25.104Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:26.424Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:27.740Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:29.062Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:30.387Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:31.708Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:33.033Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:34.357Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:35.676Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:36.995Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:38.317Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:39.637Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:40.957Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:42.273Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:43.595Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:44.925Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:46.252Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:47.570Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:48.889Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:50.208Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:51.524Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:52.848Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:54.163Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:55.490Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:56.811Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:58.138Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:21:59.460Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:00.779Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:02.101Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:03.423Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:04.713Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:06.012Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:07.298Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:08.590Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:09.883Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:11.168Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:12.472Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:13.764Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:15.048Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:16.341Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:17.631Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:18.929Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:20.222Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:21.508Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:22.799Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:24.097Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:25.390Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:26.686Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:27.969Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:29.264Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:30.556Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:31.854Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:33.154Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:34.442Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:35.731Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:37.017Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:38.313Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:39.624Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:40.916Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:42.202Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:43.493Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:44.785Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:46.077Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:47.369Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:48.657Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:49.958Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:51.251Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:52.544Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:53.841Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:55.130Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:56.419Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:57.713Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:22:59.018Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:00.303Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:01.594Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:02.884Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:04.176Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:05.468Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:06.753Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:08.041Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:09.336Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:10.622Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:11.918Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:13.208Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:14.498Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:15.787Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:17.077Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:18.364Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:19.664Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:20.952Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:22.252Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:23.557Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:24.857Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:26.155Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:27.462Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:28.758Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:30.051Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:31.356Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:32.651Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:33.952Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:35.243Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:36.530Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:37.820Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:39.113Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:40.400Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:41.697Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:42.995Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:44.290Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:45.575Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:46.870Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:48.157Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:49.455Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:50.748Z",
+          "clients": 10,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:52.036Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:53.324Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:54.613Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:55.901Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:57.195Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:58.502Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:23:59.799Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:01.090Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:02.379Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:03.676Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:04.974Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:06.271Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:07.559Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:08.852Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:10.151Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:11.454Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:12.750Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:14.043Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:15.337Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:16.629Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:17.920Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:19.213Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:20.503Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:21.793Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:23.081Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:24.368Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:25.667Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:26.969Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:28.264Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:29.571Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:30.860Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:32.149Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:33.441Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:34.729Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:36.029Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:37.320Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:38.609Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:39.898Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:41.194Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:42.479Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:43.763Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:45.052Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:46.339Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:47.630Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:48.925Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:50.216Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:51.504Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:52.797Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:54.082Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:55.373Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:56.661Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:57.950Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:24:59.234Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:00.524Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:01.808Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:03.098Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:04.391Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:05.682Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:06.971Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:08.275Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:09.571Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:10.857Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:12.148Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:13.435Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:14.729Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:16.021Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:17.325Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:18.618Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:19.917Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:21.202Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:22.493Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        },
+        {
+          "at": "2026-10-18T11:25:23.790Z",
+          "clients": 9,
+          "lock_waiters": 0,
+          "lockEdges": []
+        }
+      ],
+      "observerClosed": true,
+      "finishedAt": "2026-10-18T11:25:24.095Z"
+    }
+  },
+  "codeCIAcceptance": {
+    "path": "output/perf13-20261018/ci-acceptance.json",
+    "sha256": "58120d5a90616faabcd7ee0cd1d8a01f297f88da772bf5f9473912135699bd6f",
+    "receipt": {
+      "at": "2026-10-18T11:28:14.414Z",
+      "head": "ec66037708aa603a03bb70417a1789602c67cd99",
+      "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39122692815",
+      "fullCI": "success",
+      "summaries": [
+        {
+          "job": "Static, test, build, and audit gates",
+          "path": "output/perf13-20261018/ci-job-117661324102.log",
+          "sha256": "721de4b43fcb8c0283f2187959f77456970c86665350f1a4d0076993f8c51775",
+          "testCounts": [
+            {
+              "passed": 1461,
+              "total": 1461
+            },
+            {
+              "passed": 68,
+              "total": 68
+            }
+          ]
+        },
+        {
+          "job": "PostgreSQL migration and integration gates",
+          "path": "output/perf13-20261018/ci-job-117661324269.log",
+          "sha256": "157d114923a71a7c8853fd2b83bf52fe3cf6140d4b9a64945fa5df385c759031",
+          "testCounts": [
+            {
+              "passed": 599,
+              "total": 599
+            },
+            {
+              "passed": 2128,
+              "total": 2128
+            }
+          ]
+        }
+      ],
+      "perFileCoverageThresholdsUnchanged": {
+        "lines": 80,
+        "branches": 80,
+        "sourceSha256": "b85a21a09f414c91a685d313b6be2baf2229228ed11c5f908964c8f3bb26d041"
+      },
+      "publicArtifactsContainNoSelectedPrivateCredentials": true
+    }
+  },
+  "reviewedDraft": {
+    "path": "output/perf13-20261018/reviewed-pr.json",
+    "sha256": "ef35dec697ef07cf16754ed14f2fc36ccec8b9cafe0d69e918cc9e54ac8bafc6",
+    "receipt": {
+      "at": "2026-10-18T11:30:49.633Z",
+      "url": "https://github.com/WDP301-wedding/wedding-be/pull/73",
+      "head": "ec66037708aa603a03bb70417a1789602c67cd99",
+      "draft": true,
+      "exactHeadCI": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39122692815",
+      "status": "CODE_CI_PASSED_LIVE_GUARD_DECISION_PENDING",
+      "mergeOrDeploymentPerformed": false
+    }
+  },
   "preservedFailures": [
     {
       "path": "output/perf13-20261018/local-model.log",
@@ -30180,6 +31945,18 @@
     {
       "path": "output/perf13-20261018/correlation.log",
       "reason": "Railway rejects log limit10000; corrected bounded5000 query matched all requested IDs."
+    },
+    {
+      "path": "output/perf13-20261018/isolated-verification.log",
+      "reason": "Three focused modules pass64 tests. Full coverage then records runtime-foundation30s timeout and is stopped; no local full coverage pass."
+    },
+    {
+      "path": "output/perf13-20261018/isolated-runtime-verification.log",
+      "reason": "All five runtime-foundation assertions pass alone; afterAll cleanup exceeds10s. Suite remains failed."
+    },
+    {
+      "path": "output/perf13-20261018/ci-job-117659415639.log",
+      "reason": "First exact-head integration599 passes; full coverage2127/2128. CVV fixture123 matches duration22.123. A distinct canary keeps every privacy assertion and the injected-leak negative control fails."
     }
   ],
   "limits": [
@@ -30193,6 +31970,54 @@
     {
       "path": "output/perf13-20261018/audit-npm.log",
       "sha256": "c1168f5fd33f37fb3d55a48d8999e7c17d84667c7ed16770e190fab608218ac6"
+    },
+    {
+      "path": "output/perf13-20261018/canary-pr-update.json",
+      "sha256": "8a658f95906be267cde6e4e7e9c64c734a66424e543a6725e2f986a9ce010542"
+    },
+    {
+      "path": "output/perf13-20261018/ci-acceptance.json",
+      "sha256": "58120d5a90616faabcd7ee0cd1d8a01f297f88da772bf5f9473912135699bd6f"
+    },
+    {
+      "path": "output/perf13-20261018/ci-canary-current.json",
+      "sha256": "0fa502bd02e164e92215c97526cc48b319bb9dbdc72b32a86e7012c0fe98048b"
+    },
+    {
+      "path": "output/perf13-20261018/ci-canary-start.json",
+      "sha256": "c27c802e2dedd7297065486d999cf9ed684ee4c839045010dc4550d1be9ae77a"
+    },
+    {
+      "path": "output/perf13-20261018/ci-canary-wait.log",
+      "sha256": "b8875c7090668eea4443e37b67057221d0b222df42dfa84925b9b7ce78a58ab8"
+    },
+    {
+      "path": "output/perf13-20261018/ci-current.json",
+      "sha256": "41a621c96941adee0ce3aa97e39a0c25fb119d8066c0795b5e5bcd6065844646"
+    },
+    {
+      "path": "output/perf13-20261018/ci-job-117659415577.log",
+      "sha256": "d03996845f160fd92eb8bfd1a8985ede2ca3c538c8c0fbd34c6fae8d5e0a374f"
+    },
+    {
+      "path": "output/perf13-20261018/ci-job-117659415639.log",
+      "sha256": "71e7694b9d4f49b52cf9713c35b155d1a25b106aaab106a6130be1b489c45952"
+    },
+    {
+      "path": "output/perf13-20261018/ci-job-117661324102.log",
+      "sha256": "721de4b43fcb8c0283f2187959f77456970c86665350f1a4d0076993f8c51775"
+    },
+    {
+      "path": "output/perf13-20261018/ci-job-117661324269.log",
+      "sha256": "157d114923a71a7c8853fd2b83bf52fe3cf6140d4b9a64945fa5df385c759031"
+    },
+    {
+      "path": "output/perf13-20261018/ci-status.json",
+      "sha256": "c0d3a97ca0c741a2b7680aa5071be43f6a040aeb9aa98eedad2064e596adb55d"
+    },
+    {
+      "path": "output/perf13-20261018/ci-wait.log",
+      "sha256": "2225d526e8f278286155af0abced4a73cf67b578fd0b595091fd0cb0955c75ea"
     },
     {
       "path": "output/perf13-20261018/correlation-diagnostic.log",
@@ -30211,6 +32036,14 @@
       "sha256": "ad7b68396f9ff3f1a1cd03b5bd28b5bd03aa2e536305faf00c4516e112329219"
     },
     {
+      "path": "output/perf13-20261018/draft-pr.json",
+      "sha256": "509f84f17d3627e1def58a5ebc389a83293ab7031c32ed87e4b9a3b306b1737e"
+    },
+    {
+      "path": "output/perf13-20261018/draft-pr.log",
+      "sha256": "b5c510d2679327aee7b8cafc41977f3ab608aac48cf9c361a91a2648d312afa0"
+    },
+    {
       "path": "output/perf13-20261018/final-api-check.log",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
@@ -30223,12 +32056,24 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
+      "path": "output/perf13-20261018/final-doc-format.log",
+      "sha256": "ab478ca14f977230ae39259c3b573ed35f21ae8c1135aabcfff1f2b76e9d621c"
+    },
+    {
       "path": "output/perf13-20261018/final-format.log",
       "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
     },
     {
+      "path": "output/perf13-20261018/final-handoff-format.log",
+      "sha256": "9e4b34c500301a8e474ba4061d6007368e7a9d820dfb94149213738002764708"
+    },
+    {
       "path": "output/perf13-20261018/final-lint.log",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "output/perf13-20261018/final-source-format.log",
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
     },
     {
       "path": "output/perf13-20261018/final-typecheck.log",
@@ -30263,12 +32108,28 @@
       "sha256": "601ccccecbccf3fd1a92e56ce360d4c066043060fcfc2254a387829258bc7fe8"
     },
     {
+      "path": "output/perf13-20261018/idle-observation.json",
+      "sha256": "90d8bc3774a98434941fe6801b127a07e4aed67835eccbb6ae1a99065236a2f6"
+    },
+    {
+      "path": "output/perf13-20261018/idle-observation.log",
+      "sha256": "58bb10df14ff28daf236c04a939a6cd5fbbc6df8aa3cbfb720aed2eb63c929dd"
+    },
+    {
+      "path": "output/perf13-20261018/isolated-runtime-verification.json",
+      "sha256": "a01ad86efdca6142d9247fc6fc4c16b71420ed9840679a20369ad9eec2e725e8"
+    },
+    {
+      "path": "output/perf13-20261018/isolated-runtime-verification.log",
+      "sha256": "96f2fe14948466e32de76300f4580564704461af4fc3a25160d331ec6690b5e8"
+    },
+    {
       "path": "output/perf13-20261018/isolated-verification.json",
-      "sha256": "a112ea19542e5bdc1455849320e8819288c2e9b47238289204ea335ec484ed47"
+      "sha256": "0d07a2c73539c78dbfb0896536a1867765f92bf2d90fca2d1734ff880ac94e10"
     },
     {
       "path": "output/perf13-20261018/isolated-verification.log",
-      "sha256": "485204a2a651a0efd3fb6a7c935ea6be719aae22b9b71024a9de266bed3971cc"
+      "sha256": "8294515d1a98050a637275ecc3473afc3170f4de5b018cf8bde2faef2494da03"
     },
     {
       "path": "output/perf13-20261018/lint.log",
@@ -30327,6 +32188,22 @@
       "sha256": "fd7e65d70b0ee83653e665b7efcd34b9289cc8b03db93bcc42f2221ced824eb4"
     },
     {
+      "path": "output/perf13-20261018/logging-canary-green.log",
+      "sha256": "a024313945e03d20b3fca0bf03d21bbff58a8abbfd606d690c2db11dab4457c8"
+    },
+    {
+      "path": "output/perf13-20261018/logging-format.log",
+      "sha256": "5ba2a92fd9e20b981894cc7f5bd8032d2c58c5b7968b4c035a092dd2b155a7d3"
+    },
+    {
+      "path": "output/perf13-20261018/logging-negative-control.json",
+      "sha256": "7dde4e3c824da5a3cc1fc30a95b115d3a6298cacf9da0e11bc13e18ef4042a92"
+    },
+    {
+      "path": "output/perf13-20261018/logging-negative-control.log",
+      "sha256": "f472a408ce711978283274f61a98768aae14a669aa05f4b702a37b865d410a6e"
+    },
+    {
       "path": "output/perf13-20261018/measured-cli-sha256.json",
       "sha256": "e8b6ecf4a046074c1ceaa7540caf47c705db86f347998eeef18c6b864ff4eae0"
     },
@@ -30363,12 +32240,44 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
+      "path": "output/perf13-20261018/pr-body-reviewed.md",
+      "sha256": "6236e1adbd0e7e0cac6711761f047738068a33518d685045bae3021542eaec66"
+    },
+    {
+      "path": "output/perf13-20261018/pr-body.md",
+      "sha256": "ea7601069bc876a7c0a160f93609bae40986467b1e71eea30aa99c7d70388141"
+    },
+    {
+      "path": "output/perf13-20261018/pr-files.json",
+      "sha256": "20c8f5c92b3726d5431fb659669179c4f9a6f0c1cd2366d877452ad2b467cdbe"
+    },
+    {
       "path": "output/perf13-20261018/prepare-live-diagnostic.log",
       "sha256": "f55ff3a851e261547498559ef2d2fd0eb91584aa9e00cdb5f81a185c9d715670"
     },
     {
+      "path": "output/perf13-20261018/prepublish-format.log",
+      "sha256": "3f46204e4b98f59a76c114962a96f7bd76392f686b4cf9227e5d8179cb74bcdc"
+    },
+    {
       "path": "output/perf13-20261018/pressure-stop",
       "sha256": "4e822ad79cc24e86663992b85246f28153a1270f215f892a54a0dbcc2a326636"
+    },
+    {
+      "path": "output/perf13-20261018/report-current.log",
+      "sha256": "4bd5de69eb769ec79e070e3d25c4f77e98adb3eedf06935747621c17d7d4d152"
+    },
+    {
+      "path": "output/perf13-20261018/report-format-current.log",
+      "sha256": "51259deda14fc89487e1b37c8fce1d8537f4930abf9f8d34bc2b6a23f96067ee"
+    },
+    {
+      "path": "output/perf13-20261018/reviewed-pr.json",
+      "sha256": "ef35dec697ef07cf16754ed14f2fc36ccec8b9cafe0d69e918cc9e54ac8bafc6"
+    },
+    {
+      "path": "output/perf13-20261018/reviewed-pr.log",
+      "sha256": "5bedd24cbfc6830a25eca2ec26f859531f953f25d558428c92e4cf22826fed8e"
     },
     {
       "path": "output/perf13-20261018/runner-authorized-final.log",
@@ -30437,6 +32346,268 @@
     {
       "path": "output/perf13-20261018/typecheck.log",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "output/perf13-20261018/update-canary-pr.log",
+      "sha256": "c5a5d0d3e79967c5321a75f7ea51be336067109d29746f2c410491a2b738e283"
     }
-  ]
+  ],
+  "firstHeadCI": {
+    "path": "output/perf13-20261018/ci-current.json",
+    "sha256": "41a621c96941adee0ce3aa97e39a0c25fb119d8066c0795b5e5bcd6065844646",
+    "receipt": {
+      "at": "2026-10-18T11:16:05.795Z",
+      "id": 39122037725,
+      "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39122037725",
+      "head": "3aca972f8cdc438e9426892f6ca975a31d7ca025",
+      "status": "completed",
+      "conclusion": "failure",
+      "attempt": 1,
+      "jobs": [
+        {
+          "id": 117659415577,
+          "name": "Static, test, build, and audit gates",
+          "status": "completed",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check out repository",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Set up Node.js",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Install locked dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Generate Prisma client",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check formatting",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Lint",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Typecheck",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run unit tests",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run contract tests",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify generated OpenAPI artifact",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Build production output",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Audit locked dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Set up Node.js",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Check out repository",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 117659415639,
+          "name": "PostgreSQL migration and integration gates",
+          "status": "completed",
+          "conclusion": "failure",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Initialize containers",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check out repository",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Set up Node.js",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Install locked dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Generate Prisma client",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Deploy migrations to empty PostgreSQL",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run PostgreSQL integration tests",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Enforce full-suite coverage with PostgreSQL",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "name": "Post Set up Node.js",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Post Check out repository",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Stop containers",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "investigationBands": [
+    {
+      "name": "templates-20",
+      "n": 20,
+      "p95Ms": 185.8353999999963,
+      "bandMs": 240,
+      "withinBand": true
+    },
+    {
+      "name": "print-orders-20",
+      "n": 20,
+      "p95Ms": 294.3798999999999,
+      "bandMs": 300,
+      "withinBand": true
+    },
+    {
+      "name": "inbox-empty",
+      "n": 20,
+      "p95Ms": 182.50470000000496,
+      "bandMs": 300,
+      "withinBand": true
+    },
+    {
+      "name": "unread-empty",
+      "n": 20,
+      "p95Ms": 180.09420000000682,
+      "bandMs": 245,
+      "withinBand": true
+    },
+    {
+      "name": "catalog-halls-no-assets",
+      "n": 20,
+      "p95Ms": 64.02309999999125,
+      "bandMs": 185,
+      "withinBand": true
+    },
+    {
+      "name": "analytics-warm",
+      "n": 20,
+      "p95Ms": 319.55489999998827,
+      "bandMs": 355,
+      "withinBand": true
+    },
+    {
+      "name": "analytics-refresh",
+      "n": 20,
+      "p95Ms": 2148.2326000000176,
+      "bandMs": null,
+      "withinBand": null
+    },
+    {
+      "name": "catalog-halls-with-assets",
+      "n": 20,
+      "p95Ms": 91.17449999996461,
+      "bandMs": 185,
+      "withinBand": true
+    },
+    {
+      "name": "inbox-populated",
+      "n": 20,
+      "p95Ms": 215.66519999998854,
+      "bandMs": 300,
+      "withinBand": true
+    },
+    {
+      "name": "unread-populated",
+      "n": 20,
+      "p95Ms": 160.46470000001136,
+      "bandMs": 245,
+      "withinBand": true
+    }
+  ],
+  "acceptance": {
+    "nativeMatched1120Samples": true,
+    "original19CaseLiveBaseline": true,
+    "commandCeilingsChanged": false,
+    "allExistingInvestigationBandsPass": true,
+    "liveFullBoundedCampaignPassed": false,
+    "latestCodeCIPassed": true,
+    "ownerPressureGuardDecision": "Pending explicit choice; do not change the declared stop rule or run another dependent workload",
+    "productionGO": false
+  }
 }

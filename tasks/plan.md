@@ -294,8 +294,11 @@ security regression; rollback and unresolved provider/readiness gates recorded.
 the repeatable CLI now fences list cardinality, retains complete sample/status
 accounting and records actual HTTP overlap per reader cap. Local verification and
 preserved unsuccessful attempts are recorded separately. The owner authorized
-the live campaign; deterministic command ceilings and observational
-latency-band policy remain unchanged. PERF-13 and production NO_GO remain open.
+the live campaign; deterministic command ceilings and all nine observational
+latency bands pass. PR73 code head `ec660377` passes exact CI599 integration/2128
+full coverage tests. Both bounded live attempts preserve an any-waiter fail-stop;
+the owner decision on the pressure guard and a complete live1/2/4 cohort remain
+required. PERF-13 and production NO_GO remain open; no merge/deployment is performed.
 
 ## Verification for implementation
 
