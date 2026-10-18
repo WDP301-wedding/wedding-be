@@ -599,13 +599,19 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
     not an added indefinite gate. No PERF-09 rerun; production remains NO_GO.
 - [x] PERF-12: Review table/rehearsal-schema cleanup with ownership, dependency and retention proof; deletion remains separately authorized.
 - [ ] PERF-13: Repeat matched live measurements, verify relevant correctness gates and set supported regression budgets.
-  - 2026-10-18 [PERF-06 after-rollout comparison](../docs/backend-performance-06-closure-2026-10-18.md):
-    all 63 template reads return 200 and backend p95 falls 17.2–17.5%, while client
-    p95 increases 7.4%, 26.8% and 9.9% across one/four/cursor-selected cases. Preserve
-    every sample and exact-deployment correlation. No specific network/ingress
-    cause is established; investigate end-to-end tails without changing pools,
-    deadlines or production NO_GO by assumption. PERF-06 closes only its stated
-    backend query/authority and owner-approved live/local scope.
+  - 2026-10-18 [verification/runtime checkpoint](../docs/backend-performance-13-verification-2026-10-18.md):
+    Native1120 matched samples and all nine investigation bands pass; command
+    ceilings are unchanged. The preceding runner checkpoint passes full CI599
+    integration/2128 coverage tests. Three capped live campaigns preserve fail-stop
+    evidence. The owner accepts the sustained-backlog guard; the third baseline
+    passes399/399 and caps1/2 complete, but cap4 stops at a2105ms advisory wait.
+    Across all campaigns1437 submitted reads return200; scoped data/configuration
+    remains unchanged. A local regression reproduces exclusive billing-read
+    contention against shared booking readers. The candidate adds a DB-enforced
+    read-only/shared facade for billing views while retaining exclusive commands.
+    All17 focused local cases pass. Keep open pending exact candidate CI, separate
+    authorized rollout and a fresh complete live cohort; no merge/deployment or
+    production GO. Earlier failures and unknown historical holder limits remain.
   - 2026-10-18 [PERF-07 retained limits](../docs/backend-performance-07-closure-2026-10-18.md):
     the selected three-order native page improves 32.579%, but one requested order
     regresses 19.568% (5 -> 6 HTTP commands) and the cursor page improves only

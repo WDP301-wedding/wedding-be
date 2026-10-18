@@ -290,6 +290,18 @@ warm/initial conditions, all statuses and p50/p95, rather than only the fastest 
 Acceptance: regression thresholds from measured stable results; no correctness or
 security regression; rollback and unresolved provider/readiness gates recorded.
 
+2026-10-18 [PERF-13 verification checkpoint](../docs/backend-performance-13-verification-2026-10-18.md):
+runner accounting/negative controls, native1120 matched samples, unchanged command
+ceilings and all nine observational latency bands pass. The preceding runner-only
+checkpoint passes CI599 integration/2128 coverage tests. Three bounded live
+campaigns remain preserved; the owner-approved sustained-backlog guard stops the
+third at cap4, after a full399/399 baseline and complete caps1/2. All1437 submitted
+reads return200; scoped data/configuration remains unchanged. A billing read-lock
+candidate passes17 focused local tests, retaining DB-enforced read-only/shared
+views and the original exclusive command fence. PERF-13 stays open pending exact
+candidate CI, separately authorized rollout and a complete fresh live cohort.
+Production NO_GO/provider gates remain separate; no merge/deployment is performed.
+
 ## Verification for implementation
 
 After each source/schema slice, run required typecheck, lint, unit/integration and

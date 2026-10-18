@@ -45,27 +45,30 @@ export function createPaymentsBillingProviders(
     scope,
   );
   const billing = createPrismaBillingPersistence(prisma, scope);
-  const boundary: BookingBoundaryUnitOfWork = Object.freeze({
-    async run<T>(
-      input: Readonly<{ bookingId: string; context: ContractContext }>,
-      work: (scopedContext: ContractContext) => Promise<T>,
-    ): Promise<T> {
-      for (let attempt = 1; ; attempt++) {
-        try {
-          return await scope.boundary.run(input, work);
-        } catch (error) {
-          // Retry the whole boundary, including all owner writes, never an aborted
-          // transaction participant. Business/evidence failures are not retryable.
-          if (
-            !(error instanceof Prisma.PrismaClientKnownRequestError) ||
-            !['P2034', 'P2002'].includes(error.code) ||
-            attempt >= 3
-          )
-            throw error;
+  const retryingBoundary = (owner: BookingBoundaryUnitOfWork): BookingBoundaryUnitOfWork =>
+    Object.freeze({
+      async run<T>(
+        input: Readonly<{ bookingId: string; context: ContractContext }>,
+        work: (scopedContext: ContractContext) => Promise<T>,
+      ): Promise<T> {
+        for (let attempt = 1; ; attempt++) {
+          try {
+            return await owner.run(input, work);
+          } catch (error) {
+            // Retry the whole boundary, including all owner writes, never an aborted
+            // transaction participant. Business/evidence failures are not retryable.
+            if (
+              !(error instanceof Prisma.PrismaClientKnownRequestError) ||
+              !['P2034', 'P2002'].includes(error.code) ||
+              attempt >= 3
+            )
+              throw error;
+          }
         }
-      }
-    },
-  });
+      },
+    });
+  const boundary = retryingBoundary(scope.boundary);
+  const readBoundary = retryingBoundary(scope.readBoundary);
   const deposits = createDepositOrchestrationService({
     ledger: billing.repository,
     booking: booking.lifecycleReader,
@@ -107,7 +110,7 @@ export function createPaymentsBillingProviders(
     views: createBillingViewsService({
       ledger: billing.repository,
       operations: operationsRepository,
-      boundary,
+      boundary: readBoundary,
     }),
     reporting: createBillingReportingReader(prisma),
     boundary,
