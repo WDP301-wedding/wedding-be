@@ -1,0 +1,2829 @@
+{
+  "schemaVersion": 1,
+  "task": "PERF-08",
+  "date": "2026-10-18",
+  "timezone": "Asia/Saigon",
+  "status": "RUNTIME_VERIFIED_CLOSURE_DOCUMENTATION_READY",
+  "pr": "https://github.com/WDP301-wedding/wedding-be/pull/68",
+  "authorization": {
+    "at": "2026-10-18T07:28:20.688Z",
+    "humanInstruction": "Cho phép merge, triển khai, kiểm tra và đóng PERF-08",
+    "scope": "Merge reviewed PR68 head 81369e6; automatic Railway demo rollout; GET and two-session revocation checks; maximum one additional read-only connection; update and merge evidence/checklist after passing CI. No migration, pool, region, provider setting, notification creation, email/push send or mark-read."
+  },
+  "merge": {
+    "at": "2026-10-18T07:28:45.243Z",
+    "sha": "38c6433ce55a5733eff74b297a3f9d1375d154f5",
+    "merged": true,
+    "message": "Pull Request successfully merged",
+    "head": "81369e61c68870a7a57c9d307ef66be15e78d114",
+    "base": "873aa4c56eca6ef80563768554d726e5bae9eb46",
+    "authorization": {
+      "at": "2026-10-18T07:28:20.688Z",
+      "humanInstruction": "Cho phép merge, triển khai, kiểm tra và đóng PERF-08",
+      "scope": "Merge reviewed PR68 head 81369e6; automatic Railway demo rollout; GET and two-session revocation checks; maximum one additional read-only connection; update and merge evidence/checklist after passing CI. No migration, pool, region, provider setting, notification creation, email/push send or mark-read."
+    }
+  },
+  "exactHeadCi": {
+    "at": "2026-10-18T07:26:40.024Z",
+    "pr": "https://github.com/WDP301-wedding/wedding-be/pull/68",
+    "head": "81369e61c68870a7a57c9d307ef66be15e78d114",
+    "id": 39107116787,
+    "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39107116787",
+    "attempt": 1,
+    "conclusion": "success",
+    "jobs": [
+      {
+        "id": 117615291987,
+        "name": "Static, test, build, and audit gates",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Generate Prisma client",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check formatting",
+            "conclusion": "success"
+          },
+          {
+            "name": "Lint",
+            "conclusion": "success"
+          },
+          {
+            "name": "Typecheck",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run unit tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run contract tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Verify generated OpenAPI artifact",
+            "conclusion": "success"
+          },
+          {
+            "name": "Build production output",
+            "conclusion": "success"
+          },
+          {
+            "name": "Audit locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "summaries": [
+          "found 0 vulnerabilities",
+          " Test Files  162 passed (162)",
+          "      Tests  1461 passed (1461)",
+          " Test Files  20 passed (20)",
+          "      Tests  59 passed (59)"
+        ]
+      },
+      {
+        "id": 117615292155,
+        "name": "PostgreSQL migration and integration gates",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Initialize containers",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Generate Prisma client",
+            "conclusion": "success"
+          },
+          {
+            "name": "Deploy migrations to empty PostgreSQL",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run PostgreSQL integration tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Enforce full-suite coverage with PostgreSQL",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Stop containers",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "summaries": [
+          "found 0 vulnerabilities",
+          " Test Files  106 passed (106)",
+          "      Tests  586 passed (586)",
+          " Test Files  288 passed (288)",
+          "      Tests  2106 passed (2106)",
+          "All files          |   96.66 |    93.52 |   98.45 |   97.57 |                   "
+        ]
+      }
+    ]
+  },
+  "mergeCi": {
+    "id": 39107804177,
+    "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39107804177",
+    "head": "38c6433ce55a5733eff74b297a3f9d1375d154f5",
+    "status": "completed",
+    "conclusion": "success",
+    "attempt": 1,
+    "jobs": [
+      {
+        "id": 117617331294,
+        "name": "Static, test, build, and audit gates",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39107804177/job/117617331294",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Generate Prisma client",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check formatting",
+            "conclusion": "success"
+          },
+          {
+            "name": "Lint",
+            "conclusion": "success"
+          },
+          {
+            "name": "Typecheck",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run unit tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run contract tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Verify generated OpenAPI artifact",
+            "conclusion": "success"
+          },
+          {
+            "name": "Build production output",
+            "conclusion": "success"
+          },
+          {
+            "name": "Audit locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "counts": [
+          "2026-10-18T07:29:05.9589639Z found 0 vulnerabilities",
+          "2026-10-18T07:30:48.7153705Z  Test Files  162 passed (162)",
+          "2026-10-18T07:30:48.7162412Z       Tests  1461 passed (1461)",
+          "2026-10-18T07:30:54.9719280Z  Test Files  20 passed (20)",
+          "2026-10-18T07:30:54.9720361Z       Tests  59 passed (59)"
+        ],
+        "sha256": "a4336255763ad57c06aafbafc9ea7a4901b1d56d6f46189aa2e40acf6ae3e8cb"
+      },
+      {
+        "id": 117617331413,
+        "name": "PostgreSQL migration and integration gates",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39107804177/job/117617331413",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Initialize containers",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Generate Prisma client",
+            "conclusion": "success"
+          },
+          {
+            "name": "Deploy migrations to empty PostgreSQL",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run PostgreSQL integration tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Enforce full-suite coverage with PostgreSQL",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Stop containers",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "counts": [
+          "2026-10-18T07:29:24.6328219Z found 0 vulnerabilities",
+          "2026-10-18T07:32:24.1428714Z  Test Files  106 passed (106)",
+          "2026-10-18T07:32:24.1444766Z       Tests  586 passed (586)",
+          "2026-10-18T07:36:35.4208885Z  Test Files  288 passed (288)",
+          "2026-10-18T07:36:35.4225215Z       Tests  2106 passed (2106)",
+          "2026-10-18T07:36:35.4521391Z All files          |   96.66 |    93.52 |   98.45 |   97.57 |                   "
+        ],
+        "sha256": "916990b6f525b831483795fb86abf44b8ace3aaaa857133be0441a8d58038a9b"
+      }
+    ]
+  },
+  "treeIdentical": true,
+  "unchangedSourceContinuity": [
+    {
+      "path": "src/modules/identity-access",
+      "before": "b471936e08617a82e7957a9f14bff4119910dd02",
+      "after": "b471936e08617a82e7957a9f14bff4119910dd02",
+      "equal": true
+    },
+    {
+      "path": "src/modules/notifications-automation/http",
+      "before": "1f9965157c1e42a2dddd032bfdd1e0ee43307d84",
+      "after": "1f9965157c1e42a2dddd032bfdd1e0ee43307d84",
+      "equal": true
+    },
+    {
+      "path": "src/modules/notifications-automation/infrastructure/notification-foundation.ts",
+      "before": "36301b4bf38a2eaf309f9db147c6ca87a68308b8",
+      "after": "36301b4bf38a2eaf309f9db147c6ca87a68308b8",
+      "equal": true
+    },
+    {
+      "path": "prisma",
+      "before": "a6a0f1b7a141117f9370ea5f922c974375b81833",
+      "after": "a6a0f1b7a141117f9370ea5f922c974375b81833",
+      "equal": true
+    },
+    {
+      "path": "openapi",
+      "before": "160c3bb09a500367c7fa43f050301b444ce83e04",
+      "after": "160c3bb09a500367c7fa43f050301b444ce83e04",
+      "equal": true
+    },
+    {
+      "path": "package.json",
+      "before": "a165f63c0e251eee65d56fc31684b4827765e13e",
+      "after": "a165f63c0e251eee65d56fc31684b4827765e13e",
+      "equal": true
+    },
+    {
+      "path": "package-lock.json",
+      "before": "661f3c1edaadcaeaca5612c2f2e2f06450cf4fe7",
+      "after": "661f3c1edaadcaeaca5612c2f2e2f06450cf4fe7",
+      "equal": true
+    },
+    {
+      "path": ".node-version",
+      "before": "df6ae3370f9f89272d88629c442cf554d6c1f9fb",
+      "after": "df6ae3370f9f89272d88629c442cf554d6c1f9fb",
+      "equal": true
+    },
+    {
+      "path": "railway.json",
+      "before": "75164716ec20a78fc6ed72ac53cb9927866a0b82",
+      "after": "75164716ec20a78fc6ed72ac53cb9927866a0b82",
+      "equal": true
+    },
+    {
+      "path": ".railway",
+      "before": "d662f9b7b914565b2f45b4a0abbbc00d6914ae60",
+      "after": "d662f9b7b914565b2f45b4a0abbbc00d6914ae60",
+      "equal": true
+    },
+    {
+      "path": "Dockerfile",
+      "before": "aa33d79c03ffc349380167295db50b3ee8002047",
+      "after": "aa33d79c03ffc349380167295db50b3ee8002047",
+      "equal": true
+    },
+    {
+      "path": "tsconfig.build.json",
+      "before": "588c2458d87d500adea3b91de433b15a5cd29127",
+      "after": "588c2458d87d500adea3b91de433b15a5cd29127",
+      "equal": true
+    },
+    {
+      "path": ".github/workflows",
+      "before": "5e937b867a64a4e182cea0369118ba69190ee25d",
+      "after": "5e937b867a64a4e182cea0369118ba69190ee25d",
+      "equal": true
+    }
+  ],
+  "measuredModules": [
+    {
+      "key": "candidateInbox",
+      "path": "src/modules/notifications-automation/infrastructure/notification-inbox.reader.ts",
+      "sourceSha256": "d03c04178e9d42e7156faab526d5f8fa905a288d9e7a6174a0a78c56d53fb8c6",
+      "compiledSha256": "ad33e83a646ba5df5a66a91575466530c58742174a30301a5f2ab22a932ed41c",
+      "mergedSourceMatchesMeasuredCandidate": true
+    },
+    {
+      "key": "candidateBooking",
+      "path": "src/modules/booking-lifecycle/infrastructure/notification-context.reader.ts",
+      "sourceSha256": "4aefbe5bb3f108029ab707debebb6337bb075901ef61e6e611b34ce3d4264da1",
+      "compiledSha256": "f5cb21725524f2c137b6d55e27830f9017d6c9211ae0207ab659067a3219f3f4",
+      "mergedSourceMatchesMeasuredCandidate": true
+    },
+    {
+      "key": "candidateSettings",
+      "path": "src/modules/notifications-automation/application/notification-settings.ts",
+      "sourceSha256": "b2a2d794a8eb7fb007575a01bc240ae46a131b724a73c9d2d7132e837586cdd2",
+      "compiledSha256": "5d8aee968ed67a175e3bbf60d4db546f64af493c0d1e997c60cc8f2205b4d3a4",
+      "mergedSourceMatchesMeasuredCandidate": true
+    }
+  ],
+  "acceptance": {
+    "scope": {
+      "backendOnly": true,
+      "endpoints": [
+        "GET /api/v1/notifications/inbox",
+        "GET /api/v1/notifications/unread-count"
+      ],
+      "liveRoles": [
+        "MANAGER",
+        "COUPLE"
+      ],
+      "liveInboxes": "Both empty; no populated-live claim",
+      "localCardinalities": [
+        0,
+        1,
+        20
+      ],
+      "noLiveFixtureOrReadStateWrites": true,
+      "noProviderSendOrPaidOperation": true
+    },
+    "nativeSummary": [
+      {
+        "case": "manager-inbox-empty",
+        "variants": {
+          "baseline": {
+            "n": 20,
+            "p50Ms": 1197.792757000003,
+            "p95Ms": 1208.2848570000497,
+            "commands": [
+              8
+            ]
+          },
+          "deployed": {
+            "n": 20,
+            "p50Ms": 900.103769999987,
+            "p95Ms": 902.7150819999515,
+            "commands": [
+              6
+            ]
+          },
+          "candidate": {
+            "n": 20,
+            "p50Ms": 601.4087250000011,
+            "p95Ms": 608.8937559999758,
+            "commands": [
+              4
+            ]
+          }
+        },
+        "originalToFinalP95ReductionPercent": 49.606770913959174,
+        "deployedToCandidateP95ReductionPercent": 32.54862268934502
+      },
+      {
+        "case": "manager-unread-empty",
+        "variants": {
+          "baseline": {
+            "n": 20,
+            "p50Ms": 1048.1553290000302,
+            "p95Ms": 1053.4798990000272,
+            "commands": [
+              7
+            ]
+          },
+          "deployed": {
+            "n": 20,
+            "p50Ms": 750.6037589999905,
+            "p95Ms": 752.0442119999789,
+            "commands": [
+              5
+            ]
+          },
+          "candidate": {
+            "n": 20,
+            "p50Ms": 601.6360719999975,
+            "p95Ms": 604.320298000006,
+            "commands": [
+              4
+            ]
+          }
+        },
+        "originalToFinalP95ReductionPercent": 42.63580172971194,
+        "deployedToCandidateP95ReductionPercent": 19.64298263889531
+      },
+      {
+        "case": "couple-inbox-empty",
+        "variants": {
+          "baseline": {
+            "n": 20,
+            "p50Ms": 1198.2901679999995,
+            "p95Ms": 1207.0115000000005,
+            "commands": [
+              8
+            ]
+          },
+          "deployed": {
+            "n": 20,
+            "p50Ms": 899.5525909999851,
+            "p95Ms": 903.1134150000289,
+            "commands": [
+              6
+            ]
+          },
+          "candidate": {
+            "n": 20,
+            "p50Ms": 602.004431999987,
+            "p95Ms": 605.4019179999596,
+            "commands": [
+              4
+            ]
+          }
+        },
+        "originalToFinalP95ReductionPercent": 49.8429038994277,
+        "deployedToCandidateP95ReductionPercent": 32.96501768828889
+      },
+      {
+        "case": "couple-unread-empty",
+        "variants": {
+          "baseline": {
+            "n": 20,
+            "p50Ms": 1048.2402199999924,
+            "p95Ms": 1062.6280840000254,
+            "commands": [
+              7
+            ]
+          },
+          "deployed": {
+            "n": 20,
+            "p50Ms": 751.1691789999604,
+            "p95Ms": 755.1517519999761,
+            "commands": [
+              5
+            ]
+          },
+          "candidate": {
+            "n": 20,
+            "p50Ms": 601.4047959999953,
+            "p95Ms": 604.2268990000011,
+            "commands": [
+              4
+            ]
+          }
+        },
+        "originalToFinalP95ReductionPercent": 43.13844061738663,
+        "deployedToCandidateP95ReductionPercent": 19.986029642420768
+      }
+    ],
+    "localSummary": [
+      {
+        "case": "inbox-empty",
+        "variants": {
+          "before": {
+            "n": 20,
+            "p95Ms": 376.72459999999955,
+            "commands": [
+              8
+            ]
+          },
+          "current": {
+            "n": 20,
+            "p95Ms": 190.0757999999987,
+            "commands": [
+              4
+            ]
+          }
+        },
+        "p95ReductionPercent": 49.545158452620576
+      },
+      {
+        "case": "unread-empty",
+        "variants": {
+          "before": {
+            "n": 20,
+            "p95Ms": 330.44910000000164,
+            "commands": [
+              7
+            ]
+          },
+          "current": {
+            "n": 20,
+            "p95Ms": 189.33989999999903,
+            "commands": [
+              4
+            ]
+          }
+        },
+        "p95ReductionPercent": 42.70224975646837
+      },
+      {
+        "case": "inbox-populated",
+        "variants": {
+          "before": {
+            "n": 20,
+            "p95Ms": 376.61870000000636,
+            "commands": [
+              8
+            ]
+          },
+          "current": {
+            "n": 20,
+            "p95Ms": 188.71489999999903,
+            "commands": [
+              4
+            ]
+          }
+        },
+        "p95ReductionPercent": 49.89231814564814
+      },
+      {
+        "case": "unread-populated",
+        "variants": {
+          "before": {
+            "n": 20,
+            "p95Ms": 331.21399999999994,
+            "commands": [
+              7
+            ]
+          },
+          "current": {
+            "n": 20,
+            "p95Ms": 188.08720000000176,
+            "commands": [
+              4
+            ]
+          }
+        },
+        "p95ReductionPercent": 43.21278689910396
+      }
+    ],
+    "originalReceiptPath": "tasks/evidence/perf08-verification-2026-10-18.json",
+    "originalReceiptUnchanged": true,
+    "all77OriginalOperatorArtifactsUnchanged": true
+  },
+  "serving": {
+    "at": "2026-10-18T07:39:38.856Z",
+    "runtime": {
+      "deploymentId": "dcfff39c-1c18-4a38-98b7-15ab75e2a438",
+      "source": "38c6433ce55a5733eff74b297a3f9d1375d154f5",
+      "image": "sha256:21c946494ca273f22e82a9d948c1db4270789d718b555854a2c74ea8e2599683",
+      "configurationDigest": "5bb1f835c3514bca7e8db5d8c01d34fb92be34b82742eed21ad2dc30a41aceb5",
+      "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+      "controls": {
+        "DB_POOL_MAX": "1",
+        "DB_POOL_MAX_VENUE_CATALOG": "3",
+        "DB_POOL_MAX_ANALYTICS": "2",
+        "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000",
+        "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+        "DB_CONNECTION_RESERVE": "36",
+        "DB_MAX_CONNECTIONS": "60",
+        "DB_DIAGNOSTICS_ENABLED": "false",
+        "DB_SAFE_READ_DEADLINE_ENABLED": "false"
+      }
+    },
+    "oldStopped": true,
+    "onlyNewDeploymentActive": true,
+    "configurationUnchanged": true,
+    "ci": [
+      {
+        "id": 39107804177,
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39107804177",
+        "head": "38c6433ce55a5733eff74b297a3f9d1375d154f5",
+        "status": "completed",
+        "conclusion": "success",
+        "attempt": 1
+      }
+    ],
+    "smoke": [
+      {
+        "path": "/health/live",
+        "method": "GET",
+        "status": 200,
+        "requestId": "2dfe1a3d-8f53-4932-8198-62f757289875"
+      },
+      {
+        "path": "/health/ready",
+        "method": "GET",
+        "status": 200,
+        "requestId": "035417c1-622e-4cc6-a22f-1a448969d1ac"
+      },
+      {
+        "path": "/api/v1/openapi.json",
+        "method": "GET",
+        "status": 200,
+        "requestId": "c6650c43-9881-460d-b851-665dffb6d00d",
+        "sha256": "19da7dafc991d316f7f048a58c6446deabb2e724edb3a49d55e4709ce14d04e2"
+      },
+      {
+        "path": "/api/v1/notifications/inbox",
+        "method": "GET",
+        "status": 401,
+        "requestId": "06a0a376-cb60-47f7-98fd-42f99592f992"
+      },
+      {
+        "path": "/api/v1/notifications/unread-count",
+        "method": "GET",
+        "status": 401,
+        "requestId": "1195518c-3041-42fd-bae8-e8bd9549b18b"
+      }
+    ]
+  },
+  "finalPostflight": {
+    "at": "2026-10-18T07:41:48.410Z",
+    "runtime": {
+      "deploymentId": "dcfff39c-1c18-4a38-98b7-15ab75e2a438",
+      "source": "38c6433ce55a5733eff74b297a3f9d1375d154f5",
+      "image": "sha256:21c946494ca273f22e82a9d948c1db4270789d718b555854a2c74ea8e2599683",
+      "configurationDigest": "5bb1f835c3514bca7e8db5d8c01d34fb92be34b82742eed21ad2dc30a41aceb5",
+      "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+      "controls": {
+        "DB_POOL_MAX": "1",
+        "DB_POOL_MAX_VENUE_CATALOG": "3",
+        "DB_POOL_MAX_ANALYTICS": "2",
+        "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000",
+        "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+        "DB_CONNECTION_RESERVE": "36",
+        "DB_MAX_CONNECTIONS": "60",
+        "DB_DIAGNOSTICS_ENABLED": "false",
+        "DB_SAFE_READ_DEADLINE_ENABLED": "false"
+      }
+    },
+    "inventory": {
+      "tables": {
+        "Booking": {
+          "count": 11,
+          "sha256": "151c9ddd6eb3065d2b38cb23046e291337e797b319184e2c23983c966cc02fdc"
+        },
+        "Consultation": {
+          "count": 16,
+          "sha256": "80af80dbc83bec32a0a018ee0ec8c16e557dc0f47daa1a2fff3f1e8cbf848dc0"
+        },
+        "ConsultationAccess": {
+          "count": 10,
+          "sha256": "47776976566192a28c4c8cce053ef0ec5edde4e67880a55fe469456952fe059d"
+        },
+        "GuestWorkspace": {
+          "count": 5,
+          "sha256": "21e162844e736902ced6fe71397b56522ed4d670283c8a3d84ba59b400673723"
+        },
+        "GuestPlanRevision": {
+          "count": 5,
+          "sha256": "302c9c38d76e44bf147e24ffb6a2141dc865b096e7caa379b7f2d4b13234204d"
+        },
+        "Guest": {
+          "count": 16,
+          "sha256": "c5f235cbe2bb3230a03760c8defded7307e66de64e9a59f862db0e08bae5e540"
+        },
+        "GuestGroup": {
+          "count": 20,
+          "sha256": "946e1fa84f3306c8dc063899a8378699ce4e21984a2d5519b328d4f3c48a458b"
+        },
+        "GuestHistory": {
+          "count": 36,
+          "sha256": "8e1cb71151e6624c6fa8e9e7a04954d0e21aa55a849cd9a4e9e1b142b9cafdfc"
+        },
+        "SeatingPlan": {
+          "count": 2,
+          "sha256": "473f2ab8e72b063df8e9d3045fa5095f615e2ba8b5002f733e364a82e90c8245"
+        },
+        "SeatingPlanRevision": {
+          "count": 4,
+          "sha256": "45de2e2833ed87c4c91d1e29d3b6113321d5ff82290498a38a333024b1ab7d55"
+        },
+        "StaffConfiguration": {
+          "count": 5,
+          "sha256": "7c014320c7b7e955caf0de7bef4331d7c0e1f7983a6a56c30728c07070451d9c"
+        },
+        "StaffAssignment": {
+          "count": 2,
+          "sha256": "2f5b76d1861c2685aac6c9a2b1c5dd1d37a920bf8d40785f9bfeead744a15622"
+        },
+        "StaffHistory": {
+          "count": 9,
+          "sha256": "8216e344eeb2e353de13a17b7130516d00917c623b63a9033eefc06afea274d2"
+        },
+        "StaffCheckInRecord": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "CommercialContractRevision": {
+          "count": 2,
+          "sha256": "214f4da445aa0f3fefaea669bc42006b70afee422250d6ab1f4a7d046a9a908a"
+        },
+        "FinalInvoiceRevision": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "BillingLedgerEntry": {
+          "count": 11,
+          "sha256": "d091b189fa3a6c6ad1b79fc1050ea799a52aec989595712d8671e71760ee65ff"
+        },
+        "InvitationPrintOrder": {
+          "count": 1,
+          "sha256": "b678300081034c67c7d698fe7248fd7b7f386e5b412ce53c42958bff74248203"
+        },
+        "InvitationPrintLine": {
+          "count": 1,
+          "sha256": "eee25413e140edcd488b8253e23fb5b1fb7ba509a5bd922882da057916e33baf"
+        },
+        "InvitationCommercialRevision": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "InvitationPrintAudit": {
+          "count": 1,
+          "sha256": "84d96d6aff780101a03b1fd707dfd9dcb402cad2ca96d8180aabb83993132196"
+        },
+        "AccountRole": {
+          "count": 2,
+          "sha256": "9703dfea70d4dab1556c1fd72d18b7f06dcffa4b252d7faef4eb555112db2c6b"
+        },
+        "NotificationRecipient": {
+          "count": 1,
+          "sha256": "a0e5d426b4d77648d8edf76afad9444d57115878f699f9a4f13f56a998d4c14c"
+        },
+        "NotificationInbox": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "NotificationPreference": {
+          "count": 1,
+          "sha256": "5c6ddff6a17cf2c3ee968907f4969da8d56636dcb841780e45efce626cbf33e3"
+        },
+        "NotificationInstallation": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "NotificationCommand": {
+          "count": 1,
+          "sha256": "e771d6bffdb9950e9bc0d6a4d9701d4c406b1f9a824d87f9aab4cced3d8ff481"
+        },
+        "NotificationIntent": {
+          "count": 41,
+          "sha256": "2e3c3d4026723494ae1af4b1947aa3134d149444880c71c51ee51a76dd02959e"
+        },
+        "NotificationAttempt": {
+          "count": 82,
+          "sha256": "eed801d69916dd20d8b271cb9349487edfc9441e32b0d13e2f8bddbef1a2fcc8"
+        },
+        "NotificationCredential": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "NotificationPushDelivery": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "NotificationEventReceipt": {
+          "count": 16,
+          "sha256": "9a25f5dc1d43c2c8b77dfc1df8a66331179ffde12cd8d81ec0aded25459395de"
+        }
+      },
+      "migrations": {
+        "count": 61,
+        "sha256": "b7d90da8b39b7db5f6ef24ec1084f4ea2d4e4915664ebfccd00345c18fbf910e",
+        "allChecksumsMatch": true
+      },
+      "scope": {
+        "accounts": 2,
+        "consultations": 16,
+        "bookings": 11,
+        "recipients": 1,
+        "intents": 41
+      }
+    },
+    "businessUnchanged": true,
+    "migrationsUnchanged": true,
+    "configurationUnchanged": true,
+    "correlated": [
+      {
+        "path": "/health/live",
+        "method": "GET",
+        "status": 200,
+        "requestId": "2dfe1a3d-8f53-4932-8198-62f757289875",
+        "matched": true,
+        "backendMs": 5.364,
+        "route": "/health/live"
+      },
+      {
+        "path": "/health/ready",
+        "method": "GET",
+        "status": 200,
+        "requestId": "035417c1-622e-4cc6-a22f-1a448969d1ac",
+        "matched": true,
+        "backendMs": 1209.174,
+        "route": "/health/ready"
+      },
+      {
+        "path": "/api/v1/openapi.json",
+        "method": "GET",
+        "status": 200,
+        "requestId": "c6650c43-9881-460d-b851-665dffb6d00d",
+        "sha256": "19da7dafc991d316f7f048a58c6446deabb2e724edb3a49d55e4709ce14d04e2",
+        "matched": true,
+        "backendMs": 47.705,
+        "route": "/api/v1/openapi.json"
+      },
+      {
+        "path": "/api/v1/notifications/inbox",
+        "method": "GET",
+        "status": 401,
+        "requestId": "06a0a376-cb60-47f7-98fd-42f99592f992",
+        "matched": true,
+        "backendMs": 15.643,
+        "route": "/notifications/inbox"
+      },
+      {
+        "path": "/api/v1/notifications/unread-count",
+        "method": "GET",
+        "status": 401,
+        "requestId": "1195518c-3041-42fd-bae8-e8bd9549b18b",
+        "matched": true,
+        "backendMs": 10.581,
+        "route": "/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "login",
+        "path": "/auth/web-sessions",
+        "method": "POST",
+        "round": 0,
+        "at": "2026-10-18T07:39:43.781Z",
+        "requestId": "1f64a348-1f58-439e-a0ee-e0cd7d441dd9",
+        "status": 201,
+        "ms": 3625.7545,
+        "noStore": true,
+        "noReferrer": true,
+        "matched": true,
+        "backendMs": 3210.744,
+        "route": "/api/v1/auth/web-sessions"
+      },
+      {
+        "role": "couple",
+        "label": "login",
+        "path": "/auth/web-sessions",
+        "method": "POST",
+        "round": 0,
+        "at": "2026-10-18T07:39:47.408Z",
+        "requestId": "8ee3fa53-4ae8-4f06-8c4b-0ee63df8c970",
+        "status": 201,
+        "ms": 2317.982,
+        "noStore": true,
+        "noReferrer": true,
+        "matched": true,
+        "backendMs": 2084.78,
+        "route": "/api/v1/auth/web-sessions"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 0,
+        "at": "2026-10-18T07:39:49.727Z",
+        "requestId": "0d01224f-ed22-45b5-b46d-74c2ffa1728a",
+        "status": 200,
+        "ms": 894.8759999999993,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 624.249,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 0,
+        "at": "2026-10-18T07:39:50.623Z",
+        "requestId": "9295eef3-d663-450d-bc8d-9cfafe0c1e3e",
+        "status": 200,
+        "ms": 862.6724999999997,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 609.291,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 0,
+        "at": "2026-10-18T07:39:51.487Z",
+        "requestId": "dc3c50e6-0cfc-47b9-9264-1af712cb5f83",
+        "status": 200,
+        "ms": 863.4338000000007,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 603.43,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 0,
+        "at": "2026-10-18T07:39:52.351Z",
+        "requestId": "1f04460b-cc75-4d57-b39a-f1d34a91c5ae",
+        "status": 200,
+        "ms": 850.6230999999989,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 600.685,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 1,
+        "at": "2026-10-18T07:39:53.203Z",
+        "requestId": "56690c06-ef9a-4fbf-af04-50cb318210af",
+        "status": 200,
+        "ms": 871.0627000000004,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 603.859,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 1,
+        "at": "2026-10-18T07:39:54.075Z",
+        "requestId": "afad5f59-dd34-4740-ad2d-d9c6ba9ee8cc",
+        "status": 200,
+        "ms": 885.1660000000011,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 603.703,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 1,
+        "at": "2026-10-18T07:39:54.961Z",
+        "requestId": "a88e78dd-fb87-4fd4-8bbe-316df67f46f2",
+        "status": 200,
+        "ms": 843.6161000000011,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 602.615,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 1,
+        "at": "2026-10-18T07:39:55.806Z",
+        "requestId": "2321209a-6612-4489-a17d-8eac3a3edb82",
+        "status": 200,
+        "ms": 831.0491999999995,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 602.252,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 2,
+        "at": "2026-10-18T07:39:56.638Z",
+        "requestId": "d947c280-c0f0-4303-90ee-c470aea81a4a",
+        "status": 200,
+        "ms": 838.4132000000009,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 604.737,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 2,
+        "at": "2026-10-18T07:39:57.478Z",
+        "requestId": "17ce8d53-a30e-4b55-99c0-bbdd9f9d3d59",
+        "status": 200,
+        "ms": 827.3907999999992,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 599.677,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 2,
+        "at": "2026-10-18T07:39:58.306Z",
+        "requestId": "28f9eee6-485c-45d1-84e4-df5c70636592",
+        "status": 200,
+        "ms": 836.4709000000003,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 602.054,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 2,
+        "at": "2026-10-18T07:39:59.144Z",
+        "requestId": "7a8be99f-8f00-41e1-82ce-c48bbfd1646d",
+        "status": 200,
+        "ms": 834.2075000000004,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 605.173,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 3,
+        "at": "2026-10-18T07:39:59.979Z",
+        "requestId": "e1e3f3a2-879d-469b-8c20-b4b75a1a1e87",
+        "status": 200,
+        "ms": 879.4414000000015,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 604.497,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 3,
+        "at": "2026-10-18T07:40:00.859Z",
+        "requestId": "3f790559-83e2-49c6-bf5f-4fa6f1b31f51",
+        "status": 200,
+        "ms": 863.4591,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 606.399,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 3,
+        "at": "2026-10-18T07:40:01.724Z",
+        "requestId": "dd95764a-05fc-4413-bf74-750de504ff77",
+        "status": 200,
+        "ms": 850.9413999999997,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 608.56,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 3,
+        "at": "2026-10-18T07:40:02.576Z",
+        "requestId": "7ba7b1af-95a4-4d54-ad4a-297e59836450",
+        "status": 200,
+        "ms": 836.3043999999973,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 603.737,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 4,
+        "at": "2026-10-18T07:40:03.413Z",
+        "requestId": "45d348e9-5166-4b77-a974-ad386cc2ee46",
+        "status": 200,
+        "ms": 835.3904999999977,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 607.21,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 4,
+        "at": "2026-10-18T07:40:04.251Z",
+        "requestId": "4d838b28-b867-4391-8a45-ff6c7842a516",
+        "status": 200,
+        "ms": 888.3644999999997,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 615.77,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 4,
+        "at": "2026-10-18T07:40:05.140Z",
+        "requestId": "3cb759a2-fd72-4896-a6fd-0f9c273159fc",
+        "status": 200,
+        "ms": 835.7144999999982,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 606.533,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 4,
+        "at": "2026-10-18T07:40:05.977Z",
+        "requestId": "4636e40d-7805-4ff9-a80a-fa303d5450f7",
+        "status": 200,
+        "ms": 861.0086999999985,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 615.105,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 5,
+        "at": "2026-10-18T07:40:06.839Z",
+        "requestId": "dec73690-c1eb-457f-bcde-54cb1ec821c0",
+        "status": 200,
+        "ms": 860.0248999999967,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 600.787,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 5,
+        "at": "2026-10-18T07:40:07.700Z",
+        "requestId": "d552f6d0-dccc-4f9c-b55c-cc5f635d73f8",
+        "status": 200,
+        "ms": 882.8741000000009,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 617.948,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 5,
+        "at": "2026-10-18T07:40:08.584Z",
+        "requestId": "a42fc6c7-dc9e-4c47-ba35-21ffa3171c56",
+        "status": 200,
+        "ms": 1039.3408999999992,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 606.091,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 5,
+        "at": "2026-10-18T07:40:09.624Z",
+        "requestId": "26e214ac-9914-4595-8ede-0306dc832d88",
+        "status": 200,
+        "ms": 833.2527000000009,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 603.507,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 6,
+        "at": "2026-10-18T07:40:10.459Z",
+        "requestId": "e7ea2538-a39e-43cb-81b5-2663b017740e",
+        "status": 200,
+        "ms": 895.8498,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 622.073,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 6,
+        "at": "2026-10-18T07:40:11.356Z",
+        "requestId": "4190ac6b-103d-499d-ac9f-3313ceffc62a",
+        "status": 200,
+        "ms": 839.6911,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 605.365,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 6,
+        "at": "2026-10-18T07:40:12.197Z",
+        "requestId": "ad6fc7b3-47ec-4c8a-a443-eec7154636be",
+        "status": 200,
+        "ms": 845.5743999999977,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 604.988,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 6,
+        "at": "2026-10-18T07:40:13.044Z",
+        "requestId": "71b908ae-6c99-4e3d-8c54-d65a27a0cf89",
+        "status": 200,
+        "ms": 848.8775000000023,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 615.029,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 7,
+        "at": "2026-10-18T07:40:13.894Z",
+        "requestId": "c55cf95b-df28-45fd-b85f-0efcd3a47c33",
+        "status": 200,
+        "ms": 843.3925000000017,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 615.514,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 7,
+        "at": "2026-10-18T07:40:14.739Z",
+        "requestId": "a68d2f34-6b4d-40bf-b4e4-eff1e841ae17",
+        "status": 200,
+        "ms": 857.0605999999971,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 602.679,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 7,
+        "at": "2026-10-18T07:40:15.597Z",
+        "requestId": "d9135ae3-6de0-45b9-b5fd-7129f0efbbb1",
+        "status": 200,
+        "ms": 839.3361000000004,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 611.925,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 7,
+        "at": "2026-10-18T07:40:16.438Z",
+        "requestId": "b4d3c8f8-0462-4749-8a80-7dd97970f018",
+        "status": 200,
+        "ms": 842.8016000000025,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 606.89,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 8,
+        "at": "2026-10-18T07:40:17.282Z",
+        "requestId": "058cf64d-0318-4bea-8288-1b0d8cd6d262",
+        "status": 200,
+        "ms": 1357.2481000000043,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 1127.052,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 8,
+        "at": "2026-10-18T07:40:18.641Z",
+        "requestId": "0301e3aa-4d32-43ef-9bae-685c11de428a",
+        "status": 200,
+        "ms": 1207.6120999999985,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 945.637,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 8,
+        "at": "2026-10-18T07:40:19.850Z",
+        "requestId": "c9d73aaa-f5f9-4f56-b43f-d4b860771fda",
+        "status": 200,
+        "ms": 1194.4069999999992,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 966.47,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 8,
+        "at": "2026-10-18T07:40:21.045Z",
+        "requestId": "22348416-2d0a-432e-ab44-b46501a32464",
+        "status": 200,
+        "ms": 1797.9020000000019,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 1566.875,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 9,
+        "at": "2026-10-18T07:40:22.844Z",
+        "requestId": "a5a120a9-589a-4c31-a667-9920086a6c0a",
+        "status": 200,
+        "ms": 1802.4148999999961,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 1573.173,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 9,
+        "at": "2026-10-18T07:40:24.649Z",
+        "requestId": "552b776f-f770-4de1-aedd-219306542888",
+        "status": 200,
+        "ms": 1194.3989999999976,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 961.019,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 9,
+        "at": "2026-10-18T07:40:25.844Z",
+        "requestId": "b3533a21-b934-4bcd-a691-de8079f0a768",
+        "status": 200,
+        "ms": 1645.241900000001,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 1418.168,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 9,
+        "at": "2026-10-18T07:40:27.490Z",
+        "requestId": "0f802a3f-80fa-4fa3-9133-d1c7cdd1e7d4",
+        "status": 200,
+        "ms": 1493.676800000001,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 1267.278,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 10,
+        "at": "2026-10-18T07:40:28.985Z",
+        "requestId": "fd8bcfa3-685c-4be6-b91d-1f3c84a961bc",
+        "status": 200,
+        "ms": 834.9781000000003,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 604.139,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 10,
+        "at": "2026-10-18T07:40:29.822Z",
+        "requestId": "8866f633-cba8-49c9-a895-f142d6431b6c",
+        "status": 200,
+        "ms": 837.6110000000044,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 600.24,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 10,
+        "at": "2026-10-18T07:40:30.661Z",
+        "requestId": "46544066-bfa7-470c-a0c6-20404cc6a46f",
+        "status": 200,
+        "ms": 832.4084999999977,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 603.895,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 10,
+        "at": "2026-10-18T07:40:31.495Z",
+        "requestId": "8ae2a6d6-c346-4da1-aa46-cf68900c6bf2",
+        "status": 200,
+        "ms": 829.3548999999985,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 600.678,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 11,
+        "at": "2026-10-18T07:40:32.325Z",
+        "requestId": "6e5e628e-4433-41bb-8cf5-f9e0d7dae44b",
+        "status": 200,
+        "ms": 832.3993999999948,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 600.396,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 11,
+        "at": "2026-10-18T07:40:33.159Z",
+        "requestId": "adffb104-9c91-4ad9-8fbc-f8b49b5021f3",
+        "status": 200,
+        "ms": 833.5936000000002,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 603.661,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 11,
+        "at": "2026-10-18T07:40:33.995Z",
+        "requestId": "8658f06e-a479-46b7-aebd-b5a57452e819",
+        "status": 200,
+        "ms": 846.6785999999993,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 616.452,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 11,
+        "at": "2026-10-18T07:40:34.843Z",
+        "requestId": "2e0a9264-beb1-418e-8ad5-27e5afde7e91",
+        "status": 200,
+        "ms": 851.7541000000056,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 605.256,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 12,
+        "at": "2026-10-18T07:40:35.696Z",
+        "requestId": "8815a42b-20bd-4bd1-99b3-d2ad2db26420",
+        "status": 200,
+        "ms": 843.2390999999989,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 612.657,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 12,
+        "at": "2026-10-18T07:40:36.541Z",
+        "requestId": "0fdf9f43-a03c-433b-986c-5e3de045c458",
+        "status": 200,
+        "ms": 839.6684999999998,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 605.574,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 12,
+        "at": "2026-10-18T07:40:37.381Z",
+        "requestId": "e7b4951e-0d3d-48cf-9ebe-130d76f1a0a2",
+        "status": 200,
+        "ms": 827.4407999999967,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 598.583,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 12,
+        "at": "2026-10-18T07:40:38.210Z",
+        "requestId": "0b432b6d-f54f-4f14-b63e-d2bc2b798795",
+        "status": 200,
+        "ms": 838.6365000000005,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 601.785,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 13,
+        "at": "2026-10-18T07:40:39.050Z",
+        "requestId": "a7a51b1e-ab6c-4b9f-966d-b015a7ebd61c",
+        "status": 200,
+        "ms": 841.5239000000001,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 611.566,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 13,
+        "at": "2026-10-18T07:40:39.892Z",
+        "requestId": "affacee3-a337-410a-98b8-8667ddaeb85d",
+        "status": 200,
+        "ms": 832.0137000000032,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 601.225,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 13,
+        "at": "2026-10-18T07:40:40.725Z",
+        "requestId": "17eb4a8e-2861-4610-8c63-6ed204319bd3",
+        "status": 200,
+        "ms": 827.9746000000014,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 598.812,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 13,
+        "at": "2026-10-18T07:40:41.554Z",
+        "requestId": "1bed4ce3-bdbc-45ea-8ced-c1a3d29cf09b",
+        "status": 200,
+        "ms": 834.3792999999932,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 600.455,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 14,
+        "at": "2026-10-18T07:40:42.390Z",
+        "requestId": "bcd174b7-6da7-4e3c-a712-dc8326a96d86",
+        "status": 200,
+        "ms": 882.4286999999968,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 610.41,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 14,
+        "at": "2026-10-18T07:40:43.273Z",
+        "requestId": "38f97fbe-79ac-43ca-b2ce-2ff639753ee9",
+        "status": 200,
+        "ms": 827.081299999998,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 598.236,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 14,
+        "at": "2026-10-18T07:40:44.102Z",
+        "requestId": "08ed6c26-be24-4879-b371-0df54579da48",
+        "status": 200,
+        "ms": 840.8035000000018,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 600.84,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 14,
+        "at": "2026-10-18T07:40:44.944Z",
+        "requestId": "0cf65334-60b1-4c81-be17-4e35da94e4bc",
+        "status": 200,
+        "ms": 844.1281999999992,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 608.087,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 15,
+        "at": "2026-10-18T07:40:45.789Z",
+        "requestId": "5447251c-d925-43eb-8ebf-58aedb520162",
+        "status": 200,
+        "ms": 849.0081999999966,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 603.33,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 15,
+        "at": "2026-10-18T07:40:46.639Z",
+        "requestId": "1317aae9-2770-46a4-9010-59a010ba0350",
+        "status": 200,
+        "ms": 835.4973000000027,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 603.052,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 15,
+        "at": "2026-10-18T07:40:47.476Z",
+        "requestId": "9e78addd-fa85-41ae-9231-3e5d9e1db413",
+        "status": 200,
+        "ms": 827.6501999999964,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 599.44,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 15,
+        "at": "2026-10-18T07:40:48.307Z",
+        "requestId": "84ee456e-e823-4afb-8aaa-959c141481b9",
+        "status": 200,
+        "ms": 839.9680000000008,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 602.361,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 16,
+        "at": "2026-10-18T07:40:49.148Z",
+        "requestId": "b9cec507-bfd0-4aa7-876b-2656cc8f6b38",
+        "status": 200,
+        "ms": 854.1051999999981,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 601.24,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 16,
+        "at": "2026-10-18T07:40:50.003Z",
+        "requestId": "8c002efb-2b97-4e85-b35c-15a6a0f4ab38",
+        "status": 200,
+        "ms": 837.5731999999989,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 601.719,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 16,
+        "at": "2026-10-18T07:40:50.842Z",
+        "requestId": "1e536f96-5ac5-4a4e-856f-5e60ff1aa251",
+        "status": 200,
+        "ms": 842.1489000000001,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 609.94,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 16,
+        "at": "2026-10-18T07:40:51.686Z",
+        "requestId": "3dd71f31-6310-4c73-beb9-08ba984cd1d8",
+        "status": 200,
+        "ms": 832.8871000000072,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 599.263,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 17,
+        "at": "2026-10-18T07:40:52.520Z",
+        "requestId": "0b9a4f1d-9496-4476-9915-276ad7242456",
+        "status": 200,
+        "ms": 826.6633000000002,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 599.828,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 17,
+        "at": "2026-10-18T07:40:53.347Z",
+        "requestId": "369b178e-0f88-4835-860c-545b4d1b594a",
+        "status": 200,
+        "ms": 846.3963999999978,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 609.45,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 17,
+        "at": "2026-10-18T07:40:54.195Z",
+        "requestId": "f09e9371-059f-4e8e-b882-d4a97da9af3f",
+        "status": 200,
+        "ms": 844.0896999999968,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 610.227,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 17,
+        "at": "2026-10-18T07:40:55.041Z",
+        "requestId": "645504f9-7d2f-4c45-b710-7ee6a4a2ffb5",
+        "status": 200,
+        "ms": 827.846000000005,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 599.565,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 18,
+        "at": "2026-10-18T07:40:55.870Z",
+        "requestId": "11c9a5c5-281d-4b6f-a996-9edd01e9042f",
+        "status": 200,
+        "ms": 841.9322999999858,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 602.44,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 18,
+        "at": "2026-10-18T07:40:56.714Z",
+        "requestId": "92deee57-8119-46cb-998e-bd4afa45a8b3",
+        "status": 200,
+        "ms": 832.900999999998,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 599.517,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 18,
+        "at": "2026-10-18T07:40:57.548Z",
+        "requestId": "4f47a1d8-98e3-443d-861a-6e5a42fcee64",
+        "status": 200,
+        "ms": 840.6843000000081,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 609.02,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 18,
+        "at": "2026-10-18T07:40:58.391Z",
+        "requestId": "3f11d140-e1ca-4c0b-b0f2-9c3459849653",
+        "status": 200,
+        "ms": 835.8225999999995,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 603.14,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 19,
+        "at": "2026-10-18T07:40:59.228Z",
+        "requestId": "002f2476-ca6a-4bfe-b3d9-de9bedafbfa5",
+        "status": 200,
+        "ms": 860.482799999998,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 617.63,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 19,
+        "at": "2026-10-18T07:41:00.089Z",
+        "requestId": "7a46d1ea-330c-44d5-823a-897e56aaf33f",
+        "status": 200,
+        "ms": 834.5934999999881,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 606.609,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 19,
+        "at": "2026-10-18T07:41:00.925Z",
+        "requestId": "e1da59d7-604b-405b-b873-c03baa4ef56a",
+        "status": 200,
+        "ms": 833.8559000000096,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 600.938,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 19,
+        "at": "2026-10-18T07:41:01.760Z",
+        "requestId": "71b1f515-93e3-43bd-a761-2e24fb3beb83",
+        "status": 200,
+        "ms": 836.0574999999953,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 604.123,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "manager-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 20,
+        "at": "2026-10-18T07:41:02.598Z",
+        "requestId": "35049e32-96da-46de-96d7-985959a91f66",
+        "status": 200,
+        "ms": 833.2367999999988,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 608.238,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "manager-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 20,
+        "at": "2026-10-18T07:41:03.432Z",
+        "requestId": "3ed7da45-a5ee-4c80-b75a-ea624214945a",
+        "status": 200,
+        "ms": 842.363599999997,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 605.622,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "couple-inbox-empty",
+        "path": "/notifications/inbox?limit=20",
+        "method": "GET",
+        "round": 20,
+        "at": "2026-10-18T07:41:04.275Z",
+        "requestId": "7b39ded1-3a5e-46c5-8f9a-90399be4d43f",
+        "status": 200,
+        "ms": 826.3364000000001,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "d47160c01f441269d023ff1a0e5126668c511828d22da948a5f6f4ed033367a5",
+        "matched": true,
+        "backendMs": 600.724,
+        "route": "/api/v1/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "couple-unread-empty",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 20,
+        "at": "2026-10-18T07:41:05.103Z",
+        "requestId": "0a95b00c-577a-4ebe-be87-a32a822ec10c",
+        "status": 200,
+        "ms": 841.940499999997,
+        "noStore": true,
+        "noReferrer": true,
+        "returned": 0,
+        "responseSha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c",
+        "matched": true,
+        "backendMs": 603.568,
+        "route": "/api/v1/notifications/unread-count"
+      },
+      {
+        "role": "manager",
+        "label": "logout",
+        "path": "/auth/sessions/current",
+        "method": "DELETE",
+        "round": 0,
+        "at": "2026-10-18T07:41:05.946Z",
+        "requestId": "c1a2c38c-1dc4-48f0-97fe-ce140baa2758",
+        "status": 204,
+        "ms": 2536.520199999999,
+        "noStore": true,
+        "noReferrer": true,
+        "matched": true,
+        "backendMs": 2301.05,
+        "route": "/api/v1/auth/sessions/current"
+      },
+      {
+        "role": "manager",
+        "label": "revoked-identity",
+        "path": "/auth/me",
+        "method": "GET",
+        "round": 0,
+        "at": "2026-10-18T07:41:08.483Z",
+        "requestId": "5dc80d3c-6b90-4316-ade7-14a15c090f77",
+        "status": 401,
+        "ms": 378.46169999999984,
+        "noStore": true,
+        "noReferrer": true,
+        "matched": true,
+        "backendMs": 151.036,
+        "route": "/auth/me"
+      },
+      {
+        "role": "manager",
+        "label": "revoked-notification",
+        "path": "/notifications/inbox",
+        "method": "GET",
+        "round": 0,
+        "at": "2026-10-18T07:41:08.863Z",
+        "requestId": "01548b53-63d9-47fe-a58d-07d815d7fd24",
+        "status": 401,
+        "ms": 392.7133000000031,
+        "noStore": true,
+        "noReferrer": true,
+        "matched": true,
+        "backendMs": 153.999,
+        "route": "/notifications/inbox"
+      },
+      {
+        "role": "manager",
+        "label": "revoked-notification",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 0,
+        "at": "2026-10-18T07:41:09.258Z",
+        "requestId": "4cbd1c9e-d7a0-4c48-98b4-01a140d03de0",
+        "status": 401,
+        "ms": 391.93730000000505,
+        "noStore": true,
+        "noReferrer": true,
+        "matched": true,
+        "backendMs": 156.859,
+        "route": "/notifications/unread-count"
+      },
+      {
+        "role": "couple",
+        "label": "logout",
+        "path": "/auth/sessions/current",
+        "method": "DELETE",
+        "round": 0,
+        "at": "2026-10-18T07:41:09.651Z",
+        "requestId": "56a0c758-dbcf-4035-a6e8-af7cf5f45b7f",
+        "status": 204,
+        "ms": 1448.461500000005,
+        "noStore": true,
+        "noReferrer": true,
+        "matched": true,
+        "backendMs": 1219.08,
+        "route": "/api/v1/auth/sessions/current"
+      },
+      {
+        "role": "couple",
+        "label": "revoked-identity",
+        "path": "/auth/me",
+        "method": "GET",
+        "round": 0,
+        "at": "2026-10-18T07:41:11.101Z",
+        "requestId": "c98384ed-7134-4909-8f5f-75ac40c3a135",
+        "status": 401,
+        "ms": 392.19749999999476,
+        "noStore": true,
+        "noReferrer": true,
+        "matched": true,
+        "backendMs": 151.322,
+        "route": "/auth/me"
+      },
+      {
+        "role": "couple",
+        "label": "revoked-notification",
+        "path": "/notifications/inbox",
+        "method": "GET",
+        "round": 0,
+        "at": "2026-10-18T07:41:11.494Z",
+        "requestId": "cbb3090f-b505-4a51-a484-3cf425d5c018",
+        "status": 401,
+        "ms": 398.2479000000021,
+        "noStore": true,
+        "noReferrer": true,
+        "matched": true,
+        "backendMs": 157.104,
+        "route": "/notifications/inbox"
+      },
+      {
+        "role": "couple",
+        "label": "revoked-notification",
+        "path": "/notifications/unread-count",
+        "method": "GET",
+        "round": 0,
+        "at": "2026-10-18T07:41:11.894Z",
+        "requestId": "a7fa35fb-e325-408b-9826-b75a053074ca",
+        "status": 401,
+        "ms": 390.2789000000048,
+        "noStore": true,
+        "noReferrer": true,
+        "matched": true,
+        "backendMs": 162.459,
+        "route": "/notifications/unread-count"
+      }
+    ],
+    "summary": [
+      {
+        "case": "manager-inbox-empty",
+        "before": {
+          "case": "manager-inbox-empty",
+          "n": 20,
+          "clientP50Ms": 1126.010500000004,
+          "clientP95Ms": 1782.568299999999,
+          "backendP50Ms": 895.976,
+          "backendP95Ms": 1553.553
+        },
+        "after": {
+          "n": 20,
+          "backendP50Ms": 604.737,
+          "backendP95Ms": 1127.052,
+          "clientP50Ms": 843.3925000000017,
+          "clientP95Ms": 1357.2481000000043
+        },
+        "backendP95ReductionPercent": 27.453263583540455,
+        "clientP95ReductionPercent": 23.859966543778143
+      },
+      {
+        "case": "manager-unread-empty",
+        "before": {
+          "case": "manager-unread-empty",
+          "n": 20,
+          "clientP50Ms": 977.4410999999964,
+          "clientP95Ms": 1930.4709000000003,
+          "backendP50Ms": 747.114,
+          "backendP95Ms": 1702.095
+        },
+        "after": {
+          "n": 20,
+          "backendP50Ms": 603.703,
+          "backendP95Ms": 945.637,
+          "clientP50Ms": 839.6684999999998,
+          "clientP95Ms": 1194.3989999999976
+        },
+        "backendP95ReductionPercent": 44.44276024546221,
+        "clientP95ReductionPercent": 38.12913730012727
+      },
+      {
+        "case": "couple-inbox-empty",
+        "before": {
+          "case": "couple-inbox-empty",
+          "n": 20,
+          "clientP50Ms": 1125.584799999997,
+          "clientP95Ms": 2376.6898,
+          "backendP50Ms": 895.625,
+          "backendP95Ms": 2138.155
+        },
+        "after": {
+          "n": 20,
+          "backendP50Ms": 604.988,
+          "backendP95Ms": 966.47,
+          "clientP50Ms": 840.6843000000081,
+          "clientP95Ms": 1194.4069999999992
+        },
+        "backendP95ReductionPercent": 54.79888034309954,
+        "clientP95ReductionPercent": 49.744935161500706
+      },
+      {
+        "case": "couple-unread-empty",
+        "before": {
+          "case": "couple-unread-empty",
+          "n": 20,
+          "clientP50Ms": 978.1564999999973,
+          "clientP95Ms": 1932.1197000000102,
+          "backendP50Ms": 746.504,
+          "backendP95Ms": 1688.07
+        },
+        "after": {
+          "n": 20,
+          "backendP50Ms": 603.568,
+          "backendP95Ms": 1267.278,
+          "clientP50Ms": 836.3043999999973,
+          "clientP95Ms": 1493.676800000001
+        },
+        "backendP95ReductionPercent": 24.927402299667666,
+        "clientP95ReductionPercent": 22.692325946472515
+      }
+    ],
+    "publicReadsAfter": 84,
+    "matchedAfter": 99,
+    "sessionRevoked": true,
+    "allResponseHashesMatchNative": true,
+    "passed": true
+  },
+  "cleanup": {
+    "key": {
+      "at": "2026-10-18T07:07:55.489Z",
+      "fingerprint": "SHA256:RBGLr3wbXlNaZfjBZr/GXSiDPfIdxIBk0mR9Dm3uXPc",
+      "revoked": true,
+      "revokedTransportDenied": true,
+      "ownedKeysRemoved": true,
+      "otherKeysUntouched": true,
+      "remoteFilesWritten": false
+    },
+    "local": {
+      "at": "2026-10-18T07:11:30.793Z",
+      "testDatabasesRemaining": 0,
+      "clusterStopped": true,
+      "clusterPort": 55441,
+      "sharedDatabaseCleanup": false
+    },
+    "noNewSshKeyCreatedForRollout": true
+  },
+  "preservation": {
+    "selectedTableDigestsUnchanged": 32,
+    "appliedMigrationChecksumsUnchanged": 61,
+    "configurationAndControlsUnchanged": true,
+    "onlyMergedSourceDeploymentActive": true,
+    "precedingDeploymentStopped": true,
+    "noLiveNotificationOrBusinessWrites": true
+  },
+  "limits": [
+    "Live acceptance uses only the existing empty Manager/Couple inboxes; populated 0/1/20, cursor and authority races are verified on isolated local PostgreSQL. No populated-live claim.",
+    "The original pinned-source native target passes for both endpoints. Incremental deployed-to-candidate unread gain is only 19.643–19.986%, reported separately.",
+    "Public cohorts report client/backend timings separately and retain every tail. Manager inbox and Couple unread incremental backend p95 gains are only 27.453% and 24.927%; corresponding client gains are 23.860% and 22.692%. Retain below-thirty public results under PERF-13. These cohorts do not establish shared-load capacity, holder attribution or production SLO.",
+    "The original verification and CI receipts retain historical pending-rollout statuses. This receipt supersedes runtime status only; the follow-up documentation PR records canonical checklist closure after green CI.",
+    "Provider acceptance and production NO_GO stay unchanged; no paid generation, real-money operation, provider send, mark-read, live fixture or frontend change."
+  ],
+  "productionReadiness": "NO_GO_UNCHANGED",
+  "perf13": "OPEN",
+  "artifacts": [
+    {
+      "path": "output/perf08-20261018/rollout-authorization.json",
+      "sha256": "1666b4ace06daeb3584da8cf2c3019f879271286fc32f7c76bab4d4100f46643"
+    },
+    {
+      "path": "output/perf08-20261018/premerge.json",
+      "sha256": "403d33157104e36f6dc655c4ae95dda8b8eb6dcc19eb5848405204896b6d2339"
+    },
+    {
+      "path": "output/perf08-20261018/merge.json",
+      "sha256": "3583bbf78ce5a5e48f7ebece555cd431093b1dc6b4f60446842a61009fbb0ed8"
+    },
+    {
+      "path": "output/perf08-20261018/serving.json",
+      "sha256": "f913b992d415a5916df9ec4daebee77be241ca5a6b09ed4bd075e8c29a8362e4"
+    },
+    {
+      "path": "output/perf08-20261018/public-after.json",
+      "sha256": "30c7fff78107ea34706003827c28f70c216c32c0e718c7a09b92e6be53b2ea95"
+    },
+    {
+      "path": "output/perf08-20261018/final-postflight.json",
+      "sha256": "6255784ac6ba377c06f782258f78c51eb9e9a0b74d7993da76364597225c4061"
+    },
+    {
+      "path": "output/perf08-20261018/ci-final.json",
+      "sha256": "7ece824594d667e08d143ab75d292019402dd078a98db7e7b38e27cc3fbf1374"
+    },
+    {
+      "path": "output/perf08-20261018/review.json",
+      "sha256": "a3d372421a4bdd005b4aa0f4f9666e4b7aea436e1843702a51af1ebc3d99c4f4"
+    },
+    {
+      "path": "output/perf08-20261018/local-cleanup.json",
+      "sha256": "d8d70bfa30ca18ecbbef4282f371acdb46c1ff01d88079b5f6889c4b954eda3c"
+    },
+    {
+      "path": "output/perf08-20261018/key-revocation.json",
+      "sha256": "9ceb75ef685e69bfc0d833c850c3a03945296d322241e04721c048875249dd42"
+    },
+    {
+      "path": "output/perf08-20261018/merge.mjs",
+      "sha256": "cde38734138b1bed792fb6cf8244b81e1649bb47aad83d7a2b03a3d6a172e901"
+    },
+    {
+      "path": "output/perf08-20261018/rollout-status.mjs",
+      "sha256": "4a693185a26a3d1aeea7689625095fafd5c9d8c15b5ae6f365e7c5663d33a5ce"
+    },
+    {
+      "path": "output/perf08-20261018/serving.mjs",
+      "sha256": "bd114cbc8426bb613328ad43d649d341102975a5a4f9b5e03eb3564ea16ad010"
+    },
+    {
+      "path": "output/perf08-20261018/public.mjs",
+      "sha256": "6b7810ca713646073445638dce1341575c7ca93afbebc4e74e677c1bcc03c49d"
+    },
+    {
+      "path": "output/perf08-20261018/final-postflight.mjs",
+      "sha256": "0d85499e902cb45a7453239d5c2cb1c8af4bec9f79bea0e35d17fb13f1632d78"
+    },
+    {
+      "path": "output/perf08-20261018/close-rollout.mjs",
+      "sha256": "635e9118599da2329f55bc70d3ed8dfda96041a74e67f047d27f35f8cd86e2da"
+    },
+    {
+      "path": "tasks/evidence/perf08-verification-2026-10-18.json",
+      "sha256": "8a72ef9dd16bf6a76b7dd4c6d75f5123c5f78c1dbb594b35a3d355bde2f608a5"
+    },
+    {
+      "path": "tasks/evidence/perf08-pr68-ci-2026-10-18.json",
+      "sha256": "a1cd7bfca8ea94dff6a84c3ca2f9df3dd4a6850575de204b65b3bf684548c670"
+    }
+  ]
+}
