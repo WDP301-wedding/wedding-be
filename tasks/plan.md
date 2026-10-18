@@ -290,6 +290,13 @@ warm/initial conditions, all statuses and p50/p95, rather than only the fastest 
 Acceptance: regression thresholds from measured stable results; no correctness or
 security regression; rollback and unresolved provider/readiness gates recorded.
 
+2026-10-18 [PERF-13 verification checkpoint](../docs/backend-performance-13-verification-2026-10-18.md):
+the repeatable CLI now fences list cardinality, retains complete sample/status
+accounting and records actual HTTP overlap per reader cap. Local verification and
+preserved unsuccessful attempts are recorded separately. The owner authorized
+the live campaign; deterministic command ceilings and observational
+latency-band policy remain unchanged. PERF-13 and production NO_GO remain open.
+
 ## Verification for implementation
 
 After each source/schema slice, run required typecheck, lint, unit/integration and

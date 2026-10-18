@@ -5,7 +5,8 @@
     "PERF-13 repeated 20-sample matched run, pool maximum 3, 40ms per submitted command",
     "2026-10-18 PERF-06 joined snapshot: native 1/4/20/empty service reads assert three actual commands; other ceilings and modeled bands unchanged",
     "2026-10-18 PERF-08 captured Booking audience plus owned inbox/count snapshot: inbox ceiling 6 -> 4, unread 5 -> 4; initial/final authority and final audience checks retained; modeled bands unchanged",
-    "2026-10-18 PERF-09 original-gate completion: public Hall page, cursor eligibility and attached media share one statement; 1/20 plain/media service and HTTP reads assert one driver command; other ceilings and latency investigation bands unchanged"
+    "2026-10-18 PERF-09 original-gate completion: public Hall page, cursor eligibility and attached media share one statement; 1/20 plain/media service and HTTP reads assert one driver command; other ceilings and latency investigation bands unchanged",
+    "2026-10-18 PERF-13 single-reader native repeat: 20 current samples per ten cases retain identical driver counts (3/5/4/4/1/6/58/1/4/4); all 400 baseline/current responses match. No ceiling is relaxed. See perf13-verification-2026-10-18.json for separate bounded-stage results, preserved failures and live evidence."
   ],
   "queryCeilings": {
     "templates-20": 3,

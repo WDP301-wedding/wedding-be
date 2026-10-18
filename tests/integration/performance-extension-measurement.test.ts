@@ -353,11 +353,25 @@ const normalize = (value: unknown): unknown =>
           for (const [variant, work] of Math.floor(n / readers) % 2
             ? [...variants].reverse()
             : variants) {
-            await Promise.all(
+            const failures: {
+              name: string;
+              queries: number;
+              acquires: number;
+              acquireMs: number;
+            }[] = [];
+            const wave = await Promise.allSettled(
               Array.from({ length: Math.min(readers, sampleCount - n) }, async () => {
                 const state = newDatabaseDiagnostics(),
                   started = performance.now();
-                const value = await withDatabaseDiagnostics(state, work);
+                const value = await withDatabaseDiagnostics(state, work).catch((error: unknown) => {
+                  failures.push({
+                    name: error instanceof Error ? error.name : 'UnknownError',
+                    queries: state.queries,
+                    acquires: state.acquires,
+                    acquireMs: state.acquireMs,
+                  });
+                  throw error;
+                });
                 expect(normalize(value)).toEqual(reference);
                 if (readers === 1 && variant === 'current') {
                   expect(state.queries).toBeGreaterThan(0);
@@ -373,6 +387,32 @@ const normalize = (value: unknown): unknown =>
                 });
               }),
             );
+            const rejected = wave.find((result) => result.status === 'rejected');
+            if (rejected?.status === 'rejected') {
+              await mkdir('test-results/performance', { recursive: true });
+              await writeFile(
+                'test-results/performance/extensions-failure.json',
+                JSON.stringify(
+                  {
+                    baseline: baseline ?? null,
+                    node: process.version,
+                    modelMs: addedDelay,
+                    poolMax,
+                    readers,
+                    sampleCount,
+                    failedCase: c.name,
+                    variant,
+                    round: n,
+                    failures,
+                    samples,
+                    inFlightDrained: true,
+                  },
+                  null,
+                  2,
+                ),
+              );
+              throw rejected.reason;
+            }
           }
         }
       }

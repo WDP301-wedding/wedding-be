@@ -599,6 +599,13 @@ Measurement authorizes no database deletion, business-rule reduction or deployme
     not an added indefinite gate. No PERF-09 rerun; production remains NO_GO.
 - [x] PERF-12: Review table/rehearsal-schema cleanup with ownership, dependency and retention proof; deletion remains separately authorized.
 - [ ] PERF-13: Repeat matched live measurements, verify relevant correctness gates and set supported regression budgets.
+  - 2026-10-18 [runner/local verification checkpoint](../docs/backend-performance-13-verification-2026-10-18.md):
+    Added cardinality fail-stop, complete status/sample accounting, explicit empty
+    percentiles and actual HTTP overlap peaks. Contract tests exercise capped
+    1/2/4 readers, overload/transport/cardinality failures and session renewal cleanup.
+    Keep the task open pending the owner-authorized live campaign: the first
+    full local coverage run was interrupted, and no new latency SLO, production GO
+    or provider acceptance is claimed. See the receipt for exact local results.
   - 2026-10-18 [PERF-06 after-rollout comparison](../docs/backend-performance-06-closure-2026-10-18.md):
     all 63 template reads return 200 and backend p95 falls 17.2–17.5%, while client
     p95 increases 7.4%, 26.8% and 9.9% across one/four/cursor-selected cases. Preserve
