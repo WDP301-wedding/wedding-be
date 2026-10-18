@@ -48,7 +48,8 @@ describe('request logging', () => {
       phone: '+84-900-000-000',
       token: 'invitation-token-secret',
       cardNumber: '4111111111111111',
-      cvv: '123',
+      // A distinct canary cannot collide with a timestamp or duration such as22.123ms.
+      cvv: 'sensitive-cvv-canary-123',
     };
     const app = createApp({
       isTrustedRequestId: () => true,
