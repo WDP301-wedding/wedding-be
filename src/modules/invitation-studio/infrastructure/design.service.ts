@@ -120,27 +120,16 @@ export class DesignService {
   async listTemplates(page: unknown, context: MediaRequestContext) {
     const query = parseStudio(pageSchema, page);
     await this.access.templates(query.bookingId, query.includeArchived, context);
-    const rows = await this.repository.prisma.invitationTemplate.findMany({
-      where: {
-        ...(query.includeArchived ? {} : { active: true }),
-        ...(query.cursor === undefined ? {} : { id: { gt: query.cursor } }),
-      },
-      orderBy: { id: 'asc' },
-      take: query.limit + 1,
-    });
+    const rows = await this.repository.templatePage(query);
     const heads = rows.slice(0, query.limit);
-    const versions = await this.repository.prisma.invitationTemplateVersion.findMany({
-      where: { id: { in: heads.map((row) => row.currentVersionId) } },
-    });
-    const byId = new Map(versions.map((version) => [version.id, version]));
     const items = heads.map((row) => {
-      const version = byId.get(row.currentVersionId);
-      if (version === undefined || version.templateId !== row.id) throw new NotFoundError();
+      if (row.versionId !== row.currentVersionId || row.versionTemplateId !== row.id)
+        throw new NotFoundError();
       return {
         templateId: row.id,
-        versionId: version.id,
+        versionId: row.versionId,
         revisionNumber: row.revision,
-        ...parseStudio(designContentSchema, version.content),
+        ...parseStudio(designContentSchema, row.content),
       };
     });
     await this.access.templates(query.bookingId, query.includeArchived, context);

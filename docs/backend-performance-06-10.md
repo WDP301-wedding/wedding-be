@@ -5,6 +5,15 @@ Backend-only implementation. No migration, Railway rollout, region change,
 provider write, paid generation or real-money payment is part of this change.
 The existing SPEC/RV acceptance history and product NO_GO decision are preserved.
 
+2026-10-18 PERF-06 follow-up: [joined template snapshot and controlled live comparison](backend-performance-06-verification-2026-10-18.md)
+reduces service work from four to three commands while preserving both authority
+checks. In the owner-authorized four-template live scope, twenty matched native
+triplets per case show 43.9–44.3% lower p95 versus the original pre-PERF-06 source,
+and 16–16.5% versus the deployed batching implementation. Local 1/4/20/empty-page,
+ownership, schema and revocation checks pass. The report keeps native/public timing
+and the pending reviewed rollout gate separate; the original experiments below
+remain unchanged.
+
 ## Implementation and contracts
 
 | Task    | Implementation                                                                                                              | Preserved behavior                                                                                                                                           |
