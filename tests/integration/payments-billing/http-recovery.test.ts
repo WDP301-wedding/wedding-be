@@ -324,6 +324,70 @@ type Providers = ReturnType<typeof createPaymentsBillingProviders>;
         }),
       ).toBe(1);
     });
+    it('fences an expired HTTP worker before it can write money after another worker takes over', async () => {
+      let releaseOld!: () => void;
+      let releaseNew!: () => void;
+      let enteredOld!: () => void;
+      let enteredNew!: () => void;
+      const oldGate = new Promise<void>((resolve) => {
+        releaseOld = resolve;
+      });
+      const newGate = new Promise<void>((resolve) => {
+        releaseNew = resolve;
+      });
+      const oldEntered = new Promise<void>((resolve) => {
+        enteredOld = resolve;
+      });
+      const newEntered = new Promise<void>((resolve) => {
+        enteredNew = resolve;
+      });
+      let calls = 0;
+      const f = await fixture((providers) => ({
+        ...providers,
+        operations: {
+          ...providers.operations,
+          async recordManualPayment(...args) {
+            if (++calls === 1) {
+              enteredOld();
+              await oldGate;
+            } else {
+              enteredNew();
+              await newGate;
+            }
+            return providers.operations.recordManualPayment(...args);
+          },
+        },
+      }));
+      const send = () =>
+        post(f.app, '/management/billing/payments/manual', f.manual, 'expired-http-worker');
+      const old = send().then((response) => response);
+      await oldEntered;
+      await database.prisma.$executeRaw`
+        UPDATE "IdempotencyRecord" SET "lockedAt" = clock_timestamp() - interval '6 minutes'
+        WHERE "idempotencyKey" = 'expired-http-worker'`;
+      const replacement = send().then((response) => response);
+      await newEntered;
+      try {
+        releaseOld();
+        expect((await old).status).toBe(409);
+        expect(
+          await database.prisma.billingLedgerEntry.count({
+            where: { bookingId: f.bookingId, kind: 'PAYMENT' },
+          }),
+        ).toBe(0);
+      } finally {
+        releaseOld();
+        releaseNew();
+      }
+      const result = await replacement;
+      expect(result.status).toBe(201);
+      expect((await send().expect(201)).body).toEqual(result.body);
+      expect(
+        await database.prisma.billingLedgerEntry.count({
+          where: { bookingId: f.bookingId, kind: 'PAYMENT' },
+        }),
+      ).toBe(1);
+    });
     it('keeps history and totals at the original fence while newer money is appended', async () => {
       const f = await fixture();
       await f.operations.recordManualPayment(f.deposit, f.manager);

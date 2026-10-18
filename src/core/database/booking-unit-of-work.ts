@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { Prisma, type PrismaClient } from '../../generated/prisma/client.js';
 import { AppError } from '../errors/app-error.js';
 import { enlistedPrismaClient } from './enlisted-prisma-client.js';
+import { lockIdempotencyExecution } from './idempotency-execution.js';
 
 type Context = Readonly<{
   requestId: string;
@@ -51,6 +52,7 @@ export function createBookingBoundaryUnitOfWork(prisma: PrismaClient) {
           await transaction.$executeRaw`SELECT pg_advisory_xact_lock_shared(hashtext(${input.bookingId}))`;
         } else {
           await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${input.bookingId}))`;
+          await lockIdempotencyExecution(transaction);
         }
         const context = Object.freeze({ ...input.context, transactionScopeId: randomUUID() });
         // Owner repositories use interactive transactions. Enlist those callbacks rather
