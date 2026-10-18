@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { PrismaPg } from '@prisma/adapter-pg';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createApp } from '../../../src/app.js';
@@ -10,11 +11,11 @@ import { createManualBillingFixture, seedBillingManager } from './operations-fix
 import { createPaymentsBillingRouter } from '../../../src/modules/payments-billing/http/payments-billing.router.js';
 import { createPaymentsBillingHttpServices } from '../../../src/modules/payments-billing/http/payments-billing.http-services.js';
 import { CATALOG_SEED_IDS } from '../../../scripts/catalog-seed.js';
-import { ipnFixture } from './vnpay-fixture.js';
+import { controlledVnpay, ipnFixture } from './vnpay-fixture.js';
 import { AuthenticationRequiredError } from '../../../src/modules/identity-access/authorization/authenticated-actor.middleware.js';
 import { errorResponseSchema } from '../../../src/core/http/common.schemas.js';
 import { createPaymentsBillingProviders } from '../../../src/modules/payments-billing/payments-billing.providers.js';
-import type { PrismaClient } from '../../../src/generated/prisma/client.js';
+import { PrismaClient } from '../../../src/generated/prisma/client.js';
 import { createBookingLifecycleService } from '../../../src/modules/booking-lifecycle/application/lifecycle.service.js';
 import { createPrismaBookingLifecycleRepository } from '../../../src/modules/booking-lifecycle/infrastructure/lifecycle.repository.js';
 import {
@@ -131,6 +132,75 @@ import {
     expect(JSON.stringify([attempt.body, read.body])).not.toMatch(
       /hashSecret|providerEvidenceId|evidenceReference|BankTranNo|SecureHash/,
     );
+  });
+  it('creates and replays a durable VNPay checkout with one connection, and rejects an expired slot', async () => {
+    const url = new URL(catalogMigrationDatabaseUrl!);
+    url.pathname = `/${database.databaseName}`;
+    const client = new PrismaClient({
+      adapter: new PrismaPg({
+        connectionString: url.toString(),
+        max: 1,
+        connectionTimeoutMillis: 500,
+      }),
+    });
+    try {
+      const f = await fixture(
+        () => createPaymentsBillingProviders(client, { vnpay: controlledVnpay }),
+        client,
+      );
+      const path = `/api/v1/bookings/${f.bookingId}/payments/deposit`;
+      const body = { timelineRevisionId: f.timelineRevisionId };
+      const post = () =>
+        request(f.app)
+          .post(path)
+          .auth('prospect', { type: 'bearer' })
+          .set('Idempotency-Key', 'one-connection-checkout')
+          .send(body);
+      const first = await post().expect(201);
+      const checkout = checkoutResponseSchema.parse(first.body).data;
+      expect(new URL(checkout.checkoutUrl).origin).toBe('https://sandbox.vnpayment.vn');
+      expect((await post().expect(201)).body).toEqual(first.body);
+      expect(await client.billingPaymentAttempt.count({ where: { bookingId: f.bookingId } })).toBe(
+        1,
+      );
+      expect(
+        await client.billingVnpayCheckout.count({
+          where: { paymentAttemptId: checkout.paymentAttemptId },
+        }),
+      ).toBe(1);
+      expect(await client.bookingDepositIntent.count({ where: { bookingId: f.bookingId } })).toBe(
+        1,
+      );
+      expect(
+        await client.billingLedgerEntry.count({
+          where: { bookingId: f.bookingId, kind: 'PAYMENT' },
+        }),
+      ).toBe(0);
+
+      const expired = await fixture(
+        () => createPaymentsBillingProviders(client, { vnpay: controlledVnpay }),
+        client,
+      );
+      await client.bookingSlotHold.updateMany({
+        where: { bookingId: expired.bookingId },
+        data: {
+          createdAt: new Date(Date.now() - 16 * 60_000),
+          expiresAt: new Date(Date.now() - 60_000),
+        },
+      });
+      const denial = await request(expired.app)
+        .post(`/api/v1/bookings/${expired.bookingId}/payments/deposit`)
+        .auth('prospect', { type: 'bearer' })
+        .set('Idempotency-Key', 'one-connection-expired-slot')
+        .send({ timelineRevisionId: expired.timelineRevisionId })
+        .expect(409);
+      expect(errorResponseSchema.parse(denial.body).error.code).toBe('DEPOSIT_NOT_ELIGIBLE');
+      expect(
+        await client.billingPaymentAttempt.count({ where: { bookingId: expired.bookingId } }),
+      ).toBe(0);
+    } finally {
+      await client.$disconnect();
+    }
   });
   it('enforces current authority, conceals foreign bookings and validates keys and strict input', async () => {
     const f = await fixture();
