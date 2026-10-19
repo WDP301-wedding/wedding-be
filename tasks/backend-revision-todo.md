@@ -705,6 +705,9 @@ Keep the final-invoice prerequisite and all existing payment admission checks.
   handling and shared financial admission checks. Verify missing/finalized invoice,
   zero balance, legacy compatibility, provider configuration, unresolved attempts,
   authorization and read-only behavior. [API hand-off](../docs/balance-payment-eligibility.md).
+  Implementation and local evidence are in [PR #76](https://github.com/WDP301-wedding/wedding-be/pull/76).
+  Acceptance remains open until exact-head CI and owner review; local Windows worker
+  exits are recorded in the [verification snapshot](evidence/balance-payment-eligibility-2026-10-19.md).
 - [ ] BILL-ELIG-02: After authorized deployment, verify the exact source/API and
   read contract on the target. Frontend then consumes the field; no UI fix or live
   provider/settlement acceptance is implied by local backend tests. Do not finalize

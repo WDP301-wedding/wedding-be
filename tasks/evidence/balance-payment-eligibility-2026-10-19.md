@@ -5,6 +5,12 @@ conflict. Base `origin/main`: `6626a3a44b306300fee78a6509e8fb4cfb2099e0`.
 Implementation branch: `codex/balance-payment-eligibility`. The original checkout's
 uncommitted work is not included. See the [API hand-off](../../docs/balance-payment-eligibility.md).
 
+This local verification snapshot is preserved separately from the final review
+result. [PR #76](https://github.com/WDP301-wedding/wedding-be/pull/76) records the
+latest validation summary and exact-head [CI checks](https://github.com/WDP301-wedding/wedding-be/pull/76/checks).
+Use those checks for the candidate currently under review; a local partial pass
+does not substitute for the whole-repository gate.
+
 ## Result and boundaries
 
 The authorized billing GET adds `data.balancePaymentEligibility`. A missing final
@@ -50,8 +56,9 @@ instance via `TEST_MIGRATION_DATABASE_URL`, `MIGRATION_DATABASE_URL` and `DATABA
 | First whole-repository coverage attempt, two fork workers | Failed: 281 files passed, 8 failed, 3 worker exits; 2,104 tests passed and 14 failed, as reported by Vitest |
 | Final typecheck, build and full lint | Passed |
 | Sequential whole-repository coverage retry, one thread worker | Process exited with `-1073740791` / `0xC0000409` before its JSON/coverage summary; not a pass |
-| Payment-module tests and changed-runtime-file coverage | Running separately; does not replace the whole-repository gate |
-| Linux CI on the candidate branch | Pending draft PR; required before merge/readiness claims |
+| Payment-module tests and changed-runtime-file coverage | 40 files / 253 tests passed; ledger worker exited abnormally before four tests completed. The run failed and is not full module acceptance |
+| Reported coverage of all six changed runtime files | 97.66% lines / 94.81% branches overall; each file exceeded 80%. Partial-run metrics, not a passing whole-repository receipt |
+| Linux CI on the current candidate | Authoritative current result is on PR #76's checks; exact-head success is required before merge/readiness claims |
 
 Focused API filter:
 
@@ -86,9 +93,29 @@ vitest run --coverage --maxWorkers=1 --pool=threads --reporter=dot --reporter=js
 The sequential process also terminated abnormally. No definitive native-crash root
 cause is established. There is no completed sequential report or global coverage
 receipt. Do not count its dots or started files as passing tests. A bounded payment
-module run covers the six changed runtime files with the existing per-file 80%
-thresholds; its scope and eventual result are separate from the broad gate. A draft
-PR is used to obtain exact-candidate Linux CI; no merge or deployment is implied.
+module run reports the six changed runtime files with the existing per-file 80%
+thresholds, but also failed because the ledger worker exited with `3221226505`.
+No failed assertions were reported in that bounded run; its unhandled worker error
+still prevents an overall pass. The corrected privacy suites completed: acceptance
+1/1, HTTP 11/11, plus eligibility 10/10. A draft PR obtains exact-candidate Linux CI;
+no merge or deployment is implied. On the initial source commit `839ecc1`, Linux CI
+completed static, unit, contract, build, audit and native integration gates; full
+coverage was still running when this local snapshot was captured. Current exact-head
+results are retained in the PR rather than inferred from these partial local runs.
+
+Bounded command scope: `src/modules/payments-billing`,
+`tests/integration/payments-billing`, the full commercial API suite, and payment /
+commercial-step6 contract tests, with one fork worker and six explicit
+`--coverage.include` paths. All six files appear in the JSON coverage summary:
+
+| Changed runtime file | Lines | Branches |
+| --- | --- | --- |
+| `balance-payment-eligibility.ts` | 100% | 100% |
+| `billing-operations.service.ts` | 95.48% | 93.02% |
+| `billing-views.service.ts` | 100% | 96.66% |
+| `payments-billing.openapi.ts` | 100% | 100% |
+| `payments-billing.schemas.ts` | 100% | 100% |
+| `payments-billing.providers.ts` | 100% | 100% |
 
 Local receipts are under `output/eligibility-*.json` / `output/eligibility-*.log` in
 the implementation worktree; database files and generated receipts are not staged.
