@@ -2,6 +2,10 @@ import { z } from 'zod';
 import type { BookingBoundaryUnitOfWork } from '../../../core/database/booking-unit-of-work.js';
 import { AppError } from '../../../core/errors/app-error.js';
 import { calculateBillingTotals } from '../domain/billing-policy.js';
+import {
+  readBalancePaymentEligibility,
+  type BalancePaymentDependencies,
+} from './balance-payment-eligibility.js';
 import type { BillingLedgerRepository, LedgerEntry } from './billing-ledger.port.js';
 import type { BillingOperationsRepository } from './billing-operations.port.js';
 import type { BillingReader, ContractContext } from './payments-billing.providers.js';
@@ -23,23 +27,25 @@ export function createBillingViewsService(
     ledger: BillingLedgerRepository;
     operations: BillingOperationsRepository;
     boundary: BookingBoundaryUnitOfWork;
+    providerEnabled: boolean;
+    invoice: NonNullable<BalancePaymentDependencies['invoice']>;
   }>,
 ) {
   async function authorized<T>(
     bookingId: string,
     context: ContractContext,
-    work: (scoped: ContractContext) => Promise<T>,
+    work: (scoped: ContractContext, phase: string) => Promise<T>,
   ) {
     z.uuid().parse(bookingId);
     return options.boundary.run({ bookingId, context }, async (scoped) => {
-      await options.operations.requireReadAccess(bookingId, scoped);
-      return work(scoped);
+      const access = await options.operations.requireReadAccess(bookingId, scoped);
+      return work(scoped, access.phase);
     });
   }
   return Object.freeze({
     async read(input: z.input<typeof billingHistoryQuerySchema>, context: ContractContext) {
       const query = billingHistoryQuerySchema.parse(input);
-      return authorized(query.bookingId, context, async (scoped) => {
+      return authorized(query.bookingId, context, async (scoped, phase) => {
         const ledger = await options.ledger.getLedger(query.bookingId, scoped);
         let cursor: z.infer<typeof cursorSchema> | undefined;
         if (query.cursor !== undefined) {
@@ -68,6 +74,11 @@ export function createBillingViewsService(
           bookingId: query.bookingId,
           billingRevision: fence,
           totals: totals(entries),
+          balancePaymentEligibility: await readBalancePaymentEligibility(
+            { bookingId: query.bookingId, phase, ledger, throughBillingRevision: fence },
+            options,
+            scoped,
+          ),
           history: Object.freeze(page.map(safeEntry)),
           nextCursor:
             remaining.length <= query.limit

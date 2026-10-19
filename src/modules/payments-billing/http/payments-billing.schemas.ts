@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { balancePaymentBlockActions } from '../application/balance-payment-eligibility.js';
 
 const uuid = z.uuid();
 const revision = z.int().positive();
@@ -116,6 +117,30 @@ export const historyEntrySchema = z.strictObject({
   paymentAttemptId: uuid.nullable(),
   revision,
 });
+export const balancePaymentEligibilitySchema = z.discriminatedUnion('canPay', [
+  z.strictObject({
+    canPay: z.literal(true),
+    reasonCode: z.null(),
+    nextAction: z.literal('PAY_BALANCE'),
+    billingRevision: z.int().nonnegative(),
+  }),
+  z
+    .strictObject({
+      canPay: z.literal(false),
+      reasonCode: z.enum(
+        Object.keys(balancePaymentBlockActions) as (keyof typeof balancePaymentBlockActions)[],
+      ),
+      nextAction: z.enum([
+        'CONTACT_RESTAURANT',
+        'WAIT_FOR_FINAL_INVOICE',
+        'CHECK_EXISTING_PAYMENT',
+        'NONE',
+        'REFRESH_BILLING',
+      ]),
+      billingRevision: z.int().nonnegative(),
+    })
+    .refine((value) => balancePaymentBlockActions[value.reasonCode] === value.nextAction),
+]);
 export const billingResponseSchema = z.strictObject({
   data: z.strictObject({
     bookingId: uuid,
@@ -123,6 +148,7 @@ export const billingResponseSchema = z.strictObject({
     totals: billingTotalsSchema,
     history: z.array(historyEntrySchema),
     nextCursor: z.string().nullable(),
+    balancePaymentEligibility: balancePaymentEligibilitySchema,
   }),
 });
 export const ipnResponseSchema = z.strictObject({

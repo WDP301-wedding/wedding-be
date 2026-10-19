@@ -580,6 +580,38 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
   }, 30_000);
   it('requires finalization before a full-contract balance payment', async () => {
     const { f } = await paidFixture(true);
+    const billingPath = `/bookings/${f.id}/billing`;
+    for (const who of ['own', 'manager']) {
+      const read = await get(billingPath, who);
+      expect(read.status, JSON.stringify(read.body)).toBe(200);
+      expect(
+        billingResponseSchema.parse(read.body as unknown).data.balancePaymentEligibility,
+      ).toEqual({
+        canPay: false,
+        reasonCode: 'INVOICE_FINALIZATION_REQUIRED',
+        nextAction: 'WAIT_FOR_FINAL_INVOICE',
+        billingRevision: 2,
+      });
+    }
+    for (const [who, status] of [
+      ['staff', 404],
+      ['outsider', 404],
+      ['anonymous', 401],
+    ] as const)
+      expect((await get(billingPath, who)).status).toBe(status);
+    expect(await database.prisma.finalInvoiceRevision.count({ where: { bookingId: f.id } })).toBe(
+      0,
+    );
+    expect(await database.prisma.billingPaymentAttempt.count({ where: { bookingId: f.id } })).toBe(
+      1,
+    );
+    const checkout = await post(
+      `/bookings/${f.id}/payments/balance`,
+      { expectedBillingRevision: 2 },
+      'own',
+    );
+    expect(checkout.status).toBe(409);
+    expect(checkout.body).toMatchObject({ error: { code: 'INVOICE_FINALIZATION_REQUIRED' } });
     const result = await post('/management/billing/payments/manual', {
       bookingId: f.id,
       purpose: 'BALANCE',
@@ -602,6 +634,25 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
     let invoice = finalInvoiceResponseSchema.parse(finalized.body as unknown).data;
     expect(invoice.document.incidentalLines).toEqual([]);
     expect(await database.prisma.billingLedgerEntry.count({ where: { bookingId: f.id } })).toBe(2);
+    expect(
+      billingResponseSchema.parse((await get(`/bookings/${f.id}/billing`, 'own')).body as unknown)
+        .data.balancePaymentEligibility,
+    ).toEqual({
+      canPay: true,
+      reasonCode: null,
+      nextAction: 'PAY_BALANCE',
+      billingRevision: 2,
+    });
+    expect(
+      billingResponseSchema.parse(
+        (await get(`/bookings/${f.id}/billing?throughBillingRevision=1`, 'own')).body as unknown,
+      ).data.balancePaymentEligibility,
+    ).toMatchObject({
+      canPay: false,
+      reasonCode: 'STALE_BILLING_REVISION',
+      nextAction: 'REFRESH_BILLING',
+      billingRevision: 2,
+    });
     const manual = await post('/management/billing/payments/manual', {
       bookingId: f.id,
       purpose: 'BALANCE',
@@ -626,6 +677,14 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
     );
     expect(checkout.status, JSON.stringify(checkout.body)).toBe(201);
     const attempt = checkoutResponseSchema.parse(checkout.body as unknown).data;
+    expect(
+      billingResponseSchema.parse((await get(`/bookings/${f.id}/billing`, 'own')).body as unknown)
+        .data.balancePaymentEligibility,
+    ).toMatchObject({
+      canPay: false,
+      reasonCode: 'PAYMENT_ATTEMPT_ACTIVE',
+      nextAction: 'CHECK_EXISTING_PAYMENT',
+    });
     const due = total - deposit - 100000;
     expect(new URL(attempt.checkoutUrl).searchParams.get('vnp_Amount')).toBe(String(due * 100));
     expect(
@@ -669,6 +728,11 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
       refundedVnd: 0,
       outstandingVnd: 0,
       creditVnd: 100000,
+    });
+    expect(bill.balancePaymentEligibility).toMatchObject({
+      canPay: false,
+      reasonCode: 'BILLING_BALANCE_LIMIT_EXCEEDED',
+      nextAction: 'NONE',
     });
     const basis = bill.history.find((e) => e.sourceType === 'INVOICE_ADJUSTMENT')!;
     const approval = await post('/management/billing/refund-approvals', {

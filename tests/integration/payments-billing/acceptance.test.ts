@@ -231,7 +231,11 @@ import { ipnFixture } from './vnpay-fixture.js';
       expect(
         await f.providers.views.reader(f.context).requireDepositSettlement(f.bookingId),
       ).toMatchObject({ amountVnd: 15_000_000 });
-      expect(JSON.stringify(final)).not.toMatch(/PRIVATE-W8|evidenceReference|reason|vnp_/u);
+      expect(final.balancePaymentEligibility).toMatchObject({
+        canPay: false,
+        reasonCode: 'BILLING_BALANCE_LIMIT_EXCEEDED',
+      });
+      expect(JSON.stringify(final)).not.toMatch(/PRIVATE-W8|evidenceReference|"reason"\s*:|vnp_/u);
       expect(
         JSON.stringify(
           await database.prisma.auditLog.findMany({ where: { entityType: 'billing' } }),

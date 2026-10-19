@@ -405,8 +405,12 @@ import {
       .auth('prospect', { type: 'bearer' })
       .expect(200);
     expect(JSON.stringify(read.body)).not.toMatch(
-      /private-refund|private-decision|approvedRefundableVnd|reason|evidenceReference/,
+      /private-refund|private-decision|approvedRefundableVnd|"reason"\s*:|evidenceReference/,
     );
+    expect(billingResponseSchema.parse(read.body).data.balancePaymentEligibility).toMatchObject({
+      canPay: true,
+      reasonCode: null,
+    });
   });
   it('lets a Manager approve a credit refund over HTTP, then refund with replay and budget protection', async () => {
     const f = await fixture();

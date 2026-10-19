@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { registerContractCharge } from './contract-charge.service.js';
+import { requireBalancePayment } from './balance-payment-eligibility.js';
 import type { InvoiceBalancePin } from '../infrastructure/invoice-balance.reader.js';
 import type { BookingBoundaryUnitOfWork } from '../../../core/database/booking-unit-of-work.js';
 import { AppError } from '../../../core/errors/app-error.js';
@@ -92,12 +93,11 @@ export function createBillingOperationsService(
     if (!['CONFIRMED', 'COMPLETED'].includes(access.phase)) throw error('BALANCE_NOT_ELIGIBLE');
     const ledger = await options.ledger.getLedger(command.bookingId, context);
     if (ledger.revision !== command.expectedBillingRevision) throw error('STALE_BILLING_REVISION');
-    const invoicePin = (await options.invoice?.getApplicable(command.bookingId, context)) ?? null;
-    if (invoicePin && invoicePin.totalVnd !== ledger.totals.acceptedChargesVnd)
-      throw error('FINANCIAL_SOURCE_CONFLICT');
-    await options.operations.requireBalanceAvailable(command.bookingId, context);
-    if (ledger.totals.outstandingVnd === 0) throw error('BILLING_BALANCE_LIMIT_EXCEEDED');
-    return { amountVnd: ledger.totals.outstandingVnd, invoicePin };
+    return requireBalancePayment(
+      { bookingId: command.bookingId, phase: access.phase, ledger },
+      options,
+      context,
+    );
   }
   async function createAttempt(
     command: { bookingId: string; commandId: string },

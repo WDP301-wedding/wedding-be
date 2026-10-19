@@ -5,6 +5,7 @@ import {
   catalogMigrationDatabaseUrl,
 } from '../venue-catalog/catalog-test-database.js';
 import { createManualBillingFixture, seedBillingManager } from './operations-fixture.js';
+import { createPaymentsBillingProviders } from '../../../src/modules/payments-billing/payments-billing.providers.js';
 
 const databaseDescribe = catalogMigrationDatabaseUrl ? describe : describe.skip;
 databaseDescribe('W5 immutable invoice and receivable views', () => {
@@ -66,6 +67,59 @@ databaseDescribe('W5 immutable invoice and receivable views', () => {
     );
     return { ...f, payment, print, charge, credit };
   }
+  it('keeps legacy checkout eligibility and blocks disabled providers and every unresolved attempt state without writing on reads', async () => {
+    const f = await createManualBillingFixture(database.prisma);
+    await f.operations.recordManualPayment(f.deposit, f.manager);
+    const read = () => f.providers.views.read({ bookingId: f.bookingId, limit: 1 }, f.manager);
+    expect((await read()).balancePaymentEligibility).toEqual({
+      canPay: true,
+      reasonCode: null,
+      nextAction: 'PAY_BALANCE',
+      billingRevision: 2,
+    });
+    const disabled = createPaymentsBillingProviders(database.prisma, { vnpay: { enabled: false } });
+    expect(
+      (await disabled.views.read({ bookingId: f.bookingId, limit: 1 }, f.manager))
+        .balancePaymentEligibility,
+    ).toMatchObject({
+      canPay: false,
+      reasonCode: 'PAYMENT_PROVIDER_UNAVAILABLE',
+    });
+    const created = await f.operations.createBalance(f.balance, f.context);
+    const blocked = {
+      canPay: false,
+      reasonCode: 'PAYMENT_ATTEMPT_ACTIVE',
+      nextAction: 'CHECK_EXISTING_PAYMENT',
+    };
+    expect(created.attempt.state).toBe('CREATED');
+    expect((await read()).balancePaymentEligibility).toMatchObject(blocked);
+    for (const [evidence, state] of [
+      ['PROVIDER_REQUESTED', 'PENDING'],
+      ['OUTCOME_UNKNOWN', 'UNKNOWN'],
+      ['VERIFIED_SUCCESS', 'SUCCEEDED'],
+    ] as const) {
+      const attempt = await f.providers.ledger.transitionAttempt(
+        {
+          bookingId: f.bookingId,
+          paymentAttemptId: created.attempt.id,
+          evidence,
+          providerEvidenceId: evidence === 'VERIFIED_SUCCESS' ? randomUUID() : null,
+        },
+        f.context,
+      );
+      expect(attempt.state).toBe(state);
+      expect((await read()).balancePaymentEligibility).toMatchObject(blocked);
+    }
+    expect(
+      await database.prisma.finalInvoiceRevision.count({ where: { bookingId: f.bookingId } }),
+    ).toBe(0);
+    expect(
+      await database.prisma.billingLedgerEntry.count({ where: { bookingId: f.bookingId } }),
+    ).toBe(2);
+    expect(
+      await database.prisma.billingPaymentAttempt.count({ where: { bookingId: f.bookingId } }),
+    ).toBe(2);
+  });
   it('handles empty authorized ledgers and rejects invalid, foreign and mismatched history fences', async () => {
     const empty = await createManualBillingFixture(database.prisma);
     expect(
