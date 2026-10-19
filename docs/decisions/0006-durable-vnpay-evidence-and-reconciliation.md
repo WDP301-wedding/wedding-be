@@ -2,6 +2,11 @@
 
 ## Status
 
+2026-10-19 amendment: the owner authorized the frontend's expiry recovery proposal.
+Authenticated nonpayment after expiry plus 15 minutes may now resolve FAILED; see
+[the recovery policy](../payment-attempt-reopen-and-expiry.md). The original decision
+and historical proof below remain preserved.
+
 Implemented technical realization of SPEC-04 Sections 7, 8 and 11 on 2026-10-08.
 Final module acceptance and HTTP publication remain with W6-W8. This decision
 preserves the approved money, reservation and account-promotion policies.

@@ -68,6 +68,7 @@ export const checkoutResponseSchema = z.strictObject({
 export const attemptResponseSchema = z.strictObject({
   data: z.strictObject({
     paymentAttemptId: uuid,
+    checkoutUrl: z.url().optional(),
     status: z.enum(['CREATED', 'PENDING', 'SUCCEEDED', 'FAILED', 'UNKNOWN']),
     purpose: z.enum(['DEPOSIT', 'BALANCE']),
     amountVnd: vnd.positive(),

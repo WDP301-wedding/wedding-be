@@ -80,6 +80,11 @@ applied payment entry. Expiry alone does not release it. GET does not reconcile 
 call a payment provider. `canPay: true` proves neither external provider health nor
 provider settlement; configuration presence is not live provider evidence.
 
+As of the owner-approved 2026-10-19 [expiry recovery amendment](./payment-attempt-reopen-and-expiry.md),
+the separate payment-attempt GET may resolve authenticated nonpayment after expiry
+plus 15 minutes. Refresh this billing GET afterward to obtain the updated `canPay`;
+this billing GET itself still performs no provider reconciliation.
+
 ## Pagination and freshness
 
 The existing root `billingRevision` and `totals` retain their historical fence.

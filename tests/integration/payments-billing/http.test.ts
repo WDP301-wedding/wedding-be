@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { PrismaPg } from '@prisma/adapter-pg';
 import request from 'supertest';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { createApp } from '../../../src/app.js';
 import {
   CatalogTestDatabase,
@@ -11,7 +11,7 @@ import { createManualBillingFixture, seedBillingManager } from './operations-fix
 import { createPaymentsBillingRouter } from '../../../src/modules/payments-billing/http/payments-billing.router.js';
 import { createPaymentsBillingHttpServices } from '../../../src/modules/payments-billing/http/payments-billing.http-services.js';
 import { CATALOG_SEED_IDS } from '../../../scripts/catalog-seed.js';
-import { controlledVnpay, ipnFixture } from './vnpay-fixture.js';
+import { controlledVnpay, ipnFixture, queryFixture } from './vnpay-fixture.js';
 import { AuthenticationRequiredError } from '../../../src/modules/identity-access/authorization/authenticated-actor.middleware.js';
 import { errorResponseSchema } from '../../../src/core/http/common.schemas.js';
 import { createPaymentsBillingProviders } from '../../../src/modules/payments-billing/payments-billing.providers.js';
@@ -85,6 +85,20 @@ import {
       .expect(201);
     const data = checkoutResponseSchema.parse(first.body).data;
     expect(data.checkoutUrl).toContain('vnp_Amount=1500000000');
+    const attemptPath = `/api/v1/bookings/${f.bookingId}/payments/${data.paymentAttemptId}`;
+    for (let i = 0; i < 2; i++) {
+      const reopened = await request(f.app)
+        .get(attemptPath)
+        .auth('prospect', { type: 'bearer' })
+        .expect(200);
+      expect(attemptResponseSchema.parse(reopened.body).data).toMatchObject({
+        status: 'UNKNOWN',
+        checkoutUrl: data.checkoutUrl,
+      });
+    }
+    expect(
+      await database.prisma.billingPaymentAttempt.count({ where: { bookingId: f.bookingId } }),
+    ).toBe(1);
     expect(
       (
         await request(f.app)
@@ -119,6 +133,7 @@ import {
       applicationStatus: 'SUCCEEDED',
       amountVnd: 15000000,
     });
+    expect(attemptResponseSchema.parse(attempt.body).data).not.toHaveProperty('checkoutUrl');
     const read = await request(f.app)
       .get(`/api/v1/bookings/${f.bookingId}/billing?limit=1`)
       .auth('prospect', { type: 'bearer' })
@@ -536,6 +551,7 @@ import {
       (await request(f.app).get(attemptUrl).auth('prospect', { type: 'bearer' }).expect(200)).body,
     ).data;
     expect(unknown).toMatchObject({ status: 'UNKNOWN', applicationStatus: null });
+    expect(unknown.checkoutUrl).toBe(data.checkoutUrl);
     await post(2, 'second-balance').expect(409);
     await request(f.app)
       .get(`/api/v1/bookings/${f.bookingId}/payments/${randomUUID()}`)
@@ -555,6 +571,59 @@ import {
     });
     f.actors.set('restricted', restricted.id);
     await request(f.app).get(attemptUrl).auth('restricted', { type: 'bearer' }).expect(403);
+  });
+  it('expires a verified missing balance through GET and permits a new authorized HTTP checkout', async () => {
+    const query = vi.fn<() => Promise<unknown>>();
+    const f = await fixture(() =>
+      createPaymentsBillingProviders(database.prisma, {
+        vnpay: controlledVnpay,
+        gateway: { query },
+      }),
+    );
+    await f.operations.recordManualPayment(f.deposit, f.manager);
+    const path = `/api/v1/bookings/${f.bookingId}`;
+    const post = (key: string) =>
+      request(f.app)
+        .post(`${path}/payments/balance`)
+        .auth('prospect', { type: 'bearer' })
+        .set('Idempotency-Key', key)
+        .send({ expectedBillingRevision: 2 });
+    const first = checkoutResponseSchema.parse(
+      (await post('expire-balance').expect(201)).body,
+    ).data;
+    query.mockResolvedValue(
+      queryFixture(first.paymentAttemptId, {
+        vnp_ResponseCode: '91',
+        vnp_Amount: '3500000000',
+        vnp_TransactionStatus: '01',
+        vnp_TransactionNo: '0',
+        vnp_PayDate: undefined,
+      }),
+    );
+    await post('blocked-balance').expect(409);
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(Date.parse(first.expiresAt) + 15 * 60_000 + 1));
+    try {
+      const expired = await request(f.app)
+        .get(`${path}/payments/${first.paymentAttemptId}`)
+        .auth('prospect', { type: 'bearer' })
+        .expect(200);
+      expect(attemptResponseSchema.parse(expired.body).data.status).toBe('FAILED');
+      expect(attemptResponseSchema.parse(expired.body).data).not.toHaveProperty('checkoutUrl');
+      const billing = await request(f.app)
+        .get(`${path}/billing`)
+        .auth('prospect', { type: 'bearer' })
+        .expect(200);
+      expect(billingResponseSchema.parse(billing.body).data.balancePaymentEligibility.canPay).toBe(
+        true,
+      );
+      const replacement = checkoutResponseSchema.parse(
+        (await post('replacement-balance').expect(201)).body,
+      ).data;
+      expect(replacement.paymentAttemptId).not.toBe(first.paymentAttemptId);
+    } finally {
+      vi.useRealTimers();
+    }
   });
   it('acknowledges bad, unknown and mismatched IPN with provider bodies and preserves raw duplicates', async () => {
     const f = await fixture();

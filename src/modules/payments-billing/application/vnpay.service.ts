@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 
 import { z } from 'zod';
 
@@ -24,6 +24,7 @@ type Balances = Pick<
   ReturnType<typeof createBillingOperationsService>,
   'createBalance' | 'applySettledBalance'
 >;
+const EXPIRY_GRACE_MS = 15 * 60_000;
 const acknowledgements = {
   '00': 'Confirm success',
   '02': 'Order already confirmed',
@@ -267,10 +268,28 @@ export function createVnpayService(
                 createdAt: now().toISOString(),
               }),
             ),
+            snapshot.attempt,
           );
           if (proof.paymentAttemptId !== paymentAttemptId) proof = null;
+          if (
+            proof?.outcome === 'UNKNOWN' &&
+            proof.nonPaymentReason !== undefined &&
+            now().getTime() > Date.parse(attempt.expiresAt) + EXPIRY_GRACE_MS
+          ) {
+            proof = {
+              ...proof,
+              outcome: 'FAILED',
+              resolutionReason: 'EXPIRED_UNPAID',
+              sourcePayloadHash: proof.payloadHash,
+              // Distinguish this policy decision from the same signed reply stored
+              // as UNKNOWN before grace. Never overwrite immutable provider facts.
+              payloadHash: createHash('sha256')
+                .update(`vnpay-expired-unpaid-v1|${proof.payloadHash}|${attempt.expiresAt}`)
+                .digest('hex'),
+            };
+          }
         } catch {
-          /* Timeout, missing order, malformed or unverified response remains unknown. */
+          /* Timeout, malformed or unverified responses never prove expiry failure. */
         }
         if (proof === null) attempt = await markUnknown(bookingId, paymentAttemptId, context);
         else {
@@ -284,6 +303,12 @@ export function createVnpayService(
       return Object.freeze({
         status: attempt.state,
         applicationStatus: await applyMoney(bookingId, attempt, context),
+        ...(attempt.provider === 'VNPAY' &&
+        ['CREATED', 'PENDING', 'UNKNOWN'].includes(attempt.state) &&
+        now().getTime() < Date.parse(attempt.expiresAt) &&
+        snapshot.checkout !== null
+          ? { checkoutUrl: options.protocol.checkoutUrl(snapshot.checkout.parameters) }
+          : {}),
       });
     },
     // ReturnURL is a display hint only: verification has no persistence side effects.

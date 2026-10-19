@@ -15,6 +15,14 @@ evidence and frontend source. New requirements are extensions to completed work.
 
 ## 1. Team Boundary
 
+Payment recovery amendment approved by the owner on **2026-10-19**: implement the
+frontend's payment-attempt reopen/expiry request. An authenticated VNPay missing-order
+or unpaid response may close an unresolved attempt only after `expiresAt + 15 minutes`;
+expiry alone, unavailable queries and unverified responses still retain UNKNOWN.
+This supersedes the earlier missing-order rule in ADR-006 for this narrow condition.
+Use the existing atomic verified-failure release and settlement safeguards. See
+[the implementation hand-off](./payment-attempt-reopen-and-expiry.md).
+
 Backend merge-policy amendment confirmed by the owner on **2026-10-13**:
 `wedding-be` no longer requires approval from another team member before merge.
 The owner may authorize merge and deployment after change review, resolved

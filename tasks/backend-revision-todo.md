@@ -19,6 +19,16 @@ Companion clarification: a named Guest may bring other people. Planned/actual
 companion recording was proposed but not confirmed. Resolve this narrow point before
 implementing dependent GM/STF fields/counts; do not infer a ban from Household removal.
 
+## Payment recovery amendment — 2026-10-19
+
+Owner authorized the frontend's reopen/expiry request. Implementation and bounded
+offline evidence are recorded in [the hand-off](../docs/payment-attempt-reopen-and-expiry.md).
+
+- [x] PAY-REC-01: Return the existing unexpired VNPay checkout URL through the authorized attempt GET; retain transaction reference, expiry and amount.
+- [x] PAY-REC-02: Resolve authenticated missing-order/unpaid evidence after expiry plus 15 minutes, with atomic deposit release, replay-safe evidence and audit reason.
+- [x] PAY-REC-03: Complete type/lint/build/API/contract checks and local disposable PostgreSQL regression verification; [97-test coverage and whole-suite retry evidence](./evidence/payment-attempt-reopen-expiry-2026-10-19.md).
+- [ ] PAY-REC-04: Verify authorized live sandbox and deployed frontend integration separately; offline fixtures do not close provider/deployment readiness.
+
 ## Completed Scope Preparation
 
 - [x] Interview and record removal of guest response behavior while retaining guests/seating/check-in.

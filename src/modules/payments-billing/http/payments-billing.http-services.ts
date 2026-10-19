@@ -338,6 +338,7 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
       if (attempt.purpose === 'BALANCE') await authorize(bookingId, actor, 'FULL');
       let status = attempt.state;
       let applicationStatus: 'PENDING' | 'SUCCEEDED' | null = null;
+      let checkoutUrl: string | undefined;
       if (attempt.provider === 'VNPAY' && providers.vnpay !== null) {
         const result = await providers.vnpay.reconcile(bookingId, attemptId, {
           ...ctx,
@@ -346,6 +347,7 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
         });
         status = result.status;
         applicationStatus = result.applicationStatus;
+        checkoutUrl = result.checkoutUrl;
       } else if (status === 'SUCCEEDED') {
         const ledger = await providers.ledger.getLedger(bookingId, ctx);
         const payment = ledger.entries.find(
@@ -362,6 +364,7 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
       return attemptResponseSchema.parse({
         data: {
           paymentAttemptId: attempt.id,
+          ...(checkoutUrl === undefined ? {} : { checkoutUrl }),
           status,
           purpose: attempt.purpose,
           amountVnd: attempt.amountVnd,
