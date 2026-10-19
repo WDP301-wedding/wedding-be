@@ -98,6 +98,11 @@ The project owner approved the following architecture decisions at Checkpoint H1
 | D6  | Terminal invitation metadata is retained for 180 days; terminal password-reset metadata for 30 days; expired/revoked session metadata for 90 days. Disabled account PII is retained for 365 days after its last linked consultation/booking reaches a terminal state, then deleted or anonymized unless an active legal/financial hold applies.                                                   | Provides abuse/audit evidence while bounding identity PII. Raw credentials are never retained; backup purge timing remains a deployment-policy input for `release-demo`.                                                                                                                                                               |
 | D7  | Accepting an invitation always requires a password. For a new account it sets the first credential; for an existing matching account it verifies the existing credential and never overwrites it.                                                                                                                                                                                                 | Preserves one identity per normalized email and prevents an invitation from silently resetting an existing password.                                                                                                                                                                                                                   |
 
+Owner-approved amendment on 2026-10-19 supersedes D3's access lifetime: newly issued
+access credentials live for 30 minutes (`AUTH_ACCESS_TOKEN_TTL_SECONDS=1800`).
+Existing credentials retain their stored expiry; refresh and password-reset lifetimes
+remain as recorded above.
+
 Any change to D1, D2, D5, D6, roles, CORS, or rate limiting requires explicit
 project-owner approval because it changes authentication, token transport, PII
 retention, or security policy.

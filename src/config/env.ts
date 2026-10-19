@@ -52,7 +52,7 @@ const productionRequiredVariables = [
 ] as const;
 
 const approvedIdentityPolicy = Object.freeze({
-  accessTokenTtlSeconds: 600,
+  accessTokenTtlSeconds: 1_800,
   refreshIdleTtlSeconds: 2_592_000,
   refreshAbsoluteTtlSeconds: 7_776_000,
   passwordResetTtlSeconds: 1_800,
