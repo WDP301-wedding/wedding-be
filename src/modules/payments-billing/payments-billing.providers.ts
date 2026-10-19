@@ -79,10 +79,11 @@ export function createPaymentsBillingProviders(
   });
   const settings = options.vnpay ?? config.vnpay;
   const operationsRepository = createBillingOperationsRepository(prisma, scope);
+  const invoice = createInvoiceBalanceReader(prisma, scope);
   const operations = createBillingOperationsService({
     ledger: billing.repository,
     operations: operationsRepository,
-    invoice: createInvoiceBalanceReader(prisma, scope),
+    invoice,
     boundary,
     booking: booking.lifecycleReader,
     commercial: booking.commercial,
@@ -111,6 +112,8 @@ export function createPaymentsBillingProviders(
       ledger: billing.repository,
       operations: operationsRepository,
       boundary: readBoundary,
+      invoice,
+      providerEnabled: settings.enabled,
     }),
     reporting: createBillingReportingReader(prisma),
     boundary,

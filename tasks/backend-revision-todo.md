@@ -693,3 +693,22 @@ ANL-W1–W4: [backend integration evidence](evidence/analytics-spec09-integratio
   [Implementation and bounded verification evidence](evidence/booking-multi-menu-proposals-2026-10-18.md)
   records completed feature checks and the still-open whole-repository coverage gate.
   This new task does not reopen SPEC-01–05 or establish live deployment/provider proof.
+
+## Balance checkout eligibility extension — 2026-10-19
+
+Owner selected an advisory backend read contract before frontend integration. This
+is a targeted priority exception to the broader frontend-first remediation order.
+Keep the final-invoice prerequisite and all existing payment admission checks.
+
+- [ ] BILL-ELIG-01: Add `balancePaymentEligibility` to authorized billing GET with
+  strict schema/OpenAPI, actionable reason codes, current-vs-historical revision
+  handling and shared financial admission checks. Verify missing/finalized invoice,
+  zero balance, legacy compatibility, provider configuration, unresolved attempts,
+  authorization and read-only behavior. [API hand-off](../docs/balance-payment-eligibility.md).
+  Implementation and local evidence are in [PR #76](https://github.com/WDP301-wedding/wedding-be/pull/76).
+  Acceptance remains open until exact-head CI and owner review; local Windows worker
+  exits are recorded in the [verification snapshot](evidence/balance-payment-eligibility-2026-10-19.md).
+- [ ] BILL-ELIG-02: After authorized deployment, verify the exact source/API and
+  read contract on the target. Frontend then consumes the field; no UI fix or live
+  provider/settlement acceptance is implied by local backend tests. Do not finalize
+  the shared synthetic invoice or create gateway payments to manufacture proof.

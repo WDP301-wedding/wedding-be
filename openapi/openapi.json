@@ -437,6 +437,83 @@
         ],
         "type": "object"
       },
+      "BalancePaymentEligibility": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "billingRevision": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "canPay": {
+                "const": true,
+                "type": "boolean"
+              },
+              "nextAction": {
+                "const": "PAY_BALANCE",
+                "type": "string"
+              },
+              "reasonCode": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "canPay",
+              "reasonCode",
+              "nextAction",
+              "billingRevision"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "billingRevision": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "canPay": {
+                "const": false,
+                "type": "boolean"
+              },
+              "nextAction": {
+                "enum": [
+                  "CONTACT_RESTAURANT",
+                  "WAIT_FOR_FINAL_INVOICE",
+                  "CHECK_EXISTING_PAYMENT",
+                  "NONE",
+                  "REFRESH_BILLING"
+                ],
+                "type": "string"
+              },
+              "reasonCode": {
+                "enum": [
+                  "BALANCE_NOT_ELIGIBLE",
+                  "INVOICE_FINALIZATION_REQUIRED",
+                  "FINANCIAL_SOURCE_CONFLICT",
+                  "PAYMENT_ATTEMPT_ACTIVE",
+                  "BILLING_BALANCE_LIMIT_EXCEEDED",
+                  "PAYMENT_PROVIDER_AMOUNT_UNSUPPORTED",
+                  "PAYMENT_PROVIDER_UNAVAILABLE",
+                  "STALE_BILLING_REVISION"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "canPay",
+              "reasonCode",
+              "nextAction",
+              "billingRevision"
+            ],
+            "type": "object"
+          }
+        ],
+        "type": "object"
+      },
       "BillingAttemptResponse": {
         "additionalProperties": false,
         "properties": {
@@ -876,6 +953,9 @@
           "data": {
             "additionalProperties": false,
             "properties": {
+              "balancePaymentEligibility": {
+                "$ref": "#/components/schemas/BalancePaymentEligibility"
+              },
               "billingRevision": {
                 "maximum": 9007199254740991,
                 "minimum": 0,
@@ -1034,7 +1114,8 @@
               "billingRevision",
               "totals",
               "history",
-              "nextCursor"
+              "nextCursor",
+              "balancePaymentEligibility"
             ],
             "type": "object"
           }
@@ -7521,6 +7602,7 @@
     },
     "/bookings/{bookingId}/billing": {
       "get": {
+        "description": "Includes advisory VNPay balancePaymentEligibility computed in the authorized booking snapshot. A missing final invoice blocks full-contract checkout without failing this GET. Historical ledger pages report STALE_BILLING_REVISION with the current billing revision. POST balance still revalidates all authority, invoice, attempt and amount facts; canPay does not reserve or settle money or prove provider availability.",
         "operationId": "getBookingBilling",
         "parameters": [
           {

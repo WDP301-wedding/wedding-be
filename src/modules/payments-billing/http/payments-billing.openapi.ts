@@ -12,6 +12,7 @@ import {
   refundApprovalResponseSchema,
   attemptResponseSchema,
   billingResponseSchema,
+  balancePaymentEligibilitySchema,
   ipnResponseSchema,
 } from './payments-billing.schemas.js';
 import { vnpayIpnFieldsSchema } from '../infrastructure/vnpay.protocol.js';
@@ -147,6 +148,8 @@ export const paymentsBillingOpenApiPaths: NonNullable<ZodOpenApiObject['paths']>
       operationId: 'getBookingBilling',
       summary:
         'Read exact ledger totals and ascending revision history with own FULL access or Manager. Pagination binds the booking and a fixed billing revision.',
+      description:
+        'Includes advisory VNPay balancePaymentEligibility computed in the authorized booking snapshot. A missing final invoice blocks full-contract checkout without failing this GET. Historical ledger pages report STALE_BILLING_REVISION with the current billing revision. POST balance still revalidates all authority, invoice, attempt and amount facts; canPay does not reserve or settle money or prove provider availability.',
       tags: ['Payments and Billing'],
       security: bearer,
       parameters: [
@@ -210,5 +213,6 @@ export const paymentsBillingOpenApiSchemas = {
   BillingRefundApprovalResponse: refundApprovalResponseSchema,
   BillingAttemptResponse: attemptResponseSchema,
   BookingBillingResponse: billingResponseSchema,
+  BalancePaymentEligibility: balancePaymentEligibilitySchema,
   BillingIpnResponse: ipnResponseSchema,
 };
