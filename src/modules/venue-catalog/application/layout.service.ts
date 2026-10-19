@@ -452,7 +452,7 @@ async function createGeometry(
   });
 }
 
-function toLayoutSnapshot(version: {
+export function toLayoutSnapshot(version: {
   id: string;
   layoutTemplateId: string;
   versionNumber: number | null;

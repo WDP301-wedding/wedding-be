@@ -1,0 +1,182 @@
+{
+  "units": "milliseconds",
+  "median": "Arithmetic mean of the two central sorted values for even N; initial probes excluded.",
+  "groups": [
+    {
+      "campaign": "baseline",
+      "variant": "baseline",
+      "phase": "steady",
+      "route": "seating-current",
+      "n": 20,
+      "wallMedianMs": 4469.0928859999985,
+      "wallMinMs": 4462.367453999992,
+      "wallMaxMs": 4482.593851999991,
+      "poolAcquireMedianMs": 0.14198850000684615,
+      "commands": [
+        30
+      ],
+      "advisoryServerAcquireMedianMs": 0.06,
+      "lifecycleLockStatementServerMedianMs": 0,
+      "errors": 0,
+      "newConnections": 0
+    },
+    {
+      "campaign": "baseline",
+      "variant": "baseline",
+      "phase": "steady",
+      "route": "seating-detail",
+      "n": 20,
+      "wallMedianMs": 4618.343172000001,
+      "wallMinMs": 4611.746666999999,
+      "wallMaxMs": 4632.111389999998,
+      "poolAcquireMedianMs": 0.1377984999999171,
+      "commands": [
+        31
+      ],
+      "advisoryServerAcquireMedianMs": 0.060000000000000005,
+      "lifecycleLockStatementServerMedianMs": 0,
+      "errors": 0,
+      "newConnections": 0
+    },
+    {
+      "campaign": "baseline",
+      "variant": "baseline",
+      "phase": "two-reader-cohort",
+      "route": "seating-detail",
+      "n": 10,
+      "wallMedianMs": 8044.648193500005,
+      "wallMinMs": 4763.069033000007,
+      "wallMaxMs": 11329.324932999996,
+      "poolAcquireMedianMs": 2381.543931500026,
+      "commands": [
+        31
+      ],
+      "advisoryServerAcquireMedianMs": 0.062,
+      "lifecycleLockStatementServerMedianMs": 0,
+      "errors": 0,
+      "newConnections": 0
+    },
+    {
+      "campaign": "comparison",
+      "variant": "baseline",
+      "phase": "steady",
+      "route": "seating-current",
+      "n": 20,
+      "wallMedianMs": 4667.776238999999,
+      "wallMinMs": 4662.044420999999,
+      "wallMaxMs": 6993.668460000001,
+      "poolAcquireMedianMs": 0.15162899999995716,
+      "commands": [
+        30
+      ],
+      "advisoryServerAcquireMedianMs": 0.060000000000000005,
+      "lifecycleLockStatementServerMedianMs": 0,
+      "errors": 0,
+      "newConnections": 0
+    },
+    {
+      "campaign": "comparison",
+      "variant": "baseline",
+      "phase": "steady",
+      "route": "seating-detail",
+      "n": 20,
+      "wallMedianMs": 4823.665283999995,
+      "wallMinMs": 4816.830818000017,
+      "wallMaxMs": 4836.5583719999995,
+      "poolAcquireMedianMs": 0.13807299999461975,
+      "commands": [
+        31
+      ],
+      "advisoryServerAcquireMedianMs": 0.059500000000000004,
+      "lifecycleLockStatementServerMedianMs": 0,
+      "errors": 0,
+      "newConnections": 0
+    },
+    {
+      "campaign": "comparison",
+      "variant": "baseline",
+      "phase": "two-reader-cohort",
+      "route": "seating-detail",
+      "n": 10,
+      "wallMedianMs": 7323.915125999978,
+      "wallMinMs": 4982.041099999973,
+      "wallMaxMs": 12083.075471999997,
+      "poolAcquireMedianMs": 2489.44560799998,
+      "commands": [
+        31
+      ],
+      "advisoryServerAcquireMedianMs": 0.061000000000000006,
+      "lifecycleLockStatementServerMedianMs": 0,
+      "errors": 0,
+      "newConnections": 0
+    },
+    {
+      "campaign": "comparison",
+      "variant": "candidate",
+      "phase": "steady",
+      "route": "seating-current",
+      "n": 20,
+      "wallMedianMs": 3270.3208319999976,
+      "wallMinMs": 3265.355101000023,
+      "wallMaxMs": 3282.1166200000007,
+      "poolAcquireMedianMs": 0.13899249998212326,
+      "commands": [
+        21
+      ],
+      "advisoryServerAcquireMedianMs": 0.008,
+      "lifecycleLockStatementServerMedianMs": 0.059,
+      "errors": 0,
+      "newConnections": 0
+    },
+    {
+      "campaign": "comparison",
+      "variant": "candidate",
+      "phase": "steady",
+      "route": "seating-detail",
+      "n": 20,
+      "wallMedianMs": 3268.503359500006,
+      "wallMinMs": 3265.0004929999996,
+      "wallMaxMs": 3281.029074000002,
+      "poolAcquireMedianMs": 0.14121800000430085,
+      "commands": [
+        21
+      ],
+      "advisoryServerAcquireMedianMs": 0.008,
+      "lifecycleLockStatementServerMedianMs": 0.059,
+      "errors": 0,
+      "newConnections": 0
+    },
+    {
+      "campaign": "comparison",
+      "variant": "candidate",
+      "phase": "two-reader-cohort",
+      "route": "seating-detail",
+      "n": 10,
+      "wallMedianMs": 4986.399986500008,
+      "wallMinMs": 3422.311973999953,
+      "wallMaxMs": 6561.966615999991,
+      "poolAcquireMedianMs": 1710.3249610000057,
+      "commands": [
+        21
+      ],
+      "advisoryServerAcquireMedianMs": 0.008,
+      "lifecycleLockStatementServerMedianMs": 0.08399999999999999,
+      "errors": 0,
+      "newConnections": 0
+    }
+  ],
+  "improvementPercent": {
+    "seating-current": 29.938354699268643,
+    "seating-detail": 32.2402536854792
+  },
+  "plans": {
+    "baseline": {
+      "n": 13,
+      "maxServerExecutionMs": 0.243
+    },
+    "comparison": {
+      "n": 14,
+      "maxServerExecutionMs": 0.348
+    }
+  }
+}

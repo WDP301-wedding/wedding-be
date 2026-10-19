@@ -125,8 +125,13 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
       return result;
     });
   }
-  private async current(tx: Prisma.TransactionClient, bookingId: string, planId?: string) {
-    const head = await tx.seatingPlan.findUnique({ where: { bookingId } });
+  private async current(
+    tx: Prisma.TransactionClient,
+    bookingId: string,
+    planId?: string,
+    knownHead?: SeatingPlan,
+  ) {
+    const head = knownHead ?? (await tx.seatingPlan.findUnique({ where: { bookingId } }));
     if (head === null || (planId !== undefined && head.id !== planId)) throw new NotFoundError();
     const row = await tx.seatingPlanRevision.findUniqueOrThrow({ where: { id: head.revisionId } });
     return { head, row, snapshot: parse(snapshotSchema, row.snapshot) };
@@ -156,7 +161,7 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
     const planning = await this.guest.owners.planning.getSource(bookingId, scope);
     const eligibility = await this.venue.getLayoutEligibility(layoutId, scope);
     if (eligibility.hallId !== event.hallId) throw new NotFoundError();
-    const layout = await this.layouts.resolveVersion(layoutId);
+    const layout = eligibility.layoutSnapshot ?? (await this.layouts.resolveVersion(layoutId));
     return { planning, eligibility, layout };
   }
   private async snapshot(
@@ -522,8 +527,14 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
     bookingId: string,
     eventRevision?: number,
     readOnly = false,
+    selection?: { head?: SeatingPlan; planId?: string },
   ) {
-    const { head, row, snapshot } = await this.current(tx, bookingId);
+    const { head, row, snapshot } = await this.current(
+      tx,
+      bookingId,
+      selection?.planId,
+      selection?.head,
+    );
     if (eventRevision !== undefined && eventRevision <= head.observedBookingRevision)
       return this.view(row);
     const { planning, eligibility, layout } = await this.facts(
@@ -585,10 +596,7 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
     return this.run(
       bookingId,
       context,
-      async (tx, scope) => {
-        await this.current(tx, bookingId, planId);
-        return this.readView(tx, scope, bookingId);
-      },
+      (tx, scope) => this.revalidate(tx, scope, bookingId, undefined, false, { planId }),
       'READ',
     );
   }
@@ -599,13 +607,10 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
       async (tx, scope) => {
         const head = await tx.seatingPlan.findUnique({ where: { bookingId } });
         if (head === null) return null;
-        return this.readView(tx, scope, bookingId);
+        return this.revalidate(tx, scope, bookingId, undefined, false, { head });
       },
       'READ',
     );
-  }
-  private async readView(tx: Prisma.TransactionClient, scope: ContractContext, bookingId: string) {
-    return this.revalidate(tx, scope, bookingId);
   }
   async bookingForPlan(planValue: string, context: SeatingRequestContext) {
     const actor = await this.guest.identity.resolver.resolve(context.accessToken);
