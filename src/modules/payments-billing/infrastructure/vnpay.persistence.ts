@@ -23,6 +23,12 @@ const evidenceSchema = z
     payloadHash: z.string().regex(/^[a-f0-9]{64}$/u),
     channel: z.enum(['IPN', 'QUERY']),
     correlationConflict: z.literal('CURRENCY').optional(),
+    nonPaymentReason: z.enum(['NOT_FOUND', 'UNPAID']).optional(),
+    resolutionReason: z.literal('EXPIRED_UNPAID').optional(),
+    sourcePayloadHash: z
+      .string()
+      .regex(/^[a-f0-9]{64}$/u)
+      .optional(),
   })
   .refine((input) => (input.outcome === 'SUCCEEDED') === (input.settledAt !== null));
 const checkoutSchema = z
@@ -173,7 +179,13 @@ export function createVnpayEvidenceRepository(
                 (['SUCCEEDED', 'FAILED'].includes(attempt.state) && terminal === null)
               ? 'CONFLICT'
               : 'ACCEPTED';
-        const { correlationConflict, ...normalizedProof } = proof;
+        const {
+          correlationConflict,
+          nonPaymentReason,
+          resolutionReason,
+          sourcePayloadHash,
+          ...normalizedProof
+        } = proof;
         const stored = await client.billingProviderEvidence.create({
           data: {
             ...normalizedProof,
@@ -207,6 +219,9 @@ export function createVnpayEvidenceRepository(
               outcome: proof.outcome,
               amountVnd: proof.amountVnd,
               ...(correlationConflict === undefined ? {} : { conflictReason: correlationConflict }),
+              ...(nonPaymentReason === undefined ? {} : { nonPaymentReason }),
+              ...(resolutionReason === undefined ? {} : { resolutionReason }),
+              ...(sourcePayloadHash === undefined ? {} : { sourcePayloadHash }),
             },
           },
         });

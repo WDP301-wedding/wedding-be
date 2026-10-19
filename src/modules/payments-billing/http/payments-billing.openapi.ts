@@ -130,7 +130,7 @@ export const paymentsBillingOpenApiPaths: NonNullable<ZodOpenApiObject['paths']>
     get: {
       operationId: 'getPaymentAttempt',
       summary:
-        'Read owned deposit status with RESTRICTED/FULL access or balance status with FULL access; Managers can read either. VNPay reconciliation preserves UNKNOWN on unproven outcomes.',
+        'Read owned deposit status with RESTRICTED/FULL access or balance status with FULL access; Managers can read either. Reopens an unexpired VNPay checkout. After expiry plus 15 minutes, authenticated missing-order or unpaid evidence resolves FAILED; unverified outcomes remain UNKNOWN.',
       tags: ['Payments and Billing'],
       security: bearer,
       parameters: [...booking, path('attemptId')],

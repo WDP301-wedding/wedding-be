@@ -539,6 +539,10 @@
                   }
                 ]
               },
+              "checkoutUrl": {
+                "format": "uri",
+                "type": "string"
+              },
               "expiresAt": {
                 "format": "date-time",
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
@@ -19070,7 +19074,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Read owned deposit status with RESTRICTED/FULL access or balance status with FULL access; Managers can read either. VNPay reconciliation preserves UNKNOWN on unproven outcomes.",
+        "summary": "Read owned deposit status with RESTRICTED/FULL access or balance status with FULL access; Managers can read either. Reopens an unexpired VNPay checkout. After expiry plus 15 minutes, authenticated missing-order or unpaid evidence resolves FAILED; unverified outcomes remain UNKNOWN.",
         "tags": [
           "Payments and Billing"
         ]

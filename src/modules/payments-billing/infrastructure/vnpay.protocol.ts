@@ -4,6 +4,7 @@ import { isIP } from 'node:net';
 import { z } from 'zod';
 
 import type { ProviderEvidence, VnpaySettings } from '../application/vnpay.port.js';
+import type { PaymentAttempt } from '../application/billing-ledger.port.js';
 import { VnpayProtocolError, type VnpayProtocol } from '../application/vnpay.port.js';
 export { VnpayProtocolError } from '../application/vnpay.port.js';
 
@@ -14,7 +15,7 @@ export function createVnpayProtocol(config: VnpaySettings): VnpayProtocol {
     createCheckout: (attempt, ip) => createCheckout(attempt, ip, config),
     checkoutUrl: (parameters) => checkoutUrl(parameters, config),
     verifyIpn: (rawQuery) => verifyIpn(rawQuery, config),
-    verifyQuery: (raw) => verifyQuery(raw, config),
+    verifyQuery: (raw, attempt) => verifyQuery(raw, config, attempt),
     createQuery: (input) => createQuery(input, config),
   });
 }
@@ -189,7 +190,11 @@ export function createQuery(
     vnp_SecureHash: sign(Object.values(parameters).join('|'), config.hashSecret),
   });
 }
-export function verifyQuery(raw: unknown, config: VnpaySettings): ProviderEvidence {
+export function verifyQuery(
+  raw: unknown,
+  config: VnpaySettings,
+  attempt?: Pick<PaymentAttempt, 'id' | 'amountVnd'>,
+): ProviderEvidence {
   const parsed = z.record(z.string(), z.string().max(512)).safeParse(raw);
   if (!parsed.success) throw new VnpayProtocolError('FIELDS');
   const parameters = parsed.data;
@@ -199,10 +204,51 @@ export function verifyQuery(raw: unknown, config: VnpaySettings): ProviderEviden
   verify(canonical, parameters.vnp_SecureHash, config);
   if (
     parameters.vnp_Command !== 'querydr' ||
-    parameters.vnp_TransactionType !== '01' ||
     !/^[A-Za-z0-9]{1,32}$/u.test(parameters.vnp_ResponseId ?? '')
   )
     throw new VnpayProtocolError('CORRELATION');
+  // Authenticate the original reply before interpreting absent/empty payment fields.
+  // Nonpayment is bound to the persisted order; it never proves a settlement.
+  const missing = parameters.vnp_ResponseCode === '91';
+  const unpaid =
+    attempt !== undefined &&
+    parameters.vnp_ResponseCode === '00' &&
+    parameters.vnp_TransactionStatus === '01' &&
+    /^0{1,15}$/u.test(parameters.vnp_TransactionNo ?? '') &&
+    (parameters.vnp_PayDate ?? '') === '';
+  if (missing || unpaid) {
+    if (
+      attempt === undefined ||
+      parameters.vnp_TmnCode !== config.merchantCode ||
+      parameters.vnp_TxnRef !== attempt.id ||
+      !(missing ? ['', '01'] : ['01']).includes(parameters.vnp_TransactionType ?? '') ||
+      !['', '01'].includes(parameters.vnp_TransactionStatus ?? '') ||
+      !/^0{0,15}$/u.test(parameters.vnp_TransactionNo ?? '') ||
+      (parameters.vnp_PayDate ?? '') !== ''
+    )
+      throw new VnpayProtocolError('CORRELATION');
+    const amount = parameters.vnp_Amount ?? '';
+    if (
+      (amount !== '' && (!/^\d{1,12}$/u.test(amount) || BigInt(amount) % 100n !== 0n)) ||
+      (!missing && (amount === '' || BigInt(amount) === 0n)) ||
+      ((parameters.vnp_BankCode ?? '') !== '' &&
+        !/^[A-Za-z0-9]{3,20}$/u.test(parameters.vnp_BankCode!))
+    )
+      throw new VnpayProtocolError('FIELDS');
+    return Object.freeze({
+      paymentAttemptId: attempt.id,
+      merchantCode: parameters.vnp_TmnCode,
+      transactionId: '0',
+      amountVnd:
+        amount === '' || BigInt(amount) === 0n ? attempt.amountVnd : Number(BigInt(amount) / 100n),
+      outcome: 'UNKNOWN',
+      settledAt: null,
+      payloadHash: createHash('sha256').update(canonical).digest('hex'),
+      channel: 'QUERY',
+      nonPaymentReason: missing ? 'NOT_FOUND' : 'UNPAID',
+    });
+  }
+  if (parameters.vnp_TransactionType !== '01') throw new VnpayProtocolError('CORRELATION');
   return normalize(parameters, canonical, 'QUERY', config);
 }
 function normalize(

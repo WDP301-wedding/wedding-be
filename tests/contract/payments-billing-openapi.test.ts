@@ -63,4 +63,12 @@ describe('PB-C3 billing HTTP contract', () => {
       serializeOpenApiDocument(createOpenApiDocument()),
     );
   });
+  it('publishes an optional URI for reopening the existing unexpired checkout', () => {
+    const schema = createOpenApiDocument().components?.schemas?.BillingAttemptResponse;
+    expect(schema).toMatchObject({
+      properties: { data: { properties: { checkoutUrl: { type: 'string', format: 'uri' } } } },
+    });
+    const data = (schema as { properties: { data: { required: string[] } } }).properties.data;
+    expect(data.required).not.toContain('checkoutUrl');
+  });
 });

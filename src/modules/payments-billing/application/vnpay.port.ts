@@ -23,6 +23,9 @@ export type ProviderEvidence = Readonly<{
   payloadHash: string;
   channel: 'IPN' | 'QUERY';
   correlationConflict?: 'CURRENCY' | undefined;
+  nonPaymentReason?: 'NOT_FOUND' | 'UNPAID' | undefined;
+  resolutionReason?: 'EXPIRED_UNPAID' | undefined;
+  sourcePayloadHash?: string | undefined;
 }>;
 export type StoredProviderEvidence = ProviderEvidence &
   Readonly<{ id: string; decision: 'ACCEPTED' | 'CONFLICT' | 'AMOUNT_MISMATCH' }>;
@@ -66,7 +69,7 @@ export interface VnpayProtocol {
   ): Readonly<{ parameters: Readonly<Record<string, string>>; url: string }>;
   checkoutUrl(parameters: Readonly<Record<string, string>>): string;
   verifyIpn(rawQuery: string): ProviderEvidence;
-  verifyQuery(raw: unknown): ProviderEvidence;
+  verifyQuery(raw: unknown, attempt?: Pick<PaymentAttempt, 'id' | 'amountVnd'>): ProviderEvidence;
   createQuery(
     input: Readonly<{
       paymentAttemptId: string;

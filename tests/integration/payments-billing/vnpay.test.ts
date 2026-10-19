@@ -346,6 +346,7 @@ databaseDescribe('PB-W4 verified VNPay with real Booking/Identity/PostgreSQL', (
     expect(await f.vnpay.reconcile(f.bookingId, f.id, f.system)).toEqual({
       status: 'UNKNOWN',
       applicationStatus: null,
+      checkoutUrl: f.checkout.checkoutUrl,
     });
     expect(await paid(f.bookingId)).toBe(0);
     expect(
