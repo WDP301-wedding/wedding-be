@@ -8,7 +8,7 @@ silently override them.
 
 - The web refresh credential uses the exact cookie name `__Host-wedding-refresh` with
   `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, and no `Domain` attribute.
-- Access credentials live for 10 minutes. Refresh sessions expire after 30 idle days or 90 days
+- Access credentials live for 30 minutes. Refresh sessions expire after 30 idle days or 90 days
   absolutely, whichever comes first. Password-reset credentials live for 30 minutes.
 - Workspace invitations live for 72 hours. At most three issues or reissues are allowed for one
   consultation/email pair in 24 hours.
@@ -29,6 +29,12 @@ parser accepts only the approved values. Development and test receive the same p
 only trusted-proxy hops default to zero. Set `AUTH_TRUST_PROXY_HOPS=1` only when exactly one
 controlled reverse proxy sits between the application and every client. Any other topology needs
 a reviewed configuration change before deployment.
+
+Owner-approved update on 2026-10-19: access lifetime increased from 600 to 1800 seconds.
+Deploy the code together with `AUTH_ACCESS_TOKEN_TTL_SECONDS=1800` and restart the backend;
+the parser rejects the previous value. The new lifetime applies to access credentials issued
+by login, invitation acceptance, and refresh after the update. Existing credentials retain
+their persisted expiry.
 
 ## Initial Manager bootstrap
 

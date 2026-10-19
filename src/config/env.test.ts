@@ -36,7 +36,7 @@ describe('Public invitation origin configuration', () => {
 
 const approvedIdentityEnvironment = {
   AUTH_TRUST_PROXY_HOPS: '1',
-  AUTH_ACCESS_TOKEN_TTL_SECONDS: '600',
+  AUTH_ACCESS_TOKEN_TTL_SECONDS: '1800',
   AUTH_REFRESH_IDLE_TTL_SECONDS: '2592000',
   AUTH_REFRESH_ABSOLUTE_TTL_SECONDS: '7776000',
   AUTH_PASSWORD_RESET_TTL_SECONDS: '1800',
@@ -163,7 +163,7 @@ describe('parseEnvironment', () => {
           sameSite: 'lax',
         },
         lifetimesSeconds: {
-          accessToken: 600,
+          accessToken: 1_800,
           refreshIdle: 2_592_000,
           refreshAbsolute: 7_776_000,
           passwordReset: 1_800,
@@ -333,7 +333,8 @@ describe('parseEnvironment', () => {
 
   it.each([
     ['AUTH_TRUST_PROXY_HOPS', '2'],
-    ['AUTH_ACCESS_TOKEN_TTL_SECONDS', '601'],
+    ['AUTH_ACCESS_TOKEN_TTL_SECONDS', '600'],
+    ['AUTH_ACCESS_TOKEN_TTL_SECONDS', '1801'],
     ['AUTH_REFRESH_IDLE_TTL_SECONDS', '2591999'],
     ['AUTH_REFRESH_ABSOLUTE_TTL_SECONDS', '7776001'],
     ['AUTH_PASSWORD_RESET_TTL_SECONDS', '3600'],
