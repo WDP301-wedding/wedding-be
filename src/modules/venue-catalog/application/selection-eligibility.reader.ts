@@ -1,4 +1,5 @@
 import type { ContractContext } from '../../../core/database/booking-boundary.js';
+import type { LayoutVersionSnapshot } from './layout.service.js';
 
 export type LayoutEligibility = Readonly<{
   layoutTemplateVersionId: string;
@@ -8,6 +9,8 @@ export type LayoutEligibility = Readonly<{
   currentForNewSelection: boolean;
   hallMaxGuests: number;
   totalSeatCapacity: number;
+  /** Single-version reads can reuse the same fully validated immutable source. */
+  layoutSnapshot?: LayoutVersionSnapshot;
 }>;
 
 export interface VenueSelectionEligibilityReader {
