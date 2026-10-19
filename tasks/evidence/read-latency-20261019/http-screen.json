@@ -1,0 +1,1804 @@
+{
+  "startedAt": "2026-10-19T12:39:43.528Z",
+  "source": {
+    "deploymentId": "8333a351-49d2-497f-9cd8-ab146891fb6e",
+    "source": "7b07d8bbf38e6a9808c08ab1642b2eb58e364a78",
+    "image": "sha256:6b5e35dde3f78ee82ab4cf36852c34571d90555c0aedb7d0f7bcee0c9c34001a"
+  },
+  "methodology": "38 retained audited synthetic HTTP read templates, one initial probe plus three serial screening rounds per route. Initial probes are not controlled cold-cache measurements. No artificial locks, configuration changes or provider commands. At least 20 steady samples follow for finalists.",
+  "samples": [
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/auth/me",
+      "status": 200,
+      "ms": 497.59290000000055,
+      "bytes": 171,
+      "requestId": "654b626b-c60d-44f6-9007-c490f8c95bf0",
+      "responseSha256": "b3bea8f5ded0fd7525e309add2394abaa4dec037cefceac84aafed090ebe31f5"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/auth/profile",
+      "status": 200,
+      "ms": 549.0753000000004,
+      "bytes": 140,
+      "requestId": "2ec01006-39b5-439e-a76e-f601b847fb4b",
+      "responseSha256": "d5edd08caad544ca181d8d938f936750095198dfc0a8f5a481445b7f9a6a7f1e"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/auth/sessions",
+      "status": 200,
+      "ms": 588.5102999999999,
+      "bytes": 5284,
+      "requestId": "3ac549e3-4e32-484c-ba12-084ecb273fd1",
+      "responseSha256": "7305fd0952eec403b4e6f3af15e168db17495e558e8397516640c03a5f35258a"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/couple/bookings",
+      "status": 200,
+      "ms": 2053.8943,
+      "bytes": 666,
+      "requestId": "b0e72ac1-fbbf-4781-a41a-f4dd7d23ae31",
+      "responseSha256": "4e34938675fb1914600d05d57e7db5924e942ea77a700ecd5e5dc7e62adaf0a4"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/catalog/restaurant",
+      "status": 200,
+      "ms": 1770.6474999999991,
+      "bytes": 401,
+      "requestId": "32cf2818-dfdf-4c06-9d49-bac7221dad3f",
+      "responseSha256": "d36aa2d6fdbc64d7983540cfd26b3f1bcaef003461f88ed183b6e12896d22886"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/catalog/halls",
+      "status": 200,
+      "ms": 1279.2122999999992,
+      "bytes": 1435,
+      "requestId": "1d42f64a-1e8d-451c-9be2-12bb4cfb1a8a",
+      "responseSha256": "333543042cf2a1d36c330cf3d508ea7eaaf409b5b3cf6caa49b1b947d92f669d"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/catalog/menu-packages",
+      "status": 200,
+      "ms": 1145.7788,
+      "bytes": 1785,
+      "requestId": "7549da28-dce4-4e97-8702-484aeba53e42",
+      "responseSha256": "8596d3a570b625f61242abcd3dba52a19c4b46e23977c6ac7f61cc969f631a83"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/catalog/dishes",
+      "status": 200,
+      "ms": 1388.2090000000007,
+      "bytes": 1948,
+      "requestId": "b0851aee-0ffe-4bbf-a379-e59ecbe783f7",
+      "responseSha256": "8268c4c343c9609ac6fcefcb735e1793245b4ed76be63ee93bb42072835961c6"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/catalog/services",
+      "status": 200,
+      "ms": 1164.4225999999999,
+      "bytes": 1980,
+      "requestId": "6478e1da-7ecf-4993-a2af-40af93fcecb4",
+      "responseSha256": "a3893d70e37e3fced0cb0e6935412b9f1cbd06a106783b4b05cf1cfa140997f2"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/catalog/print-offerings",
+      "status": 200,
+      "ms": 1338.4876000000004,
+      "bytes": 1982,
+      "requestId": "b085f4c4-d88c-4f50-b8ea-848a6c7b282f",
+      "responseSha256": "2b7404d32b18f4c7d9088ad47347439dbdd028bee05b9f9d9b96b03a0168f8f1"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/proposal",
+      "status": 200,
+      "ms": 1714.4516999999996,
+      "bytes": 2119,
+      "requestId": "fe6c2410-fa4c-4685-b943-8cb883a91a23",
+      "responseSha256": "98016a89cf7ab42d902efeef51f020b45b042f263605c2681a1845e412976cf9"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/contracts",
+      "status": 200,
+      "ms": 2924.9375999999975,
+      "bytes": 2333,
+      "requestId": "283d7a5c-1061-425b-a6ab-10807f0e900a",
+      "responseSha256": "854856084303c05a73c9312721b9263202e1b75d19cd2224980f8bc1c4794ef7"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/contract-appendices",
+      "status": 200,
+      "ms": 2199.266599999999,
+      "bytes": 230,
+      "requestId": "79df5627-3444-43a9-b9d3-c6979892331f",
+      "responseSha256": "631d218e8fe7c75411f658d5c69a8677d83017b51ea37e817e94e256e80879c0"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/billing",
+      "status": 200,
+      "ms": 3843.0656000000017,
+      "bytes": 984,
+      "requestId": "978274ab-3ca6-4b20-aab4-4ab4c60d4ace",
+      "responseSha256": "a8185255ee275049eb918b5a3d73e0f5054f8c3672a812f544e14ba478ae0fad"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/final-invoices",
+      "status": 200,
+      "ms": 1871.166799999999,
+      "bytes": 119,
+      "requestId": "b837d9e6-fca6-49ed-8046-1b23b93d3ec0",
+      "responseSha256": "5e272ff25ad0837139e2d2f73d6cd8574a5340c1d43f4afca511e262e116d366"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/incidental-expenses",
+      "status": 200,
+      "ms": 2008.2896,
+      "bytes": 116,
+      "requestId": "cbc56c5c-6dff-4abc-9405-ebd4645aa272",
+      "responseSha256": "a0c293ec8c1d86161e2217050d673fce9472401651cdbc53fb4bd5f9495242ac"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/guest-groups",
+      "status": 200,
+      "ms": 4069.3663000000015,
+      "bytes": 708,
+      "requestId": "79692e0c-eba5-4906-acda-4b572bddfd57",
+      "responseSha256": "f3b3e7c2ccbe77c6c1fae90d478803b9cf478c32f32ed099f441a19e3fda7b6d"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/guest-plan",
+      "status": 200,
+      "ms": 3170.0138000000006,
+      "bytes": 183,
+      "requestId": "7bbe36b4-f62c-45c2-9ba0-85007a92ab2e",
+      "responseSha256": "804bc8e181fcdc534dd568cdcd052c8906fe37fd8a3e09c8dd4e9cf7ca59eda6"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/guests",
+      "status": 200,
+      "ms": 2969.578800000003,
+      "bytes": 2537,
+      "requestId": "965a2461-9a2f-4a67-bfdf-3193bf74d6b6",
+      "responseSha256": "56daffdf32a1db7b7bc3e1cb2c218a08f02c74b49a997a497591f1a10c5248d7"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/check-in-settings",
+      "status": 200,
+      "ms": 3819.5841999999975,
+      "bytes": 119,
+      "requestId": "d5fbb7d7-401d-4f97-a7c4-d82d08fe13d8",
+      "responseSha256": "3018044c4e7edff10ab03adb6c43d63320adcfe6018b7e5d5b0d78175adedd93"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/attendance-summary",
+      "status": 200,
+      "ms": 3058.6682,
+      "bytes": 193,
+      "requestId": "dbea811c-8a49-41fc-b9d4-1b68394607da",
+      "responseSha256": "776eeacaa9678f16daa7bdb9244e50ce5dc904e5c4e07acabb93ee742e556a74"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/seating-layout-options",
+      "status": 200,
+      "ms": 4263.6206999999995,
+      "bytes": 246,
+      "requestId": "11b7c0b0-e186-4084-98cf-6b36bc70e5a7",
+      "responseSha256": "ac314cb813bd439d157be201f21a6ccc5e1701acbeef0b0d8a2bac8426a669e5"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/seating-plans/current",
+      "status": 200,
+      "ms": 4903.105000000003,
+      "bytes": 1692,
+      "requestId": "6c400f9e-1f72-4766-a002-80f932339754",
+      "responseSha256": "d8fd5b69de9c0db896cc35234ee2261bc396555151cffc3db8c004071cffdf53"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/invitations",
+      "status": 200,
+      "ms": 3862.3257000000012,
+      "bytes": 316,
+      "requestId": "3c525652-75a7-4e93-a5a3-e0a463b6a676",
+      "responseSha256": "c3be0bd8fbffafc8e659321937f790e27cab470eb122fcd1e851a917a65ef692"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/print-orders",
+      "status": 200,
+      "ms": 2013.0878000000012,
+      "bytes": 39,
+      "requestId": "03d0e20d-7e98-4b2b-8261-f5176e19f4ed",
+      "responseSha256": "107a74eeb96c0ecf1fc297b5721c087bef32d58ecb2333d999699994db4b9588"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/invitation-templates",
+      "status": 200,
+      "ms": 3808.6373999999996,
+      "bytes": 2271,
+      "requestId": "6e4a17bc-d620-43e2-aa54-7d8e15da560f",
+      "responseSha256": "96856e14116291c25d97183fb5632b11306c995f2f80d95e8082d83bd8ee203d"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/notifications/inbox",
+      "status": 200,
+      "ms": 860.5455999999976,
+      "bytes": 39,
+      "requestId": "7165317d-d157-4db6-99a4-eb939b6afe44",
+      "responseSha256": "107a74eeb96c0ecf1fc297b5721c087bef32d58ecb2333d999699994db4b9588"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/notifications/unread-count",
+      "status": 200,
+      "ms": 852.545299999998,
+      "bytes": 20,
+      "requestId": "fd729456-8149-4f2c-b68a-e7a54c8324d9",
+      "responseSha256": "8e820d24d79df590234b55caabca0e47d1a48cffd6128898200644ede301c199"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/notifications/preferences",
+      "status": 200,
+      "ms": 722.9953000000096,
+      "bytes": 65,
+      "requestId": "d54aca67-fa5e-4320-8c10-60f36c585b27",
+      "responseSha256": "90582ee26f5995ca4ecbaf5baf92f932730c286bcaccf4e36d7bee24dc1e6550"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/notifications/android-installations",
+      "status": 200,
+      "ms": 706.8581999999878,
+      "bytes": 11,
+      "requestId": "3ef50bea-dcb8-421c-879f-ab94326cdfb9",
+      "responseSha256": "8fe32e407a1038ee38753b70e5374b3a46d6ae9d5f16cd5b73c53abaca8f5ed0"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/consultations/{consultationId}/couple-profile",
+      "status": 200,
+      "ms": 526.9116999999969,
+      "bytes": 168,
+      "requestId": "78af2761-0174-448b-9e02-77242e5144e6",
+      "responseSha256": "9a07396d62db3af201236aedf7d0f1d44b15ca5040fa7933a14de92ea1609797"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/catalog/halls/{hallId}",
+      "status": 200,
+      "ms": 698.5213000000076,
+      "bytes": 149,
+      "requestId": "5b8424ab-c480-480c-a70a-43e3b90f3b01",
+      "responseSha256": "591722b43dceea4e1d63205d5e00b8295bd16cd05746dbf7066acf3d221023c2"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/contracts/{revisionId}/pdf",
+      "status": 200,
+      "ms": 3674.9746000000014,
+      "bytes": 24485,
+      "requestId": "bb18ec40-a17a-4d68-8979-e4b2438d907d",
+      "responseSha256": "4f062d45e953c8cac537f233f1a659bc8f528210a0e0712094ccda8dcc3fa102"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/guests/{guestId}/personalized-invitations",
+      "status": 200,
+      "ms": 3467.2285999999876,
+      "bytes": 126,
+      "requestId": "c1bc99ec-30bf-4dac-b688-b2667589995a",
+      "responseSha256": "fd0e35b5f69af51ed170903d061d45188173ca45d1f17db1d2f4d0cdc98fd64e"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/seating-plans/{planId}",
+      "status": 200,
+      "ms": 4852.604800000001,
+      "bytes": 1692,
+      "requestId": "43388e91-fd78-4173-ae9b-194ae7f79f20",
+      "responseSha256": "d8fd5b69de9c0db896cc35234ee2261bc396555151cffc3db8c004071cffdf53"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/invitations/{designId}",
+      "status": 200,
+      "ms": 3878.2685000000056,
+      "bytes": 286,
+      "requestId": "4b1e1dc7-43c0-4c0d-b966-e178e0dca3a4",
+      "responseSha256": "9797cb5b6e829cccbad94f44cf42a85043c0640c32c8c70889ec7783f8beda73"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/bookings/{bookingId}/payments/{attemptId}",
+      "status": 200,
+      "ms": 4045.2924000000057,
+      "bytes": 200,
+      "requestId": "f871ab68-ab19-4e2c-bbca-ba838de01fcd",
+      "responseSha256": "d97113e68d22983dd289353ca90af4d193dd37abd7416870e50b2dcb5260679c"
+    },
+    {
+      "round": 0,
+      "measured": false,
+      "label": "/management/bookings/{bookingId}/incidental-expenses",
+      "status": 200,
+      "ms": 2206.599900000001,
+      "bytes": 116,
+      "requestId": "aea292c6-7bb3-4298-9ec1-ced58a36fadc",
+      "responseSha256": "a0c293ec8c1d86161e2217050d673fce9472401651cdbc53fb4bd5f9495242ac"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/auth/me",
+      "status": 200,
+      "ms": 1568.0473999999958,
+      "bytes": 171,
+      "requestId": "8cb78457-d362-4977-afb5-0277eeb79a6e",
+      "responseSha256": "b3bea8f5ded0fd7525e309add2394abaa4dec037cefceac84aafed090ebe31f5"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/auth/profile",
+      "status": 200,
+      "ms": 623.6622999999963,
+      "bytes": 140,
+      "requestId": "65818fe1-6e46-4d98-bd13-d783dc46f135",
+      "responseSha256": "d5edd08caad544ca181d8d938f936750095198dfc0a8f5a481445b7f9a6a7f1e"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/auth/sessions",
+      "status": 200,
+      "ms": 536.3797999999952,
+      "bytes": 5284,
+      "requestId": "d2a0767f-c24a-40ef-b717-62c17e9844ed",
+      "responseSha256": "7305fd0952eec403b4e6f3af15e168db17495e558e8397516640c03a5f35258a"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/couple/bookings",
+      "status": 200,
+      "ms": 1034.5014999999985,
+      "bytes": 666,
+      "requestId": "cc86e95f-99ad-4200-81b7-46c08dd7e850",
+      "responseSha256": "4e34938675fb1914600d05d57e7db5924e942ea77a700ecd5e5dc7e62adaf0a4"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/catalog/restaurant",
+      "status": 200,
+      "ms": 1797.7176000000036,
+      "bytes": 401,
+      "requestId": "2a665164-67b9-4ac9-bbd0-82a560661ec6",
+      "responseSha256": "d36aa2d6fdbc64d7983540cfd26b3f1bcaef003461f88ed183b6e12896d22886"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/catalog/halls",
+      "status": 200,
+      "ms": 1084.7445000000007,
+      "bytes": 1435,
+      "requestId": "18196d01-0bc0-4649-972c-65ab29fe5012",
+      "responseSha256": "b37895b0b1e21973f97ab1e66b8d5bf0098c6f55c0649607b7f214344bea7359"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/catalog/menu-packages",
+      "status": 200,
+      "ms": 1170.1872000000003,
+      "bytes": 1785,
+      "requestId": "467c50cf-50f1-47e1-9797-cc22f34a7bfa",
+      "responseSha256": "8596d3a570b625f61242abcd3dba52a19c4b46e23977c6ac7f61cc969f631a83"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/catalog/dishes",
+      "status": 200,
+      "ms": 1370.7862999999925,
+      "bytes": 1948,
+      "requestId": "6b9a3fef-5c19-4381-b2ef-2e38afe6ab51",
+      "responseSha256": "9bd240bb1797d3bc2dc0adc4c24e0224d02b55ab2f16f90d3dff31fff6625b93"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/catalog/services",
+      "status": 200,
+      "ms": 1175.7280000000028,
+      "bytes": 1980,
+      "requestId": "bc374f9d-8db8-4f9a-adc7-88b7bc1c6251",
+      "responseSha256": "a3893d70e37e3fced0cb0e6935412b9f1cbd06a106783b4b05cf1cfa140997f2"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/catalog/print-offerings",
+      "status": 200,
+      "ms": 1340.620299999995,
+      "bytes": 1982,
+      "requestId": "b3c2d4f1-e425-49e6-9415-c10544d740ce",
+      "responseSha256": "2b7404d32b18f4c7d9088ad47347439dbdd028bee05b9f9d9b96b03a0168f8f1"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/proposal",
+      "status": 200,
+      "ms": 1774.4988999999914,
+      "bytes": 2119,
+      "requestId": "20c8a247-0d57-48f8-90d6-5d5a369f5607",
+      "responseSha256": "98016a89cf7ab42d902efeef51f020b45b042f263605c2681a1845e412976cf9"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/contracts",
+      "status": 200,
+      "ms": 2917.242200000008,
+      "bytes": 2333,
+      "requestId": "50f507f6-4600-4b11-bcf4-57d8a4f2dbbd",
+      "responseSha256": "854856084303c05a73c9312721b9263202e1b75d19cd2224980f8bc1c4794ef7"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/contract-appendices",
+      "status": 200,
+      "ms": 2165.3300000000163,
+      "bytes": 230,
+      "requestId": "ede3a325-2cc7-419a-824f-3b1ab402f52d",
+      "responseSha256": "631d218e8fe7c75411f658d5c69a8677d83017b51ea37e817e94e256e80879c0"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/billing",
+      "status": 200,
+      "ms": 2746.118300000002,
+      "bytes": 984,
+      "requestId": "46ab2190-98d1-4c27-825f-19f8a08f4436",
+      "responseSha256": "a8185255ee275049eb918b5a3d73e0f5054f8c3672a812f544e14ba478ae0fad"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/final-invoices",
+      "status": 200,
+      "ms": 1848.6506999999983,
+      "bytes": 119,
+      "requestId": "eb65a42e-be35-434a-a2a9-a84d16c88bb6",
+      "responseSha256": "5e272ff25ad0837139e2d2f73d6cd8574a5340c1d43f4afca511e262e116d366"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/incidental-expenses",
+      "status": 200,
+      "ms": 2004.031799999997,
+      "bytes": 116,
+      "requestId": "b12f1a84-b27f-4206-ab99-0414b3bc3d17",
+      "responseSha256": "a0c293ec8c1d86161e2217050d673fce9472401651cdbc53fb4bd5f9495242ac"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/guest-groups",
+      "status": 200,
+      "ms": 4069.3642999999865,
+      "bytes": 708,
+      "requestId": "bb9d8019-97de-470c-a673-a6c3cfa1ac8b",
+      "responseSha256": "f3b3e7c2ccbe77c6c1fae90d478803b9cf478c32f32ed099f441a19e3fda7b6d"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/guest-plan",
+      "status": 200,
+      "ms": 3152.832699999999,
+      "bytes": 183,
+      "requestId": "893168f5-682a-48cf-8959-0001ae988e10",
+      "responseSha256": "804bc8e181fcdc534dd568cdcd052c8906fe37fd8a3e09c8dd4e9cf7ca59eda6"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/guests",
+      "status": 200,
+      "ms": 2988.4878000000026,
+      "bytes": 2537,
+      "requestId": "dacc1205-1631-434a-8da5-1679cc5114d5",
+      "responseSha256": "56daffdf32a1db7b7bc3e1cb2c218a08f02c74b49a997a497591f1a10c5248d7"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/check-in-settings",
+      "status": 200,
+      "ms": 3935.048299999995,
+      "bytes": 119,
+      "requestId": "ad49e22c-a97c-45c8-94f4-21acd3239321",
+      "responseSha256": "3018044c4e7edff10ab03adb6c43d63320adcfe6018b7e5d5b0d78175adedd93"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/attendance-summary",
+      "status": 200,
+      "ms": 3137.888800000015,
+      "bytes": 193,
+      "requestId": "e3a13a06-94ef-46fe-9e7f-3ad0f1911a6f",
+      "responseSha256": "776eeacaa9678f16daa7bdb9244e50ce5dc904e5c4e07acabb93ee742e556a74"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/seating-layout-options",
+      "status": 200,
+      "ms": 4399.6802000000025,
+      "bytes": 246,
+      "requestId": "319b218f-b9b9-4f88-9a8b-30bf6b730303",
+      "responseSha256": "ac314cb813bd439d157be201f21a6ccc5e1701acbeef0b0d8a2bac8426a669e5"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/seating-plans/current",
+      "status": 200,
+      "ms": 4965.260900000023,
+      "bytes": 1692,
+      "requestId": "e9a1c65b-d58d-431d-9755-330ceff51ee3",
+      "responseSha256": "d8fd5b69de9c0db896cc35234ee2261bc396555151cffc3db8c004071cffdf53"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/invitations",
+      "status": 200,
+      "ms": 4008.495500000019,
+      "bytes": 316,
+      "requestId": "2257c953-1e86-4fef-8b50-6ac74093026e",
+      "responseSha256": "c3be0bd8fbffafc8e659321937f790e27cab470eb122fcd1e851a917a65ef692"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/print-orders",
+      "status": 200,
+      "ms": 2251.473499999993,
+      "bytes": 39,
+      "requestId": "d4a92464-5ffe-45a9-82f1-83f72286974a",
+      "responseSha256": "107a74eeb96c0ecf1fc297b5721c087bef32d58ecb2333d999699994db4b9588"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/invitation-templates",
+      "status": 200,
+      "ms": 3935.7772000000114,
+      "bytes": 2271,
+      "requestId": "b30f762a-3d54-40ec-8fb3-68df16044bb6",
+      "responseSha256": "96856e14116291c25d97183fb5632b11306c995f2f80d95e8082d83bd8ee203d"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/notifications/inbox",
+      "status": 200,
+      "ms": 857.8887000000104,
+      "bytes": 39,
+      "requestId": "32b97d56-33c8-428d-9500-56bda3d81f38",
+      "responseSha256": "107a74eeb96c0ecf1fc297b5721c087bef32d58ecb2333d999699994db4b9588"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/notifications/unread-count",
+      "status": 200,
+      "ms": 877.9030999999959,
+      "bytes": 20,
+      "requestId": "bdacb987-487f-4b5c-ab4c-1fc39fd6fbf7",
+      "responseSha256": "8e820d24d79df590234b55caabca0e47d1a48cffd6128898200644ede301c199"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/notifications/preferences",
+      "status": 200,
+      "ms": 693.7785000000149,
+      "bytes": 65,
+      "requestId": "3a8ff2c5-ceb3-447b-8098-848df8cb9693",
+      "responseSha256": "90582ee26f5995ca4ecbaf5baf92f932730c286bcaccf4e36d7bee24dc1e6550"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/notifications/android-installations",
+      "status": 200,
+      "ms": 723.7146000000066,
+      "bytes": 11,
+      "requestId": "60bb7c13-d348-4941-8022-10e1d792ff89",
+      "responseSha256": "8fe32e407a1038ee38753b70e5374b3a46d6ae9d5f16cd5b73c53abaca8f5ed0"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/consultations/{consultationId}/couple-profile",
+      "status": 200,
+      "ms": 544.7724000000162,
+      "bytes": 168,
+      "requestId": "60f2c931-00af-4024-b11a-311c06535f01",
+      "responseSha256": "9a07396d62db3af201236aedf7d0f1d44b15ca5040fa7933a14de92ea1609797"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/catalog/halls/{hallId}",
+      "status": 200,
+      "ms": 711.8668999999936,
+      "bytes": 149,
+      "requestId": "b7d03dc7-e5b2-4ca3-8173-d83dac876599",
+      "responseSha256": "591722b43dceea4e1d63205d5e00b8295bd16cd05746dbf7066acf3d221023c2"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/contracts/{revisionId}/pdf",
+      "status": 200,
+      "ms": 3420.4444000000076,
+      "bytes": 24485,
+      "requestId": "597c43a2-5bc7-4ade-aa3c-4db7fb3560b3",
+      "responseSha256": "4f062d45e953c8cac537f233f1a659bc8f528210a0e0712094ccda8dcc3fa102"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/guests/{guestId}/personalized-invitations",
+      "status": 200,
+      "ms": 3475.869799999986,
+      "bytes": 126,
+      "requestId": "4abef6c8-eb19-47d1-a47d-5de004f59ca7",
+      "responseSha256": "fd0e35b5f69af51ed170903d061d45188173ca45d1f17db1d2f4d0cdc98fd64e"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/seating-plans/{planId}",
+      "status": 200,
+      "ms": 4992.839299999992,
+      "bytes": 1692,
+      "requestId": "1126a21d-05db-4e25-a5b7-16e30544b731",
+      "responseSha256": "d8fd5b69de9c0db896cc35234ee2261bc396555151cffc3db8c004071cffdf53"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/invitations/{designId}",
+      "status": 200,
+      "ms": 17553.61810000002,
+      "bytes": 286,
+      "requestId": "4df17bf3-f3e6-43d5-b34d-43e3c01617de",
+      "responseSha256": "9797cb5b6e829cccbad94f44cf42a85043c0640c32c8c70889ec7783f8beda73"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/bookings/{bookingId}/payments/{attemptId}",
+      "status": 200,
+      "ms": 5299.497099999979,
+      "bytes": 200,
+      "requestId": "2ef989f9-deaa-4659-9631-f0fd3173d49b",
+      "responseSha256": "d97113e68d22983dd289353ca90af4d193dd37abd7416870e50b2dcb5260679c"
+    },
+    {
+      "round": 1,
+      "measured": true,
+      "label": "/management/bookings/{bookingId}/incidental-expenses",
+      "status": 200,
+      "ms": 2189.9823000000033,
+      "bytes": 116,
+      "requestId": "84c72f18-c26d-45d8-a847-b697365e2b3f",
+      "responseSha256": "a0c293ec8c1d86161e2217050d673fce9472401651cdbc53fb4bd5f9495242ac"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/auth/me",
+      "status": 200,
+      "ms": 1583.3213999999862,
+      "bytes": 171,
+      "requestId": "65426067-0117-4522-80c5-2aaa6aa11c3e",
+      "responseSha256": "b3bea8f5ded0fd7525e309add2394abaa4dec037cefceac84aafed090ebe31f5"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/auth/profile",
+      "status": 200,
+      "ms": 684.6710000000021,
+      "bytes": 140,
+      "requestId": "9ef7cd27-2b70-4a6d-a619-bc13bd2c274f",
+      "responseSha256": "d5edd08caad544ca181d8d938f936750095198dfc0a8f5a481445b7f9a6a7f1e"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/auth/sessions",
+      "status": 200,
+      "ms": 548.9701999999816,
+      "bytes": 5284,
+      "requestId": "ce975926-e212-487c-8187-3ed5297d4318",
+      "responseSha256": "7305fd0952eec403b4e6f3af15e168db17495e558e8397516640c03a5f35258a"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/couple/bookings",
+      "status": 200,
+      "ms": 981.8295000000217,
+      "bytes": 666,
+      "requestId": "2eda6a42-bbf0-4e3a-88a7-bc50aac583ee",
+      "responseSha256": "4e34938675fb1914600d05d57e7db5924e942ea77a700ecd5e5dc7e62adaf0a4"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/catalog/restaurant",
+      "status": 200,
+      "ms": 1820.1375000000116,
+      "bytes": 401,
+      "requestId": "b4d559cb-01dd-4b3c-a211-243049014260",
+      "responseSha256": "d36aa2d6fdbc64d7983540cfd26b3f1bcaef003461f88ed183b6e12896d22886"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/catalog/halls",
+      "status": 200,
+      "ms": 840.1342000000004,
+      "bytes": 1435,
+      "requestId": "c5014aab-e226-440a-9633-ca8b4698e550",
+      "responseSha256": "7a3e12c99eb2ff2cc8664cf506733c71b353e365f1f2c86169e0818bddbb7abc"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/catalog/menu-packages",
+      "status": 200,
+      "ms": 1179.3748999999953,
+      "bytes": 1785,
+      "requestId": "afe22944-92d2-42cd-a56b-5cfe72afaffd",
+      "responseSha256": "8596d3a570b625f61242abcd3dba52a19c4b46e23977c6ac7f61cc969f631a83"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/catalog/dishes",
+      "status": 200,
+      "ms": 1066.459200000012,
+      "bytes": 1948,
+      "requestId": "a041c167-111e-425a-bd18-1fe63dae8c2a",
+      "responseSha256": "90e1a5511a3c5c33921716e0909524c4581c9d9727be6064d7eb6e34727ad42c"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/catalog/services",
+      "status": 200,
+      "ms": 1182.594299999997,
+      "bytes": 1980,
+      "requestId": "4efce06d-b44b-4d6b-b664-3ef04dbe7d87",
+      "responseSha256": "a3893d70e37e3fced0cb0e6935412b9f1cbd06a106783b4b05cf1cfa140997f2"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/catalog/print-offerings",
+      "status": 200,
+      "ms": 1316.8740000000107,
+      "bytes": 1982,
+      "requestId": "6f2b2bcd-742a-4106-b64e-e02c7a053104",
+      "responseSha256": "2b7404d32b18f4c7d9088ad47347439dbdd028bee05b9f9d9b96b03a0168f8f1"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/proposal",
+      "status": 200,
+      "ms": 1727.7160999999905,
+      "bytes": 2119,
+      "requestId": "93d925da-80d3-473a-8106-d8fcdd3ca661",
+      "responseSha256": "98016a89cf7ab42d902efeef51f020b45b042f263605c2681a1845e412976cf9"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/contracts",
+      "status": 200,
+      "ms": 2917.010099999985,
+      "bytes": 2333,
+      "requestId": "99cceebb-217e-484c-908a-dd105317a7d3",
+      "responseSha256": "854856084303c05a73c9312721b9263202e1b75d19cd2224980f8bc1c4794ef7"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/contract-appendices",
+      "status": 200,
+      "ms": 2187.621299999999,
+      "bytes": 230,
+      "requestId": "a6f6e490-8674-45c8-aa67-f5b87603ab6f",
+      "responseSha256": "631d218e8fe7c75411f658d5c69a8677d83017b51ea37e817e94e256e80879c0"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/billing",
+      "status": 200,
+      "ms": 2791.627700000012,
+      "bytes": 984,
+      "requestId": "86b9ddce-4251-411b-80ea-f4c9561feb5f",
+      "responseSha256": "a8185255ee275049eb918b5a3d73e0f5054f8c3672a812f544e14ba478ae0fad"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/final-invoices",
+      "status": 200,
+      "ms": 1886.1665000000503,
+      "bytes": 119,
+      "requestId": "bf455536-fd80-46ad-81fb-cb3c4e677546",
+      "responseSha256": "5e272ff25ad0837139e2d2f73d6cd8574a5340c1d43f4afca511e262e116d366"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/incidental-expenses",
+      "status": 200,
+      "ms": 2017.324900000007,
+      "bytes": 116,
+      "requestId": "bbe4033c-c33a-4514-bc4f-e9254de6b26e",
+      "responseSha256": "a0c293ec8c1d86161e2217050d673fce9472401651cdbc53fb4bd5f9495242ac"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/guest-groups",
+      "status": 200,
+      "ms": 4058.45630000002,
+      "bytes": 708,
+      "requestId": "b5adb996-5684-47d9-a980-f5c698c3486c",
+      "responseSha256": "f3b3e7c2ccbe77c6c1fae90d478803b9cf478c32f32ed099f441a19e3fda7b6d"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/guest-plan",
+      "status": 200,
+      "ms": 3128.127299999993,
+      "bytes": 183,
+      "requestId": "7a5ef22b-4c04-43e3-a9ae-c761b6c68797",
+      "responseSha256": "804bc8e181fcdc534dd568cdcd052c8906fe37fd8a3e09c8dd4e9cf7ca59eda6"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/guests",
+      "status": 200,
+      "ms": 2994.5200000000186,
+      "bytes": 2537,
+      "requestId": "062f02d1-19cd-4004-9029-802d87677a19",
+      "responseSha256": "56daffdf32a1db7b7bc3e1cb2c218a08f02c74b49a997a497591f1a10c5248d7"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/check-in-settings",
+      "status": 200,
+      "ms": 3826.581999999995,
+      "bytes": 119,
+      "requestId": "3a580c4c-06f9-478a-834f-f6792855025d",
+      "responseSha256": "3018044c4e7edff10ab03adb6c43d63320adcfe6018b7e5d5b0d78175adedd93"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/attendance-summary",
+      "status": 200,
+      "ms": 3078.8692000000156,
+      "bytes": 193,
+      "requestId": "41a7d6ba-227f-4be3-a851-41c722b8e14e",
+      "responseSha256": "776eeacaa9678f16daa7bdb9244e50ce5dc904e5c4e07acabb93ee742e556a74"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/seating-layout-options",
+      "status": 200,
+      "ms": 4253.343600000022,
+      "bytes": 246,
+      "requestId": "c863ff3e-dade-4556-a6e9-6a7b7bbc62d2",
+      "responseSha256": "ac314cb813bd439d157be201f21a6ccc5e1701acbeef0b0d8a2bac8426a669e5"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/seating-plans/current",
+      "status": 200,
+      "ms": 4887.896799999988,
+      "bytes": 1692,
+      "requestId": "909d9476-5a4e-42d2-a76f-2f360236e7ec",
+      "responseSha256": "d8fd5b69de9c0db896cc35234ee2261bc396555151cffc3db8c004071cffdf53"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/invitations",
+      "status": 200,
+      "ms": 3823.2353000000003,
+      "bytes": 316,
+      "requestId": "647b5072-f04c-4946-81c5-d854a41accf4",
+      "responseSha256": "c3be0bd8fbffafc8e659321937f790e27cab470eb122fcd1e851a917a65ef692"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/print-orders",
+      "status": 200,
+      "ms": 2022.4156000000075,
+      "bytes": 39,
+      "requestId": "f21d52f2-a56c-4d64-b022-b77763ae4c8f",
+      "responseSha256": "107a74eeb96c0ecf1fc297b5721c087bef32d58ecb2333d999699994db4b9588"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/invitation-templates",
+      "status": 200,
+      "ms": 3825.4398999999976,
+      "bytes": 2271,
+      "requestId": "a3a9b1cc-c586-424e-acf7-be1ce6d63dd5",
+      "responseSha256": "96856e14116291c25d97183fb5632b11306c995f2f80d95e8082d83bd8ee203d"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/notifications/inbox",
+      "status": 200,
+      "ms": 864.5973999999696,
+      "bytes": 39,
+      "requestId": "83a75a40-3a1d-4253-b447-2b0442d9fec8",
+      "responseSha256": "107a74eeb96c0ecf1fc297b5721c087bef32d58ecb2333d999699994db4b9588"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/notifications/unread-count",
+      "status": 200,
+      "ms": 861.9232999999658,
+      "bytes": 20,
+      "requestId": "1f8e9b61-2166-48a7-8ad6-664a19879a1a",
+      "responseSha256": "8e820d24d79df590234b55caabca0e47d1a48cffd6128898200644ede301c199"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/notifications/preferences",
+      "status": 200,
+      "ms": 707.8491999999969,
+      "bytes": 65,
+      "requestId": "6562a4aa-4060-40a3-89f2-308cdf56f4b7",
+      "responseSha256": "90582ee26f5995ca4ecbaf5baf92f932730c286bcaccf4e36d7bee24dc1e6550"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/notifications/android-installations",
+      "status": 200,
+      "ms": 709.9743000000017,
+      "bytes": 11,
+      "requestId": "475bdb01-a1c0-400b-8d0a-34e73e628b66",
+      "responseSha256": "8fe32e407a1038ee38753b70e5374b3a46d6ae9d5f16cd5b73c53abaca8f5ed0"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/consultations/{consultationId}/couple-profile",
+      "status": 200,
+      "ms": 591.851399999985,
+      "bytes": 168,
+      "requestId": "75ba0aa5-233b-4b55-abfd-3d273143c0c0",
+      "responseSha256": "9a07396d62db3af201236aedf7d0f1d44b15ca5040fa7933a14de92ea1609797"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/catalog/halls/{hallId}",
+      "status": 200,
+      "ms": 706.5758999999962,
+      "bytes": 149,
+      "requestId": "1ba6d5b3-8bda-4aec-8dd5-270bf18660d2",
+      "responseSha256": "591722b43dceea4e1d63205d5e00b8295bd16cd05746dbf7066acf3d221023c2"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/contracts/{revisionId}/pdf",
+      "status": 200,
+      "ms": 3367.905700000003,
+      "bytes": 24485,
+      "requestId": "50463e9f-6149-427f-ac14-0bb8f2791f72",
+      "responseSha256": "4f062d45e953c8cac537f233f1a659bc8f528210a0e0712094ccda8dcc3fa102"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/guests/{guestId}/personalized-invitations",
+      "status": 200,
+      "ms": 3479.4939000000013,
+      "bytes": 126,
+      "requestId": "2adda5d4-d7ef-43c7-90b5-31d21a97b475",
+      "responseSha256": "fd0e35b5f69af51ed170903d061d45188173ca45d1f17db1d2f4d0cdc98fd64e"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/seating-plans/{planId}",
+      "status": 200,
+      "ms": 4858.198899999959,
+      "bytes": 1692,
+      "requestId": "453af48f-98b6-4aed-87bc-96855f00de00",
+      "responseSha256": "d8fd5b69de9c0db896cc35234ee2261bc396555151cffc3db8c004071cffdf53"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/invitations/{designId}",
+      "status": 200,
+      "ms": 3832.94160000002,
+      "bytes": 286,
+      "requestId": "ff451264-95e0-4a66-bd4f-1aa42202bbb8",
+      "responseSha256": "9797cb5b6e829cccbad94f44cf42a85043c0640c32c8c70889ec7783f8beda73"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/bookings/{bookingId}/payments/{attemptId}",
+      "status": 200,
+      "ms": 3974.869800000044,
+      "bytes": 200,
+      "requestId": "3cd01427-17cc-4492-8560-d0d3797d4592",
+      "responseSha256": "d97113e68d22983dd289353ca90af4d193dd37abd7416870e50b2dcb5260679c"
+    },
+    {
+      "round": 2,
+      "measured": true,
+      "label": "/management/bookings/{bookingId}/incidental-expenses",
+      "status": 200,
+      "ms": 2027.0109999999986,
+      "bytes": 116,
+      "requestId": "aa86007d-e28d-4b6b-a21d-b36f9cc28149",
+      "responseSha256": "a0c293ec8c1d86161e2217050d673fce9472401651cdbc53fb4bd5f9495242ac"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/auth/me",
+      "status": 200,
+      "ms": 1667.6172999999835,
+      "bytes": 171,
+      "requestId": "cf2e5c1b-1f29-46e1-9d2f-cf63838701d4",
+      "responseSha256": "b3bea8f5ded0fd7525e309add2394abaa4dec037cefceac84aafed090ebe31f5"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/auth/profile",
+      "status": 200,
+      "ms": 690.7043000000413,
+      "bytes": 140,
+      "requestId": "00511d5a-a1f3-443a-b04e-91fba3872990",
+      "responseSha256": "d5edd08caad544ca181d8d938f936750095198dfc0a8f5a481445b7f9a6a7f1e"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/auth/sessions",
+      "status": 200,
+      "ms": 549.3129999999655,
+      "bytes": 5284,
+      "requestId": "e36a27e4-168b-4c3c-9e0f-dff1409d657e",
+      "responseSha256": "7305fd0952eec403b4e6f3af15e168db17495e558e8397516640c03a5f35258a"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/couple/bookings",
+      "status": 200,
+      "ms": 986.5092999999761,
+      "bytes": 666,
+      "requestId": "4732302b-bf36-43bf-8569-0a547407bf48",
+      "responseSha256": "4e34938675fb1914600d05d57e7db5924e942ea77a700ecd5e5dc7e62adaf0a4"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/catalog/restaurant",
+      "status": 200,
+      "ms": 1800.8072999999858,
+      "bytes": 401,
+      "requestId": "c02037ff-ba34-49c0-ac43-84993075ede3",
+      "responseSha256": "d36aa2d6fdbc64d7983540cfd26b3f1bcaef003461f88ed183b6e12896d22886"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/catalog/halls",
+      "status": 200,
+      "ms": 687.4743999999482,
+      "bytes": 1435,
+      "requestId": "2d96217b-fce8-4d31-abbe-4af8f8fea31b",
+      "responseSha256": "2a3611759cd0a841414f981ed5dfe32df3a4a9441f93b9e890a369949cc317e1"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/catalog/menu-packages",
+      "status": 200,
+      "ms": 1154.333099999989,
+      "bytes": 1785,
+      "requestId": "2a3f2e12-23d6-464c-88aa-f5bdae375fa1",
+      "responseSha256": "8596d3a570b625f61242abcd3dba52a19c4b46e23977c6ac7f61cc969f631a83"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/catalog/dishes",
+      "status": 200,
+      "ms": 1395.6931999999797,
+      "bytes": 1948,
+      "requestId": "8b85f266-b21a-4ffd-a592-3b92634e7318",
+      "responseSha256": "9c03a669ffa78b8befe40b5a611686103f1d0a7b177cbb962dbbba388d725979"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/catalog/services",
+      "status": 200,
+      "ms": 1139.614200000011,
+      "bytes": 1980,
+      "requestId": "c57b4771-2c1a-40d3-9568-319bd42fe44f",
+      "responseSha256": "a3893d70e37e3fced0cb0e6935412b9f1cbd06a106783b4b05cf1cfa140997f2"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/catalog/print-offerings",
+      "status": 200,
+      "ms": 1332.4710000000196,
+      "bytes": 1982,
+      "requestId": "3492b1aa-bd4c-43c3-a3d1-8b744c4d444e",
+      "responseSha256": "2b7404d32b18f4c7d9088ad47347439dbdd028bee05b9f9d9b96b03a0168f8f1"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/proposal",
+      "status": 200,
+      "ms": 1722.6483000000007,
+      "bytes": 2119,
+      "requestId": "1419dad0-9743-4fa4-bdab-aa37339aab75",
+      "responseSha256": "98016a89cf7ab42d902efeef51f020b45b042f263605c2681a1845e412976cf9"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/contracts",
+      "status": 200,
+      "ms": 2919.8710999999894,
+      "bytes": 2333,
+      "requestId": "02c80b07-ab35-4338-ae8e-1e7a0b000cfa",
+      "responseSha256": "854856084303c05a73c9312721b9263202e1b75d19cd2224980f8bc1c4794ef7"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/contract-appendices",
+      "status": 200,
+      "ms": 2182.02509999997,
+      "bytes": 230,
+      "requestId": "1ca197f2-369c-4045-8d49-55d482657d76",
+      "responseSha256": "631d218e8fe7c75411f658d5c69a8677d83017b51ea37e817e94e256e80879c0"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/billing",
+      "status": 200,
+      "ms": 2795.6425000000163,
+      "bytes": 984,
+      "requestId": "4309f82f-72ab-437c-9304-c6b87df1f974",
+      "responseSha256": "a8185255ee275049eb918b5a3d73e0f5054f8c3672a812f544e14ba478ae0fad"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/final-invoices",
+      "status": 200,
+      "ms": 1864.1003999999957,
+      "bytes": 119,
+      "requestId": "f3c1b632-c3ba-41a5-a9a2-c7745e641854",
+      "responseSha256": "5e272ff25ad0837139e2d2f73d6cd8574a5340c1d43f4afca511e262e116d366"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/incidental-expenses",
+      "status": 200,
+      "ms": 2052.732399999979,
+      "bytes": 116,
+      "requestId": "0e06a087-8321-4679-acf6-06862d045d1b",
+      "responseSha256": "a0c293ec8c1d86161e2217050d673fce9472401651cdbc53fb4bd5f9495242ac"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/guest-groups",
+      "status": 200,
+      "ms": 3977.883600000001,
+      "bytes": 708,
+      "requestId": "99edaaad-c9fb-4dbd-a205-b7801d662c81",
+      "responseSha256": "f3b3e7c2ccbe77c6c1fae90d478803b9cf478c32f32ed099f441a19e3fda7b6d"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/guest-plan",
+      "status": 200,
+      "ms": 2939.6244000000297,
+      "bytes": 183,
+      "requestId": "fb1d61cd-4a76-4f26-bc29-c87e7dcc7e50",
+      "responseSha256": "804bc8e181fcdc534dd568cdcd052c8906fe37fd8a3e09c8dd4e9cf7ca59eda6"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/guests",
+      "status": 200,
+      "ms": 2930.484300000011,
+      "bytes": 2537,
+      "requestId": "8cb66288-44c5-4f18-9e4a-0cf27fef7e07",
+      "responseSha256": "56daffdf32a1db7b7bc3e1cb2c218a08f02c74b49a997a497591f1a10c5248d7"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/check-in-settings",
+      "status": 200,
+      "ms": 3989.8433000000077,
+      "bytes": 119,
+      "requestId": "06777952-05c2-4c4b-a698-0b2bb7b332a8",
+      "responseSha256": "3018044c4e7edff10ab03adb6c43d63320adcfe6018b7e5d5b0d78175adedd93"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/attendance-summary",
+      "status": 200,
+      "ms": 3187.2722000000067,
+      "bytes": 193,
+      "requestId": "f6196011-a540-4556-a777-5cd134184764",
+      "responseSha256": "776eeacaa9678f16daa7bdb9244e50ce5dc904e5c4e07acabb93ee742e556a74"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/seating-layout-options",
+      "status": 200,
+      "ms": 4437.005100000009,
+      "bytes": 246,
+      "requestId": "6d250fd0-8641-4b00-a340-f3acd63c4bdb",
+      "responseSha256": "ac314cb813bd439d157be201f21a6ccc5e1701acbeef0b0d8a2bac8426a669e5"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/seating-plans/current",
+      "status": 200,
+      "ms": 5059.921000000031,
+      "bytes": 1692,
+      "requestId": "64a62671-4278-4df4-988d-ecbcb5afb34a",
+      "responseSha256": "d8fd5b69de9c0db896cc35234ee2261bc396555151cffc3db8c004071cffdf53"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/invitations",
+      "status": 200,
+      "ms": 3955.5101999999606,
+      "bytes": 316,
+      "requestId": "aa00741c-56f5-4ed1-a0ca-13ee040bfd51",
+      "responseSha256": "c3be0bd8fbffafc8e659321937f790e27cab470eb122fcd1e851a917a65ef692"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/print-orders",
+      "status": 200,
+      "ms": 2115.3472000000183,
+      "bytes": 39,
+      "requestId": "e186e48b-525e-4e2d-83b0-2d6ee1167d48",
+      "responseSha256": "107a74eeb96c0ecf1fc297b5721c087bef32d58ecb2333d999699994db4b9588"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/invitation-templates",
+      "status": 200,
+      "ms": 3973.542699999991,
+      "bytes": 2271,
+      "requestId": "4cc56f5d-f6a7-4a90-938c-bfc559d85dd7",
+      "responseSha256": "96856e14116291c25d97183fb5632b11306c995f2f80d95e8082d83bd8ee203d"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/notifications/inbox",
+      "status": 200,
+      "ms": 866.8446000000113,
+      "bytes": 39,
+      "requestId": "e8338b4e-df4e-47cb-8f4f-24841be3b47e",
+      "responseSha256": "107a74eeb96c0ecf1fc297b5721c087bef32d58ecb2333d999699994db4b9588"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/notifications/unread-count",
+      "status": 200,
+      "ms": 846.1754000000074,
+      "bytes": 20,
+      "requestId": "01774c66-e49e-4fcc-96f2-b0212d0bfab9",
+      "responseSha256": "8e820d24d79df590234b55caabca0e47d1a48cffd6128898200644ede301c199"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/notifications/preferences",
+      "status": 200,
+      "ms": 707.7339999999967,
+      "bytes": 65,
+      "requestId": "a5d1c020-fdda-40ff-bc46-de9e900f704b",
+      "responseSha256": "90582ee26f5995ca4ecbaf5baf92f932730c286bcaccf4e36d7bee24dc1e6550"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/notifications/android-installations",
+      "status": 200,
+      "ms": 715.6851000000024,
+      "bytes": 11,
+      "requestId": "5ac1adcc-2fef-420a-989d-faf2cac55540",
+      "responseSha256": "8fe32e407a1038ee38753b70e5374b3a46d6ae9d5f16cd5b73c53abaca8f5ed0"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/consultations/{consultationId}/couple-profile",
+      "status": 200,
+      "ms": 545.7391999999527,
+      "bytes": 168,
+      "requestId": "0a7b8feb-dfa6-4963-8348-b8a54e09f034",
+      "responseSha256": "9a07396d62db3af201236aedf7d0f1d44b15ca5040fa7933a14de92ea1609797"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/catalog/halls/{hallId}",
+      "status": 200,
+      "ms": 688.4081000000006,
+      "bytes": 149,
+      "requestId": "17288119-decb-4250-ba5f-d304051a04ee",
+      "responseSha256": "591722b43dceea4e1d63205d5e00b8295bd16cd05746dbf7066acf3d221023c2"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/contracts/{revisionId}/pdf",
+      "status": 200,
+      "ms": 3388.53820000001,
+      "bytes": 24485,
+      "requestId": "5f9fbe00-80a0-487a-a2f2-582f5d7dd97a",
+      "responseSha256": "4f062d45e953c8cac537f233f1a659bc8f528210a0e0712094ccda8dcc3fa102"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/guests/{guestId}/personalized-invitations",
+      "status": 200,
+      "ms": 3394.8426999999792,
+      "bytes": 126,
+      "requestId": "06f57414-f01d-4a4a-80b0-0cbe97c72020",
+      "responseSha256": "fd0e35b5f69af51ed170903d061d45188173ca45d1f17db1d2f4d0cdc98fd64e"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/seating-plans/{planId}",
+      "status": 200,
+      "ms": 5059.47159999999,
+      "bytes": 1692,
+      "requestId": "9f5156a0-c708-4379-8a79-5c079b32e03c",
+      "responseSha256": "d8fd5b69de9c0db896cc35234ee2261bc396555151cffc3db8c004071cffdf53"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/invitations/{designId}",
+      "status": 200,
+      "ms": 3990.316999999981,
+      "bytes": 286,
+      "requestId": "d12f26b5-80e0-41a0-b026-6b458d7c5a29",
+      "responseSha256": "9797cb5b6e829cccbad94f44cf42a85043c0640c32c8c70889ec7783f8beda73"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/bookings/{bookingId}/payments/{attemptId}",
+      "status": 200,
+      "ms": 3978.4814999999944,
+      "bytes": 200,
+      "requestId": "cbb43aec-db2f-4512-baa2-20326bf1edab",
+      "responseSha256": "d97113e68d22983dd289353ca90af4d193dd37abd7416870e50b2dcb5260679c"
+    },
+    {
+      "round": 3,
+      "measured": true,
+      "label": "/management/bookings/{bookingId}/incidental-expenses",
+      "status": 200,
+      "ms": 2037.368300000031,
+      "bytes": 116,
+      "requestId": "43fe3359-9b9c-45bc-be8a-4813f85c183b",
+      "responseSha256": "a0c293ec8c1d86161e2217050d673fce9472401651cdbc53fb4bd5f9495242ac"
+    }
+  ],
+  "cleanup": {
+    "revoked": true,
+    "tokenReuseDenied": true
+  },
+  "ranking": [
+    {
+      "label": "/bookings/{bookingId}/seating-plans/{planId}",
+      "samples": 3,
+      "medianMs": 4992.839299999992,
+      "minMs": 4858.198899999959,
+      "maxMs": 5059.47159999999
+    },
+    {
+      "label": "/bookings/{bookingId}/seating-plans/current",
+      "samples": 3,
+      "medianMs": 4965.260900000023,
+      "minMs": 4887.896799999988,
+      "maxMs": 5059.921000000031
+    },
+    {
+      "label": "/bookings/{bookingId}/seating-layout-options",
+      "samples": 3,
+      "medianMs": 4399.6802000000025,
+      "minMs": 4253.343600000022,
+      "maxMs": 4437.005100000009
+    },
+    {
+      "label": "/bookings/{bookingId}/guest-groups",
+      "samples": 3,
+      "medianMs": 4058.45630000002,
+      "minMs": 3977.883600000001,
+      "maxMs": 4069.3642999999865
+    },
+    {
+      "label": "/bookings/{bookingId}/invitations/{designId}",
+      "samples": 3,
+      "medianMs": 3990.316999999981,
+      "minMs": 3832.94160000002,
+      "maxMs": 17553.61810000002
+    },
+    {
+      "label": "/bookings/{bookingId}/payments/{attemptId}",
+      "samples": 3,
+      "medianMs": 3978.4814999999944,
+      "minMs": 3974.869800000044,
+      "maxMs": 5299.497099999979
+    },
+    {
+      "label": "/bookings/{bookingId}/invitations",
+      "samples": 3,
+      "medianMs": 3955.5101999999606,
+      "minMs": 3823.2353000000003,
+      "maxMs": 4008.495500000019
+    },
+    {
+      "label": "/invitation-templates",
+      "samples": 3,
+      "medianMs": 3935.7772000000114,
+      "minMs": 3825.4398999999976,
+      "maxMs": 3973.542699999991
+    },
+    {
+      "label": "/bookings/{bookingId}/check-in-settings",
+      "samples": 3,
+      "medianMs": 3935.048299999995,
+      "minMs": 3826.581999999995,
+      "maxMs": 3989.8433000000077
+    },
+    {
+      "label": "/bookings/{bookingId}/guests/{guestId}/personalized-invitations",
+      "samples": 3,
+      "medianMs": 3475.869799999986,
+      "minMs": 3394.8426999999792,
+      "maxMs": 3479.4939000000013
+    },
+    {
+      "label": "/bookings/{bookingId}/contracts/{revisionId}/pdf",
+      "samples": 3,
+      "medianMs": 3388.53820000001,
+      "minMs": 3367.905700000003,
+      "maxMs": 3420.4444000000076
+    },
+    {
+      "label": "/bookings/{bookingId}/attendance-summary",
+      "samples": 3,
+      "medianMs": 3137.888800000015,
+      "minMs": 3078.8692000000156,
+      "maxMs": 3187.2722000000067
+    },
+    {
+      "label": "/bookings/{bookingId}/guest-plan",
+      "samples": 3,
+      "medianMs": 3128.127299999993,
+      "minMs": 2939.6244000000297,
+      "maxMs": 3152.832699999999
+    },
+    {
+      "label": "/bookings/{bookingId}/guests",
+      "samples": 3,
+      "medianMs": 2988.4878000000026,
+      "minMs": 2930.484300000011,
+      "maxMs": 2994.5200000000186
+    },
+    {
+      "label": "/bookings/{bookingId}/contracts",
+      "samples": 3,
+      "medianMs": 2917.242200000008,
+      "minMs": 2917.010099999985,
+      "maxMs": 2919.8710999999894
+    },
+    {
+      "label": "/bookings/{bookingId}/billing",
+      "samples": 3,
+      "medianMs": 2791.627700000012,
+      "minMs": 2746.118300000002,
+      "maxMs": 2795.6425000000163
+    },
+    {
+      "label": "/bookings/{bookingId}/contract-appendices",
+      "samples": 3,
+      "medianMs": 2182.02509999997,
+      "minMs": 2165.3300000000163,
+      "maxMs": 2187.621299999999
+    },
+    {
+      "label": "/bookings/{bookingId}/print-orders",
+      "samples": 3,
+      "medianMs": 2115.3472000000183,
+      "minMs": 2022.4156000000075,
+      "maxMs": 2251.473499999993
+    },
+    {
+      "label": "/management/bookings/{bookingId}/incidental-expenses",
+      "samples": 3,
+      "medianMs": 2037.368300000031,
+      "minMs": 2027.0109999999986,
+      "maxMs": 2189.9823000000033
+    },
+    {
+      "label": "/bookings/{bookingId}/incidental-expenses",
+      "samples": 3,
+      "medianMs": 2017.324900000007,
+      "minMs": 2004.031799999997,
+      "maxMs": 2052.732399999979
+    },
+    {
+      "label": "/bookings/{bookingId}/final-invoices",
+      "samples": 3,
+      "medianMs": 1864.1003999999957,
+      "minMs": 1848.6506999999983,
+      "maxMs": 1886.1665000000503
+    },
+    {
+      "label": "/catalog/restaurant",
+      "samples": 3,
+      "medianMs": 1800.8072999999858,
+      "minMs": 1797.7176000000036,
+      "maxMs": 1820.1375000000116
+    },
+    {
+      "label": "/bookings/{bookingId}/proposal",
+      "samples": 3,
+      "medianMs": 1727.7160999999905,
+      "minMs": 1722.6483000000007,
+      "maxMs": 1774.4988999999914
+    },
+    {
+      "label": "/auth/me",
+      "samples": 3,
+      "medianMs": 1583.3213999999862,
+      "minMs": 1568.0473999999958,
+      "maxMs": 1667.6172999999835
+    },
+    {
+      "label": "/catalog/dishes",
+      "samples": 3,
+      "medianMs": 1370.7862999999925,
+      "minMs": 1066.459200000012,
+      "maxMs": 1395.6931999999797
+    },
+    {
+      "label": "/catalog/print-offerings",
+      "samples": 3,
+      "medianMs": 1332.4710000000196,
+      "minMs": 1316.8740000000107,
+      "maxMs": 1340.620299999995
+    },
+    {
+      "label": "/catalog/services",
+      "samples": 3,
+      "medianMs": 1175.7280000000028,
+      "minMs": 1139.614200000011,
+      "maxMs": 1182.594299999997
+    },
+    {
+      "label": "/catalog/menu-packages",
+      "samples": 3,
+      "medianMs": 1170.1872000000003,
+      "minMs": 1154.333099999989,
+      "maxMs": 1179.3748999999953
+    },
+    {
+      "label": "/couple/bookings",
+      "samples": 3,
+      "medianMs": 986.5092999999761,
+      "minMs": 981.8295000000217,
+      "maxMs": 1034.5014999999985
+    },
+    {
+      "label": "/notifications/inbox",
+      "samples": 3,
+      "medianMs": 864.5973999999696,
+      "minMs": 857.8887000000104,
+      "maxMs": 866.8446000000113
+    },
+    {
+      "label": "/notifications/unread-count",
+      "samples": 3,
+      "medianMs": 861.9232999999658,
+      "minMs": 846.1754000000074,
+      "maxMs": 877.9030999999959
+    },
+    {
+      "label": "/catalog/halls",
+      "samples": 3,
+      "medianMs": 840.1342000000004,
+      "minMs": 687.4743999999482,
+      "maxMs": 1084.7445000000007
+    },
+    {
+      "label": "/notifications/android-installations",
+      "samples": 3,
+      "medianMs": 715.6851000000024,
+      "minMs": 709.9743000000017,
+      "maxMs": 723.7146000000066
+    },
+    {
+      "label": "/notifications/preferences",
+      "samples": 3,
+      "medianMs": 707.7339999999967,
+      "minMs": 693.7785000000149,
+      "maxMs": 707.8491999999969
+    },
+    {
+      "label": "/catalog/halls/{hallId}",
+      "samples": 3,
+      "medianMs": 706.5758999999962,
+      "minMs": 688.4081000000006,
+      "maxMs": 711.8668999999936
+    },
+    {
+      "label": "/auth/profile",
+      "samples": 3,
+      "medianMs": 684.6710000000021,
+      "minMs": 623.6622999999963,
+      "maxMs": 690.7043000000413
+    },
+    {
+      "label": "/auth/sessions",
+      "samples": 3,
+      "medianMs": 548.9701999999816,
+      "minMs": 536.3797999999952,
+      "maxMs": 549.3129999999655
+    },
+    {
+      "label": "/consultations/{consultationId}/couple-profile",
+      "samples": 3,
+      "medianMs": 545.7391999999527,
+      "minMs": 544.7724000000162,
+      "maxMs": 591.851399999985
+    }
+  ],
+  "finishedAt": "2026-10-19T12:47:26.160Z"
+}

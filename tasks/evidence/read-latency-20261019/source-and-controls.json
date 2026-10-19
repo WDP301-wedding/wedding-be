@@ -1,0 +1,308 @@
+{
+  "serving": {
+    "deploymentId": "8333a351-49d2-497f-9cd8-ab146891fb6e",
+    "source": "7b07d8bbf38e6a9808c08ab1642b2eb58e364a78",
+    "image": "sha256:6b5e35dde3f78ee82ab4cf36852c34571d90555c0aedb7d0f7bcee0c9c34001a"
+  },
+  "controls": {
+    "DB_POOL_MAX": "1",
+    "DB_POOL_MAX_VENUE_CATALOG": "3",
+    "DB_POOL_MAX_ANALYTICS": "2",
+    "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000",
+    "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+    "DB_PLANNED_PROCESSES": "2",
+    "DB_CONNECTION_RESERVE": "36",
+    "DB_DIAGNOSTICS_ENABLED": "false",
+    "DB_SAFE_READ_DEADLINE_ENABLED": "false"
+  },
+  "guard": {
+    "manualPaymentReadOnly": true,
+    "attempt": {
+      "provider": "MANUAL",
+      "state": "SUCCEEDED",
+      "purpose": "DEPOSIT"
+    },
+    "extensions": [
+      "pg_stat_statements"
+    ]
+  },
+  "fixtureDigest": "0050eb3491094bcd7d4f1d2c1da8b71e56b495dfa509b9f90c71092ced969910",
+  "inventoryBefore": {
+    "business": {
+      "tables": {
+        "Booking": {
+          "count": 18,
+          "sha256": "3bb6d466331c47c73afec6aff170913f33de7500643b2014fe567acad8180c58"
+        },
+        "Consultation": {
+          "count": 27,
+          "sha256": "70e71ea37b043044405801b2f3d4b73a3b4ef08fe4328bae800935dd8fd1997d"
+        },
+        "ConsultationAccess": {
+          "count": 15,
+          "sha256": "46f88cae4bce756422f4a6f266a072017f68908e453f73fb8b8dd02e79445501"
+        },
+        "GuestWorkspace": {
+          "count": 7,
+          "sha256": "98290236f3c2004298b6109a950244233b26d67a9c2bf4c9803630916013d0bd"
+        },
+        "GuestPlanRevision": {
+          "count": 9,
+          "sha256": "f4e544526c5c2efb0f2a6dd63085504f365e78183a7c10554d230226b3e87816"
+        },
+        "Guest": {
+          "count": 16,
+          "sha256": "c5f235cbe2bb3230a03760c8defded7307e66de64e9a59f862db0e08bae5e540"
+        },
+        "GuestGroup": {
+          "count": 29,
+          "sha256": "5dc9bee0d4e2735b98a08a40bcc01925b79c451fb20ecf9fa183e3e42cbea1c0"
+        },
+        "GuestHistory": {
+          "count": 45,
+          "sha256": "d0697dee5e8a7f36f0a44a56619300414bf5baeeb02d2817294494db2c3f0bbb"
+        },
+        "SeatingPlan": {
+          "count": 4,
+          "sha256": "f7ab6c1cd5411a5c6e127d8676a12d3833555555fa393dfe0c102d68fd2e45fa"
+        },
+        "SeatingPlanRevision": {
+          "count": 10,
+          "sha256": "78bc61603497eaf657c6f1a1c168f85faea095fc325e7f97e21dbc7ed5a870b9"
+        },
+        "StaffConfiguration": {
+          "count": 7,
+          "sha256": "4dc78c18105810b7caeb9c3f08046632bda8a742c0917ebe5f982cb6f53f8ec6"
+        },
+        "StaffAssignment": {
+          "count": 2,
+          "sha256": "2f5b76d1861c2685aac6c9a2b1c5dd1d37a920bf8d40785f9bfeead744a15622"
+        },
+        "StaffHistory": {
+          "count": 11,
+          "sha256": "39b919d1cb888532e20a22bfebcebb2d6f9d62edea1fcd12e36a31c17391e0e9"
+        },
+        "StaffCheckInRecord": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "CommercialContractRevision": {
+          "count": 4,
+          "sha256": "d644a65b1abc040d08a37c2ca2a1e079d70aa2675e597d9e8c4fc37a968474bb"
+        },
+        "FinalInvoiceRevision": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "BillingLedgerEntry": {
+          "count": 17,
+          "sha256": "514b19b861b67f7d7edb4124296da7071912a2031102d98914841481aa1a6c9c"
+        },
+        "InvitationPrintOrder": {
+          "count": 1,
+          "sha256": "b678300081034c67c7d698fe7248fd7b7f386e5b412ce53c42958bff74248203"
+        },
+        "InvitationPrintLine": {
+          "count": 1,
+          "sha256": "eee25413e140edcd488b8253e23fb5b1fb7ba509a5bd922882da057916e33baf"
+        },
+        "InvitationCommercialRevision": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "InvitationPrintAudit": {
+          "count": 1,
+          "sha256": "84d96d6aff780101a03b1fd707dfd9dcb402cad2ca96d8180aabb83993132196"
+        },
+        "AccountRole": {
+          "count": 2,
+          "sha256": "9703dfea70d4dab1556c1fd72d18b7f06dcffa4b252d7faef4eb555112db2c6b"
+        },
+        "NotificationRecipient": {
+          "count": 1,
+          "sha256": "a0e5d426b4d77648d8edf76afad9444d57115878f699f9a4f13f56a998d4c14c"
+        },
+        "NotificationInbox": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "NotificationPreference": {
+          "count": 1,
+          "sha256": "5c6ddff6a17cf2c3ee968907f4969da8d56636dcb841780e45efce626cbf33e3"
+        },
+        "NotificationInstallation": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "NotificationCommand": {
+          "count": 1,
+          "sha256": "e771d6bffdb9950e9bc0d6a4d9701d4c406b1f9a824d87f9aab4cced3d8ff481"
+        },
+        "NotificationIntent": {
+          "count": 41,
+          "sha256": "2e3c3d4026723494ae1af4b1947aa3134d149444880c71c51ee51a76dd02959e"
+        },
+        "NotificationAttempt": {
+          "count": 82,
+          "sha256": "eed801d69916dd20d8b271cb9349487edfc9441e32b0d13e2f8bddbef1a2fcc8"
+        },
+        "NotificationCredential": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "NotificationPushDelivery": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "NotificationEventReceipt": {
+          "count": 16,
+          "sha256": "9a25f5dc1d43c2c8b77dfc1df8a66331179ffde12cd8d81ec0aded25459395de"
+        }
+      },
+      "migrations": {
+        "count": 61,
+        "sha256": "b7d90da8b39b7db5f6ef24ec1084f4ea2d4e4915664ebfccd00345c18fbf910e",
+        "allChecksumsMatch": true
+      },
+      "scope": {
+        "accounts": 2,
+        "consultations": 27,
+        "bookings": 18,
+        "recipients": 1,
+        "intents": 41
+      }
+    },
+    "catalog": {
+      "CatalogMediaAsset": {
+        "count": 4,
+        "sha256": "fcfcec0a8c4be49e3215058d899c6f0c5ebacd5f0ea10f5b3c8ac60b43b3a525"
+      },
+      "Dish": {
+        "count": 5,
+        "sha256": "3c6d6a3890e4b9e9db32200797047643b9a87aff5e15dd291ce76cca758e7c44"
+      },
+      "DishVersion": {
+        "count": 7,
+        "sha256": "45d4f5b8e1609b6af30da2af6150c4265a70788e578a5a457b2969430dd9de8c"
+      },
+      "Hall": {
+        "count": 3,
+        "sha256": "af7a69758699aa88092943596984d2c2ad3b295ebcd666d36fe31d7be2c195bc"
+      },
+      "LayoutTableGeometry": {
+        "count": 15,
+        "sha256": "26504c6d98f5ea4cd1adebe23d3ddddf0623dbd7b85430a496eefaf2da459b6c"
+      },
+      "LayoutTableIdentity": {
+        "count": 15,
+        "sha256": "58e6481bcffa159e53da848540eb92c668975d814f98f3490f723954773530fb"
+      },
+      "LayoutTemplate": {
+        "count": 4,
+        "sha256": "7415f8a65a3151aa2f35bed3855ec588ed261049e7f3ef1579650ef287e2404f"
+      },
+      "LayoutTemplateVersion": {
+        "count": 4,
+        "sha256": "d1c93f9e35e9b2ca39fc27068163028a2a56591d5ea04b4a63506fe05fe949d6"
+      },
+      "MenuPackage": {
+        "count": 2,
+        "sha256": "42c9198febdaeda79a301f97f96784bc7fa52c66148eb5739dd4c4e668bc0d31"
+      },
+      "MenuPackageItem": {
+        "count": 5,
+        "sha256": "6734abf2e3245690f71abb6e637f2108ef2b530bfa8bfe060de88b205a442f47"
+      },
+      "MenuPackageVersion": {
+        "count": 2,
+        "sha256": "650ac095779abadd27e48dcac287e6fcc0829e15d46651b7e86d5124d59003be"
+      },
+      "RestaurantProfile": {
+        "count": 1,
+        "sha256": "5a82b462f0c394aef1fa0b15704409c4d4f14aaf46a920fb19e866b1ef9dd9bc"
+      },
+      "TimelineTemplate": {
+        "count": 1,
+        "sha256": "dd6b78e908ffc4daf08c74785442ca9f78068b881100b52143c0d87ce1630cb1"
+      },
+      "TimelineTemplateItem": {
+        "count": 2,
+        "sha256": "24e0358615a754b17cfa76c76f1d8e6680fe00246bad03a1f294a082f2856534"
+      },
+      "TimelineTemplateVersion": {
+        "count": 1,
+        "sha256": "68ad9e4a42b91269b298ad8cd8ded1a33c35f94ee5ef836efd0cb0734cb96a6c"
+      }
+    }
+  },
+  "modules": [
+    {
+      "key": "layout",
+      "path": "src/modules/venue-catalog/application/layout.service.ts",
+      "sourceSha256": "6e070fbb1c74213e933e196b74043c983210f66c9e30e3c3dd64e9c8eb38c33a",
+      "compiledSha256": "7016662478bd54f4aefbff58e4ac3bc031f17936a2df01675d0dcd496398c380"
+    },
+    {
+      "key": "venue",
+      "path": "src/modules/venue-catalog/infrastructure/prisma-selection-eligibility.reader.ts",
+      "sourceSha256": "fde6daeef980d8ff58100a1858b816695333d5bb6a8a5bc36bba11c976f4807c",
+      "compiledSha256": "1b3dcffb1e1b8c717272638b19083cc9daa23cefb4ae49b1f2bd6c59d7e3695f"
+    },
+    {
+      "key": "deposit",
+      "path": "src/modules/payments-billing/infrastructure/prisma-deposit-settlement.reader.ts",
+      "sourceSha256": "c8344e3740562ed44f8eb27ad144e3fe52885e3d2e9cab3259a0e1ed1c804a11",
+      "compiledSha256": "dfabbad4dedcc7e768f41764b69d5648768b79f29555533cd0c6d18602663d25"
+    },
+    {
+      "key": "seating",
+      "path": "src/modules/seating-plan/application/seating.service.ts",
+      "sourceSha256": "c7c6218b74cdde2248803f4c734e84cd61c887eec33500f0379da612ac7535c0",
+      "compiledSha256": "77beaa4d91986ef43f70e744e868b61f4a131b61348ac91e23e2db998df3db2f"
+    }
+  ],
+  "programSha256": "2f239471557a4dc44737a52061599a158b8b4c7e8418676cc9f30c048659ba22",
+  "budget": "One owned native pool (max1) plus one read-only observer consume the two existing ordinary spare slots. Operator inventory closes before worker starts; no second app process or background workers.",
+  "cleanup": {
+    "baseline": [
+      {
+        "path": "/api/v1/auth/web-sessions",
+        "method": "POST",
+        "status": 201,
+        "requestId": "c13bb822-f6e1-4ad2-b846-a86e9bd7f170"
+      },
+      {
+        "path": "/api/v1/auth/sessions/current",
+        "method": "DELETE",
+        "status": 204,
+        "requestId": "2593b7bb-fa5f-4ed3-baba-22680d808386"
+      },
+      {
+        "path": "/api/v1/auth/me",
+        "method": "GET",
+        "status": 401,
+        "requestId": "a0aeb764-eb25-4de7-94f8-504504b33ce2"
+      }
+    ],
+    "comparison": [
+      {
+        "path": "/api/v1/auth/web-sessions",
+        "method": "POST",
+        "status": 201,
+        "requestId": "f5c030f2-aa6b-4f7d-9a85-2affccf4e596"
+      },
+      {
+        "path": "/api/v1/auth/sessions/current",
+        "method": "DELETE",
+        "status": 204,
+        "requestId": "9b539be5-058e-48da-9520-ed57e7ef3a38"
+      },
+      {
+        "path": "/api/v1/auth/me",
+        "method": "GET",
+        "status": 401,
+        "requestId": "ea326155-e275-4404-a915-210c744b8e54"
+      }
+    ]
+  }
+}
