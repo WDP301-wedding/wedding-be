@@ -1,5 +1,6 @@
 import type { StoredObject } from '../../../integrations/storage/storage-provider.js';
 import type { StorageContentType } from '../../../integrations/storage/storage.schemas.js';
+import type { Logger } from 'pino';
 
 export interface MediaRequestContext {
   readonly actorId: string;
@@ -9,6 +10,8 @@ export interface MediaRequestContext {
   readonly accessToken?: string;
   /** Trusted Core/owner UoW handle only. Never accepted from a command or HTTP field. */
   readonly transactionScopeId?: string;
+  /** Server-owned request logger; never accepted from a payload or persisted. */
+  readonly logger?: Logger;
 }
 
 /** The adapter must re-resolve enabled/current identity, own FULL access and CONFIRMED

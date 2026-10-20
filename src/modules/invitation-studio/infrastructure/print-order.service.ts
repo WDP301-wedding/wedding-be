@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { Prisma } from '../../../generated/prisma/client.js';
+import { Prisma, type InvitationPrintOrder } from '../../../generated/prisma/client.js';
 import { prismaSchema } from '../../../core/database/prisma.js';
 import { NotFoundError, ValidationError } from '../../../core/errors/app-error.js';
 import type {
@@ -36,6 +36,7 @@ import type { StudioAuthorization } from './studio-authorization.js';
 import type { PrintableService } from './printable.service.js';
 import type { ContractedPrintFulfillment } from './contracted-print.fulfillment.js';
 import { commercialPrintSnapshotSchema } from '../domain/contracted-print.js';
+import { studioPhase } from './studio-phase.js';
 
 export class PrintOrderService {
   constructor(
@@ -1376,7 +1377,9 @@ export class PrintOrderService {
     context: MediaRequestContext,
   ): Promise<{ items: PrintOrderView[]; nextCursor: string | null }> {
     const parsedBookingId = parseStudio(id, bookingId);
-    await this.authorization.booking(parsedBookingId, context, 'COUPLE');
+    await studioPhase(context, 'print.list', 'authorization', () =>
+      this.authorization.booking(parsedBookingId, context, 'COUPLE'),
+    );
 
     const limit = query.limit;
     let cursorOrder: { createdAt: Date; id: string } | null = null;
@@ -1409,38 +1412,12 @@ export class PrintOrderService {
     const pageOrders = hasMore ? orders.slice(0, limit) : orders;
     const nextCursor = hasMore ? pageOrders[pageOrders.length - 1]!.id : null;
 
-    const items: PrintOrderView[] = [];
-    for (const order of pageOrders) {
-      const lines = await this.repository.prisma.invitationPrintLine.findMany({
-        where: { orderId: order.id },
-      });
-      let currentRev: {
-        id: string;
-        revisionNumber: number;
-        linesJson: Prisma.JsonValue;
-        orderTotalVnd: Prisma.Decimal;
-        estimatedHandoverAt: Date;
-        expiresAt: Date;
-        createdAt: Date;
-      } | null = null;
-      if (order.currentCommercialRevisionId !== null) {
-        currentRev = await this.repository.prisma.invitationCommercialRevision.findUnique({
-          where: { id: order.currentCommercialRevisionId },
-        });
-      }
-      let pendingProposal: typeof currentRev = null;
-      if (order.status === 'APPROVED' && currentRev !== null) {
-        pendingProposal = await this.repository.prisma.invitationCommercialRevision.findFirst({
-          where: {
-            orderId: order.id,
-            revisionNumber: { gt: currentRev.revisionNumber },
-            expiresAt: { gt: this.now() },
-          },
-          orderBy: { revisionNumber: 'desc' },
-        });
-      }
-      items.push(this.mapOrderView(order, lines, currentRev, pendingProposal));
-    }
+    const items = await studioPhase(context, 'print.list', 'read', () =>
+      this.pageViews(pageOrders),
+    );
+    await studioPhase(context, 'print.list', 'authorization', () =>
+      this.authorization.booking(parsedBookingId, context, 'COUPLE'),
+    );
     return { items, nextCursor };
   }
 
@@ -1486,6 +1463,12 @@ export class PrintOrderService {
     const pageOrders = hasMore ? orders.slice(0, limit) : orders;
     const nextCursor = hasMore ? pageOrders[pageOrders.length - 1]!.id : null;
 
+    const items = await this.pageViews(pageOrders);
+    await this.authorization.manager(context);
+    return { items, nextCursor };
+  }
+
+  private async pageViews(pageOrders: InvitationPrintOrder[]): Promise<PrintOrderView[]> {
     const lines = await this.repository.prisma.invitationPrintLine.findMany({
       where: { orderId: { in: pageOrders.map((order) => order.id) } },
     });
@@ -1546,7 +1529,6 @@ export class PrintOrderService {
         proposalByOrder.get(order.id) ?? null,
       ),
     );
-    await this.authorization.manager(context);
-    return { items, nextCursor };
+    return items;
   }
 }

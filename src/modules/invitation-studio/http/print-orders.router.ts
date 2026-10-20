@@ -42,6 +42,7 @@ export function createPrintOrdersRouter(
           actorId: actor.accountId,
           requestId: req.requestId,
           accessToken: token,
+          ...(req.log ? { logger: req.log } : {}),
         } satisfies MediaRequestContext;
         res.set('Cache-Control', 'no-store');
         next();

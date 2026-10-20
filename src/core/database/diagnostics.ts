@@ -36,6 +36,11 @@ export function withDatabaseDiagnostics<T>(state: DatabaseDiagnostics, work: () 
   return context.run(state, work);
 }
 
+export function databaseDiagnosticsSnapshot(): DatabaseDiagnostics | undefined {
+  const state = context.getStore();
+  return state ? { ...state } : undefined;
+}
+
 export function createDatabaseDiagnosticsMiddleware(enabled: boolean): RequestHandler {
   const delay = enabled ? monitorEventLoopDelay({ resolution: 20 }) : undefined;
   delay?.enable();
