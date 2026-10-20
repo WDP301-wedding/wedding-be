@@ -2127,6 +2127,20 @@ model InvitationGenerationIntent {
   @@id([bookingId, intentDigest])
 }
 
+// Short-lived fenced ownership of provider work; no prompts or image bytes.
+// Reservations count toward active-media quotas while a generation is in flight.
+model InvitationExternalWork {
+  bookingId     String   @db.Uuid
+  intentDigest  String   @db.Char(64)
+  token         String   @unique @db.Uuid
+  expiresAt     DateTime @db.Timestamptz(6)
+  reservedFiles Int      @default(0)
+  reservedBytes Int      @default(0)
+
+  @@id([bookingId, intentDigest])
+  @@index([bookingId, expiresAt])
+}
+
 model InvitationStudioOutbox {
   eventId   String   @id @db.Uuid
   bookingId String   @db.Uuid

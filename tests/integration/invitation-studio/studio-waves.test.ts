@@ -349,7 +349,7 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
         provider: 'gemini',
         apiKey: 'controlled-test-key',
         model: 'fixture-image',
-        timeoutMs: 10000,
+        timeoutMs: 45000,
       });
       expect(f.storage.bucket.upload).toHaveBeenCalledTimes(1);
     } finally {
@@ -1486,19 +1486,32 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
       expectedRevision: 1,
       idempotencyKey: key(),
     };
-    await expect(
-      f.services.boundary.run({ bookingId: f.bookingId, context: f.contract }, async (ctx) => {
-        await f.services.derivedAssets.derive(input, {
-          ...f.couple,
-          transactionScopeId: ctx.transactionScopeId!,
-        });
-        throw new Error('owner rollback');
-      }),
-    ).rejects.toThrow('owner rollback');
+    // Provider work now runs before the owner's acceptance transaction. Inject
+    // rollback at its audit/commit boundary instead of holding a parent transaction
+    // across Storage; retain the durable-journal and exact-object retry proof.
+    const rollback = vi
+      .spyOn(f.services.studioRepository, 'audit')
+      .mockRejectedValueOnce(new Error('owner rollback'));
+    try {
+      await expect(f.services.derivedAssets.derive(input, f.couple)).rejects.toThrow(
+        'owner rollback',
+      );
+    } finally {
+      rollback.mockRestore();
+    }
     expect(await f.prisma.invitationDerivedAsset.count({ where: { bookingId: f.bookingId } })).toBe(
       0,
     );
+    const journal = await f.prisma.invitationDerivedUploadAttempt.findUniqueOrThrow({
+      where: {
+        bookingId_intentDigest: {
+          bookingId: f.bookingId,
+          intentDigest: digest({ actorId: f.couple.actorId, key: input.idempotencyKey }),
+        },
+      },
+    });
     const result = await f.services.derivedAssets.derive(input, f.couple);
+    expect(result.derivedAssetId).toBe(journal.assetId);
     expect(await f.services.derivedAssets.derive(input, f.couple)).toEqual(result);
     await expect(
       f.services.derivedAssets.derive(

@@ -1,0 +1,129 @@
+{
+  "recordedAt": "2026-10-20T04:27:58.478Z",
+  "scope": "Owner-requested backend items 2 and 3 from invitation/print latency audit, plus Gemini 45s and HTTP 60s. Frontend separately owned.",
+  "baselineCommit": "d1b963023f77c41b992bafae5bca9d1256d4d041",
+  "codeCommit": "72cc4d641f98465499095a801b9f924b3c88c093",
+  "branch": "codex/invitation-backend-latency",
+  "verification": {
+    "isolation": "Managed worktree based on baseline; only the 31 owned files copied. node_modules/generated Prisma client are local junctions. No .env or credentials copied. Clean environment defaults exclude unrelated local auth TTL and performance edits.",
+    "runtime": "Node.js 24.21.0; PostgreSQL 18.6 task-owned disposable cluster, loopback port 55445, synthetic random-name databases/schemas and a migrated disposable base database, shared_buffers=128MB, 2 Vitest workers.",
+    "databaseLimitations": "Local fast test cluster disables fsync/full_page_writes/synchronous_commit; it proves transactional application behavior and regression assertions, not deployment durability, production performance or PostgreSQL 17 exact-head CI.",
+    "gates": {
+      "format": "passed",
+      "lint": "passed",
+      "typecheck": "passed",
+      "build": "passed",
+      "openapi": "passed; unchanged artifact",
+      "dependencyAudit": "passed; no high/critical advisories",
+      "diffWhitespace": "passed"
+    },
+    "tests": {
+      "actualExitCode": 0,
+      "success": true,
+      "files": 291,
+      "total": 2100,
+      "passed": 2100,
+      "failed": 0,
+      "pending": 0,
+      "failedFiles": []
+    },
+    "coverage": {
+      "thresholds": {
+        "perFile": true,
+        "lines": 80,
+        "branches": 80
+      },
+      "total": {
+        "lines": {
+          "total": 12359,
+          "covered": 12057,
+          "skipped": 0,
+          "pct": 97.55
+        },
+        "statements": {
+          "total": 13262,
+          "covered": 12815,
+          "skipped": 0,
+          "pct": 96.62
+        },
+        "functions": {
+          "total": 3219,
+          "covered": 3170,
+          "skipped": 0,
+          "pct": 98.47
+        },
+        "branches": {
+          "total": 8724,
+          "covered": 8155,
+          "skipped": 0,
+          "pct": 93.47
+        },
+        "branchesTrue": {
+          "total": 0,
+          "covered": 0,
+          "skipped": 0,
+          "pct": 100
+        }
+      },
+      "belowThreshold": []
+    },
+    "mutation": {
+      "mutation": "invert claim token ownership predicate",
+      "expectedExit": 1,
+      "actualExit": 1,
+      "restoredSha256": "1a57538dd12eb639e5a0f6af721205aafccd7cde77e7f4c81e33c6549f6ba8f2",
+      "originalSha256": "1a57538dd12eb639e5a0f6af721205aafccd7cde77e7f4c81e33c6549f6ba8f2",
+      "restored": true,
+      "execution": "Primary checkout diagnostic, controlled providers and the task-owned disposable cluster; full clean-worktree validation uses the original predicate. The failed assertion was RequestInProgressError at assertLease after token ownership was deliberately inverted."
+    },
+    "sourceVerification": {
+      "matchedOwnedFiles": 31,
+      "mismatches": [],
+      "preexistingConfigEdits": [
+        {
+          "file": "src/config/env.ts",
+          "preserved": true
+        },
+        {
+          "file": "src/config/env.test.ts",
+          "preserved": true
+        },
+        {
+          "file": ".env.example",
+          "preserved": true
+        }
+      ]
+    },
+    "regressions": [
+      "Couple print list bounds line/revision reads at page sizes 1/3/20, tied-timestamp cursor, immutable accepted prices and current pending proposals, current authority on populated/empty pages.",
+      "Real PostgreSQL AI and derive with a single connection: provider, upload and Sharp work see no active booking transaction; unrelated booking commands and revocation can progress.",
+      "Durable claim ownership/expiry/takeover, same-key concurrency and changed-body denial, cutoff/source revision rechecks, quota reservation shared with ordinary uploads, deadline and disconnect recovery, acceptance rollback and no repeated paid call."
+    ],
+    "earlierAttempts": {
+      "dirtyCheckout": "Not accepted: local .env defaults and concurrent resource-heavy checks produced timeouts/default-pool expectation failures. Validation was repeated in the isolated worktree.",
+      "firstIsolatedRun": {
+        "total": 2100,
+        "passed": 2092,
+        "failed": 8,
+        "actualExitCode": 1,
+        "cause": "The disposable base public schema had not been migrated, causing database/idempotency tests to fail. The runtime-foundation assertions passed but its 10-second schema cleanup hook exceeded its budget. Applied all 62 migrations to the task-owned base DB, restarted the task-owned cluster with normal 128MB shared_buffers, then repeated the complete run. No test deadlines or coverage thresholds changed."
+      },
+      "acceptance": "Earlier focused regressions are supplemental; the final clean run and actual command exit code govern acceptance. reportOnFailure is enabled only to retain coverage diagnostics on a failed run; it does not change thresholds or test outcomes."
+    }
+  },
+  "rollout": {
+    "migration": "20261020030000_invitation_external_work",
+    "immutablePriorMigrations": true,
+    "migrationCount": 62,
+    "geminiTimeoutMs": 45000,
+    "httpRequestTimeoutMs": 60000,
+    "explicitEnvironmentRequired": "Set HTTP_REQUEST_TIMEOUT_MS=60000 when the deployment currently overrides the default.",
+    "databaseTransactionTimeoutMs": 30000,
+    "leaseMs": 120000,
+    "apiContracts": "No route/schema changes; existing errors and examples documented in docs/invitation-backend-latency-2026-10-20.md.",
+    "liveDeployment": "not performed",
+    "paidGenerationAndRealMoney": "not performed",
+    "liveProviderReadiness": "not established by these controlled-provider tests",
+    "remainingAcceptance": "Review and exact-head CI, migration/config rollout, then deployed measurement and authorized provider environment evidence. PDF caching and ordinary-upload/signed-preview transaction restructuring remain separate follow-ups."
+  }
+}

@@ -172,7 +172,7 @@ const rawEnvironmentSchema = z
       maximum: 10_485_760,
     }),
     HTTP_REQUEST_TIMEOUT_MS: integerEnvironmentVariable({
-      defaultValue: 30_000,
+      defaultValue: 60_000,
       minimum: 1_000,
       maximum: 120_000,
     }),

@@ -75,8 +75,8 @@ export function claimMediaQuota(
   newBytes: number,
   replacedAssetId?: string,
 ): void {
-  let files = 1;
-  let bytes = newBytes;
+  let files = 1 + (state.reservedFiles ?? 0);
+  let bytes = newBytes + (state.reservedBytes ?? 0);
   for (const asset of state.assets.values()) {
     if (asset.detachedAt !== null || asset.id === replacedAssetId) continue;
     const current = state.files.get(asset.currentFileRevisionId);

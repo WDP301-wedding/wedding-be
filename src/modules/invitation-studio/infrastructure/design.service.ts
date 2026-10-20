@@ -15,6 +15,7 @@ import {
 } from '../domain/studio-policy.js';
 import { asJson, type StudioRepository } from './studio.repository.js';
 import { type StudioAuthorization } from './studio-authorization.js';
+import { studioPhase } from './studio-phase.js';
 
 const createSchema = z
   .strictObject({
@@ -160,16 +161,22 @@ export class DesignService {
   async list(bookingValue: string, page: unknown, context: MediaRequestContext) {
     const bookingId = parseStudio(id, bookingValue),
       query = parseStudio(pageSchema.omit({ bookingId: true, includeArchived: true }), page);
-    await this.access.booking(bookingId, context);
-    const rows = await this.repository.prisma.invitationDesign.findMany({
-      where: { bookingId, ...(query.cursor === undefined ? {} : { id: { gt: query.cursor } }) },
-      orderBy: { id: 'asc' },
-      take: query.limit + 1,
-    });
+    await studioPhase(context, 'design.list', 'authorization', () =>
+      this.access.booking(bookingId, context),
+    );
+    const rows = await studioPhase(context, 'design.list', 'page', () =>
+      this.repository.prisma.invitationDesign.findMany({
+        where: { bookingId, ...(query.cursor === undefined ? {} : { id: { gt: query.cursor } }) },
+        orderBy: { id: 'asc' },
+        take: query.limit + 1,
+      }),
+    );
     const heads = rows.slice(0, query.limit);
-    const revisions = await this.repository.prisma.invitationDesignRevision.findMany({
-      where: { bookingId, id: { in: heads.map((row) => row.currentRevisionId) } },
-    });
+    const revisions = await studioPhase(context, 'design.list', 'revisions', () =>
+      this.repository.prisma.invitationDesignRevision.findMany({
+        where: { bookingId, id: { in: heads.map((row) => row.currentRevisionId) } },
+      }),
+    );
     const byId = new Map(revisions.map((row) => [row.id, row]));
     const items = heads.map((head) => {
       const row = byId.get(head.currentRevisionId);
@@ -183,7 +190,9 @@ export class DesignService {
       });
     });
     // Recheck current authority once for the complete response, including empty pages.
-    await this.access.booking(bookingId, context);
+    await studioPhase(context, 'design.list', 'authorization', () =>
+      this.access.booking(bookingId, context),
+    );
     return { items, nextCursor: rows.length > query.limit ? rows[query.limit - 1]!.id : null };
   }
   async create(value: unknown, context: MediaRequestContext) {

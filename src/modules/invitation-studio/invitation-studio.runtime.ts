@@ -52,7 +52,7 @@ export async function createInvitationStudioRuntime(
         };
     const ai =
       config.aiImage?.provider === 'gemini'
-        ? createGeminiAiImageProvider({ ...config.aiImage, timeoutMs: 10000 })
+        ? createGeminiAiImageProvider({ ...config.aiImage, timeoutMs: 45_000 })
         : null;
     const composition = createInvitationStudioServices(
       prisma,

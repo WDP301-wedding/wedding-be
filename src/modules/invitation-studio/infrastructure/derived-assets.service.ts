@@ -11,6 +11,8 @@ import type { MediaRequestContext } from '../application/media.contracts.js';
 import { id, parseStudio, revision, studioConflict, digest } from '../domain/studio-policy.js';
 import { asJson, type StudioRepository } from './studio.repository.js';
 import { type StudioAuthorization } from './studio-authorization.js';
+import { StudioExternalWork } from './external-work.js';
+import { studioPhase } from './studio-phase.js';
 
 const schema = z.strictObject({
   bookingId: id,
@@ -26,27 +28,36 @@ export class DerivedAssetsService {
   ) {}
   async derive(value: unknown, context: MediaRequestContext) {
     const input = parseStudio(schema, value);
-    return this.repository.command(
-      input.bookingId,
+    const intentDigest = digest({ actorId: context.actorId, key: input.idempotencyKey });
+    const external = new StudioExternalWork(this.repository);
+    return external.run(
+      {
+        bookingId: input.bookingId,
+        idempotencyKey: input.idempotencyKey,
+        payload: { action: 'asset.derive', ...input },
+        operation: { action: 'asset.derive', resourceId: input.mediaAssetId },
+      },
       context,
-      input.idempotencyKey,
-      { action: 'asset.derive', ...input },
-      (ctx) => this.access.booking(input.bookingId, ctx, 'COUPLE'),
-      async (tx, scoped) => {
-        if (this.storage.read === undefined) throw new ProviderError('unavailable');
+      (scoped) => this.access.booking(input.bookingId, scoped, 'COUPLE'),
+      async (tx) => {
+        if (!this.storage.read) throw new ProviderError('unavailable');
         const source = await tx.invitationMediaAsset.findFirst({
           where: { bookingId: input.bookingId, id: input.mediaAssetId, detachedAt: null },
           include: { currentFile: true },
         });
-        if (source === null) throw new NotFoundError();
+        if (!source) throw new NotFoundError();
         if (source.revision !== input.expectedRevision)
           throw studioConflict('MEDIA_REVISION_STALE');
-        const file = source.currentFile;
-        const bytes = await this.storage.read({
-          objectKey: file.objectKey as StoredObject['objectKey'],
-          purpose: 'PRIVATE_WEDDING_MEDIA',
-          resourceId: input.bookingId,
-        });
+        return source.currentFile;
+      },
+      async (file, lease) => {
+        const bytes = await studioPhase(context, 'asset.derive', 'read', () =>
+          this.storage.read!({
+            objectKey: file.objectKey as StoredObject['objectKey'],
+            purpose: 'PRIVATE_WEDDING_MEDIA',
+            resourceId: input.bookingId,
+          }),
+        );
         if (
           createStoredObject({
             bytes,
@@ -56,55 +67,74 @@ export class DerivedAssetsService {
           }).checksumSha256 !== file.checksumSha256
         )
           throw new ProviderError('failure');
-        const output = await sharp(bytes, { failOn: 'warning', limitInputPixels: 40000000 })
-          .timeout({ seconds: 10 })
-          .rotate()
-          .resize({ width: 2048, height: 2048, fit: 'inside', withoutEnlargement: true })
-          .png()
-          .toBuffer({ resolveWithObject: true });
-        const intentDigest = digest({ actorId: context.actorId, key: input.idempotencyKey });
-        let attempt = await this.repository.prisma.invitationDerivedUploadAttempt.findUnique({
-          where: { bookingId_intentDigest: { bookingId: input.bookingId, intentDigest } },
-        });
-        if (attempt === null) {
+        const output = await studioPhase(context, 'asset.derive', 'decode', () =>
+          sharp(bytes, { failOn: 'warning', limitInputPixels: 40000000 })
+            .timeout({ seconds: 10 })
+            .rotate()
+            .resize({ width: 2048, height: 2048, fit: 'inside', withoutEnlargement: true })
+            .png()
+            .toBuffer({ resolveWithObject: true }),
+        );
+        const attempt = await lease.write(async (tx) => {
+          const prior = await tx.invitationDerivedUploadAttempt.findUnique({
+            where: { bookingId_intentDigest: { bookingId: input.bookingId, intentDigest } },
+          });
+          if (prior) {
+            if (prior.sourceFileId !== file.id) throw studioConflict('MEDIA_REVISION_STALE');
+            return prior;
+          }
           const assetId = randomUUID();
-          const expected = createStoredObject({
+          const object = createStoredObject({
             bytes: output.data,
             contentType: 'image/png',
             purpose: 'PRIVATE_WEDDING_MEDIA',
             resourceId: assetId,
           });
-          attempt = await this.repository.prisma.invitationDerivedUploadAttempt.create({
+          return tx.invitationDerivedUploadAttempt.create({
             data: {
               bookingId: input.bookingId,
               intentDigest,
               assetId,
               sourceFileId: file.id,
-              object: asJson(expected),
+              object: asJson(object),
             },
           });
-        }
-        if (attempt.sourceFileId !== file.id) throw studioConflict('MEDIA_REVISION_STALE');
-        const expected = attempt.object as unknown as StoredObject;
-        const object = await this.storage.put({
-          bytes: output.data,
-          contentType: 'image/png',
-          purpose: 'PRIVATE_WEDDING_MEDIA',
-          resourceId: attempt.assetId,
         });
+        const expected = attempt.object as unknown as StoredObject;
+        const object = await studioPhase(context, 'asset.derive', 'upload', () =>
+          this.storage.put({
+            bytes: output.data,
+            contentType: 'image/png',
+            purpose: 'PRIVATE_WEDDING_MEDIA',
+            resourceId: attempt.assetId,
+          }),
+        );
         if (
           object.objectKey !== expected.objectKey ||
-          object.checksumSha256 !== expected.checksumSha256
+          object.checksumSha256 !== expected.checksumSha256 ||
+          object.sizeBytes !== expected.sizeBytes ||
+          object.contentType !== expected.contentType ||
+          object.resourceId !== attempt.assetId ||
+          object.purpose !== expected.purpose
         )
           throw new ProviderError('failure');
+        return { attempt, object, width: output.info.width, height: output.info.height };
+      },
+      async (tx, scoped, output, file) => {
+        const source = await tx.invitationMediaAsset.findFirst({
+          where: { id: input.mediaAssetId, bookingId: input.bookingId, detachedAt: null },
+        });
+        if (!source) throw new NotFoundError();
+        if (source.revision !== input.expectedRevision || source.currentFileRevisionId !== file.id)
+          throw studioConflict('MEDIA_REVISION_STALE');
         const asset = await tx.invitationDerivedAsset.create({
           data: {
-            id: attempt.assetId,
+            id: output.attempt.assetId,
             bookingId: input.bookingId,
             sourceFileId: file.id,
-            object: asJson(object),
-            width: output.info.width,
-            height: output.info.height,
+            object: asJson(output.object),
+            width: output.width,
+            height: output.height,
             publicSlug: randomBytes(32).toString('hex'),
           },
         });
@@ -116,7 +146,6 @@ export class DerivedAssetsService {
           contentType: 'image/png' as const,
         };
       },
-      { action: 'asset.derive', resourceId: input.mediaAssetId },
     );
   }
   async readPublic(slug: string) {

@@ -5,6 +5,7 @@ import { createInvitationStudioServices } from './infrastructure/studio.composit
 import { createInvitationStudioRuntime } from './invitation-studio.runtime.js';
 import type { StorageProvider } from '../../integrations/storage/storage-provider.js';
 import { startSeatingReconciler } from '../seating-plan/infrastructure/seating-reconciler.js';
+import * as gemini from '../../integrations/ai-image/gemini-ai-image-provider.js';
 
 const prisma = vi.hoisted(() => ({ $connect: vi.fn(), $disconnect: vi.fn() }));
 vi.mock('../../core/database/prisma.js', () => ({ createPrismaClient: vi.fn(() => prisma) }));
@@ -31,6 +32,19 @@ function storage(): StorageProvider {
 }
 
 describe('InvitationStudioRuntime', () => {
+  it('gives Gemini a 45-second provider budget', async () => {
+    const factory = vi.spyOn(gemini, 'createGeminiAiImageProvider');
+    try {
+      const runtime = await createInvitationStudioRuntime({
+        ...config(),
+        aiImage: { provider: 'gemini', apiKey: 'test-key', model: 'gemini-2.5-flash-image' },
+      });
+      expect(factory).toHaveBeenCalledWith(expect.objectContaining({ timeoutMs: 45_000 }));
+      await runtime.resource.close();
+    } finally {
+      factory.mockRestore();
+    }
+  });
   beforeEach(() => {
     vi.clearAllMocks();
     prisma.$connect.mockResolvedValue(undefined);

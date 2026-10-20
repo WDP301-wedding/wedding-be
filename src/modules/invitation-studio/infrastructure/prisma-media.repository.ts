@@ -74,7 +74,7 @@ export class PrismaMediaRepository implements MediaRepository {
       }
     };
     const accept = async (tx: Prisma.TransactionClient, scopedContext?: MediaRequestContext) => {
-      const [policy, assets, receipts] = await Promise.all([
+      const [policy, assets, receipts, reservations] = await Promise.all([
         tx.invitationMediaPolicy.findUnique({ where: { bookingId } }),
         tx.invitationMediaAsset.findMany({
           where: { bookingId, detachedAt: null },
@@ -87,11 +87,17 @@ export class PrismaMediaRepository implements MediaRepository {
               where: { bookingId, intentKeyDigest: command.intentKeyDigest },
               take: 1,
             }),
+        tx.invitationExternalWork.aggregate({
+          where: { bookingId, expiresAt: { gt: new Date() } },
+          _sum: { reservedFiles: true, reservedBytes: true },
+        }),
       ]);
       if (assets.length > MEDIA_LIMITS.activeFiles)
         throw new Error('Persisted active media exceeds quota.');
       const files = assets.map((a) => a.currentFile);
       const state: MediaState = {
+        reservedFiles: reservations._sum.reservedFiles ?? 0,
+        reservedBytes: reservations._sum.reservedBytes ?? 0,
         policy:
           policy === null
             ? null
