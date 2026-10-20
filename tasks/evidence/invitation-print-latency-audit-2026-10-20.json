@@ -1,0 +1,150 @@
+{
+  "capturedAt": "2026-10-20T02:10:00Z",
+  "mode": "read-only Railway connector log/config metadata inspection; no live API/provider invocation",
+  "projectId": "1c56721d-021a-442c-9e01-bb91abe73adb",
+  "serviceId": "0f70d648-8c59-48bd-84f3-29a86d2e2d38",
+  "environmentId": "08a2899c-b0d6-4200-a505-604965a4b3fc",
+  "deploymentId": "e66cbbb0-0e0b-40ba-aa0b-f1fa455e38a3",
+  "servingCommit": "e82c269c7f04c5b9e364ceb39847581b98f9bc3f",
+  "localHead": "d1b963023f77c41b992bafae5bca9d1256d4d041",
+  "sourceContinuity": "git diff servingCommit -- src/modules/invitation-studio src/integrations/ai-image src/integrations/storage src/core/database/booking-boundary.ts returned no diff",
+  "window": {
+    "start": "2026-10-19T18:00:00Z",
+    "end": "2026-10-20T02:10:00Z",
+    "limitPerStreamRequested": 500,
+    "returnedHttp": 501,
+    "returnedDeploy": 501,
+    "truncatedPossible": true
+  },
+  "config": {
+    "valuesRedacted": true,
+    "currentNumericPoolAndDeadlineValuesUnverified": true
+  },
+  "http": [
+    {
+      "timestamp": "2026-10-19T23:48:09.613770906Z",
+      "path": "/api/v1/bookings/:bookingId/print-orders",
+      "method": "GET",
+      "httpStatus": 200,
+      "durationMs": 3313
+    },
+    {
+      "timestamp": "2026-10-19T23:48:10.721724674Z",
+      "path": "/api/v1/bookings/:bookingId/invitations",
+      "method": "GET",
+      "httpStatus": 200,
+      "durationMs": 4925
+    },
+    {
+      "timestamp": "2026-10-19T23:52:34.595262111Z",
+      "path": "/api/v1/bookings/:bookingId/print-orders",
+      "method": "GET",
+      "httpStatus": 200,
+      "durationMs": 3208
+    },
+    {
+      "timestamp": "2026-10-19T23:52:36.264560997Z",
+      "path": "/api/v1/bookings/:bookingId/invitations",
+      "method": "GET",
+      "httpStatus": 200,
+      "durationMs": 4834
+    },
+    {
+      "timestamp": "2026-10-19T23:53:19.672853254Z",
+      "path": "/api/v1/bookings/:bookingId/invitation-image-generations",
+      "method": "POST",
+      "httpStatus": 500,
+      "durationMs": 15334
+    },
+    {
+      "timestamp": "2026-10-20T02:02:58.226212950Z",
+      "path": "/api/v1/bookings/:bookingId/print-orders",
+      "method": "GET",
+      "httpStatus": 200,
+      "durationMs": 2647
+    },
+    {
+      "timestamp": "2026-10-20T02:03:00.460482456Z",
+      "path": "/api/v1/bookings/:bookingId/invitations",
+      "method": "GET",
+      "httpStatus": 200,
+      "durationMs": 4385
+    },
+    {
+      "timestamp": "2026-10-20T02:04:52.528473625Z",
+      "path": "/api/v1/bookings/:bookingId/invitation-image-generations",
+      "method": "POST",
+      "httpStatus": 500,
+      "durationMs": 16351
+    }
+  ],
+  "application": [
+    {
+      "timestamp": "2026-10-19T23:53:19.669Z",
+      "route": "/bookings/:bookingId/invitation-image-generations",
+      "requestId": "e28d54c7-cc00-4bfb-ad8d-7891029847ad",
+      "durationMs": 15328.734,
+      "statusClass": "5xx",
+      "errorCode": "INTERNAL_ERROR",
+      "event": "http_request_completed"
+    },
+    {
+      "timestamp": "2026-10-20T02:02:58.226Z",
+      "route": "/api/v1/bookings/:bookingId/print-orders",
+      "requestId": "ac15470b-2641-4135-a410-c1c77325b1d9",
+      "durationMs": 2642.277,
+      "statusClass": "2xx",
+      "event": "http_request_completed"
+    },
+    {
+      "timestamp": "2026-10-20T02:03:00.459Z",
+      "route": "/api/v1/bookings/:bookingId/invitations",
+      "requestId": "1bd0961a-247c-41cc-a3f4-23ad384331ed",
+      "durationMs": 4379.889,
+      "statusClass": "2xx",
+      "event": "http_request_completed"
+    },
+    {
+      "timestamp": "2026-10-20T02:03:04.933Z",
+      "route": "/api/v1/bookings/:bookingId/contracts",
+      "requestId": "d926ba09-f1e7-42c8-906a-faf796fc9b13",
+      "durationMs": 3698.646,
+      "statusClass": "2xx",
+      "event": "http_request_completed"
+    },
+    {
+      "timestamp": "2026-10-20T02:03:06.625Z",
+      "route": "/api/v1/bookings/:bookingId/contract-appendices",
+      "requestId": "507093f8-b089-48c4-ac41-b8b20253784c",
+      "durationMs": 4880.157,
+      "statusClass": "2xx",
+      "event": "http_request_completed"
+    },
+    {
+      "timestamp": "2026-10-20T02:04:52.530Z",
+      "route": "/bookings/:bookingId/invitation-image-generations",
+      "requestId": "824f5091-0733-4fda-943e-feff71f70931",
+      "durationMs": 16340.797,
+      "statusClass": "5xx",
+      "errorCode": "INTERNAL_ERROR",
+      "event": "http_request_completed"
+    }
+  ],
+  "localReproduction": {
+    "script": "output/invitation-latency-audit-20261020/pool-repro.test.ts",
+    "testFiles": 1,
+    "testsPassed": 1,
+    "database": "Random-name disposable database on 127.0.0.1:55435; dropped in finally",
+    "providerNetworkCalls": 0,
+    "results": [
+      { "max": 1, "acquisitionTimeoutMs": 1000, "outcome": "error", "elapsedMs": 1245.4047, "providerCalls": 0, "errorName": "Error", "message": "timeout exceeded when trying to connect" },
+      { "max": 2, "acquisitionTimeoutMs": 1000, "outcome": "success", "elapsedMs": 368.1238, "providerCalls": 1, "mediaAssetReturned": true }
+    ]
+  },
+  "limits": [
+    "Bounded recent log sample, not exhaustive history or latency percentile",
+    "Connector text filter 'invitation' returned no records; unfiltered logs and structured route attributes yielded these records",
+    "No new browser session or live reproduction of mutations",
+    "INTERNAL_ERROR logs expose Error name but no underlying message/stack; exact live AI failure stage remains unproven"
+  ]
+}
