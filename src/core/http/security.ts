@@ -17,7 +17,7 @@ const CORS_EXPOSED_HEADERS = ['Retry-After', 'X-Request-Id'] as const;
 
 export const defaultHttpSecurityConfig: BackendConfig['security'] = Object.freeze({
   bodyLimitBytes: 1_048_576,
-  requestTimeoutMs: 30_000,
+  requestTimeoutMs: 60_000,
   rateLimit: Object.freeze({ maxRequests: 100, windowMs: 60_000 }),
   replicaCount: 1,
 });

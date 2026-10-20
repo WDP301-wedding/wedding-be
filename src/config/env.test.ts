@@ -148,7 +148,7 @@ describe('parseEnvironment', () => {
       cors: { allowedOrigins: [] },
       security: {
         bodyLimitBytes: 1_048_576,
-        requestTimeoutMs: 30_000,
+        requestTimeoutMs: 60_000,
         rateLimit: { maxRequests: 100, windowMs: 60_000 },
         replicaCount: 1,
       },

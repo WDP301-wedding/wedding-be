@@ -10,7 +10,7 @@ describe('HTTP security configuration', () => {
   it('keeps conservative process-local defaults immutable', () => {
     expect(defaultHttpSecurityConfig).toEqual({
       bodyLimitBytes: 1_048_576,
-      requestTimeoutMs: 30_000,
+      requestTimeoutMs: 60_000,
       rateLimit: { maxRequests: 100, windowMs: 60_000 },
       replicaCount: 1,
     });

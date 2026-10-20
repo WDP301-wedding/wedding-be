@@ -349,7 +349,7 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
         provider: 'gemini',
         apiKey: 'controlled-test-key',
         model: 'fixture-image',
-        timeoutMs: 10000,
+        timeoutMs: 45000,
       });
       expect(f.storage.bucket.upload).toHaveBeenCalledTimes(1);
     } finally {
