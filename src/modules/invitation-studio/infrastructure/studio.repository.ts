@@ -75,27 +75,14 @@ export class StudioRepository {
     work: (tx: Prisma.TransactionClient, scoped: MediaRequestContext) => Promise<T>,
     operation?: { action: string; resourceId?: string | null },
   ): Promise<T> {
-    const bookingId = parseStudio(id, bookingValue),
-      key = parseStudio(idempotencyKeySchema, keyValue);
-    const action = operation?.action ?? 'default';
-    const resourceId = operation?.resourceId ?? null;
-    const intentDigest = digest({ actorId: context.actorId, action, key }),
-      commandDigest = digest({
-        bookingId,
-        actorId: context.actorId,
-        action,
-        resourceId,
-        payload,
-      });
-    await authorize(context);
-    await this.prisma.invitationStudioCommand.createMany({
-      data: { bookingId, intentDigest, commandDigest },
-      skipDuplicates: true,
-    });
-    const bound = await this.prisma.invitationStudioCommand.findUniqueOrThrow({
-      where: { bookingId_intentDigest: { bookingId, intentDigest } },
-    });
-    if (bound.commandDigest !== commandDigest) throw new IdempotencyKeyReusedError();
+    const { bookingId, intentDigest } = await this.bindCommand(
+      bookingValue,
+      context,
+      keyValue,
+      payload,
+      authorize,
+      operation,
+    );
     return this.boundary.run(
       { bookingId, context: contractContext(context) },
       async (scope) => {
@@ -120,6 +107,38 @@ export class StudioRepository {
         if (lock?.acquired !== true) throw new RequestInProgressError(1);
       },
     );
+  }
+
+  async bindCommand(
+    bookingValue: string,
+    context: MediaRequestContext,
+    keyValue: string,
+    payload: unknown,
+    authorize: (scoped: MediaRequestContext) => Promise<void>,
+    operation?: { action: string; resourceId?: string | null },
+  ) {
+    const bookingId = parseStudio(id, bookingValue),
+      key = parseStudio(idempotencyKeySchema, keyValue);
+    const action = operation?.action ?? 'default';
+    const resourceId = operation?.resourceId ?? null;
+    const intentDigest = digest({ actorId: context.actorId, action, key }),
+      commandDigest = digest({
+        bookingId,
+        actorId: context.actorId,
+        action,
+        resourceId,
+        payload,
+      });
+    await authorize(context);
+    await this.prisma.invitationStudioCommand.createMany({
+      data: { bookingId, intentDigest, commandDigest },
+      skipDuplicates: true,
+    });
+    const bound = await this.prisma.invitationStudioCommand.findUniqueOrThrow({
+      where: { bookingId_intentDigest: { bookingId, intentDigest } },
+    });
+    if (bound.commandDigest !== commandDigest) throw new IdempotencyKeyReusedError();
+    return { bookingId, intentDigest };
   }
   async audit(
     tx: Prisma.TransactionClient,

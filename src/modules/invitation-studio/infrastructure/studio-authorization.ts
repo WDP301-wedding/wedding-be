@@ -12,12 +12,19 @@ export class StudioAuthorization {
     readonly templateDenied?: (context: MediaRequestContext) => Promise<void>,
   ) {}
   async booking(bookingId: string, context: MediaRequestContext, role?: 'COUPLE' | 'MANAGER') {
+    await this.bookingActor(bookingId, context, role);
+  }
+  async bookingActor(bookingId: string, context: MediaRequestContext, role?: 'COUPLE' | 'MANAGER') {
     try {
       const actor = await this.guard.requireAccess(bookingId, context);
       if (role !== undefined && actor.role !== role) throw new NotFoundError();
+      return actor;
     } catch (error) {
-      if (error instanceof AppError && [401, 403, 404].includes(error.status))
-        await this.denied?.(bookingId, context);
+      if (error instanceof AppError && [401, 403, 404].includes(error.status)) {
+        const persist = () => this.denied?.(bookingId, context) ?? Promise.resolve();
+        if (context.deferDeniedAccess) context.deferDeniedAccess(persist);
+        else await persist();
+      }
       throw error;
     }
   }
