@@ -14,6 +14,7 @@ import type { createInvitationStudioServices } from '../infrastructure/studio.co
 import type { MediaRequestContext } from '../application/media.contracts.js';
 import { mediaAssetResponseSchema } from './media.schemas.js';
 import * as schemas from './studio.schemas.js';
+import * as jobs from '../domain/image-jobs.js';
 import { createPrintOrdersRouter } from './print-orders.router.js';
 
 type Services = ReturnType<typeof createInvitationStudioServices>;
@@ -64,6 +65,7 @@ export function createStudioRouter(
       '/management/invitation-templates',
       '/bookings/:bookingId/invitations',
       '/bookings/:bookingId/invitation-image-generations',
+      '/bookings/:bookingId/invitation-image-jobs',
       '/bookings/:bookingId/invitation-derived-assets',
       '/bookings/:bookingId/printable-revisions',
     ],
@@ -250,6 +252,72 @@ export function createStudioRouter(
         context(res),
       );
     },
+  );
+  route(
+    'post',
+    '/bookings/:bookingId/invitation-image-jobs',
+    jobs.imageJobResponse,
+    async (req, res) => {
+      noQuery(req);
+      const job = await services.imageJobs.enqueue(
+        {
+          ...parseStudio(bookParams, req.params),
+          ...parseStudio(schemas.generationBody, req.body),
+          idempotencyKey: key(req),
+        },
+        context(res),
+      );
+      res.set('Location', job.statusPath);
+      if (job.retryAfterSeconds) res.set('Retry-After', String(job.retryAfterSeconds));
+      return job;
+    },
+    202,
+  );
+  route(
+    'get',
+    '/bookings/:bookingId/invitation-image-jobs',
+    jobs.imageJobListResponse,
+    (req, res) =>
+      services.imageJobs.list(
+        parseStudio(bookParams, req.params).bookingId,
+        req.query,
+        context(res),
+      ),
+  );
+  const jobParams = bookParams.extend({ jobId: id });
+  route(
+    'post',
+    '/bookings/:bookingId/invitation-image-jobs/:jobId/reconciliation',
+    jobs.imageJobResponse,
+    (req, res) => {
+      noQuery(req);
+      const p = parseStudio(jobParams, req.params);
+      return services.imageJobs.abandon(p.bookingId, p.jobId, req.body, key(req), context(res));
+    },
+  );
+  route(
+    'get',
+    '/bookings/:bookingId/invitation-image-jobs/:jobId',
+    jobs.imageJobResponse,
+    async (req, res) => {
+      noQuery(req);
+      const p = parseStudio(jobParams, req.params);
+      const job = await services.imageJobs.read(p.bookingId, p.jobId, context(res));
+      if (job.retryAfterSeconds) res.set('Retry-After', String(job.retryAfterSeconds));
+      return job;
+    },
+  );
+  route(
+    'post',
+    '/bookings/:bookingId/invitation-image-jobs/:jobId/recovery',
+    jobs.imageJobResponse,
+    (req, res) => {
+      noQuery(req);
+      parseStudio(empty, req.body);
+      const p = parseStudio(jobParams, req.params);
+      return services.imageJobs.recover(p.bookingId, p.jobId, key(req), context(res));
+    },
+    202,
   );
   route(
     'post',

@@ -19,6 +19,7 @@ import { PrintOrderService } from './print-order.service.js';
 import { createContractedPrintFulfillment } from './contracted-print.providers.js';
 import { PrismaInvitationAutomationReader } from './prisma-automation.reader.js';
 import { PrismaInvitationReportingReader } from './prisma-reporting.reader.js';
+import { ImageJobsService } from './image-jobs.service.js';
 
 export function createInvitationStudioServices(
   prisma: PrismaClient,
@@ -26,6 +27,7 @@ export function createInvitationStudioServices(
   ai: AiImageProvider | null,
   publicOrigin: string | null,
   now: () => Date = () => new Date(),
+  imageJobsEnabled = true,
 ) {
   const media = createPersistentMediaService(prisma, storage, now);
   const editor = createInvitationEditorReader(prisma, media.boundary, media.identity.resolver);
@@ -81,6 +83,18 @@ export function createInvitationStudioServices(
     designs,
     derivedAssets,
     generation,
+    imageJobs: new ImageJobsService(
+      {
+        repository,
+        access: authorization,
+        generation,
+        derivedAssets,
+        booking: media.booking,
+        timeline: media.timeline,
+      },
+      now,
+      imageJobsEnabled,
+    ),
     publication,
     printable,
     billing,

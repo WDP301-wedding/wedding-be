@@ -6,6 +6,7 @@ import { createInvitationStudioRuntime } from './invitation-studio.runtime.js';
 import type { StorageProvider } from '../../integrations/storage/storage-provider.js';
 import { startSeatingReconciler } from '../seating-plan/infrastructure/seating-reconciler.js';
 import * as gemini from '../../integrations/ai-image/gemini-ai-image-provider.js';
+import { startImageJobsWorker } from './infrastructure/image-jobs.worker.js';
 
 const prisma = vi.hoisted(() => ({ $connect: vi.fn(), $disconnect: vi.fn() }));
 vi.mock('../../core/database/prisma.js', () => ({ createPrismaClient: vi.fn(() => prisma) }));
@@ -18,13 +19,16 @@ vi.mock('../seating-plan/infrastructure/seating.composition.js', () => ({
 vi.mock('../seating-plan/infrastructure/seating-reconciler.js', () => ({
   startSeatingReconciler: vi.fn(() => ({ close: vi.fn().mockResolvedValue(undefined) })),
 }));
+vi.mock('./infrastructure/image-jobs.worker.js', () => ({
+  startImageJobsWorker: vi.fn(() => ({ close: vi.fn().mockResolvedValue(undefined) })),
+}));
 
 function config(storage: Config['storage'] = { enabled: false }): Config {
   return {
     database: { url: 'postgresql://local/test' },
     invitationStudio: { publicOrigin: null, reconcilerEnabled: true },
     storage,
-    runtime: { environment: 'test' },
+    runtime: { environment: 'test', logLevel: 'warn' },
   } as Config;
 }
 function storage(): StorageProvider {
@@ -71,6 +75,7 @@ describe('InvitationStudioRuntime', () => {
       null,
       null,
       expect.any(Function),
+      false,
     );
     for (const operation of [
       storage().put({
@@ -94,6 +99,11 @@ describe('InvitationStudioRuntime', () => {
     expect(runtime.router).toBeTypeOf('function');
     await runtime.resource.close();
     expect(prisma.$disconnect).toHaveBeenCalledOnce();
+    expect(startImageJobsWorker).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Function),
+      false,
+    );
   });
   it('constructs the real Supabase adapter when configured', async () => {
     const runtime = await createInvitationStudioRuntime(
@@ -105,6 +115,25 @@ describe('InvitationStudioRuntime', () => {
       }),
     );
     expect(storage().constructor.name).toBe('SupabaseStorageProvider');
+    await runtime.resource.close();
+  });
+  it('enables paid job dispatch only with the flag, AI and Storage together', async () => {
+    const runtime = await createInvitationStudioRuntime({
+      ...config({
+        enabled: true,
+        supabaseUrl: 'https://storage.example.test',
+        serviceRoleKey: 'test-key',
+        bucket: 'private-media',
+      }),
+      aiImage: { provider: 'gemini', apiKey: 'test-key', model: 'gemini-2.5-flash-image' },
+      invitationStudio: { publicOrigin: null, reconcilerEnabled: true, imageJobsEnabled: true },
+    });
+    expect(vi.mocked(createInvitationStudioServices).mock.calls.at(-1)?.[5]).toBe(true);
+    expect(startImageJobsWorker).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Function),
+      true,
+    );
     await runtime.resource.close();
   });
   it('disconnects on database connection failure', async () => {
