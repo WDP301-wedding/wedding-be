@@ -75,6 +75,10 @@ are not weakened or cached; timings now identify remaining read costs.
   AI budget; frontend work is separate.
 - Apply additive migration `20261020030000_invitation_external_work` before the new
   application starts. Existing migration files and business history are unchanged.
+- Apply companion migration `20261020031000_invitation_external_work_private` in the
+  same pre-deploy step. It enables RLS without client policies and revokes public,
+  `anon` and `authenticated` grants on internal claims; the backend table owner
+  retains access. This covers Supabase installations with default client grants.
 - Drain old/new in-flight requests during rollout/rollback. Roll back to the prior
   application image if needed; retain the additive table and durable intents/journals.
   Do not drop recovery evidence, expire claims to trigger paid regeneration or
