@@ -84,9 +84,9 @@ generated drift SQL was applied and no historical migration was rewritten.
 
 ## Final quality gates
 
-Final full-suite/coverage and static receipts are recorded below when complete.
-Earlier lint, typecheck and build passed. `npm run audit:ci` passed without high or
-critical findings. An initial direct audit-script invocation failed because it
+Final full-suite/coverage receipts are recorded below when complete. Final
+whole-repository lint, typecheck, production build and OpenAPI check passed on
+the implementation in `67e985a`. `npm run audit:ci` passed without high or critical
+findings. An initial direct audit-script invocation failed because it
 lacked npm execution context; it was corrected by invoking the actual npm command,
 without modifying dependencies, suppressing findings or weakening the audit.
-

@@ -729,7 +729,7 @@ Owner authorized backend option B after review of the frontend timeout proposal.
 This adds an async workflow to completed Invitation Studio scope; it does not reopen
 SPEC-01–05 or replace the separate provider/runtime readiness gates.
 
-- [ ] AIJ-BE-01: Add durable PostgreSQL enqueue/list/status/recovery and evidence-backed
+- [x] AIJ-BE-01: Add durable PostgreSQL enqueue/list/status/recovery and evidence-backed
   Manager reconciliation; generation plus derive worker, current authority and fenced
   restart/replay, bounded input/queue limits, opt-in runtime flag and additive migration.
 - [ ] AIJ-BE-02: Complete native disposable-DB/controlled-provider tests, regression and
