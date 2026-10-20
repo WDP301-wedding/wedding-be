@@ -536,21 +536,24 @@ suite('Durable invitation image jobs', { timeout: 15000 }, () => {
     });
     const table = db.prisma.invitationImageJob;
     const findMany = table.findMany.bind(table);
-    const sweepRead = vi.spyOn(table, 'findMany').mockImplementationOnce((args) =>
-      Object.assign(
-        findMany(args).then(async (rows) => {
-          await services.imageJobs.abandon(
-            f.bookingId,
-            job.jobId,
-            { outcome: 'ABANDONED', evidenceReference: 'reviewed-during-input-sweep' },
-            randomUUID(),
-            f.manager,
-          );
-          return rows;
-        }),
-        { [Symbol.toStringTag]: 'PrismaPromise' as const },
-      ),
-    );
+    const sweepRead = vi.spyOn(table, 'findMany').mockImplementationOnce((args) => {
+      const pending = findMany(args).then(async (rows) => {
+        await services.imageJobs.abandon(
+          f.bookingId,
+          job.jobId,
+          { outcome: 'ABANDONED', evidenceReference: 'reviewed-during-input-sweep' },
+          randomUUID(),
+          f.manager,
+        );
+        return rows;
+      });
+      return {
+        [Symbol.toStringTag]: 'PrismaPromise' as const,
+        then: pending.then.bind(pending),
+        catch: pending.catch.bind(pending),
+        finally: pending.finally.bind(pending),
+      };
+    });
     try {
       await services.imageJobs.runNext();
     } finally {
