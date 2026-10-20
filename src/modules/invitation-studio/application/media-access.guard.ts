@@ -41,11 +41,29 @@ export function createMediaAccessGuard(
   booking: MediaBookingReader | undefined,
   eventStart: MediaEventStartReader | undefined,
 ): MediaAccessGuard {
+  return createResolvedMediaAccessGuard(
+    async (context) => {
+      if (context.accessToken === undefined) throw new NotFoundError();
+      return resolver.resolve(context.accessToken);
+    },
+    booking,
+    eventStart,
+  );
+}
+
+/** Infrastructure may bind a persisted job's current Identity authority here.
+ * HTTP continues to use the bearer-only factory above. */
+export function createResolvedMediaAccessGuard(
+  resolve: (
+    context: MediaRequestContext,
+  ) => Promise<{ accountId: string; roles: readonly string[] }>,
+  booking: MediaBookingReader | undefined,
+  eventStart: MediaEventStartReader | undefined,
+): MediaAccessGuard {
   return {
     async requireAccess(bookingId, context) {
-      if (context.accessToken === undefined) throw new NotFoundError();
       // Current resolver reads enabled account, active/non-expired/non-revoked session.
-      const actor = await resolver.resolve(context.accessToken);
+      const actor = await resolve(context);
       if (actor.accountId !== context.actorId) throw new NotFoundError();
       const role = actor.roles.includes('MANAGER')
         ? 'MANAGER'
