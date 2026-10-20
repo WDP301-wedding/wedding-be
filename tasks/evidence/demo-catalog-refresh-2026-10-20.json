@@ -1,0 +1,921 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-20",
+  "timezone": "Asia/Saigon",
+  "task": "DEMO-CATALOG-01",
+  "authorization": {
+    "humanInstruction": "hãy thực hiện theo đề xuất của bạn đi",
+    "scope": "Retain reusable synthetic PERF data, rename mutable demo labels, publish per-hall seating templates; preserve IDs and immutable history."
+  },
+  "origin": "https://wedding-be-production-e1dc.up.railway.app",
+  "synthetic": true,
+  "catalogApplied": true,
+  "catalogChanges": [
+    {
+      "kind": "consultation-label",
+      "id": "52f0225b-8069-4140-a849-0146ef86e04b",
+      "bookingId": "e80c6f1b-a4fc-4674-a4dd-13ef2601206b",
+      "before": "PERF-TEST-20261016",
+      "after": "DEMO — Tiệc Orchid 50 khách",
+      "applied": true
+    },
+    {
+      "kind": "consultation-label",
+      "id": "dc8b7116-36d7-4e28-b848-e03fb8c0383f",
+      "bookingId": "984bd852-462f-4ede-854a-436b108a1851",
+      "before": "PERF-TEST-20261017-STAFF",
+      "after": "DEMO — Thực hành vận hành 50 khách",
+      "applied": true
+    },
+    {
+      "kind": "hall-label",
+      "id": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+      "before": "PERF-TEST Staff event and Storage",
+      "after": "Sảnh Demo — Tiệc thân mật",
+      "description": "Sảnh mẫu cho tiệc thân mật và thực hành vận hành. Dữ liệu giả lập, không phải sự kiện khách hàng.",
+      "applied": true
+    },
+    {
+      "kind": "layout-successor",
+      "templateId": "2e65cdee-d43c-4df0-8d65-9583939f4f15",
+      "sourceVersionId": "71b4c5e4-cfcd-49ee-8815-a692b892d8cd",
+      "hallId": "10000000-0000-4000-8000-000000000011",
+      "name": "Orchid — 5 bàn, 50 chỗ (demo)",
+      "versionId": "291b5703-bc94-51aa-afa4-683bc49ff818",
+      "applied": true
+    },
+    {
+      "kind": "layout-successor",
+      "templateId": "76191cc8-faee-4248-b709-e011752512fe",
+      "sourceVersionId": "3060b9f4-2ed1-4664-9f9f-3f2b3428d885",
+      "hallId": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+      "name": "Tiệc thân mật — 5 bàn, 50 chỗ (demo)",
+      "versionId": "1a5bc588-5c9a-5721-a7c1-f58cc4ff890f",
+      "applied": true
+    },
+    {
+      "kind": "new-layout",
+      "hallId": "10000000-0000-4000-8000-000000000010",
+      "templateId": "e3d0ef95-c3d7-5ebe-ae86-9363f3583f98",
+      "versionId": "856a52a0-c7e1-51ae-a381-6d2093eb1ef1",
+      "name": "Lotus — 10 bàn, 100 chỗ",
+      "tables": 10,
+      "minGuests": 1,
+      "maxGuests": 100,
+      "applied": true
+    },
+    {
+      "kind": "new-layout",
+      "hallId": "10000000-0000-4000-8000-000000000010",
+      "templateId": "dbdc4b57-1b8a-5ae4-ab70-20d693679e16",
+      "versionId": "8ada4b60-7397-54f0-a0e6-f97af1cc1854",
+      "name": "Lotus — 20 bàn, 200 chỗ",
+      "tables": 20,
+      "minGuests": 101,
+      "maxGuests": 200,
+      "applied": true
+    },
+    {
+      "kind": "new-layout",
+      "hallId": "10000000-0000-4000-8000-000000000010",
+      "templateId": "85c3b13c-740e-5a91-a072-6b42208c575a",
+      "versionId": "84b7ee77-af39-597c-a152-20a19d15c30a",
+      "name": "Lotus — 30 bàn, 300 chỗ",
+      "tables": 30,
+      "minGuests": 201,
+      "maxGuests": 300,
+      "applied": true
+    },
+    {
+      "kind": "new-layout",
+      "hallId": "10000000-0000-4000-8000-000000000011",
+      "templateId": "f4ede61b-9999-5ee2-a13e-55d28f0613b0",
+      "versionId": "14e0f79d-22f2-5ad7-a6cc-dca5639d3658",
+      "name": "Orchid — 5 bàn, 50 chỗ",
+      "tables": 5,
+      "minGuests": 1,
+      "maxGuests": 50,
+      "applied": true
+    },
+    {
+      "kind": "new-layout",
+      "hallId": "10000000-0000-4000-8000-000000000011",
+      "templateId": "9b3f64ae-e3e0-52ed-a980-c911ef88b292",
+      "versionId": "c89fa2ac-2d94-564a-a834-0494b9000bf5",
+      "name": "Orchid — 10 bàn, 100 chỗ",
+      "tables": 10,
+      "minGuests": 51,
+      "maxGuests": 100,
+      "applied": true
+    },
+    {
+      "kind": "new-layout",
+      "hallId": "10000000-0000-4000-8000-000000000011",
+      "templateId": "055ef5ad-d225-55c6-a76a-7c3f31d79d39",
+      "versionId": "c3f8e9b3-3864-5a9c-a9c8-7779ba90e8c1",
+      "name": "Orchid — 12 bàn, 120 chỗ",
+      "tables": 12,
+      "minGuests": 101,
+      "maxGuests": 120,
+      "applied": true
+    },
+    {
+      "kind": "new-layout",
+      "hallId": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+      "templateId": "32f6d2dd-a85d-501b-a301-f9edf010fe75",
+      "versionId": "55a069da-c836-535d-a555-22985c02db4c",
+      "name": "Tiệc thân mật — 5 bàn, 50 chỗ",
+      "tables": 5,
+      "minGuests": 1,
+      "maxGuests": 50,
+      "applied": true
+    },
+    {
+      "kind": "new-layout",
+      "hallId": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+      "templateId": "3789b691-5486-5a84-aa3f-c3d98eb860b5",
+      "versionId": "b86fb59e-9c6a-55c8-acb8-111e6cfff5c5",
+      "name": "Tiệc thân mật — 10 bàn, 100 chỗ",
+      "tables": 10,
+      "minGuests": 51,
+      "maxGuests": 100,
+      "applied": true
+    },
+    {
+      "kind": "new-layout",
+      "hallId": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+      "templateId": "8b4f9e04-e630-5ca1-a665-4e02d477cc5d",
+      "versionId": "83b47982-6c02-5393-af03-ddd63fdb85ab",
+      "name": "Tiệc thân mật — 12 bàn, 120 chỗ",
+      "tables": 12,
+      "minGuests": 101,
+      "maxGuests": 120,
+      "applied": true
+    }
+  ],
+  "guestLabels": {
+    "count": 16,
+    "allRenamed": true,
+    "otherFieldsPreserved": true,
+    "onlyListSequenceAdvanced": true,
+    "oldHistoryPreserved": true,
+    "appendedHistory": 16,
+    "mappings": [
+      {
+        "bookingId": "e80c6f1b-a4fc-4674-a4dd-13ef2601206b",
+        "guestId": "6da30a72-30ea-4488-b39b-93c5111f1179",
+        "before": "Khách PERF 01",
+        "after": "Khách Demo 01"
+      },
+      {
+        "bookingId": "e80c6f1b-a4fc-4674-a4dd-13ef2601206b",
+        "guestId": "9b3c6ac3-c56e-470d-9c5c-e5f863715ea7",
+        "before": "Khách PERF 02",
+        "after": "Khách Demo 02"
+      },
+      {
+        "bookingId": "e80c6f1b-a4fc-4674-a4dd-13ef2601206b",
+        "guestId": "dd1283b2-fe0f-4ce1-9d5b-db0007fc76eb",
+        "before": "Khách PERF 03",
+        "after": "Khách Demo 03"
+      },
+      {
+        "bookingId": "e80c6f1b-a4fc-4674-a4dd-13ef2601206b",
+        "guestId": "ae7acd38-8df2-4346-bb2f-819047c84437",
+        "before": "Khách PERF 04",
+        "after": "Khách Demo 04"
+      },
+      {
+        "bookingId": "e80c6f1b-a4fc-4674-a4dd-13ef2601206b",
+        "guestId": "4b934ff9-5353-41ae-b6ee-27c11b3afc0d",
+        "before": "Khách PERF 05",
+        "after": "Khách Demo 05"
+      },
+      {
+        "bookingId": "e80c6f1b-a4fc-4674-a4dd-13ef2601206b",
+        "guestId": "fc4685a1-73b0-41af-9eba-045935902b9d",
+        "before": "Khách PERF 06",
+        "after": "Khách Demo 06"
+      },
+      {
+        "bookingId": "e80c6f1b-a4fc-4674-a4dd-13ef2601206b",
+        "guestId": "96231218-8a27-47d3-a9c6-5516837875a9",
+        "before": "Khách PERF 07",
+        "after": "Khách Demo 07"
+      },
+      {
+        "bookingId": "e80c6f1b-a4fc-4674-a4dd-13ef2601206b",
+        "guestId": "71d89d83-3577-4191-8584-676bc0ba3be6",
+        "before": "Khách PERF 08",
+        "after": "Khách Demo 08"
+      },
+      {
+        "bookingId": "984bd852-462f-4ede-854a-436b108a1851",
+        "guestId": "c5c7d81d-fd5f-483f-8c26-8caa2f111ebe",
+        "before": "Khách PERF 01",
+        "after": "Khách Demo 01"
+      },
+      {
+        "bookingId": "984bd852-462f-4ede-854a-436b108a1851",
+        "guestId": "7a2d047b-d2ed-4b86-acf6-e4effc8d1b84",
+        "before": "Khách PERF 02",
+        "after": "Khách Demo 02"
+      },
+      {
+        "bookingId": "984bd852-462f-4ede-854a-436b108a1851",
+        "guestId": "85e20fc0-4e20-4e4b-96de-faaf1f6a0bf9",
+        "before": "Khách PERF 03",
+        "after": "Khách Demo 03"
+      },
+      {
+        "bookingId": "984bd852-462f-4ede-854a-436b108a1851",
+        "guestId": "44d774b5-f4f4-4dc0-b040-ba23816f772a",
+        "before": "Khách PERF 04",
+        "after": "Khách Demo 04"
+      },
+      {
+        "bookingId": "984bd852-462f-4ede-854a-436b108a1851",
+        "guestId": "31ff9238-8d11-4598-ac80-1a1f2727e92b",
+        "before": "Khách PERF 05",
+        "after": "Khách Demo 05"
+      },
+      {
+        "bookingId": "984bd852-462f-4ede-854a-436b108a1851",
+        "guestId": "32168e1b-4245-4d0d-b7ef-6a728093ed84",
+        "before": "Khách PERF 06",
+        "after": "Khách Demo 06"
+      },
+      {
+        "bookingId": "984bd852-462f-4ede-854a-436b108a1851",
+        "guestId": "e0b311e1-3a9e-46c4-b79e-af9b24523974",
+        "before": "Khách PERF 07",
+        "after": "Khách Demo 07"
+      },
+      {
+        "bookingId": "984bd852-462f-4ede-854a-436b108a1851",
+        "guestId": "b8cd6bb0-756b-4078-a95a-96bf4fe48baa",
+        "before": "Khách PERF 08",
+        "after": "Khách Demo 08"
+      }
+    ],
+    "note": "All sixteen mappings come from retained original seed receipts; final audit reconstructs and matches original Guest/Workspace hashes and retained GuestHistory."
+  },
+  "preservation": {
+    "tables": {
+      "Booking": true,
+      "BookingSlotHold": true,
+      "GuestPlanRevision": true,
+      "GuestGroup": true,
+      "SeatingPlan": true,
+      "SeatingPlanRevision": true,
+      "StaffConfiguration": true,
+      "StaffAssignment": true,
+      "StaffHistory": true,
+      "StaffCheckInRecord": true,
+      "CommercialContractRevision": true,
+      "CommercialAppendixRevision": true,
+      "FinalInvoiceRevision": true,
+      "BillingLedgerEntry": true,
+      "BillingPaymentAttempt": true
+    },
+    "baseline": {
+      "Booking": {
+        "count": 27,
+        "sha256": "a2e6816f2395575b326a20c378ba5ac3a9a7e9cbe41ec28a71680067c47f5dea"
+      },
+      "BookingSlotHold": {
+        "count": 17,
+        "sha256": "51775b16412175512bf44bbbba29adf417fe1d64957190563fbcb434ff7ca632"
+      },
+      "GuestWorkspace": {
+        "count": 11,
+        "sha256": "b5f7505e8b8ca15952d02e5e2c7dcdaf313d5cfe939f1a4622497e57ac7ced15"
+      },
+      "GuestPlanRevision": {
+        "count": 16,
+        "sha256": "7aa9c3e5666620d977da3a1e5fbe3639e8757785da271a38ad06e559fab750f9"
+      },
+      "Guest": {
+        "count": 29,
+        "sha256": "3373c0106092d95a89259bd6b464e5a02904893ba7017f5d2d954c35a8ead12e"
+      },
+      "GuestGroup": {
+        "count": 48,
+        "sha256": "65b1cc830b0ad9c601694b219129cd30f5fd6f91043ecd9660e3998d80f0c110"
+      },
+      "GuestHistory": {
+        "count": 77,
+        "sha256": "662a0e277ef0d9f19e68875676c39d78f9a4693808ff79ccc44c31db50804776"
+      },
+      "SeatingPlan": {
+        "count": 4,
+        "sha256": "aacbbd9feb751143f3348d6cc4846949b80c38484cca224a34fa155f0c8e6993"
+      },
+      "SeatingPlanRevision": {
+        "count": 13,
+        "sha256": "c3cea521040c54b51ef9104e05800f31b82ba9b5a7212caa2a1ea454d07758b8"
+      },
+      "StaffConfiguration": {
+        "count": 8,
+        "sha256": "bf3471348980d2d34d505b6d7d666ff14a51058e48a2a5b8d06e75a0e130b59d"
+      },
+      "StaffAssignment": {
+        "count": 2,
+        "sha256": "2f5b76d1861c2685aac6c9a2b1c5dd1d37a920bf8d40785f9bfeead744a15622"
+      },
+      "StaffHistory": {
+        "count": 12,
+        "sha256": "31ca3ef12114562ee5c8e070e455acc22e10f0616f339b273d384fa87bfda364"
+      },
+      "StaffCheckInRecord": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "CommercialContractRevision": {
+        "count": 9,
+        "sha256": "8a6c4e5d4a28d0475bbe735bbaf5598605d2ef131ef76a89e7236eca056e454a"
+      },
+      "CommercialAppendixRevision": {
+        "count": 2,
+        "sha256": "137fa98eb34fee1b9de05a8e792090aeca11e7acf7db5bfa30df2d9b13d15d14"
+      },
+      "FinalInvoiceRevision": {
+        "count": 1,
+        "sha256": "a5cc65388d67284b4648a16d9e6a453e456f252d40798ce7318b68cf0807e082"
+      },
+      "BillingLedgerEntry": {
+        "count": 28,
+        "sha256": "3871ce9184a42d9ce8f7a852b88ce1381b0ea6d5bc01e5dbdd070edc8ec9c972"
+      },
+      "BillingPaymentAttempt": {
+        "count": 17,
+        "sha256": "2121195415a63d1bba4d802c15cbc003261b64e9118a6d21f6abc5a5332efa35"
+      }
+    },
+    "oldCatalogContentAndGeometryPreserved": true,
+    "financialSnapshotsUnchanged": true,
+    "selectedSeatingUnchanged": true,
+    "confirmedSlotConflicts": 0
+  },
+  "publishedLayouts": [
+    {
+      "id": "10000000-0000-4000-8000-000000000050",
+      "hallId": "10000000-0000-4000-8000-000000000010",
+      "versionId": "10000000-0000-4000-8000-000000000051",
+      "name": "Lotus Compact",
+      "minGuests": 80,
+      "maxGuests": 120,
+      "tables": 2,
+      "seats": 120
+    },
+    {
+      "id": "10000000-0000-4000-8000-000000000054",
+      "hallId": "10000000-0000-4000-8000-000000000010",
+      "versionId": "10000000-0000-4000-8000-000000000055",
+      "name": "Lotus Grand",
+      "minGuests": 150,
+      "maxGuests": 240,
+      "tables": 3,
+      "seats": 240
+    },
+    {
+      "id": "e3d0ef95-c3d7-5ebe-ae86-9363f3583f98",
+      "hallId": "10000000-0000-4000-8000-000000000010",
+      "versionId": "856a52a0-c7e1-51ae-a381-6d2093eb1ef1",
+      "name": "Lotus — 10 bàn, 100 chỗ",
+      "minGuests": 1,
+      "maxGuests": 100,
+      "tables": 10,
+      "seats": 100
+    },
+    {
+      "id": "dbdc4b57-1b8a-5ae4-ab70-20d693679e16",
+      "hallId": "10000000-0000-4000-8000-000000000010",
+      "versionId": "8ada4b60-7397-54f0-a0e6-f97af1cc1854",
+      "name": "Lotus — 20 bàn, 200 chỗ",
+      "minGuests": 101,
+      "maxGuests": 200,
+      "tables": 20,
+      "seats": 200
+    },
+    {
+      "id": "85c3b13c-740e-5a91-a072-6b42208c575a",
+      "hallId": "10000000-0000-4000-8000-000000000010",
+      "versionId": "84b7ee77-af39-597c-a152-20a19d15c30a",
+      "name": "Lotus — 30 bàn, 300 chỗ",
+      "minGuests": 201,
+      "maxGuests": 300,
+      "tables": 30,
+      "seats": 300
+    },
+    {
+      "id": "f4ede61b-9999-5ee2-a13e-55d28f0613b0",
+      "hallId": "10000000-0000-4000-8000-000000000011",
+      "versionId": "14e0f79d-22f2-5ad7-a6cc-dca5639d3658",
+      "name": "Orchid — 5 bàn, 50 chỗ",
+      "minGuests": 1,
+      "maxGuests": 50,
+      "tables": 5,
+      "seats": 50
+    },
+    {
+      "id": "9b3f64ae-e3e0-52ed-a980-c911ef88b292",
+      "hallId": "10000000-0000-4000-8000-000000000011",
+      "versionId": "c89fa2ac-2d94-564a-a834-0494b9000bf5",
+      "name": "Orchid — 10 bàn, 100 chỗ",
+      "minGuests": 51,
+      "maxGuests": 100,
+      "tables": 10,
+      "seats": 100
+    },
+    {
+      "id": "055ef5ad-d225-55c6-a76a-7c3f31d79d39",
+      "hallId": "10000000-0000-4000-8000-000000000011",
+      "versionId": "c3f8e9b3-3864-5a9c-a9c8-7779ba90e8c1",
+      "name": "Orchid — 12 bàn, 120 chỗ",
+      "minGuests": 101,
+      "maxGuests": 120,
+      "tables": 12,
+      "seats": 120
+    },
+    {
+      "id": "2e65cdee-d43c-4df0-8d65-9583939f4f15",
+      "hallId": "10000000-0000-4000-8000-000000000011",
+      "versionId": "291b5703-bc94-51aa-afa4-683bc49ff818",
+      "name": "Orchid — 5 bàn, 50 chỗ (demo)",
+      "minGuests": 50,
+      "maxGuests": 50,
+      "tables": 5,
+      "seats": 50
+    },
+    {
+      "id": "32f6d2dd-a85d-501b-a301-f9edf010fe75",
+      "hallId": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+      "versionId": "55a069da-c836-535d-a555-22985c02db4c",
+      "name": "Tiệc thân mật — 5 bàn, 50 chỗ",
+      "minGuests": 1,
+      "maxGuests": 50,
+      "tables": 5,
+      "seats": 50
+    },
+    {
+      "id": "3789b691-5486-5a84-aa3f-c3d98eb860b5",
+      "hallId": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+      "versionId": "b86fb59e-9c6a-55c8-acb8-111e6cfff5c5",
+      "name": "Tiệc thân mật — 10 bàn, 100 chỗ",
+      "minGuests": 51,
+      "maxGuests": 100,
+      "tables": 10,
+      "seats": 100
+    },
+    {
+      "id": "8b4f9e04-e630-5ca1-a665-4e02d477cc5d",
+      "hallId": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+      "versionId": "83b47982-6c02-5393-af03-ddd63fdb85ab",
+      "name": "Tiệc thân mật — 12 bàn, 120 chỗ",
+      "minGuests": 101,
+      "maxGuests": 120,
+      "tables": 12,
+      "seats": 120
+    },
+    {
+      "id": "76191cc8-faee-4248-b709-e011752512fe",
+      "hallId": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+      "versionId": "1a5bc588-5c9a-5721-a7c1-f58cc4ff890f",
+      "name": "Tiệc thân mật — 5 bàn, 50 chỗ (demo)",
+      "minGuests": 50,
+      "maxGuests": 50,
+      "tables": 5,
+      "seats": 50
+    }
+  ],
+  "replay": {
+    "passed": true,
+    "changes": 0
+  },
+  "requestReceipts": [
+    {
+      "path": "/auth/web-sessions",
+      "method": "POST",
+      "status": 201,
+      "requestId": "0b3737bb-868f-4d13-a20f-11a99c5dd637"
+    },
+    {
+      "path": "/auth/me",
+      "method": "GET",
+      "status": 200,
+      "requestId": "23bf2b5c-ceb4-481c-ae0d-f153411b0220"
+    },
+    {
+      "path": "/management/catalog/halls?limit=100",
+      "method": "GET",
+      "status": 200,
+      "requestId": "aa2be12e-f1b4-4070-a68f-5d4f5054971b"
+    },
+    {
+      "path": "/management/catalog/layout-templates?limit=100",
+      "method": "GET",
+      "status": 200,
+      "requestId": "9baf442c-7831-4504-9273-d4b4ad713713"
+    },
+    {
+      "path": "/management/catalog/halls/be5d4496-de6a-4666-8d17-3202b1f873ed",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "b8fdb1dc-54b3-44f5-9698-fe0f28e25e27"
+    },
+    {
+      "path": "/management/catalog/layout-templates/2e65cdee-d43c-4df0-8d65-9583939f4f15/versions",
+      "method": "POST",
+      "status": 201,
+      "requestId": "5b481b4b-9018-43f3-9790-52f149e73c55"
+    },
+    {
+      "path": "/management/catalog/layout-templates/2e65cdee-d43c-4df0-8d65-9583939f4f15",
+      "method": "GET",
+      "status": 200,
+      "requestId": "cd4206b6-7790-46be-a49c-bc92921b3a86"
+    },
+    {
+      "path": "/management/catalog/layout-template-versions/291b5703-bc94-51aa-afa4-683bc49ff818",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "41139e75-0888-452f-a398-2a782f403840"
+    },
+    {
+      "path": "/management/catalog/layout-template-versions/291b5703-bc94-51aa-afa4-683bc49ff818/publication",
+      "method": "POST",
+      "status": 201,
+      "requestId": "3cb097c1-5540-48fe-adfc-6ec12e06a1c7"
+    },
+    {
+      "path": "/management/catalog/layout-templates/76191cc8-faee-4248-b709-e011752512fe/versions",
+      "method": "POST",
+      "status": 201,
+      "requestId": "c21ca4dd-4d48-4aed-8ad5-3bfb192bb3dd"
+    },
+    {
+      "path": "/management/catalog/layout-templates/76191cc8-faee-4248-b709-e011752512fe",
+      "method": "GET",
+      "status": 200,
+      "requestId": "9b8c28ae-b223-4fa5-bfd1-62d805d4185c"
+    },
+    {
+      "path": "/management/catalog/layout-template-versions/1a5bc588-5c9a-5721-a7c1-f58cc4ff890f",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "323d2543-db79-4cd1-86ae-86258f609772"
+    },
+    {
+      "path": "/management/catalog/layout-template-versions/1a5bc588-5c9a-5721-a7c1-f58cc4ff890f/publication",
+      "method": "POST",
+      "status": 201,
+      "requestId": "519fa4d2-32bd-452d-9bfc-68028add8298"
+    },
+    {
+      "path": "/management/catalog/layout-templates",
+      "method": "POST",
+      "status": 201,
+      "requestId": "de189f91-4390-4c6a-bde1-6221ef90cbbe"
+    },
+    {
+      "path": "/management/catalog/layout-template-versions/856a52a0-c7e1-51ae-a381-6d2093eb1ef1/publication",
+      "method": "POST",
+      "status": 201,
+      "requestId": "ed2fd5bd-fb1a-4a4e-9fbc-a31cba29eb97"
+    },
+    {
+      "path": "/management/catalog/layout-templates",
+      "method": "POST",
+      "status": 201,
+      "requestId": "90b50ca6-211c-416c-a7c6-5416e497e5e3"
+    },
+    {
+      "path": "/management/catalog/layout-template-versions/8ada4b60-7397-54f0-a0e6-f97af1cc1854/publication",
+      "method": "POST",
+      "status": 201,
+      "requestId": "b2aa88c5-7333-4553-9af4-0e230a48ac62"
+    },
+    {
+      "path": "/management/catalog/layout-templates",
+      "method": "POST",
+      "status": 201,
+      "requestId": "a04be7db-aba7-4ea6-842d-b8ecbcecb025"
+    },
+    {
+      "path": "/management/catalog/layout-template-versions/84b7ee77-af39-597c-a152-20a19d15c30a/publication",
+      "method": "POST",
+      "status": 201,
+      "requestId": "fdf4e16b-0329-44db-9725-bfc8e4ddab99"
+    },
+    {
+      "path": "/management/catalog/layout-templates",
+      "method": "POST",
+      "status": 201,
+      "requestId": "69cf2e35-cd54-4696-8c52-cd227f549139"
+    },
+    {
+      "path": "/management/catalog/layout-template-versions/14e0f79d-22f2-5ad7-a6cc-dca5639d3658/publication",
+      "method": "POST",
+      "status": 201,
+      "requestId": "975dac4b-2277-48fe-8ece-af352c254da9"
+    },
+    {
+      "path": "/management/catalog/layout-templates",
+      "method": "POST",
+      "status": 201,
+      "requestId": "b2158bf4-964b-4079-994b-2a6a2086d728"
+    },
+    {
+      "path": "/management/catalog/layout-template-versions/c89fa2ac-2d94-564a-a834-0494b9000bf5/publication",
+      "method": "POST",
+      "status": 201,
+      "requestId": "7edd0968-6e14-4dd7-abfb-0c84ac1194ff"
+    },
+    {
+      "path": "/management/catalog/layout-templates",
+      "method": "POST",
+      "status": 201,
+      "requestId": "a6d025fc-65cb-416e-b98f-f8096426107d"
+    },
+    {
+      "path": "/management/catalog/layout-template-versions/c3f8e9b3-3864-5a9c-a9c8-7779ba90e8c1/publication",
+      "method": "POST",
+      "status": 201,
+      "requestId": "ae7f536e-6a5b-43bc-8f29-5e5780cb9700"
+    },
+    {
+      "path": "/management/catalog/layout-templates",
+      "method": "POST",
+      "status": 201,
+      "requestId": "7cffe281-d353-491a-bd98-7a7b755c414f"
+    },
+    {
+      "path": "/management/catalog/layout-template-versions/55a069da-c836-535d-a555-22985c02db4c/publication",
+      "method": "POST",
+      "status": 201,
+      "requestId": "81c0a340-bf36-4ba4-9376-fe4add84d7f0"
+    },
+    {
+      "path": "/management/catalog/layout-templates",
+      "method": "POST",
+      "status": 201,
+      "requestId": "b160197d-b0b3-411a-b281-6de294c611ad"
+    },
+    {
+      "path": "/management/catalog/layout-template-versions/b86fb59e-9c6a-55c8-acb8-111e6cfff5c5/publication",
+      "method": "POST",
+      "status": 201,
+      "requestId": "423f4146-c861-44c9-bf07-0382d939ead7"
+    },
+    {
+      "path": "/management/catalog/layout-templates",
+      "method": "POST",
+      "status": 201,
+      "requestId": "c2457b09-3aee-4e79-8808-0aa3ad3d3e9e"
+    },
+    {
+      "path": "/management/catalog/layout-template-versions/83b47982-6c02-5393-af03-ddd63fdb85ab/publication",
+      "method": "POST",
+      "status": 201,
+      "requestId": "0eeaa3d8-5586-4efb-beab-eda25b2d3352"
+    },
+    {
+      "path": "/auth/sessions/current",
+      "method": "DELETE",
+      "status": 204,
+      "requestId": "22245e78-c5a2-406c-9ecf-76c915e9eaa0"
+    },
+    {
+      "path": "/auth/web-sessions",
+      "method": "POST",
+      "status": 201,
+      "requestId": "3e4caa4b-ac65-43d1-a094-9e432de27965"
+    },
+    {
+      "path": "/auth/me",
+      "method": "GET",
+      "status": 200,
+      "requestId": "1fa746c0-a928-4a5e-9460-3bb1d898b51e"
+    },
+    {
+      "path": "/management/catalog/halls?limit=100",
+      "method": "GET",
+      "status": 200,
+      "requestId": "cf14f81a-e8e7-4218-b84b-42c6d62589e0"
+    },
+    {
+      "path": "/management/catalog/layout-templates?limit=100",
+      "method": "GET",
+      "status": 200,
+      "requestId": "019134b0-d842-4e15-9dca-32f509c04167"
+    },
+    {
+      "path": "/auth/sessions/current",
+      "method": "DELETE",
+      "status": 204,
+      "requestId": "98c39736-500e-4206-977a-25412d6649ec"
+    },
+    {
+      "path": "/auth/web-sessions",
+      "method": "POST",
+      "status": 201,
+      "requestId": "f056eb47-ae5b-495e-9119-77f6f86c002b"
+    },
+    {
+      "path": "/auth/me",
+      "method": "GET",
+      "status": 200,
+      "requestId": "fe0b9e55-a73c-4064-af00-658f325e783d"
+    },
+    {
+      "path": "/management/catalog/halls?limit=100",
+      "method": "GET",
+      "status": 200,
+      "requestId": "60eb859f-0c9e-4049-ae20-ef3e121e056e"
+    },
+    {
+      "path": "/management/catalog/layout-templates?limit=100",
+      "method": "GET",
+      "status": 200,
+      "requestId": "52d2f930-5665-499b-a1c8-0412c0247655"
+    },
+    {
+      "path": "/bookings/984bd852-462f-4ede-854a-436b108a1851/guests/31ff9238-8d11-4598-ac80-1a1f2727e92b",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "d73c71f1-a6d4-450b-a45c-df39f148f9ee"
+    },
+    {
+      "path": "/bookings/984bd852-462f-4ede-854a-436b108a1851/guests/32168e1b-4245-4d0d-b7ef-6a728093ed84",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "8808d13c-e773-4b29-89e6-f59e43879f28"
+    },
+    {
+      "path": "/bookings/984bd852-462f-4ede-854a-436b108a1851/guests/44d774b5-f4f4-4dc0-b040-ba23816f772a",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "1fc1a0d6-169d-4aea-83a0-c342485f38e0"
+    },
+    {
+      "path": "/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/guests/4b934ff9-5353-41ae-b6ee-27c11b3afc0d",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "447c9a34-d281-425e-ad5d-0bb56c982506"
+    },
+    {
+      "path": "/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/guests/6da30a72-30ea-4488-b39b-93c5111f1179",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "8c939c75-2afc-408a-91a8-efc8015f9a3f"
+    },
+    {
+      "path": "/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/guests/71d89d83-3577-4191-8584-676bc0ba3be6",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "9b01d05b-8e89-427a-8e65-fc1ed161a61a"
+    },
+    {
+      "path": "/bookings/984bd852-462f-4ede-854a-436b108a1851/guests/7a2d047b-d2ed-4b86-acf6-e4effc8d1b84",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "f6bbdd8a-36ec-4983-996a-fa7992c3ffea"
+    },
+    {
+      "path": "/bookings/984bd852-462f-4ede-854a-436b108a1851/guests/85e20fc0-4e20-4e4b-96de-faaf1f6a0bf9",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "ad7cb3b6-60f8-44c1-be27-ea91e31ee6f1"
+    },
+    {
+      "path": "/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/guests/96231218-8a27-47d3-a9c6-5516837875a9",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "f0da89c4-7bf0-45f2-8bf4-ad0209495932"
+    },
+    {
+      "path": "/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/guests/9b3c6ac3-c56e-470d-9c5c-e5f863715ea7",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "dca4badd-19d5-4b9b-bada-cb01a9615a38"
+    },
+    {
+      "path": "/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/guests/ae7acd38-8df2-4346-bb2f-819047c84437",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "341e2918-b6d5-4da0-8fad-e39965bf5396"
+    },
+    {
+      "path": "/bookings/984bd852-462f-4ede-854a-436b108a1851/guests/b8cd6bb0-756b-4078-a95a-96bf4fe48baa",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "5eaf1dbf-fd62-4044-a7fa-4fb37d8c908d"
+    },
+    {
+      "path": "/bookings/984bd852-462f-4ede-854a-436b108a1851/guests/c5c7d81d-fd5f-483f-8c26-8caa2f111ebe",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "e7d5fd23-86a7-476e-8786-50ce0a6c1691"
+    },
+    {
+      "path": "/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/guests/dd1283b2-fe0f-4ce1-9d5b-db0007fc76eb",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "32fe2bd3-9587-4e48-a078-e0a86f20220c"
+    },
+    {
+      "path": "/bookings/984bd852-462f-4ede-854a-436b108a1851/guests/e0b311e1-3a9e-46c4-b79e-af9b24523974",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "debdf629-b706-4a19-8b35-ad690e217499"
+    },
+    {
+      "path": "/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/guests/fc4685a1-73b0-41af-9eba-045935902b9d",
+      "method": "PATCH",
+      "status": 200,
+      "requestId": "2a1a4fad-bdbb-49a5-be0c-0855e21bceac"
+    }
+  ],
+  "cleanup": {
+    "ownedSessionsRevoked": true,
+    "browserLoggedOut": true
+  },
+  "browser": {
+    "site": "https://wedding-web-silk.vercel.app",
+    "reads": [
+      "Public renamed Hall detail after existing 300-second cache revalidation",
+      "Orchid 50-person fixture seating options",
+      "Historical operational fixture seating options"
+    ],
+    "viewports": [
+      "1020px desktop screenshot",
+      "390px mobile screenshot"
+    ],
+    "screenshots": [
+      "output/playwright/demo-refresh-orchid-desktop.png",
+      "output/playwright/demo-refresh-orchid-mobile.png",
+      "output/playwright/demo-refresh-hall-mobile.png"
+    ],
+    "seatingMutation": false,
+    "limits": [
+      "Historical proposal/contract snapshots retain original labels.",
+      "Existing mobile table uses horizontal scrolling.",
+      "Initial pre-refresh Hall image request returned 400; refreshed renamed detail had zero console errors. No image/provider bytes were modified."
+    ]
+  },
+  "checks": {
+    "focusedTests": {
+      "passed": 3
+    },
+    "typecheck": "PASS",
+    "build": "PASS",
+    "contract": {
+      "passed": 71
+    },
+    "openapiGenerate": "PASS",
+    "openapiCheck": "PASS",
+    "prettier": "PASS",
+    "changedFileLint": "PASS",
+    "authoredCodeLint": "PASS; generated Prisma and local output excluded through CLI only",
+    "defaultLint": "Default heap exhausted while traversing pre-existing generated/operator output; no lint configuration changed",
+    "fullTests": {
+      "command": "node scripts/staff-operations.verify.mjs --maxWorkers=2",
+      "passed": 2037,
+      "failed": 1,
+      "workerErrors": 7,
+      "filesPassed": 284,
+      "filesFailed": 1,
+      "filesTotal": 292,
+      "testsTotal": 2135,
+      "durationSeconds": 859.29,
+      "error": "idempotency repository concurrent-claim test: pg-pool connect timeout; seven Windows workers exited with code 3221226505",
+      "status": "NOT_GREEN",
+      "focusedRecovery": {
+        "filesPassed": 7,
+        "filesTotal": 8,
+        "testsPassed": 108,
+        "testsTotal": 112,
+        "workerErrors": 1,
+        "workerErrorFile": "tests/integration/booking-lifecycle/runtime.test.ts",
+        "workerExitCode": 3221226505,
+        "idempotencyConnectTimeoutReproduced": false,
+        "remainingFileRecovery": {
+          "command": "node scripts/staff-operations.verify.mjs tests/integration/booking-lifecycle/runtime.test.ts --maxWorkers=1",
+          "testsPassed": 5,
+          "filesPassed": 1,
+          "status": "PASS",
+          "durationSeconds": 12.68
+        },
+        "configurationChanged": false
+      },
+      "allAffectedFilesPassedOnRetry": true,
+      "continuousFullRunPassed": false
+    }
+  },
+  "limits": [
+    "No real funds, provider settlement, paid generation, notification delivery or check-in performed.",
+    "No application deployment, migration, frontend code or production-readiness change.",
+    "Existing synthetic fixture reservations retained."
+  ]
+}
