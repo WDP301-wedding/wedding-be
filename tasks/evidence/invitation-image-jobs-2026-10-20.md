@@ -42,6 +42,12 @@ hidden console when starting local PostgreSQL; hiding only a detached Node-spawn
 parent was insufficient. These temporary QA launchers are local artifacts, not
 application runtime dependencies or registered Windows services.
 
+All three task clusters (ports 55455, 55456, 55457) are now stopped. The final
+cluster stopped gracefully with exit 0 after checking both its PID file and the
+connected server's data directory. No listener remains on these task ports. Raw
+QA artifacts are retained locally under ignored
+`.local-demo/invitation-image-jobs-validation/`; they are not part of the PR.
+
 ## Regression and review evidence
 
 - Focused native-DB, controlled-provider, runtime/config and worker run: **159
@@ -61,6 +67,10 @@ application runtime dependencies or registered Windows services.
   test fails. Restore the exact source bytes and both worker tests pass. Original
   and restored SHA-256:
   `6b60d2a9e82cb0475491b0ac51607e92ae2db67321659f2f10bdc9703dd1b81d`.
+- The expiry test also detects a real mutation: remove both observed-state/input
+  comparisons and its business assertion fails. Restore the exact source and it
+  passes. Original/restored service SHA-256:
+  `fa6d9aa03a29a13884a7483d8fd9cbe34cf5812be2f1eebaa964732ff8e3ecf6`.
 - Review covered authorization/input boundaries, bounded polling/cleanup/admission,
   no DB lock during external work, token fencing, privacy, provider replay and
   additive/backwards-compatible contracts. No quality thresholds, old assertions,
@@ -84,9 +94,39 @@ generated drift SQL was applied and no historical migration was rewritten.
 
 ## Final quality gates
 
-Final full-suite/coverage receipts are recorded below when complete. Final
-whole-repository lint, typecheck, production build and OpenAPI check passed on
-the implementation in `67e985a`. `npm run audit:ci` passed without high or critical
-findings. An initial direct audit-script invocation failed because it
-lacked npm execution context; it was corrected by invoking the actual npm command,
-without modifying dependencies, suppressing findings or weakening the audit.
+PR: [#82](https://github.com/WDP301-wedding/wedding-be/pull/82), kept in draft for
+owner review. [Backend CI run 240](https://github.com/WDP301-wedding/wedding-be/actions/runs/39441752927)
+is successful on exact source `fea8e8bf161b03a15792abab7e8d8ad23462c160`, using
+PostgreSQL 17.11 and the repository's unchanged workflow and coverage thresholds:
+
+| Gate | Result |
+| --- | --- |
+| Formatting, full lint, typecheck, build, OpenAPI check, dependency audit | Passed |
+| Unit tests | 165 files, 1482 tests passed |
+| Contract tests | 23 files, 99 tests passed |
+| Native PostgreSQL integration | 114 files, 679 tests passed |
+| Full suite with PostgreSQL and coverage | 302 files, 2260 tests passed |
+| Overall coverage | 97.58% lines, 93.60% branches |
+| Per-file gate | Existing 80% lines and 80% branches passed |
+
+The [machine-readable receipt](./invitation-image-jobs-2026-10-20.json) records
+the verified source, CI run, counts, digests and local PostgreSQL shutdown scope.
+
+No skipped tests or lowered thresholds contribute to these counts. Local final
+repository formatting, full lint, typecheck, production build, OpenAPI check and
+the actual `npm run audit:ci` also passed. Local full-coverage attempts were stopped
+and are not accepted as completed runs; full-suite acceptance comes from the CI
+run above. The local focused 159-test run and both mutation proofs completed.
+
+The first CI run on `a9807b6` caught one test-adapter defect: assigning a brand to
+the native Promise's read-only Symbol.toStringTag threw before the expiry-race
+assertion. A typed thenable wrapper fixes that adapter in `fea8e8b`; no assertion,
+scenario, runtime safeguard or quality gate was removed. The repaired test passes
+both integration and coverage on CI, and detects the cleanup mutation locally.
+An initial direct audit-script invocation also failed because it lacked npm
+execution context; the actual npm command passed without changing dependencies
+or suppressing findings.
+
+The final documentation checkpoint records these results; it does not change
+runtime source. Live provider calls, production migrations, deployment, frontend
+adoption and merge authorization remain separate from this implementation proof.

@@ -732,9 +732,10 @@ SPEC-01–05 or replace the separate provider/runtime readiness gates.
 - [x] AIJ-BE-01: Add durable PostgreSQL enqueue/list/status/recovery and evidence-backed
   Manager reconciliation; generation plus derive worker, current authority and fenced
   restart/replay, bounded input/queue limits, opt-in runtime flag and additive migration.
-- [ ] AIJ-BE-02: Complete native disposable-DB/controlled-provider tests, regression and
+- [x] AIJ-BE-02: Complete native disposable-DB/controlled-provider tests, regression and
   coverage gates, typecheck/lint/build/contracts/OpenAPI, migration/privacy and mutation
-  proof. [Backend and frontend hand-off](../docs/invitation-image-jobs.md).
+  proof. [Backend and frontend hand-off](../docs/invitation-image-jobs.md) and
+  [verification evidence](evidence/invitation-image-jobs-2026-10-20.md).
 - [ ] AIJ-OPS-01: After explicit rollout authorization, apply the additive migration
   and matching application, then enable the flag on an approved provider environment
   with bounded paid-call authorization and restart/unknown-effect evidence. Backend
