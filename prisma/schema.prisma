@@ -168,6 +168,8 @@ model NotificationInbox {
   intent NotificationIntent @relation(fields: [intentId], references: [id], onDelete: Restrict)
   @@unique([intentId, accountId])
   @@index([accountId, createdAt, id])
+  @@index([accountId, bookingId], map: "NotificationInbox_unread_account_booking_idx", where: raw("\"readAt\" IS NULL"))
+  @@index([createdAt, id])
 }
 
 model NotificationCommand {
