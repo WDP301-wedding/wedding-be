@@ -2114,6 +2114,31 @@ model InvitationStudioReceipt {
   @@id([bookingId, intentDigest])
 }
 
+model InvitationImageJob {
+  id                     String   @id @db.Uuid
+  bookingId              String   @db.Uuid
+  actorId                String   @db.Uuid
+  sessionId              String   @db.Uuid
+  requestId              String
+  intentDigest           String   @db.Char(64)
+  generationIntentDigest String   @db.Char(64)
+  prompt                 String?
+  aspectRatio            String
+  status                 String   @default("QUEUED")
+  claimToken             String?  @db.Uuid
+  claimExpiresAt         DateTime? @db.Timestamptz(6)
+  result                 Json?    @db.JsonB
+  errorCode              String?
+  createdAt              DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt              DateTime @updatedAt @db.Timestamptz(6)
+  inputExpiresAt         DateTime @db.Timestamptz(6)
+
+  @@unique([bookingId, intentDigest])
+  @@index([status, claimExpiresAt, createdAt])
+  @@index([bookingId, id])
+  @@index([inputExpiresAt])
+}
+
 model InvitationGenerationIntent {
   bookingId     String   @db.Uuid
   intentDigest  String   @db.Char(64)

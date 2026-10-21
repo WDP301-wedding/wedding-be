@@ -392,6 +392,14 @@ export class GenerationService {
           },
           data: { status: 'FAILED', errorCode: 'AI_GENERATION_ABANDONED', errorStatus: 502 },
         });
+        await tx.invitationImageJob.updateMany({
+          where: {
+            bookingId: input.bookingId,
+            generationIntentDigest: input.intentDigest,
+            status: 'RECOVERY_REQUIRED',
+          },
+          data: { status: 'FAILED', errorCode: 'AI_GENERATION_ABANDONED', prompt: null },
+        });
         await createPrismaAuditRepository(tx).append({
           occurredAt: new Date(),
           requestId: scoped.requestId,

@@ -722,3 +722,22 @@ Keep the final-invoice prerequisite and all existing payment admission checks.
   read contract on the target. Frontend then consumes the field; no UI fix or live
   provider/settlement acceptance is implied by local backend tests. Do not finalize
   the shared synthetic invoice or create gateway payments to manufacture proof.
+
+## Durable invitation image jobs — 2026-10-20
+
+Owner authorized backend option B after review of the frontend timeout proposal.
+This adds an async workflow to completed Invitation Studio scope; it does not reopen
+SPEC-01–05 or replace the separate provider/runtime readiness gates.
+
+- [x] AIJ-BE-01: Add durable PostgreSQL enqueue/list/status/recovery and evidence-backed
+  Manager reconciliation; generation plus derive worker, current authority and fenced
+  restart/replay, bounded input/queue limits, opt-in runtime flag and additive migration.
+- [x] AIJ-BE-02: Complete native disposable-DB/controlled-provider tests, regression and
+  coverage gates, typecheck/lint/build/contracts/OpenAPI, migration/privacy and mutation
+  proof. [Backend and frontend hand-off](../docs/invitation-image-jobs.md) and
+  [verification evidence](evidence/invitation-image-jobs-2026-10-20.md).
+- [ ] AIJ-OPS-01: After explicit rollout authorization, apply the additive migration
+  and matching application, then enable the flag on an approved provider environment
+  with bounded paid-call authorization and restart/unknown-effect evidence. Backend
+  implementation tests do not establish live Gemini readiness or deployed latency.
+  Frontend adoption and its browser E2E remain a separate team hand-off.

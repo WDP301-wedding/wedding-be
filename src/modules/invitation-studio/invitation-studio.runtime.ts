@@ -17,6 +17,7 @@ import { createStaffRouter } from '../staff-operations/http/staff.router.js';
 import { createSeatingRouter } from '../seating-plan/http/seating.router.js';
 import { startSeatingReconciler } from '../seating-plan/infrastructure/seating-reconciler.js';
 import { createLogger } from '../../core/logging/logger.js';
+import { startImageJobsWorker } from './infrastructure/image-jobs.worker.js';
 import type {
   SeatingPlanReader,
   SeatingGuidanceReader,
@@ -60,6 +61,7 @@ export async function createInvitationStudioRuntime(
       ai,
       config.invitationStudio?.publicOrigin ?? null,
       now,
+      config.invitationStudio.imageJobsEnabled === true && ai !== null && config.storage.enabled,
     );
     const router = Router();
     router.use(createMediaRouter(composition.service, composition.identity.resolver));
@@ -67,11 +69,23 @@ export async function createInvitationStudioRuntime(
     const { staff, seating } = createStaffSeatingServices(prisma, composition, now);
     router.use(createSeatingRouter(seating.seating, seating.resolver));
     router.use(createStaffRouter(staff));
-    const logger = createLogger({ level: 'warn', runtimeEnvironment: config.runtime.environment });
+    const logger = createLogger({
+      level: config.runtime.logLevel,
+      runtimeEnvironment: config.runtime.environment,
+    });
     const reconciler = startSeatingReconciler(
       seating.seating,
       (failures) => logger.warn({ failures }, 'Seating reconciliation needs retry'),
       config.invitationStudio.reconcilerEnabled,
+    );
+    const imageWorker = startImageJobsWorker(
+      { runNext: () => composition.imageJobs.runNext(logger) },
+      () =>
+        logger.warn(
+          { event: 'invitation_image_job_worker_failed' },
+          'Image job worker needs retry',
+        ),
+      config.invitationStudio.imageJobsEnabled === true && ai !== null && config.storage.enabled,
     );
     return Object.freeze({
       router,
@@ -84,6 +98,7 @@ export async function createInvitationStudioRuntime(
       resource: Object.freeze({
         name: 'invitation-studio-database',
         close: async () => {
+          await imageWorker.close();
           await reconciler.close();
           await prisma.$disconnect();
         },

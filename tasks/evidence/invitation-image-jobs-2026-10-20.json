@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-20",
+  "baseCommit": "7e31f84",
+  "verifiedCommit": "fea8e8bf161b03a15792abab7e8d8ad23462c160",
+  "pullRequest": "https://github.com/WDP301-wedding/wedding-be/pull/82",
+  "workflowRun": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39441752927",
+  "ci": {
+    "status": "success",
+    "postgresVersion": "17.11",
+    "unitTestsPassed": 1482,
+    "contractTestsPassed": 99,
+    "integrationTestsPassed": 679,
+    "fullSuiteTestsPassed": 2260,
+    "fullSuiteFilesPassed": 302,
+    "skippedTests": 0,
+    "coverage": {
+      "statements": 96.65,
+      "branches": 93.6,
+      "functions": 98.44,
+      "lines": 97.58
+    },
+    "perFileThresholds": {
+      "lines": 80,
+      "branches": 80
+    },
+    "staticGates": [
+      "format",
+      "lint",
+      "typecheck",
+      "build",
+      "openapi-check",
+      "dependency-audit"
+    ],
+    "allStaticGatesPassed": true
+  },
+  "local": {
+    "focusedTestsPassed": 159,
+    "workerOverlapMutationDetected": true,
+    "expirySweepMutationDetected": true,
+    "mutatedSourcesRestoredExactly": true,
+    "postgresVersion": "18.6",
+    "taskPostgresPortsStopped": [
+      55455,
+      55456,
+      55457
+    ],
+    "existingPostgresUntouched": true,
+    "rawArtifactsIgnored": true,
+    "fullCoverageAttemptsAccepted": false
+  },
+  "migration": {
+    "appliedCount": 64,
+    "priorCount": 63,
+    "changedPriorMigrations": [],
+    "newMigration": "20261020130000_invitation_image_jobs",
+    "sha256": "5f970582a7979c738aaa696a139ba13c3c349ccd025cba1cb9067e836aa97157"
+  },
+  "openApiSha256": "20a3df4acd167d625b7ab053eeb5b57fb315d67ef8e77a98e204021c5da1164b",
+  "scope": {
+    "frontendFilesChanged": false,
+    "liveProviderEvidence": false,
+    "deploymentPerformed": false,
+    "featureEnabledByDefault": false
+  }
+}

@@ -138,7 +138,7 @@ describe('parseEnvironment', () => {
     const parsed = parseEnvironment({});
 
     expect(parsed).toEqual({
-      invitationStudio: { publicOrigin: null, reconcilerEnabled: true },
+      invitationStudio: { publicOrigin: null, reconcilerEnabled: true, imageJobsEnabled: false },
       runtime: {
         environment: 'development',
         port: 3001,
@@ -217,6 +217,15 @@ describe('parseEnvironment', () => {
         guestLinkUrl: null,
       },
     });
+  });
+  it('requires an explicit valid boolean to enable durable AI job dispatch', () => {
+    expect(
+      parseEnvironment({ AI_IMAGE_JOBS_ENABLED: 'true' }).invitationStudio.imageJobsEnabled,
+    ).toBe(true);
+    expect(
+      parseEnvironment({ AI_IMAGE_JOBS_ENABLED: 'false' }).invitationStudio.imageJobsEnabled,
+    ).toBe(false);
+    expect(() => parseEnvironment({ AI_IMAGE_JOBS_ENABLED: 'yes' })).toThrow();
   });
 
   it('parses valid test configuration and removes blank optional values', () => {

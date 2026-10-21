@@ -2,6 +2,7 @@ import type { ZodOpenApiObject } from 'zod-openapi';
 import { z } from 'zod';
 import * as s from './studio.schemas.js';
 import { mediaAssetResponseSchema } from './media.schemas.js';
+import * as jobs from '../domain/image-jobs.js';
 const errors = Object.fromEntries(
   ['400', '401', '403', '404', '409', '422', '429', '500', '502', '503', '504'].map((status, i) => [
     status,
@@ -57,6 +58,71 @@ function list(operationId: string, response: z.ZodType, query: z.ZodObject) {
   };
 }
 export const invitationStudioOpenApiPaths = {
+  '/bookings/{bookingId}/invitation-image-jobs': {
+    post: {
+      ...operation(
+        'enqueueInvitationImageJob',
+        'Owning FULL Couple enqueues generation and derive without waiting for AI',
+        jobs.imageJobResponse,
+        ['bookingId'],
+        s.generationBody,
+        '202',
+      ),
+      description:
+        'Requires AI_IMAGE_JOBS_ENABLED=true. Same key/body returns current job without paid dispatch in this request. At most 2 unresolved jobs and 10 new jobs per rolling 24 hours per booking. Unknown effects require explicit recovery; no automatic paid retry. Legacy synchronous generation is unchanged.',
+      responses: {
+        ...operation('unused', '', jobs.imageJobResponse, [], undefined, '202').responses,
+        '202': {
+          description: 'Durable job accepted or replayed.',
+          headers: {
+            Location: { schema: { type: 'string' } },
+            'Retry-After': { schema: { type: 'string' } },
+          },
+          content: { 'application/json': { schema: jobs.imageJobResponse } },
+        },
+      },
+    },
+    get: {
+      ...operation(
+        'listInvitationImageJobs',
+        'Current owning FULL Couple or Manager lists all job states, newest first',
+        jobs.imageJobListResponse,
+        ['bookingId'],
+      ),
+      requestParams: { query: jobs.imageJobQuery },
+    },
+  },
+  '/bookings/{bookingId}/invitation-image-jobs/{jobId}': {
+    get: operation(
+      'getInvitationImageJob',
+      'Current owning FULL Couple or Manager reads job state and completed private result',
+      jobs.imageJobResponse,
+      ['bookingId', 'jobId'],
+    ),
+  },
+  '/bookings/{bookingId}/invitation-image-jobs/{jobId}/reconciliation': {
+    post: operation(
+      'abandonInvitationImageJob',
+      'Manager abandons an unresolved job with evidence, retaining paid output and history',
+      jobs.imageJobResponse,
+      ['bookingId', 'jobId'],
+      s.generationReconcileBody,
+    ),
+  },
+  '/bookings/{bookingId}/invitation-image-jobs/{jobId}/recovery': {
+    post: {
+      ...operation(
+        'recoverInvitationImageJob',
+        'Explicitly requeue unresolved work using the same durable generation intent',
+        jobs.imageJobResponse,
+        ['bookingId', 'jobId'],
+        z.strictObject({}),
+        '202',
+      ),
+      description:
+        'Current owning FULL Couple or Manager. Retain Idempotency-Key on retries. Recovery never repeats an existing paid intent; a missing journal remains RECOVERY_REQUIRED. Input expires after 24 hours. Manager abandonment remains on the evidence-backed generation reconciliation API.',
+    },
+  },
   '/bookings/{bookingId}/printable-revisions/{printableRevisionId}/file': {
     get: {
       operationId: 'getPrintableInvitationFile',
