@@ -6073,7 +6073,7 @@
     }
   },
   "cleanup": {
-    "at": "2026-10-21T06:58:15Z",
+    "at": "2026-10-21T07:02:12.449Z",
     "originalServiceUntouched": true,
     "measurementAppProcessesClosed": true,
     "sshKeyRevoked": true,
@@ -6082,10 +6082,62 @@
     "toolResult": "Cancelled — the user did not approve this action. No changes were made.",
     "userQuestionPending": true,
     "appStopRequested": true,
-    "appStopConfirmed": false,
+    "appStopConfirmed": true,
     "dbStopRequested": true,
-    "dbStopConfirmed": false,
-    "note": "deploymentStop returned true, but the read-back still showed running replicas; do not claim shutdown or zero further hosting cost. No deletion was retried through an alternate tool."
+    "dbStopConfirmed": true,
+    "note": "Services and copied volume/public proxy retained pending user confirmation of deletion. Storage cost may continue. Original service/configuration unchanged.",
+    "stopMethod": "railway down; connector confirms both services Offline with no active deployments or pending work",
+    "stopProof": {
+      "at": "2026-10-21T07:02:12.449Z",
+      "environment": {
+        "id": "08a2899c-b0d6-4200-a505-604965a4b3fc",
+        "name": "production"
+      },
+      "services": [
+        {
+          "serviceId": "3ca65665-de73-4faa-959f-ff6ed3e14700",
+          "serviceName": "db-host-bench-app-20261021",
+          "state": "offline",
+          "statusText": "Offline",
+          "activeDeployments": [],
+          "replicaStatus": null,
+          "cronJob": null,
+          "issues": {
+            "warningCount": 0,
+            "criticalCount": 0
+          },
+          "recentFailures": 0,
+          "recentFailedDeployments": [],
+          "hasIssues": false,
+          "isCronJob": false,
+          "hasVolume": false
+        },
+        {
+          "serviceId": "a86977eb-770f-4f57-957f-ba149ddf734b",
+          "serviceName": "db-host-bench-pg-20261021",
+          "state": "offline",
+          "statusText": "Offline",
+          "activeDeployments": [],
+          "replicaStatus": null,
+          "cronJob": null,
+          "issues": {
+            "warningCount": 0,
+            "criticalCount": 0
+          },
+          "recentFailures": 0,
+          "recentFailedDeployments": [],
+          "hasIssues": false,
+          "isCronJob": false,
+          "hasVolume": true
+        }
+      ],
+      "pendingWork": [],
+      "summary": {
+        "totalServices": 2,
+        "servicesWithIssues": 0,
+        "totalFailures": 0
+      }
+    }
   },
   "pricing": {
     "checkedAt": "2026-10-21",
