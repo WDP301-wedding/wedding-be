@@ -1,0 +1,14 @@
+# Demo catalog: PR #80 merge and deployment, 2026-10-20
+
+The five-file change from requested commit `d1b963023f77c41b992bafae5bca9d1256d4d041` was cherry-picked onto current `main` as `cb0f2a0f7d90f174d75ed89d5513801448ec8205`, reviewed and merged through [PR #80](https://github.com/WDP301-wedding/wedding-be/pull/80). Merge commit: `568e45616879a2dba04fbb99993b64efe72dc2b9`. The five files are byte-identical to the requested change; the unrelated ancestor was excluded. The merge tree matches the tested PR head.
+
+- [PR CI](https://github.com/WDP301-wedding/wedding-be/actions/runs/39357034762) and [main CI](https://github.com/WDP301-wedding/wedding-be/actions/runs/39357864949) both passed. Each full coverage run passed 2,206 tests across 296 files; statement coverage 96.68%, branch coverage 93.6%, function coverage 98.49%, line coverage 97.58%. Static checks, build, OpenAPI, formatting, audit and PostgreSQL gates also passed.
+- Railway deployment `0f1dc704-f5ee-4ad0-84e3-d816a53a618e` reached **SUCCESS**, serving merge commit `568e456`. Automatic main deployment waited for CI. Runtime image, variables and service configuration match the previous deployment. All 61 migration checksums match; predeploy reported no pending migrations.
+- Before/after counts and hashes match for all 24 compared domain tables. There are 13 published active seating templates across 3 halls and no duplicate confirmed slots. The rollout did not rerun seeding or initiate business writes, payments or paid generation.
+- Six API/web smoke checks returned their expected responses. Direct browser checks confirmed the renamed public demo hall, Orchid and demo hall seating options, and 8 renamed guest rows. Planned headcount remained 50. Desktop and mobile seating screenshots were captured; the test account was logged out and browser closed.
+
+The original dirty workspace was preserved. A separate managed worktree was used for the merge.
+
+Runtime limitations: the sampled logs contain an invitation-image-generation 5xx, also seen before deployment, and an attendance-summary 5xx whose cause was not established. These were outside the six successful deployment smoke requests. The patch changes scripts, tests, documentation and evidence only; the runtime image is unchanged. This rollout does not establish overall provider or production readiness. Historical proposal snapshots retain their original PERF hall labels. The existing mobile seating table scrolls horizontally; no frontend code was changed.
+
+The detailed local receipt is [demo-catalog-pr80-merge-deploy-2026-10-20.json](demo-catalog-pr80-merge-deploy-2026-10-20.json). It records source/deployment identities, CI results, read-only comparisons and sanitized runtime observations. This postdeployment receipt is local and is not part of the already merged commit.

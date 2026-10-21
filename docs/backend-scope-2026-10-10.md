@@ -23,6 +23,14 @@ This supersedes the earlier missing-order rule in ADR-006 for this narrow condit
 Use the existing atomic verified-failure release and settlement safeguards. See
 [the implementation hand-off](./payment-attempt-reopen-and-expiry.md).
 
+Website remediation amendment confirmed by the owner on **2026-10-19**: for the
+performance/reliability initiative, changes may cover all of `wedding-web` plus
+supporting `wedding-be` code. Required sequence is frontend -> backend -> direct
+deployed browser E2E. This is a scoped exception to the backend-only restriction
+below, not a transfer of `wedding-manage-web` or `wedding-app` ownership. The
+[scope amendment](./web-remediation-scope-2026-10-19.md) links the canonical plan
+and task status. Historical SPEC/RV evidence and all business rules remain valid.
+
 Backend merge-policy amendment confirmed by the owner on **2026-10-13**:
 `wedding-be` no longer requires approval from another team member before merge.
 The owner may authorize merge and deployment after change review, resolved

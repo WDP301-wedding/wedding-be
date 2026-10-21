@@ -1,0 +1,662 @@
+{
+  "base": "563c7bb38ba2433d3571043c26e76528479e4ddf",
+  "main": "220263177c31a9249bdf4838687161b5b6f9ae44",
+  "entries": [
+    {
+      "path": ".env.example",
+      "kind": "modified",
+      "bytes": 6221,
+      "comparison": "differs-from-main",
+      "decision": "not copied: current main supersedes local version; newer safeguards retained"
+    },
+    {
+      "path": "AGENTS.md",
+      "kind": "modified",
+      "bytes": 3148,
+      "comparison": "differs-from-main",
+      "decision": "selected: owner scope guidance"
+    },
+    {
+      "path": "SPEC-identity-access.md",
+      "kind": "modified",
+      "bytes": 43749,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "docs/backend-performance-02-05.md",
+      "kind": "modified",
+      "bytes": 17131,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "docs/backend-scope-2026-10-10.md",
+      "kind": "modified",
+      "bytes": 18779,
+      "comparison": "differs-from-main",
+      "decision": "selected: owner scope guidance"
+    },
+    {
+      "path": "docs/identity-access-operations.md",
+      "kind": "modified",
+      "bytes": 8282,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "kind": "modified",
+      "bytes": 90239,
+      "comparison": "differs-from-main",
+      "decision": "selected only two additive index declarations on current main"
+    },
+    {
+      "path": "scripts/performance-regression.mjs",
+      "kind": "modified",
+      "bytes": 10552,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "src/config/env.test.ts",
+      "kind": "modified",
+      "bytes": 23267,
+      "comparison": "differs-from-main",
+      "decision": "not copied: current main supersedes local version; newer safeguards retained"
+    },
+    {
+      "path": "src/config/env.ts",
+      "kind": "modified",
+      "bytes": 33156,
+      "comparison": "differs-from-main",
+      "decision": "not copied: current main supersedes local version; newer safeguards retained"
+    },
+    {
+      "path": "src/core/database/booking-unit-of-work.ts",
+      "kind": "modified",
+      "bytes": 3853,
+      "comparison": "differs-from-main",
+      "decision": "not copied: current main supersedes local version; newer safeguards retained"
+    },
+    {
+      "path": "src/modules/booking-lifecycle/infrastructure/notification-context.reader.ts",
+      "kind": "modified",
+      "bytes": 2703,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "src/modules/notifications-automation/application/notification-settings.ts",
+      "kind": "modified",
+      "bytes": 20613,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "src/modules/payments-billing/infrastructure/billing.persistence.ts",
+      "kind": "modified",
+      "bytes": 23858,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "src/modules/payments-billing/payments-billing.providers.ts",
+      "kind": "modified",
+      "bytes": 6035,
+      "comparison": "differs-from-main",
+      "decision": "not copied: current main supersedes local version; newer safeguards retained"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/catalog-media.service.ts",
+      "kind": "modified",
+      "bytes": 19073,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/catalog-query.service.test.ts",
+      "kind": "modified",
+      "bytes": 13202,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "src/modules/venue-catalog/application/catalog-query.service.ts",
+      "kind": "modified",
+      "bytes": 17401,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tasks/backend-revision-todo.md",
+      "kind": "modified",
+      "bytes": 72617,
+      "comparison": "differs-from-main",
+      "decision": "selected only PostgreSQL section; newer main sections retained"
+    },
+    {
+      "path": "tasks/evidence/performance-regression-budgets.json",
+      "kind": "modified",
+      "bytes": 2096,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tasks/plan.md",
+      "kind": "modified",
+      "bytes": 27523,
+      "comparison": "differs-from-main",
+      "decision": "selected only PostgreSQL section; newer main sections retained"
+    },
+    {
+      "path": "tests/integration/catalog-read-performance.test.ts",
+      "kind": "modified",
+      "bytes": 2447,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tests/integration/notification-http.test.ts",
+      "kind": "modified",
+      "bytes": 18418,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tests/integration/performance-extension-measurement.test.ts",
+      "kind": "modified",
+      "bytes": 19411,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tests/integration/pool-deadline.test.ts",
+      "kind": "modified",
+      "bytes": 8847,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tests/integration/print-read-performance.test.ts",
+      "kind": "modified",
+      "bytes": 15281,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tests/integration/request-logging.test.ts",
+      "kind": "modified",
+      "bytes": 5772,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "docs/backend-performance-05-closure-2026-10-18.md",
+      "kind": "untracked",
+      "bytes": 9560,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "docs/backend-performance-07-closure-2026-10-18.md",
+      "kind": "untracked",
+      "bytes": 8683,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "docs/backend-performance-07-rollout-2026-10-18.md",
+      "kind": "untracked",
+      "bytes": 5226,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "docs/backend-performance-08-rollout-2026-10-18.md",
+      "kind": "untracked",
+      "bytes": 5019,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "docs/backend-performance-08-verification-2026-10-18.md",
+      "kind": "untracked",
+      "bytes": 11112,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "docs/backend-performance-09-original-2026-10-18.md",
+      "kind": "untracked",
+      "bytes": 7758,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "docs/backend-performance-09-rollout-2026-10-18.md",
+      "kind": "untracked",
+      "bytes": 6554,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "docs/backend-performance-13-verification-2026-10-18.md",
+      "kind": "untracked",
+      "bytes": 14723,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "docs/postgres-best-practices-2026-10-21.md",
+      "kind": "untracked",
+      "bytes": 8389,
+      "comparison": "local-only",
+      "decision": "selected: PostgreSQL indexes and evidence"
+    },
+    {
+      "path": "docs/web-remediation-scope-2026-10-19.md",
+      "kind": "untracked",
+      "bytes": 2624,
+      "comparison": "local-only",
+      "decision": "selected: owner scope guidance"
+    },
+    {
+      "path": "prisma/migrations/20261021040000_notification_inbox_query_indexes/migration.sql",
+      "kind": "untracked",
+      "bytes": 477,
+      "comparison": "local-only",
+      "decision": "selected: PostgreSQL indexes and evidence"
+    },
+    {
+      "path": "src/modules/notifications-automation/infrastructure/notification-inbox.reader.ts",
+      "kind": "untracked",
+      "bytes": 3094,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "src/modules/venue-catalog/infrastructure/catalog-hall-page.reader.ts",
+      "kind": "untracked",
+      "bytes": 2666,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tasks/evidence/balance-invoice-conflict-2026-10-19.json",
+      "kind": "untracked",
+      "bytes": 4964,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/balance-invoice-conflict-2026-10-19.md",
+      "kind": "untracked",
+      "bytes": 5196,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/be17-pr33-merge-swagger-2026-10-12.json",
+      "kind": "untracked",
+      "bytes": 13321,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/be17-pr33-merge-swagger-2026-10-12.md",
+      "kind": "untracked",
+      "bytes": 4930,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/demo-catalog-pr80-merge-deploy-2026-10-20.json",
+      "kind": "untracked",
+      "bytes": 26567,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/demo-catalog-pr80-merge-deploy-2026-10-20.md",
+      "kind": "untracked",
+      "bytes": 2827,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/guest-management-pr34-merge-swagger-2026-10-12.json",
+      "kind": "untracked",
+      "bytes": 14392,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/guest-management-pr34-merge-swagger-2026-10-12.md",
+      "kind": "untracked",
+      "bytes": 3146,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/invitation-backend-release-2026-10-20.json",
+      "kind": "untracked",
+      "bytes": 12675,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/multi-menu-pr65-final-ci-2026-10-18.md",
+      "kind": "untracked",
+      "bytes": 3457,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/multi-menu-pr65-merge-verification-2026-10-18.md",
+      "kind": "untracked",
+      "bytes": 4828,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/perf04-pr63-merge-railway-2026-10-18.json",
+      "kind": "untracked",
+      "bytes": 37484,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/perf04-pr63-merge-railway-2026-10-18.md",
+      "kind": "untracked",
+      "bytes": 2511,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/perf05-closure-2026-10-18.json",
+      "kind": "untracked",
+      "bytes": 57622,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tasks/evidence/perf07-closure-2026-10-18.json",
+      "kind": "untracked",
+      "bytes": 174608,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tasks/evidence/perf07-pr67-ci-2026-10-18.json",
+      "kind": "untracked",
+      "bytes": 7859,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/perf07-pr67-rollout-2026-10-18.json",
+      "kind": "untracked",
+      "bytes": 67174,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/perf08-final-closure-2026-10-18.json",
+      "kind": "untracked",
+      "bytes": 7117,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/perf08-pr68-ci-2026-10-18.json",
+      "kind": "untracked",
+      "bytes": 9163,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tasks/evidence/perf08-pr68-rollout-2026-10-18.json",
+      "kind": "untracked",
+      "bytes": 93448,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tasks/evidence/perf08-verification-2026-10-18.json",
+      "kind": "untracked",
+      "bytes": 493328,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tasks/evidence/perf09-final-closure-2026-10-18.json",
+      "kind": "untracked",
+      "bytes": 10372,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/perf09-original-verification-2026-10-18.json",
+      "kind": "untracked",
+      "bytes": 437627,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tasks/evidence/perf09-pr70-ci-2026-10-18.json",
+      "kind": "untracked",
+      "bytes": 9369,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tasks/evidence/perf09-pr70-rollout-2026-10-18.json",
+      "kind": "untracked",
+      "bytes": 135906,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tasks/evidence/perf13-verification-2026-10-18.json",
+      "kind": "untracked",
+      "bytes": 2974689,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tasks/evidence/postgres-best-practices-2026-10-21.json",
+      "kind": "untracked",
+      "bytes": 14479,
+      "comparison": "local-only",
+      "decision": "selected: PostgreSQL indexes and evidence"
+    },
+    {
+      "path": "tasks/evidence/seating-plan-pr35-merge-swagger-2026-10-12.json",
+      "kind": "untracked",
+      "bytes": 11729,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/seating-plan-pr35-merge-swagger-2026-10-12.md",
+      "kind": "untracked",
+      "bytes": 2454,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/staff-operations-pr36-merge-swagger-2026-10-12.json",
+      "kind": "untracked",
+      "bytes": 13375,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/staff-operations-pr36-merge-swagger-2026-10-12.md",
+      "kind": "untracked",
+      "bytes": 2785,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/web-api500-investigation-2026-10-18.json",
+      "kind": "untracked",
+      "bytes": 8479,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/web-api500-investigation-2026-10-18.md",
+      "kind": "untracked",
+      "bytes": 6107,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/web-api500-profile-contention-2026-10-18.json",
+      "kind": "untracked",
+      "bytes": 23700,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/web-api500-profile-contention-2026-10-18.md",
+      "kind": "untracked",
+      "bytes": 8603,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/web-api500-profile-rollout-2026-10-18.json",
+      "kind": "untracked",
+      "bytes": 26730,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/web-api500-profile-rollout-2026-10-18.md",
+      "kind": "untracked",
+      "bytes": 9324,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/web-api500-rollout-latency-2026-10-18.json",
+      "kind": "untracked",
+      "bytes": 232245,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/web-api500-rollout-latency-2026-10-18.md",
+      "kind": "untracked",
+      "bytes": 15371,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/web-dashboard-audit-2026-10-19.json",
+      "kind": "untracked",
+      "bytes": 143770,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tasks/evidence/web-dashboard-audit-2026-10-19.md",
+      "kind": "untracked",
+      "bytes": 15904,
+      "comparison": "local-only",
+      "decision": "selected: dated historical receipt, no new runtime acceptance"
+    },
+    {
+      "path": "tests/contract/performance-regression-runner.test.ts",
+      "kind": "untracked",
+      "bytes": 8901,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tests/integration/catalog-hall-page.test.ts",
+      "kind": "untracked",
+      "bytes": 12727,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tests/integration/notification-inbox-indexes.test.ts",
+      "kind": "untracked",
+      "bytes": 5772,
+      "comparison": "local-only",
+      "decision": "selected: PostgreSQL indexes and evidence"
+    },
+    {
+      "path": "tests/integration/notification-read-performance.test.ts",
+      "kind": "untracked",
+      "bytes": 16769,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    },
+    {
+      "path": "tests/integration/payments-billing/read-locks.test.ts",
+      "kind": "untracked",
+      "bytes": 6010,
+      "comparison": "identical-to-main",
+      "decision": "already integrated; no duplicate patch"
+    }
+  ],
+  "output": {
+    "decision": "excluded: raw logs, runtime binaries, generated reports, private fixture/configuration material, disposable PostgreSQL data",
+    "directories": [
+      "access-token-30m-deploy",
+      "analytics-postgres-20261013",
+      "api500-20261018",
+      "api500-profile-20261018",
+      "api500-profile-rollout-20261018",
+      "api500-rollout-20261018",
+      "backend-perf-audit-20261016",
+      "demo-refresh-20261020",
+      "demo-release-20261020",
+      "invitation-backend-latency-20261020",
+      "invitation-latency-audit-20261020",
+      "media-notifications-focused-coverage",
+      "multi-menu-proposals-coverage",
+      "node-v24.21.0-win-x64",
+      "perf-acceptance-20261017",
+      "perf-followup-20261017",
+      "perf-railway-fixture-20261016",
+      "perf03-20261017",
+      "perf04-20261017",
+      "perf04-merge-deploy-20261018",
+      "perf04-pool-fix-20261017",
+      "perf04-rerun-20261017",
+      "perf05-06-sync-20261018",
+      "perf05-closure-20261018",
+      "perf06-10-20261016",
+      "perf06-20261018",
+      "perf07-20261018",
+      "perf08-20261018",
+      "perf09-catalog-20261017",
+      "perf09-original-20261018",
+      "perf09-owner-closure-20261017",
+      "perf10-analytics-20261017",
+      "perf11-13-20261016",
+      "perf13-20261018",
+      "perf46-release-20261016",
+      "perf47-merge-20261016",
+      "perf48-49-release-20261016",
+      "playwright",
+      "postgres-best-practices-20261021",
+      "postgres-release-20261021",
+      "railway-api-performance-20261016",
+      "read-latency-20261019",
+      "read-latency-deploy-20261019",
+      "spec08-merge-tools",
+      "staff-spec08-accepted-coverage",
+      "staff-spec08-coverage",
+      "staff-spec08-final-coverage",
+      "staff-spec08-module-coverage",
+      "staff-spec08-thread-coverage"
+    ]
+  }
+}

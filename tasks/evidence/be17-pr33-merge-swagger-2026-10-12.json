@@ -1,0 +1,424 @@
+{
+  "date": "2026-10-12",
+  "timezone": "Asia/Saigon",
+  "reportScope": "Local post-merge evidence; not included in the tested/deployed merge commit",
+  "merge": {
+    "checkedAt": "2026-10-11T21:19:36.640Z",
+    "url": "https://github.com/WDP301-wedding/wedding-be/pull/33",
+    "number": 33,
+    "head": "d7d156b0de23459aac39a74d099c805ae9dc1574",
+    "base": "054d670d6a7edd4d8028004271b02fab5c60973f",
+    "premergeCI": {
+      "id": 38175296731,
+      "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38175296731",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 114576306564,
+          "name": "Static, test, build, and audit gates",
+          "conclusion": "success"
+        },
+        {
+          "id": 114576306711,
+          "name": "PostgreSQL migration and integration gates",
+          "conclusion": "success"
+        }
+      ]
+    },
+    "ownerReviewWaiver": "Explicit human instruction in this chat; tasks/evidence/be11-17-owner-acceptance-2026-10-12.md",
+    "teamMemberApprovalPresent": false,
+    "reviewThreads": 0,
+    "mergeMethod": "merge",
+    "mergeCommit": "07e4457b946e61c45e1f4e599a17de4467488ee8",
+    "merged": true,
+    "mergedAt": "2026-10-11T21:19:37Z",
+    "state": "closed"
+  },
+  "main": {
+    "checkedAt": "2026-10-11T21:38:53.219Z",
+    "source": "07e4457b946e61c45e1f4e599a17de4467488ee8",
+    "ci": [
+      {
+        "id": 38175897931,
+        "attempt": 2,
+        "event": "push",
+        "sha": "07e4457b946e61c45e1f4e599a17de4467488ee8",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38175897931",
+        "jobs": [
+          {
+            "id": 114580048732,
+            "name": "PostgreSQL migration and integration gates",
+            "status": "completed",
+            "conclusion": "success",
+            "active": null,
+            "failed": []
+          },
+          {
+            "id": 114580049835,
+            "name": "Static, test, build, and audit gates",
+            "status": "completed",
+            "conclusion": "success",
+            "active": null,
+            "failed": []
+          }
+        ]
+      }
+    ],
+    "deployment": {
+      "latest": {
+        "id": "b71e6a8f-4cbf-4dfe-b6c1-e52f4259d914",
+        "status": "SUCCESS",
+        "createdAt": "2026-10-11T21:36:56.952Z",
+        "commit": "07e4457b946e61c45e1f4e599a17de4467488ee8",
+        "branch": "main"
+      },
+      "active": [
+        {
+          "id": "b71e6a8f-4cbf-4dfe-b6c1-e52f4259d914",
+          "status": "SUCCESS",
+          "createdAt": "2026-10-11T21:36:56.952Z",
+          "commit": "07e4457b946e61c45e1f4e599a17de4467488ee8",
+          "branch": "main"
+        }
+      ]
+    }
+  },
+  "initialMainCIFailure": {
+    "id": 38175897931,
+    "sha": "07e4457b946e61c45e1f4e599a17de4467488ee8",
+    "attempt": 1,
+    "conclusion": "failure",
+    "failedJob": 114578105532,
+    "signature": "Vitest coverage-v8 writeCoverageFile EBADF write/close; 213/214 files, 1650/1653 tests; bootstrap-secret.ts coverage absent",
+    "focusedDiagnostic": {
+      "files": 1,
+      "tests": 4,
+      "result": "pass; focused-only coverage thresholds overridden for diagnosis, not an acceptance gate"
+    },
+    "runtimeDiff": "No application, test, CI, dependency or API bytes changed by PR33"
+  },
+  "redeployment": {
+    "checkedAt": "2026-10-11T21:36:55.123Z",
+    "reason": "Initial GitHub-triggered deployment skipped after failed CI; exact-source CI now passed",
+    "source": "07e4457b946e61c45e1f4e599a17de4467488ee8",
+    "ci": {
+      "id": 38175897931,
+      "attempt": 2,
+      "conclusion": "success"
+    },
+    "deploymentId": "b71e6a8f-4cbf-4dfe-b6c1-e52f4259d914",
+    "configurationChanged": false
+  },
+  "verification": {
+    "unitFiles": 134,
+    "unitTests": 1234,
+    "contractFiles": 12,
+    "contractTests": 37,
+    "integrationFiles": 68,
+    "integrationTests": 382,
+    "fullSuiteFiles": 214,
+    "fullSuiteTests": 1653,
+    "coverage": {
+      "statements": 96.51,
+      "branches": 93.56,
+      "functions": 98.48,
+      "lines": 97.33,
+      "perFileBranchLineThreshold": 80
+    },
+    "ciLogProvenance": "Filtered GitHub logs from both PR and merge-commit jobs, kept in ignored .local-demo/be17-*-summary.log"
+  },
+  "swagger": {
+    "checkedAt": "2026-10-11T21:39:04.663Z",
+    "target": "https://wedding-be-production-e1dc.up.railway.app",
+    "http": [
+      {
+        "path": "/docs",
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "requestId": "f41f6b42-1ad2-453e-be72-d4600be53b35",
+        "bytes": 1147
+      },
+      {
+        "path": "/docs/openapi.json",
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "requestId": "331dda40-6794-49c1-8daa-14a44db2a857",
+        "bytes": 549691
+      },
+      {
+        "path": "/api/v1/openapi.json",
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "requestId": "8b3bb0c8-008a-4661-a123-cd56af4732b1",
+        "bytes": 1246199
+      },
+      {
+        "path": "/docs/swagger-ui.css",
+        "status": 200,
+        "type": "text/css; charset=utf-8",
+        "requestId": "877f1753-38a7-478e-ba9d-6b79a8f25005",
+        "bytes": 186154
+      },
+      {
+        "path": "/docs/swagger-ui-bundle.js",
+        "status": 200,
+        "type": "text/javascript; charset=utf-8",
+        "requestId": "e89231b9-2e7a-40f2-9d8a-567fcb53dff6",
+        "bytes": 1586002
+      },
+      {
+        "path": "/docs/initializer.js",
+        "status": 200,
+        "type": "text/javascript; charset=utf-8",
+        "requestId": "0bdbfbc0-7887-498e-b35c-44b48f0457f8",
+        "bytes": 442
+      },
+      {
+        "path": "/docs/docs.css",
+        "status": 200,
+        "type": "text/css; charset=utf-8",
+        "requestId": "32780776-b8ac-4671-9c94-d5eb7b3f9d95",
+        "bytes": 665
+      },
+      {
+        "path": "/docs/fonts/400.css",
+        "status": 200,
+        "type": "text/css; charset=utf-8",
+        "requestId": "4a281fe7-30ef-4840-a5f2-680166ce351e",
+        "bytes": 1428
+      },
+      {
+        "path": "/docs/fonts/600.css",
+        "status": 200,
+        "type": "text/css; charset=utf-8",
+        "requestId": "e9451442-4e3e-4c29-9235-6f5ae8fc59b6",
+        "bytes": 1428
+      },
+      {
+        "path": "/docs/fonts/700.css",
+        "status": 200,
+        "type": "text/css; charset=utf-8",
+        "requestId": "350dd81c-bb1e-448e-8e7c-8661d10d6237",
+        "bytes": 1428
+      },
+      {
+        "path": "/health/live",
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "requestId": "281f6539-b208-457f-a275-2f93b6e458d0",
+        "bytes": 77
+      },
+      {
+        "path": "/health/ready",
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "requestId": "c50a46f3-b7f1-4811-b335-bbe1fd8ef016",
+        "bytes": 78
+      },
+      {
+        "path": "/api/v1/catalog/halls?limit=20",
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "requestId": "fd28d145-0116-4d93-bf1d-c4bf29509e1a",
+        "bytes": 312
+      }
+    ],
+    "denied": [
+      {
+        "path": "/api/v1/bookings/00000000-0000-4000-8000-000000000017/contracts",
+        "status": 401,
+        "errorCode": "AUTHENTICATION_REQUIRED",
+        "requestId": "4dbe5436-e36b-40d3-88b6-b0dafae5807a"
+      },
+      {
+        "path": "/api/v1/bookings/00000000-0000-4000-8000-000000000017/contract-appendices",
+        "status": 401,
+        "errorCode": "AUTHENTICATION_REQUIRED",
+        "requestId": "7fdc140a-d791-4d78-aa01-a46480b9bde0"
+      },
+      {
+        "path": "/api/v1/bookings/00000000-0000-4000-8000-000000000017/final-invoices",
+        "status": 401,
+        "errorCode": "AUTHENTICATION_REQUIRED",
+        "requestId": "c00cf3f4-3557-42e1-821c-367ca5d3150b"
+      },
+      {
+        "path": "/api/v1/management/bookings/00000000-0000-4000-8000-000000000017/incidental-expenses",
+        "status": 401,
+        "errorCode": "AUTHENTICATION_REQUIRED",
+        "requestId": "604afdda-6502-43cc-8e7d-8177a3d0d277"
+      },
+      {
+        "path": "/api/v1/bookings/00000000-0000-4000-8000-000000000017/printable-revisions/00000000-0000-4000-8000-000000000017/file",
+        "status": 401,
+        "errorCode": "AUTHENTICATION_REQUIRED",
+        "requestId": "26fdf62d-68ae-4a1c-bff3-f3db6d69d201"
+      }
+    ],
+    "canonical": {
+      "sha256": "55c15733cdc25a9151c724e311cb5753f9b41124a15c879cf73cc3c90c108b9e",
+      "exactMatch": true,
+      "paths": 144,
+      "operations": 166,
+      "schemas": 73,
+      "resolvedReferences": 1525,
+      "uniqueOperationIds": 166
+    },
+    "swagger": {
+      "servers": [
+        {
+          "url": "/",
+          "description": "Backend hiện tại — gọi API thật"
+        }
+      ],
+      "pathsMatch": true,
+      "componentsMatch": true
+    },
+    "commercialOperationCount": 49,
+    "health": {
+      "live": {
+        "data": {
+          "status": "live",
+          "requestId": "281f6539-b208-457f-a275-2f93b6e458d0"
+        }
+      },
+      "ready": {
+        "data": {
+          "status": "ready",
+          "requestId": "c50a46f3-b7f1-4811-b335-bbe1fd8ef016"
+        }
+      }
+    }
+  },
+  "browser": {
+    "checkedAt": "2026-10-11T21:40:25.424Z",
+    "browser": "Codex In-app Browser",
+    "url": "https://wedding-be-production-e1dc.up.railway.app/docs",
+    "reloadedAfterExactSourceDeployment": true,
+    "title": "Wedding API — Tài liệu API",
+    "tryItOut": {
+      "method": "GET",
+      "url": "https://wedding-be-production-e1dc.up.railway.app/api/v1/catalog/halls?limit=20",
+      "status": 200,
+      "requestId": "85470b0a-10b3-456a-a74a-c5abf826ba64",
+      "response": "Two public catalog halls, nextCursor null",
+      "observation": "Execute button used; live Server response, response body and x-request-id observed in DOM"
+    },
+    "visibleRouteChecks": [
+      "GET /api/v1/bookings/{bookingId}/contracts",
+      "GET /api/v1/bookings/{bookingId}/contract-appendices",
+      "GET /api/v1/bookings/{bookingId}/contracts/{revisionId}/pdf",
+      "GET /api/v1/bookings/{bookingId}/final-invoices",
+      "POST /api/v1/management/bookings/{bookingId}/final-invoices",
+      "GET /api/v1/catalog/services",
+      "GET /api/v1/catalog/print-offerings"
+    ],
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "authenticatedCommercialMutationsExecuted": false
+  },
+  "deployedLogs": {
+    "checkedAt": "2026-10-11T21:40:27.407Z",
+    "deploymentId": "b71e6a8f-4cbf-4dfe-b6c1-e52f4259d914",
+    "source": "07e4457b946e61c45e1f4e599a17de4467488ee8",
+    "lines": 57,
+    "migrationCount44": true,
+    "noPendingMigrations": true,
+    "requests": [
+      {
+        "requestId": "f41f6b42-1ad2-453e-be72-d4600be53b35",
+        "matched": true
+      },
+      {
+        "requestId": "331dda40-6794-49c1-8daa-14a44db2a857",
+        "matched": true
+      },
+      {
+        "requestId": "8b3bb0c8-008a-4661-a123-cd56af4732b1",
+        "matched": true
+      },
+      {
+        "requestId": "877f1753-38a7-478e-ba9d-6b79a8f25005",
+        "matched": true
+      },
+      {
+        "requestId": "e89231b9-2e7a-40f2-9d8a-567fcb53dff6",
+        "matched": true
+      },
+      {
+        "requestId": "0bdbfbc0-7887-498e-b35c-44b48f0457f8",
+        "matched": true
+      },
+      {
+        "requestId": "32780776-b8ac-4671-9c94-d5eb7b3f9d95",
+        "matched": true
+      },
+      {
+        "requestId": "4a281fe7-30ef-4840-a5f2-680166ce351e",
+        "matched": true
+      },
+      {
+        "requestId": "e9451442-4e3e-4c29-9235-6f5ae8fc59b6",
+        "matched": true
+      },
+      {
+        "requestId": "350dd81c-bb1e-448e-8e7c-8661d10d6237",
+        "matched": true
+      },
+      {
+        "requestId": "281f6539-b208-457f-a275-2f93b6e458d0",
+        "matched": true
+      },
+      {
+        "requestId": "c50a46f3-b7f1-4811-b335-bbe1fd8ef016",
+        "matched": true
+      },
+      {
+        "requestId": "fd28d145-0116-4d93-bf1d-c4bf29509e1a",
+        "matched": true
+      },
+      {
+        "requestId": "4dbe5436-e36b-40d3-88b6-b0dafae5807a",
+        "matched": true
+      },
+      {
+        "requestId": "7fdc140a-d791-4d78-aa01-a46480b9bde0",
+        "matched": true
+      },
+      {
+        "requestId": "c00cf3f4-3557-42e1-821c-367ca5d3150b",
+        "matched": true
+      },
+      {
+        "requestId": "604afdda-6502-43cc-8e7d-8177a3d0d277",
+        "matched": true
+      },
+      {
+        "requestId": "26fdf62d-68ae-4a1c-bff3-f3db6d69d201",
+        "matched": true
+      },
+      {
+        "requestId": "85470b0a-10b3-456a-a74a-c5abf826ba64",
+        "matched": true
+      }
+    ],
+    "allRequestsMatched": true
+  },
+  "acceptance": {
+    "BE": "17/17 complete for backend developer scope; explicit owner waiver, no independent team-member approval claimed",
+    "RV": "18/21, RV-16/19/21 open"
+  },
+  "scope": {
+    "target": "Owner-authorized developer staging; Railway environment label production",
+    "frontendChanged": false,
+    "applicationSourceChanged": false,
+    "newPayment": false,
+    "paidGeneration": false,
+    "newEmail": false,
+    "sharedDataWrite": false,
+    "providerConfigurationChanged": false,
+    "productionReadiness": "Not established by Swagger checks or the review exception"
+  }
+}

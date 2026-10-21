@@ -1,0 +1,862 @@
+{
+  "at": "2026-10-18T01:40:06.526Z",
+  "authorization": "Owner approved deployment and direct web verification of PR #64.",
+  "merge": {
+    "at": "2026-10-18T01:15:26.914Z",
+    "number": 64,
+    "head": "32a25a8bf0eed993b3de2fe73e116e38698cdb65",
+    "base": "cc2999acdd24dc87e713806328022b160585c599",
+    "sha": "9bbd251fa318abed8210e1b15aa72a825d7e9876",
+    "merged": true,
+    "message": "Pull Request successfully merged"
+  },
+  "serving": {
+    "at": "2026-10-18T01:24:12.032Z",
+    "ready": true,
+    "deploymentId": "5d548270-df78-4010-8f53-f7c3e87607b8",
+    "commit": "9bbd251fa318abed8210e1b15aa72a825d7e9876",
+    "image": "sha256:84f84ccac8cd53ace49400aa22dad10f769dcfb55d0753ba94fa1df158d94d70",
+    "ci": {
+      "id": 39085822061,
+      "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39085822061",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1,
+      "jobs": [
+        {
+          "id": 117552041001,
+          "name": "PostgreSQL migration and integration gates",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 117552041137,
+          "name": "Static, test, build, and audit gates",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    "oldStopped": true,
+    "configurationUnchanged": true,
+    "serviceConfigurationUnchanged": true,
+    "region": {
+      "sfo": {
+        "numReplicas": 1
+      }
+    }
+  },
+  "ci": {
+    "at": "2026-10-18T01:22:24.249Z",
+    "commit": "9bbd251fa318abed8210e1b15aa72a825d7e9876",
+    "reviewedHead": "32a25a8bf0eed993b3de2fe73e116e38698cdb65",
+    "treeMatchesReviewedHead": true,
+    "tree": "d3ccaad126991e13aba3a2803bd5d21036ebc098",
+    "ci": {
+      "id": 39085822061,
+      "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39085822061",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1,
+      "jobs": [
+        {
+          "id": 117552041001,
+          "name": "PostgreSQL migration and integration gates",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 117552041137,
+          "name": "Static, test, build, and audit gates",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    "results": [
+      {
+        "job": "PostgreSQL migration and integration gates",
+        "summaries": [
+          "2026-10-18T01:16:11.6773241Z All migrations have been successfully applied.",
+          "2026-10-18T01:18:30.2359416Z  Test Files  105 passed (105)",
+          "2026-10-18T01:18:30.2363378Z       Tests  549 passed (549)",
+          "2026-10-18T01:21:51.0588880Z  Test Files  287 passed (287)",
+          "2026-10-18T01:21:51.0601284Z       Tests  2047 passed (2047)",
+          "2026-10-18T01:21:51.0844860Z All files          |   96.65 |    93.48 |   98.47 |   97.56 |                   "
+        ]
+      },
+      {
+        "job": "Static, test, build, and audit gates",
+        "summaries": [
+          "2026-10-18T01:17:30.8909821Z  Test Files  162 passed (162)",
+          "2026-10-18T01:17:30.8917748Z       Tests  1440 passed (1440)",
+          "2026-10-18T01:17:37.0764777Z  Test Files  20 passed (20)",
+          "2026-10-18T01:17:37.0765821Z       Tests  58 passed (58)"
+        ]
+      }
+    ]
+  },
+  "methodology": "38 retained Public/own-Couple GET templates: three Vercel serial samples and one direct sample each; 20 four-reader profile/proposal/contracts waves (16 Vercel, 4 direct), plus 4 original six-reader incident waves (3 Vercel, 1 direct). No request retries. Full response download timed. Two-second median is an investigation threshold, not an SLA/p95/capacity claim. Session renewal is separate from measurement.",
+  "scope": "38 retained ordinary Public/own-Couple GET templates on the existing synthetic booking. No other-role, mutation, provider-payment or full capacity acceptance.",
+  "measurements": {
+    "startedAt": "2026-10-18T01:28:50.324Z",
+    "finishedAt": "2026-10-18T01:38:04.345Z",
+    "passed": true,
+    "samples": 269,
+    "serialReads": 152,
+    "profileMixedReads": 80,
+    "originalIncidentReads": 24,
+    "smokeReads": 4,
+    "sessionOperations": 9,
+    "serverErrors": 0,
+    "transportErrors": 0,
+    "slowThresholdMs": 2000,
+    "summary": [
+      {
+        "label": "/bookings/{bookingId}/payments/{attemptId}",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 5449.2583999999915,
+        "vercelMaxMs": 5452.650499999989,
+        "directMs": 5209.666099999973,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/seating-plans/{planId}",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 5309.208799999993,
+        "vercelMaxMs": 5360.540100000042,
+        "directMs": 5076.508600000001,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/seating-plans/current",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 5277.857900000003,
+        "vercelMaxMs": 5355.499400000001,
+        "directMs": 5071.386499999964,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/seating-layout-options",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 4708.272400000002,
+        "vercelMaxMs": 4743.704900000012,
+        "directMs": 4442.926800000016,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/invitation-templates",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 4381.253100000002,
+        "vercelMaxMs": 4386.681100000016,
+        "directMs": 4146.204300000041,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/invitations",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 4231.992799999993,
+        "vercelMaxMs": 4236.440000000002,
+        "directMs": 3935.5226999999722,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/invitations/{designId}",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 4083.9764999999898,
+        "vercelMaxMs": 4207.171700000006,
+        "directMs": 3936.5864000000292,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/contracts/{revisionId}/pdf",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 3914.5627999999997,
+        "vercelMaxMs": 3962.468200000003,
+        "directMs": 3460.3206000000355,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/attendance-summary",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 3582.315399999992,
+        "vercelMaxMs": 3597.9274000000005,
+        "directMs": 3189.997399999993,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/guests/{guestId}/personalized-invitations",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 3515.830400000006,
+        "vercelMaxMs": 3657.213700000022,
+        "directMs": 3265.6521000000066,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/guest-groups",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 3344.023600000015,
+        "vercelMaxMs": 4316.556800000006,
+        "directMs": 2956.5029000000213,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/guests",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 3218.967100000009,
+        "vercelMaxMs": 3224.604099999997,
+        "directMs": 2957.541300000041,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/guest-plan",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 3210.519899999985,
+        "vercelMaxMs": 3339.4397000000026,
+        "directMs": 2961.7180999999982,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/contracts",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 3205.528399999952,
+        "vercelMaxMs": 3205.966000000015,
+        "directMs": 2977.399800000014,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/check-in-settings",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 3136.882500000007,
+        "vercelMaxMs": 4254.480499999991,
+        "directMs": 2881.5960000000196,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/billing",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 2857.787900000025,
+        "vercelMaxMs": 4060.1589000000095,
+        "directMs": 2453.5264000000316,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/print-orders",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 2468.1333999999915,
+        "vercelMaxMs": 2487.2109000000055,
+        "directMs": 2089.498099999968,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/contract-appendices",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 2457.720100000006,
+        "vercelMaxMs": 2475.931899999996,
+        "directMs": 2205.144800000009,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/management/bookings/{bookingId}/incidental-expenses",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 2400.996600000013,
+        "vercelMaxMs": 2406.407500000001,
+        "directMs": 2168.647100000002,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/incidental-expenses",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 2296.5004999999946,
+        "vercelMaxMs": 4152.681699999957,
+        "directMs": 2003.7419999999693,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/final-invoices",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 2142.6407999999938,
+        "vercelMaxMs": 2269.314400000003,
+        "directMs": 1852.0997999999672,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/catalog/restaurant",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 2035.7981999999902,
+        "vercelMaxMs": 2052.0895999999993,
+        "directMs": 1735.7761000000173,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/catalog/halls/{hallId}",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 2003.5934000000125,
+        "vercelMaxMs": 2031.0553999999975,
+        "directMs": 666.4457999999868,
+        "statuses": [
+          200
+        ],
+        "slow": true
+      },
+      {
+        "label": "/bookings/{bookingId}/proposal",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 1985.324999999997,
+        "vercelMaxMs": 1993.5195999999996,
+        "directMs": 1748.5518999999622,
+        "statuses": [
+          200
+        ],
+        "slow": false
+      },
+      {
+        "label": "/catalog/halls",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 1621.403799999971,
+        "vercelMaxMs": 2006.6771000000008,
+        "directMs": 1263.1186999999918,
+        "statuses": [
+          200
+        ],
+        "slow": false
+      },
+      {
+        "label": "/catalog/dishes",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 1578.5291000000434,
+        "vercelMaxMs": 1602.8200999999972,
+        "directMs": 1342.739499999967,
+        "statuses": [
+          200
+        ],
+        "slow": false
+      },
+      {
+        "label": "/catalog/print-offerings",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 1542.0192000000097,
+        "vercelMaxMs": 1558.6168999999936,
+        "directMs": 1266.850999999966,
+        "statuses": [
+          200
+        ],
+        "slow": false
+      },
+      {
+        "label": "/catalog/services",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 1405.8899999999994,
+        "vercelMaxMs": 1423.8825999999826,
+        "directMs": 1112.4882000000216,
+        "statuses": [
+          200
+        ],
+        "slow": false
+      },
+      {
+        "label": "/catalog/menu-packages",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 1400.7975000000151,
+        "vercelMaxMs": 1420.0748000000021,
+        "directMs": 1119.7636999999522,
+        "statuses": [
+          200
+        ],
+        "slow": false
+      },
+      {
+        "label": "/notifications/inbox",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 1371.779600000009,
+        "vercelMaxMs": 2158.0941999999923,
+        "directMs": 1257.5274999999674,
+        "statuses": [
+          200
+        ],
+        "slow": false
+      },
+      {
+        "label": "/notifications/unread-count",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 1324.671399999992,
+        "vercelMaxMs": 1944.9181999999855,
+        "directMs": 959.9977000000072,
+        "statuses": [
+          200
+        ],
+        "slow": false
+      },
+      {
+        "label": "/couple/bookings",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 1233.1361999999936,
+        "vercelMaxMs": 1236.8344999999972,
+        "directMs": 985.4576000000234,
+        "statuses": [
+          200
+        ],
+        "slow": false
+      },
+      {
+        "label": "/notifications/preferences",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 955.8463999999803,
+        "vercelMaxMs": 1639.263500000001,
+        "directMs": 665.8956999999937,
+        "statuses": [
+          200
+        ],
+        "slow": false
+      },
+      {
+        "label": "/notifications/android-installations",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 908.4002000000037,
+        "vercelMaxMs": 1491.9536999999837,
+        "directMs": 662.6608000000124,
+        "statuses": [
+          200
+        ],
+        "slow": false
+      },
+      {
+        "label": "/auth/profile",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 798.3718999999983,
+        "vercelMaxMs": 895.7037000000055,
+        "directMs": 634.880999999994,
+        "statuses": [
+          200
+        ],
+        "slow": false
+      },
+      {
+        "label": "/consultations/{consultationId}/couple-profile",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 782.7350999999908,
+        "vercelMaxMs": 884.1946999999927,
+        "directMs": 521.4952000000048,
+        "statuses": [
+          200
+        ],
+        "slow": false
+      },
+      {
+        "label": "/auth/sessions",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 777.017399999997,
+        "vercelMaxMs": 788.4021999999823,
+        "directMs": 530.0285000000149,
+        "statuses": [
+          200
+        ],
+        "slow": false
+      },
+      {
+        "label": "/auth/me",
+        "vercelN": 3,
+        "directN": 1,
+        "vercelMedianMs": 762.7280000000028,
+        "vercelMaxMs": 1720.044900000008,
+        "directMs": 1651.6359999999986,
+        "statuses": [
+          200
+        ],
+        "slow": false
+      }
+    ]
+  },
+  "profile": {
+    "captured": 48,
+    "statuses": [
+      200
+    ],
+    "serial": 4,
+    "mixed": 40,
+    "browser": 4,
+    "maxClientMs": 5328.523700000001,
+    "maxBackendMs": 4257.34,
+    "vercelSerialMedianMs": 782.7350999999908
+  },
+  "browser": {
+    "passed": true,
+    "startedAt": "2026-10-18T01:27:20.708Z",
+    "finishedAt": "2026-10-18T01:28:36.118Z",
+    "capturedApiResponses": 22,
+    "revocationProbe": {
+      "at": "2026-10-18T01:28:36.118Z",
+      "path": "/api/v1/auth/me",
+      "method": "GET",
+      "status": 401,
+      "requestId": "ab38ad5a-de25-44ae-8ed2-c7093a1dcc5a",
+      "phase": "revoked-browser-identity"
+    },
+    "profileVisits": [
+      {
+        "round": 1,
+        "at": "2026-10-18T01:28:03.198Z",
+        "url": "/khong-gian/thoa-thuan/ten",
+        "profile": [
+          {
+            "at": "2026-10-18T01:28:00.073Z",
+            "method": "GET",
+            "path": "/api/v1/consultations/{id}/couple-profile",
+            "status": 200,
+            "requestId": "c7bf77cc-259b-41d4-9670-2fea72a63ef4",
+            "ms": 904.204,
+            "ttfbMs": 898.655,
+            "finished": true
+          }
+        ],
+        "errorBanner": 0
+      }
+    ],
+    "firstPassPartial": {
+      "scope": "First browser pass on the deployed source; selected observed profile responses retained. Full metadata export failed after logout, before saving. This is not a complete HTTP-operation count.",
+      "startedAt": "2026-10-18T01:24:12.177Z",
+      "profile": [
+        {
+          "requestId": "68c51dcf-a32f-4b62-925c-650ecdcc5080",
+          "status": 200,
+          "ms": 921.245
+        },
+        {
+          "requestId": "d60fa1f5-949f-4439-9d92-e06fe239a086",
+          "status": 200,
+          "ms": 984.139
+        },
+        {
+          "requestId": "0bbfbd15-22d9-470c-bf5c-c69568a98b57",
+          "status": 200,
+          "ms": 916.143
+        }
+      ],
+      "profileErrorBanners": 0,
+      "predeploymentPublicBaseline": {
+        "unauthenticatedRefreshStatus": 401,
+        "nextImageStatus": 400,
+        "imagePath": "/_next/image",
+        "queryTokensRetained": false,
+        "outsidePostdeploymentProfileAcceptance": true
+      },
+      "screenshot": "output/playwright/api500-profile-rollout-20261018/profile-after.png",
+      "captureFailure": "ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING while trying to save metadata from Playwright VM; browser flow and API responses are separate from this tooling failure.",
+      "operatorWaitFailure": "The initial overview selected another authorized synthetic event. Waiting for visible Orchid Hall matched a hidden option and timed out; corrected by navigating to the supplied booking URL. This was not an API failure.",
+      "session": "Normal UI logout and old-bearer 401 assertion ran before the export failure; credentials were cleared by the collector detach. A fresh browser pass will capture metadata through the tool result before closing the tab."
+    },
+    "failures": [],
+    "consoleErrors": [
+      {
+        "at": "2026-10-18T01:27:21.070Z",
+        "source": "/api/v1/auth/web-session-refreshes"
+      }
+    ],
+    "pageErrors": [],
+    "screenshot": "output/playwright/api500-profile-rollout-20261018/profile-after.png"
+  },
+  "correlation": {
+    "expected": 295,
+    "matched": 295,
+    "passed": true,
+    "openapiMatches": true
+  },
+  "data": {
+    "before": {
+      "at": "2026-10-18T01:15:13.523Z",
+      "readOnly": true,
+      "tables": {
+        "Booking": {
+          "count": 1,
+          "sha256": "4c4c2f575556f03261cd3a5a0a190f19c9a65cada728ba1616cb16215e723208"
+        },
+        "GuestWorkspace": {
+          "count": 1,
+          "sha256": "96388fdfb6c0cb76f5b4ba384f14fc93db844222a1a20bf4533037b88e95b12d"
+        },
+        "GuestPlanRevision": {
+          "count": 1,
+          "sha256": "7cd3122165cb67c4cdcaa430d7c895cb95942ad35a83bfc933d37df99e20804d"
+        },
+        "Guest": {
+          "count": 8,
+          "sha256": "b2b586adc5cbb9b291e0efab771009f86f2cb76fa1f76dc3a4b64f06aef13ee7"
+        },
+        "GuestGroup": {
+          "count": 4,
+          "sha256": "43da72db9deab54cb3d6d7e7e81b61ab59841e88fd87a5ac18be2f8dc3fa5eaa"
+        },
+        "GuestHistory": {
+          "count": 12,
+          "sha256": "aea3a3b7a8adc761e8720777c31b1e76128d60e433378dc399d9cbeeb732fcc5"
+        },
+        "SeatingPlan": {
+          "count": 1,
+          "sha256": "9c1ec53ea1d901487d515a638f848e0523c35e36c905a2b54d8bff196b759270"
+        },
+        "SeatingPlanRevision": {
+          "count": 2,
+          "sha256": "afc6805271c1530347d10b0683fbad7463008dbef27f19cb38796cf9f2167f6b"
+        },
+        "StaffConfiguration": {
+          "count": 1,
+          "sha256": "034f11ef5605b519154fe7612189557cde39fbf0296f6bbc5478a17869e6d5cb"
+        },
+        "StaffAssignment": {
+          "count": 1,
+          "sha256": "7467e6b94d7fe8965caa7c6dd3e5d333464782c8cd7316fba5e871d0dd897bb1"
+        },
+        "StaffHistory": {
+          "count": 3,
+          "sha256": "0b45bd0ff60f61172375fe1f86a7f6a8d0c9be542b84ff789045b2a6072e53ab"
+        },
+        "StaffCheckInRecord": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "CommercialContractRevision": {
+          "count": 1,
+          "sha256": "6e9ab27802ea39a595178575b26ef3cbc244a42a2264539b770704e7a2f38d8b"
+        },
+        "FinalInvoiceRevision": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "BillingLedgerEntry": {
+          "count": 2,
+          "sha256": "c3e10fe0d068362606967596ff14aa980ec43bc85cf8a763c1cc4936c25f9f57"
+        },
+        "Consultation": {
+          "count": 1,
+          "sha256": "d0ad11435d1e0ea5e933814c9a6e153a26861a7dfffdc888dcd6a1ab27359d3e"
+        },
+        "ConsultationAccess": {
+          "count": 1,
+          "sha256": "428338c837e20b9f7aded8b818a8f1b5a9a84526ab42b15af12a335e68605278"
+        }
+      },
+      "migrations": {
+        "count": 60,
+        "sha256": "a215d732a5d292fe7d13d0c100ca86b92ead1f7e40a1c9531fcbcabdb5d88103",
+        "allChecksumsMatch": true
+      }
+    },
+    "after": {
+      "at": "2026-10-18T01:38:42.548Z",
+      "readOnly": true,
+      "tables": {
+        "Booking": {
+          "count": 1,
+          "sha256": "4c4c2f575556f03261cd3a5a0a190f19c9a65cada728ba1616cb16215e723208"
+        },
+        "GuestWorkspace": {
+          "count": 1,
+          "sha256": "96388fdfb6c0cb76f5b4ba384f14fc93db844222a1a20bf4533037b88e95b12d"
+        },
+        "GuestPlanRevision": {
+          "count": 1,
+          "sha256": "7cd3122165cb67c4cdcaa430d7c895cb95942ad35a83bfc933d37df99e20804d"
+        },
+        "Guest": {
+          "count": 8,
+          "sha256": "b2b586adc5cbb9b291e0efab771009f86f2cb76fa1f76dc3a4b64f06aef13ee7"
+        },
+        "GuestGroup": {
+          "count": 4,
+          "sha256": "43da72db9deab54cb3d6d7e7e81b61ab59841e88fd87a5ac18be2f8dc3fa5eaa"
+        },
+        "GuestHistory": {
+          "count": 12,
+          "sha256": "aea3a3b7a8adc761e8720777c31b1e76128d60e433378dc399d9cbeeb732fcc5"
+        },
+        "SeatingPlan": {
+          "count": 1,
+          "sha256": "9c1ec53ea1d901487d515a638f848e0523c35e36c905a2b54d8bff196b759270"
+        },
+        "SeatingPlanRevision": {
+          "count": 2,
+          "sha256": "afc6805271c1530347d10b0683fbad7463008dbef27f19cb38796cf9f2167f6b"
+        },
+        "StaffConfiguration": {
+          "count": 1,
+          "sha256": "034f11ef5605b519154fe7612189557cde39fbf0296f6bbc5478a17869e6d5cb"
+        },
+        "StaffAssignment": {
+          "count": 1,
+          "sha256": "7467e6b94d7fe8965caa7c6dd3e5d333464782c8cd7316fba5e871d0dd897bb1"
+        },
+        "StaffHistory": {
+          "count": 3,
+          "sha256": "0b45bd0ff60f61172375fe1f86a7f6a8d0c9be542b84ff789045b2a6072e53ab"
+        },
+        "StaffCheckInRecord": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "CommercialContractRevision": {
+          "count": 1,
+          "sha256": "6e9ab27802ea39a595178575b26ef3cbc244a42a2264539b770704e7a2f38d8b"
+        },
+        "FinalInvoiceRevision": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "BillingLedgerEntry": {
+          "count": 2,
+          "sha256": "c3e10fe0d068362606967596ff14aa980ec43bc85cf8a763c1cc4936c25f9f57"
+        },
+        "Consultation": {
+          "count": 1,
+          "sha256": "d0ad11435d1e0ea5e933814c9a6e153a26861a7dfffdc888dcd6a1ab27359d3e"
+        },
+        "ConsultationAccess": {
+          "count": 1,
+          "sha256": "428338c837e20b9f7aded8b818a8f1b5a9a84526ab42b15af12a335e68605278"
+        }
+      },
+      "migrations": {
+        "count": 60,
+        "sha256": "a215d732a5d292fe7d13d0c100ca86b92ead1f7e40a1c9531fcbcabdb5d88103",
+        "allChecksumsMatch": true
+      },
+      "businessUnchanged": true,
+      "migrationsUnchanged": true
+    },
+    "providerPaymentGuard": {
+      "at": "2026-10-18T01:18:50.473Z",
+      "manualOnly": true,
+      "readOnlyProviderCheck": true,
+      "provider": "MANUAL",
+      "providerReconciliationInvoked": false
+    }
+  },
+  "postflight": {
+    "at": "2026-10-18T01:39:05.107Z",
+    "deploymentId": "5d548270-df78-4010-8f53-f7c3e87607b8",
+    "commit": "9bbd251fa318abed8210e1b15aa72a825d7e9876",
+    "image": "sha256:84f84ccac8cd53ace49400aa22dad10f769dcfb55d0753ba94fa1df158d94d70",
+    "status": "SUCCESS",
+    "stopped": false,
+    "oldStopped": true,
+    "onlyExpectedDeploymentActive": true,
+    "configurationUnchanged": true,
+    "serviceConfigurationUnchanged": true,
+    "businessUnchanged": true,
+    "migrationsUnchanged": true,
+    "measurementsPassed": true,
+    "browserPassed": true,
+    "passed": true
+  },
+  "knownLimits": [
+    "Earlier live 500s and the first candidate CI/Windows failures remain preserved in the prior investigation.",
+    "The first browser capture export/wait errors were tooling failures; only its three retained profile responses are included in correlation counts.",
+    "Zero observed 5xx in this bounded campaign is not proof that every future request, role or load level will succeed.",
+    "Profile fix does not remove admission limits from other transactional routes or establish a latency SLA.",
+    "Worker configuration stays enabled/default as before; successful reads do not prove every background delivery or sweep completed.",
+    "Overall production NO_GO/provider gates remain unchanged."
+  ],
+  "passed": true
+}

@@ -1,0 +1,4971 @@
+{
+  "auditDate": "2026-10-19",
+  "timezone": "Asia/Saigon",
+  "site": "https://wedding-web-silk.vercel.app",
+  "scope": "Read-only dashboard navigation on default selected existing booking; login/refresh/logout security writes only.",
+  "backend": {
+    "deploymentId": "6ec27e24-359b-40c7-b67f-6e712a56617f",
+    "sourceCommit": "6626a3a44b306300fee78a6509e8fb4cfb2099e0",
+    "region": "sfo"
+  },
+  "localFrontendSource": "5ac528ac8096e296a3ae07678c3ab1b798602fa4; deployed frontend commit not independently verified",
+  "browser": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+    "viewport": {
+      "width": 1072,
+      "height": 687
+    },
+    "throttling": "No artificial CPU/network throttling applied; single operator browser, desktop environment load uncontrolled"
+  },
+  "sample": {
+    "apiRequests": 99,
+    "matchedCompletionLogs": 99,
+    "http5xx": 0,
+    "networkFailures": 0,
+    "refreshCalls": 12,
+    "authMeCalls": 13
+  },
+  "methodology": {
+    "primary": "Playwright Request.timing().responseEnd (milliseconds) and matched Railway durationMs; request IDs join browser and server evidence.",
+    "pageWait": "Derived per navigation: first API start to last API response end before next navigation. Not Web Vitals, CPU time, p95 or field RUM.",
+    "excluded": "Automation ready probes can resolve early during intermediate empty states or late due static 'Đang mở' text. Do not treat raw mark.ms as definitive rendered-ready latency; 30s profile result invalid. First guest failure occurred during heavy main-thread stalls and is retained separately.",
+    "residual": "clientMs minus backendMs includes browser/network/edge/proxy/transport; not all frontend CPU or Vercel processing.",
+    "otherTraffic": "Only exact audit request IDs retained from shared deployment logs."
+  },
+  "initialValidation": {
+    "status": 422,
+    "code": "VALIDATION_ERROR",
+    "field": "email",
+    "detail": "Invalid email address",
+    "requestId": "49183679-ad38-4780-a3a9-2c46f428bb7d",
+    "display": "Không thể kết nối máy chủ. Vui lòng thử lại.",
+    "excludedFromAuthenticatedCount": true
+  },
+  "guestUiFailure": {
+    "supportRequestId": "4c8356c1-206a-418a-a5a1-dd7255bf1ec5",
+    "status": 200,
+    "responseContentType": "application/json; charset=utf-8",
+    "responseShape": {
+      "data": {
+        "items": [],
+        "sourceSequence": "number",
+        "nextCursor": null
+      }
+    },
+    "display": "Máy chủ từ chối yêu cầu.",
+    "reproduced": 1,
+    "recovery": "Retry loads successfully; exact thrown error kind/stack unobserved",
+    "interpretation": "Client-side response consumption/validation/abort handling is suspected. No server rejection is evidenced for this support ID."
+  },
+  "pageTimings": [
+    {
+      "name": "Kịch bản lần 1",
+      "automationMs": 9221,
+      "fromStartToLastApiMs": 17005.4,
+      "apiWindowMs": 7493.8,
+      "requests": 6,
+      "slowest": 3152.576
+    },
+    {
+      "name": "Tên lần 1",
+      "automationMs": 4913,
+      "fromStartToLastApiMs": 4529.4,
+      "apiWindowMs": 3306,
+      "requests": 2,
+      "slowest": 3304.744
+    },
+    {
+      "name": "Hợp đồng lần 1",
+      "automationMs": 9012,
+      "fromStartToLastApiMs": 4394.2,
+      "apiWindowMs": 3243.3,
+      "requests": 2,
+      "slowest": 3240.739
+    },
+    {
+      "name": "Thanh toán lần 1",
+      "automationMs": 12140,
+      "fromStartToLastApiMs": 11763.5,
+      "apiWindowMs": 10569.2,
+      "requests": 5,
+      "slowest": 4335.795
+    },
+    {
+      "name": "Khách lần 1",
+      "automationMs": 30623,
+      "fromStartToLastApiMs": 30684.9,
+      "apiWindowMs": 29508.4,
+      "requests": 5,
+      "slowest": 5317.472
+    },
+    {
+      "name": "Khách retry",
+      "automationMs": 15383,
+      "fromStartToLastApiMs": 15032,
+      "apiWindowMs": 12853.5,
+      "requests": 5,
+      "slowest": 9816.634
+    },
+    {
+      "name": "Sơ đồ lần 1",
+      "automationMs": 6308,
+      "fromStartToLastApiMs": 5843,
+      "apiWindowMs": 4232.9,
+      "requests": 2,
+      "slowest": 4232.934
+    },
+    {
+      "name": "Thiệp lần 1",
+      "automationMs": 19528,
+      "fromStartToLastApiMs": 19215.4,
+      "apiWindowMs": 16102.4,
+      "requests": 6,
+      "slowest": 5745.869
+    },
+    {
+      "name": "Phụ lục lần 1",
+      "automationMs": 8411,
+      "fromStartToLastApiMs": 6913.1,
+      "apiWindowMs": 4761.4,
+      "requests": 2,
+      "slowest": 4761.422
+    },
+    {
+      "name": "Quyết toán lần 1",
+      "automationMs": 9247,
+      "fromStartToLastApiMs": 8913.9,
+      "apiWindowMs": 6736.6,
+      "requests": 3,
+      "slowest": 6734.225
+    },
+    {
+      "name": "Thông báo lần 1",
+      "automationMs": 5866,
+      "fromStartToLastApiMs": 5533.9,
+      "apiWindowMs": 4180.7,
+      "requests": 4,
+      "slowest": 2119.684
+    },
+    {
+      "name": "Hồ sơ lần 1",
+      "automationMs": 30055,
+      "fromStartToLastApiMs": 4294.1,
+      "apiWindowMs": 2909.6,
+      "requests": 3,
+      "slowest": 2273.873
+    },
+    {
+      "name": "Tổng quan quay lại",
+      "automationMs": 9478,
+      "fromStartToLastApiMs": 8922.9,
+      "apiWindowMs": 7756.4,
+      "requests": 7,
+      "slowest": 2492.185
+    },
+    {
+      "name": "Kịch bản lần 2",
+      "automationMs": 4223,
+      "fromStartToLastApiMs": 8511.1,
+      "apiWindowMs": 7217.6,
+      "requests": 6,
+      "slowest": 3475.283
+    },
+    {
+      "name": "Tên lần 2",
+      "automationMs": 5546,
+      "fromStartToLastApiMs": 4526.5,
+      "apiWindowMs": 3235.5,
+      "requests": 2,
+      "slowest": 3235.455
+    },
+    {
+      "name": "Hợp đồng lần 2",
+      "automationMs": 5485,
+      "fromStartToLastApiMs": 4464.5,
+      "apiWindowMs": 3234.2,
+      "requests": 2,
+      "slowest": 3228.307
+    },
+    {
+      "name": "Thanh toán lần 2",
+      "automationMs": 13873,
+      "fromStartToLastApiMs": 12749.4,
+      "apiWindowMs": 10579.3,
+      "requests": 5,
+      "slowest": 4349.505
+    },
+    {
+      "name": "Khách lần 2",
+      "automationMs": 11269,
+      "fromStartToLastApiMs": 10717.5,
+      "apiWindowMs": 9478.6,
+      "requests": 5,
+      "slowest": 5460.759
+    },
+    {
+      "name": "Thiệp lần 2",
+      "automationMs": 17703,
+      "fromStartToLastApiMs": 14889.3,
+      "apiWindowMs": 12708.2,
+      "requests": 6,
+      "slowest": 5305.217
+    },
+    {
+      "name": "Phụ lục lần 2",
+      "automationMs": 6460,
+      "fromStartToLastApiMs": 5948.3,
+      "apiWindowMs": 4750.6,
+      "requests": 2,
+      "slowest": 4750.614
+    },
+    {
+      "name": "Quyết toán lần 2",
+      "automationMs": 8653,
+      "fromStartToLastApiMs": 7704.3,
+      "apiWindowMs": 5774.7,
+      "requests": 3,
+      "slowest": 5752.328
+    },
+    {
+      "name": "Thông báo lần 2",
+      "automationMs": 6432,
+      "fromStartToLastApiMs": 5276.2,
+      "apiWindowMs": 4112.3,
+      "requests": 4,
+      "slowest": 2048.819
+    },
+    {
+      "name": "Hồ sơ lần 2",
+      "automationMs": 4921,
+      "fromStartToLastApiMs": 4540.4,
+      "apiWindowMs": 2883.8,
+      "requests": 3,
+      "slowest": 2276.726
+    }
+  ],
+  "requests": [
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/web-sessions",
+      "method": "POST",
+      "status": 201,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383207377.673,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 2.301,
+        "responseStart": 2586.393,
+        "responseEnd": 2589.304
+      },
+      "requestId": "4615f7e1-d89e-4832-aa14-25a7ed6570f2",
+      "size": {
+        "requestBodySize": 66,
+        "requestHeadersSize": 788,
+        "responseBodySize": 638,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383210008
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/me",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383209989.375,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.753,
+        "responseStart": 1067.951,
+        "responseEnd": 1077.816
+      },
+      "requestId": "b7ded933-b5c9-43a3-88c5-4cf6f7c6c6d4",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 820,
+        "responseBodySize": 1024,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383211065
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/catalog/restaurant",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383211824.596,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.403,
+        "responseStart": 865.903,
+        "responseEnd": 868.236
+      },
+      "requestId": "e2fa8b09-7380-4876-88f4-b9a800c1469b",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 824,
+        "responseBodySize": 214,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383212697
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383211667.206,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.43,
+        "responseStart": 1989.657,
+        "responseEnd": 1992.107
+      },
+      "requestId": "d58ac9b5-cd1b-4cb8-9f90-b31fc8692642",
+      "size": {
+        "requestBodySize": 2,
+        "requestHeadersSize": 886,
+        "responseBodySize": 1284,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383213663
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/me",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383213660.407,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.034,
+        "responseStart": 586.635,
+        "responseEnd": 588.099
+      },
+      "requestId": "a15f56e6-72c3-4b9e-8a3e-c4f4f8400d3f",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 821,
+        "responseBodySize": 410,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383214255
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/couple/bookings",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383214256.367,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.572,
+        "responseStart": 1150.808,
+        "responseEnd": 1158.141
+      },
+      "requestId": "71fcaf2b-35e9-48e2-9976-f76d1c748bbf",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 857,
+        "responseBodySize": 574,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383215440
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/proposal",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383215479.5881,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.336,
+        "responseStart": 2319.132,
+        "responseEnd": 2320.709
+      },
+      "requestId": "2619928c-3ba9-4275-8f45-5fec4a4371ab",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1005,
+        "responseBodySize": 985,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383217977
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/notifications/inbox",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383219063.881,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.008,
+        "responseStart": 1294.691,
+        "responseEnd": 1296.757
+      },
+      "requestId": "957c6155-1057-445d-9ab4-09bd4cd877a9",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 944,
+        "responseBodySize": 254,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383220364
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/notifications/unread-count",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383219065.217,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.337,
+        "responseStart": 1574.368,
+        "responseEnd": 1576.048
+      },
+      "requestId": "bb9b7725-b5b6-4096-9dca-679642b59f2c",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 949,
+        "responseBodySize": 624,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383220645
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383247457.638,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.152,
+        "responseStart": 1994.091,
+        "responseEnd": 2013.842
+      },
+      "requestId": "79fa6da6-b6bc-4f71-bf7f-058f6a74272a",
+      "size": {
+        "requestBodySize": 2,
+        "requestHeadersSize": 953,
+        "responseBodySize": 861,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383249490
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/me",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383249493.7898,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.329,
+        "responseStart": 598.919,
+        "responseEnd": 618.787
+      },
+      "requestId": "d887a527-2334-4afd-84c3-bcda43803c38",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 888,
+        "responseBodySize": 795,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383250115
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/couple/bookings",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383250323.5898,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.73,
+        "responseStart": 1701.404,
+        "responseEnd": 1909.612
+      },
+      "requestId": "695c9244-a74b-472a-88f4-4d3b0ef854f8",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 924,
+        "responseBodySize": 586,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383252222
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/couple/bookings",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383250514.0732,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.698,
+        "responseStart": 2630.342,
+        "responseEnd": 2655.447
+      },
+      "requestId": "7da05f6d-17f2-4c56-91ef-03f2fa43ee99",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 924,
+        "responseBodySize": 591,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383253142
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/proposal",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383250533.952,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.024,
+        "responseStart": 3146.189,
+        "responseEnd": 3152.576
+      },
+      "requestId": "c2a744f6-7d0e-4914-a8ba-f17fed385680",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 982,
+        "responseBodySize": 984,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383253732
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/proposal",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383252224.189,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.01,
+        "responseStart": 2713.105,
+        "responseEnd": 2727.229
+      },
+      "requestId": "07508281-de1f-473b-8251-7e6abc428d5a",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1025,
+        "responseBodySize": 928,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383255243
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383272804.426,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.443,
+        "responseStart": 3107.761,
+        "responseEnd": 3110.003
+      },
+      "requestId": "d8f696e2-d2ea-4222-ab0f-0f95aef85071",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1022,
+        "responseBodySize": 2158,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383275922
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/consultations/78b8d64d-02e2-4b1c-8843-124c577ed964/couple-profile",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383272805.7007,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.27,
+        "responseStart": 3300.378,
+        "responseEnd": 3304.744
+      },
+      "requestId": "ccb7dba2-9544-4d49-a1e1-a85f4d351110",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1042,
+        "responseBodySize": 794,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383276120
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383284415.921,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.609,
+        "responseStart": 3093.742,
+        "responseEnd": 3103.592
+      },
+      "requestId": "7143af23-aa40-48ae-be2d-4a2d18046d87",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1027,
+        "responseBodySize": 1951,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383287543
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/consultations/78b8d64d-02e2-4b1c-8843-124c577ed964/couple-profile",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383284418.509,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.489,
+        "responseStart": 3236.213,
+        "responseEnd": 3240.739
+      },
+      "requestId": "803dacc0-ef89-46bb-96b5-996aea0eca17",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1047,
+        "responseBodySize": 322,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383289620
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383308665.2798,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.805,
+        "responseStart": 2026.729,
+        "responseEnd": 2038.526
+      },
+      "requestId": "4dbd9cc8-39dc-4223-8ca0-3d32f5698767",
+      "size": {
+        "requestBodySize": 2,
+        "requestHeadersSize": 944,
+        "responseBodySize": 656,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383310709
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/me",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383310703.065,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.816,
+        "responseStart": 622.772,
+        "responseEnd": 627.381
+      },
+      "requestId": "f52009ce-5e6e-45e6-be59-7789f33ee796",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 879,
+        "responseBodySize": 360,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383311335
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383311348.4392,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.214,
+        "responseStart": 3082.175,
+        "responseEnd": 3087.063
+      },
+      "requestId": "3d4c95bc-fa91-42c2-b707-9d9d64881e8e",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1018,
+        "responseBodySize": 2166,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383314438
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/proposal",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383311347.024,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.367,
+        "responseStart": 4330.26,
+        "responseEnd": 4335.795
+      },
+      "requestId": "f143df61-f076-4331-b364-ba1837754ea2",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1016,
+        "responseBodySize": 1452,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383315685
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/billing",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383315684.204,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.627,
+        "responseStart": 3546.269,
+        "responseEnd": 3550.279
+      },
+      "requestId": "1dff64d7-6fd5-4f28-84ea-bffcf7af3df9",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1023,
+        "responseBodySize": 687,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383319242
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guest-groups",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383328060.456,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.526,
+        "responseStart": 2955.129,
+        "responseEnd": 2959.397
+      },
+      "requestId": "e2669a1a-10a7-4191-91b1-947cd5f35f3c",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1028,
+        "responseBodySize": 694,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383334884
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guest-plan",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383348553.007,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.014,
+        "responseStart": 3049.415,
+        "responseEnd": 3066.166
+      },
+      "requestId": "2f57c030-61d4-42c9-8736-e8314a38fc5a",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1024,
+        "responseBodySize": 874,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383355150
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guests",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383349415.2798,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.42,
+        "responseStart": 4588.708,
+        "responseEnd": 4874.436
+      },
+      "requestId": "4c8356c1-206a-418a-a5a1-dd7255bf1ec5",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1039,
+        "responseBodySize": 491,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383367524
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/check-in-settings",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383351247.167,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 2.02,
+        "responseStart": 2821.842,
+        "responseEnd": 2854.091
+      },
+      "requestId": "50dfd8c1-30d3-437d-bbef-5ce4bf7200df",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1038,
+        "responseBodySize": 710,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383368303
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/attendance-summary",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383352251.401,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.512,
+        "responseStart": 4315.713,
+        "responseEnd": 5317.472
+      },
+      "requestId": "0f50d6eb-8879-4c62-9fc4-b1e15b0cf169",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1040,
+        "responseBodySize": 656,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383368470
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guest-groups",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383402839.5168,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 4.848,
+        "responseStart": 2996.466,
+        "responseEnd": 3013.829
+      },
+      "requestId": "fe92495b-cdfd-42a5-acef-9be6070cf6fb",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1028,
+        "responseBodySize": 931,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383405866
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guest-plan",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383405869.1,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.87,
+        "responseStart": 3577.762,
+        "responseEnd": 3580.126
+      },
+      "requestId": "1741d6e1-2ffa-45db-9c5c-4bf2d97c69e5",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1024,
+        "responseBodySize": 447,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383409518
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guests",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383405871.529,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.407,
+        "responseStart": 5930.009,
+        "responseEnd": 5932.217
+      },
+      "requestId": "689ed6f0-a2cf-41f2-bc96-3526d51f45de",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1039,
+        "responseBodySize": 269,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383411812
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/check-in-settings",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383405872.293,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.346,
+        "responseStart": 7456.92,
+        "responseEnd": 7459.097
+      },
+      "requestId": "597f06b9-2981-4558-82e4-ec00431a603f",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1038,
+        "responseBodySize": 321,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383413359
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/attendance-summary",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383405876.351,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.509,
+        "responseStart": 9810.483,
+        "responseEnd": 9816.634
+      },
+      "requestId": "a90822bf-9552-4e16-9b72-3bb79e7b34a9",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1040,
+        "responseBodySize": 516,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383415695
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guest-groups",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383422638.112,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.342,
+        "responseStart": 2969.036,
+        "responseEnd": 2971.827
+      },
+      "requestId": "c2a09295-ba85-4e2b-9a91-d3bb90c5b8bb",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1038,
+        "responseBodySize": 1069,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383425636
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/seating-layout-options",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383422636.092,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.488,
+        "responseStart": 4210.352,
+        "responseEnd": 4232.934
+      },
+      "requestId": "57520740-2530-415a-b13b-af5da17c0133",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1058,
+        "responseBodySize": 486,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383426916
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383435916.952,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.246,
+        "responseStart": 3023.653,
+        "responseEnd": 3036.283
+      },
+      "requestId": "7f5d8c97-16f8-44e6-9851-62aec0fcf2da",
+      "size": {
+        "requestBodySize": 2,
+        "requestHeadersSize": 948,
+        "responseBodySize": 731,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383438956
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/me",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383438960.182,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.089,
+        "responseStart": 1076.365,
+        "responseEnd": 1084.759
+      },
+      "requestId": "d4feffe8-fd2f-4775-be9c-86c8ffd3bfed",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 883,
+        "responseBodySize": 384,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383440043
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/print-orders",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383440045.777,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.142,
+        "responseStart": 3640.402,
+        "responseEnd": 3643.325
+      },
+      "requestId": "7263c94a-d6f8-420d-a785-8380ecd93bc9",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 985,
+        "responseBodySize": 252,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383443698
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/invitations",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383440043.415,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.895,
+        "responseStart": 5317.938,
+        "responseEnd": 5320.358
+      },
+      "requestId": "56563220-465c-4de3-850b-2b2a0b5ef0a9",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 983,
+        "responseBodySize": 750,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383445381
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383446281.787,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.076,
+        "responseStart": 4063.846,
+        "responseEnd": 4072.388
+      },
+      "requestId": "1fda3f8f-3e3b-45e1-86dc-94368287d7c2",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 979,
+        "responseBodySize": 2116,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383450353
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contract-appendices",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383446273.5168,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.1,
+        "responseStart": 5743.022,
+        "responseEnd": 5745.869
+      },
+      "requestId": "8e01c8a5-0230-4a80-843c-870956ff84d5",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 999,
+        "responseBodySize": 444,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383452026
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383463836.8472,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.547,
+        "responseStart": 3573.95,
+        "responseEnd": 3641.242
+      },
+      "requestId": "4cf9765e-b6f2-4cdc-b527-01a5bfe6210e",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1024,
+        "responseBodySize": 1984,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383467428
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contract-appendices",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383463769.667,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.551,
+        "responseStart": 4743.955,
+        "responseEnd": 4761.422
+      },
+      "requestId": "99f4cbe9-f4b2-4b87-b18f-1a4afb39d48c",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1044,
+        "responseBodySize": 941,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383468577
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/incidental-expenses",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383473329.33,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.816,
+        "responseStart": 3411.788,
+        "responseEnd": 3420.912
+      },
+      "requestId": "edac1d21-4122-4979-ae03-4f60a9691d32",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1038,
+        "responseBodySize": 327,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383476744
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/final-invoices",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383473327.313,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.426,
+        "responseStart": 4794.082,
+        "responseEnd": 4795.973
+      },
+      "requestId": "3c8b0809-4e42-4844-9035-456cc56278d2",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1028,
+        "responseBodySize": 331,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383478125
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/billing",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383473329.7021,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.445,
+        "responseStart": 6728.792,
+        "responseEnd": 6734.225
+      },
+      "requestId": "efb3079b-abaa-41a1-9d77-4ddc4beb6792",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1022,
+        "responseBodySize": 818,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383480069
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383489282.183,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.544,
+        "responseStart": 2105.894,
+        "responseEnd": 2119.684
+      },
+      "requestId": "0ee99732-9d5b-498d-898d-5d8c5b33b5db",
+      "size": {
+        "requestBodySize": 2,
+        "requestHeadersSize": 943,
+        "responseBodySize": 607,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383491408
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/me",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383491400.012,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.149,
+        "responseStart": 592.016,
+        "responseEnd": 595.534
+      },
+      "requestId": "b26470ae-d536-48db-842a-f13fc649f0f9",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 878,
+        "responseBodySize": 935,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383492009
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/notifications/inbox",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383491997.8052,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.573,
+        "responseStart": 1292.582,
+        "responseEnd": 1294.407
+      },
+      "requestId": "295cc54c-7e96-498a-baf1-b5fb9c02d1e4",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 954,
+        "responseBodySize": 253,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383493297
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/notifications/preferences",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383491999.9531,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.383,
+        "responseStart": 1460.697,
+        "responseEnd": 1462.907
+      },
+      "requestId": "8f749f08-7d05-4690-9a2b-14cb2fdf6185",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 957,
+        "responseBodySize": 253,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383493481
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/profile",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383496378.508,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.409,
+        "responseStart": 2127.685,
+        "responseEnd": 2129.209
+      },
+      "requestId": "dddeeee8-c0bc-4ca5-b7d8-640fa0bd5991",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 826,
+        "responseBodySize": 1035,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383498520
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383496379.261,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.476,
+        "responseStart": 2269.438,
+        "responseEnd": 2273.873
+      },
+      "requestId": "f37581ca-f2b1-4948-a167-9d41c8688f75",
+      "size": {
+        "requestBodySize": 2,
+        "requestHeadersSize": 881,
+        "responseBodySize": 659,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383498677
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/me",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383498675.0132,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.254,
+        "responseStart": 594.969,
+        "responseEnd": 613.123
+      },
+      "requestId": "e0e90cb3-9945-4c50-a7db-18a65981dc96",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 816,
+        "responseBodySize": 360,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383499282
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/catalog/restaurant",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383544150.97,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.209,
+        "responseStart": 891.136,
+        "responseEnd": 895.353
+      },
+      "requestId": "05aed989-a91f-4052-9d88-3b2d3f479ca9",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 824,
+        "responseBodySize": 778,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383545079
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383544149.5261,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.394,
+        "responseStart": 2487.814,
+        "responseEnd": 2492.185
+      },
+      "requestId": "ce0225af-719f-45fa-94e7-9bb782ac83d1",
+      "size": {
+        "requestBodySize": 2,
+        "requestHeadersSize": 886,
+        "responseBodySize": 708,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383546649
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/me",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383546645.4949,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.084,
+        "responseStart": 594.288,
+        "responseEnd": 598.707
+      },
+      "requestId": "555afef7-7fb2-47e0-9559-69e02a31cdb5",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 821,
+        "responseBodySize": 383,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383547250
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/couple/bookings",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383547245.276,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.627,
+        "responseStart": 1165.475,
+        "responseEnd": 1166.857
+      },
+      "requestId": "896a51a0-f3d9-4ce8-90ec-24aa8e101146",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 857,
+        "responseBodySize": 1160,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383548426
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/proposal",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383548427.85,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.106,
+        "responseStart": 1843.712,
+        "responseEnd": 1855.217
+      },
+      "requestId": "25ab99e1-08aa-48e3-a810-b2511be9fe46",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1005,
+        "responseBodySize": 983,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383550283
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/notifications/inbox",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383550329.5159,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.555,
+        "responseStart": 1289.416,
+        "responseEnd": 1291.658
+      },
+      "requestId": "c380ebc2-9e7f-4174-89d7-0c43aee12b9a",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 944,
+        "responseBodySize": 251,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383551624
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/notifications/unread-count",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383550331.573,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.361,
+        "responseStart": 1571.354,
+        "responseEnd": 1574.304
+      },
+      "requestId": "40e7166a-7f99-44f6-b801-e055e3c65d9a",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 949,
+        "responseBodySize": 336,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383551913
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383564673.449,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.154,
+        "responseStart": 2001.868,
+        "responseEnd": 2013.593
+      },
+      "requestId": "6a262825-ea56-49b9-b953-d41352cda34d",
+      "size": {
+        "requestBodySize": 2,
+        "requestHeadersSize": 953,
+        "responseBodySize": 1200,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383566699
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/me",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383566685.895,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 4.831,
+        "responseStart": 593.08,
+        "responseEnd": 597.473
+      },
+      "requestId": "5d15df91-ac9e-4b2a-a904-6c91630113ff",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 888,
+        "responseBodySize": 360,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383567300
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/couple/bookings",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383567290.0479,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.491,
+        "responseStart": 1691.484,
+        "responseEnd": 1696.073
+      },
+      "requestId": "00a7e2c5-feb1-4d75-8d48-79943559b88a",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 924,
+        "responseBodySize": 586,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383569001
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/couple/bookings",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383567313.368,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.865,
+        "responseStart": 2090.564,
+        "responseEnd": 2094.775
+      },
+      "requestId": "a3b4dcc3-af05-4ad2-be57-a5fe93c83dca",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 924,
+        "responseBodySize": 547,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383569415
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/proposal",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383567319.239,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 3.935,
+        "responseStart": 3470.808,
+        "responseEnd": 3475.283
+      },
+      "requestId": "9dec4168-f7a0-4c79-ac9d-8f8617102f12",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1034,
+        "responseBodySize": 277,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383570803
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/proposal",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383569004.481,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.499,
+        "responseStart": 2880.09,
+        "responseEnd": 2886.586
+      },
+      "requestId": "64f0b2d9-c5d1-43f8-a315-518c572be529",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1025,
+        "responseBodySize": 1284,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383571898
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/consultations/78b8d64d-02e2-4b1c-8843-124c577ed964/couple-profile",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383572674.135,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.482,
+        "responseStart": 870.188,
+        "responseEnd": 872.589
+      },
+      "requestId": "70e7a3e3-7900-4017-82fd-a5f113891f04",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1042,
+        "responseBodySize": 598,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383573553
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383572672.0222,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.479,
+        "responseStart": 3228.371,
+        "responseEnd": 3235.455
+      },
+      "requestId": "0ce6d0d6-d4b0-45a0-82e0-dbabb7a927df",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1022,
+        "responseBodySize": 2014,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383575981
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383591613.317,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.506,
+        "responseStart": 3092.525,
+        "responseEnd": 3101.493
+      },
+      "requestId": "0600db7f-caab-471d-9076-5c5536a641cc",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1027,
+        "responseBodySize": 1951,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383594713
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/consultations/78b8d64d-02e2-4b1c-8843-124c577ed964/couple-profile",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383591619.2,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.438,
+        "responseStart": 3221.39,
+        "responseEnd": 3228.307
+      },
+      "requestId": "b6f4e1b8-6d48-4e15-b507-a856e2e48e75",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1047,
+        "responseBodySize": 351,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383594854
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383599795.1091,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.47,
+        "responseStart": 1996.69,
+        "responseEnd": 2002.416
+      },
+      "requestId": "492ed95d-a0b2-46c4-a190-3f8d7c9901aa",
+      "size": {
+        "requestBodySize": 2,
+        "requestHeadersSize": 944,
+        "responseBodySize": 656,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383601809
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/me",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383601803.996,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.468,
+        "responseStart": 596.852,
+        "responseEnd": 602.569
+      },
+      "requestId": "30853697-80dc-407e-bcbc-55814bcad80b",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 879,
+        "responseBodySize": 937,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383602414
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383602425.4521,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.504,
+        "responseStart": 2960.274,
+        "responseEnd": 2965.689
+      },
+      "requestId": "017d3969-4445-4487-b7ff-810f59ef5e27",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1018,
+        "responseBodySize": 2016,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383605524
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/proposal",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383602419.906,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.567,
+        "responseStart": 4346.581,
+        "responseEnd": 4349.505
+      },
+      "requestId": "ee3d0f7a-ecc5-436a-a37a-68e394beb9e1",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1016,
+        "responseBodySize": 1000,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383606796
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/billing",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383606795.064,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.329,
+        "responseStart": 3572.249,
+        "responseEnd": 3579.353
+      },
+      "requestId": "c30b4b43-5b03-4b7f-a570-f787cbc7c2d4",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1023,
+        "responseBodySize": 704,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383610819
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guest-groups",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383627871.9211,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.543,
+        "responseStart": 3998.593,
+        "responseEnd": 4006.152
+      },
+      "requestId": "58626b14-c8e8-442c-abf9-3b345749190b",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1028,
+        "responseBodySize": 562,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383631888
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/check-in-settings",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383631890.6472,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.362,
+        "responseStart": 2946.457,
+        "responseEnd": 2949.422
+      },
+      "requestId": "68b5d8be-31e3-4f61-ac8b-f2bf72003632",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1038,
+        "responseBodySize": 878,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383634854
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guest-plan",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383631884.922,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.074,
+        "responseStart": 3102.439,
+        "responseEnd": 3112.291
+      },
+      "requestId": "8a8cde67-5866-4dd2-b7d0-f81764d3fceb",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1024,
+        "responseBodySize": 376,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383635002
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/attendance-summary",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383631891.5251,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.393,
+        "responseStart": 5304.792,
+        "responseEnd": 5309.893
+      },
+      "requestId": "fe91d1df-3efd-42ff-8067-d61ba5fc4176",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1040,
+        "responseBodySize": 445,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383637210
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guests",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383631889.771,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.455,
+        "responseStart": 5458.091,
+        "responseEnd": 5460.759
+      },
+      "requestId": "8aca7869-5618-485b-b872-31820ece8710",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1039,
+        "responseBodySize": 248,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383637362
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383641581.102,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.462,
+        "responseStart": 1994.256,
+        "responseEnd": 2007.63
+      },
+      "requestId": "7788a581-e6d2-4eb4-b2fd-4ae5bde158a9",
+      "size": {
+        "requestBodySize": 2,
+        "requestHeadersSize": 948,
+        "responseBodySize": 1265,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383643596
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/me",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383643590.432,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 2.03,
+        "responseStart": 595.402,
+        "responseEnd": 605.046
+      },
+      "requestId": "785ea887-7692-4fbe-a640-629c942d4030",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 883,
+        "responseBodySize": 433,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383644219
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/print-orders",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383644208.441,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.765,
+        "responseStart": 3783.397,
+        "responseEnd": 3785.519
+      },
+      "requestId": "3b8e6386-46ac-4abe-961c-a9612ab3f7d0",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 985,
+        "responseBodySize": 253,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383648005
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/invitations",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383644207.73,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.348,
+        "responseStart": 5302.361,
+        "responseEnd": 5305.217
+      },
+      "requestId": "e204f290-c3ad-4ddb-a90f-e06b8f2d0df5",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 983,
+        "responseBodySize": 220,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383649527
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383649540.269,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.726,
+        "responseStart": 3217.174,
+        "responseEnd": 3222.788
+      },
+      "requestId": "1361d44c-afad-4e61-87d2-b18890216562",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 979,
+        "responseBodySize": 1979,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383652767
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contract-appendices",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383649535.727,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.358,
+        "responseStart": 4750.247,
+        "responseEnd": 4753.537
+      },
+      "requestId": "461ec40f-3c43-4d4f-aded-f59f91a363b2",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 999,
+        "responseBodySize": 1101,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383654301
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383659232.549,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.328,
+        "responseStart": 3218.804,
+        "responseEnd": 3226.385
+      },
+      "requestId": "5211f7a2-0025-4e70-8bdf-c177874cb1f2",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1024,
+        "responseBodySize": 2681,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383662473
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contract-appendices",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383659228.6812,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.552,
+        "responseStart": 4746.164,
+        "responseEnd": 4750.614
+      },
+      "requestId": "a0412fbd-c78e-4e60-b8dd-d788404282c9",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1044,
+        "responseBodySize": 500,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383664007
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/incidental-expenses",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383667912.6338,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.463,
+        "responseStart": 2274.394,
+        "responseEnd": 2277.614
+      },
+      "requestId": "025331d0-77ab-43d9-8663-1105881662bd",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1038,
+        "responseBodySize": 329,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383670204
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/final-invoices",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383667935.539,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 1.834,
+        "responseStart": 4063.273,
+        "responseEnd": 4077.504
+      },
+      "requestId": "9d55829b-d2c1-46ed-8380-1de77c5df612",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1028,
+        "responseBodySize": 330,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383672009
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/billing",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383667935.019,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.561,
+        "responseStart": 5730.796,
+        "responseEnd": 5752.328
+      },
+      "requestId": "4488e046-2a28-49e0-801f-e634b48987b9",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 1022,
+        "responseBodySize": 675,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383673687
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383689424.9329,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.514,
+        "responseStart": 2045.125,
+        "responseEnd": 2048.819
+      },
+      "requestId": "c65bfed0-a673-4e78-9719-c1c3adc599bb",
+      "size": {
+        "requestBodySize": 2,
+        "requestHeadersSize": 943,
+        "responseBodySize": 1258,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383691502
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/me",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383691475.538,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 9.534,
+        "responseStart": 596.517,
+        "responseEnd": 601.265
+      },
+      "requestId": "182c04e2-8977-43e4-bc43-bfb914fbc296",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 878,
+        "responseBodySize": 389,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383692096
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/notifications/inbox",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383692098.8108,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.61,
+        "responseStart": 1286.723,
+        "responseEnd": 1293.079
+      },
+      "requestId": "042ee095-754d-402f-b71a-84d7e5d46a05",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 954,
+        "responseBodySize": 255,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383693401
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/notifications/preferences",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383692101.023,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.505,
+        "responseStart": 1433.259,
+        "responseEnd": 1436.166
+      },
+      "requestId": "b5885dde-4c45-4519-b9d5-315d8b8d2728",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 957,
+        "responseBodySize": 255,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383693666
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/profile",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383697527.5662,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.795,
+        "responseStart": 2129.461,
+        "responseEnd": 2132.046
+      },
+      "requestId": "3deb14cc-e23a-48f5-b731-6b74b841dc8b",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 826,
+        "responseBodySize": 1004,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383699668
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383697529.676,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.652,
+        "responseStart": 2270.875,
+        "responseEnd": 2276.726
+      },
+      "requestId": "5f1674b5-0915-4c3b-b7ee-b97cb3f67877",
+      "size": {
+        "requestBodySize": 2,
+        "requestHeadersSize": 881,
+        "responseBodySize": 640,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383699823
+    },
+    {
+      "url": "https://wedding-web-silk.vercel.app/api/v1/auth/me",
+      "method": "GET",
+      "status": 200,
+      "type": "fetch",
+      "timing": {
+        "startTime": 1792383699809.69,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 3.73,
+        "responseStart": 599.779,
+        "responseEnd": 601.677
+      },
+      "requestId": "300bf325-ef5a-43da-b37f-80c756b1e3ff",
+      "size": {
+        "requestBodySize": 0,
+        "requestHeadersSize": 816,
+        "responseBodySize": 360,
+        "responseHeadersSize": 0
+      },
+      "at": 1792383700422
+    }
+  ],
+  "logCorrelation": [
+    {
+      "requestId": "4615f7e1-d89e-4832-aa14-25a7ed6570f2",
+      "timestamp": "2026-10-19T04:13:31.256Z",
+      "route": "/api/v1/auth/web-sessions",
+      "method": "POST",
+      "durationMs": 1641.99,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "b7ded933-b5c9-43a3-88c5-4cf6f7c6c6d4",
+      "timestamp": "2026-10-19T04:13:32.353Z",
+      "route": "/api/v1/auth/me",
+      "method": "GET",
+      "durationMs": 139.543,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "e2fa8b09-7380-4876-88f4-b9a800c1469b",
+      "timestamp": "2026-10-19T04:13:33.985Z",
+      "route": "/api/v1/catalog/restaurant",
+      "method": "GET",
+      "durationMs": 418.495,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "d58ac9b5-cd1b-4cb8-9f90-b31fc8692642",
+      "timestamp": "2026-10-19T04:13:34.950Z",
+      "route": "/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "durationMs": 1536.22,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "a15f56e6-72c3-4b9e-8a3e-c4f4f8400d3f",
+      "timestamp": "2026-10-19T04:13:35.543Z",
+      "route": "/api/v1/auth/me",
+      "method": "GET",
+      "durationMs": 139.888,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "71fcaf2b-35e9-48e2-9976-f76d1c748bbf",
+      "timestamp": "2026-10-19T04:13:36.695Z",
+      "route": "/api/v1/couple/bookings",
+      "method": "GET",
+      "durationMs": 694.702,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "2619928c-3ba9-4275-8f45-5fec4a4371ab",
+      "timestamp": "2026-10-19T04:13:39.084Z",
+      "route": "/api/v1/bookings/:bookingId/proposal",
+      "method": "GET",
+      "durationMs": 1384.967,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "957c6155-1057-445d-9ab4-09bd4cd877a9",
+      "timestamp": "2026-10-19T04:13:41.651Z",
+      "route": "/api/v1/notifications/inbox",
+      "method": "GET",
+      "durationMs": 840.348,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "bb9b7725-b5b6-4096-9dca-679642b59f2c",
+      "timestamp": "2026-10-19T04:13:41.929Z",
+      "route": "/api/v1/notifications/unread-count",
+      "method": "GET",
+      "durationMs": 1110.308,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "79fa6da6-b6bc-4f71-bf7f-058f6a74272a",
+      "timestamp": "2026-10-19T04:14:10.732Z",
+      "route": "/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "durationMs": 1531.883,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "d887a527-2334-4afd-84c3-bcda43803c38",
+      "timestamp": "2026-10-19T04:14:11.384Z",
+      "route": "/api/v1/auth/me",
+      "method": "GET",
+      "durationMs": 139.93,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "695c9244-a74b-472a-88f4-4d3b0ef854f8",
+      "timestamp": "2026-10-19T04:14:13.316Z",
+      "route": "/api/v1/couple/bookings",
+      "method": "GET",
+      "durationMs": 1247.134,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "7da05f6d-17f2-4c56-91ef-03f2fa43ee99",
+      "timestamp": "2026-10-19T04:14:14.423Z",
+      "route": "/api/v1/couple/bookings",
+      "method": "GET",
+      "durationMs": 2169.615,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "c2a744f6-7d0e-4914-a8ba-f17fed385680",
+      "timestamp": "2026-10-19T04:14:14.976Z",
+      "route": "/api/v1/bookings/:bookingId/proposal",
+      "method": "GET",
+      "durationMs": 2687.793,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "07508281-de1f-473b-8251-7e6abc428d5a",
+      "timestamp": "2026-10-19T04:14:16.222Z",
+      "route": "/api/v1/bookings/:bookingId/proposal",
+      "method": "GET",
+      "durationMs": 1769.925,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "d8f696e2-d2ea-4222-ab0f-0f95aef85071",
+      "timestamp": "2026-10-19T04:14:37.202Z",
+      "route": "/api/v1/bookings/:bookingId/contracts",
+      "method": "GET",
+      "durationMs": 2654.232,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "ccb7dba2-9544-4d49-a1e1-a85f4d351110",
+      "timestamp": "2026-10-19T04:14:37.342Z",
+      "route": "/api/v1/consultations/:consultationId/couple-profile",
+      "method": "GET",
+      "durationMs": 2772.839,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "7143af23-aa40-48ae-be2d-4a2d18046d87",
+      "timestamp": "2026-10-19T04:14:48.798Z",
+      "route": "/api/v1/bookings/:bookingId/contracts",
+      "method": "GET",
+      "durationMs": 2629.508,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "803dacc0-ef89-46bb-96b5-996aea0eca17",
+      "timestamp": "2026-10-19T04:14:48.936Z",
+      "route": "/api/v1/consultations/:consultationId/couple-profile",
+      "method": "GET",
+      "durationMs": 2757.834,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "4dbd9cc8-39dc-4223-8ca0-3d32f5698767",
+      "timestamp": "2026-10-19T04:15:11.984Z",
+      "route": "/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "durationMs": 1532.917,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "f52009ce-5e6e-45e6-be59-7789f33ee796",
+      "timestamp": "2026-10-19T04:15:12.616Z",
+      "route": "/api/v1/auth/me",
+      "method": "GET",
+      "durationMs": 139.747,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "3d4c95bc-fa91-42c2-b707-9d9d64881e8e",
+      "timestamp": "2026-10-19T04:15:15.727Z",
+      "route": "/api/v1/bookings/:bookingId/contracts",
+      "method": "GET",
+      "durationMs": 2627.447,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "f143df61-f076-4331-b364-ba1837754ea2",
+      "timestamp": "2026-10-19T04:15:16.969Z",
+      "route": "/api/v1/bookings/:bookingId/proposal",
+      "method": "GET",
+      "durationMs": 3840.062,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "1dff64d7-6fd5-4f28-84ea-bffcf7af3df9",
+      "timestamp": "2026-10-19T04:15:20.527Z",
+      "route": "/api/v1/bookings/:bookingId/billing",
+      "method": "GET",
+      "durationMs": 3081.715,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "e2669a1a-10a7-4191-91b1-947cd5f35f3c",
+      "timestamp": "2026-10-19T04:15:32.303Z",
+      "route": "/api/v1/bookings/:bookingId/guest-groups",
+      "method": "GET",
+      "durationMs": 2495.11,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "2f57c030-61d4-42c9-8736-e8314a38fc5a",
+      "timestamp": "2026-10-19T04:15:52.800Z",
+      "route": "/api/v1/bookings/:bookingId/guest-plan",
+      "method": "GET",
+      "durationMs": 2498.894,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "4c8356c1-206a-418a-a5a1-dd7255bf1ec5",
+      "timestamp": "2026-10-19T04:15:55.294Z",
+      "route": "/api/v1/bookings/:bookingId/guests",
+      "method": "GET",
+      "durationMs": 3646.891,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "50dfd8c1-30d3-437d-bbef-5ce4bf7200df",
+      "timestamp": "2026-10-19T04:15:55.358Z",
+      "route": "/api/v1/bookings/:bookingId/check-in-settings",
+      "method": "GET",
+      "durationMs": 2361.497,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "0f50d6eb-8879-4c62-9fc4-b1e15b0cf169",
+      "timestamp": "2026-10-19T04:15:57.857Z",
+      "route": "/api/v1/bookings/:bookingId/attendance-summary",
+      "method": "GET",
+      "durationMs": 3374.483,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "fe92495b-cdfd-42a5-acef-9be6070cf6fb",
+      "timestamp": "2026-10-19T04:16:47.109Z",
+      "route": "/api/v1/bookings/:bookingId/guest-groups",
+      "method": "GET",
+      "durationMs": 2508.107,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "1741d6e1-2ffa-45db-9c5c-4bf2d97c69e5",
+      "timestamp": "2026-10-19T04:16:50.744Z",
+      "route": "/api/v1/bookings/:bookingId/guest-plan",
+      "method": "GET",
+      "durationMs": 2631.448,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "689ed6f0-a2cf-41f2-bc96-3526d51f45de",
+      "timestamp": "2026-10-19T04:16:53.095Z",
+      "route": "/api/v1/bookings/:bookingId/guests",
+      "method": "GET",
+      "durationMs": 4936.691,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "597f06b9-2981-4558-82e4-ec00431a603f",
+      "timestamp": "2026-10-19T04:16:54.616Z",
+      "route": "/api/v1/bookings/:bookingId/check-in-settings",
+      "method": "GET",
+      "durationMs": 6999.461,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "a90822bf-9552-4e16-9b72-3bb79e7b34a9",
+      "timestamp": "2026-10-19T04:16:56.975Z",
+      "route": "/api/v1/bookings/:bookingId/attendance-summary",
+      "method": "GET",
+      "durationMs": 9349.74,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "c2a09295-ba85-4e2b-9a91-d3bb90c5b8bb",
+      "timestamp": "2026-10-19T04:17:06.888Z",
+      "route": "/api/v1/bookings/:bookingId/guest-groups",
+      "method": "GET",
+      "durationMs": 2495.333,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "57520740-2530-415a-b13b-af5da17c0133",
+      "timestamp": "2026-10-19T04:17:08.139Z",
+      "route": "/api/v1/bookings/:bookingId/seating-layout-options",
+      "method": "GET",
+      "durationMs": 3747.185,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "7f5d8c97-16f8-44e6-9851-62aec0fcf2da",
+      "timestamp": "2026-10-19T04:17:20.230Z",
+      "route": "/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "durationMs": 2558.006,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "d4feffe8-fd2f-4775-be9c-86c8ffd3bfed",
+      "timestamp": "2026-10-19T04:17:21.325Z",
+      "route": "/api/v1/auth/me",
+      "method": "GET",
+      "durationMs": 142.846,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "7263c94a-d6f8-420d-a785-8380ecd93bc9",
+      "timestamp": "2026-10-19T04:17:24.981Z",
+      "route": "/api/v1/bookings/:bookingId/print-orders",
+      "method": "GET",
+      "durationMs": 3196.077,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "56563220-465c-4de3-850b-2b2a0b5ef0a9",
+      "timestamp": "2026-10-19T04:17:26.655Z",
+      "route": "/api/v1/bookings/:bookingId/invitations",
+      "method": "GET",
+      "durationMs": 4844.23,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "1fda3f8f-3e3b-45e1-86dc-94368287d7c2",
+      "timestamp": "2026-10-19T04:17:31.638Z",
+      "route": "/api/v1/bookings/:bookingId/contracts",
+      "method": "GET",
+      "durationMs": 3616.509,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "8e01c8a5-0230-4a80-843c-870956ff84d5",
+      "timestamp": "2026-10-19T04:17:33.310Z",
+      "route": "/api/v1/bookings/:bookingId/contract-appendices",
+      "method": "GET",
+      "durationMs": 4802.418,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "4cf9765e-b6f2-4cdc-b527-01a5bfe6210e",
+      "timestamp": "2026-10-19T04:17:48.701Z",
+      "route": "/api/v1/bookings/:bookingId/contracts",
+      "method": "GET",
+      "durationMs": 2634.484,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "99f4cbe9-f4b2-4b87-b18f-1a4afb39d48c",
+      "timestamp": "2026-10-19T04:17:49.809Z",
+      "route": "/api/v1/bookings/:bookingId/contract-appendices",
+      "method": "GET",
+      "durationMs": 4290.634,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "edac1d21-4122-4979-ae03-4f60a9691d32",
+      "timestamp": "2026-10-19T04:17:58.024Z",
+      "route": "/api/v1/bookings/:bookingId/incidental-expenses",
+      "method": "GET",
+      "durationMs": 2952.372,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "3c8b0809-4e42-4844-9035-456cc56278d2",
+      "timestamp": "2026-10-19T04:17:59.410Z",
+      "route": "/api/v1/bookings/:bookingId/final-invoices",
+      "method": "GET",
+      "durationMs": 4336.138,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "efb3079b-abaa-41a1-9d77-4ddc4beb6792",
+      "timestamp": "2026-10-19T04:18:01.347Z",
+      "route": "/api/v1/bookings/:bookingId/billing",
+      "method": "GET",
+      "durationMs": 6264.26,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "0ee99732-9d5b-498d-898d-5d8c5b33b5db",
+      "timestamp": "2026-10-19T04:18:12.572Z",
+      "route": "/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "durationMs": 1543.905,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "b26470ae-d536-48db-842a-f13fc649f0f9",
+      "timestamp": "2026-10-19T04:18:13.288Z",
+      "route": "/api/v1/auth/me",
+      "method": "GET",
+      "durationMs": 140.884,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "295cc54c-7e96-498a-baf1-b5fb9c02d1e4",
+      "timestamp": "2026-10-19T04:18:14.587Z",
+      "route": "/api/v1/notifications/inbox",
+      "method": "GET",
+      "durationMs": 838.969,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "8f749f08-7d05-4690-9a2b-14cb2fdf6185",
+      "timestamp": "2026-10-19T04:18:14.752Z",
+      "route": "/api/v1/notifications/preferences",
+      "method": "GET",
+      "durationMs": 1002.109,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "dddeeee8-c0bc-4ca5-b7d8-640fa0bd5991",
+      "timestamp": "2026-10-19T04:18:19.803Z",
+      "route": "/api/v1/auth/profile",
+      "method": "GET",
+      "durationMs": 1678.917,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "f37581ca-f2b1-4948-a167-9d41c8688f75",
+      "timestamp": "2026-10-19T04:18:19.943Z",
+      "route": "/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "durationMs": 1811.689,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "e0e90cb3-9945-4c50-a7db-18a65981dc96",
+      "timestamp": "2026-10-19T04:18:20.568Z",
+      "route": "/api/v1/auth/me",
+      "method": "GET",
+      "durationMs": 140.964,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "05aed989-a91f-4052-9d88-3b2d3f479ca9",
+      "timestamp": "2026-10-19T04:19:06.322Z",
+      "route": "/api/v1/catalog/restaurant",
+      "method": "GET",
+      "durationMs": 421.336,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "ce0225af-719f-45fa-94e7-9bb782ac83d1",
+      "timestamp": "2026-10-19T04:19:07.924Z",
+      "route": "/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "durationMs": 1538.316,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "555afef7-7fb2-47e0-9559-69e02a31cdb5",
+      "timestamp": "2026-10-19T04:19:08.531Z",
+      "route": "/api/v1/auth/me",
+      "method": "GET",
+      "durationMs": 141.015,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "896a51a0-f3d9-4ce8-90ec-24aa8e101146",
+      "timestamp": "2026-10-19T04:19:09.702Z",
+      "route": "/api/v1/couple/bookings",
+      "method": "GET",
+      "durationMs": 694.313,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "25ab99e1-08aa-48e3-a810-b2511be9fe46",
+      "timestamp": "2026-10-19T04:19:11.568Z",
+      "route": "/api/v1/bookings/:bookingId/proposal",
+      "method": "GET",
+      "durationMs": 1384.51,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "c380ebc2-9e7f-4174-89d7-0c43aee12b9a",
+      "timestamp": "2026-10-19T04:19:12.915Z",
+      "route": "/api/v1/notifications/inbox",
+      "method": "GET",
+      "durationMs": 839.28,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "40e7166a-7f99-44f6-b801-e055e3c65d9a",
+      "timestamp": "2026-10-19T04:19:13.192Z",
+      "route": "/api/v1/notifications/unread-count",
+      "method": "GET",
+      "durationMs": 1116.093,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "6a262825-ea56-49b9-b953-d41352cda34d",
+      "timestamp": "2026-10-19T04:19:27.965Z",
+      "route": "/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "durationMs": 1539.497,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "5d15df91-ac9e-4b2a-a904-6c91630113ff",
+      "timestamp": "2026-10-19T04:19:28.576Z",
+      "route": "/api/v1/auth/me",
+      "method": "GET",
+      "durationMs": 140.846,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "00a7e2c5-feb1-4d75-8d48-79943559b88a",
+      "timestamp": "2026-10-19T04:19:30.280Z",
+      "route": "/api/v1/couple/bookings",
+      "method": "GET",
+      "durationMs": 1246.033,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "a3b4dcc3-af05-4ad2-be57-a5fe93c83dca",
+      "timestamp": "2026-10-19T04:19:30.694Z",
+      "route": "/api/v1/couple/bookings",
+      "method": "GET",
+      "durationMs": 1633.266,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "9dec4168-f7a0-4c79-ac9d-8f8617102f12",
+      "timestamp": "2026-10-19T04:19:32.076Z",
+      "route": "/api/v1/bookings/:bookingId/proposal",
+      "method": "GET",
+      "durationMs": 2534.401,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "64f0b2d9-c5d1-43f8-a315-518c572be529",
+      "timestamp": "2026-10-19T04:19:33.181Z",
+      "route": "/api/v1/bookings/:bookingId/proposal",
+      "method": "GET",
+      "durationMs": 2426.021,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "70e7a3e3-7900-4017-82fd-a5f113891f04",
+      "timestamp": "2026-10-19T04:19:34.839Z",
+      "route": "/api/v1/consultations/:consultationId/couple-profile",
+      "method": "GET",
+      "durationMs": 418.283,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "0ce6d0d6-d4b0-45a0-82e0-dbabb7a927df",
+      "timestamp": "2026-10-19T04:19:37.189Z",
+      "route": "/api/v1/bookings/:bookingId/contracts",
+      "method": "GET",
+      "durationMs": 2763.048,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "0600db7f-caab-471d-9076-5c5536a641cc",
+      "timestamp": "2026-10-19T04:19:55.997Z",
+      "route": "/api/v1/bookings/:bookingId/contracts",
+      "method": "GET",
+      "durationMs": 2627.978,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "b6f4e1b8-6d48-4e15-b507-a856e2e48e75",
+      "timestamp": "2026-10-19T04:19:56.135Z",
+      "route": "/api/v1/consultations/:consultationId/couple-profile",
+      "method": "GET",
+      "durationMs": 2765.201,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "492ed95d-a0b2-46c4-a190-3f8d7c9901aa",
+      "timestamp": "2026-10-19T04:20:03.087Z",
+      "route": "/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "durationMs": 1536.593,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "30853697-80dc-407e-bcbc-55814bcad80b",
+      "timestamp": "2026-10-19T04:20:03.698Z",
+      "route": "/api/v1/auth/me",
+      "method": "GET",
+      "durationMs": 141.022,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "017d3969-4445-4487-b7ff-810f59ef5e27",
+      "timestamp": "2026-10-19T04:20:06.671Z",
+      "route": "/api/v1/bookings/:bookingId/contracts",
+      "method": "GET",
+      "durationMs": 2493.708,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "ee3d0f7a-ecc5-436a-a37a-68e394beb9e1",
+      "timestamp": "2026-10-19T04:20:08.055Z",
+      "route": "/api/v1/bookings/:bookingId/proposal",
+      "method": "GET",
+      "durationMs": 3395.375,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "c30b4b43-5b03-4b7f-a570-f787cbc7c2d4",
+      "timestamp": "2026-10-19T04:20:11.640Z",
+      "route": "/api/v1/bookings/:bookingId/billing",
+      "method": "GET",
+      "durationMs": 3082.484,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "58626b14-c8e8-442c-abf9-3b345749190b",
+      "timestamp": "2026-10-19T04:20:33.160Z",
+      "route": "/api/v1/bookings/:bookingId/guest-groups",
+      "method": "GET",
+      "durationMs": 3506.327,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "68b5d8be-31e3-4f61-ac8b-f2bf72003632",
+      "timestamp": "2026-10-19T04:20:36.134Z",
+      "route": "/api/v1/bookings/:bookingId/check-in-settings",
+      "method": "GET",
+      "durationMs": 2494.46,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "8a8cde67-5866-4dd2-b7d0-f81764d3fceb",
+      "timestamp": "2026-10-19T04:20:36.276Z",
+      "route": "/api/v1/bookings/:bookingId/guest-plan",
+      "method": "GET",
+      "durationMs": 2637.399,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "fe91d1df-3efd-42ff-8067-d61ba5fc4176",
+      "timestamp": "2026-10-19T04:20:38.488Z",
+      "route": "/api/v1/bookings/:bookingId/attendance-summary",
+      "method": "GET",
+      "durationMs": 4835.016,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "8aca7869-5618-485b-b872-31820ece8710",
+      "timestamp": "2026-10-19T04:20:38.635Z",
+      "route": "/api/v1/bookings/:bookingId/guests",
+      "method": "GET",
+      "durationMs": 4995.363,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "7788a581-e6d2-4eb4-b2fd-4ae5bde158a9",
+      "timestamp": "2026-10-19T04:20:44.865Z",
+      "route": "/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "durationMs": 1539.595,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "785ea887-7692-4fbe-a640-629c942d4030",
+      "timestamp": "2026-10-19T04:20:45.483Z",
+      "route": "/api/v1/auth/me",
+      "method": "GET",
+      "durationMs": 140.689,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "3b8e6386-46ac-4abe-961c-a9612ab3f7d0",
+      "timestamp": "2026-10-19T04:20:49.281Z",
+      "route": "/api/v1/bookings/:bookingId/print-orders",
+      "method": "GET",
+      "durationMs": 3303.706,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "e204f290-c3ad-4ddb-a90f-e06b8f2d0df5",
+      "timestamp": "2026-10-19T04:20:50.806Z",
+      "route": "/api/v1/bookings/:bookingId/invitations",
+      "method": "GET",
+      "durationMs": 4847.547,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "1361d44c-afad-4e61-87d2-b18890216562",
+      "timestamp": "2026-10-19T04:20:54.053Z",
+      "route": "/api/v1/bookings/:bookingId/contracts",
+      "method": "GET",
+      "durationMs": 2751.448,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "461ec40f-3c43-4d4f-aded-f59f91a363b2",
+      "timestamp": "2026-10-19T04:20:55.580Z",
+      "route": "/api/v1/bookings/:bookingId/contract-appendices",
+      "method": "GET",
+      "durationMs": 4293.862,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "5211f7a2-0025-4e70-8bdf-c177874cb1f2",
+      "timestamp": "2026-10-19T04:21:03.748Z",
+      "route": "/api/v1/bookings/:bookingId/contracts",
+      "method": "GET",
+      "durationMs": 2746.65,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "a0412fbd-c78e-4e60-b8dd-d788404282c9",
+      "timestamp": "2026-10-19T04:21:05.270Z",
+      "route": "/api/v1/bookings/:bookingId/contract-appendices",
+      "method": "GET",
+      "durationMs": 4290.473,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "025331d0-77ab-43d9-8663-1105881662bd",
+      "timestamp": "2026-10-19T04:21:11.480Z",
+      "route": "/api/v1/bookings/:bookingId/incidental-expenses",
+      "method": "GET",
+      "durationMs": 1813.703,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "9d55829b-d2c1-46ed-8380-1de77c5df612",
+      "timestamp": "2026-10-19T04:21:13.291Z",
+      "route": "/api/v1/bookings/:bookingId/final-invoices",
+      "method": "GET",
+      "durationMs": 3131.877,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "4488e046-2a28-49e0-801f-e634b48987b9",
+      "timestamp": "2026-10-19T04:21:14.962Z",
+      "route": "/api/v1/bookings/:bookingId/billing",
+      "method": "GET",
+      "durationMs": 5282.57,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "c65bfed0-a673-4e78-9719-c1c3adc599bb",
+      "timestamp": "2026-10-19T04:21:32.771Z",
+      "route": "/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "durationMs": 1538.71,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "182c04e2-8977-43e4-bc43-bfb914fbc296",
+      "timestamp": "2026-10-19T04:21:33.369Z",
+      "route": "/api/v1/auth/me",
+      "method": "GET",
+      "durationMs": 140.739,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "042ee095-754d-402f-b71a-84d7e5d46a05",
+      "timestamp": "2026-10-19T04:21:34.688Z",
+      "route": "/api/v1/notifications/inbox",
+      "method": "GET",
+      "durationMs": 838.95,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "b5885dde-4c45-4519-b9d5-315d8b8d2728",
+      "timestamp": "2026-10-19T04:21:34.826Z",
+      "route": "/api/v1/notifications/preferences",
+      "method": "GET",
+      "durationMs": 973.738,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "3deb14cc-e23a-48f5-b731-6b74b841dc8b",
+      "timestamp": "2026-10-19T04:21:40.954Z",
+      "route": "/api/v1/auth/profile",
+      "method": "GET",
+      "durationMs": 1675.062,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "5f1674b5-0915-4c3b-b7ee-b97cb3f67877",
+      "timestamp": "2026-10-19T04:21:41.094Z",
+      "route": "/api/v1/auth/web-session-refreshes",
+      "method": "POST",
+      "durationMs": 1813.755,
+      "statusClass": "2xx"
+    },
+    {
+      "requestId": "300bf325-ef5a-43da-b37f-80c756b1e3ff",
+      "timestamp": "2026-10-19T04:21:41.703Z",
+      "route": "/api/v1/auth/me",
+      "method": "GET",
+      "durationMs": 140.977,
+      "statusClass": "2xx"
+    }
+  ],
+  "pairs": [
+    {
+      "path": "/api/v1/auth/web-sessions",
+      "status": 201,
+      "clientMs": 2589.304,
+      "backendMs": 1641.99,
+      "residualMs": 947.31,
+      "id": "4615f7e1-d89e-4832-aa14-25a7ed6570f2"
+    },
+    {
+      "path": "/api/v1/auth/me",
+      "status": 200,
+      "clientMs": 1077.816,
+      "backendMs": 139.543,
+      "residualMs": 938.27,
+      "id": "b7ded933-b5c9-43a3-88c5-4cf6f7c6c6d4"
+    },
+    {
+      "path": "/api/v1/catalog/restaurant",
+      "status": 200,
+      "clientMs": 868.236,
+      "backendMs": 418.495,
+      "residualMs": 449.74,
+      "id": "e2fa8b09-7380-4876-88f4-b9a800c1469b"
+    },
+    {
+      "path": "/api/v1/auth/web-session-refreshes",
+      "status": 200,
+      "clientMs": 1992.107,
+      "backendMs": 1536.22,
+      "residualMs": 455.89,
+      "id": "d58ac9b5-cd1b-4cb8-9f90-b31fc8692642"
+    },
+    {
+      "path": "/api/v1/auth/me",
+      "status": 200,
+      "clientMs": 588.099,
+      "backendMs": 139.888,
+      "residualMs": 448.21,
+      "id": "a15f56e6-72c3-4b9e-8a3e-c4f4f8400d3f"
+    },
+    {
+      "path": "/api/v1/couple/bookings",
+      "status": 200,
+      "clientMs": 1158.141,
+      "backendMs": 694.702,
+      "residualMs": 463.44,
+      "id": "71fcaf2b-35e9-48e2-9976-f76d1c748bbf"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/proposal",
+      "status": 200,
+      "clientMs": 2320.709,
+      "backendMs": 1384.967,
+      "residualMs": 935.74,
+      "id": "2619928c-3ba9-4275-8f45-5fec4a4371ab"
+    },
+    {
+      "path": "/api/v1/notifications/inbox",
+      "status": 200,
+      "clientMs": 1296.757,
+      "backendMs": 840.348,
+      "residualMs": 456.41,
+      "id": "957c6155-1057-445d-9ab4-09bd4cd877a9"
+    },
+    {
+      "path": "/api/v1/notifications/unread-count",
+      "status": 200,
+      "clientMs": 1576.048,
+      "backendMs": 1110.308,
+      "residualMs": 465.74,
+      "id": "bb9b7725-b5b6-4096-9dca-679642b59f2c"
+    },
+    {
+      "path": "/api/v1/auth/web-session-refreshes",
+      "status": 200,
+      "clientMs": 2013.842,
+      "backendMs": 1531.883,
+      "residualMs": 481.96,
+      "id": "79fa6da6-b6bc-4f71-bf7f-058f6a74272a"
+    },
+    {
+      "path": "/api/v1/auth/me",
+      "status": 200,
+      "clientMs": 618.787,
+      "backendMs": 139.93,
+      "residualMs": 478.86,
+      "id": "d887a527-2334-4afd-84c3-bcda43803c38"
+    },
+    {
+      "path": "/api/v1/couple/bookings",
+      "status": 200,
+      "clientMs": 1909.612,
+      "backendMs": 1247.134,
+      "residualMs": 662.48,
+      "id": "695c9244-a74b-472a-88f4-4d3b0ef854f8"
+    },
+    {
+      "path": "/api/v1/couple/bookings",
+      "status": 200,
+      "clientMs": 2655.447,
+      "backendMs": 2169.615,
+      "residualMs": 485.83,
+      "id": "7da05f6d-17f2-4c56-91ef-03f2fa43ee99"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/proposal",
+      "status": 200,
+      "clientMs": 3152.576,
+      "backendMs": 2687.793,
+      "residualMs": 464.78,
+      "id": "c2a744f6-7d0e-4914-a8ba-f17fed385680"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/proposal",
+      "status": 200,
+      "clientMs": 2727.229,
+      "backendMs": 1769.925,
+      "residualMs": 957.3,
+      "id": "07508281-de1f-473b-8251-7e6abc428d5a"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "status": 200,
+      "clientMs": 3110.003,
+      "backendMs": 2654.232,
+      "residualMs": 455.77,
+      "id": "d8f696e2-d2ea-4222-ab0f-0f95aef85071"
+    },
+    {
+      "path": "/api/v1/consultations/78b8d64d-02e2-4b1c-8843-124c577ed964/couple-profile",
+      "status": 200,
+      "clientMs": 3304.744,
+      "backendMs": 2772.839,
+      "residualMs": 531.91,
+      "id": "ccb7dba2-9544-4d49-a1e1-a85f4d351110"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "status": 200,
+      "clientMs": 3103.592,
+      "backendMs": 2629.508,
+      "residualMs": 474.08,
+      "id": "7143af23-aa40-48ae-be2d-4a2d18046d87"
+    },
+    {
+      "path": "/api/v1/consultations/78b8d64d-02e2-4b1c-8843-124c577ed964/couple-profile",
+      "status": 200,
+      "clientMs": 3240.739,
+      "backendMs": 2757.834,
+      "residualMs": 482.91,
+      "id": "803dacc0-ef89-46bb-96b5-996aea0eca17"
+    },
+    {
+      "path": "/api/v1/auth/web-session-refreshes",
+      "status": 200,
+      "clientMs": 2038.526,
+      "backendMs": 1532.917,
+      "residualMs": 505.61,
+      "id": "4dbd9cc8-39dc-4223-8ca0-3d32f5698767"
+    },
+    {
+      "path": "/api/v1/auth/me",
+      "status": 200,
+      "clientMs": 627.381,
+      "backendMs": 139.747,
+      "residualMs": 487.63,
+      "id": "f52009ce-5e6e-45e6-be59-7789f33ee796"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "status": 200,
+      "clientMs": 3087.063,
+      "backendMs": 2627.447,
+      "residualMs": 459.62,
+      "id": "3d4c95bc-fa91-42c2-b707-9d9d64881e8e"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/proposal",
+      "status": 200,
+      "clientMs": 4335.795,
+      "backendMs": 3840.062,
+      "residualMs": 495.73,
+      "id": "f143df61-f076-4331-b364-ba1837754ea2"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/billing",
+      "status": 200,
+      "clientMs": 3550.279,
+      "backendMs": 3081.715,
+      "residualMs": 468.56,
+      "id": "1dff64d7-6fd5-4f28-84ea-bffcf7af3df9"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guest-groups",
+      "status": 200,
+      "clientMs": 2959.397,
+      "backendMs": 2495.11,
+      "residualMs": 464.29,
+      "id": "e2669a1a-10a7-4191-91b1-947cd5f35f3c"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guest-plan",
+      "status": 200,
+      "clientMs": 3066.166,
+      "backendMs": 2498.894,
+      "residualMs": 567.27,
+      "id": "2f57c030-61d4-42c9-8736-e8314a38fc5a"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guests",
+      "status": 200,
+      "clientMs": 4874.436,
+      "backendMs": 3646.891,
+      "residualMs": 1227.54,
+      "id": "4c8356c1-206a-418a-a5a1-dd7255bf1ec5"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/check-in-settings",
+      "status": 200,
+      "clientMs": 2854.091,
+      "backendMs": 2361.497,
+      "residualMs": 492.59,
+      "id": "50dfd8c1-30d3-437d-bbef-5ce4bf7200df"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/attendance-summary",
+      "status": 200,
+      "clientMs": 5317.472,
+      "backendMs": 3374.483,
+      "residualMs": 1942.99,
+      "id": "0f50d6eb-8879-4c62-9fc4-b1e15b0cf169"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guest-groups",
+      "status": 200,
+      "clientMs": 3013.829,
+      "backendMs": 2508.107,
+      "residualMs": 505.72,
+      "id": "fe92495b-cdfd-42a5-acef-9be6070cf6fb"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guest-plan",
+      "status": 200,
+      "clientMs": 3580.126,
+      "backendMs": 2631.448,
+      "residualMs": 948.68,
+      "id": "1741d6e1-2ffa-45db-9c5c-4bf2d97c69e5"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guests",
+      "status": 200,
+      "clientMs": 5932.217,
+      "backendMs": 4936.691,
+      "residualMs": 995.53,
+      "id": "689ed6f0-a2cf-41f2-bc96-3526d51f45de"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/check-in-settings",
+      "status": 200,
+      "clientMs": 7459.097,
+      "backendMs": 6999.461,
+      "residualMs": 459.64,
+      "id": "597f06b9-2981-4558-82e4-ec00431a603f"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/attendance-summary",
+      "status": 200,
+      "clientMs": 9816.634,
+      "backendMs": 9349.74,
+      "residualMs": 466.89,
+      "id": "a90822bf-9552-4e16-9b72-3bb79e7b34a9"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guest-groups",
+      "status": 200,
+      "clientMs": 2971.827,
+      "backendMs": 2495.333,
+      "residualMs": 476.49,
+      "id": "c2a09295-ba85-4e2b-9a91-d3bb90c5b8bb"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/seating-layout-options",
+      "status": 200,
+      "clientMs": 4232.934,
+      "backendMs": 3747.185,
+      "residualMs": 485.75,
+      "id": "57520740-2530-415a-b13b-af5da17c0133"
+    },
+    {
+      "path": "/api/v1/auth/web-session-refreshes",
+      "status": 200,
+      "clientMs": 3036.283,
+      "backendMs": 2558.006,
+      "residualMs": 478.28,
+      "id": "7f5d8c97-16f8-44e6-9851-62aec0fcf2da"
+    },
+    {
+      "path": "/api/v1/auth/me",
+      "status": 200,
+      "clientMs": 1084.759,
+      "backendMs": 142.846,
+      "residualMs": 941.91,
+      "id": "d4feffe8-fd2f-4775-be9c-86c8ffd3bfed"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/print-orders",
+      "status": 200,
+      "clientMs": 3643.325,
+      "backendMs": 3196.077,
+      "residualMs": 447.25,
+      "id": "7263c94a-d6f8-420d-a785-8380ecd93bc9"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/invitations",
+      "status": 200,
+      "clientMs": 5320.358,
+      "backendMs": 4844.23,
+      "residualMs": 476.13,
+      "id": "56563220-465c-4de3-850b-2b2a0b5ef0a9"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "status": 200,
+      "clientMs": 4072.388,
+      "backendMs": 3616.509,
+      "residualMs": 455.88,
+      "id": "1fda3f8f-3e3b-45e1-86dc-94368287d7c2"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contract-appendices",
+      "status": 200,
+      "clientMs": 5745.869,
+      "backendMs": 4802.418,
+      "residualMs": 943.45,
+      "id": "8e01c8a5-0230-4a80-843c-870956ff84d5"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "status": 200,
+      "clientMs": 3641.242,
+      "backendMs": 2634.484,
+      "residualMs": 1006.76,
+      "id": "4cf9765e-b6f2-4cdc-b527-01a5bfe6210e"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contract-appendices",
+      "status": 200,
+      "clientMs": 4761.422,
+      "backendMs": 4290.634,
+      "residualMs": 470.79,
+      "id": "99f4cbe9-f4b2-4b87-b18f-1a4afb39d48c"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/incidental-expenses",
+      "status": 200,
+      "clientMs": 3420.912,
+      "backendMs": 2952.372,
+      "residualMs": 468.54,
+      "id": "edac1d21-4122-4979-ae03-4f60a9691d32"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/final-invoices",
+      "status": 200,
+      "clientMs": 4795.973,
+      "backendMs": 4336.138,
+      "residualMs": 459.84,
+      "id": "3c8b0809-4e42-4844-9035-456cc56278d2"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/billing",
+      "status": 200,
+      "clientMs": 6734.225,
+      "backendMs": 6264.26,
+      "residualMs": 469.97,
+      "id": "efb3079b-abaa-41a1-9d77-4ddc4beb6792"
+    },
+    {
+      "path": "/api/v1/auth/web-session-refreshes",
+      "status": 200,
+      "clientMs": 2119.684,
+      "backendMs": 1543.905,
+      "residualMs": 575.78,
+      "id": "0ee99732-9d5b-498d-898d-5d8c5b33b5db"
+    },
+    {
+      "path": "/api/v1/auth/me",
+      "status": 200,
+      "clientMs": 595.534,
+      "backendMs": 140.884,
+      "residualMs": 454.65,
+      "id": "b26470ae-d536-48db-842a-f13fc649f0f9"
+    },
+    {
+      "path": "/api/v1/notifications/inbox",
+      "status": 200,
+      "clientMs": 1294.407,
+      "backendMs": 838.969,
+      "residualMs": 455.44,
+      "id": "295cc54c-7e96-498a-baf1-b5fb9c02d1e4"
+    },
+    {
+      "path": "/api/v1/notifications/preferences",
+      "status": 200,
+      "clientMs": 1462.907,
+      "backendMs": 1002.109,
+      "residualMs": 460.8,
+      "id": "8f749f08-7d05-4690-9a2b-14cb2fdf6185"
+    },
+    {
+      "path": "/api/v1/auth/profile",
+      "status": 200,
+      "clientMs": 2129.209,
+      "backendMs": 1678.917,
+      "residualMs": 450.29,
+      "id": "dddeeee8-c0bc-4ca5-b7d8-640fa0bd5991"
+    },
+    {
+      "path": "/api/v1/auth/web-session-refreshes",
+      "status": 200,
+      "clientMs": 2273.873,
+      "backendMs": 1811.689,
+      "residualMs": 462.18,
+      "id": "f37581ca-f2b1-4948-a167-9d41c8688f75"
+    },
+    {
+      "path": "/api/v1/auth/me",
+      "status": 200,
+      "clientMs": 613.123,
+      "backendMs": 140.964,
+      "residualMs": 472.16,
+      "id": "e0e90cb3-9945-4c50-a7db-18a65981dc96"
+    },
+    {
+      "path": "/api/v1/catalog/restaurant",
+      "status": 200,
+      "clientMs": 895.353,
+      "backendMs": 421.336,
+      "residualMs": 474.02,
+      "id": "05aed989-a91f-4052-9d88-3b2d3f479ca9"
+    },
+    {
+      "path": "/api/v1/auth/web-session-refreshes",
+      "status": 200,
+      "clientMs": 2492.185,
+      "backendMs": 1538.316,
+      "residualMs": 953.87,
+      "id": "ce0225af-719f-45fa-94e7-9bb782ac83d1"
+    },
+    {
+      "path": "/api/v1/auth/me",
+      "status": 200,
+      "clientMs": 598.707,
+      "backendMs": 141.015,
+      "residualMs": 457.69,
+      "id": "555afef7-7fb2-47e0-9559-69e02a31cdb5"
+    },
+    {
+      "path": "/api/v1/couple/bookings",
+      "status": 200,
+      "clientMs": 1166.857,
+      "backendMs": 694.313,
+      "residualMs": 472.54,
+      "id": "896a51a0-f3d9-4ce8-90ec-24aa8e101146"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/proposal",
+      "status": 200,
+      "clientMs": 1855.217,
+      "backendMs": 1384.51,
+      "residualMs": 470.71,
+      "id": "25ab99e1-08aa-48e3-a810-b2511be9fe46"
+    },
+    {
+      "path": "/api/v1/notifications/inbox",
+      "status": 200,
+      "clientMs": 1291.658,
+      "backendMs": 839.28,
+      "residualMs": 452.38,
+      "id": "c380ebc2-9e7f-4174-89d7-0c43aee12b9a"
+    },
+    {
+      "path": "/api/v1/notifications/unread-count",
+      "status": 200,
+      "clientMs": 1574.304,
+      "backendMs": 1116.093,
+      "residualMs": 458.21,
+      "id": "40e7166a-7f99-44f6-b801-e055e3c65d9a"
+    },
+    {
+      "path": "/api/v1/auth/web-session-refreshes",
+      "status": 200,
+      "clientMs": 2013.593,
+      "backendMs": 1539.497,
+      "residualMs": 474.1,
+      "id": "6a262825-ea56-49b9-b953-d41352cda34d"
+    },
+    {
+      "path": "/api/v1/auth/me",
+      "status": 200,
+      "clientMs": 597.473,
+      "backendMs": 140.846,
+      "residualMs": 456.63,
+      "id": "5d15df91-ac9e-4b2a-a904-6c91630113ff"
+    },
+    {
+      "path": "/api/v1/couple/bookings",
+      "status": 200,
+      "clientMs": 1696.073,
+      "backendMs": 1246.033,
+      "residualMs": 450.04,
+      "id": "00a7e2c5-feb1-4d75-8d48-79943559b88a"
+    },
+    {
+      "path": "/api/v1/couple/bookings",
+      "status": 200,
+      "clientMs": 2094.775,
+      "backendMs": 1633.266,
+      "residualMs": 461.51,
+      "id": "a3b4dcc3-af05-4ad2-be57-a5fe93c83dca"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/proposal",
+      "status": 200,
+      "clientMs": 3475.283,
+      "backendMs": 2534.401,
+      "residualMs": 940.88,
+      "id": "9dec4168-f7a0-4c79-ac9d-8f8617102f12"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/proposal",
+      "status": 200,
+      "clientMs": 2886.586,
+      "backendMs": 2426.021,
+      "residualMs": 460.56,
+      "id": "64f0b2d9-c5d1-43f8-a315-518c572be529"
+    },
+    {
+      "path": "/api/v1/consultations/78b8d64d-02e2-4b1c-8843-124c577ed964/couple-profile",
+      "status": 200,
+      "clientMs": 872.589,
+      "backendMs": 418.283,
+      "residualMs": 454.31,
+      "id": "70e7a3e3-7900-4017-82fd-a5f113891f04"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "status": 200,
+      "clientMs": 3235.455,
+      "backendMs": 2763.048,
+      "residualMs": 472.41,
+      "id": "0ce6d0d6-d4b0-45a0-82e0-dbabb7a927df"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "status": 200,
+      "clientMs": 3101.493,
+      "backendMs": 2627.978,
+      "residualMs": 473.51,
+      "id": "0600db7f-caab-471d-9076-5c5536a641cc"
+    },
+    {
+      "path": "/api/v1/consultations/78b8d64d-02e2-4b1c-8843-124c577ed964/couple-profile",
+      "status": 200,
+      "clientMs": 3228.307,
+      "backendMs": 2765.201,
+      "residualMs": 463.11,
+      "id": "b6f4e1b8-6d48-4e15-b507-a856e2e48e75"
+    },
+    {
+      "path": "/api/v1/auth/web-session-refreshes",
+      "status": 200,
+      "clientMs": 2002.416,
+      "backendMs": 1536.593,
+      "residualMs": 465.82,
+      "id": "492ed95d-a0b2-46c4-a190-3f8d7c9901aa"
+    },
+    {
+      "path": "/api/v1/auth/me",
+      "status": 200,
+      "clientMs": 602.569,
+      "backendMs": 141.022,
+      "residualMs": 461.55,
+      "id": "30853697-80dc-407e-bcbc-55814bcad80b"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "status": 200,
+      "clientMs": 2965.689,
+      "backendMs": 2493.708,
+      "residualMs": 471.98,
+      "id": "017d3969-4445-4487-b7ff-810f59ef5e27"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/proposal",
+      "status": 200,
+      "clientMs": 4349.505,
+      "backendMs": 3395.375,
+      "residualMs": 954.13,
+      "id": "ee3d0f7a-ecc5-436a-a37a-68e394beb9e1"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/billing",
+      "status": 200,
+      "clientMs": 3579.353,
+      "backendMs": 3082.484,
+      "residualMs": 496.87,
+      "id": "c30b4b43-5b03-4b7f-a570-f787cbc7c2d4"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guest-groups",
+      "status": 200,
+      "clientMs": 4006.152,
+      "backendMs": 3506.327,
+      "residualMs": 499.82,
+      "id": "58626b14-c8e8-442c-abf9-3b345749190b"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/check-in-settings",
+      "status": 200,
+      "clientMs": 2949.422,
+      "backendMs": 2494.46,
+      "residualMs": 454.96,
+      "id": "68b5d8be-31e3-4f61-ac8b-f2bf72003632"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guest-plan",
+      "status": 200,
+      "clientMs": 3112.291,
+      "backendMs": 2637.399,
+      "residualMs": 474.89,
+      "id": "8a8cde67-5866-4dd2-b7d0-f81764d3fceb"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/attendance-summary",
+      "status": 200,
+      "clientMs": 5309.893,
+      "backendMs": 4835.016,
+      "residualMs": 474.88,
+      "id": "fe91d1df-3efd-42ff-8067-d61ba5fc4176"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/guests",
+      "status": 200,
+      "clientMs": 5460.759,
+      "backendMs": 4995.363,
+      "residualMs": 465.4,
+      "id": "8aca7869-5618-485b-b872-31820ece8710"
+    },
+    {
+      "path": "/api/v1/auth/web-session-refreshes",
+      "status": 200,
+      "clientMs": 2007.63,
+      "backendMs": 1539.595,
+      "residualMs": 468.04,
+      "id": "7788a581-e6d2-4eb4-b2fd-4ae5bde158a9"
+    },
+    {
+      "path": "/api/v1/auth/me",
+      "status": 200,
+      "clientMs": 605.046,
+      "backendMs": 140.689,
+      "residualMs": 464.36,
+      "id": "785ea887-7692-4fbe-a640-629c942d4030"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/print-orders",
+      "status": 200,
+      "clientMs": 3785.519,
+      "backendMs": 3303.706,
+      "residualMs": 481.81,
+      "id": "3b8e6386-46ac-4abe-961c-a9612ab3f7d0"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/invitations",
+      "status": 200,
+      "clientMs": 5305.217,
+      "backendMs": 4847.547,
+      "residualMs": 457.67,
+      "id": "e204f290-c3ad-4ddb-a90f-e06b8f2d0df5"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "status": 200,
+      "clientMs": 3222.788,
+      "backendMs": 2751.448,
+      "residualMs": 471.34,
+      "id": "1361d44c-afad-4e61-87d2-b18890216562"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contract-appendices",
+      "status": 200,
+      "clientMs": 4753.537,
+      "backendMs": 4293.862,
+      "residualMs": 459.68,
+      "id": "461ec40f-3c43-4d4f-aded-f59f91a363b2"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contracts",
+      "status": 200,
+      "clientMs": 3226.385,
+      "backendMs": 2746.65,
+      "residualMs": 479.74,
+      "id": "5211f7a2-0025-4e70-8bdf-c177874cb1f2"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/contract-appendices",
+      "status": 200,
+      "clientMs": 4750.614,
+      "backendMs": 4290.473,
+      "residualMs": 460.14,
+      "id": "a0412fbd-c78e-4e60-b8dd-d788404282c9"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/incidental-expenses",
+      "status": 200,
+      "clientMs": 2277.614,
+      "backendMs": 1813.703,
+      "residualMs": 463.91,
+      "id": "025331d0-77ab-43d9-8663-1105881662bd"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/final-invoices",
+      "status": 200,
+      "clientMs": 4077.504,
+      "backendMs": 3131.877,
+      "residualMs": 945.63,
+      "id": "9d55829b-d2c1-46ed-8380-1de77c5df612"
+    },
+    {
+      "path": "/api/v1/bookings/bb31b097-d3da-475c-af63-72453cf25df0/billing",
+      "status": 200,
+      "clientMs": 5752.328,
+      "backendMs": 5282.57,
+      "residualMs": 469.76,
+      "id": "4488e046-2a28-49e0-801f-e634b48987b9"
+    },
+    {
+      "path": "/api/v1/auth/web-session-refreshes",
+      "status": 200,
+      "clientMs": 2048.819,
+      "backendMs": 1538.71,
+      "residualMs": 510.11,
+      "id": "c65bfed0-a673-4e78-9719-c1c3adc599bb"
+    },
+    {
+      "path": "/api/v1/auth/me",
+      "status": 200,
+      "clientMs": 601.265,
+      "backendMs": 140.739,
+      "residualMs": 460.53,
+      "id": "182c04e2-8977-43e4-bc43-bfb914fbc296"
+    },
+    {
+      "path": "/api/v1/notifications/inbox",
+      "status": 200,
+      "clientMs": 1293.079,
+      "backendMs": 838.95,
+      "residualMs": 454.13,
+      "id": "042ee095-754d-402f-b71a-84d7e5d46a05"
+    },
+    {
+      "path": "/api/v1/notifications/preferences",
+      "status": 200,
+      "clientMs": 1436.166,
+      "backendMs": 973.738,
+      "residualMs": 462.43,
+      "id": "b5885dde-4c45-4519-b9d5-315d8b8d2728"
+    },
+    {
+      "path": "/api/v1/auth/profile",
+      "status": 200,
+      "clientMs": 2132.046,
+      "backendMs": 1675.062,
+      "residualMs": 456.98,
+      "id": "3deb14cc-e23a-48f5-b731-6b74b841dc8b"
+    },
+    {
+      "path": "/api/v1/auth/web-session-refreshes",
+      "status": 200,
+      "clientMs": 2276.726,
+      "backendMs": 1813.755,
+      "residualMs": 462.97,
+      "id": "5f1674b5-0915-4c3b-b7ee-b97cb3f67877"
+    },
+    {
+      "path": "/api/v1/auth/me",
+      "status": 200,
+      "clientMs": 601.677,
+      "backendMs": 140.977,
+      "residualMs": 460.7,
+      "id": "300bf325-ef5a-43da-b37f-80c756b1e3ff"
+    }
+  ],
+  "performanceObservation": {
+    "states": [
+      {
+        "at": 208159.40000000037,
+        "path": "/khong-gian/thoa-thuan/hop-dong",
+        "heading": "Hợp đồng tiệc cưới",
+        "busy": false,
+        "length": 888
+      },
+      {
+        "at": 210160.90000000037,
+        "path": "/khong-gian/thanh-toan",
+        "heading": "Đang mở thanh toán…",
+        "busy": true,
+        "length": 51
+      },
+      {
+        "at": 212841.80000000028,
+        "path": "/khong-gian/thanh-toan",
+        "heading": "Thanh toán cho ngày trọng đại",
+        "busy": false,
+        "length": 92
+      },
+      {
+        "at": 212852.7000000002,
+        "path": "/khong-gian/thanh-toan",
+        "heading": "Thanh toán cho ngày trọng đại",
+        "busy": true,
+        "length": 120
+      },
+      {
+        "at": 220752.30000000028,
+        "path": "/khong-gian/thanh-toan",
+        "heading": "Thanh toán cho ngày trọng đại",
+        "busy": false,
+        "length": 815
+      },
+      {
+        "at": 229553.2000000002,
+        "path": "/khong-gian/chuan-bi/khach",
+        "heading": "Khách mời",
+        "busy": true,
+        "length": 184
+      },
+      {
+        "at": 269943.1000000001,
+        "path": "/khong-gian/chuan-bi/khach",
+        "heading": "Khách mời",
+        "busy": false,
+        "length": 246
+      },
+      {
+        "at": 317216.9000000004,
+        "path": "/khong-gian/chuan-bi/khach",
+        "heading": "Khách mời",
+        "busy": false,
+        "length": 1507
+      },
+      {
+        "at": 323828.4000000004,
+        "path": "/khong-gian/chuan-bi/khach",
+        "busy": true,
+        "length": 45
+      },
+      {
+        "at": 324128.5,
+        "path": "/khong-gian/chuan-bi/khach",
+        "heading": "Sơ đồ bàn",
+        "busy": true,
+        "length": 157
+      },
+      {
+        "at": 328404.3000000003,
+        "path": "/khong-gian/chuan-bi/khach",
+        "heading": "Sơ đồ bàn",
+        "busy": false,
+        "length": 266
+      },
+      {
+        "at": 337192.3000000003,
+        "path": "/khong-gian/chuan-bi/thiep",
+        "busy": false,
+        "length": 40
+      },
+      {
+        "at": 346881.1000000001,
+        "path": "/khong-gian/chuan-bi/thiep",
+        "busy": true,
+        "length": 22
+      },
+      {
+        "at": 347583.7000000002,
+        "path": "/khong-gian/chuan-bi/thiep",
+        "heading": "Studio Thiệp Cưới & In Ấn",
+        "busy": false,
+        "length": 790
+      },
+      {
+        "at": 365207.9000000004,
+        "path": "/khong-gian/chuan-bi/phu-luc",
+        "heading": "Phụ lục hợp đồng",
+        "busy": true,
+        "length": 204
+      },
+      {
+        "at": 370030.3000000003,
+        "path": "/khong-gian/chuan-bi/phu-luc",
+        "heading": "Phụ lục hợp đồng",
+        "busy": false,
+        "length": 895
+      },
+      {
+        "at": 374786.5,
+        "path": "/khong-gian/quyet-toan",
+        "heading": "Chi phí phát sinh & hoá đơn",
+        "busy": true,
+        "length": 191
+      },
+      {
+        "at": 381570,
+        "path": "/khong-gian/quyet-toan",
+        "heading": "Chi phí phát sinh & hoá đơn",
+        "busy": false,
+        "length": 593
+      },
+      {
+        "at": 390751.5,
+        "path": "/khong-gian/thong-bao",
+        "heading": "Thông báo",
+        "busy": true,
+        "length": 39
+      },
+      {
+        "at": 394975.2000000002,
+        "path": "/khong-gian/thong-bao",
+        "heading": "Thông báo",
+        "busy": false,
+        "length": 199
+      },
+      {
+        "at": 397874.6000000001,
+        "path": "/ho-so",
+        "heading": "Kế hoạch ngày trọng đại",
+        "busy": true,
+        "length": 510
+      },
+      {
+        "at": 400029.7000000002,
+        "path": "/ho-so",
+        "heading": "Kế hoạch ngày trọng đại",
+        "busy": true,
+        "length": 684
+      },
+      {
+        "at": 445640,
+        "path": "/khong-gian",
+        "busy": true,
+        "length": 24
+      },
+      {
+        "at": 445656.6000000001,
+        "path": "/khong-gian",
+        "busy": true,
+        "length": 18
+      },
+      {
+        "at": 451801.2000000002,
+        "path": "/khong-gian",
+        "heading": "Tổng quan tiệc cưới",
+        "busy": true,
+        "length": 767
+      },
+      {
+        "at": 453126.7000000002,
+        "path": "/khong-gian",
+        "heading": "Tổng quan tiệc cưới",
+        "busy": false,
+        "length": 770
+      },
+      {
+        "at": 466156.7000000002,
+        "path": "/khong-gian/thoa-thuan/kich-ban",
+        "heading": "Đang mở không gian cộng tác…",
+        "busy": true,
+        "length": 88
+      },
+      {
+        "at": 468796.8000000003,
+        "path": "/khong-gian/thoa-thuan/kich-ban",
+        "heading": "Đề xuất & kịch bản",
+        "busy": true,
+        "length": 227
+      },
+      {
+        "at": 468823.3000000003,
+        "path": "/khong-gian/thoa-thuan/kich-ban",
+        "heading": "Đề xuất & kịch bản",
+        "busy": true,
+        "length": 248
+      },
+      {
+        "at": 470910.6000000001,
+        "path": "/khong-gian/thoa-thuan/kich-ban",
+        "heading": "Đề xuất & kịch bản",
+        "busy": true,
+        "length": 346
+      },
+      {
+        "at": 472310.7000000002,
+        "path": "/khong-gian/thoa-thuan/kich-ban",
+        "heading": "Đề xuất & kịch bản",
+        "busy": false,
+        "length": 939
+      },
+      {
+        "at": 474168.3000000003,
+        "path": "/khong-gian/thoa-thuan/ten",
+        "heading": "Tên cô dâu & chú rể",
+        "busy": true,
+        "length": 182
+      },
+      {
+        "at": 477412.9000000004,
+        "path": "/khong-gian/thoa-thuan/ten",
+        "heading": "Tên cô dâu & chú rể",
+        "busy": false,
+        "length": 351
+      },
+      {
+        "at": 493105.7000000002,
+        "path": "/khong-gian/thoa-thuan/hop-dong",
+        "heading": "Hợp đồng tiệc cưới",
+        "busy": true,
+        "length": 164
+      },
+      {
+        "at": 496367.7000000002,
+        "path": "/khong-gian/thoa-thuan/hop-dong",
+        "heading": "Hợp đồng tiệc cưới",
+        "busy": false,
+        "length": 888
+      },
+      {
+        "at": 501287.6000000001,
+        "path": "/khong-gian/thanh-toan",
+        "heading": "Đang mở thanh toán…",
+        "busy": true,
+        "length": 51
+      },
+      {
+        "at": 503912.2000000002,
+        "path": "/khong-gian/thanh-toan",
+        "heading": "Thanh toán cho ngày trọng đại",
+        "busy": false,
+        "length": 92
+      },
+      {
+        "at": 503928.6000000001,
+        "path": "/khong-gian/thanh-toan",
+        "heading": "Thanh toán cho ngày trọng đại",
+        "busy": true,
+        "length": 120
+      },
+      {
+        "at": 512374.4000000004,
+        "path": "/khong-gian/thanh-toan",
+        "heading": "Thanh toán cho ngày trọng đại",
+        "busy": false,
+        "length": 815
+      },
+      {
+        "at": 529365.4000000004,
+        "path": "/khong-gian/chuan-bi/khach",
+        "heading": "Khách mời",
+        "busy": true,
+        "length": 184
+      },
+      {
+        "at": 538867.7000000002,
+        "path": "/khong-gian/chuan-bi/khach",
+        "heading": "Khách mời",
+        "busy": false,
+        "length": 1507
+      },
+      {
+        "at": 543063.3000000003,
+        "path": "/khong-gian/chuan-bi/thiep",
+        "busy": false,
+        "length": 40
+      },
+      {
+        "at": 551025.5,
+        "path": "/khong-gian/chuan-bi/thiep",
+        "heading": "Studio Thiệp Cưới & In Ấn",
+        "busy": false,
+        "length": 790
+      },
+      {
+        "at": 560719.5,
+        "path": "/khong-gian/chuan-bi/phu-luc",
+        "heading": "Phụ lục hợp đồng",
+        "busy": true,
+        "length": 204
+      },
+      {
+        "at": 565526.9000000004,
+        "path": "/khong-gian/chuan-bi/phu-luc",
+        "heading": "Phụ lục hợp đồng",
+        "busy": false,
+        "length": 895
+      },
+      {
+        "at": 569407.6000000001,
+        "path": "/khong-gian/quyet-toan",
+        "heading": "Chi phí phát sinh & hoá đơn",
+        "busy": true,
+        "length": 191
+      },
+      {
+        "at": 575188.3000000003,
+        "path": "/khong-gian/quyet-toan",
+        "heading": "Chi phí phát sinh & hoá đơn",
+        "busy": false,
+        "length": 593
+      },
+      {
+        "at": 590906,
+        "path": "/khong-gian/thong-bao",
+        "heading": "Thông báo",
+        "busy": true,
+        "length": 39
+      },
+      {
+        "at": 595140.1000000001,
+        "path": "/khong-gian/thong-bao",
+        "heading": "Thông báo",
+        "busy": false,
+        "length": 199
+      },
+      {
+        "at": 599017.4000000004,
+        "path": "/ho-so",
+        "heading": "Kế hoạch ngày trọng đại",
+        "busy": true,
+        "length": 510
+      },
+      {
+        "at": 601166.7000000002,
+        "path": "/ho-so",
+        "heading": "Kế hoạch ngày trọng đại",
+        "busy": true,
+        "length": 684
+      }
+    ],
+    "longTasks": [
+      {
+        "start": 570.5,
+        "ms": 466
+      },
+      {
+        "start": 32288.400000000373,
+        "ms": 405
+      },
+      {
+        "start": 34879.40000000037,
+        "ms": 60
+      },
+      {
+        "start": 35322.60000000009,
+        "ms": 588
+      },
+      {
+        "start": 106648.70000000019,
+        "ms": 91
+      },
+      {
+        "start": 113037.70000000019,
+        "ms": 124
+      },
+      {
+        "start": 113164.20000000019,
+        "ms": 163
+      },
+      {
+        "start": 118846.5,
+        "ms": 154
+      },
+      {
+        "start": 119450.1000000001,
+        "ms": 351
+      },
+      {
+        "start": 119802.70000000019,
+        "ms": 707
+      },
+      {
+        "start": 120510,
+        "ms": 53
+      },
+      {
+        "start": 144578.7000000002,
+        "ms": 2114
+      },
+      {
+        "start": 146768,
+        "ms": 733
+      },
+      {
+        "start": 147578.7000000002,
+        "ms": 110
+      },
+      {
+        "start": 147690,
+        "ms": 272
+      },
+      {
+        "start": 148258.80000000028,
+        "ms": 50
+      },
+      {
+        "start": 148372.40000000037,
+        "ms": 515
+      },
+      {
+        "start": 149427.80000000028,
+        "ms": 210
+      },
+      {
+        "start": 151625.2000000002,
+        "ms": 211
+      },
+      {
+        "start": 151975.1000000001,
+        "ms": 60
+      },
+      {
+        "start": 153596.30000000028,
+        "ms": 113
+      },
+      {
+        "start": 155271.7000000002,
+        "ms": 207
+      },
+      {
+        "start": 155479.1000000001,
+        "ms": 476
+      },
+      {
+        "start": 174242.40000000037,
+        "ms": 60
+      },
+      {
+        "start": 191113.6000000001,
+        "ms": 79
+      },
+      {
+        "start": 191192.7000000002,
+        "ms": 164
+      },
+      {
+        "start": 193563.80000000028,
+        "ms": 162
+      },
+      {
+        "start": 193740.1000000001,
+        "ms": 227
+      },
+      {
+        "start": 230420.30000000028,
+        "ms": 325
+      },
+      {
+        "start": 235488.90000000037,
+        "ms": 235
+      },
+      {
+        "start": 235735.90000000037,
+        "ms": 55
+      },
+      {
+        "start": 235791.40000000037,
+        "ms": 162
+      },
+      {
+        "start": 235956.7000000002,
+        "ms": 238
+      },
+      {
+        "start": 239557.7000000002,
+        "ms": 2594
+      },
+      {
+        "start": 247391.80000000028,
+        "ms": 2582
+      },
+      {
+        "start": 249974.80000000028,
+        "ms": 2778
+      },
+      {
+        "start": 252759.40000000037,
+        "ms": 262
+      },
+      {
+        "start": 254454.6000000001,
+        "ms": 1028
+      },
+      {
+        "start": 257963.90000000037,
+        "ms": 2780
+      },
+      {
+        "start": 260747.1000000001,
+        "ms": 2565
+      },
+      {
+        "start": 263313,
+        "ms": 716
+      },
+      {
+        "start": 264029.4000000004,
+        "ms": 2468
+      },
+      {
+        "start": 266498.6000000001,
+        "ms": 295
+      },
+      {
+        "start": 266794.3000000003,
+        "ms": 361
+      },
+      {
+        "start": 267870.6000000001,
+        "ms": 902
+      },
+      {
+        "start": 268990.8000000003,
+        "ms": 781
+      },
+      {
+        "start": 269801.4000000004,
+        "ms": 60
+      },
+      {
+        "start": 269922.2000000002,
+        "ms": 67
+      },
+      {
+        "start": 304211.9000000004,
+        "ms": 118
+      },
+      {
+        "start": 317193.7000000002,
+        "ms": 91
+      },
+      {
+        "start": 330890.5,
+        "ms": 159
+      },
+      {
+        "start": 336631.9000000004,
+        "ms": 100
+      },
+      {
+        "start": 336911.3000000003,
+        "ms": 281
+      },
+      {
+        "start": 337193.2000000002,
+        "ms": 182
+      },
+      {
+        "start": 347580.9000000004,
+        "ms": 187
+      },
+      {
+        "start": 364654.9000000004,
+        "ms": 63
+      },
+      {
+        "start": 364835.5,
+        "ms": 373
+      },
+      {
+        "start": 365210.9000000004,
+        "ms": 379
+      },
+      {
+        "start": 367625.7000000002,
+        "ms": 77
+      },
+      {
+        "start": 374680.8000000003,
+        "ms": 111
+      },
+      {
+        "start": 390685.7000000002,
+        "ms": 66
+      },
+      {
+        "start": 397772.9000000004,
+        "ms": 102
+      },
+      {
+        "start": 449747.4000000004,
+        "ms": 148
+      },
+      {
+        "start": 451779.5,
+        "ms": 50
+      },
+      {
+        "start": 466092.2000000002,
+        "ms": 65
+      },
+      {
+        "start": 477411.6000000001,
+        "ms": 66
+      },
+      {
+        "start": 512005.4000000004,
+        "ms": 58
+      },
+      {
+        "start": 512063.6000000001,
+        "ms": 326
+      },
+      {
+        "start": 512389.7000000002,
+        "ms": 51
+      },
+      {
+        "start": 565495.8000000003,
+        "ms": 66
+      },
+      {
+        "start": 569187.9000000004,
+        "ms": 220
+      },
+      {
+        "start": 593845.6000000001,
+        "ms": 56
+      }
+    ],
+    "navigation": [
+      {
+        "ttfb": 56.200000000186265,
+        "dom": 570.7000000001863,
+        "load": 1265.6000000000931
+      }
+    ],
+    "warning": "Tooling and uncontrolled host load can contaminate CPU/UI timing. No INP/LCP/CLS score claimed."
+  },
+  "logout": {
+    "status": 204,
+    "requestId": "fc89d518-9c5a-48f2-9199-385ecf83e829",
+    "clientMs": 3117.605,
+    "revokedTokenReplay": "Not performed; no credential material read or exported."
+  },
+  "changes": "No application code, frontend, migrations, deployment or config changed. No provider payment, AI generation, publication, guest check-in or business command performed."
+}

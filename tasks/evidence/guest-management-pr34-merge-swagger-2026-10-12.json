@@ -1,0 +1,467 @@
+{
+  "date": "2026-10-12",
+  "timezone": "Asia/Saigon",
+  "reportScope": "Local post-merge evidence; not included in the tested/deployed merge commit",
+  "merge": {
+    "checkedAt": "2026-10-11T23:33:37.078Z",
+    "number": 34,
+    "state": "closed",
+    "draft": true,
+    "merged": true,
+    "head": "1648ebd6259940609ec636c570fe275e4524ef06",
+    "base": "07e4457b946e61c45e1f4e599a17de4467488ee8",
+    "mergeable": true,
+    "mergeableState": "clean",
+    "checks": [
+      {
+        "name": "PostgreSQL migration and integration gates",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38184081109/job/114602574810"
+      },
+      {
+        "name": "Static, test, build, and audit gates",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38184081109/job/114602574589"
+      }
+    ],
+    "statusContexts": [],
+    "reviews": [],
+    "reviewThreads": 0,
+    "unresolvedReviewThreads": 0,
+    "ownerInstruction": "Explicit human request in this chat: merge and verify Swagger; no independent team-member approval claimed",
+    "mergeMethod": "merge",
+    "mergeCommit": "4eee04447de048e615eac8214869b00ff0e4049c",
+    "mergedAt": "2026-10-11T23:33:42Z",
+    "url": "https://github.com/WDP301-wedding/wedding-be/pull/34"
+  },
+  "main": {
+    "source": "4eee04447de048e615eac8214869b00ff0e4049c",
+    "ci": {
+      "checkedAt": "2026-10-11T23:39:54.631Z",
+      "mergeCommit": "4eee04447de048e615eac8214869b00ff0e4049c",
+      "runs": [
+        {
+          "id": 38184745109,
+          "status": "completed",
+          "conclusion": "success",
+          "attempt": 1,
+          "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38184745109",
+          "sha": "4eee04447de048e615eac8214869b00ff0e4049c",
+          "jobs": [
+            {
+              "id": 114604561882,
+              "name": "Static, test, build, and audit gates",
+              "status": "completed",
+              "conclusion": "success",
+              "active": null,
+              "failed": []
+            },
+            {
+              "id": 114604562016,
+              "name": "PostgreSQL migration and integration gates",
+              "status": "completed",
+              "conclusion": "success",
+              "active": null,
+              "failed": []
+            }
+          ]
+        }
+      ]
+    },
+    "deployment": {
+      "checkedAt": "2026-10-11T23:41:42.934Z",
+      "latest": {
+        "id": "7157feaf-f953-4e09-9893-63f1ba645ccc",
+        "status": "SUCCESS",
+        "createdAt": "2026-10-11T23:33:44.057Z",
+        "commit": "4eee04447de048e615eac8214869b00ff0e4049c",
+        "branch": "main"
+      },
+      "active": [
+        {
+          "id": "7157feaf-f953-4e09-9893-63f1ba645ccc",
+          "status": "SUCCESS",
+          "createdAt": "2026-10-11T23:33:44.057Z",
+          "commit": "4eee04447de048e615eac8214869b00ff0e4049c",
+          "branch": "main"
+        }
+      ]
+    }
+  },
+  "verification": {
+    "mergeCommit": "4eee04447de048e615eac8214869b00ff0e4049c",
+    "unit": {
+      "files": 136,
+      "tests": 1241
+    },
+    "contract": {
+      "files": 13,
+      "tests": 39
+    },
+    "integration": {
+      "files": 73,
+      "tests": 403
+    },
+    "fullSuite": {
+      "files": 222,
+      "tests": 1683
+    },
+    "coverage": {
+      "statements": 96.6,
+      "branches": 93.61,
+      "functions": 98.53,
+      "lines": 97.44,
+      "existingPerFileLineBranchThreshold": 80
+    },
+    "audit": {
+      "passed": true,
+      "documentedExistingException": "1145093"
+    },
+    "emptyDatabaseMigration": {
+      "count45": true,
+      "successful": true
+    }
+  },
+  "swagger": {
+    "checkedAt": "2026-10-11T23:41:49.491Z",
+    "target": "https://wedding-be-production-e1dc.up.railway.app",
+    "http": [
+      {
+        "path": "/docs",
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "cacheControl": "no-store",
+        "requestId": "89b28ee5-b2ad-49df-9aef-1d55800b7d26",
+        "bytes": 1147
+      },
+      {
+        "path": "/docs/openapi.json",
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "cacheControl": "no-store",
+        "requestId": "2f4523fa-e192-49a8-9057-5f0abdb66af8",
+        "bytes": 584448
+      },
+      {
+        "path": "/api/v1/openapi.json",
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "cacheControl": "no-store",
+        "requestId": "c5eb3b03-a43a-40c2-a076-f06aaeafa1b7",
+        "bytes": 1322575
+      },
+      {
+        "path": "/docs/swagger-ui.css",
+        "status": 200,
+        "type": "text/css; charset=utf-8",
+        "cacheControl": "no-store",
+        "requestId": "5511d4e9-6651-4cd1-ab5e-e98051e96153",
+        "bytes": 186154
+      },
+      {
+        "path": "/docs/swagger-ui-bundle.js",
+        "status": 200,
+        "type": "text/javascript; charset=utf-8",
+        "cacheControl": "no-store",
+        "requestId": "fb1b867f-a163-46ec-a59b-7abeb663c1ae",
+        "bytes": 1586002
+      },
+      {
+        "path": "/docs/initializer.js",
+        "status": 200,
+        "type": "text/javascript; charset=utf-8",
+        "cacheControl": "no-store",
+        "requestId": "33611ef0-041b-4bfd-99f4-5b9dc35c909c",
+        "bytes": 442
+      },
+      {
+        "path": "/docs/docs.css",
+        "status": 200,
+        "type": "text/css; charset=utf-8",
+        "cacheControl": "no-store",
+        "requestId": "2e129a61-df6c-4569-a738-e134d907ebaa",
+        "bytes": 665
+      },
+      {
+        "path": "/docs/fonts/400.css",
+        "status": 200,
+        "type": "text/css; charset=utf-8",
+        "cacheControl": "no-store",
+        "requestId": "5f7b4028-f932-498a-96a7-5481296b9f24",
+        "bytes": 1428
+      },
+      {
+        "path": "/docs/fonts/600.css",
+        "status": 200,
+        "type": "text/css; charset=utf-8",
+        "cacheControl": "no-store",
+        "requestId": "0f4ffa1b-2745-4e99-af6b-7f3ec10c744a",
+        "bytes": 1428
+      },
+      {
+        "path": "/docs/fonts/700.css",
+        "status": 200,
+        "type": "text/css; charset=utf-8",
+        "cacheControl": "no-store",
+        "requestId": "149703f0-ca08-4271-a271-e2b4b2d7c0c3",
+        "bytes": 1428
+      },
+      {
+        "path": "/health/live",
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "cacheControl": null,
+        "requestId": "5b5484a2-5288-4908-b4ab-9b857fb80625",
+        "bytes": 77
+      },
+      {
+        "path": "/health/ready",
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "cacheControl": null,
+        "requestId": "ac99e257-950a-4a1d-8c35-d11a07a07e9a",
+        "bytes": 78
+      },
+      {
+        "path": "/api/v1/catalog/halls?limit=20",
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "cacheControl": null,
+        "requestId": "a3a08d10-4c40-468f-9050-4e21dd718c45",
+        "bytes": 312
+      }
+    ],
+    "denied": [
+      {
+        "path": "/api/v1/bookings/00000000-0000-4000-8000-000000000034/guest-groups",
+        "status": 401,
+        "errorCode": "AUTHENTICATION_REQUIRED",
+        "requestId": "35c415a9-d860-4f34-ae70-f455b1e21f34"
+      },
+      {
+        "path": "/api/v1/bookings/00000000-0000-4000-8000-000000000034/guests",
+        "status": 401,
+        "errorCode": "AUTHENTICATION_REQUIRED",
+        "requestId": "c5be8bad-27bd-4cbf-863b-b36919b24198"
+      },
+      {
+        "path": "/api/v1/bookings/00000000-0000-4000-8000-000000000034/guest-plan",
+        "status": 401,
+        "errorCode": "AUTHENTICATION_REQUIRED",
+        "requestId": "20e2accf-226d-4bfa-b28b-670e3f0d1a25"
+      }
+    ],
+    "canonical": {
+      "sha256": "4d162cdb766164e240a16c8bc53770a481cfa521491dae313f2971beba0cd63f",
+      "exactMatch": true,
+      "paths": 154,
+      "operations": 179,
+      "schemas": 73,
+      "resolvedReferences": 1612,
+      "uniqueOperationIds": 179
+    },
+    "swagger": {
+      "servers": [
+        {
+          "url": "/",
+          "description": "Backend hiện tại — gọi API thật"
+        }
+      ],
+      "pathsMatch": true,
+      "componentsMatch": true
+    },
+    "guestOperations": [
+      {
+        "method": "GET",
+        "path": "/bookings/{bookingId}/guest-groups",
+        "operationId": "listGuestGroups"
+      },
+      {
+        "method": "POST",
+        "path": "/bookings/{bookingId}/guest-groups",
+        "operationId": "createGuestGroup"
+      },
+      {
+        "method": "PATCH",
+        "path": "/bookings/{bookingId}/guest-groups/{groupId}",
+        "operationId": "updateGuestGroup"
+      },
+      {
+        "method": "GET",
+        "path": "/bookings/{bookingId}/guest-plan",
+        "operationId": "readExplicitGuestPlan"
+      },
+      {
+        "method": "PATCH",
+        "path": "/bookings/{bookingId}/guest-plan",
+        "operationId": "reviseExplicitGuestPlan"
+      },
+      {
+        "method": "GET",
+        "path": "/bookings/{bookingId}/guests",
+        "operationId": "listNamedGuests"
+      },
+      {
+        "method": "POST",
+        "path": "/bookings/{bookingId}/guests",
+        "operationId": "createNamedGuest"
+      },
+      {
+        "method": "POST",
+        "path": "/bookings/{bookingId}/guests/import-previews",
+        "operationId": "previewNamedGuestImport"
+      },
+      {
+        "method": "POST",
+        "path": "/bookings/{bookingId}/guests/imports",
+        "operationId": "commitNamedGuestImport"
+      },
+      {
+        "method": "PATCH",
+        "path": "/bookings/{bookingId}/guests/{guestId}",
+        "operationId": "updateNamedGuest"
+      },
+      {
+        "method": "POST",
+        "path": "/bookings/{bookingId}/guests/{guestId}/personalized-invitations",
+        "operationId": "issueReadOnlyGuestInvitation"
+      },
+      {
+        "method": "GET",
+        "path": "/guest/invitation",
+        "operationId": "viewGuestInvitation"
+      },
+      {
+        "method": "POST",
+        "path": "/guest/invitation-sessions",
+        "operationId": "exchangeGuestInvitationCredential"
+      }
+    ]
+  },
+  "browser": {
+    "checkedAt": "2026-10-11T23:42:37.093Z",
+    "url": "https://wedding-be-production-e1dc.up.railway.app/docs",
+    "title": "Wedding API — Tài liệu API",
+    "reloadedAfterDeployment": true,
+    "guestOperationCount": 13,
+    "visibleGuestOperations": [
+      "GET /api/v1/bookings/{bookingId}/guest-groups",
+      "POST /api/v1/bookings/{bookingId}/guest-groups",
+      "PATCH /api/v1/bookings/{bookingId}/guest-groups/{groupId}",
+      "GET /api/v1/bookings/{bookingId}/guest-plan",
+      "PATCH /api/v1/bookings/{bookingId}/guest-plan",
+      "GET /api/v1/bookings/{bookingId}/guests",
+      "POST /api/v1/bookings/{bookingId}/guests",
+      "POST /api/v1/bookings/{bookingId}/guests/import-previews",
+      "POST /api/v1/bookings/{bookingId}/guests/imports",
+      "PATCH /api/v1/bookings/{bookingId}/guests/{guestId}",
+      "POST /api/v1/bookings/{bookingId}/guests/{guestId}/personalized-invitations",
+      "GET /api/v1/guest/invitation",
+      "POST /api/v1/guest/invitation-sessions"
+    ],
+    "consoleIssues": [],
+    "tryItOut": {
+      "method": "GET",
+      "url": "https://wedding-be-production-e1dc.up.railway.app/api/v1/catalog/halls?limit=20",
+      "status": 200,
+      "requestId": "56e8cd67-2e0d-4ea9-9830-8bb6af8f3cc5",
+      "observation": "Swagger Execute used; live Server response 200 and request ID observed in UI"
+    }
+  },
+  "deployedLogs": {
+    "checkedAt": "2026-10-11T23:43:43.385Z",
+    "deploymentId": "7157feaf-f953-4e09-9893-63f1ba645ccc",
+    "source": "4eee04447de048e615eac8214869b00ff0e4049c",
+    "migrationCount45": true,
+    "appliedGuestMigration": true,
+    "migrationDeploymentSucceeded": true,
+    "requests": [
+      {
+        "requestId": "89b28ee5-b2ad-49df-9aef-1d55800b7d26",
+        "matched": true
+      },
+      {
+        "requestId": "2f4523fa-e192-49a8-9057-5f0abdb66af8",
+        "matched": true
+      },
+      {
+        "requestId": "c5eb3b03-a43a-40c2-a076-f06aaeafa1b7",
+        "matched": true
+      },
+      {
+        "requestId": "5511d4e9-6651-4cd1-ab5e-e98051e96153",
+        "matched": true
+      },
+      {
+        "requestId": "fb1b867f-a163-46ec-a59b-7abeb663c1ae",
+        "matched": true
+      },
+      {
+        "requestId": "33611ef0-041b-4bfd-99f4-5b9dc35c909c",
+        "matched": true
+      },
+      {
+        "requestId": "2e129a61-df6c-4569-a738-e134d907ebaa",
+        "matched": true
+      },
+      {
+        "requestId": "5f7b4028-f932-498a-96a7-5481296b9f24",
+        "matched": true
+      },
+      {
+        "requestId": "0f4ffa1b-2745-4e99-af6b-7f3ec10c744a",
+        "matched": true
+      },
+      {
+        "requestId": "149703f0-ca08-4271-a271-e2b4b2d7c0c3",
+        "matched": true
+      },
+      {
+        "requestId": "5b5484a2-5288-4908-b4ab-9b857fb80625",
+        "matched": true
+      },
+      {
+        "requestId": "ac99e257-950a-4a1d-8c35-d11a07a07e9a",
+        "matched": true
+      },
+      {
+        "requestId": "a3a08d10-4c40-468f-9050-4e21dd718c45",
+        "matched": true
+      },
+      {
+        "requestId": "35c415a9-d860-4f34-ae70-f455b1e21f34",
+        "matched": true
+      },
+      {
+        "requestId": "c5be8bad-27bd-4cbf-863b-b36919b24198",
+        "matched": true
+      },
+      {
+        "requestId": "20e2accf-226d-4bfa-b28b-670e3f0d1a25",
+        "matched": true
+      },
+      {
+        "requestId": "56e8cd67-2e0d-4ea9-9830-8bb6af8f3cc5",
+        "matched": true
+      }
+    ],
+    "allRequestsMatched": true
+  },
+  "scope": {
+    "target": "Previously owner-authorized developer staging; Railway environment label production",
+    "completed": "SPEC-06 GM-W1-W4 merged and deployed Swagger verified",
+    "GM_W5": "Pending; separate downstream work",
+    "teamMemberApprovalPresent": false,
+    "mergeAuthorization": "Explicit human request in this chat: hãy merge và kiểm tra cập nhật swagger giúp tôi",
+    "sourceCommitPreserved": "a6e79d73c55ba58a49876f8b0440c29ae74b75cf",
+    "frontendChanged": false,
+    "newPayment": false,
+    "paidGeneration": false,
+    "newEmail": false,
+    "authenticatedSharedDataMutation": false,
+    "providerConfigurationChanged": false,
+    "productionReadiness": "Not established by Swagger verification"
+  }
+}
