@@ -142,3 +142,27 @@ appropriate, inspect real workload plans and compare inbox/retention latency.
 An application rollback remains compatible with the additive indexes. If removal
 is warranted, use a new forward migration; never rewrite an applied migration.
 Existing RV/provider and production NO_GO decisions remain unchanged.
+
+## Authorized deployment follow-up — 2026-10-21
+
+The owner requested deployment and safe reconciliation of the dirty workspace.
+The candidate was rebuilt on current main without replacing application source,
+dependencies, newer schema additions or API contracts. Exact implementation-head
+[CI](https://github.com/WDP301-wedding/wedding-be/actions/runs/39546896925) passes
+static, integration, full PostgreSQL coverage and dependency-audit gates. This
+supersedes the earlier local pending-release/default-suite checkpoint for this
+reviewed implementation only; the recorded failures are retained.
+
+Prisma applied `20261021040000_notification_inbox_query_indexes` to the connected
+Supabase project. Both indexes are valid and ready; migration count advances from
+64 to 65, all prior migration records/checksums match, and counts/digests for Booking,
+contract/appendix/final-invoice revisions, ledger entries and NotificationInbox
+match before/after. See the [deployment receipt](../tasks/evidence/postgres-release-2026-10-21.json)
+and [workspace selection review](./uncommitted-review-2026-10-21.md).
+
+This establishes migration/index installation and retained data, with no claim of
+HTTP latency improvement on the six-row hosted inbox or overall provider readiness.
+The actual inbox page/unread reader was also executed read-only against existing
+hosted data and matched equivalent scoped Prisma reads (five visible rows and five
+unread rows). No identity details or message bodies were retained. This is database
+verification, not an HTTP/session or provider E2E test.
