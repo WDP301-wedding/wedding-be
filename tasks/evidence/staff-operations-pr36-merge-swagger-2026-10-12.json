@@ -1,0 +1,372 @@
+{
+  "date": "2026-10-12",
+  "timezone": "Asia/Saigon",
+  "reportScope": "Local post-merge receipt; not committed or part of tested/deployed commit",
+  "preflight": {
+    "checkedAt": "2026-10-12T04:56:50.521Z",
+    "url": "https://github.com/WDP301-wedding/wedding-be/pull/36",
+    "node": "PR_kwDOUoym288AAAABH5Xf3w",
+    "head": "24666301c9792156784091b4aa4d4ceea9a3c272",
+    "base": "c66847706f6df19f5a65742478e0d83d5cff01e1",
+    "state": "open",
+    "draft": true,
+    "mergeable": true,
+    "mergeableState": "clean",
+    "checks": [
+      {
+        "name": "Static, test, build, and audit gates",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38205147772/job/114666870594"
+      },
+      {
+        "name": "PostgreSQL migration and integration gates",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38205147772/job/114666870435"
+      }
+    ],
+    "reviews": [],
+    "status": [],
+    "threads": {
+      "node": {
+        "reviewDecision": null,
+        "reviewThreads": {
+          "nodes": []
+        }
+      }
+    }
+  },
+  "merge": {
+    "checkedAt": "2026-10-12T05:10:09.849Z",
+    "url": "https://github.com/WDP301-wedding/wedding-be/pull/36",
+    "merged": true,
+    "mergedAt": "2026-10-12T04:57:26Z",
+    "mergeCommit": "376435941e8e876e16c7caa07855d234dc65338d",
+    "mergedBy": "BachLeBa",
+    "head": "24666301c9792156784091b4aa4d4ceea9a3c272",
+    "run": {
+      "id": 38205884398,
+      "attempt": 2,
+      "head": "376435941e8e876e16c7caa07855d234dc65338d",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38205884398"
+    },
+    "jobs": [
+      {
+        "id": 114669727719,
+        "name": "PostgreSQL migration and integration gates",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38205884398/job/114669727719"
+      },
+      {
+        "id": 114669729598,
+        "name": "Static, test, build, and audit gates",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/38205884398/job/114669729598"
+      }
+    ],
+    "checks": [
+      {
+        "name": "Static, test, build, and audit gates",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "PostgreSQL migration and integration gates",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "authorization": "Explicit human merge/Swagger request; existing runbook confirms developer staging despite production label",
+  "ciIncident": {
+    "firstAttempt": "PostgreSQL public ECR image pull toomanyrequests: Data limit exceeded before checkout/tests",
+    "recovery": "Rerun attempt 2 passed unchanged gates. Original Railway deployment SKIPPED; service-scoped redeploy from main after green CI",
+    "skippedDeployment": "7dfb759b-2be8-4a14-b03f-72943c4cb214"
+  },
+  "verification": {
+    "unit": 1250,
+    "contract": 41,
+    "integration": 431,
+    "fullSuite": 1722,
+    "files": 233,
+    "coverage": {
+      "lines": 97.42,
+      "branches": 93.32,
+      "perFileThreshold": 80
+    },
+    "migrationCount": 47
+  },
+  "deployment": {
+    "id": "73b0616a-d4db-4b3a-854f-9bc9057bba27",
+    "status": "SUCCESS",
+    "createdAt": "2026-10-12T05:10:41.865Z",
+    "commit": "376435941e8e876e16c7caa07855d234dc65338d",
+    "branch": "main",
+    "checkedAt": "2026-10-12T05:13:34.035Z",
+    "migration": "20261012030000_staff_operations",
+    "migrationApplied": true
+  },
+  "swagger": {
+    "checkedAt": "2026-10-12T05:13:59.717Z",
+    "base": "https://wedding-be-production-e1dc.up.railway.app",
+    "swagger": "https://wedding-be-production-e1dc.up.railway.app/docs",
+    "canonicalSha256": "8be62bc16348dbe60fed7c8482384beb8ba16bd9cf9d02f85a1995dd13b00f2b",
+    "canonicalBytesMatch": true,
+    "browserStaffOperationsMatch": true,
+    "pathCount": 169,
+    "operationCount": 197,
+    "resolvedReferences": 1713,
+    "staffOperations": [
+      {
+        "path": "/bookings/{bookingId}/attendance-summary",
+        "method": "get",
+        "operationId": "readAttendanceSummary"
+      },
+      {
+        "path": "/bookings/{bookingId}/check-in-settings",
+        "method": "get",
+        "operationId": "readCheckInSettings"
+      },
+      {
+        "path": "/bookings/{bookingId}/check-in-settings",
+        "method": "patch",
+        "operationId": "configureCheckIn"
+      },
+      {
+        "path": "/management/events/{bookingId}/assignments",
+        "method": "get",
+        "operationId": "listEventStaffAssignments"
+      },
+      {
+        "path": "/management/events/{bookingId}/assignments",
+        "method": "post",
+        "operationId": "assignEventStaff"
+      },
+      {
+        "path": "/management/events/{bookingId}/assignments/{assignmentId}/revocation",
+        "method": "post",
+        "operationId": "revokeEventStaffAssignment"
+      },
+      {
+        "path": "/management/staff-accounts",
+        "method": "post",
+        "operationId": "provisionStaffAccount"
+      },
+      {
+        "path": "/management/staff-accounts/{accountId}/operational-access",
+        "method": "post",
+        "operationId": "setStaffOperationalAccess"
+      },
+      {
+        "path": "/staff/events/{bookingId}/guests/search",
+        "method": "get",
+        "operationId": "searchStaffEventGuests"
+      },
+      {
+        "path": "/staff/events/{bookingId}/guests/{guestId}/check-in-undos",
+        "method": "post",
+        "operationId": "undoNamedGuestCheckIn"
+      },
+      {
+        "path": "/staff/events/{bookingId}/guests/{guestId}/check-ins",
+        "method": "get",
+        "operationId": "readNamedGuestCheckInHistory"
+      },
+      {
+        "path": "/staff/events/{bookingId}/guests/{guestId}/check-ins",
+        "method": "post",
+        "operationId": "checkInNamedGuest"
+      }
+    ],
+    "responses": [
+      {
+        "path": "/api/v1/openapi.json",
+        "status": 200,
+        "requestId": "386cbc90-f86c-4aa4-b24e-572b1ebbe113",
+        "echoRequestId": "af6e11d5-771b-4dff-b81c-9d4715cc36dc",
+        "contentType": "application/json; charset=utf-8",
+        "cacheControl": "no-store",
+        "etag": "W/\"17116e-1a12e7906f0\"",
+        "bytes": 1511790
+      },
+      {
+        "path": "/docs/openapi.json",
+        "status": 200,
+        "requestId": "3c94e750-b272-4515-90c7-f680d1ceb10a",
+        "echoRequestId": "25d18a55-2b6b-473a-8baa-f851923c24ec",
+        "contentType": "application/json; charset=utf-8",
+        "cacheControl": "no-store",
+        "etag": "W/\"a3b8e-sdywEduY/q7xDQMJg7tn98WHRY8\"",
+        "bytes": 670606
+      },
+      {
+        "path": "/docs",
+        "status": 200,
+        "requestId": "d4e98e69-550b-4272-8ce2-923c881684f6",
+        "echoRequestId": "bb94f89c-2bac-4e29-998a-dac1e521de8b",
+        "contentType": "text/html; charset=utf-8",
+        "cacheControl": "no-store",
+        "etag": "W/\"47b-ilWUp4uqIzwF0PEqwVKlNXborYY\"",
+        "bytes": 1147
+      },
+      {
+        "path": "/docs/initializer.js",
+        "status": 200,
+        "requestId": "3ecf5342-0a88-45ba-ad87-baf1afc0d5e2",
+        "echoRequestId": "d73ce0be-a573-47d1-a831-4a81818e473f",
+        "contentType": "text/javascript; charset=utf-8",
+        "cacheControl": "no-store",
+        "etag": "W/\"1ba-vtsZ0p4kRPVNbLl9TYSCZJtcjYQ\"",
+        "bytes": 442
+      },
+      {
+        "path": "/docs/swagger-ui-bundle.js",
+        "status": 200,
+        "requestId": "ddfb6afb-4f30-4648-b9d3-ec74978c688f",
+        "echoRequestId": "92db5bde-3184-46da-b91e-9a97a796ce2c",
+        "contentType": "text/javascript; charset=utf-8",
+        "cacheControl": "no-store",
+        "etag": "W/\"183352-1a1295e3410\"",
+        "bytes": 1586002
+      },
+      {
+        "path": "/docs/swagger-ui.css",
+        "status": 200,
+        "requestId": "cf5294cd-3f4e-406c-9505-ddd2647ca0cc",
+        "echoRequestId": "a7ebcbeb-6f8d-4f36-9aa8-fe58a2dc8b0d",
+        "contentType": "text/css; charset=utf-8",
+        "cacheControl": "no-store",
+        "etag": "W/\"2d72a-1a1295e2c40\"",
+        "bytes": 186154
+      },
+      {
+        "path": "/docs/docs.css",
+        "status": 200,
+        "requestId": "59f1c030-b425-4b4b-8364-6b4304eea7a3",
+        "echoRequestId": "20302f06-cb8e-4d52-a3d3-398507cfbe8e",
+        "contentType": "text/css; charset=utf-8",
+        "cacheControl": "no-store",
+        "etag": "W/\"299-iNEGNQFkDnjS1xXWA0byXlcz9No\"",
+        "bytes": 665
+      },
+      {
+        "path": "/docs/fonts/400.css",
+        "status": 200,
+        "requestId": "17d5bbca-fa42-4c08-9a16-71738fc58756",
+        "echoRequestId": "ccc7fac7-5a54-48c3-814a-9fdc5e38bc77",
+        "contentType": "text/css; charset=utf-8",
+        "cacheControl": "no-store",
+        "etag": "W/\"594-1a1295e3028\"",
+        "bytes": 1428
+      },
+      {
+        "path": "/health/live",
+        "status": 200,
+        "requestId": "5ade1730-21ca-46d6-98c0-651ee804a48f",
+        "echoRequestId": "1500aa13-bcf9-4c27-bef2-8d5d13af0160",
+        "contentType": "application/json; charset=utf-8",
+        "cacheControl": null,
+        "etag": "W/\"4d-ewaBL73t8DS1WFTg4LF54lwEBk4\"",
+        "bytes": 77
+      },
+      {
+        "path": "/health/ready",
+        "status": 200,
+        "requestId": "cb5eb634-a643-4b3e-a98e-ba160248138e",
+        "echoRequestId": "a981ac78-fa2b-4b2b-8b62-f8542035d396",
+        "contentType": "application/json; charset=utf-8",
+        "cacheControl": null,
+        "etag": "W/\"4e-ukNz9IONUeXnQgBtMV085ei9n5w\"",
+        "bytes": 78
+      },
+      {
+        "path": "/api/v1/catalog/halls",
+        "status": 200,
+        "requestId": "7159688c-60f6-4752-90c7-f0791687f861",
+        "echoRequestId": "f4404d72-e053-4fa9-bdaa-e7783dd87fc7",
+        "contentType": "application/json; charset=utf-8",
+        "cacheControl": null,
+        "etag": "W/\"138-Fa/RaAp7j9PZCPmHp07N+te01Qw\"",
+        "bytes": 312
+      },
+      {
+        "path": "/api/v1/catalog/dishes",
+        "status": 200,
+        "requestId": "85f5abd2-cae1-44c0-a94e-230579c6ad4b",
+        "echoRequestId": "6a867d84-7ed3-46bc-93da-6fb32c9e4f0f",
+        "contentType": "application/json; charset=utf-8",
+        "cacheControl": null,
+        "etag": "W/\"2ee-lh1sMKZKpBlMtnLdgoye2ZTAIjM\"",
+        "bytes": 750
+      },
+      {
+        "path": "/api/v1/bookings/4076a77c-52ad-4206-9798-8accd74d88c9/check-in-settings",
+        "status": 401,
+        "requestId": "5e62e329-dd33-4f95-9724-093a1a85ac1c",
+        "echoRequestId": "860ec6f7-dc82-43bb-88e8-2fed3cef7852",
+        "contentType": "application/json; charset=utf-8",
+        "cacheControl": "no-store",
+        "etag": "W/\"87-TVwOti41Y6AiaFhtvr4wQ3HfyQQ\"",
+        "bytes": 135
+      },
+      {
+        "path": "/api/v1/bookings/4076a77c-52ad-4206-9798-8accd74d88c9/attendance-summary",
+        "status": 401,
+        "requestId": "e0167a51-d6bb-42eb-a3f2-95e59c389479",
+        "echoRequestId": "9a94630d-dc5b-483d-bbb5-57f6df9de0ba",
+        "contentType": "application/json; charset=utf-8",
+        "cacheControl": "no-store",
+        "etag": "W/\"87-aFRIVQqirVQDGEvsngYN1wc5qs4\"",
+        "bytes": 135
+      },
+      {
+        "path": "/api/v1/staff/events/4076a77c-52ad-4206-9798-8accd74d88c9/guests/search",
+        "status": 401,
+        "requestId": "35108467-8182-4687-9e5e-98d00e4690a3",
+        "echoRequestId": "d0d1a82c-1f0a-4a3f-bc74-240794d57ca1",
+        "contentType": "application/json; charset=utf-8",
+        "cacheControl": "no-store",
+        "etag": "W/\"87-M1h9oV9FlDM38uwIbi1YECqAryQ\"",
+        "bytes": 135
+      },
+      {
+        "path": "/api/v1/staff/events/4076a77c-52ad-4206-9798-8accd74d88c9/guests/d9375be1-9f5b-436a-a0e8-51773be92808/check-ins",
+        "status": 401,
+        "requestId": "468b9e81-8772-48c0-8948-ed1e163f0856",
+        "echoRequestId": "bb63003b-5944-4ce3-8493-72ecb35dd2f4",
+        "contentType": "application/json; charset=utf-8",
+        "cacheControl": "no-store",
+        "etag": "W/\"87-SjvxKr3n+H9dNqLpPImZ9C6Tths\"",
+        "bytes": 135
+      },
+      {
+        "path": "/api/v1/management/events/4076a77c-52ad-4206-9798-8accd74d88c9/assignments",
+        "status": 401,
+        "requestId": "8458b1e0-0abd-406d-bf4c-8e265eea0a3c",
+        "echoRequestId": "b39f3c65-caa3-4ff7-93d3-ba68b2464d41",
+        "contentType": "application/json; charset=utf-8",
+        "cacheControl": "no-store",
+        "etag": "W/\"87-+YyuMbU4xn0PHA4y+oDFa0c+1mk\"",
+        "bytes": 135
+      }
+    ]
+  },
+  "browser": {
+    "filter": "Staff operations",
+    "renderedOperationCount": 12,
+    "consoleErrors": 0,
+    "consoleWarnings": 0,
+    "screenshot": "output/playwright/spec08-pr36-swagger.png"
+  },
+  "logCorrelation": {
+    "expected": 17,
+    "matched": 17,
+    "field": "Server-issued x-request-id response header (echoRequestId); supplied request IDs are replaced by server"
+  },
+  "limitations": "Publication and anonymous read denials only; no authenticated Staff journey or external-provider acceptance. No business-data write, paid generation, payment or email during verification; authorized release migration recorded separately."
+}

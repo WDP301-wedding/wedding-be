@@ -1,5 +1,14 @@
 # Backend Ownership
 
+Owner-approved exception, 2026-10-19: the website performance/reliability revision
+may change both `wedding-web` and `wedding-be`, in that order, followed by direct
+browser E2E verification of the deployed website. It covers all wedding-web routes,
+not only the dashboard. `wedding-manage-web` and `wedding-app` remain outside this
+revision. Follow each repository's own instructions. The canonical plan/task list
+is `../wedding-web/tasks/plan.md` and `../wedding-web/tasks/todo.md`; see
+`docs/web-remediation-scope-2026-10-19.md`. This exception supersedes the frontend
+edit restriction below only for this revision; business/provider safeguards remain.
+
 From SPEC-06 onward, work in this repository is backend-only. The frontend team
 owns wedding-web, wedding-manage-web and wedding-app, including their new UI.
 Do not delete or modify existing frontend code as part of this backend revision.

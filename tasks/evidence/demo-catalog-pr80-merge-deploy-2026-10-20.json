@@ -1,0 +1,705 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-20",
+  "timezone": "Asia/Saigon",
+  "completedAt": "2026-10-20T02:27:56.006Z",
+  "authorization": {
+    "humanInstruction": "hãy giúp tôi merge và deploy commit `d1b9630` đi",
+    "scope": "Merge the requested change through a reviewed PR with exact-head CI, deploy the existing synthetic Railway demo, and verify read-only runtime/data/browser behavior."
+  },
+  "requestedCommit": "d1b963023f77c41b992bafae5bca9d1256d4d041",
+  "integratedHead": "cb0f2a0f7d90f174d75ed89d5513801448ec8205",
+  "base": "e82c269c7f04c5b9e364ceb39847581b98f9bc3f",
+  "merge": "568e45616879a2dba04fbb99993b64efe72dc2b9",
+  "pullRequest": "https://github.com/WDP301-wedding/wedding-be/pull/80",
+  "fiveFilesByteIdentical": true,
+  "unrelatedAncestorExcluded": true,
+  "mergeTreeIdentical": true,
+  "review": {
+    "reviewedHead": "cb0f2a0f7d90f174d75ed89d5513801448ec8205",
+    "requestedCommit": "d1b963023f77c41b992bafae5bca9d1256d4d041",
+    "base": "e82c269c7f04c5b9e364ceb39847581b98f9bc3f",
+    "fiveFilesByteIdentical": true,
+    "runtimeSourceChanged": false,
+    "migrationChanged": false,
+    "dependenciesChanged": false,
+    "dockerAndStartupChanged": false,
+    "seedingInvokedByDeployment": false,
+    "correctness": "Existing catalog schemas and immutable-layout policy validate deterministic geometry. Explicit Manager APIs handle version publication and guest history. Exact fixture IDs/labels/ownership guard the two audited Consultation label updates. Replay and original-history preservation have dedicated live evidence.",
+    "security": "Pinned synthetic API origin, private operator config and sanitized public receipts; no credentials added. Constant table allowlist and parameterized fixture values for SQL. No new public endpoints or privileges.",
+    "architecture": "Operator-only utility and tests reuse Venue schemas/policy. No application import of the operator executable.",
+    "performance": "No runtime request-path changes. Bounded catalog pagination; operator snapshots target the documented small synthetic database.",
+    "readability": "Fixed fixture manifest and explicit plan/apply stages; no shared runtime abstraction changes.",
+    "blockingFindings": [],
+    "rollback": "Prior SUCCESS deployment e66cbbb0-0e0b-40ba-aa0b-f1fa455e38a3 is rollback-capable. Revert/redeploy application source if needed; do not erase the previously applied synthetic data or immutable business history.",
+    "scope": "This review does not waive exact-head CI, deployment verification, or the existing production NO_GO."
+  },
+  "ci": {
+    "pullRequestRun": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39357034762",
+    "pullRequestChecks": [
+      {
+        "name": "PostgreSQL migration and integration gates",
+        "status": "completed",
+        "conclusion": "success",
+        "head": "cb0f2a0f7d90f174d75ed89d5513801448ec8205",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39357034762/job/118414074722"
+      },
+      {
+        "name": "Static, test, build, and audit gates",
+        "status": "completed",
+        "conclusion": "success",
+        "head": "cb0f2a0f7d90f174d75ed89d5513801448ec8205",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39357034762/job/118414074315"
+      }
+    ],
+    "mainRun": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39357864949",
+    "mainChecks": [
+      {
+        "id": 118416775987,
+        "name": "PostgreSQL migration and integration gates",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39357864949/job/118416775987"
+      },
+      {
+        "id": 118416775661,
+        "name": "Static, test, build, and audit gates",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39357864949/job/118416775661"
+      }
+    ],
+    "prStatic": {
+      "job": "118414074315",
+      "summary": [
+        "2026-10-20T02:05:55.5610933Z found 0 vulnerabilities",
+        "2026-10-20T02:07:03.3380277Z  Test Files  163 passed (163)",
+        "2026-10-20T02:07:03.3386180Z       Tests  1475 passed (1475)",
+        "2026-10-20T02:07:07.7794821Z  Test Files  23 passed (23)",
+        "2026-10-20T02:07:07.7795353Z       Tests  99 passed (99)",
+        "2026-10-20T02:07:20.4668972Z Dependency audit passed with no high/critical advisories."
+      ]
+    },
+    "prPostgres": {
+      "job": "118414074722",
+      "summary": [
+        "2026-10-20T02:06:12.4608684Z found 0 vulnerabilities",
+        "2026-10-20T02:09:31.4245614Z  Test Files  110 passed (110)",
+        "2026-10-20T02:09:31.4250929Z       Tests  632 passed (632)",
+        "2026-10-20T02:14:03.4019485Z  Test Files  296 passed (296)",
+        "2026-10-20T02:14:03.4034014Z       Tests  2206 passed (2206)",
+        "2026-10-20T02:14:03.4340274Z All files          |   96.68 |     93.6 |   98.49 |   97.58 |                   "
+      ]
+    },
+    "mainStatic": {
+      "job": "118416775661",
+      "summary": [
+        "2026-10-20T02:15:11.6063911Z found 0 vulnerabilities",
+        "2026-10-20T02:16:36.2418152Z  Test Files  163 passed (163)",
+        "2026-10-20T02:16:36.2424262Z       Tests  1475 passed (1475)",
+        "2026-10-20T02:16:41.6671158Z  Test Files  23 passed (23)",
+        "2026-10-20T02:16:41.6671945Z       Tests  99 passed (99)",
+        "2026-10-20T02:16:57.9326358Z Dependency audit passed with no high/critical advisories."
+      ]
+    },
+    "mainPostgres": {
+      "job": "118416775987",
+      "summary": [
+        "2026-10-20T02:15:22.9185034Z found 0 vulnerabilities",
+        "2026-10-20T02:17:23.4696875Z  Test Files  110 passed (110)",
+        "2026-10-20T02:17:23.4705566Z       Tests  632 passed (632)",
+        "2026-10-20T02:20:01.9565264Z  Test Files  296 passed (296)",
+        "2026-10-20T02:20:01.9570610Z       Tests  2206 passed (2206)",
+        "2026-10-20T02:20:01.9753770Z All files          |   96.68 |     93.6 |   98.49 |   97.58 |                   "
+      ]
+    }
+  },
+  "deployment": {
+    "projectId": "1c56721d-021a-442c-9e01-bb91abe73adb",
+    "environmentId": "08a2899c-b0d6-4200-a505-604965a4b3fc",
+    "serviceId": "0f70d648-8c59-48bd-84f3-29a86d2e2d38",
+    "previous": {
+      "deploymentId": "e66cbbb0-0e0b-40ba-aa0b-f1fa455e38a3",
+      "source": "e82c269c7f04c5b9e364ceb39847581b98f9bc3f",
+      "image": "sha256:3c60b5013dadcc9098da9b6a1f36c590ea7e104eae0a45247fe09592a741e5bd",
+      "variableDigest": "600329aff5e4681383dd20c20f235c56551ed255a8760a7bde3e22403c8dda46",
+      "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+      "controls": {
+        "DB_POOL_MAX": "1",
+        "DB_POOL_MAX_VENUE_CATALOG": "3",
+        "DB_POOL_MAX_ANALYTICS": "2",
+        "DB_CONNECTION_RESERVE": "36",
+        "DB_MAX_CONNECTIONS": "60",
+        "DB_DIAGNOSTICS_ENABLED": "false",
+        "DB_SAFE_READ_DEADLINE_ENABLED": "false",
+        "SEATING_RECONCILER_ENABLED": null,
+        "NOTIFICATIONS_WORKER_ENABLED": "true"
+      }
+    },
+    "current": {
+      "deploymentId": "0f1dc704-f5ee-4ad0-84e3-d816a53a618e",
+      "source": "568e45616879a2dba04fbb99993b64efe72dc2b9",
+      "image": "sha256:3c60b5013dadcc9098da9b6a1f36c590ea7e104eae0a45247fe09592a741e5bd",
+      "variableDigest": "600329aff5e4681383dd20c20f235c56551ed255a8760a7bde3e22403c8dda46",
+      "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+      "controls": {
+        "DB_POOL_MAX": "1",
+        "DB_POOL_MAX_VENUE_CATALOG": "3",
+        "DB_POOL_MAX_ANALYTICS": "2",
+        "DB_CONNECTION_RESERVE": "36",
+        "DB_MAX_CONNECTIONS": "60",
+        "DB_DIAGNOSTICS_ENABLED": "false",
+        "DB_SAFE_READ_DEADLINE_ENABLED": "false",
+        "SEATING_RECONCILER_ENABLED": null,
+        "NOTIFICATIONS_WORKER_ENABLED": "true"
+      }
+    },
+    "sourceVerified": true,
+    "runtimeImageIdentical": true,
+    "waitForCiPreserved": true,
+    "configurationUnchanged": true,
+    "variablesUnchanged": true
+  },
+  "preservation": {
+    "passed": true,
+    "tablesCompared": 24,
+    "before": {
+      "Booking": {
+        "count": 27,
+        "sha256": "a2e6816f2395575b326a20c378ba5ac3a9a7e9cbe41ec28a71680067c47f5dea"
+      },
+      "BookingSlotHold": {
+        "count": 17,
+        "sha256": "51775b16412175512bf44bbbba29adf417fe1d64957190563fbcb434ff7ca632"
+      },
+      "GuestWorkspace": {
+        "count": 11,
+        "sha256": "8adb011a157d7b5ecd8b99fb641634e1ec9177f6ca9684a7a9b72cc6042a657d"
+      },
+      "GuestPlanRevision": {
+        "count": 16,
+        "sha256": "7aa9c3e5666620d977da3a1e5fbe3639e8757785da271a38ad06e559fab750f9"
+      },
+      "Guest": {
+        "count": 29,
+        "sha256": "88afeafefb39924d5c9572c3f2352df36528961e5803da31e72d62df574ff267"
+      },
+      "GuestGroup": {
+        "count": 48,
+        "sha256": "65b1cc830b0ad9c601694b219129cd30f5fd6f91043ecd9660e3998d80f0c110"
+      },
+      "GuestHistory": {
+        "count": 93,
+        "sha256": "07e2492e8c1f5b12168dec69712c9a609478c1f3708a3329bbd00f64810f361e"
+      },
+      "SeatingPlan": {
+        "count": 4,
+        "sha256": "4d5ae0dade2a17b0110726a944c4b940f0145f6514746cfbfe1d2c544b8d672d"
+      },
+      "SeatingPlanRevision": {
+        "count": 15,
+        "sha256": "2f6e691133dc6a1b88941304473722866f7044d490ce1ad82caadeaeace2c938"
+      },
+      "StaffConfiguration": {
+        "count": 8,
+        "sha256": "bf3471348980d2d34d505b6d7d666ff14a51058e48a2a5b8d06e75a0e130b59d"
+      },
+      "StaffAssignment": {
+        "count": 2,
+        "sha256": "2f5b76d1861c2685aac6c9a2b1c5dd1d37a920bf8d40785f9bfeead744a15622"
+      },
+      "StaffHistory": {
+        "count": 12,
+        "sha256": "31ca3ef12114562ee5c8e070e455acc22e10f0616f339b273d384fa87bfda364"
+      },
+      "StaffCheckInRecord": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "CommercialContractRevision": {
+        "count": 9,
+        "sha256": "8a6c4e5d4a28d0475bbe735bbaf5598605d2ef131ef76a89e7236eca056e454a"
+      },
+      "CommercialAppendixRevision": {
+        "count": 2,
+        "sha256": "137fa98eb34fee1b9de05a8e792090aeca11e7acf7db5bfa30df2d9b13d15d14"
+      },
+      "FinalInvoiceRevision": {
+        "count": 1,
+        "sha256": "a5cc65388d67284b4648a16d9e6a453e456f252d40798ce7318b68cf0807e082"
+      },
+      "BillingLedgerEntry": {
+        "count": 28,
+        "sha256": "3871ce9184a42d9ce8f7a852b88ce1381b0ea6d5bc01e5dbdd070edc8ec9c972"
+      },
+      "BillingPaymentAttempt": {
+        "count": 17,
+        "sha256": "2121195415a63d1bba4d802c15cbc003261b64e9118a6d21f6abc5a5332efa35"
+      },
+      "Consultation": {
+        "count": 39,
+        "sha256": "448ab1c415a3a75d172e4a672c454049c8565c2c976e97c9e9f9a3dbef3c3e01"
+      },
+      "Hall": {
+        "count": 3,
+        "sha256": "be8e57371427c48ff0c89239b54cfb07f4e24723d43f17a6d6cfb68baaaad0d7"
+      },
+      "LayoutTemplate": {
+        "count": 13,
+        "sha256": "907db6565387c2720b60fc4a1cca9e0bcce7ae3d27c1c805594a53e9f67e9901"
+      },
+      "LayoutTemplateVersion": {
+        "count": 15,
+        "sha256": "0b8b3703311cb68051a04426c1601d75bd82f416d4ae1ac1ba8266b2714c4d6c"
+      },
+      "LayoutTableIdentity": {
+        "count": 129,
+        "sha256": "cba91372d47ae0a7808ba2b502a12dad3866bf0f15ad88539108b865726d3515"
+      },
+      "LayoutTableGeometry": {
+        "count": 139,
+        "sha256": "e5f3060d68c3179b986d115fb9c5882e1b7a4a810a14f8703bca224f3b9af106"
+      }
+    },
+    "after": {
+      "Booking": {
+        "count": 27,
+        "sha256": "a2e6816f2395575b326a20c378ba5ac3a9a7e9cbe41ec28a71680067c47f5dea"
+      },
+      "BookingSlotHold": {
+        "count": 17,
+        "sha256": "51775b16412175512bf44bbbba29adf417fe1d64957190563fbcb434ff7ca632"
+      },
+      "GuestWorkspace": {
+        "count": 11,
+        "sha256": "8adb011a157d7b5ecd8b99fb641634e1ec9177f6ca9684a7a9b72cc6042a657d"
+      },
+      "GuestPlanRevision": {
+        "count": 16,
+        "sha256": "7aa9c3e5666620d977da3a1e5fbe3639e8757785da271a38ad06e559fab750f9"
+      },
+      "Guest": {
+        "count": 29,
+        "sha256": "88afeafefb39924d5c9572c3f2352df36528961e5803da31e72d62df574ff267"
+      },
+      "GuestGroup": {
+        "count": 48,
+        "sha256": "65b1cc830b0ad9c601694b219129cd30f5fd6f91043ecd9660e3998d80f0c110"
+      },
+      "GuestHistory": {
+        "count": 93,
+        "sha256": "07e2492e8c1f5b12168dec69712c9a609478c1f3708a3329bbd00f64810f361e"
+      },
+      "SeatingPlan": {
+        "count": 4,
+        "sha256": "4d5ae0dade2a17b0110726a944c4b940f0145f6514746cfbfe1d2c544b8d672d"
+      },
+      "SeatingPlanRevision": {
+        "count": 15,
+        "sha256": "2f6e691133dc6a1b88941304473722866f7044d490ce1ad82caadeaeace2c938"
+      },
+      "StaffConfiguration": {
+        "count": 8,
+        "sha256": "bf3471348980d2d34d505b6d7d666ff14a51058e48a2a5b8d06e75a0e130b59d"
+      },
+      "StaffAssignment": {
+        "count": 2,
+        "sha256": "2f5b76d1861c2685aac6c9a2b1c5dd1d37a920bf8d40785f9bfeead744a15622"
+      },
+      "StaffHistory": {
+        "count": 12,
+        "sha256": "31ca3ef12114562ee5c8e070e455acc22e10f0616f339b273d384fa87bfda364"
+      },
+      "StaffCheckInRecord": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "CommercialContractRevision": {
+        "count": 9,
+        "sha256": "8a6c4e5d4a28d0475bbe735bbaf5598605d2ef131ef76a89e7236eca056e454a"
+      },
+      "CommercialAppendixRevision": {
+        "count": 2,
+        "sha256": "137fa98eb34fee1b9de05a8e792090aeca11e7acf7db5bfa30df2d9b13d15d14"
+      },
+      "FinalInvoiceRevision": {
+        "count": 1,
+        "sha256": "a5cc65388d67284b4648a16d9e6a453e456f252d40798ce7318b68cf0807e082"
+      },
+      "BillingLedgerEntry": {
+        "count": 28,
+        "sha256": "3871ce9184a42d9ce8f7a852b88ce1381b0ea6d5bc01e5dbdd070edc8ec9c972"
+      },
+      "BillingPaymentAttempt": {
+        "count": 17,
+        "sha256": "2121195415a63d1bba4d802c15cbc003261b64e9118a6d21f6abc5a5332efa35"
+      },
+      "Consultation": {
+        "count": 39,
+        "sha256": "448ab1c415a3a75d172e4a672c454049c8565c2c976e97c9e9f9a3dbef3c3e01"
+      },
+      "Hall": {
+        "count": 3,
+        "sha256": "be8e57371427c48ff0c89239b54cfb07f4e24723d43f17a6d6cfb68baaaad0d7"
+      },
+      "LayoutTemplate": {
+        "count": 13,
+        "sha256": "907db6565387c2720b60fc4a1cca9e0bcce7ae3d27c1c805594a53e9f67e9901"
+      },
+      "LayoutTemplateVersion": {
+        "count": 15,
+        "sha256": "0b8b3703311cb68051a04426c1601d75bd82f416d4ae1ac1ba8266b2714c4d6c"
+      },
+      "LayoutTableIdentity": {
+        "count": 129,
+        "sha256": "cba91372d47ae0a7808ba2b502a12dad3866bf0f15ad88539108b865726d3515"
+      },
+      "LayoutTableGeometry": {
+        "count": 139,
+        "sha256": "e5f3060d68c3179b986d115fb9c5882e1b7a4a810a14f8703bca224f3b9af106"
+      }
+    },
+    "migrations": {
+      "count": 61,
+      "sha256": "b7d90da8b39b7db5f6ef24ec1084f4ea2d4e4915664ebfccd00345c18fbf910e",
+      "allChecksumsMatch": true
+    },
+    "openapiHash": "b6e8c71ae108e3206a3ea2d99d393b44f6e39e1a2b1e9ec357c7ef4d695c0061",
+    "halls": [
+      {
+        "id": "10000000-0000-4000-8000-000000000010",
+        "name": "Lotus Hall",
+        "maxGuests": 300
+      },
+      {
+        "id": "10000000-0000-4000-8000-000000000011",
+        "name": "Orchid Hall",
+        "maxGuests": 120
+      },
+      {
+        "id": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+        "name": "Sảnh Demo — Tiệc thân mật",
+        "maxGuests": 120
+      }
+    ],
+    "layouts": [
+      {
+        "id": "10000000-0000-4000-8000-000000000050",
+        "hallId": "10000000-0000-4000-8000-000000000010",
+        "versionId": "10000000-0000-4000-8000-000000000051",
+        "name": "Lotus Compact",
+        "minGuests": 80,
+        "maxGuests": 120,
+        "tables": 2,
+        "seats": 120
+      },
+      {
+        "id": "10000000-0000-4000-8000-000000000054",
+        "hallId": "10000000-0000-4000-8000-000000000010",
+        "versionId": "10000000-0000-4000-8000-000000000055",
+        "name": "Lotus Grand",
+        "minGuests": 150,
+        "maxGuests": 240,
+        "tables": 3,
+        "seats": 240
+      },
+      {
+        "id": "e3d0ef95-c3d7-5ebe-ae86-9363f3583f98",
+        "hallId": "10000000-0000-4000-8000-000000000010",
+        "versionId": "856a52a0-c7e1-51ae-a381-6d2093eb1ef1",
+        "name": "Lotus — 10 bàn, 100 chỗ",
+        "minGuests": 1,
+        "maxGuests": 100,
+        "tables": 10,
+        "seats": 100
+      },
+      {
+        "id": "dbdc4b57-1b8a-5ae4-ab70-20d693679e16",
+        "hallId": "10000000-0000-4000-8000-000000000010",
+        "versionId": "8ada4b60-7397-54f0-a0e6-f97af1cc1854",
+        "name": "Lotus — 20 bàn, 200 chỗ",
+        "minGuests": 101,
+        "maxGuests": 200,
+        "tables": 20,
+        "seats": 200
+      },
+      {
+        "id": "85c3b13c-740e-5a91-a072-6b42208c575a",
+        "hallId": "10000000-0000-4000-8000-000000000010",
+        "versionId": "84b7ee77-af39-597c-a152-20a19d15c30a",
+        "name": "Lotus — 30 bàn, 300 chỗ",
+        "minGuests": 201,
+        "maxGuests": 300,
+        "tables": 30,
+        "seats": 300
+      },
+      {
+        "id": "f4ede61b-9999-5ee2-a13e-55d28f0613b0",
+        "hallId": "10000000-0000-4000-8000-000000000011",
+        "versionId": "14e0f79d-22f2-5ad7-a6cc-dca5639d3658",
+        "name": "Orchid — 5 bàn, 50 chỗ",
+        "minGuests": 1,
+        "maxGuests": 50,
+        "tables": 5,
+        "seats": 50
+      },
+      {
+        "id": "9b3f64ae-e3e0-52ed-a980-c911ef88b292",
+        "hallId": "10000000-0000-4000-8000-000000000011",
+        "versionId": "c89fa2ac-2d94-564a-a834-0494b9000bf5",
+        "name": "Orchid — 10 bàn, 100 chỗ",
+        "minGuests": 51,
+        "maxGuests": 100,
+        "tables": 10,
+        "seats": 100
+      },
+      {
+        "id": "055ef5ad-d225-55c6-a76a-7c3f31d79d39",
+        "hallId": "10000000-0000-4000-8000-000000000011",
+        "versionId": "c3f8e9b3-3864-5a9c-a9c8-7779ba90e8c1",
+        "name": "Orchid — 12 bàn, 120 chỗ",
+        "minGuests": 101,
+        "maxGuests": 120,
+        "tables": 12,
+        "seats": 120
+      },
+      {
+        "id": "2e65cdee-d43c-4df0-8d65-9583939f4f15",
+        "hallId": "10000000-0000-4000-8000-000000000011",
+        "versionId": "291b5703-bc94-51aa-afa4-683bc49ff818",
+        "name": "Orchid — 5 bàn, 50 chỗ (demo)",
+        "minGuests": 50,
+        "maxGuests": 50,
+        "tables": 5,
+        "seats": 50
+      },
+      {
+        "id": "32f6d2dd-a85d-501b-a301-f9edf010fe75",
+        "hallId": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+        "versionId": "55a069da-c836-535d-a555-22985c02db4c",
+        "name": "Tiệc thân mật — 5 bàn, 50 chỗ",
+        "minGuests": 1,
+        "maxGuests": 50,
+        "tables": 5,
+        "seats": 50
+      },
+      {
+        "id": "3789b691-5486-5a84-aa3f-c3d98eb860b5",
+        "hallId": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+        "versionId": "b86fb59e-9c6a-55c8-acb8-111e6cfff5c5",
+        "name": "Tiệc thân mật — 10 bàn, 100 chỗ",
+        "minGuests": 51,
+        "maxGuests": 100,
+        "tables": 10,
+        "seats": 100
+      },
+      {
+        "id": "8b4f9e04-e630-5ca1-a665-4e02d477cc5d",
+        "hallId": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+        "versionId": "83b47982-6c02-5393-af03-ddd63fdb85ab",
+        "name": "Tiệc thân mật — 12 bàn, 120 chỗ",
+        "minGuests": 101,
+        "maxGuests": 120,
+        "tables": 12,
+        "seats": 120
+      },
+      {
+        "id": "76191cc8-faee-4248-b709-e011752512fe",
+        "hallId": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+        "versionId": "1a5bc588-5c9a-5721-a7c1-f58cc4ff890f",
+        "name": "Tiệc thân mật — 5 bàn, 50 chỗ (demo)",
+        "minGuests": 50,
+        "maxGuests": 50,
+        "tables": 5,
+        "seats": 50
+      }
+    ],
+    "duplicateConfirmedSlots": 0,
+    "seedingRerun": false,
+    "financialWrites": false
+  },
+  "smoke": {
+    "at": "2026-10-20T02:21:27.781Z",
+    "phase": "after",
+    "checks": [
+      {
+        "name": "live",
+        "status": 200,
+        "expected": 200,
+        "requestId": "4196c60c-3229-479a-8d29-33af1db53b3c",
+        "durationMs": 505
+      },
+      {
+        "name": "ready",
+        "status": 200,
+        "expected": 200,
+        "requestId": "9bf6d561-2108-4cc6-85b7-c3aeee881f4f",
+        "durationMs": 1504
+      },
+      {
+        "name": "halls",
+        "status": 200,
+        "expected": 200,
+        "requestId": "f41c032e-ca87-458c-9dd2-9b4f9ea89b86",
+        "durationMs": 919,
+        "items": [
+          {
+            "id": "10000000-0000-4000-8000-000000000010",
+            "name": "Lotus Hall",
+            "maxGuests": 300
+          },
+          {
+            "id": "10000000-0000-4000-8000-000000000011",
+            "name": "Orchid Hall",
+            "maxGuests": 120
+          },
+          {
+            "id": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+            "name": "Sảnh Demo — Tiệc thân mật",
+            "maxGuests": 120
+          }
+        ]
+      },
+      {
+        "name": "hall-demo",
+        "status": 200,
+        "expected": 200,
+        "requestId": "377ab6c9-1201-4d29-b6bf-9fa0897bd17a",
+        "durationMs": 1175,
+        "hall": {
+          "id": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+          "name": "Sảnh Demo — Tiệc thân mật",
+          "maxGuests": 120
+        }
+      },
+      {
+        "name": "management-denied",
+        "status": 401,
+        "expected": 401,
+        "requestId": "5261330e-dc54-4a28-bd9f-fb0a14510d78",
+        "durationMs": 219,
+        "errorCode": "AUTHENTICATION_REQUIRED"
+      },
+      {
+        "name": "web-halls",
+        "status": 200,
+        "expected": 200,
+        "requestId": "123b8d76-9f2f-4735-8970-36c594fded56",
+        "durationMs": 1313,
+        "items": [
+          {
+            "id": "10000000-0000-4000-8000-000000000010",
+            "name": "Lotus Hall",
+            "maxGuests": 300
+          },
+          {
+            "id": "10000000-0000-4000-8000-000000000011",
+            "name": "Orchid Hall",
+            "maxGuests": 120
+          },
+          {
+            "id": "be5d4496-de6a-4666-8d17-3202b1f873ed",
+            "name": "Sảnh Demo — Tiệc thân mật",
+            "maxGuests": 120
+          }
+        ]
+      }
+    ],
+    "passed": true,
+    "catalogUnchanged": true
+  },
+  "browser": {
+    "passed": true,
+    "at": "2026-10-20T02:27:30.509Z",
+    "site": "https://wedding-web-silk.vercel.app",
+    "authenticatedSyntheticCouple": true,
+    "checks": {
+      "publicDemoHallHeading": true,
+      "orchidTemplates5_10_12Tables": true,
+      "demoHallTemplates5_10_12Tables": true,
+      "demoGuestNamesVisible": 8,
+      "plannedHeadcountDisplayed": 50,
+      "desktopViewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "mobileViewport": {
+        "width": 390,
+        "height": 844
+      },
+      "loggedOut": true,
+      "browserSessionClosed": true
+    },
+    "mutations": {
+      "seatingSelection": false,
+      "guestEdit": false,
+      "checkIn": false,
+      "bookingOrFinancialWrite": false,
+      "providerGeneration": false
+    },
+    "screenshots": [
+      "output/playwright/demo-release-orchid-seating-desktop.png",
+      "output/playwright/demo-release-orchid-seating-mobile.png",
+      "output/playwright/demo-release-hall-seating-desktop.png"
+    ],
+    "limits": [
+      "Historical proposal snapshots retain their original PERF hall label by design.",
+      "Existing mobile seating table scrolls horizontally; no frontend code was changed.",
+      "Expected unauthenticated refresh response produced a browser console 401 on the login screen."
+    ]
+  },
+  "limits": [
+    "Deployment is for the existing synthetic developer demo, despite its Railway environment name production.",
+    "No production readiness or real provider-settlement claim.",
+    "No seeding, payment, paid generation, notification delivery, schema change, or frontend deployment was performed during this rollout.",
+    "Prior seed evidence remains unchanged; this receipt records a later clean Linux CI and deployment verification.",
+    "Two 5xx responses were observed outside the six deployment smoke requests: invitation-image generation (also present before deploy) and attendance summary. The attendance-summary cause was not established; neither route was changed by this patch."
+  ],
+  "runtimeLogs": {
+    "capturedAt": "2026-10-20T02:27:30.419Z",
+    "previous": {
+      "deploymentId": "e66cbbb0-0e0b-40ba-aa0b-f1fa455e38a3",
+      "status": "REMOVED",
+      "entries": 301,
+      "errors": [
+        {
+          "at": "2026-10-20T02:04:56.301580745Z",
+          "requestId": "824f5091-0733-4fda-943e-feff71f70931",
+          "method": "POST",
+          "route": "/bookings/:bookingId/invitation-image-generations",
+          "statusClass": "5xx"
+        }
+      ],
+      "pgClientConcurrencyDeprecation": false
+    },
+    "current": {
+      "deploymentId": "0f1dc704-f5ee-4ad0-84e3-d816a53a618e",
+      "status": "SUCCESS",
+      "entries": 139,
+      "errors": [
+        {
+          "at": "2026-10-20T02:21:24.186209032Z",
+          "requestId": "a2c7c0d7-7650-4d60-b1ad-6ce880a5ad4c",
+          "method": "POST",
+          "route": "/bookings/:bookingId/invitation-image-generations",
+          "statusClass": "5xx"
+        },
+        {
+          "at": "2026-10-20T02:22:04.740196657Z",
+          "requestId": "7996aa08-a112-43d8-bb16-f6400e99d1ec",
+          "method": "GET",
+          "route": "/bookings/:bookingId/attendance-summary",
+          "statusClass": "5xx"
+        }
+      ],
+      "pgClientConcurrencyDeprecation": true
+    },
+    "assessment": [
+      "Invitation-image-generation 5xx was also present in the previous deployment.",
+      "Attendance-summary 5xx occurred in the sampled current window; no cause established by these sanitized logs.",
+      "Current source changes only scripts, documentation, evidence and tests. Runtime image, configuration, variables and schema are identical to the previous deployment.",
+      "The six deployment smoke requests all met their expected responses. A successful rollout is not a claim that every unrelated feature is error-free."
+    ],
+    "noGenerationOrAttendanceWritesInitiatedByRollout": true
+  }
+}

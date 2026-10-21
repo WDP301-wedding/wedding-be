@@ -1,0 +1,421 @@
+{
+  "date": "2026-10-21",
+  "timezone": "Asia/Saigon",
+  "skill": "supabase-postgres-best-practices",
+  "startingHead": "563c7bb38ba2433d3571043c26e76528479e4ddf",
+  "checkout": "pre-existing uncommitted changes retained; candidate is local and uncommitted",
+  "scope": "additive NotificationInbox indexes; no application/API business behavior change",
+  "hostedInspection": {
+    "mode": "read-only Supabase connector catalog, table statistics and performance advisor",
+    "project": "wedding",
+    "postgres": "17.6",
+    "publicAdvisors": {
+      "unindexedForeignKeys": 52,
+      "unusedIndexes": 43
+    },
+    "allSchemaAdvisors": {
+      "unindexedForeignKeys": 169,
+      "unusedIndexes": 302
+    },
+    "approximateRows": {
+      "Guest": 30,
+      "NotificationInbox": 6,
+      "NotificationIntent": 232,
+      "NotificationRecipient": 13
+    },
+    "candidateIndexesPresent": false,
+    "sharedDdlOrDataWrites": false,
+    "hostedLatencyImprovementEstablished": false
+  },
+  "migration": {
+    "name": "20261021040000_notification_inbox_query_indexes",
+    "indexes": [
+      "NotificationInbox_unread_account_booking_idx",
+      "NotificationInbox_createdAt_id_idx"
+    ],
+    "atomic": true,
+    "lockTimeout": "5s",
+    "statementTimeout": "60s",
+    "generatedFrom": "Prisma migrate diff between original and candidate schema",
+    "appliedHistoricalMigrationsChanged": false
+  },
+  "local": {
+    "postgres": "18.6",
+    "target": "dedicated loopback test cluster; isolated disposable databases",
+    "inboxRows": 30000,
+    "unreadRows": 300,
+    "retentionBatch": 100,
+    "warmups": 1,
+    "samplesPerQuery": 7,
+    "baselineMode": "only the new indexes dropped in a new disposable test database; two intentional access-path assertion failures",
+    "candidateMode": "complete migration chain including new migration; two passing assertions and unchanged functional results",
+    "note": "Background host load varied. Compare plans/buffer work as deterministic evidence; timings are not deployed HTTP budgets.",
+    "excludedAttempt": "baseline-stable.log: setup and cleanup hook timeouts under concurrent checks; no successful measurements",
+    "measurements": {
+      "baseline-matched": [
+        {
+          "query": "unread",
+          "medianMs": 8.194,
+          "timesMs": [
+            6.68,
+            7.137,
+            7.32,
+            8.194,
+            9.171,
+            13.636,
+            14.619
+          ],
+          "sharedHitBlocks": [
+            404,
+            404,
+            404,
+            404,
+            404,
+            404,
+            404
+          ],
+          "representativePlan": {
+            "Node Type": "CTE Scan",
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 404,
+            "Shared Read Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Result",
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Shared Hit Blocks": 4,
+                "Shared Read Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Index Scan",
+                    "Relation Name": "Booking",
+                    "Index Name": "Booking_pkey",
+                    "Actual Rows": 1,
+                    "Actual Loops": 1,
+                    "Rows Removed by Filter": 0,
+                    "Shared Hit Blocks": 4,
+                    "Shared Read Blocks": 0,
+                    "Plans": [
+                      {
+                        "Node Type": "Bitmap Heap Scan",
+                        "Relation Name": "ConsultationAccess",
+                        "Actual Rows": 1,
+                        "Actual Loops": 1,
+                        "Shared Hit Blocks": 2,
+                        "Shared Read Blocks": 0,
+                        "Plans": [
+                          {
+                            "Node Type": "Bitmap Index Scan",
+                            "Index Name": "ConsultationAccess_accountId_consultationId_key",
+                            "Actual Rows": 1,
+                            "Actual Loops": 1,
+                            "Shared Hit Blocks": 1,
+                            "Shared Read Blocks": 0
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "Node Type": "Aggregate",
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Shared Hit Blocks": 400,
+                "Shared Read Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Nested Loop",
+                    "Actual Rows": 300,
+                    "Actual Loops": 1,
+                    "Shared Hit Blocks": 400,
+                    "Shared Read Blocks": 0,
+                    "Plans": [
+                      {
+                        "Node Type": "CTE Scan",
+                        "Actual Rows": 1,
+                        "Actual Loops": 1,
+                        "Shared Hit Blocks": 0,
+                        "Shared Read Blocks": 0
+                      },
+                      {
+                        "Node Type": "Seq Scan",
+                        "Relation Name": "NotificationInbox",
+                        "Actual Rows": 300,
+                        "Actual Loops": 1,
+                        "Rows Removed by Filter": 29700,
+                        "Shared Hit Blocks": 400,
+                        "Shared Read Blocks": 0
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "query": "retention",
+          "medianMs": 29.446,
+          "timesMs": [
+            23.657,
+            25.851,
+            28.263,
+            29.446,
+            37.485,
+            38.279,
+            43.868
+          ],
+          "sharedHitBlocks": [
+            400,
+            400,
+            400,
+            400,
+            400,
+            400,
+            400
+          ],
+          "representativePlan": {
+            "Node Type": "Limit",
+            "Actual Rows": 100,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 400,
+            "Shared Read Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Sort",
+                "Actual Rows": 100,
+                "Actual Loops": 1,
+                "Shared Hit Blocks": 400,
+                "Shared Read Blocks": 0,
+                "Sort Method": "top-N heapsort",
+                "Plans": [
+                  {
+                    "Node Type": "Seq Scan",
+                    "Relation Name": "NotificationInbox",
+                    "Actual Rows": 17041,
+                    "Actual Loops": 1,
+                    "Rows Removed by Filter": 12959,
+                    "Shared Hit Blocks": 400,
+                    "Shared Read Blocks": 0
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "candidate-plans": [
+        {
+          "query": "unread",
+          "medianMs": 0.612,
+          "timesMs": [
+            0.394,
+            0.537,
+            0.545,
+            0.612,
+            0.626,
+            0.638,
+            0.97
+          ],
+          "sharedHitBlocks": [
+            305,
+            305,
+            305,
+            305,
+            305,
+            305,
+            305
+          ],
+          "representativePlan": {
+            "Node Type": "CTE Scan",
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 305,
+            "Shared Read Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Result",
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Shared Hit Blocks": 4,
+                "Shared Read Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Index Scan",
+                    "Relation Name": "Booking",
+                    "Index Name": "Booking_pkey",
+                    "Actual Rows": 1,
+                    "Actual Loops": 1,
+                    "Rows Removed by Filter": 0,
+                    "Shared Hit Blocks": 4,
+                    "Shared Read Blocks": 0,
+                    "Plans": [
+                      {
+                        "Node Type": "Bitmap Heap Scan",
+                        "Relation Name": "ConsultationAccess",
+                        "Actual Rows": 1,
+                        "Actual Loops": 1,
+                        "Shared Hit Blocks": 2,
+                        "Shared Read Blocks": 0,
+                        "Plans": [
+                          {
+                            "Node Type": "Bitmap Index Scan",
+                            "Index Name": "ConsultationAccess_accountId_consultationId_key",
+                            "Actual Rows": 1,
+                            "Actual Loops": 1,
+                            "Shared Hit Blocks": 1,
+                            "Shared Read Blocks": 0
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "Node Type": "Aggregate",
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Shared Hit Blocks": 301,
+                "Shared Read Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Nested Loop",
+                    "Actual Rows": 300,
+                    "Actual Loops": 1,
+                    "Shared Hit Blocks": 301,
+                    "Shared Read Blocks": 0,
+                    "Plans": [
+                      {
+                        "Node Type": "CTE Scan",
+                        "Actual Rows": 1,
+                        "Actual Loops": 1,
+                        "Shared Hit Blocks": 0,
+                        "Shared Read Blocks": 0
+                      },
+                      {
+                        "Node Type": "Index Only Scan",
+                        "Relation Name": "NotificationInbox",
+                        "Index Name": "NotificationInbox_unread_account_booking_idx",
+                        "Actual Rows": 300,
+                        "Actual Loops": 1,
+                        "Shared Hit Blocks": 301,
+                        "Shared Read Blocks": 0
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "query": "retention",
+          "medianMs": 0.104,
+          "timesMs": [
+            0.092,
+            0.097,
+            0.098,
+            0.104,
+            0.107,
+            0.112,
+            0.12
+          ],
+          "sharedHitBlocks": [
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4
+          ],
+          "representativePlan": {
+            "Node Type": "Limit",
+            "Actual Rows": 100,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 4,
+            "Shared Read Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Index Only Scan",
+                "Relation Name": "NotificationInbox",
+                "Index Name": "NotificationInbox_createdAt_id_idx",
+                "Actual Rows": 100,
+                "Actual Loops": 1,
+                "Shared Hit Blocks": 4,
+                "Shared Read Blocks": 0
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "checks": {
+    "typecheck": "passed",
+    "build": "passed",
+    "apiGenerate": "passed",
+    "apiCheck": "passed",
+    "sourceLint": "passed: node --max-old-space-size=4096 node_modules/eslint/bin/eslint.js . --max-warnings 0 --ignore-pattern output/** --ignore-pattern src/generated/**",
+    "initialFullLint": "out of memory while scanning existing generated/audit output; source lint rerun separately",
+    "focusedNativeIndexes": "2 passed with complete migration chain",
+    "fullSuite": {
+      "status": "not-passed",
+      "totalFiles": 296,
+      "detail": "Attempt stopped after a 30-second runtime-foundation test timeout; no full-suite success claim."
+    },
+    "unit": {
+      "files": 163,
+      "tests": 1465,
+      "status": "passed"
+    },
+    "contract": {
+      "files": 22,
+      "tests": 71,
+      "status": "passed"
+    },
+    "latestTestTypecheckAndLint": "passed after evidence-file support was added",
+    "focusedIntegration": {
+      "files": 6,
+      "tests": 35,
+      "passed": 34,
+      "failed": 1,
+      "passedFiles": 4,
+      "failedFiles": 2,
+      "failures": [
+        "runtime-foundation afterAll: DROP SCHEMA cleanup exceeds default 10s hook timeout",
+        "notification-security afterEach: database disconnect/drop exceeds default 10s hook timeout"
+      ],
+      "passedScope": [
+        "new index tests",
+        "notification read/authority regressions",
+        "guest delivery/retention",
+        "fresh migration and forward compensation"
+      ]
+    },
+    "cleanupRecheck": {
+      "command": "vitest run tests/integration/runtime-foundation.test.ts tests/integration/notification-security.test.ts --maxWorkers=1 --hookTimeout=60000",
+      "status": "10 tests passed in 2 files",
+      "note": "Only this local command changes the cleanup wait budget. Checked-in tests and default full-suite CI remain unchanged."
+    },
+    "formattingAndDiff": "checked separately after final evidence update"
+  },
+  "localCleanup": {
+    "server": "dedicated test PostgreSQL stopped successfully",
+    "dataDirectory": "output/postgres-best-practices-20261021/pgdata",
+    "deletion": "automatic approval rejected the recursive directory removal with blocked by policy; data retained"
+  },
+  "deployment": "not performed; owner-authorized rollout and hosted verification pending",
+  "providerCalls": "none; existing controlled test providers only",
+  "openapiSha256": "19da7dafc991d316f7f048a58c6446deabb2e724edb3a49d55e4709ce14d04e2",
+  "sourceSha256": {
+    "prisma/schema.prisma": "fa050fa10f3321b9c98e9f92eb4bebad7c6769d2ffc000f9076c490e82c49d20",
+    "prisma/migrations/20261021040000_notification_inbox_query_indexes/migration.sql": "20e6b9b537ce8f4d8b6724a453c729d9334ee85f5dcb8007777b63897edbbcb0",
+    "tests/integration/notification-inbox-indexes.test.ts": "ea1b887e63a9eb4740fa7efcee5342d35b360ed678e20f39a5f5530ae22718e3"
+  }
+}

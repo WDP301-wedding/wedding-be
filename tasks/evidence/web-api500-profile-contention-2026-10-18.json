@@ -1,0 +1,769 @@
+{
+  "at": "2026-10-18T01:08:00.019Z",
+  "scope": "Intermittent Couple profile 500 after configuration-only acquisition-wait rollout; source candidate is not deployed.",
+  "deployment": {
+    "id": "df563b30-08b6-41bc-949d-cb908f2650b9",
+    "source": "cc2999acdd24dc87e713806328022b160585c599",
+    "image": "sha256:d201a414b903413b28724591c52f2ab3a3cc0492818dd42d58ed2af370d55892",
+    "commonPoolMax": 1,
+    "acquireTimeoutMs": 10000,
+    "changedInThisFollowup": false,
+    "finalServing": {
+      "at": "2026-10-18T01:07:26.879Z",
+      "deploymentId": "df563b30-08b6-41bc-949d-cb908f2650b9",
+      "source": "cc2999acdd24dc87e713806328022b160585c599",
+      "image": "sha256:d201a414b903413b28724591c52f2ab3a3cc0492818dd42d58ed2af370d55892",
+      "status": "SUCCESS",
+      "stopped": false,
+      "selected": {
+        "DB_POOL_MAX": "1",
+        "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000",
+        "DB_POOL_MAX_VENUE_CATALOG": "3",
+        "DB_POOL_MAX_ANALYTICS": "2",
+        "DB_CONNECTION_RESERVE": "36",
+        "DB_PLANNED_PROCESSES": "2",
+        "DB_MAX_CONNECTIONS": "60"
+      },
+      "sourceCandidateDeployed": false
+    }
+  },
+  "screenshot": {
+    "requestId": "1f8aac3e-22d7-41f5-adc5-95b94a53a8ac",
+    "matched": [
+      {
+        "at": "2026-10-18T00:25:39.907Z",
+        "event": "http_request_error",
+        "errorName": "PrismaClientKnownRequestError"
+      },
+      {
+        "at": "2026-10-18T00:25:39.908Z",
+        "event": "http_request_completed",
+        "ms": 2282.356,
+        "route": "/consultations/:consultationId/couple-profile",
+        "statusClass": "5xx"
+      }
+    ],
+    "prismaCodeObserved": false
+  },
+  "live": {
+    "at": "2026-10-18T00:32:24.118Z",
+    "matched": 28,
+    "expected": 28,
+    "serialProfileGet200": 10,
+    "mixedGets": 12,
+    "mixedFailures": [
+      {
+        "requestId": "21b94023-bd11-4fbd-92ac-225a28b00eeb",
+        "origin": "vercel",
+        "label": "couple-profile",
+        "phase": "mixed-booking-burst",
+        "round": 2,
+        "status": 500,
+        "clientMs": 3841.959,
+        "backendMs": 2754.809,
+        "errorName": "PrismaClientKnownRequestError",
+        "matched": true
+      }
+    ],
+    "operations": [
+      {
+        "requestId": "0996c3d3-6c3e-4b24-b379-8729f6838144",
+        "origin": "vercel",
+        "label": "login",
+        "phase": "session",
+        "round": 0,
+        "status": 201,
+        "clientMs": 4028.527,
+        "backendMs": 2779.192,
+        "matched": true
+      },
+      {
+        "requestId": "cddc009b-f1ef-4f81-a544-a579252347b4",
+        "origin": "vercel",
+        "label": "couple-profile",
+        "phase": "reproduction",
+        "round": 1,
+        "status": 200,
+        "clientMs": 2986.984,
+        "backendMs": 1888.448,
+        "matched": true
+      },
+      {
+        "requestId": "f751f31b-a492-463f-820a-52eba0ccb9d0",
+        "origin": "vercel",
+        "label": "couple-profile",
+        "phase": "reproduction",
+        "round": 2,
+        "status": 200,
+        "clientMs": 1262.498,
+        "backendMs": 786.725,
+        "matched": true
+      },
+      {
+        "requestId": "cd6de57d-909b-4210-ae34-bc82f6b0223e",
+        "origin": "vercel",
+        "label": "couple-profile",
+        "phase": "reproduction",
+        "round": 3,
+        "status": 200,
+        "clientMs": 1716.599,
+        "backendMs": 781.83,
+        "matched": true
+      },
+      {
+        "requestId": "80e2793c-178b-472b-abaf-97491a475ac7",
+        "origin": "vercel",
+        "label": "couple-profile",
+        "phase": "reproduction",
+        "round": 4,
+        "status": 200,
+        "clientMs": 1225.699,
+        "backendMs": 780.926,
+        "matched": true
+      },
+      {
+        "requestId": "679819f5-839a-45e0-80f8-44a5e3ebdf0e",
+        "origin": "vercel",
+        "label": "couple-profile",
+        "phase": "reproduction",
+        "round": 5,
+        "status": 200,
+        "clientMs": 1266.736,
+        "backendMs": 782.601,
+        "matched": true
+      },
+      {
+        "requestId": "adcd4d6c-33b9-4636-a46b-bb2b3fb7e367",
+        "origin": "railway",
+        "label": "couple-profile",
+        "phase": "reproduction",
+        "round": 1,
+        "status": 200,
+        "clientMs": 1155.094,
+        "backendMs": 782.384,
+        "matched": true
+      },
+      {
+        "requestId": "d4591b9d-68df-4da2-bdb9-f5eeb2549ed9",
+        "origin": "railway",
+        "label": "couple-profile",
+        "phase": "reproduction",
+        "round": 2,
+        "status": 200,
+        "clientMs": 1074.908,
+        "backendMs": 785.222,
+        "matched": true
+      },
+      {
+        "requestId": "d9be236c-3392-4fc6-9088-67c667d4cd16",
+        "origin": "railway",
+        "label": "couple-profile",
+        "phase": "reproduction",
+        "round": 3,
+        "status": 200,
+        "clientMs": 1008.957,
+        "backendMs": 781.836,
+        "matched": true
+      },
+      {
+        "requestId": "a5506e0e-565a-4ee6-b1a7-f5c1ae531834",
+        "origin": "railway",
+        "label": "couple-profile",
+        "phase": "reproduction",
+        "round": 4,
+        "status": 200,
+        "clientMs": 992.888,
+        "backendMs": 784.702,
+        "matched": true
+      },
+      {
+        "requestId": "b2fafd77-f6a5-4c1e-8d8a-5dc38399f41d",
+        "origin": "railway",
+        "label": "couple-profile",
+        "phase": "reproduction",
+        "round": 5,
+        "status": 200,
+        "clientMs": 1002.485,
+        "backendMs": 780.75,
+        "matched": true
+      },
+      {
+        "requestId": "ea77e4bf-bca8-4378-9c21-0c090f6258f3",
+        "origin": "vercel",
+        "label": "logout",
+        "phase": "session",
+        "round": 0,
+        "status": 204,
+        "clientMs": 1815.584,
+        "backendMs": 1208.558,
+        "matched": true
+      },
+      {
+        "requestId": "08b6ee73-3f9a-4542-aae7-59276114faea",
+        "origin": "vercel",
+        "label": "revoked-identity",
+        "phase": "session",
+        "round": 0,
+        "status": 401,
+        "clientMs": 744.09,
+        "backendMs": 151.6,
+        "matched": true
+      },
+      {
+        "requestId": "94293a90-b5e7-42c5-a21e-f76c1910f2f4",
+        "origin": "vercel",
+        "label": "login",
+        "phase": "session",
+        "round": 0,
+        "status": 201,
+        "clientMs": 4086.909,
+        "backendMs": 2851.911,
+        "matched": true
+      },
+      {
+        "requestId": "882a999e-8f34-4b12-a34c-88f18171abad",
+        "origin": "vercel",
+        "label": "couple-profile",
+        "phase": "mixed-booking-burst",
+        "round": 1,
+        "status": 200,
+        "clientMs": 2893.582,
+        "backendMs": 2298.164,
+        "matched": true
+      },
+      {
+        "requestId": "4c50cf22-fb47-48f0-a44b-b815f27273c5",
+        "origin": "vercel",
+        "label": "couple-profile",
+        "phase": "mixed-booking-burst",
+        "round": 1,
+        "status": 200,
+        "clientMs": 3499.849,
+        "backendMs": 2421.588,
+        "matched": true
+      },
+      {
+        "requestId": "57384f9f-0354-4434-b854-4321aea7b0d6",
+        "origin": "vercel",
+        "label": "contracts",
+        "phase": "mixed-booking-burst",
+        "round": 1,
+        "status": 200,
+        "clientMs": 6103.212,
+        "backendMs": 5009.622,
+        "matched": true
+      },
+      {
+        "requestId": "aa48863a-7b27-465f-85bf-5ff128022cdf",
+        "origin": "vercel",
+        "label": "proposal",
+        "phase": "mixed-booking-burst",
+        "round": 1,
+        "status": 200,
+        "clientMs": 7484.464,
+        "backendMs": 6377.684,
+        "matched": true
+      },
+      {
+        "requestId": "dbe52987-5954-4c92-b632-197114e4d068",
+        "origin": "vercel",
+        "label": "couple-profile",
+        "phase": "mixed-booking-burst",
+        "round": 2,
+        "status": 200,
+        "clientMs": 1381.659,
+        "backendMs": 918.57,
+        "matched": true
+      },
+      {
+        "requestId": "21b94023-bd11-4fbd-92ac-225a28b00eeb",
+        "origin": "vercel",
+        "label": "couple-profile",
+        "phase": "mixed-booking-burst",
+        "round": 2,
+        "status": 500,
+        "clientMs": 3841.959,
+        "backendMs": 2754.809,
+        "errorName": "PrismaClientKnownRequestError",
+        "matched": true
+      },
+      {
+        "requestId": "e557fc0c-7869-4984-a611-e24ef7c4f523",
+        "origin": "vercel",
+        "label": "contracts",
+        "phase": "mixed-booking-burst",
+        "round": 2,
+        "status": 200,
+        "clientMs": 5193.55,
+        "backendMs": 4239.814,
+        "matched": true
+      },
+      {
+        "requestId": "7bd85cb4-5b40-47ca-90a9-977c91e79b9a",
+        "origin": "vercel",
+        "label": "proposal",
+        "phase": "mixed-booking-burst",
+        "round": 2,
+        "status": 200,
+        "clientMs": 5962.926,
+        "backendMs": 5345.096,
+        "matched": true
+      },
+      {
+        "requestId": "4e498c47-6c14-4d56-a9a3-bdc6cf90aee2",
+        "origin": "railway",
+        "label": "couple-profile",
+        "phase": "mixed-booking-burst",
+        "round": 1,
+        "status": 200,
+        "clientMs": 1709.252,
+        "backendMs": 1361.589,
+        "matched": true
+      },
+      {
+        "requestId": "717fd1be-a860-4e01-ae99-c1484dc17527",
+        "origin": "railway",
+        "label": "couple-profile",
+        "phase": "mixed-booking-burst",
+        "round": 1,
+        "status": 200,
+        "clientMs": 2313.862,
+        "backendMs": 1951.625,
+        "matched": true
+      },
+      {
+        "requestId": "c0189d08-2ed0-484a-be0d-248b52307331",
+        "origin": "railway",
+        "label": "contracts",
+        "phase": "mixed-booking-burst",
+        "round": 1,
+        "status": 200,
+        "clientMs": 4895.979,
+        "backendMs": 4519.037,
+        "matched": true
+      },
+      {
+        "requestId": "6a8d1b68-31d6-4115-bcd5-680d02430d6d",
+        "origin": "railway",
+        "label": "proposal",
+        "phase": "mixed-booking-burst",
+        "round": 1,
+        "status": 200,
+        "clientMs": 6110.144,
+        "backendMs": 5778.37,
+        "matched": true
+      },
+      {
+        "requestId": "213ab9d3-ae86-426b-9595-ad225eb6aa70",
+        "origin": "vercel",
+        "label": "logout",
+        "phase": "session",
+        "round": 0,
+        "status": 204,
+        "clientMs": 1838.67,
+        "backendMs": 1224.718,
+        "matched": true
+      },
+      {
+        "requestId": "b77ceaf5-31ea-4b8e-9a88-5b1135fcfe30",
+        "origin": "vercel",
+        "label": "revoked-identity",
+        "phase": "session",
+        "round": 0,
+        "status": 401,
+        "clientMs": 735.971,
+        "backendMs": 155.095,
+        "matched": true
+      }
+    ]
+  },
+  "reproducedMechanism": {
+    "prismaVersion": "7.10.1",
+    "transactionMaxWaitDefaultMs": 2000,
+    "transactionTimeoutDefaultMs": 5000,
+    "pgAcquireTimeoutMs": 10000,
+    "occupiedConnectionMs": 2500,
+    "originalErrorCode": "P2028",
+    "originalErrorMessage": "Transaction API error: Unable to start a transaction in the given time.",
+    "source": "https://github.com/prisma/prisma/blob/7.10.1/packages/client/src/runtime/getPrismaClient.ts",
+    "livePrismaCodeUnobserved": true
+  },
+  "candidate": {
+    "pr": {
+      "number": 64,
+      "url": "https://github.com/WDP301-wedding/wedding-be/pull/64",
+      "head": "32a25a8bf0eed993b3de2fe73e116e38698cdb65",
+      "base": "cc2999acdd24dc87e713806328022b160585c599",
+      "draft": true
+    },
+    "change": "Single parameterized schema-qualified statement reads profile and authorizes manager/access grant.",
+    "regressionTests": {
+      "passed": 3,
+      "files": 1,
+      "nativePostgres": true,
+      "cases": [
+        "wait beyond 2000ms",
+        "preserved roles/grants/404/null names",
+        "quoted schema isolation"
+      ]
+    },
+    "earlierIntegrationCohort": {
+      "passed": 18,
+      "files": 3
+    },
+    "mutation": {
+      "originalSourceSha256": "b126673cdb175c13a6b90a65a8be8e2faf6a2b08336b33162102c01bb9439567",
+      "mutation": "Drop STAFF negation in new grant predicate",
+      "originalDeniesStaffOnly": true,
+      "mutantAllowsStaffOnly": true,
+      "authorizationAssertionKillsMutation": true,
+      "originalSourceUntouched": true
+    },
+    "staticChecks": [
+      {
+        "name": "typecheck",
+        "exitCode": 0
+      },
+      {
+        "name": "lint",
+        "exitCode": 0
+      },
+      {
+        "name": "build",
+        "exitCode": 0
+      },
+      {
+        "name": "api-generate",
+        "exitCode": 0
+      },
+      {
+        "name": "api-check",
+        "exitCode": 0
+      }
+    ],
+    "sourceHttp": {
+      "scope": "Updated source on operator localhost, existing synthetic booking/database, one connection and 10-second acquisition. Not deployed/container acceptance.",
+      "get200": 12,
+      "operations": [
+        {
+          "requestId": "12dfb2e4-7ff3-4dee-9d0a-2ba679bfb913",
+          "origin": "vercel",
+          "label": "login",
+          "phase": "session",
+          "round": 0,
+          "status": 201,
+          "clientMs": 4434.069
+        },
+        {
+          "requestId": "e5de7ce0-9f01-47dd-b08a-33b09a6493b5",
+          "origin": "operator-source",
+          "label": "couple-profile",
+          "phase": "mixed-booking-burst",
+          "round": 1,
+          "status": 200,
+          "clientMs": 2978.565
+        },
+        {
+          "requestId": "1563075f-6959-47b7-bdc0-be5a0ab96d44",
+          "origin": "operator-source",
+          "label": "contracts",
+          "phase": "mixed-booking-burst",
+          "round": 1,
+          "status": 200,
+          "clientMs": 7408.496
+        },
+        {
+          "requestId": "f4c7942d-18b5-4b8b-84d9-3dac93a8c00f",
+          "origin": "operator-source",
+          "label": "couple-profile",
+          "phase": "mixed-booking-burst",
+          "round": 1,
+          "status": 200,
+          "clientMs": 7645.674
+        },
+        {
+          "requestId": "1ff249f9-758c-4e7d-acb7-0c56958b7b43",
+          "origin": "operator-source",
+          "label": "proposal",
+          "phase": "mixed-booking-burst",
+          "round": 1,
+          "status": 200,
+          "clientMs": 9625.262
+        },
+        {
+          "requestId": "845dd1c8-bf55-4396-8e81-4cd21004e47d",
+          "origin": "operator-source",
+          "label": "contracts",
+          "phase": "mixed-booking-burst",
+          "round": 2,
+          "status": 200,
+          "clientMs": 5387.071
+        },
+        {
+          "requestId": "578f1c63-e3de-4fde-9c40-a8469884efec",
+          "origin": "operator-source",
+          "label": "couple-profile",
+          "phase": "mixed-booking-burst",
+          "round": 2,
+          "status": 200,
+          "clientMs": 5631.16
+        },
+        {
+          "requestId": "5fd011dc-f570-4f26-b42e-08af1fc62aa2",
+          "origin": "operator-source",
+          "label": "couple-profile",
+          "phase": "mixed-booking-burst",
+          "round": 2,
+          "status": 200,
+          "clientMs": 5871.602
+        },
+        {
+          "requestId": "8e01b48b-c74f-41c3-bf16-ebb1f5d8a6a8",
+          "origin": "operator-source",
+          "label": "proposal",
+          "phase": "mixed-booking-burst",
+          "round": 2,
+          "status": 200,
+          "clientMs": 7830.918
+        },
+        {
+          "requestId": "0d4dade4-1347-4ba6-9b02-cd8005175abe",
+          "origin": "operator-source",
+          "label": "couple-profile",
+          "phase": "mixed-booking-burst",
+          "round": 3,
+          "status": 200,
+          "clientMs": 1232.901
+        },
+        {
+          "requestId": "a5e96709-6f2a-4259-94de-c27f29033174",
+          "origin": "operator-source",
+          "label": "contracts",
+          "phase": "mixed-booking-burst",
+          "round": 3,
+          "status": 200,
+          "clientMs": 5380.619
+        },
+        {
+          "requestId": "3ed30fee-d3d1-4d85-a2dd-e51160f3a3ab",
+          "origin": "operator-source",
+          "label": "couple-profile",
+          "phase": "mixed-booking-burst",
+          "round": 3,
+          "status": 200,
+          "clientMs": 5621.663
+        },
+        {
+          "requestId": "835ff065-2b21-4a24-836e-78263ccf711f",
+          "origin": "operator-source",
+          "label": "proposal",
+          "phase": "mixed-booking-burst",
+          "round": 3,
+          "status": 200,
+          "clientMs": 7819.234
+        },
+        {
+          "requestId": "3d8f96a6-fc30-4211-a9b9-5cb149ed62e1",
+          "origin": "vercel",
+          "label": "logout",
+          "phase": "session",
+          "round": 0,
+          "status": 204,
+          "clientMs": 1808.276
+        },
+        {
+          "requestId": "0d67a56e-2228-4e44-ac29-dc23b1f54985",
+          "origin": "vercel",
+          "label": "revoked-identity",
+          "phase": "session",
+          "round": 0,
+          "status": 401,
+          "clientMs": 733.866
+        }
+      ],
+      "notDeployedAcceptance": true
+    },
+    "ci": {
+      "at": "2026-10-18T01:06:47.595Z",
+      "head": "32a25a8bf0eed993b3de2fe73e116e38698cdb65",
+      "run": {
+        "id": 39084286438,
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39084286438",
+        "status": "completed",
+        "conclusion": "success",
+        "attempt": 2
+      },
+      "jobs": [
+        {
+          "id": 117548926431,
+          "name": "PostgreSQL migration and integration gates",
+          "status": "completed",
+          "conclusion": "success",
+          "failedSteps": []
+        },
+        {
+          "id": 117548927321,
+          "name": "Static, test, build, and audit gates",
+          "status": "completed",
+          "conclusion": "success",
+          "failedSteps": []
+        }
+      ]
+    },
+    "ciCounts": {
+      "at": "2026-10-18T01:06:58.419Z",
+      "head": "32a25a8bf0eed993b3de2fe73e116e38698cdb65",
+      "run": {
+        "id": 39084286438,
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39084286438",
+        "status": "completed",
+        "conclusion": "success",
+        "attempt": 2
+      },
+      "results": [
+        {
+          "job": "PostgreSQL migration and integration gates",
+          "conclusion": "success",
+          "summaries": [
+            "2026-10-18T00:59:40.3604246Z All migrations have been successfully applied.",
+            "2026-10-18T01:02:23.3405006Z  Test Files  105 passed (105)",
+            "2026-10-18T01:02:23.3406069Z       Tests  549 passed (549)",
+            "2026-10-18T01:06:18.0425319Z  Test Files  287 passed (287)",
+            "2026-10-18T01:06:18.0438514Z       Tests  2047 passed (2047)",
+            "2026-10-18T01:06:18.0721808Z All files          |   96.65 |    93.48 |   98.47 |   97.56 |                   "
+          ]
+        },
+        {
+          "job": "Static, test, build, and audit gates",
+          "conclusion": "success",
+          "summaries": [
+            "2026-10-18T00:53:06.2791606Z  Test Files  162 passed (162)",
+            "2026-10-18T00:53:06.2801088Z       Tests  1440 passed (1440)",
+            "2026-10-18T00:53:12.5764253Z  Test Files  20 passed (20)",
+            "2026-10-18T00:53:12.5765391Z       Tests  58 passed (58)"
+          ]
+        }
+      ]
+    },
+    "firstCi": {
+      "at": "2026-10-18T00:57:53.061Z",
+      "head": "32a25a8bf0eed993b3de2fe73e116e38698cdb65",
+      "run": {
+        "id": 39084286438,
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39084286438",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      "jobs": [
+        {
+          "id": 117547498777,
+          "name": "PostgreSQL migration and integration gates",
+          "status": "completed",
+          "conclusion": "failure",
+          "failedSteps": [
+            "Enforce full-suite coverage with PostgreSQL"
+          ]
+        },
+        {
+          "id": 117547498918,
+          "name": "Static, test, build, and audit gates",
+          "status": "completed",
+          "conclusion": "success",
+          "failedSteps": []
+        }
+      ]
+    },
+    "retry": {
+      "at": "2026-10-18T00:58:58.207Z",
+      "head": "32a25a8bf0eed993b3de2fe73e116e38698cdb65",
+      "runId": 39084286438,
+      "status": 201,
+      "reason": "Single controlled rerun after inspecting unchanged native deadline test: it received P2028 instead of REQUEST_TIMEOUT in 100ms occupied-pool case; integration had passed. Original failure is retained, no assertions/timeouts/coverage or source changed.",
+      "unchanged": [
+        {
+          "path": "src/core/database/safe-read.ts",
+          "gitBlob": "35b35f53d178871968fa76d51ac41036b5914f27"
+        },
+        {
+          "path": "tests/integration/pool-deadline.test.ts",
+          "gitBlob": "bf3e2f0ba4e8adde338bbcd3f74bba0a6a319f70"
+        }
+      ]
+    }
+  },
+  "windowsVerification": {
+    "full": {
+      "exitCode": 1,
+      "filesPassed": 283,
+      "filesFailed": 4,
+      "testsPassed": 2043,
+      "testsFailed": 4,
+      "seconds": 921.44,
+      "failures": [
+        {
+          "module": "idempotency-repository",
+          "reason": "pg pool connection timeout"
+        },
+        {
+          "module": "notification-fcm",
+          "reason": "10000ms afterEach disconnect hook timeout"
+        },
+        {
+          "module": "notification-security",
+          "reason": "10000ms afterEach disconnect hook timeout"
+        },
+        {
+          "module": "runtime-foundation",
+          "reason": "30000ms CLI test timeout and 10000ms afterAll hook timeout"
+        }
+      ]
+    },
+    "selected": {
+      "at": "2026-10-18T00:54:23.828Z",
+      "scope": "Only four failed Windows full-suite modules; original assertions/timeouts, one worker, no coverage claim.",
+      "tests": [
+        "tests/integration/notification-fcm.test.ts",
+        "tests/integration/idempotency-repository.test.ts",
+        "tests/integration/runtime-foundation.test.ts",
+        "tests/integration/notification-security.test.ts"
+      ],
+      "code": 1,
+      "testsPassed": 19,
+      "testsFailed": 1,
+      "remainingFailure": "notification-fcm afterEach fixture-disconnect timeout",
+      "coverageClaim": false
+    },
+    "localClustersStopped": true,
+    "dataDeleted": false
+  },
+  "verificationLimits": {
+    "fullWindowsCoverage": "Failed; original full and selected logs retained.",
+    "firstCiDeadlineMismatchUnresolved": true,
+    "noCoverageOrAssertionRelaxation": true,
+    "notAllRoutesFixed": true,
+    "latencyStillRequiresWork": true,
+    "noLivePrismaCodeOrHolderAttribution": true,
+    "noNewSharedBusinessDigestsCollected": true,
+    "candidateReadyForOwnerReview": true,
+    "mergeDeploymentApprovalOutstanding": true,
+    "concurrentAfterDeploymentEvidenceOutstanding": true,
+    "productionReadiness": "NO_GO unchanged"
+  },
+  "localArtifacts": [
+    "output/api500-profile-20261018/live-correlation.json",
+    "output/api500-profile-20261018/red-reproduction.log",
+    "output/api500-profile-20261018/green-integration.log",
+    "output/api500-profile-20261018/green-schema-native.log",
+    "output/api500-profile-20261018/review-mutation.json",
+    "output/api500-profile-20261018/candidate-source.json",
+    "output/api500-profile-20261018/static-results.json",
+    "output/api500-profile-20261018/full-coverage.log",
+    "output/api500-profile-20261018/selected-verification.log",
+    "output/api500-profile-20261018/ci-first-attempt.json",
+    "output/api500-profile-20261018/ci-first-counts.json",
+    "output/api500-profile-20261018/ci-retry.json",
+    "output/api500-profile-20261018/ci.json",
+    "output/api500-profile-20261018/ci-counts.json",
+    "output/api500-profile-20261018/final-serving.json"
+  ]
+}

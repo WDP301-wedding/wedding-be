@@ -1,0 +1,310 @@
+{
+  "schemaVersion": 1,
+  "task": "PERF-09",
+  "at": "2026-10-18T09:07:26.224Z",
+  "timezone": "Asia/Saigon",
+  "status": "COMPLETE_ORIGINAL_CRITERIA_ON_MAIN_AFTER_OWNER_AUTHORIZED_ROLLOUT",
+  "runtimePr": "https://github.com/WDP301-wedding/wedding-be/pull/70",
+  "documentationPr": "https://github.com/WDP301-wedding/wedding-be/pull/71",
+  "documentationMerge": {
+    "at": "2026-10-18T09:07:07.836Z",
+    "sha": "1bf777a18dd98517f24d38ee36399941f2643766",
+    "merged": true,
+    "message": "Pull Request successfully merged",
+    "head": "0ff6bd6e334eec9cef54d23b27a113d83d2b9bb1",
+    "base": "14aebab69e28982dbeece7c5dc4da3dc5b645ea1",
+    "pr": "https://github.com/WDP301-wedding/wedding-be/pull/71",
+    "ci": {
+      "id": 39113463883,
+      "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39113463883",
+      "head": "0ff6bd6e334eec9cef54d23b27a113d83d2b9bb1",
+      "attempt": 1,
+      "conclusion": "success",
+      "jobs": [
+        {
+          "name": "Static, test, build, and audit gates",
+          "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39113463883/job/117634422350",
+          "conclusion": "success",
+          "sha256": "9a36d6de9b665da26e6737c75ea3697d82923b568cb33be425ed3a5ed8290a41",
+          "summaries": [
+            "2026-10-18T08:58:41.0098877Z found 0 vulnerabilities",
+            "2026-10-18T08:59:48.6736491Z       Tests  1461 passed (1461)",
+            "2026-10-18T08:59:52.6972704Z       Tests  59 passed (59)"
+          ]
+        },
+        {
+          "name": "PostgreSQL migration and integration gates",
+          "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39113463883/job/117634422482",
+          "conclusion": "success",
+          "sha256": "98362782854cc481706b8f47e4bda337d7a586f675d4022bfc75f09321466dc2",
+          "summaries": [
+            "2026-10-18T08:59:09.5502504Z found 0 vulnerabilities",
+            "2026-10-18T09:02:09.6246328Z       Tests  599 passed (599)",
+            "2026-10-18T09:06:26.7504459Z       Tests  2119 passed (2119)",
+            "2026-10-18T09:06:26.7818277Z All files          |   96.67 |    93.54 |   98.48 |   97.58 |                   "
+          ]
+        }
+      ]
+    },
+    "authorization": {
+      "at": "2026-10-18T08:40:48.382Z",
+      "humanInstruction": "Cho phép merge, triển khai, kiểm tra và đóng PERF-09",
+      "scope": "Merge reviewed PR70 head4f945d6; automatic Railway demo rollout; read-only catalog/signed URL and scoped data verification with maximum one additional connection; update and merge evidence/checklist after green CI. No new fixture/key, migration, pool, region or provider configuration changes."
+    }
+  },
+  "canonicalMain": "1bf777a18dd98517f24d38ee36399941f2643766",
+  "canonicalCheckbox": true,
+  "canonicalPlanUpdated": true,
+  "originalNativeGatesPassed": [
+    {
+      "case": "one-no-assets",
+      "returned": 1,
+      "media": 0,
+      "variants": {
+        "baseline": {
+          "n": 20,
+          "p50Ms": 470.13350500003435,
+          "p95Ms": 473.3913160000084,
+          "commands": [
+            3
+          ]
+        },
+        "deployed": {
+          "n": 20,
+          "p50Ms": 469.9377679999743,
+          "p95Ms": 474.3518380000023,
+          "commands": [
+            3
+          ]
+        },
+        "candidate": {
+          "n": 20,
+          "p50Ms": 158.30122299998766,
+          "p95Ms": 160.02460299999802,
+          "commands": [
+            1
+          ]
+        }
+      },
+      "originalToCandidateP95ReductionPercent": 66.1961262086195,
+      "deployedToCandidateP95ReductionPercent": 66.26457616888221
+    },
+    {
+      "case": "twenty-no-assets",
+      "returned": 20,
+      "media": 0,
+      "variants": {
+        "baseline": {
+          "n": 20,
+          "p50Ms": 6373.236850000016,
+          "p95Ms": 6393.686277000001,
+          "commands": [
+            41
+          ]
+        },
+        "deployed": {
+          "n": 20,
+          "p50Ms": 470.1404340000008,
+          "p95Ms": 472.9314430000086,
+          "commands": [
+            3
+          ]
+        },
+        "candidate": {
+          "n": 20,
+          "p50Ms": 158.43046000000322,
+          "p95Ms": 161.13912299997173,
+          "commands": [
+            1
+          ]
+        }
+      },
+      "originalToCandidateP95ReductionPercent": 97.47971489343108,
+      "deployedToCandidateP95ReductionPercent": 65.92759365336408
+    },
+    {
+      "case": "one-with-assets",
+      "returned": 1,
+      "media": 1,
+      "variants": {
+        "baseline": {
+          "n": 20,
+          "p50Ms": 684.5364139999729,
+          "p95Ms": 1002.8221190000186,
+          "commands": [
+            3
+          ]
+        },
+        "deployed": {
+          "n": 20,
+          "p50Ms": 817.5592990000005,
+          "p95Ms": 1147.5688549999613,
+          "commands": [
+            4
+          ]
+        },
+        "candidate": {
+          "n": 20,
+          "p50Ms": 362.208060999983,
+          "p95Ms": 660.9099869999918,
+          "commands": [
+            1
+          ]
+        }
+      },
+      "originalToCandidateP95ReductionPercent": 34.09499307224798,
+      "deployedToCandidateP95ReductionPercent": 42.40781421346485
+    },
+    {
+      "case": "twenty-with-assets",
+      "returned": 20,
+      "media": 20,
+      "variants": {
+        "baseline": {
+          "n": 20,
+          "p50Ms": 6573.679787000001,
+          "p95Ms": 6724.4778440000955,
+          "commands": [
+            41
+          ]
+        },
+        "deployed": {
+          "n": 20,
+          "p50Ms": 1170.8697989999782,
+          "p95Ms": 1941.1705930000026,
+          "commands": [
+            4
+          ]
+        },
+        "candidate": {
+          "n": 20,
+          "p50Ms": 864.2700550000009,
+          "p95Ms": 1011.9272580000106,
+          "commands": [
+            1
+          ]
+        }
+      },
+      "originalToCandidateP95ReductionPercent": 84.95158610860915,
+      "deployedToCandidateP95ReductionPercent": 47.870256140851744
+    }
+  ],
+  "acceptedRuntime": {
+    "deploymentId": "fcfb17ed-f14b-4a6c-bb3c-f330616e7616",
+    "source": "14aebab69e28982dbeece7c5dc4da3dc5b645ea1",
+    "image": "sha256:2236f991eebb147e6a31d3000f0cc422fdc987b0b335e22e777365ebc5a72285",
+    "configurationDigest": "5bb1f835c3514bca7e8db5d8c01d34fb92be34b82742eed21ad2dc30a41aceb5",
+    "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+    "controls": {
+      "DB_POOL_MAX": "1",
+      "DB_POOL_MAX_VENUE_CATALOG": "3",
+      "DB_POOL_MAX_ANALYTICS": "2",
+      "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000",
+      "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+      "DB_CONNECTION_RESERVE": "36",
+      "DB_MAX_CONNECTIONS": "60",
+      "DB_DIAGNOSTICS_ENABLED": "false",
+      "DB_SAFE_READ_DEADLINE_ENABLED": "false"
+    }
+  },
+  "currentRuntime": {
+    "deploymentId": "fcfb17ed-f14b-4a6c-bb3c-f330616e7616",
+    "source": "14aebab69e28982dbeece7c5dc4da3dc5b645ea1",
+    "image": "sha256:2236f991eebb147e6a31d3000f0cc422fdc987b0b335e22e777365ebc5a72285",
+    "configurationDigest": "5bb1f835c3514bca7e8db5d8c01d34fb92be34b82742eed21ad2dc30a41aceb5",
+    "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+    "controls": {
+      "DB_POOL_MAX": "1",
+      "DB_POOL_MAX_VENUE_CATALOG": "3",
+      "DB_POOL_MAX_ANALYTICS": "2",
+      "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000",
+      "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+      "DB_CONNECTION_RESERVE": "36",
+      "DB_MAX_CONNECTIONS": "60",
+      "DB_DIAGNOSTICS_ENABLED": "false",
+      "DB_SAFE_READ_DEADLINE_ENABLED": "false"
+    }
+  },
+  "productionContinuity": [
+    {
+      "path": "src",
+      "accepted": "d242273dc9dd0495504eb78152cb4f97e82f2da3",
+      "closed": "d242273dc9dd0495504eb78152cb4f97e82f2da3",
+      "equal": true
+    },
+    {
+      "path": "prisma",
+      "accepted": "a6a0f1b7a141117f9370ea5f922c974375b81833",
+      "closed": "a6a0f1b7a141117f9370ea5f922c974375b81833",
+      "equal": true
+    },
+    {
+      "path": "openapi",
+      "accepted": "160c3bb09a500367c7fa43f050301b444ce83e04",
+      "closed": "160c3bb09a500367c7fa43f050301b444ce83e04",
+      "equal": true
+    },
+    {
+      "path": "package.json",
+      "accepted": "a165f63c0e251eee65d56fc31684b4827765e13e",
+      "closed": "a165f63c0e251eee65d56fc31684b4827765e13e",
+      "equal": true
+    },
+    {
+      "path": "package-lock.json",
+      "accepted": "661f3c1edaadcaeaca5612c2f2e2f06450cf4fe7",
+      "closed": "661f3c1edaadcaeaca5612c2f2e2f06450cf4fe7",
+      "equal": true
+    },
+    {
+      "path": ".node-version",
+      "accepted": "df6ae3370f9f89272d88629c442cf554d6c1f9fb",
+      "closed": "df6ae3370f9f89272d88629c442cf554d6c1f9fb",
+      "equal": true
+    },
+    {
+      "path": "tsconfig.build.json",
+      "accepted": "588c2458d87d500adea3b91de433b15a5cd29127",
+      "closed": "588c2458d87d500adea3b91de433b15a5cd29127",
+      "equal": true
+    },
+    {
+      "path": "Dockerfile",
+      "accepted": "aa33d79c03ffc349380167295db50b3ee8002047",
+      "closed": "aa33d79c03ffc349380167295db50b3ee8002047",
+      "equal": true
+    },
+    {
+      "path": "railway.json",
+      "accepted": "75164716ec20a78fc6ed72ac53cb9927866a0b82",
+      "closed": "75164716ec20a78fc6ed72ac53cb9927866a0b82",
+      "equal": true
+    },
+    {
+      "path": ".railway",
+      "accepted": "d662f9b7b914565b2f45b4a0abbbc00d6914ae60",
+      "closed": "d662f9b7b914565b2f45b4a0abbbc00d6914ae60",
+      "equal": true
+    },
+    {
+      "path": ".github/workflows",
+      "accepted": "5e937b867a64a4e182cea0369118ba69190ee25d",
+      "closed": "5e937b867a64a4e182cea0369118ba69190ee25d",
+      "equal": true
+    }
+  ],
+  "acceptanceReceipt": {
+    "path": "tasks/evidence/perf09-pr70-rollout-2026-10-18.json",
+    "sha256": "94571513bf23cb280471e1a183d55d261eaa6cc032bd1b409ca64b8c68a65c8e"
+  },
+  "publicReads": 84,
+  "matchedOperations": 95,
+  "selectedBusinessAndCatalogDigestsUnchanged": 47,
+  "appliedMigrationChecksumsUnchanged": 61,
+  "signedUrlFreshnessExpiryPrivateControls": true,
+  "noNewFixtureOrKeyForRollout": true,
+  "noAdditionalMeasurementsRequiredForDocumentationOnlyTree": true,
+  "documentationMergeCi": "Exact-head follow-up CI passes before owner-authorized merge; documentation-only production tree is identical to the accepted runtime",
+  "productionReadiness": "NO_GO_UNCHANGED",
+  "perf13": "OPEN"
+}

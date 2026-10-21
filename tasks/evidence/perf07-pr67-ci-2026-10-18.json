@@ -1,0 +1,251 @@
+{
+  "schemaVersion": 1,
+  "task": "PERF-07",
+  "at": "2026-10-18T06:19:37.859Z",
+  "pr": {
+    "number": 67,
+    "url": "https://github.com/WDP301-wedding/wedding-be/pull/67",
+    "head": "30e65b23740e3b1546766907a31aa429130703a7",
+    "base": "df945b6f4ad10a44f37134e76a662f041283325b",
+    "state": "open",
+    "mergeable": true
+  },
+  "ci": {
+    "at": "2026-10-18T06:19:04.043Z",
+    "pr": "https://github.com/WDP301-wedding/wedding-be/pull/67",
+    "head": "30e65b23740e3b1546766907a31aa429130703a7",
+    "id": 39103129775,
+    "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39103129775",
+    "attempt": 1,
+    "conclusion": "success",
+    "jobs": [
+      {
+        "id": 117603313144,
+        "name": "Static, test, build, and audit gates",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Generate Prisma client",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check formatting",
+            "conclusion": "success"
+          },
+          {
+            "name": "Lint",
+            "conclusion": "success"
+          },
+          {
+            "name": "Typecheck",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run unit tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run contract tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Verify generated OpenAPI artifact",
+            "conclusion": "success"
+          },
+          {
+            "name": "Build production output",
+            "conclusion": "success"
+          },
+          {
+            "name": "Audit locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "summaries": [
+          "found 0 vulnerabilities",
+          " Test Files  162 passed (162)",
+          "      Tests  1461 passed (1461)",
+          " Test Files  20 passed (20)",
+          "      Tests  59 passed (59)"
+        ]
+      },
+      {
+        "id": 117603313255,
+        "name": "PostgreSQL migration and integration gates",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Initialize containers",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Generate Prisma client",
+            "conclusion": "success"
+          },
+          {
+            "name": "Deploy migrations to empty PostgreSQL",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run PostgreSQL integration tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Enforce full-suite coverage with PostgreSQL",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Stop containers",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "summaries": [
+          "found 0 vulnerabilities",
+          " Test Files  105 passed (105)",
+          "      Tests  566 passed (566)",
+          " Test Files  287 passed (287)",
+          "      Tests  2086 passed (2086)",
+          "All files          |   96.66 |    93.52 |   98.45 |   97.56 |                   "
+        ]
+      }
+    ]
+  },
+  "review": {
+    "at": "2026-10-18T06:14:37.704Z",
+    "head": "30e65b23740e3b1546766907a31aa429130703a7",
+    "base": "df945b6f4ad10a44f37134e76a662f041283325b",
+    "state": "open",
+    "draft": false,
+    "mergeable": true,
+    "files": [
+      {
+        "path": "docs/backend-performance-07-closure-2026-10-18.md",
+        "status": "added",
+        "additions": 135,
+        "deletions": 0
+      },
+      {
+        "path": "tasks/backend-revision-todo.md",
+        "status": "modified",
+        "additions": 21,
+        "deletions": 1
+      },
+      {
+        "path": "tasks/evidence/perf07-closure-2026-10-18.json",
+        "status": "added",
+        "additions": 6040,
+        "deletions": 0
+      },
+      {
+        "path": "tasks/plan.md",
+        "status": "modified",
+        "additions": 9,
+        "deletions": 0
+      },
+      {
+        "path": "tests/integration/print-read-performance.test.ts",
+        "status": "modified",
+        "additions": 360,
+        "deletions": 0
+      }
+    ],
+    "sealedArtifactsChecked": 46,
+    "sealedArtifactChanges": 0,
+    "credentialPatternFound": false,
+    "unresolvedThreads": 0,
+    "reviews": [],
+    "fiveAxisSelfReview": {
+      "kind": "five-axis self-review",
+      "independentHumanOrAgentReviewClaimed": false,
+      "correctness": "Complete snapshots, ties/cursors, expiry/newest proposals, ownership, four revocations and one-winner monetary race verified",
+      "readability": "Existing fixture/service patterns; tests and evidence only",
+      "architecture": "Manager read owner retained; public contracts and applied migrations unchanged",
+      "security": "Read-only max-one pool, no secrets/payloads in receipt, revocation probes, dedicated key removed",
+      "performance": "Bounded cardinality and matched measurements; regressions retained"
+    },
+    "ownerMergeApproval": "Not yet granted for PR #67; existing approval covers read-only campaign"
+  },
+  "runtimeStillUnchanged": {
+    "deploymentId": "f0332652-cf57-4b46-807a-d0d92e75d5e3",
+    "source": "df945b6f4ad10a44f37134e76a662f041283325b",
+    "image": "sha256:cb99729e156b0d563c2463a92589cc65597bdb6f449092a353b67fa442dc0388",
+    "configurationDigest": "5bb1f835c3514bca7e8db5d8c01d34fb92be34b82742eed21ad2dc30a41aceb5",
+    "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+    "controls": {
+      "DB_POOL_MAX": "1",
+      "DB_POOL_MAX_VENUE_CATALOG": "3",
+      "DB_POOL_MAX_ANALYTICS": "2",
+      "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000",
+      "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+      "DB_CONNECTION_RESERVE": "36",
+      "DB_MAX_CONNECTIONS": "60",
+      "DB_DIAGNOSTICS_ENABLED": "false",
+      "DB_SAFE_READ_DEADLINE_ENABLED": "false"
+    }
+  },
+  "acceptanceReceipt": {
+    "path": "tasks/evidence/perf07-closure-2026-10-18.json",
+    "sha256": "6565baf08da11378c86aac6262738f3c6b5a4b738286292a5174effd179311f5"
+  },
+  "mergeAndAutomaticRailwayRollout": "AWAITING_EXPLICIT_OWNER_APPROVAL",
+  "approvalRule": {
+    "path": ".github/pull_request_template.md",
+    "quote": "The change has been reviewed, any conversations are resolved, and merge is authorized by the project owner; teammate approval is optional."
+  }
+}

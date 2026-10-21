@@ -1,0 +1,133 @@
+{
+  "date": "2026-10-19",
+  "timezone": "Asia/Saigon",
+  "type": "READ_ONLY_DIAGNOSIS",
+  "backend": {
+    "deploymentId": "6ec27e24-359b-40c7-b67f-6e712a56617f",
+    "source": "6626a3a44b306300fee78a6509e8fb4cfb2099e0"
+  },
+  "booking": {
+    "id": "984bd852-462f-4ede-854a-436b108a1851",
+    "phase": "CONFIRMED",
+    "eventDate": "2026-10-16",
+    "hasFullContract": true,
+    "currentInvoiceRevisionId": null,
+    "invoiceRevisionCount": 0
+  },
+  "preview": {
+    "commercialRevisionId": "1ba45fbe-6301-4057-942f-53658c333236",
+    "commercialTotalVnd": 17500000,
+    "approvedAppendices": 0,
+    "expenseDraftRevision": 0,
+    "expenseLines": 0,
+    "expenseTotalVnd": 0,
+    "invoiceTotalVnd": 17500000,
+    "billingRevision": 2,
+    "netPaidVnd": 5250000,
+    "outstandingVnd": 12250000,
+    "creditVnd": 0,
+    "unresolvedAttempts": 0,
+    "previewOnly": true
+  },
+  "logs": [
+    {
+      "timestamp": "2026-10-19T05:16:17.826Z",
+      "requestId": "750beabd-5d4d-45e5-a110-167da55555fb",
+      "route": "/auth/web-session-refreshes",
+      "statusClass": "4xx",
+      "errorCode": "INVALID_OR_EXPIRED_TOKEN",
+      "durationMs": 1.151,
+      "method": "POST"
+    },
+    {
+      "timestamp": "2026-10-19T05:17:00.677Z",
+      "requestId": "fe9aedd7-3015-42f8-850f-eadc294a926f",
+      "route": "/auth/web-session-refreshes",
+      "statusClass": "4xx",
+      "errorCode": "INVALID_OR_EXPIRED_TOKEN",
+      "durationMs": 1.162,
+      "method": "POST"
+    },
+    {
+      "timestamp": "2026-10-19T05:17:02.285Z",
+      "requestId": "d7377568-5f6a-4b4a-942b-f1d53051ce8f",
+      "route": "/auth/web-session-refreshes",
+      "statusClass": "4xx",
+      "errorCode": "INVALID_OR_EXPIRED_TOKEN",
+      "durationMs": 1.046,
+      "method": "POST"
+    },
+    {
+      "timestamp": "2026-10-19T05:17:27.561Z",
+      "requestId": "fe06bfd4-9249-42ad-9fc6-3dd1ffbdd8ff",
+      "route": "/api/v1/auth/web-sessions",
+      "statusClass": "2xx",
+      "durationMs": 2733.849,
+      "method": "POST"
+    },
+    {
+      "timestamp": "2026-10-19T05:17:30.994Z",
+      "requestId": "a9f757a6-34b2-484c-ab30-2ebeb9b35ca3",
+      "route": "/api/v1/auth/web-session-refreshes",
+      "statusClass": "2xx",
+      "durationMs": 1549.159,
+      "method": "POST"
+    },
+    {
+      "timestamp": "2026-10-19T05:17:41.232Z",
+      "requestId": "e7db1650-a91f-4485-bd4a-c106df402066",
+      "route": "/api/v1/auth/web-session-refreshes",
+      "statusClass": "2xx",
+      "durationMs": 1537.576,
+      "method": "POST"
+    },
+    {
+      "timestamp": "2026-10-19T05:17:46.213Z",
+      "requestId": "08b3337d-b184-4eea-a4ae-d23e73824f6e",
+      "route": "/api/v1/auth/web-session-refreshes",
+      "statusClass": "2xx",
+      "durationMs": 1534.486,
+      "method": "POST"
+    },
+    {
+      "timestamp": "2026-10-19T05:18:04.332Z",
+      "requestId": "9b5414c2-cec3-4a58-ba3e-74a9cc3729d7",
+      "route": "/bookings/:bookingId/payments/balance",
+      "statusClass": "4xx",
+      "errorCode": "INVOICE_FINALIZATION_REQUIRED",
+      "durationMs": 3649.964,
+      "method": "POST"
+    },
+    {
+      "timestamp": "2026-10-19T05:18:17.998Z",
+      "requestId": "b7ccb727-2d05-4aff-a5cf-ebe48aef8f11",
+      "route": "/bookings/:bookingId/payments/balance",
+      "statusClass": "4xx",
+      "errorCode": "INVOICE_FINALIZATION_REQUIRED",
+      "durationMs": 3606.626,
+      "method": "POST"
+    },
+    {
+      "timestamp": "2026-10-19T05:21:02.019Z",
+      "requestId": "1a37aa68-caee-4296-a9c7-8d781b800ee3",
+      "route": "/bookings/:bookingId/payments/balance",
+      "statusClass": "4xx",
+      "errorCode": "INVOICE_FINALIZATION_REQUIRED",
+      "durationMs": 4638.03,
+      "method": "POST"
+    }
+  ],
+  "source": {
+    "guard": "src/modules/payments-billing/infrastructure/invoice-balance.reader.ts:28",
+    "existingRegression": "tests/integration/commercial-step6-api-cases.ts:582",
+    "businessContract": "docs/be11-16-commercial-settlement.md:116"
+  },
+  "conclusion": "Full-contract balance guard is acting according to the approved contract; no finalized invoice exists. A code change to bypass finalization would change business behavior and is not an ordinary bug fix.",
+  "authConclusion": "Invalid refreshes precede successful login and refreshes; no evidence in these logs alone of a backend cookie/rotation defect. Missing vs expired vs revoked credential cannot be inferred from generic error.",
+  "browserVerification": {
+    "suppliedAccount": "Authenticated account cannot access this booking: concealed 404 on proposal. No access grants changed. Fixture state verified using explicit read-only operator transactions.",
+    "logoutStatus": 204,
+    "logoutRequestId": "e5aceb45-6600-4560-bb19-dc1c3f4da0c3"
+  },
+  "safety": "SET TRANSACTION READ ONLY used in both operator probes; no finalization, payment creation/reconciliation, settlement, grant edit, deployment or application-source change. Existing regression identified but not rerun in this diagnosis."
+}

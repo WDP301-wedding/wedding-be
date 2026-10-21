@@ -1,0 +1,298 @@
+{
+  "date": "2026-10-18",
+  "timezone": "Asia/Saigon",
+  "status": "REPRODUCED; MITIGATION OPERATOR-TESTED; NOT DEPLOYED",
+  "serving": {
+    "deploymentId": "86d2addb-b0dd-4e1f-a3cd-4ed2717eb075",
+    "commit": "cc2999acdd24dc87e713806328022b160585c599"
+  },
+  "target": {
+    "projectId": "1c56721d-021a-442c-9e01-bb91abe73adb",
+    "environmentId": "08a2899c-b0d6-4200-a505-604965a4b3fc",
+    "serviceId": "0f70d648-8c59-48bd-84f3-29a86d2e2d38"
+  },
+  "proposedVariables": {
+    "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000"
+  },
+  "previousVariables": {
+    "DB_POOL_ACQUIRE_TIMEOUT_MS": "2000"
+  },
+  "unchanged": {
+    "DB_POOL_MAX": "1",
+    "DB_POOL_MAX_VENUE_CATALOG": "3",
+    "DB_POOL_MAX_ANALYTICS": "2",
+    "DB_CONNECTION_RESERVE": "36",
+    "DB_PLANNED_PROCESSES": "2",
+    "DB_MAX_CONNECTIONS": "60",
+    "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+    "HTTP_REQUEST_TIMEOUT_MS": 30000,
+    "source": true,
+    "region": true,
+    "workers": true,
+    "providerSettings": true,
+    "commands": true
+  },
+  "liveBurst": {
+    "at": "2026-10-17T19:42:20.463Z",
+    "deployment": "86d2addb-b0dd-4e1f-a3cd-4ed2717eb075",
+    "commit": "cc2999acdd24dc87e713806328022b160585c599",
+    "samples": [
+      {
+        "index": 0,
+        "path": "check-in-settings",
+        "status": 500,
+        "ms": 3249.9033,
+        "requestId": "82f9d8a9-590e-44fa-a7dd-9864da27f4a5",
+        "errorCode": "INTERNAL_ERROR"
+      },
+      {
+        "index": 1,
+        "path": "guests?limit=50&status=ACTIVE",
+        "status": 500,
+        "ms": 3898.0024999999996,
+        "requestId": "25e001ee-9f87-436e-8172-1c4ac5919924",
+        "errorCode": "INTERNAL_ERROR"
+      },
+      {
+        "index": 2,
+        "path": "attendance-summary",
+        "status": 200,
+        "ms": 3261.8264999999997,
+        "requestId": "5a8d84a5-8f51-4dd6-855d-745265558be7"
+      },
+      {
+        "index": 3,
+        "path": "guests?limit=50&status=ACTIVE",
+        "status": 200,
+        "ms": 4274.6222,
+        "requestId": "d131fce8-df02-4e39-a041-3ba4b0dd6153"
+      },
+      {
+        "index": 4,
+        "path": "contract-appendices",
+        "status": 200,
+        "ms": 3908.5161999999996,
+        "requestId": "1641798d-12dc-4410-a51d-1d18c339c409"
+      },
+      {
+        "index": 5,
+        "path": "billing?limit=1",
+        "status": 200,
+        "ms": 5228.036400000001,
+        "requestId": "4b8dbf8b-da6f-43e8-b08e-e0e3b85a5558"
+      }
+    ],
+    "login": 201,
+    "logout": 204,
+    "revokedReuse": 401
+  },
+  "liveLogs": {
+    "at": "2026-10-17T19:44:21.264Z",
+    "samples": [
+      {
+        "requestId": "82f9d8a9-590e-44fa-a7dd-9864da27f4a5",
+        "path": "check-in-settings",
+        "status": 500,
+        "matched": true,
+        "backendMs": 2002.284,
+        "errorName": "Error",
+        "diagnosticsPresent": false
+      },
+      {
+        "requestId": "25e001ee-9f87-436e-8172-1c4ac5919924",
+        "path": "guests?limit=50&status=ACTIVE",
+        "status": 500,
+        "matched": true,
+        "backendMs": 2789.205,
+        "errorName": "Error",
+        "diagnosticsPresent": false
+      },
+      {
+        "requestId": "5a8d84a5-8f51-4dd6-855d-745265558be7",
+        "path": "attendance-summary",
+        "status": 200,
+        "matched": true,
+        "backendMs": 2641.97,
+        "diagnosticsPresent": false
+      },
+      {
+        "requestId": "d131fce8-df02-4e39-a041-3ba4b0dd6153",
+        "path": "guests?limit=50&status=ACTIVE",
+        "status": 200,
+        "matched": true,
+        "backendMs": 3651.282,
+        "diagnosticsPresent": false
+      },
+      {
+        "requestId": "1641798d-12dc-4410-a51d-1d18c339c409",
+        "path": "contract-appendices",
+        "status": 200,
+        "matched": true,
+        "backendMs": 2795.989,
+        "diagnosticsPresent": false
+      },
+      {
+        "requestId": "4b8dbf8b-da6f-43e8-b08e-e0e3b85a5558",
+        "path": "billing?limit=1",
+        "status": 200,
+        "matched": true,
+        "backendMs": 4136.321,
+        "diagnosticsPresent": false
+      }
+    ],
+    "allMatched": true,
+    "scope": "Matching live deployment logs; error messages/stacks and pool telemetry are unavailable, so exact holder and driver error for these requests remain unproved."
+  },
+  "localFixedRead": {
+    "at": "2026-10-17T19:40:21.360Z",
+    "scope": "Local fixed read-only queries; five queued readers, one connection; no business data",
+    "cases": [
+      {
+        "timeout": 2000,
+        "max": 1,
+        "succeeded": 1,
+        "failed": 4,
+        "samples": [
+          {
+            "index": 0,
+            "success": true,
+            "ms": 2461.78
+          },
+          {
+            "index": 1,
+            "success": false,
+            "ms": 2019.4034000000001,
+            "error": "POOL_ACQUIRE_TIMEOUT"
+          },
+          {
+            "index": 2,
+            "success": false,
+            "ms": 2019.7325000000003,
+            "error": "POOL_ACQUIRE_TIMEOUT"
+          },
+          {
+            "index": 3,
+            "success": false,
+            "ms": 2019.9580999999998,
+            "error": "POOL_ACQUIRE_TIMEOUT"
+          },
+          {
+            "index": 4,
+            "success": false,
+            "ms": 2020.0487999999998,
+            "error": "POOL_ACQUIRE_TIMEOUT"
+          }
+        ]
+      },
+      {
+        "timeout": 15000,
+        "max": 1,
+        "succeeded": 5,
+        "failed": 0,
+        "samples": [
+          {
+            "index": 0,
+            "success": true,
+            "ms": 2412.4797
+          },
+          {
+            "index": 1,
+            "success": true,
+            "ms": 4817.143800000001
+          },
+          {
+            "index": 2,
+            "success": true,
+            "ms": 7223.0728
+          },
+          {
+            "index": 3,
+            "success": true,
+            "ms": 9633.982399999999
+          },
+          {
+            "index": 4,
+            "success": true,
+            "ms": 12048.0592
+          }
+        ]
+      }
+    ]
+  },
+  "operatorCandidate": {
+    "at": "2026-10-17T19:43:44.850Z",
+    "scope": "Operator HTTP composition using unchanged production source and existing initialized synthetic booking; not deployed/container proof. Four owner pools, one connection each; background workers disabled in this operator process only.",
+    "samples": [
+      {
+        "index": 0,
+        "path": "check-in-settings",
+        "status": 200,
+        "ms": 7324.578599999999,
+        "requestId": "5850d9ab-f6de-435d-8c30-63d369578e2d"
+      },
+      {
+        "index": 1,
+        "path": "guests?limit=50&status=ACTIVE",
+        "status": 200,
+        "ms": 7459.9239,
+        "requestId": "911f4c4d-9922-4594-a4ef-2806d0e39032"
+      },
+      {
+        "index": 2,
+        "path": "attendance-summary",
+        "status": 200,
+        "ms": 11939.21,
+        "requestId": "4bb06124-5051-479a-9670-c672ad22b350"
+      },
+      {
+        "index": 3,
+        "path": "guests?limit=50&status=ACTIVE",
+        "status": 200,
+        "ms": 11762.6297,
+        "requestId": "10f83b80-da1a-42b6-a970-ceef475ee075"
+      },
+      {
+        "index": 4,
+        "path": "contract-appendices",
+        "status": 200,
+        "ms": 5407.7467,
+        "requestId": "5f933593-16b1-4d29-90a8-c19745e0a0c1"
+      },
+      {
+        "index": 5,
+        "path": "billing?limit=1",
+        "status": 200,
+        "ms": 3969.1892000000007,
+        "requestId": "92c8f201-3ebc-439a-8b4c-de3ac6284052"
+      }
+    ],
+    "budget": {
+      "max": 1,
+      "venueCatalogMax": 3,
+      "analyticsMax": 2,
+      "connectionTimeoutMillis": 10000,
+      "idleTimeoutMillis": 60000,
+      "plannedProcesses": 2,
+      "databaseMax": 60,
+      "reserve": 36,
+      "perProcess": 12,
+      "aggregate": 60
+    },
+    "login": 201,
+    "logout": 204,
+    "revokedReuse": 401,
+    "passed": true
+  },
+  "tests": {
+    "focusedUnit": 38,
+    "focusedStaffIntegration": 1,
+    "fullSuiteRerun": false
+  },
+  "limits": [
+    "Live error events contain generic Error only; exact driver failure and holder are not established for every request.",
+    "Operator source HTTP verification does not prove deployed success with enabled workers.",
+    "No application/migration/OpenAPI/frontend source change; no deployment or paid/business/provider mutation.",
+    "Larger pool with reduced provider reserve rejected; 20-second wait on five same-pool Staff reads still hits transaction-admission limits.",
+    "PERF-13 and production NO_GO remain open."
+  ]
+}

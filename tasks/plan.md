@@ -395,3 +395,14 @@ five temporary SSH keys revoked; selected business history and migrations match.
 PERF-04 is complete in this synthetic scope. The earlier failed campaign remains
 immutable; historical acquisition holder, enabled-worker capacity and production
 readiness are not closed by scheduler isolation. PERF-13 and NO_GO remain.
+
+## PostgreSQL best-practices review — 2026-10-21
+
+This owner-requested backend database review uses `supabase-postgres-best-practices`.
+Read-only hosted catalog/advisor inspection precedes disposable native PostgreSQL
+measurements. Keep only query access paths supported by EXPLAIN evidence, declare
+them in Prisma and add a forward migration without changing existing business
+behavior. Verify unread visibility/read updates and the bounded inbox-retention
+batch, then run repository correctness checks. Hosted rollout and runtime/provider
+acceptance are separate. The implementation, advisor triage, costs and release
+procedure are in [the PostgreSQL review](../docs/postgres-best-practices-2026-10-21.md).

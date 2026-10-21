@@ -1,0 +1,2032 @@
+{
+  "schemaVersion": 1,
+  "task": "PERF-07",
+  "date": "2026-10-18",
+  "timezone": "Asia/Saigon",
+  "status": "COMPLETE_ON_MAIN_AND_VERIFIED_AFTER_OWNER_AUTHORIZED_ROLLOUT",
+  "pr": "https://github.com/WDP301-wedding/wedding-be/pull/67",
+  "authorization": {
+    "at": "2026-10-18T06:21:53.483Z",
+    "humanInstruction": "Cho phép merge và kiểm tra sau rollout",
+    "scope": "PR67 reviewed head 30e65b2; existing Railway demo automatic main rollout; read-only print-order/public revocation verification. No runtime, migration, pool, region or provider setting change."
+  },
+  "merge": {
+    "at": "2026-10-18T06:22:17.043Z",
+    "sha": "873aa4c56eca6ef80563768554d726e5bae9eb46",
+    "merged": true,
+    "message": "Pull Request successfully merged",
+    "head": "30e65b23740e3b1546766907a31aa429130703a7",
+    "base": "df945b6f4ad10a44f37134e76a662f041283325b",
+    "authorization": {
+      "at": "2026-10-18T06:21:53.483Z",
+      "humanInstruction": "Cho phép merge và kiểm tra sau rollout",
+      "scope": "PR67 reviewed head 30e65b2; existing Railway demo automatic main rollout; read-only print-order/public revocation verification. No runtime, migration, pool, region or provider setting change."
+    }
+  },
+  "exactHeadCi": {
+    "at": "2026-10-18T06:19:04.043Z",
+    "pr": "https://github.com/WDP301-wedding/wedding-be/pull/67",
+    "head": "30e65b23740e3b1546766907a31aa429130703a7",
+    "id": 39103129775,
+    "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39103129775",
+    "attempt": 1,
+    "conclusion": "success",
+    "jobs": [
+      {
+        "id": 117603313144,
+        "name": "Static, test, build, and audit gates",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Generate Prisma client",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check formatting",
+            "conclusion": "success"
+          },
+          {
+            "name": "Lint",
+            "conclusion": "success"
+          },
+          {
+            "name": "Typecheck",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run unit tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run contract tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Verify generated OpenAPI artifact",
+            "conclusion": "success"
+          },
+          {
+            "name": "Build production output",
+            "conclusion": "success"
+          },
+          {
+            "name": "Audit locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "summaries": [
+          "found 0 vulnerabilities",
+          " Test Files  162 passed (162)",
+          "      Tests  1461 passed (1461)",
+          " Test Files  20 passed (20)",
+          "      Tests  59 passed (59)"
+        ]
+      },
+      {
+        "id": 117603313255,
+        "name": "PostgreSQL migration and integration gates",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Initialize containers",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Generate Prisma client",
+            "conclusion": "success"
+          },
+          {
+            "name": "Deploy migrations to empty PostgreSQL",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run PostgreSQL integration tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Enforce full-suite coverage with PostgreSQL",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Stop containers",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "summaries": [
+          "found 0 vulnerabilities",
+          " Test Files  105 passed (105)",
+          "      Tests  566 passed (566)",
+          " Test Files  287 passed (287)",
+          "      Tests  2086 passed (2086)",
+          "All files          |   96.66 |    93.52 |   98.45 |   97.56 |                   "
+        ]
+      }
+    ]
+  },
+  "mergeCi": {
+    "id": 39103797172,
+    "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39103797172",
+    "head": "873aa4c56eca6ef80563768554d726e5bae9eb46",
+    "status": "completed",
+    "conclusion": "success",
+    "attempt": 1,
+    "jobs": [
+      {
+        "id": 117605287614,
+        "name": "PostgreSQL migration and integration gates",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39103797172/job/117605287614",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Initialize containers",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Generate Prisma client",
+            "conclusion": "success"
+          },
+          {
+            "name": "Deploy migrations to empty PostgreSQL",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run PostgreSQL integration tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Enforce full-suite coverage with PostgreSQL",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Stop containers",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "counts": [
+          "2026-10-18T06:25:55.9544620Z  Test Files  105 passed (105)",
+          "2026-10-18T06:25:55.9549260Z       Tests  566 passed (566)",
+          "2026-10-18T06:30:06.7954592Z  Test Files  287 passed (287)",
+          "2026-10-18T06:30:06.7967922Z       Tests  2086 passed (2086)",
+          "2026-10-18T06:30:06.8266943Z All files          |   96.66 |    93.52 |   98.45 |   97.56 |                   "
+        ],
+        "sha256": "1c4f161c2d6b684c3fba803d3a0c1c183b0fd4080529bc6ad16972a3462bf6b3"
+      },
+      {
+        "id": 117605287829,
+        "name": "Static, test, build, and audit gates",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39103797172/job/117605287829",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Generate Prisma client",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check formatting",
+            "conclusion": "success"
+          },
+          {
+            "name": "Lint",
+            "conclusion": "success"
+          },
+          {
+            "name": "Typecheck",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run unit tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run contract tests",
+            "conclusion": "success"
+          },
+          {
+            "name": "Verify generated OpenAPI artifact",
+            "conclusion": "success"
+          },
+          {
+            "name": "Build production output",
+            "conclusion": "success"
+          },
+          {
+            "name": "Audit locked dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Node.js",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Check out repository",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "counts": [
+          "2026-10-18T06:24:29.0897123Z  Test Files  162 passed (162)",
+          "2026-10-18T06:24:29.0905721Z       Tests  1461 passed (1461)",
+          "2026-10-18T06:24:35.3212360Z  Test Files  20 passed (20)",
+          "2026-10-18T06:24:35.3213617Z       Tests  59 passed (59)",
+          "2026-10-18T06:24:55.3238604Z Dependency audit passed with no high/critical advisories."
+        ],
+        "sha256": "7a0582cf1cc10bcbb819b6e0620ee0b4b1c71f8304199eba2b522bd948661b46"
+      }
+    ]
+  },
+  "treeIdentical": true,
+  "productionSourceContinuity": [
+    {
+      "path": "src",
+      "before": "77b8f2db2af6e56609995e2e99b1a78f4351beb4",
+      "after": "77b8f2db2af6e56609995e2e99b1a78f4351beb4",
+      "equal": true
+    },
+    {
+      "path": "prisma",
+      "before": "a6a0f1b7a141117f9370ea5f922c974375b81833",
+      "after": "a6a0f1b7a141117f9370ea5f922c974375b81833",
+      "equal": true
+    },
+    {
+      "path": "openapi",
+      "before": "160c3bb09a500367c7fa43f050301b444ce83e04",
+      "after": "160c3bb09a500367c7fa43f050301b444ce83e04",
+      "equal": true
+    },
+    {
+      "path": "package.json",
+      "before": "a165f63c0e251eee65d56fc31684b4827765e13e",
+      "after": "a165f63c0e251eee65d56fc31684b4827765e13e",
+      "equal": true
+    },
+    {
+      "path": "package-lock.json",
+      "before": "661f3c1edaadcaeaca5612c2f2e2f06450cf4fe7",
+      "after": "661f3c1edaadcaeaca5612c2f2e2f06450cf4fe7",
+      "equal": true
+    },
+    {
+      "path": ".node-version",
+      "before": "df6ae3370f9f89272d88629c442cf554d6c1f9fb",
+      "after": "df6ae3370f9f89272d88629c442cf554d6c1f9fb",
+      "equal": true
+    },
+    {
+      "path": "tsconfig.build.json",
+      "before": "588c2458d87d500adea3b91de433b15a5cd29127",
+      "after": "588c2458d87d500adea3b91de433b15a5cd29127",
+      "equal": true
+    },
+    {
+      "path": "Dockerfile",
+      "before": "aa33d79c03ffc349380167295db50b3ee8002047",
+      "after": "aa33d79c03ffc349380167295db50b3ee8002047",
+      "equal": true
+    },
+    {
+      "path": "railway.json",
+      "before": "75164716ec20a78fc6ed72ac53cb9927866a0b82",
+      "after": "75164716ec20a78fc6ed72ac53cb9927866a0b82",
+      "equal": true
+    },
+    {
+      "path": ".railway",
+      "before": "d662f9b7b914565b2f45b4a0abbbc00d6914ae60",
+      "after": "d662f9b7b914565b2f45b4a0abbbc00d6914ae60",
+      "equal": true
+    },
+    {
+      "path": ".github/workflows",
+      "before": "5e937b867a64a4e182cea0369118ba69190ee25d",
+      "after": "5e937b867a64a4e182cea0369118ba69190ee25d",
+      "equal": true
+    }
+  ],
+  "runtimeSourceChangedByPr": false,
+  "acceptance": {
+    "scope": {
+      "backendOnly": true,
+      "endpoint": "GET /api/v1/management/print-orders",
+      "liveExistingOrders": 3,
+      "liveStatuses": [
+        "REQUESTED",
+        "IN_PRODUCTION",
+        "CANCELLED"
+      ],
+      "livePendingProposals": 0,
+      "localRequestedCardinalities": [
+        1,
+        3,
+        20
+      ],
+      "localApprovedWithProposalCardinalities": [
+        1,
+        3,
+        20
+      ],
+      "runtimeSourceChanged": false,
+      "liveFixtureWrites": false,
+      "paidOrRealMoneyOperations": false
+    },
+    "nativeSummary": [
+      {
+        "case": "one",
+        "returnedItems": 1,
+        "variants": {
+          "baseline": {
+            "n": 20,
+            "p50Ms": 749.0875220000162,
+            "p95Ms": 754.7659339999955,
+            "commands": [
+              5
+            ]
+          },
+          "deployed": {
+            "n": 20,
+            "p50Ms": 897.3143920000002,
+            "p95Ms": 902.4588760000042,
+            "commands": [
+              6
+            ]
+          }
+        },
+        "p95ReductionPercent": -19.56804558166634
+      },
+      {
+        "case": "three",
+        "returnedItems": 3,
+        "variants": {
+          "baseline": {
+            "n": 20,
+            "p50Ms": 1343.422921999998,
+            "p95Ms": 1348.201006999996,
+            "commands": [
+              9
+            ]
+          },
+          "deployed": {
+            "n": 20,
+            "p50Ms": 897.0266600000032,
+            "p95Ms": 908.9671399999934,
+            "commands": [
+              6
+            ]
+          }
+        },
+        "p95ReductionPercent": 32.57925670723104
+      },
+      {
+        "case": "cursor",
+        "returnedItems": 2,
+        "variants": {
+          "baseline": {
+            "n": 20,
+            "p50Ms": 1344.7758269999904,
+            "p95Ms": 1350.9839599999905,
+            "commands": [
+              9
+            ]
+          },
+          "deployed": {
+            "n": 20,
+            "p50Ms": 1047.3812909999979,
+            "p95Ms": 1054.5790740000011,
+            "commands": [
+              7
+            ]
+          }
+        },
+        "p95ReductionPercent": 21.939926363003703
+      }
+    ],
+    "localSummary": [
+      {
+        "limit": 1,
+        "variants": {
+          "before": {
+            "n": 20,
+            "p50Ms": 186.76090000000113,
+            "p95Ms": 202.16700000000128,
+            "commands": [
+              4
+            ]
+          },
+          "current": {
+            "n": 20,
+            "p50Ms": 233.91330000000016,
+            "p95Ms": 250.4620000000068,
+            "commands": [
+              5
+            ]
+          }
+        },
+        "p95ReductionPercent": -23.88866630063522
+      },
+      {
+        "limit": 3,
+        "variants": {
+          "before": {
+            "n": 20,
+            "p50Ms": 279.75940000000264,
+            "p95Ms": 282.11939999999595,
+            "commands": [
+              6
+            ]
+          },
+          "current": {
+            "n": 20,
+            "p50Ms": 233.8876999999993,
+            "p95Ms": 249.98309999999765,
+            "commands": [
+              5
+            ]
+          }
+        },
+        "p95ReductionPercent": 11.391028054078788
+      },
+      {
+        "limit": 20,
+        "variants": {
+          "before": {
+            "n": 20,
+            "p50Ms": 1073.871500000001,
+            "p95Ms": 1096.0856999999996,
+            "commands": [
+              23
+            ]
+          },
+          "current": {
+            "n": 20,
+            "p50Ms": 234.23519999999917,
+            "p95Ms": 244.31550000000425,
+            "commands": [
+              5
+            ]
+          }
+        },
+        "p95ReductionPercent": 77.71018269830505
+      }
+    ],
+    "originalReceiptPath": "tasks/evidence/perf07-closure-2026-10-18.json",
+    "originalReceiptUnchanged": true,
+    "all46OriginalOperatorArtifactsUnchanged": true
+  },
+  "serving": {
+    "at": "2026-10-18T06:32:06.486Z",
+    "runtime": {
+      "deploymentId": "f100e2bd-1ad5-497b-989b-28f2f2e2f705",
+      "source": "873aa4c56eca6ef80563768554d726e5bae9eb46",
+      "image": "sha256:cb99729e156b0d563c2463a92589cc65597bdb6f449092a353b67fa442dc0388",
+      "configurationDigest": "5bb1f835c3514bca7e8db5d8c01d34fb92be34b82742eed21ad2dc30a41aceb5",
+      "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+      "controls": {
+        "DB_POOL_MAX": "1",
+        "DB_POOL_MAX_VENUE_CATALOG": "3",
+        "DB_POOL_MAX_ANALYTICS": "2",
+        "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000",
+        "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+        "DB_CONNECTION_RESERVE": "36",
+        "DB_MAX_CONNECTIONS": "60",
+        "DB_DIAGNOSTICS_ENABLED": "false",
+        "DB_SAFE_READ_DEADLINE_ENABLED": "false"
+      }
+    },
+    "oldStopped": true,
+    "onlyNewDeploymentActive": true,
+    "configurationUnchanged": true,
+    "ci": [
+      {
+        "id": 39103797172,
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39103797172",
+        "head": "873aa4c56eca6ef80563768554d726e5bae9eb46",
+        "status": "completed",
+        "conclusion": "success",
+        "attempt": 1
+      }
+    ],
+    "smoke": [
+      {
+        "path": "/health/live",
+        "method": "GET",
+        "status": 200,
+        "requestId": "5b669b00-9761-4100-978d-fbd80c0a666b"
+      },
+      {
+        "path": "/health/ready",
+        "method": "GET",
+        "status": 200,
+        "requestId": "22d97a77-f044-4fd5-b18e-29700706541a"
+      },
+      {
+        "path": "/api/v1/openapi.json",
+        "method": "GET",
+        "status": 200,
+        "requestId": "425e5ca6-8044-49bc-830e-94f4ff17b847",
+        "sha256": "19da7dafc991d316f7f048a58c6446deabb2e724edb3a49d55e4709ce14d04e2"
+      },
+      {
+        "path": "/api/v1/management/print-orders",
+        "method": "GET",
+        "status": 401,
+        "requestId": "9414c1e1-a356-45eb-ad15-7529ad5bdb96"
+      }
+    ]
+  },
+  "finalPostflight": {
+    "at": "2026-10-18T06:33:58.537Z",
+    "runtime": {
+      "deploymentId": "f100e2bd-1ad5-497b-989b-28f2f2e2f705",
+      "source": "873aa4c56eca6ef80563768554d726e5bae9eb46",
+      "image": "sha256:cb99729e156b0d563c2463a92589cc65597bdb6f449092a353b67fa442dc0388",
+      "configurationDigest": "5bb1f835c3514bca7e8db5d8c01d34fb92be34b82742eed21ad2dc30a41aceb5",
+      "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+      "controls": {
+        "DB_POOL_MAX": "1",
+        "DB_POOL_MAX_VENUE_CATALOG": "3",
+        "DB_POOL_MAX_ANALYTICS": "2",
+        "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000",
+        "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+        "DB_CONNECTION_RESERVE": "36",
+        "DB_MAX_CONNECTIONS": "60",
+        "DB_DIAGNOSTICS_ENABLED": "false",
+        "DB_SAFE_READ_DEADLINE_ENABLED": "false"
+      }
+    },
+    "inventory": {
+      "tables": {
+        "Booking": {
+          "count": 3,
+          "sha256": "a43ba82e180ffdd0c90b8ab958b0d05010d19a2bc03c56cfc71e2af3655fd132"
+        },
+        "Consultation": {
+          "count": 3,
+          "sha256": "ddba007d1269769e228d194a9b5c9a3e43e71e787a37703d6de8a3a07552ccff"
+        },
+        "ConsultationAccess": {
+          "count": 3,
+          "sha256": "3db4a854e3e87ef83eaf5f1fedfa97aa98f4c1864eeb39378be9c346b2646556"
+        },
+        "GuestWorkspace": {
+          "count": 3,
+          "sha256": "2adc74581205b0a91b183da144979700032100d02b8e1428ce5645365380fded"
+        },
+        "GuestPlanRevision": {
+          "count": 3,
+          "sha256": "3bb6ad2d1e99fb796950dd546d88dabdb6c93731d09172ad436fe2a2f6999638"
+        },
+        "Guest": {
+          "count": 8,
+          "sha256": "b2b586adc5cbb9b291e0efab771009f86f2cb76fa1f76dc3a4b64f06aef13ee7"
+        },
+        "GuestGroup": {
+          "count": 12,
+          "sha256": "5dd8e10dc95c46c70ade7f392905792271b842869761f94e41a7e25f65a16340"
+        },
+        "GuestHistory": {
+          "count": 20,
+          "sha256": "04e0f0ac96082eee960325b4b61ed279d0e1571997e6c64ba3afab78417c9598"
+        },
+        "SeatingPlan": {
+          "count": 1,
+          "sha256": "9c1ec53ea1d901487d515a638f848e0523c35e36c905a2b54d8bff196b759270"
+        },
+        "SeatingPlanRevision": {
+          "count": 2,
+          "sha256": "afc6805271c1530347d10b0683fbad7463008dbef27f19cb38796cf9f2167f6b"
+        },
+        "StaffConfiguration": {
+          "count": 2,
+          "sha256": "3bba552bab58a4f01d405cb702850a3a16f272802eedc6a2dccf0233be80ef46"
+        },
+        "StaffAssignment": {
+          "count": 1,
+          "sha256": "7467e6b94d7fe8965caa7c6dd3e5d333464782c8cd7316fba5e871d0dd897bb1"
+        },
+        "StaffHistory": {
+          "count": 4,
+          "sha256": "72c3786aa33411335a48a4ea25276828d458cab1816fd5800b47eca52fb1f673"
+        },
+        "StaffCheckInRecord": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "CommercialContractRevision": {
+          "count": 2,
+          "sha256": "58cfa68d5865370ed2743bc79e3d625619a0a9df0a9acd8164bcdde31df5c229"
+        },
+        "FinalInvoiceRevision": {
+          "count": 1,
+          "sha256": "a5cc65388d67284b4648a16d9e6a453e456f252d40798ce7318b68cf0807e082"
+        },
+        "BillingLedgerEntry": {
+          "count": 11,
+          "sha256": "315b6f976aa3ed6a13e50d9cabd71b052f810a5ad81d1f07550146201560330b"
+        },
+        "InvitationPrintOrder": {
+          "count": 3,
+          "sha256": "633fb1c5ac2acc4b00af373e6ee6eb61ea501a4ace0540c30fd1db6e64617314"
+        },
+        "InvitationPrintLine": {
+          "count": 3,
+          "sha256": "91a712aedc8f7e6b4db697ec00dea5d61078370aba2206b9e100380679dfc087"
+        },
+        "InvitationCommercialRevision": {
+          "count": 2,
+          "sha256": "8963e49013da8746128e019681dedf98aef52fd9da239ba7314899061257efa2"
+        },
+        "InvitationPrintAudit": {
+          "count": 10,
+          "sha256": "55990bebaafa30e4e86995fb46b4cec7b45747ec8783ac592be51ef49cd7e0a7"
+        }
+      },
+      "selectedOrders": 3,
+      "selectedBookings": 3,
+      "migrations": {
+        "count": 61,
+        "sha256": "b7d90da8b39b7db5f6ef24ec1084f4ea2d4e4915664ebfccd00345c18fbf910e",
+        "allChecksumsMatch": true
+      }
+    },
+    "businessUnchanged": true,
+    "migrationsUnchanged": true,
+    "configurationUnchanged": true,
+    "correlated": [
+      {
+        "path": "/health/live",
+        "method": "GET",
+        "status": 200,
+        "requestId": "5b669b00-9761-4100-978d-fbd80c0a666b",
+        "matched": true,
+        "backendMs": 3.559,
+        "route": "/health/live"
+      },
+      {
+        "path": "/health/ready",
+        "method": "GET",
+        "status": 200,
+        "requestId": "22d97a77-f044-4fd5-b18e-29700706541a",
+        "matched": true,
+        "backendMs": 1251.824,
+        "route": "/health/ready"
+      },
+      {
+        "path": "/api/v1/openapi.json",
+        "method": "GET",
+        "status": 200,
+        "requestId": "425e5ca6-8044-49bc-830e-94f4ff17b847",
+        "sha256": "19da7dafc991d316f7f048a58c6446deabb2e724edb3a49d55e4709ce14d04e2",
+        "matched": true,
+        "backendMs": 18.99,
+        "route": "/api/v1/openapi.json"
+      },
+      {
+        "path": "/api/v1/management/print-orders",
+        "method": "GET",
+        "status": 401,
+        "requestId": "9414c1e1-a356-45eb-ad15-7529ad5bdb96",
+        "matched": true,
+        "backendMs": 6.083,
+        "route": "<unmatched>"
+      },
+      {
+        "label": "login",
+        "path": "/auth/web-sessions",
+        "method": "POST",
+        "round": 0,
+        "requestId": "1b2841c4-249d-4382-8b99-caa64e8ab911",
+        "at": "2026-10-18T06:32:06.619Z",
+        "status": 201,
+        "ms": 3464.04,
+        "noStore": true,
+        "matched": true,
+        "backendMs": 2997.006,
+        "route": "/api/v1/auth/web-sessions"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 0,
+        "requestId": "0aafc7c7-4b11-42cb-bf1b-01742b4317ad",
+        "at": "2026-10-18T06:32:10.084Z",
+        "status": 200,
+        "ms": 2323.0713,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 2068.014,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 0,
+        "requestId": "9a07dd3c-419f-4be6-8302-64111de056d9",
+        "at": "2026-10-18T06:32:12.408Z",
+        "status": 200,
+        "ms": 1185.4251999999997,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 906.396,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 0,
+        "requestId": "5f74632b-f855-492c-806a-d71a9b330aae",
+        "at": "2026-10-18T06:32:13.595Z",
+        "status": 200,
+        "ms": 1314.3840999999993,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1047.985,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 1,
+        "requestId": "94ff9560-29e6-467d-9ea7-0fa114e3b960",
+        "at": "2026-10-18T06:32:14.911Z",
+        "status": 200,
+        "ms": 1136.4676999999992,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 896.695,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 1,
+        "requestId": "d2bf625e-c36a-44b3-ae5e-96b9b4cff3c7",
+        "at": "2026-10-18T06:32:16.049Z",
+        "status": 200,
+        "ms": 1172.7916999999998,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 907.333,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 1,
+        "requestId": "54053d17-17e3-4010-8c1d-6153adc4b0c5",
+        "at": "2026-10-18T06:32:17.223Z",
+        "status": 200,
+        "ms": 1311.512200000001,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1047.005,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 2,
+        "requestId": "d3da2688-eb58-4c39-b6f6-560e0530ffc5",
+        "at": "2026-10-18T06:32:18.536Z",
+        "status": 200,
+        "ms": 1165.6193000000003,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 896.787,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 2,
+        "requestId": "ea17518d-6c14-4e19-9b9e-893c7140b071",
+        "at": "2026-10-18T06:32:19.702Z",
+        "status": 200,
+        "ms": 1166.1020000000008,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 893.995,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 2,
+        "requestId": "8e33b988-d6c0-4002-bdf6-39b3ca3a1c6d",
+        "at": "2026-10-18T06:32:20.869Z",
+        "status": 200,
+        "ms": 1320.2015999999985,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1043.344,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 3,
+        "requestId": "a9ec90f2-6916-406d-b9e6-aaf94c5ee0f5",
+        "at": "2026-10-18T06:32:22.192Z",
+        "status": 200,
+        "ms": 1132.6373999999996,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 895.385,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 3,
+        "requestId": "4f80f563-de80-40d7-9e09-052ff47ed5cd",
+        "at": "2026-10-18T06:32:23.325Z",
+        "status": 200,
+        "ms": 1161.425800000001,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 895.644,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 3,
+        "requestId": "f4256988-0551-4a9e-9655-0881bdee612b",
+        "at": "2026-10-18T06:32:24.488Z",
+        "status": 200,
+        "ms": 1282.0555999999997,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1044.064,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 4,
+        "requestId": "bdf9cf88-b009-499d-9c9e-5ea8049679d5",
+        "at": "2026-10-18T06:32:25.771Z",
+        "status": 200,
+        "ms": 1140.7037000000018,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 893.741,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 4,
+        "requestId": "443cb510-397e-431c-8a91-c7c3ce39ee99",
+        "at": "2026-10-18T06:32:26.913Z",
+        "status": 200,
+        "ms": 1136.808000000001,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 894.752,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 4,
+        "requestId": "7da57358-f8f1-4833-bbfd-127a260822f9",
+        "at": "2026-10-18T06:32:28.054Z",
+        "status": 200,
+        "ms": 1286.8086000000003,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1043.941,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 5,
+        "requestId": "596a7ca8-1c64-4500-b073-4848a6112768",
+        "at": "2026-10-18T06:32:29.342Z",
+        "status": 200,
+        "ms": 1126.5868999999984,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 893.854,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 5,
+        "requestId": "8be6ec0d-623a-453d-9848-3725190b7aae",
+        "at": "2026-10-18T06:32:30.470Z",
+        "status": 200,
+        "ms": 1167.371900000002,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 895.13,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 5,
+        "requestId": "f4c6fa5e-403c-4aaf-a741-8600e4b42373",
+        "at": "2026-10-18T06:32:31.638Z",
+        "status": 200,
+        "ms": 1304.900999999998,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1044.434,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 6,
+        "requestId": "f21dab21-790d-49c0-b373-999b8671977c",
+        "at": "2026-10-18T06:32:32.944Z",
+        "status": 200,
+        "ms": 1131.9202000000005,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 894.168,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 6,
+        "requestId": "ae85f0fb-8ba6-4927-9417-1d1334d285b9",
+        "at": "2026-10-18T06:32:34.077Z",
+        "status": 200,
+        "ms": 1136.6293000000005,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 894.895,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 6,
+        "requestId": "e8229e84-8c11-4f86-b727-e3477245cc17",
+        "at": "2026-10-18T06:32:35.215Z",
+        "status": 200,
+        "ms": 1283.173200000001,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1047.023,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 7,
+        "requestId": "5c165635-85df-451e-8221-655d0ec6a65b",
+        "at": "2026-10-18T06:32:36.499Z",
+        "status": 200,
+        "ms": 1134.2187999999987,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 896.773,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 7,
+        "requestId": "6c31d38f-fd9d-4195-b19c-da752296e8a0",
+        "at": "2026-10-18T06:32:37.635Z",
+        "status": 200,
+        "ms": 1155.120500000001,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 896.453,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 7,
+        "requestId": "0dc16367-3652-4144-9cf1-d13721f48930",
+        "at": "2026-10-18T06:32:38.791Z",
+        "status": 200,
+        "ms": 1277.952099999995,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1045.563,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 8,
+        "requestId": "759ebc10-fe7e-47fc-983a-e9d109ab48ce",
+        "at": "2026-10-18T06:32:40.070Z",
+        "status": 200,
+        "ms": 1133.5783999999985,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 894.636,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 8,
+        "requestId": "a3da6262-0392-4e7b-ae16-bc6e9e1d58e7",
+        "at": "2026-10-18T06:32:41.205Z",
+        "status": 200,
+        "ms": 1140.716499999995,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 894.385,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 8,
+        "requestId": "0008dcd8-3869-43bd-8eb2-812f251ca1f1",
+        "at": "2026-10-18T06:32:42.347Z",
+        "status": 200,
+        "ms": 1378.184699999998,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1043.26,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 9,
+        "requestId": "78c07e0b-98d4-41e0-ade6-2920d8cca8eb",
+        "at": "2026-10-18T06:32:43.726Z",
+        "status": 200,
+        "ms": 1127.6672000000035,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 893.172,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 9,
+        "requestId": "2f7f376a-6f44-445e-9385-56d8d27500ed",
+        "at": "2026-10-18T06:32:44.855Z",
+        "status": 200,
+        "ms": 1138.8190000000031,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 896.077,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 9,
+        "requestId": "6aa9e7fa-19a8-4936-9fdc-62ce193fc8b8",
+        "at": "2026-10-18T06:32:45.995Z",
+        "status": 200,
+        "ms": 1277.7713000000003,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1043.037,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 10,
+        "requestId": "d45d74ab-71ac-4e39-b6f3-978364f13df6",
+        "at": "2026-10-18T06:32:47.274Z",
+        "status": 200,
+        "ms": 1157.093399999998,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 895.133,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 10,
+        "requestId": "b4dde206-90f1-45a9-8e93-6a8d85bff42d",
+        "at": "2026-10-18T06:32:48.432Z",
+        "status": 200,
+        "ms": 1137.9112999999998,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 894.075,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 10,
+        "requestId": "353c5607-a56d-4e68-8412-fd2f325bd74a",
+        "at": "2026-10-18T06:32:49.571Z",
+        "status": 200,
+        "ms": 1312.872000000003,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1042.665,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 11,
+        "requestId": "f58e16ca-97d6-4781-80dd-3d5664c630f1",
+        "at": "2026-10-18T06:32:50.886Z",
+        "status": 200,
+        "ms": 1145.6713999999993,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 894.822,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 11,
+        "requestId": "f9637233-b66a-4e0c-9e2d-730f640a4ff1",
+        "at": "2026-10-18T06:32:52.034Z",
+        "status": 200,
+        "ms": 1144.9565000000002,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 893.869,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 11,
+        "requestId": "474af68f-305f-4c1c-961f-80d8e7ef024b",
+        "at": "2026-10-18T06:32:53.181Z",
+        "status": 200,
+        "ms": 1293.261400000003,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1043.809,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 12,
+        "requestId": "9cce9e52-0f28-4ca7-b2dd-efc1a79cad42",
+        "at": "2026-10-18T06:32:54.475Z",
+        "status": 200,
+        "ms": 1149.4440000000031,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 892.798,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 12,
+        "requestId": "ed9c6c88-fcad-4a0e-a004-2123febfe9ca",
+        "at": "2026-10-18T06:32:55.625Z",
+        "status": 200,
+        "ms": 1152.553399999997,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 896.024,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 12,
+        "requestId": "f82fd5d0-e614-4a3e-8b5b-3c2d834a3f01",
+        "at": "2026-10-18T06:32:56.779Z",
+        "status": 200,
+        "ms": 1321.783000000003,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1045.393,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 13,
+        "requestId": "4f9d32fd-c729-4306-ac84-9813f78f4196",
+        "at": "2026-10-18T06:32:58.102Z",
+        "status": 200,
+        "ms": 1128.3183999999965,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 893.987,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 13,
+        "requestId": "579ec737-9168-4c29-b03a-e769c8b34e35",
+        "at": "2026-10-18T06:32:59.232Z",
+        "status": 200,
+        "ms": 1138.3787000000011,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 895.673,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 13,
+        "requestId": "eee6a313-8cda-405d-8023-30c397b5c3b2",
+        "at": "2026-10-18T06:33:00.372Z",
+        "status": 200,
+        "ms": 1293.5507999999973,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1043.213,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 14,
+        "requestId": "87670e92-f65a-4747-8585-08ce4ea8da5b",
+        "at": "2026-10-18T06:33:01.667Z",
+        "status": 200,
+        "ms": 1130.3656000000046,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 894.226,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 14,
+        "requestId": "1204a724-0d71-44d9-8ec2-ffb341ac14bc",
+        "at": "2026-10-18T06:33:02.798Z",
+        "status": 200,
+        "ms": 1128.9920999999958,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 893.577,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 14,
+        "requestId": "b0898f0e-d73a-43e1-a98a-ebe4a588924c",
+        "at": "2026-10-18T06:33:03.929Z",
+        "status": 200,
+        "ms": 1288.960699999996,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1042.336,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 15,
+        "requestId": "8b2f2612-8d6d-4d41-8b69-c2005549017f",
+        "at": "2026-10-18T06:33:05.219Z",
+        "status": 200,
+        "ms": 1131.714199999995,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 892.904,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 15,
+        "requestId": "a3309a4c-3ada-4590-9500-7ef3182dd363",
+        "at": "2026-10-18T06:33:06.353Z",
+        "status": 200,
+        "ms": 1150.6875999999975,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 895.476,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 15,
+        "requestId": "0b7fac54-35e6-4f54-93e0-696315cd85fb",
+        "at": "2026-10-18T06:33:07.506Z",
+        "status": 200,
+        "ms": 1283.153499999993,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1045.526,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 16,
+        "requestId": "b4f5b602-f7e5-473a-8fac-b44291df76db",
+        "at": "2026-10-18T06:33:08.790Z",
+        "status": 200,
+        "ms": 1142.766300000003,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 892.996,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 16,
+        "requestId": "db113c7d-4956-4c19-a132-3e02ab91d1b7",
+        "at": "2026-10-18T06:33:09.934Z",
+        "status": 200,
+        "ms": 1151.3413999999975,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 896.885,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 16,
+        "requestId": "f4610e69-a7f6-4c6e-b8b1-64bb13305742",
+        "at": "2026-10-18T06:33:11.087Z",
+        "status": 200,
+        "ms": 1461.795100000003,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1042.189,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 17,
+        "requestId": "7f7652bf-7792-43dd-b9ae-480b28075af8",
+        "at": "2026-10-18T06:33:12.550Z",
+        "status": 200,
+        "ms": 1144.6995999999926,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 893.615,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 17,
+        "requestId": "b52c784b-894b-42ac-a8f6-be4baae9fc59",
+        "at": "2026-10-18T06:33:13.696Z",
+        "status": 200,
+        "ms": 1130.1317000000126,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 894.03,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 17,
+        "requestId": "3fdfc0e3-6a42-49e0-8199-8370c536d044",
+        "at": "2026-10-18T06:33:14.828Z",
+        "status": 200,
+        "ms": 1280.7997000000032,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1043.01,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 18,
+        "requestId": "f796bacc-a7ac-4706-a93b-397adab56048",
+        "at": "2026-10-18T06:33:16.111Z",
+        "status": 200,
+        "ms": 1139.88489999999,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 893.141,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 18,
+        "requestId": "9a10c4ee-cbb6-4178-a782-3a373a0a7374",
+        "at": "2026-10-18T06:33:17.252Z",
+        "status": 200,
+        "ms": 1148.866599999994,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 895.831,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 18,
+        "requestId": "ed8c8470-98ad-49bf-80bf-84917fa707f6",
+        "at": "2026-10-18T06:33:18.402Z",
+        "status": 200,
+        "ms": 1302.2590999999957,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1042.827,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 19,
+        "requestId": "753a625b-2b62-4497-a68f-7639a13d888d",
+        "at": "2026-10-18T06:33:19.705Z",
+        "status": 200,
+        "ms": 1151.4416999999958,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 891.81,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 19,
+        "requestId": "318af7c7-6bf6-44d2-9b75-f139876ad4ec",
+        "at": "2026-10-18T06:33:20.858Z",
+        "status": 200,
+        "ms": 1145.8273000000045,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 893.123,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 19,
+        "requestId": "3797b40a-36b6-48aa-8063-bf1d7530dbbc",
+        "at": "2026-10-18T06:33:22.006Z",
+        "status": 200,
+        "ms": 1284.8546999999962,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1044.649,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "one",
+        "path": "/management/print-orders?limit=1",
+        "method": "GET",
+        "round": 20,
+        "requestId": "1ede5b63-8641-48e2-8e81-8ec0e305b176",
+        "at": "2026-10-18T06:33:23.292Z",
+        "status": 200,
+        "ms": 1128.7746000000043,
+        "noStore": true,
+        "items": 1,
+        "responseSha256": "225218e9e449cd2184bf9a6cb1da8f91c2e3ff311f7dd8868d912a3ee2531ed8",
+        "matched": true,
+        "backendMs": 893.324,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "three",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 20,
+        "requestId": "3a05e0b2-1f91-4a36-be63-afbc241651e8",
+        "at": "2026-10-18T06:33:24.423Z",
+        "status": 200,
+        "ms": 1131.024000000005,
+        "noStore": true,
+        "items": 3,
+        "responseSha256": "6c96a270cc5a1c205c9fb7458cbd8a58f6a85dcccd6d12b29a928d31c37f824d",
+        "matched": true,
+        "backendMs": 894.003,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "cursor",
+        "path": "/management/print-orders?limit=3&cursor=9df50a53-c5e0-4772-9cfd-31391b1c1e95",
+        "method": "GET",
+        "round": 20,
+        "requestId": "da909065-d6f8-427b-b44c-3dc1dc5ddd9f",
+        "at": "2026-10-18T06:33:25.556Z",
+        "status": 200,
+        "ms": 1288.3044000000082,
+        "noStore": true,
+        "items": 2,
+        "responseSha256": "001a1b3db19dae92ee008cd0b2e907384bc50a652e3f6bf9e29ae9121dfd38c5",
+        "matched": true,
+        "backendMs": 1044.88,
+        "route": "/api/v1/management/print-orders"
+      },
+      {
+        "label": "logout",
+        "path": "/auth/sessions/current",
+        "method": "DELETE",
+        "round": 0,
+        "requestId": "25fb9dd4-10a8-49cc-9fd0-757d1207d975",
+        "at": "2026-10-18T06:33:26.845Z",
+        "status": 204,
+        "ms": 2617.4611999999906,
+        "noStore": true,
+        "matched": true,
+        "backendMs": 2381.821,
+        "route": "/api/v1/auth/sessions/current"
+      },
+      {
+        "label": "revoked",
+        "path": "/auth/me",
+        "method": "GET",
+        "round": 0,
+        "requestId": "8ef9b462-ed91-4ba8-8385-501403f3bfe4",
+        "at": "2026-10-18T06:33:29.464Z",
+        "status": 401,
+        "ms": 394.4054000000033,
+        "noStore": true,
+        "matched": true,
+        "backendMs": 157.536,
+        "route": "/auth/me"
+      },
+      {
+        "label": "revoked-print",
+        "path": "/management/print-orders?limit=3",
+        "method": "GET",
+        "round": 0,
+        "requestId": "4a6b52e5-a407-4519-91aa-34064d530441",
+        "at": "2026-10-18T06:33:29.860Z",
+        "status": 401,
+        "ms": 382.3813000000082,
+        "noStore": false,
+        "matched": true,
+        "backendMs": 150.725,
+        "route": "<unmatched>"
+      }
+    ],
+    "summary": [
+      {
+        "case": "one",
+        "before": {
+          "n": 20,
+          "backendP50Ms": 895.878,
+          "backendP95Ms": 901.526,
+          "clientP50Ms": 1137.1005000000005,
+          "clientP95Ms": 1160.2265000000043
+        },
+        "after": {
+          "n": 20,
+          "backendP50Ms": 893.854,
+          "backendP95Ms": 896.773,
+          "clientP50Ms": 1134.2187999999987,
+          "clientP95Ms": 1157.093399999998
+        },
+        "implementationChanged": false
+      },
+      {
+        "case": "three",
+        "before": {
+          "n": 20,
+          "backendP50Ms": 896.944,
+          "backendP95Ms": 901.436,
+          "clientP50Ms": 1147.8073999999979,
+          "clientP95Ms": 1197.1303000000007
+        },
+        "after": {
+          "n": 20,
+          "backendP50Ms": 894.895,
+          "backendP95Ms": 896.885,
+          "clientP50Ms": 1144.9565000000002,
+          "clientP95Ms": 1167.371900000002
+        },
+        "implementationChanged": false
+      },
+      {
+        "case": "cursor",
+        "before": {
+          "n": 20,
+          "backendP50Ms": 1045.223,
+          "backendP95Ms": 1047.617,
+          "clientP50Ms": 1291.2199000000037,
+          "clientP95Ms": 1306.5609999999997
+        },
+        "after": {
+          "n": 20,
+          "backendP50Ms": 1043.809,
+          "backendP95Ms": 1047.005,
+          "clientP50Ms": 1288.960699999996,
+          "clientP95Ms": 1378.184699999998
+        },
+        "implementationChanged": false
+      }
+    ],
+    "publicReadsAfter": 63,
+    "matchedAfter": 71,
+    "sessionRevoked": true,
+    "allResponseHashesMatchNative": true,
+    "passed": true
+  },
+  "cleanup": {
+    "key": {
+      "at": "2026-10-18T06:05:21.863Z",
+      "fingerprint": "SHA256:zT+LjL/g9/8KavTzM+ajDxvZyPjgtVb/KgKC+UuxSTU",
+      "revoked": true,
+      "revokedTransportDenied": true,
+      "ownedKeysRemoved": true,
+      "otherKeysUntouched": true,
+      "remoteFilesWritten": false
+    },
+    "local": {
+      "at": "2026-10-18T06:08:11.093Z",
+      "testDatabasesRemaining": 0,
+      "clusterStopped": true,
+      "clusterPort": 55441,
+      "sharedDatabaseCleanup": false
+    },
+    "noNewSshKeyCreatedForRollout": true
+  },
+  "preservation": {
+    "selectedTableDigestsUnchanged": 21,
+    "appliedMigrationChecksumsUnchanged": 61,
+    "configurationAndControlsUnchanged": true,
+    "onlyMergedSourceDeploymentActive": true,
+    "precedingDeploymentStopped": true,
+    "noLiveFixtureOrFinancialWrites": true
+  },
+  "limits": [
+    "Three existing live orders and 1/3/20 local requested/approved-with-proposal pages are the selected scope; no twenty-order or live pending-proposal fixture is claimed.",
+    "The original-source native comparison passes the three-order target at 32.579%; one requested order regresses 19.568% and cursor improves only 21.940%. Keep those limits under PERF-13.",
+    "The after-rollout public cohort uses identical application code and fixtures. Report client/backend timings separately; do not attribute shared-load variation to a new optimization.",
+    "The original acceptance and pre-merge CI receipts retain their historical pending-rollout statuses. This receipt supersedes status only.",
+    "Provider acceptance and production NO_GO stay unchanged; no paid generation, real-money transaction, live business mutation or frontend work."
+  ],
+  "productionReadiness": "NO_GO_UNCHANGED",
+  "perf13": "OPEN",
+  "artifacts": [
+    {
+      "path": "output/perf07-20261018/rollout-authorization.json",
+      "sha256": "e992ff15ef537ff771be0662e0a935c3ceb7faf6ec214b7180b8a2aa5fc6e712"
+    },
+    {
+      "path": "output/perf07-20261018/premerge.json",
+      "sha256": "310e7ad0b79996132d28ea78ebea3100b44ad0e511ff7bcae6e953fe826d84ac"
+    },
+    {
+      "path": "output/perf07-20261018/merge.json",
+      "sha256": "1c34a8208617c370680422f76f3bee8b52d5f6798376631fb7f26dfba69b1d70"
+    },
+    {
+      "path": "output/perf07-20261018/serving.json",
+      "sha256": "01b744302cdb3a2529aeebd0a37db992ee7bec4989a068dcaa6e52e3127b708b"
+    },
+    {
+      "path": "output/perf07-20261018/public-rollout.json",
+      "sha256": "cd99c1b0f0d2e9a85c3afb33921d06f28e1648ec6f596a64b8df85ba59b63d9f"
+    },
+    {
+      "path": "output/perf07-20261018/final-postflight.json",
+      "sha256": "75bcfbd4f7a663ffb752bca79a6a33c655d0ded5141b2a99b216f2249fc1efad"
+    },
+    {
+      "path": "output/perf07-20261018/ci-final.json",
+      "sha256": "33e3e8503b9830c0f34f92226d80a7652e325083ad76ac9ac816ebdecfdc6ac4"
+    },
+    {
+      "path": "output/perf07-20261018/review.json",
+      "sha256": "14cd45eaf94d59e30fb54ee55faac62eb628acffa7dfb0194e796213af1c25d2"
+    },
+    {
+      "path": "output/perf07-20261018/local-cleanup.json",
+      "sha256": "b18df64f9133726afa49dfa3b54468ee729f96e507716fc70de92b5be3542686"
+    },
+    {
+      "path": "output/perf07-20261018/key-revocation.json",
+      "sha256": "fb77c2e50fd258381878677b434f6c97834a63c35867525bf903f1981556a481"
+    },
+    {
+      "path": "output/perf07-20261018/merge.mjs",
+      "sha256": "aadc8f20d97d12e443e660e9748e173e9e951b9901e4c74ffbb4e22edd6e3591"
+    },
+    {
+      "path": "output/perf07-20261018/rollout-status.mjs",
+      "sha256": "6c638e302d0881dacfbf322e4678ee808197581d0a90eeb582cd46c979dae50d"
+    },
+    {
+      "path": "output/perf07-20261018/serving.mjs",
+      "sha256": "e4ef90419f3455c14382c56698eca113f4d7ea804d9d9c30aefdc4fab2e83c70"
+    },
+    {
+      "path": "output/perf07-20261018/public-rollout.mjs",
+      "sha256": "b1d0268e14c4b7233ea0d2101cb821fd54f0f4679aef923900aa37438c6782d0"
+    },
+    {
+      "path": "output/perf07-20261018/final-postflight.mjs",
+      "sha256": "98454e0e5f29583927506006d9a06b2fa662d7b3092b552b6f2ec6c23c6dcd19"
+    },
+    {
+      "path": "output/perf07-20261018/close-rollout.mjs",
+      "sha256": "810379b8872d55a2584e5aadfa4f9dd2c4b1c80f218616d2e63eb293abdd7785"
+    },
+    {
+      "path": "tasks/evidence/perf07-closure-2026-10-18.json",
+      "sha256": "6565baf08da11378c86aac6262738f3c6b5a4b738286292a5174effd179311f5"
+    },
+    {
+      "path": "tasks/evidence/perf07-pr67-ci-2026-10-18.json",
+      "sha256": "a7272301760d4c4b17e794024eb6c6a8342d3d42c3f3bdc732897d8ccb354081"
+    }
+  ]
+}

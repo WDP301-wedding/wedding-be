@@ -1,0 +1,167 @@
+{
+  "date": "2026-10-21",
+  "timezone": "Asia/Saigon",
+  "scope": "Owner-authorized additive inbox indexes on Supabase; selected dirty-workspace integration",
+  "authorization": "User explicitly requested Supabase deployment and safe selection/integration of uncommitted backend work in this conversation.",
+  "base": "220263177c31a9249bdf4838687161b5b6f9ae44",
+  "testedImplementationHead": "b2d310ba038c1437629ddde0936beffe2b894b49",
+  "pullRequest": "https://github.com/WDP301-wedding/wedding-be/pull/84",
+  "ci": [
+    {
+      "id": 39546896925,
+      "head": "b2d310ba038c1437629ddde0936beffe2b894b49",
+      "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39546896925",
+      "event": "pull_request",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "name": "PostgreSQL migration and integration gates",
+          "conclusion": "success",
+          "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39546896925/job/119046997417",
+          "evidence": [
+            "2026-10-21T04:58:34.8309998Z All migrations have been successfully applied.",
+            "2026-10-21T05:01:45.0322935Z  Test Files  115 passed (115)",
+            "2026-10-21T05:01:45.0326027Z       Tests  681 passed (681)",
+            "2026-10-21T05:06:12.8352326Z  Test Files  303 passed (303)",
+            "2026-10-21T05:06:12.8363755Z       Tests  2262 passed (2262)",
+            "2026-10-21T05:06:12.8668490Z All files          |   96.65 |     93.6 |   98.44 |   97.58 |                   "
+          ]
+        },
+        {
+          "name": "Static, test, build, and audit gates",
+          "conclusion": "success",
+          "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39546896925/job/119046997680",
+          "evidence": [
+            "2026-10-21T04:58:23.8683321Z All matched files use Prettier code style!",
+            "2026-10-21T04:59:22.8819913Z  Test Files  165 passed (165)",
+            "2026-10-21T04:59:22.8826932Z       Tests  1482 passed (1482)",
+            "2026-10-21T04:59:27.4434155Z  Test Files  23 passed (23)",
+            "2026-10-21T04:59:27.4434692Z       Tests  99 passed (99)",
+            "2026-10-21T04:59:40.3597694Z Dependency audit passed with no high/critical advisories."
+          ]
+        }
+      ]
+    }
+  ],
+  "localVerification": {
+    "format": "passed",
+    "typecheck": "passed",
+    "lint": "passed without exclusions in clean worktree",
+    "audit": "no high/critical advisories",
+    "api": "unchanged; api:check passed",
+    "native": "3 tests passed: inbox access paths plus fresh/forward migration rehearsal"
+  },
+  "selection": {
+    "originalFilesOutsideOutput": 86,
+    "identicalToMain": 39,
+    "olderSourceConfigVersionsNotCopied": 5,
+    "historicalReceiptsPreserved": 32,
+    "applicationDependencyAndApiDiff": "none",
+    "detail": "tasks/evidence/uncommitted-review-2026-10-21.json",
+    "originalWorkspace": "preserved unchanged"
+  },
+  "migration": {
+    "name": "20261021040000_notification_inbox_query_indexes",
+    "checksum": "20e6b9b537ce8f4d8b6724a453c729d9334ee85f5dcb8007777b63897edbbcb0",
+    "mechanism": "Prisma migrate deploy, using the existing migration URL/session pooler",
+    "finishedAt": "2026-10-21T05:07:24.312Z",
+    "appliedBefore": 64,
+    "appliedAfter": 65,
+    "historicalPreserved": true,
+    "indexes": [
+      {
+        "name": "NotificationInbox_createdAt_id_idx",
+        "valid": true,
+        "ready": true,
+        "definition": "CREATE INDEX \"NotificationInbox_createdAt_id_idx\" ON public.\"NotificationInbox\" USING btree (\"createdAt\", id)"
+      },
+      {
+        "name": "NotificationInbox_unread_account_booking_idx",
+        "valid": true,
+        "ready": true,
+        "definition": "CREATE INDEX \"NotificationInbox_unread_account_booking_idx\" ON public.\"NotificationInbox\" USING btree (\"accountId\", \"bookingId\") WHERE (\"readAt\" IS NULL)"
+      }
+    ]
+  },
+  "preservation": {
+    "before": {
+      "Booking": {
+        "count": 27,
+        "digest": "2ead4b1194763f2a11669fa073ed76a3"
+      },
+      "CommercialContractRevision": {
+        "count": 9,
+        "digest": "536ce6cb8b59dbe5b2c986616124f6a3"
+      },
+      "CommercialAppendixRevision": {
+        "count": 2,
+        "digest": "cdcc89c1708ec5c3f676990ef3e46bc4"
+      },
+      "FinalInvoiceRevision": {
+        "count": 1,
+        "digest": "29862fa97519506ef3ca034e8c3c54fe"
+      },
+      "BillingLedgerEntry": {
+        "count": 28,
+        "digest": "60795bd9a4ea7d67b1df4d0244bcd548"
+      },
+      "NotificationInbox": {
+        "count": 6,
+        "digest": "9e00325aff22511adb8d8c12f1443519"
+      }
+    },
+    "after": {
+      "Booking": {
+        "count": 27,
+        "digest": "2ead4b1194763f2a11669fa073ed76a3"
+      },
+      "CommercialContractRevision": {
+        "count": 9,
+        "digest": "536ce6cb8b59dbe5b2c986616124f6a3"
+      },
+      "CommercialAppendixRevision": {
+        "count": 2,
+        "digest": "cdcc89c1708ec5c3f676990ef3e46bc4"
+      },
+      "FinalInvoiceRevision": {
+        "count": 1,
+        "digest": "29862fa97519506ef3ca034e8c3c54fe"
+      },
+      "BillingLedgerEntry": {
+        "count": 28,
+        "digest": "60795bd9a4ea7d67b1df4d0244bcd548"
+      },
+      "NotificationInbox": {
+        "count": 6,
+        "digest": "9e00325aff22511adb8d8c12f1443519"
+      }
+    },
+    "matched": true
+  },
+  "limits": [
+    "Hosted inbox has six rows; local 30,000-row timings are not live HTTP gains.",
+    "No paid generation, payment, retention deletion or production-readiness acceptance.",
+    "Existing provider/RV and global NO_GO decisions remain separate.",
+    "No runtime/provider settings changed."
+  ],
+  "rollback": "Retain additive indexes on application rollback. Remove only through a new reviewed forward migration if real workload evidence warrants it.",
+  "hostedRead": {
+    "at": "2026-10-21T05:08:18.059Z",
+    "mode": "Read-only actual inbox SQL against existing hosted data; not HTTP/session/provider E2E",
+    "limit": 20,
+    "pageRows": 5,
+    "unreadCount": 5,
+    "matched": true,
+    "writes": false,
+    "identityOrGuestDataRetained": false
+  },
+  "postDeployPerformanceAdvisor": {
+    "publicUnindexedForeignKeys": 52,
+    "publicUnusedIndexes": 44,
+    "interpretation": "Existing advisor candidates remain; tiny or unused new indexes do not justify deletion.",
+    "remediation": [
+      "https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys",
+      "https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index"
+    ]
+  }
+}

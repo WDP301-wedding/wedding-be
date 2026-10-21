@@ -1,0 +1,265 @@
+{
+  "at": "2026-10-20T06:13:49.819Z",
+  "authorization": "Owner explicitly requested migration 20261020030000_invitation_external_work, HTTP_REQUEST_TIMEOUT_MS=60000 and deployment on 2026-10-20.",
+  "target": {
+    "project": "1c56721d-021a-442c-9e01-bb91abe73adb",
+    "environment": "08a2899c-b0d6-4200-a505-604965a4b3fc",
+    "service": "0f70d648-8c59-48bd-84f3-29a86d2e2d38"
+  },
+  "environment": "Railway production (existing owner-designated synthetic staging/demo)",
+  "repository": "https://github.com/WDP301-wedding/wedding-be",
+  "pullRequest": "https://github.com/WDP301-wedding/wedding-be/pull/81",
+  "releaseBranch": "codex/invitation-latency-release",
+  "originalImplementationHead": "563c7bb",
+  "integration": {
+    "baseline": "568e45616879a2dba04fbb99993b64efe72dc2b9",
+    "reviewedHead": "526f0e688aaf7ce1e181e7884fc571b3020f8150",
+    "merge": "7e31f84c34d903b0299f8625bf323b71ccd65319",
+    "mergeTreeIdenticalToReviewedHead": true,
+    "reason": "Cherry-picked implementation-only commits onto current main to preserve previously deployed payment, auth and performance fixes."
+  },
+  "review": {
+    "head": "526f0e688aaf7ce1e181e7884fc571b3020f8150",
+    "base": "568e45616879a2dba04fbb99993b64efe72dc2b9",
+    "scope": "The six implementation commits were cherry-picked onto current main without conflicts; the release additionally restricts client access to the new internal claim table.",
+    "correctness": "Durable generation intent commits before paid work. Provider/Storage/Sharp work runs without an active booking transaction, then current authorization, cutoff, quota, source revision and lease ownership are checked at acceptance. Receipts and acceptance facts commit atomically; same-key retries do not repeat a paid generation. Both a retained output and an unknown outcome preserve reconciliation evidence.",
+    "security": "Routes and authentication contracts are unchanged. Logs allowlist phase/request metrics only. The new table's RLS denies non-owner row operations even with grants; the companion migration also revokes PUBLIC/anon/authenticated privileges, including TRUNCATE. The runtime connects as table owner. No broader Data API policy redesign is included.",
+    "architecture": "Reuses the existing booking boundary and authorization mechanisms. External work coordinator owns fencing and reservation orchestration shared by generation and derive. Couple and Manager print pages share bounded hydration.",
+    "performance": "No database connection or booking lock is retained while waiting on Gemini or Storage. Claim/journal/acceptance are separate short transactions. Print line/revision hydration is bounded at 1/3/20 orders. Pool limits and transaction timeout are unchanged.",
+    "readability": "Implementation is separated into diagnostics, schema, shared orchestration, timeout and workflow commits. Recovery and cutoff checks remain explicit in the owning service.",
+    "verification": "Exact-head PR and merged-main CI both passed, including PostgreSQL integration, per-file coverage, OpenAPI and dependency audit.",
+    "apiAndDependencies": "No OpenAPI, dependency, CI workflow, Dockerfile or Railway config file changes versus current main.",
+    "blockingFindings": [],
+    "rollback": "Prior SUCCESS deployment 0f1dc704-f5ee-4ad0-84e3-d816a53a618e can be redeployed. Retain additive migrations, claims and durable intent/journal history; do not drop evidence. Restore the timeout to 30000 only if requested/required for a rollback; 60000 is compatible with the previous image.",
+    "limitations": "Controlled tests do not prove live Gemini availability or an end-user p95 improvement. Release verification performs migration/config/source/health checks without paid generation or real-money operations. Existing production-readiness RV requirements remain independent.",
+    "mutation": {
+      "at": "2026-10-20T05:53:29.363Z",
+      "mutation": "Disable RLS in the companion migration",
+      "expectedExit": 1,
+      "actualExit": 1,
+      "restored": true,
+      "sha256": "3757c7383a3216b68fdad3497ef2c71a816b3b02e9194f05d6a5a92b791ec9b4"
+    }
+  },
+  "ci": {
+    "pullRequest": {
+      "head": "526f0e688aaf7ce1e181e7884fc571b3020f8150",
+      "run": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39377233901",
+      "static": [
+        "2026-10-20T05:52:53.9691922Z found 0 vulnerabilities",
+        "2026-10-20T05:54:15.7014332Z  Test Files  164 passed (164)",
+        "2026-10-20T05:54:15.7021631Z       Tests  1478 passed (1478)",
+        "2026-10-20T05:54:20.6294466Z  Test Files  23 passed (23)",
+        "2026-10-20T05:54:20.6294982Z       Tests  99 passed (99)",
+        "2026-10-20T05:54:35.5765057Z Dependency audit passed with no high/critical advisories."
+      ],
+      "postgres": [
+        "2026-10-20T05:53:10.4595255Z found 0 vulnerabilities",
+        "2026-10-20T05:56:22.5420818Z  Test Files  113 passed (113)",
+        "2026-10-20T05:56:22.5427202Z       Tests  651 passed (651)",
+        "2026-10-20T06:00:48.7552758Z  Test Files  300 passed (300)",
+        "2026-10-20T06:00:48.7570814Z       Tests  2228 passed (2228)",
+        "2026-10-20T06:00:48.7876335Z All files          |   96.65 |    93.56 |   98.51 |   97.57 |                   "
+      ]
+    },
+    "main": {
+      "commit": "7e31f84c34d903b0299f8625bf323b71ccd65319",
+      "run": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39378119395",
+      "static": [
+        "2026-10-20T06:02:43.2422308Z found 0 vulnerabilities",
+        "2026-10-20T06:04:17.4773118Z  Test Files  164 passed (164)",
+        "2026-10-20T06:04:17.4782383Z       Tests  1478 passed (1478)",
+        "2026-10-20T06:04:23.3787649Z  Test Files  23 passed (23)",
+        "2026-10-20T06:04:23.3788724Z       Tests  99 passed (99)",
+        "2026-10-20T06:04:40.9474913Z Dependency audit passed with no high/critical advisories."
+      ],
+      "postgres": [
+        "2026-10-20T06:03:09.7516134Z found 0 vulnerabilities",
+        "2026-10-20T06:06:05.2341101Z  Test Files  113 passed (113)",
+        "2026-10-20T06:06:05.2350038Z       Tests  651 passed (651)",
+        "2026-10-20T06:10:04.9361560Z  Test Files  300 passed (300)",
+        "2026-10-20T06:10:04.9375248Z       Tests  2228 passed (2228)",
+        "2026-10-20T06:10:04.9639962Z All files          |   96.65 |    93.56 |   98.51 |   97.57 |                   "
+      ]
+    },
+    "runs": [
+      {
+        "id": 39378119395,
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39378119395"
+      }
+    ]
+  },
+  "rollout": {
+    "previous": {
+      "id": "0f1dc704-f5ee-4ad0-84e3-d816a53a618e",
+      "status": "SUCCESS",
+      "meta": {
+        "commitHash": "568e45616879a2dba04fbb99993b64efe72dc2b9",
+        "imageDigest": "sha256:3c60b5013dadcc9098da9b6a1f36c590ea7e104eae0a45247fe09592a741e5bd"
+      }
+    },
+    "current": {
+      "id": "8eb70675-9eea-4a5b-838d-043ba840da5e",
+      "commit": "7e31f84c34d903b0299f8625bf323b71ccd65319",
+      "image": "sha256:853abbdf07c2900e92287e8ae56fe07a52b40b2905057f402bc42237eba37fcd",
+      "previousStopped": true
+    },
+    "timeout": {
+      "before": 30000,
+      "after": 60000,
+      "scope": "Shared HTTP middleware; one-minute budget for every HTTP request",
+      "geminiMs": 45000,
+      "databaseTransactionMs": 30000
+    },
+    "migrations": {
+      "count": 63,
+      "allChecksumsMatch": true,
+      "added": [
+        {
+          "migration_name": "20261020030000_invitation_external_work",
+          "checksum": "790a88693fb8fd802d413d2c1c4ad2a6ad1d3e57bf91a3a171fac5f364df117f"
+        },
+        {
+          "migration_name": "20261020031000_invitation_external_work_private",
+          "checksum": "3757c7383a3216b68fdad3497ef2c71a816b3b02e9194f05d6a5a92b791ec9b4"
+        }
+      ]
+    },
+    "claimAccess": {
+      "relrowsecurity": true,
+      "anon": false,
+      "authenticated": false
+    },
+    "otherVariablesUnchanged": true,
+    "serviceConfigurationUnchanged": true,
+    "waitForCiRetained": true,
+    "mechanism": "Existing Railway GitHub main trigger with pre-deploy npm run db:migrate:deploy before traffic cutover.",
+    "companionMigration": "20261020031000_invitation_external_work_private enables RLS and revokes direct client privileges on internal claim state."
+  },
+  "preservation": {
+    "before": {
+      "Booking": {
+        "count": 27,
+        "sha256": "a2e6816f2395575b326a20c378ba5ac3a9a7e9cbe41ec28a71680067c47f5dea"
+      },
+      "CommercialContractRevision": {
+        "count": 9,
+        "sha256": "8a6c4e5d4a28d0475bbe735bbaf5598605d2ef131ef76a89e7236eca056e454a"
+      },
+      "CommercialAppendixRevision": {
+        "count": 2,
+        "sha256": "137fa98eb34fee1b9de05a8e792090aeca11e7acf7db5bfa30df2d9b13d15d14"
+      },
+      "FinalInvoiceRevision": {
+        "count": 1,
+        "sha256": "a5cc65388d67284b4648a16d9e6a453e456f252d40798ce7318b68cf0807e082"
+      },
+      "BillingLedgerEntry": {
+        "count": 28,
+        "sha256": "3871ce9184a42d9ce8f7a852b88ce1381b0ea6d5bc01e5dbdd070edc8ec9c972"
+      },
+      "InvitationGenerationIntent": {
+        "count": 4,
+        "sha256": "c47ca5b2506286a26a7fe1f8983fcdfef6d873a74d9812906baa17226cd991ff"
+      },
+      "InvitationMediaAsset": {
+        "count": 6,
+        "sha256": "edd0cbcf5300d87f69972bd38fda0672f42b3da542eef0ce49a58931dc394dbf"
+      },
+      "InvitationMediaFile": {
+        "count": 7,
+        "sha256": "942907b3e241af8151aaec0e3d8d0dba3c743b66bf96fc2f82c6c9850c59a795"
+      },
+      "InvitationDerivedAsset": {
+        "count": 3,
+        "sha256": "dd7cc064ccee74f2a92498d65a434ee788943fcf4c9672db5c3d5afaf6435c68"
+      },
+      "InvitationPrintOrder": {
+        "count": 3,
+        "sha256": "633fb1c5ac2acc4b00af373e6ee6eb61ea501a4ace0540c30fd1db6e64617314"
+      },
+      "InvitationCommercialRevision": {
+        "count": 2,
+        "sha256": "8963e49013da8746128e019681dedf98aef52fd9da239ba7314899061257efa2"
+      }
+    },
+    "after": {
+      "Booking": {
+        "count": 27,
+        "sha256": "a2e6816f2395575b326a20c378ba5ac3a9a7e9cbe41ec28a71680067c47f5dea"
+      },
+      "CommercialContractRevision": {
+        "count": 9,
+        "sha256": "8a6c4e5d4a28d0475bbe735bbaf5598605d2ef131ef76a89e7236eca056e454a"
+      },
+      "CommercialAppendixRevision": {
+        "count": 2,
+        "sha256": "137fa98eb34fee1b9de05a8e792090aeca11e7acf7db5bfa30df2d9b13d15d14"
+      },
+      "FinalInvoiceRevision": {
+        "count": 1,
+        "sha256": "a5cc65388d67284b4648a16d9e6a453e456f252d40798ce7318b68cf0807e082"
+      },
+      "BillingLedgerEntry": {
+        "count": 28,
+        "sha256": "3871ce9184a42d9ce8f7a852b88ce1381b0ea6d5bc01e5dbdd070edc8ec9c972"
+      },
+      "InvitationGenerationIntent": {
+        "count": 4,
+        "sha256": "c47ca5b2506286a26a7fe1f8983fcdfef6d873a74d9812906baa17226cd991ff"
+      },
+      "InvitationMediaAsset": {
+        "count": 6,
+        "sha256": "edd0cbcf5300d87f69972bd38fda0672f42b3da542eef0ce49a58931dc394dbf"
+      },
+      "InvitationMediaFile": {
+        "count": 7,
+        "sha256": "942907b3e241af8151aaec0e3d8d0dba3c743b66bf96fc2f82c6c9850c59a795"
+      },
+      "InvitationDerivedAsset": {
+        "count": 3,
+        "sha256": "dd7cc064ccee74f2a92498d65a434ee788943fcf4c9672db5c3d5afaf6435c68"
+      },
+      "InvitationPrintOrder": {
+        "count": 3,
+        "sha256": "633fb1c5ac2acc4b00af373e6ee6eb61ea501a4ace0540c30fd1db6e64617314"
+      },
+      "InvitationCommercialRevision": {
+        "count": 2,
+        "sha256": "8963e49013da8746128e019681dedf98aef52fd9da239ba7314899061257efa2"
+      }
+    },
+    "passed": true
+  },
+  "verification": {
+    "http": [
+      {
+        "path": "/health/live",
+        "status": 200,
+        "durationMs": 460
+      },
+      {
+        "path": "/health/ready",
+        "status": 200,
+        "durationMs": 1738
+      },
+      {
+        "path": "/api/v1/openapi.json",
+        "status": 200,
+        "durationMs": 723
+      }
+    ],
+    "servingSourceVerified": true,
+    "previousDeploymentStopped": true,
+    "all63MigrationChecksumsMatch": true,
+    "unpaidProviderTestsOnly": true,
+    "paidGeneration": "not performed",
+    "realMoneyOperations": "not performed",
+    "frontendChanges": "none",
+    "scope": "Health/source/configuration/schema and retained-data verification; no claim of paid provider readiness or deployed latency p95 improvement."
+  },
+  "rollback": "Redeploy the prior compatible image/deployment while retaining both additive migrations and all durable intents/journals. Do not drop retained recovery or business history."
+}

@@ -1,0 +1,1079 @@
+{
+  "recordedAt": "2026-10-17T19:19:18.502Z",
+  "scope": "Owner-authorized PR63 merge and Railway developer/demo redeployment; backend only",
+  "status": "MERGED AND DEPLOYED; SMOKE VERIFIED",
+  "authorization": "hãy giúp tôi merge và deploy lại railway",
+  "pullRequest": "https://github.com/WDP301-wedding/wedding-be/pull/63",
+  "merge": {
+    "at": "2026-10-17T19:07:38.354Z",
+    "number": 63,
+    "head": "7fcca6e56c40b57ea19cb15f450f07977fc54801",
+    "base": "f2012acfba830adc2704f60b5b561eabe867eda1",
+    "sha": "cc2999acdd24dc87e713806328022b160585c599",
+    "merged": true,
+    "message": "Pull Request successfully merged"
+  },
+  "premerge": {
+    "head": "7fcca6e56c40b57ea19cb15f450f07977fc54801",
+    "base": "f2012acfba830adc2704f60b5b561eabe867eda1",
+    "headCI": {
+      "id": 39060208659,
+      "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39060208659",
+      "conclusion": "success"
+    },
+    "unresolvedReviewThreads": 0,
+    "review": "Five-axis source review, caught scheduler mutation, 2044 passing tests and full live evidence previously verified; no new diff. Backend owner approval policy applies.",
+    "changedPaths": [
+      ".env.example",
+      "docs/backend-performance-02-05.md",
+      "docs/backend-performance-04-reconciler-2026-10-17.md",
+      "docs/backend-performance-04-region-2026-10-17.md",
+      "docs/backend-performance-04-rerun-2026-10-17.md",
+      "docs/performance-region-experiment.md",
+      "src/config/env.test.ts",
+      "src/config/env.ts",
+      "src/config/runtime-manifest.test.ts",
+      "src/config/runtime-manifest.ts",
+      "src/modules/invitation-studio/invitation-studio.runtime.test.ts",
+      "src/modules/invitation-studio/invitation-studio.runtime.ts",
+      "src/modules/release-demo/release-policy.test.ts",
+      "src/modules/seating-plan/infrastructure/seating-reconciler.test.ts",
+      "src/modules/seating-plan/infrastructure/seating-reconciler.ts",
+      "tasks/backend-revision-todo.md",
+      "tasks/evidence/perf04-reconciler-isolation-2026-10-17.json",
+      "tasks/evidence/perf04-region-comparison-2026-10-17.json",
+      "tasks/evidence/perf04-region-preflight-2026-10-17.json",
+      "tasks/evidence/perf04-region-rerun-2026-10-17.json",
+      "tasks/plan.md",
+      "tests/integration/seating-reconciler-pool.test.ts",
+      "tests/integration/staff-operations.test.ts"
+    ],
+    "noMigrationChanges": true
+  },
+  "mergeCI": {
+    "at": "2026-10-17T19:15:24.104Z",
+    "head": "cc2999acdd24dc87e713806328022b160585c599",
+    "run": {
+      "id": 39061098652,
+      "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39061098652",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "jobs": [
+      {
+        "id": 117479056608,
+        "name": "PostgreSQL migration and integration gates",
+        "status": "completed",
+        "conclusion": "success",
+        "failedSteps": []
+      },
+      {
+        "id": 117479056791,
+        "name": "Static, test, build, and audit gates",
+        "status": "completed",
+        "conclusion": "success",
+        "failedSteps": []
+      }
+    ]
+  },
+  "ciTestCounts": {
+    "at": "2026-10-17T19:16:00.371Z",
+    "head": "cc2999acdd24dc87e713806328022b160585c599",
+    "results": [
+      {
+        "job": "PostgreSQL migration and integration gates",
+        "counts": [
+          "2026-10-17T19:11:02.8020982Z  Test Files  104 passed (104)",
+          "2026-10-17T19:11:02.8025111Z       Tests  546 passed (546)",
+          "2026-10-17T19:14:48.8828209Z  Test Files  286 passed (286)",
+          "2026-10-17T19:14:48.8841161Z       Tests  2044 passed (2044)"
+        ]
+      },
+      {
+        "job": "Static, test, build, and audit gates",
+        "counts": [
+          "2026-10-17T19:09:17.6793484Z  Test Files  162 passed (162)",
+          "2026-10-17T19:09:17.6800756Z       Tests  1440 passed (1440)",
+          "2026-10-17T19:09:22.4505747Z  Test Files  20 passed (20)",
+          "2026-10-17T19:09:22.4506661Z       Tests  58 passed (58)"
+        ]
+      }
+    ]
+  },
+  "serving": {
+    "at": "2026-10-17T19:17:52.609Z",
+    "target": {
+      "project": "1c56721d-021a-442c-9e01-bb91abe73adb",
+      "environment": "08a2899c-b0d6-4200-a505-604965a4b3fc",
+      "service": "0f70d648-8c59-48bd-84f3-29a86d2e2d38"
+    },
+    "deploymentId": "86d2addb-b0dd-4e1f-a3cd-4ed2717eb075",
+    "commit": "cc2999acdd24dc87e713806328022b160585c599",
+    "imageDigest": "sha256:d201a414b903413b28724591c52f2ab3a3cc0492818dd42d58ed2af370d55892",
+    "configurationDigest": "5acc9cf1a513b88a88e2cf6b07c31eaf2983dbf0753a592235e3a11a29f15f4f",
+    "serviceConfigurationUnchanged": true,
+    "previous": {
+      "deploymentStopped": true,
+      "id": "e12f82d4-c247-41ac-9b46-7417c260254a",
+      "status": "REMOVED"
+    },
+    "trialRuntimesStopped": true,
+    "deploy": {
+      "cronSchedule": null,
+      "drainingSeconds": null,
+      "healthcheckPath": "/health/ready",
+      "healthcheckTimeout": 120,
+      "ipv6EgressEnabled": true,
+      "limitOverride": null,
+      "multiRegionConfig": {
+        "sfo": {
+          "numReplicas": 1
+        }
+      },
+      "numReplicas": 1,
+      "overlapSeconds": null,
+      "preDeployCommand": [
+        "npm run db:migrate:deploy"
+      ],
+      "preDeployTimeoutSeconds": null,
+      "region": null,
+      "registryCredentials": null,
+      "requiredMountPath": null,
+      "restartPolicyMaxRetries": 3,
+      "restartPolicyType": "ON_FAILURE",
+      "runtime": "V2",
+      "sleepApplication": false,
+      "startCommand": "node --enable-source-maps --import ./dist/instrumentation.js dist/server.js",
+      "useLegacyStacker": false
+    }
+  },
+  "baselineHttp": {
+    "at": "2026-10-17T19:09:29.033Z",
+    "origin": "https://wedding-be-production-e1dc.up.railway.app",
+    "samples": [
+      {
+        "path": "/health/live",
+        "status": 200,
+        "ms": 491.2735,
+        "requestId": "336bc57c-9760-4ef3-b688-19dd1455417a",
+        "upstreamZone": "railway/us-west2"
+      },
+      {
+        "path": "/health/ready",
+        "status": 200,
+        "ms": 1619.8311999999999,
+        "requestId": "06855762-8f66-40d9-9872-334a44ae3e3e",
+        "upstreamZone": "railway/us-west2"
+      },
+      {
+        "path": "/docs",
+        "status": 200,
+        "ms": 252.6329999999998,
+        "requestId": "ea5dcd3c-2d88-4d6a-b13c-5d7ebb092245",
+        "upstreamZone": "railway/us-west2"
+      },
+      {
+        "path": "/api/v1/openapi.json",
+        "status": 200,
+        "ms": 664.4018999999998,
+        "requestId": "1944f544-bf8b-410e-a4f6-a9520730415f",
+        "upstreamZone": "railway/us-west2",
+        "sha256": "68a47cb4d43a0ea185ce3cd7c28928011c705bc6aa101f2f92a6261ec5cda694"
+      },
+      {
+        "path": "/api/v1/auth/me",
+        "status": 401,
+        "ms": 241.89280000000008,
+        "requestId": "a7b347b9-4b45-43b8-82e7-249e662ce65f",
+        "upstreamZone": "railway/us-west2"
+      },
+      {
+        "path": "/internal/metrics",
+        "status": 404,
+        "ms": 219.1509000000001,
+        "requestId": "6be94a78-2f48-4799-b094-cb451c5e4a62",
+        "upstreamZone": "railway/us-west2"
+      }
+    ],
+    "passed": true
+  },
+  "smoke": {
+    "startedAt": "2026-10-17T19:17:56.878Z",
+    "serving": {
+      "at": "2026-10-17T19:17:52.609Z",
+      "target": {
+        "project": "1c56721d-021a-442c-9e01-bb91abe73adb",
+        "environment": "08a2899c-b0d6-4200-a505-604965a4b3fc",
+        "service": "0f70d648-8c59-48bd-84f3-29a86d2e2d38"
+      },
+      "deploymentId": "86d2addb-b0dd-4e1f-a3cd-4ed2717eb075",
+      "commit": "cc2999acdd24dc87e713806328022b160585c599",
+      "imageDigest": "sha256:d201a414b903413b28724591c52f2ab3a3cc0492818dd42d58ed2af370d55892",
+      "configurationDigest": "5acc9cf1a513b88a88e2cf6b07c31eaf2983dbf0753a592235e3a11a29f15f4f",
+      "serviceConfigurationUnchanged": true,
+      "previous": {
+        "deploymentStopped": true,
+        "id": "e12f82d4-c247-41ac-9b46-7417c260254a",
+        "status": "REMOVED"
+      },
+      "trialRuntimesStopped": true,
+      "deploy": {
+        "cronSchedule": null,
+        "drainingSeconds": null,
+        "healthcheckPath": "/health/ready",
+        "healthcheckTimeout": 120,
+        "ipv6EgressEnabled": true,
+        "limitOverride": null,
+        "multiRegionConfig": {
+          "sfo": {
+            "numReplicas": 1
+          }
+        },
+        "numReplicas": 1,
+        "overlapSeconds": null,
+        "preDeployCommand": [
+          "npm run db:migrate:deploy"
+        ],
+        "preDeployTimeoutSeconds": null,
+        "region": null,
+        "registryCredentials": null,
+        "requiredMountPath": null,
+        "restartPolicyMaxRetries": 3,
+        "restartPolicyType": "ON_FAILURE",
+        "runtime": "V2",
+        "sleepApplication": false,
+        "startCommand": "node --enable-source-maps --import ./dist/instrumentation.js dist/server.js",
+        "useLegacyStacker": false
+      }
+    },
+    "scope": "Post-merge deployment smoke: public health/docs/OpenAPI/errors and existing synthetic Couple/Manager read routes. Only normal session creation/revocation, no business/provider writes requested; Analytics may refresh derived projections.",
+    "samples": [
+      {
+        "at": "2026-10-17T19:17:56.882Z",
+        "role": "public",
+        "label": "live",
+        "method": "GET",
+        "requestId": "b07c0ad3-5911-4e86-868b-f7c71370757d",
+        "status": 200,
+        "ms": 1020.9797000000001,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 77,
+        "responseSha256": "602ccbf3c2eb6ac8232bba424ac14a4e83c239e09989ea059139e06ce302859f"
+      },
+      {
+        "at": "2026-10-17T19:17:57.905Z",
+        "role": "public",
+        "label": "ready",
+        "method": "GET",
+        "requestId": "81818a98-9812-4fda-872c-116160a0ba9b",
+        "status": 200,
+        "ms": 1652.1518,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 78,
+        "responseSha256": "906dcfe96d01dff5cda5f992ff59763e1aa203868db7c66f311401b5c66e25c9"
+      },
+      {
+        "at": "2026-10-17T19:17:59.558Z",
+        "role": "public",
+        "label": "swagger",
+        "method": "GET",
+        "requestId": "12856cc1-f828-43d7-99b0-ff2b42395c31",
+        "status": 200,
+        "ms": 306.2093,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 1147,
+        "responseSha256": "7a533f4ceb3b516665813a0874447b757b245c00fd211ea0a8ab614d30af65b6"
+      },
+      {
+        "at": "2026-10-17T19:17:59.865Z",
+        "role": "public",
+        "label": "openapi",
+        "method": "GET",
+        "requestId": "4ad990b5-f2dd-4b47-a497-e6c6c2aaa522",
+        "status": 200,
+        "ms": 1341.8978000000002,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 1742554,
+        "responseSha256": "68a47cb4d43a0ea185ce3cd7c28928011c705bc6aa101f2f92a6261ec5cda694"
+      },
+      {
+        "at": "2026-10-17T19:18:01.219Z",
+        "role": "public",
+        "label": "anonymous-identity",
+        "method": "GET",
+        "requestId": "a12e331c-1596-4621-ba49-556e85d9e577",
+        "status": 401,
+        "ms": 374.3896999999997,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 135,
+        "responseSha256": "cd0fc84ed63f8e8a6cd255dc4a5106fdc67082831a6758cc806827bc479d7438"
+      },
+      {
+        "at": "2026-10-17T19:18:01.594Z",
+        "role": "public",
+        "label": "metrics-disabled",
+        "method": "GET",
+        "requestId": "655c2bd9-06d6-49fd-93da-d139166223c3",
+        "status": 404,
+        "ms": 403.1188000000002,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 131,
+        "responseSha256": "a045556b69f2b55988e5ee8aa9eeb171fbe662fedb51f9d1835d541dc3b82cb3"
+      },
+      {
+        "at": "2026-10-17T19:18:01.998Z",
+        "role": "couple",
+        "label": "login",
+        "method": "POST",
+        "requestId": "b3275df6-eec9-4b5c-9294-0a92301832b6",
+        "status": 201,
+        "ms": 3247.0441,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 404,
+        "responseSha256": "1e826303bab5590ce57ef2fd7af57de4ee0e06370d68f3f1fdef2e462d47a06a",
+        "cookieProtection": {
+          "count": 1,
+          "secure": true,
+          "httpOnly": true,
+          "sameSiteLax": true
+        }
+      },
+      {
+        "at": "2026-10-17T19:18:05.246Z",
+        "role": "manager",
+        "label": "login",
+        "method": "POST",
+        "requestId": "c8310eef-eeab-42a4-b094-471a9a625c21",
+        "status": 201,
+        "ms": 2154.9920999999995,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 406,
+        "responseSha256": "f30a57d2606dd4bccb798e5caaca7db4f1282aea850cab5346b2e180526645f3",
+        "cookieProtection": {
+          "count": 1,
+          "secure": true,
+          "httpOnly": true,
+          "sameSiteLax": true
+        }
+      },
+      {
+        "at": "2026-10-17T19:18:07.402Z",
+        "role": "couple",
+        "label": "identity",
+        "method": "GET",
+        "requestId": "22243cbc-5b3d-4b86-b40e-af50c7b04aab",
+        "status": 200,
+        "ms": 646.036399999999,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 171,
+        "responseSha256": "34d206b9950559f47feec8e59836e1da4dc1dcb022dd3ca78d5e09c999cd9b0b"
+      },
+      {
+        "at": "2026-10-17T19:18:08.049Z",
+        "role": "manager",
+        "label": "manager-identity",
+        "method": "GET",
+        "requestId": "f43b79ce-1f27-42f3-af02-64795c453208",
+        "status": 200,
+        "ms": 624.6240999999991,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 173,
+        "responseSha256": "b4476601b300184df348da604a40d7c3654f7b8bb26f9b893cd03c8ce3fbf1c3"
+      },
+      {
+        "at": "2026-10-17T19:18:08.674Z",
+        "role": "couple",
+        "label": "overview",
+        "method": "GET",
+        "requestId": "f13a1ddc-b381-4b28-b143-41577a35bcfc",
+        "status": 200,
+        "ms": 2145.2168999999994,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 666,
+        "responseSha256": "4e34938675fb1914600d05d57e7db5924e942ea77a700ecd5e5dc7e62adaf0a4"
+      },
+      {
+        "at": "2026-10-17T19:18:10.820Z",
+        "role": "couple",
+        "label": "guest-plan",
+        "method": "GET",
+        "requestId": "cf250875-d51e-4d62-b389-12a2c055a7cf",
+        "status": 200,
+        "ms": 3775.2536999999975,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 183,
+        "responseSha256": "804bc8e181fcdc534dd568cdcd052c8906fe37fd8a3e09c8dd4e9cf7ca59eda6"
+      },
+      {
+        "at": "2026-10-17T19:18:14.596Z",
+        "role": "couple",
+        "label": "seating-current",
+        "method": "GET",
+        "requestId": "53248730-4765-4518-a11f-170691412d32",
+        "status": 200,
+        "ms": 5481.364699999998,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 1692,
+        "responseSha256": "d8fd5b69de9c0db896cc35234ee2261bc396555151cffc3db8c004071cffdf53"
+      },
+      {
+        "at": "2026-10-17T19:18:20.078Z",
+        "role": "couple",
+        "label": "billing",
+        "method": "GET",
+        "requestId": "1b03f2fa-5f1e-467c-baa9-eb7bb6ec4e62",
+        "status": 200,
+        "ms": 3524.7523999999976,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 836,
+        "responseSha256": "8cd35d8afbbd014fb3ba388b848fe8cf4ca6512f4777233a9231c801e7a54237"
+      },
+      {
+        "at": "2026-10-17T19:18:23.604Z",
+        "role": "manager",
+        "label": "templates",
+        "method": "GET",
+        "requestId": "6d2653fd-2917-4e0b-b546-039f08a31c2f",
+        "status": 200,
+        "ms": 1102.5502000000015,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 2271,
+        "responseSha256": "96856e14116291c25d97183fb5632b11306c995f2f80d95e8082d83bd8ee203d",
+        "itemCount": 4
+      },
+      {
+        "at": "2026-10-17T19:18:24.707Z",
+        "role": "manager",
+        "label": "analytics",
+        "method": "GET",
+        "requestId": "3d8616cd-9023-4ce5-a14a-9426500ebc65",
+        "status": 200,
+        "ms": 1555.0575000000026,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 1672,
+        "responseSha256": "5d1a29705da48b0567e23d413241b88e17a024891446391c989b1b9048cb95ef"
+      },
+      {
+        "at": "2026-10-17T19:18:26.264Z",
+        "role": "couple",
+        "label": "logout",
+        "method": "DELETE",
+        "requestId": "046c4912-a708-46b7-a59d-c3e3830cd738",
+        "status": 204,
+        "ms": 1373.991399999999,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 0,
+        "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "at": "2026-10-17T19:18:27.638Z",
+        "role": "couple",
+        "label": "revoked-identity",
+        "method": "GET",
+        "requestId": "0ac92fb5-0271-480c-8cfc-a96f3f8978e7",
+        "status": 401,
+        "ms": 362.7564999999995,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 135,
+        "responseSha256": "42225c369e45ddc3cf97fa239bae1cb3c4001d90fc86a67467728c984c2faf6c"
+      },
+      {
+        "at": "2026-10-17T19:18:28.002Z",
+        "role": "manager",
+        "label": "logout",
+        "method": "DELETE",
+        "requestId": "bac9b6ce-fafd-4910-8d09-dde4195e78cc",
+        "status": 204,
+        "ms": 1355.6147999999994,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 0,
+        "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "at": "2026-10-17T19:18:29.358Z",
+        "role": "manager",
+        "label": "revoked-identity",
+        "method": "GET",
+        "requestId": "e8a06719-896f-49f9-920d-78aa633d0986",
+        "status": 401,
+        "ms": 391.6524000000027,
+        "upstreamZone": "railway/us-west2",
+        "bytes": 135,
+        "responseSha256": "e9c01d37c3a05ffd49d3d14192079b3a158fbf178f586a0fe2b056fce2071e7e"
+      }
+    ],
+    "cleanup": [
+      {
+        "role": "couple",
+        "revoked": true,
+        "reuseDenied": true
+      },
+      {
+        "role": "manager",
+        "revoked": true,
+        "reuseDenied": true
+      }
+    ],
+    "finishedAt": "2026-10-17T19:18:29.751Z",
+    "passed": true
+  },
+  "logs": {
+    "at": "2026-10-17T19:18:38.954Z",
+    "deploymentId": "86d2addb-b0dd-4e1f-a3cd-4ed2717eb075",
+    "commit": "cc2999acdd24dc87e713806328022b160585c599",
+    "attempt": 0,
+    "startup": [
+      {
+        "at": "2026-10-17T19:16:44.426Z",
+        "revision": "cc2999acdd24dc87e713806328022b160585c599",
+        "workers": {
+          "configuration": "configured",
+          "implementation": "implemented",
+          "liveVerification": "pending",
+          "mode": "durable-notifications-60s",
+          "offlineVerification": "not-evaluated"
+        },
+        "seatingReconciliation": {
+          "configuration": "configured",
+          "implementation": "implemented",
+          "liveVerification": "pending",
+          "mode": "seating-reconciliation-300s",
+          "offlineVerification": "not-evaluated"
+        },
+        "metrics": {
+          "configuration": "unconfigured",
+          "implementation": "implemented",
+          "liveVerification": "optional-disabled",
+          "mode": "disabled",
+          "offlineVerification": "not-evaluated"
+        }
+      }
+    ],
+    "requests": [
+      {
+        "label": "live",
+        "requestId": "b07c0ad3-5911-4e86-868b-f7c71370757d",
+        "status": 200,
+        "matched": true,
+        "statusClass": "2xx",
+        "durationMs": 2.679,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "ready",
+        "requestId": "81818a98-9812-4fda-872c-116160a0ba9b",
+        "status": 200,
+        "matched": true,
+        "statusClass": "2xx",
+        "durationMs": 1118.14,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "swagger",
+        "requestId": "12856cc1-f828-43d7-99b0-ff2b42395c31",
+        "status": 200,
+        "matched": true,
+        "statusClass": "2xx",
+        "durationMs": 1.356,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "openapi",
+        "requestId": "4ad990b5-f2dd-4b47-a497-e6c6c2aaa522",
+        "status": 200,
+        "matched": true,
+        "statusClass": "2xx",
+        "durationMs": 22.763,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "anonymous-identity",
+        "requestId": "a12e331c-1596-4621-ba49-556e85d9e577",
+        "status": 401,
+        "matched": true,
+        "statusClass": "4xx",
+        "durationMs": 2.756,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "metrics-disabled",
+        "requestId": "655c2bd9-06d6-49fd-93da-d139166223c3",
+        "status": 404,
+        "matched": true,
+        "statusClass": "4xx",
+        "durationMs": 1.43,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "login",
+        "requestId": "b3275df6-eec9-4b5c-9294-0a92301832b6",
+        "status": 201,
+        "matched": true,
+        "statusClass": "2xx",
+        "durationMs": 2864.668,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "login",
+        "requestId": "c8310eef-eeab-42a4-b094-471a9a625c21",
+        "status": 201,
+        "matched": true,
+        "statusClass": "2xx",
+        "durationMs": 1775.974,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "identity",
+        "requestId": "22243cbc-5b3d-4b86-b40e-af50c7b04aab",
+        "status": 200,
+        "matched": true,
+        "statusClass": "2xx",
+        "durationMs": 151.338,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "manager-identity",
+        "requestId": "f43b79ce-1f27-42f3-af02-64795c453208",
+        "status": 200,
+        "matched": true,
+        "statusClass": "2xx",
+        "durationMs": 141.106,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "overview",
+        "requestId": "f13a1ddc-b381-4b28-b143-41577a35bcfc",
+        "status": 200,
+        "matched": true,
+        "statusClass": "2xx",
+        "durationMs": 1706.53,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "guest-plan",
+        "requestId": "cf250875-d51e-4d62-b389-12a2c055a7cf",
+        "status": 200,
+        "matched": true,
+        "statusClass": "2xx",
+        "durationMs": 3541.545,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "seating-current",
+        "requestId": "53248730-4765-4518-a11f-170691412d32",
+        "status": 200,
+        "matched": true,
+        "statusClass": "2xx",
+        "durationMs": 5214.912,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "billing",
+        "requestId": "1b03f2fa-5f1e-467c-baa9-eb7bb6ec4e62",
+        "status": 200,
+        "matched": true,
+        "statusClass": "2xx",
+        "durationMs": 3128.505,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "templates",
+        "requestId": "6d2653fd-2917-4e0b-b546-039f08a31c2f",
+        "status": 200,
+        "matched": true,
+        "statusClass": "2xx",
+        "durationMs": 864.151,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "analytics",
+        "requestId": "3d8616cd-9023-4ce5-a14a-9426500ebc65",
+        "status": 200,
+        "matched": true,
+        "statusClass": "2xx",
+        "durationMs": 1319.443,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "logout",
+        "requestId": "046c4912-a708-46b7-a59d-c3e3830cd738",
+        "status": 204,
+        "matched": true,
+        "statusClass": "2xx",
+        "durationMs": 1126.083,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "revoked-identity",
+        "requestId": "0ac92fb5-0271-480c-8cfc-a96f3f8978e7",
+        "status": 401,
+        "matched": true,
+        "statusClass": "4xx",
+        "durationMs": 140.044,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "logout",
+        "requestId": "bac9b6ce-fafd-4910-8d09-dde4195e78cc",
+        "status": 204,
+        "matched": true,
+        "statusClass": "2xx",
+        "durationMs": 1114.511,
+        "diagnosticsPresent": false
+      },
+      {
+        "label": "revoked-identity",
+        "requestId": "e8a06719-896f-49f9-920d-78aa633d0986",
+        "status": 401,
+        "matched": true,
+        "statusClass": "4xx",
+        "durationMs": 140.39,
+        "diagnosticsPresent": false
+      }
+    ],
+    "matched": 20,
+    "expected": 20,
+    "warnings": [],
+    "passed": true
+  },
+  "retention": {
+    "before": {
+      "at": "2026-10-17T19:07:10.368Z",
+      "source": "Operator via existing IPv4 pooler for the same project/database; runtime uses direct IPv6 endpoint. Not container RTT.",
+      "readOnly": true,
+      "fixtureDigest": "25ee173570af404e85b19ee517c725c6bac48bba142a249eff562e816eb9c836",
+      "tables": {
+        "Booking": {
+          "count": 1,
+          "sha256": "fcd66b4970a6f40624586b0a7ede35cf48646d1bb4433db6501c40787beb5cc5"
+        },
+        "GuestWorkspace": {
+          "count": 1,
+          "sha256": "7574eab587cc4a1f95bd6aa9030ecb71cc0bfdd685f828ec55ec68b4ba2bdd32"
+        },
+        "GuestPlanRevision": {
+          "count": 1,
+          "sha256": "99e8fbc2882ad9ea0228dcce30a8671e2658b0c39d0a8e2dc712a7022c04b8a5"
+        },
+        "Guest": {
+          "count": 8,
+          "sha256": "413352d8d7e99847d4664090036717a9d462a8b23556cc2a6cb8debd41eff8b1"
+        },
+        "GuestGroup": {
+          "count": 4,
+          "sha256": "530586e374c380873d70fb1a0a473d89839232daf8237c1ea9d3626e8614ac39"
+        },
+        "GuestHistory": {
+          "count": 12,
+          "sha256": "9cdb00051add936d316b831b85952d81320c833e9f9f0e0465dda2e83906e76c"
+        },
+        "SeatingPlan": {
+          "count": 1,
+          "sha256": "3eca558868181709ba4a36e4d9b88f42956e7719be2f8973fcd4bb7597f50c82"
+        },
+        "SeatingPlanRevision": {
+          "count": 2,
+          "sha256": "da63d974d54e7da13f2b72784a8419f13f4b7c73259afbf527569e1e994dd14a"
+        },
+        "StaffConfiguration": {
+          "count": 1,
+          "sha256": "237babde8dd5eed45824018deaa492af040a4844d80041a6aba927dd62d74e03"
+        },
+        "StaffAssignment": {
+          "count": 1,
+          "sha256": "29e6126ff3b9efcf474a28d36622a189b3fc000b4090cd7875b3fc23089e9bf2"
+        },
+        "StaffHistory": {
+          "count": 3,
+          "sha256": "23151d1b849e5610f4245c3bfa73d8de4e6714a0d17b845af3821e9d6ae42968"
+        },
+        "StaffCheckInRecord": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "CommercialContractRevision": {
+          "count": 1,
+          "sha256": "192565c3d6c1d3a2ed90528e36f4351949a8e3a3c2ccfba5c2a1872985bf2ed6"
+        },
+        "FinalInvoiceRevision": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "BillingLedgerEntry": {
+          "count": 2,
+          "sha256": "034f3cd38391842ba9c40866c1e93db3bf15fbe87ce18d989d18f44db4bc6e03"
+        }
+      },
+      "migrations": {
+        "applied": 60,
+        "tracked": 60,
+        "sha256": "a215d732a5d292fe7d13d0c100ca86b92ead1f7e40a1c9531fcbcabdb5d88103",
+        "allChecksumsMatch": true
+      },
+      "probeConnectionScope": "All perf04_* application names, excluding this inventory backend",
+      "probeConnections": 0
+    },
+    "after": {
+      "at": "2026-10-17T19:18:38.256Z",
+      "source": "Operator via existing IPv4 pooler for the same project/database; runtime uses direct IPv6 endpoint. Not container RTT.",
+      "readOnly": true,
+      "fixtureDigest": "25ee173570af404e85b19ee517c725c6bac48bba142a249eff562e816eb9c836",
+      "tables": {
+        "Booking": {
+          "count": 1,
+          "sha256": "fcd66b4970a6f40624586b0a7ede35cf48646d1bb4433db6501c40787beb5cc5"
+        },
+        "GuestWorkspace": {
+          "count": 1,
+          "sha256": "7574eab587cc4a1f95bd6aa9030ecb71cc0bfdd685f828ec55ec68b4ba2bdd32"
+        },
+        "GuestPlanRevision": {
+          "count": 1,
+          "sha256": "99e8fbc2882ad9ea0228dcce30a8671e2658b0c39d0a8e2dc712a7022c04b8a5"
+        },
+        "Guest": {
+          "count": 8,
+          "sha256": "413352d8d7e99847d4664090036717a9d462a8b23556cc2a6cb8debd41eff8b1"
+        },
+        "GuestGroup": {
+          "count": 4,
+          "sha256": "530586e374c380873d70fb1a0a473d89839232daf8237c1ea9d3626e8614ac39"
+        },
+        "GuestHistory": {
+          "count": 12,
+          "sha256": "9cdb00051add936d316b831b85952d81320c833e9f9f0e0465dda2e83906e76c"
+        },
+        "SeatingPlan": {
+          "count": 1,
+          "sha256": "3eca558868181709ba4a36e4d9b88f42956e7719be2f8973fcd4bb7597f50c82"
+        },
+        "SeatingPlanRevision": {
+          "count": 2,
+          "sha256": "da63d974d54e7da13f2b72784a8419f13f4b7c73259afbf527569e1e994dd14a"
+        },
+        "StaffConfiguration": {
+          "count": 1,
+          "sha256": "237babde8dd5eed45824018deaa492af040a4844d80041a6aba927dd62d74e03"
+        },
+        "StaffAssignment": {
+          "count": 1,
+          "sha256": "29e6126ff3b9efcf474a28d36622a189b3fc000b4090cd7875b3fc23089e9bf2"
+        },
+        "StaffHistory": {
+          "count": 3,
+          "sha256": "23151d1b849e5610f4245c3bfa73d8de4e6714a0d17b845af3821e9d6ae42968"
+        },
+        "StaffCheckInRecord": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "CommercialContractRevision": {
+          "count": 1,
+          "sha256": "192565c3d6c1d3a2ed90528e36f4351949a8e3a3c2ccfba5c2a1872985bf2ed6"
+        },
+        "FinalInvoiceRevision": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "BillingLedgerEntry": {
+          "count": 2,
+          "sha256": "034f3cd38391842ba9c40866c1e93db3bf15fbe87ce18d989d18f44db4bc6e03"
+        }
+      },
+      "migrations": {
+        "applied": 60,
+        "tracked": 60,
+        "sha256": "a215d732a5d292fe7d13d0c100ca86b92ead1f7e40a1c9531fcbcabdb5d88103",
+        "allChecksumsMatch": true
+      },
+      "probeConnectionScope": "All perf04_* application names, excluding this inventory backend",
+      "probeConnections": 0
+    },
+    "selectedBusinessDigestsUnchanged": true,
+    "migrationChecksumsUnchanged": true
+  },
+  "sourcePolicy": {
+    "at": "2026-10-17T19:08:20.007Z",
+    "repo": "WDP301-wedding/wedding-be",
+    "branch": "main",
+    "waitForCI": true,
+    "region": {
+      "sfo": {
+        "numReplicas": 1
+      }
+    }
+  },
+  "historicalEvidencePreserved": [
+    {
+      "path": "tasks/evidence/perf04-region-comparison-2026-10-17.json",
+      "sha256": "d5665c55bed3fa53951ecf550e9b13d2b7c97e6957ccad96f01eeac38c47629d",
+      "operatorHashesVerified": 67
+    },
+    {
+      "path": "tasks/evidence/perf04-region-rerun-2026-10-17.json",
+      "sha256": "343a7e57f282afcdbf232012a4d90b279a6446e876b348328bb9d90250d4805d",
+      "operatorHashesVerified": 177
+    }
+  ],
+  "rollback": {
+    "previousDeploymentId": "e12f82d4-c247-41ac-9b46-7417c260254a",
+    "previousImageDigest": "sha256:a029e36681f1b24950eabe022bd2a0cdc9c6b8d866658fd8a5faf516d6518460",
+    "used": false
+  },
+  "configuration": {
+    "variablesUnchanged": true,
+    "serviceSettingsUnchanged": true,
+    "region": "US West / SFO; upstream railway/us-west2",
+    "replicas": 1,
+    "seatingReconciler": "Enabled by default; env variable remains absent, runtime manifest configured",
+    "notifications": "Existing worker enabled",
+    "diagnostics": false,
+    "safeReadDeadline": false,
+    "startupProbe": false,
+    "poolSettingsUnchanged": true
+  },
+  "limits": [
+    "Twenty smoke operations and initial startup prove only the checked deployment behavior, not concurrency capacity or a latency SLA.",
+    "Historical Seating acquisition holder and enabled-worker capacity remain PERF-13; broad production readiness remains NO_GO.",
+    "No paid generation, payment checkout/callback, provider-delivery test, fixture creation/deletion or Storage mutation was requested. Existing workers and Analytics derived refresh remain ordinary runtime behavior.",
+    "Selected fifteen-table fixture digests are not a whole-database freeze; session writes are expected and the two smoke sessions were revoked.",
+    "PERF-04 experimental evidence retains its original deployments and owner-approved final image exception; this deployment receipt does not rewrite those measurements."
+  ],
+  "operatorArtifacts": [
+    {
+      "path": "output/perf04-merge-deploy-20261018/baseline-http.json",
+      "bytes": 1398,
+      "sha256": "26bc01ae12e125c0404e5c575157d8bd6f4a2f57ad1f3130b92a285db40f2b47"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/baseline-http.mjs",
+      "bytes": 1394,
+      "sha256": "74bb55ee6e775c8fc3e4597b8a7df9b0c32bd8f119bcd1efb5bfff169471dc4c"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/ci-counts.json",
+      "bytes": 859,
+      "sha256": "0b05058509a589fcbf804cfee566837cccb5ee997c4eca2548177e00221ed868"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/ci-job-117479056608.log",
+      "bytes": 1488240,
+      "sha256": "a76207f5926029bb519a9eb19cd4700b57dbe7c7eeb719d40e4ad05594649d3a"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/ci-job-117479056791.log",
+      "bytes": 80105,
+      "sha256": "56d884ed496333b1675812102187d255b479673e95d9f8696ef9d880709a496f"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/ci-logs.mjs",
+      "bytes": 887,
+      "sha256": "4fa634c57b07f744e08e8b6d1e05f201cab8fd385c9ac5c02c0d432c3c60d40a"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/ci.json",
+      "bytes": 646,
+      "sha256": "17141223fa9254f2297ca688166c0aaac3e94ec4c6d7311ebb43124a3bfa76c6"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/ci.mjs",
+      "bytes": 910,
+      "sha256": "bdb136ea90c328f218fabd546c1f5ef57f9bd7d3a53403cfdf159cffdb8e9d74"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/deployment.json",
+      "bytes": 738,
+      "sha256": "eda9b53c0feddf18caed5650e5cb0272d92a3a650896dc1d85008907c495eb5d"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/deployment.mjs",
+      "bytes": 762,
+      "sha256": "a4020463c31084ac5e5e5cdd49b183f3d2eecf31c2ddeaa45afc36c56b046fbf"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/github.mjs",
+      "bytes": 66,
+      "sha256": "0dd52032b9184debac281c9143d7442e9317ac045a810c12663aae4055f26c12"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/inventory-after.json",
+      "bytes": 2582,
+      "sha256": "a58be13d3bb4c388796df954e971b798590e7848d4712c802d55a0582091f799"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/inventory-before.json",
+      "bytes": 2582,
+      "sha256": "332d51654e3b65dca21fee1ccbe81abe6639e09f39cfb86202cbc2eaacc371ae"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/inventory.mjs",
+      "bytes": 2735,
+      "sha256": "89709caf74cf77b9da91fbc2d2e52f81b3558ddfe2c41ff35aa3ee1e4dc93934"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/logs.json",
+      "bytes": 5830,
+      "sha256": "a57a30be1fb6b9632bdec2be9d6d84b9018e1703ee37e5174226e9c3eb03b3c6"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/logs.mjs",
+      "bytes": 2642,
+      "sha256": "8e0e77bee393d5d885e43cc09f6a09fbc1c9b72faa10c5a1fc631201165e5afb"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/merge.json",
+      "bytes": 283,
+      "sha256": "0baa084664489a79de1fd6053d49290542acd9df0bef112019a2aec446e693bc"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/merge.mjs",
+      "bytes": 1790,
+      "sha256": "633127ba8ffed452ffe7f86301f285c669f5f03fa2222eb7cab348d2837b6eff"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/premerge.json",
+      "bytes": 4390,
+      "sha256": "979e9be2865f6fb3b115bcf54274f5751c2f0d3d05b0434a4cc0f133c75064a3"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/premerge.mjs",
+      "bytes": 5749,
+      "sha256": "10eb3e4b80c37f04fa669cad223e9824fbabb7f4280200c02c408afd15ec334b"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/receipt.mjs",
+      "bytes": 7832,
+      "sha256": "003871d2c9f37ce3c66db61ea4b62c1e11e965668af3a738854cd58c3d714bd4"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/serving.json",
+      "bytes": 1501,
+      "sha256": "b27a91c9e4dc1e172993f23a4f81342acf6b8228f9cbf703643b076f3aee71b9"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/serving.mjs",
+      "bytes": 2654,
+      "sha256": "8d0ed930ec6493ec2c4fccfc16f407edba0dea9c7bbf2cca0a1d5d50f4bdfddd"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/smoke.json",
+      "bytes": 10320,
+      "sha256": "6d2fbdd7a51353a3f3376bf075c8e9d29fd976dd4cddd4da29195cb03cf1d823"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/smoke.mjs",
+      "bytes": 4863,
+      "sha256": "ea7166ea2fa8ceb88de2745c57a2a6f5a0d85bffac230887ef249bd70dc28733"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/source-state.json",
+      "bytes": 179,
+      "sha256": "dd806d6fc50c30a4e59ffaab974ce8e664c4a393d72305f3a1a0b5844e1b4573"
+    },
+    {
+      "path": "output/perf04-merge-deploy-20261018/source-state.mjs",
+      "bytes": 695,
+      "sha256": "89cdadbf1cfeaad5fce0440a2e41d6c971d9f142833d711ed9ca9b65a07fe915"
+    }
+  ]
+}

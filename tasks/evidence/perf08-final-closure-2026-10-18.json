@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 1,
+  "task": "PERF-08",
+  "at": "2026-10-18T07:50:48.997Z",
+  "timezone": "Asia/Saigon",
+  "status": "COMPLETE_ON_MAIN_AFTER_OWNER_AUTHORIZED_ROLLOUT",
+  "runtimePr": "https://github.com/WDP301-wedding/wedding-be/pull/68",
+  "documentationPr": "https://github.com/WDP301-wedding/wedding-be/pull/69",
+  "documentationMerge": {
+    "at": "2026-10-18T07:50:32.566Z",
+    "sha": "45f72aeadf205ed81cd991b59259f4ca3942a831",
+    "merged": true,
+    "message": "Pull Request successfully merged",
+    "head": "e97d17b06df057f000dc267905be0285fe7941f8",
+    "base": "38c6433ce55a5733eff74b297a3f9d1375d154f5",
+    "pr": "https://github.com/WDP301-wedding/wedding-be/pull/69",
+    "ci": {
+      "id": 39108685610,
+      "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39108685610",
+      "head": "e97d17b06df057f000dc267905be0285fe7941f8",
+      "attempt": 1,
+      "conclusion": "success",
+      "jobs": [
+        {
+          "name": "PostgreSQL migration and integration gates",
+          "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39108685610/job/117619944136",
+          "conclusion": "success",
+          "sha256": "8dc6052723503da5f8c9591e563e68cde749d9677bfe25c7838434fb503fbfa1",
+          "summaries": [
+            "2026-10-18T07:43:11.2242641Z found 0 vulnerabilities",
+            "2026-10-18T07:45:53.0906605Z       Tests  586 passed (586)",
+            "2026-10-18T07:49:19.1524311Z       Tests  2106 passed (2106)",
+            "2026-10-18T07:49:19.1746130Z All files          |   96.66 |    93.52 |   98.45 |   97.57 |                   "
+          ]
+        },
+        {
+          "name": "Static, test, build, and audit gates",
+          "url": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39108685610/job/117619944207",
+          "conclusion": "success",
+          "sha256": "12f4357a003307ab39788136ee8e770f4eb1cbef11039d16807d0821c423ecf5",
+          "summaries": [
+            "2026-10-18T07:42:52.4162116Z found 0 vulnerabilities",
+            "2026-10-18T07:43:53.0791975Z       Tests  1461 passed (1461)",
+            "2026-10-18T07:43:56.8514403Z       Tests  59 passed (59)"
+          ]
+        }
+      ]
+    },
+    "authorization": {
+      "at": "2026-10-18T07:28:20.688Z",
+      "humanInstruction": "Cho phép merge, triển khai, kiểm tra và đóng PERF-08",
+      "scope": "Merge reviewed PR68 head 81369e6; automatic Railway demo rollout; GET and two-session revocation checks; maximum one additional read-only connection; update and merge evidence/checklist after passing CI. No migration, pool, region, provider setting, notification creation, email/push send or mark-read."
+    }
+  },
+  "canonicalMain": "45f72aeadf205ed81cd991b59259f4ca3942a831",
+  "canonicalCheckbox": true,
+  "canonicalPlanUpdated": true,
+  "acceptedRuntime": {
+    "deploymentId": "dcfff39c-1c18-4a38-98b7-15ab75e2a438",
+    "source": "38c6433ce55a5733eff74b297a3f9d1375d154f5",
+    "image": "sha256:21c946494ca273f22e82a9d948c1db4270789d718b555854a2c74ea8e2599683",
+    "configurationDigest": "5bb1f835c3514bca7e8db5d8c01d34fb92be34b82742eed21ad2dc30a41aceb5",
+    "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+    "controls": {
+      "DB_POOL_MAX": "1",
+      "DB_POOL_MAX_VENUE_CATALOG": "3",
+      "DB_POOL_MAX_ANALYTICS": "2",
+      "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000",
+      "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+      "DB_CONNECTION_RESERVE": "36",
+      "DB_MAX_CONNECTIONS": "60",
+      "DB_DIAGNOSTICS_ENABLED": "false",
+      "DB_SAFE_READ_DEADLINE_ENABLED": "false"
+    }
+  },
+  "currentRuntime": {
+    "deploymentId": "dcfff39c-1c18-4a38-98b7-15ab75e2a438",
+    "source": "38c6433ce55a5733eff74b297a3f9d1375d154f5",
+    "image": "sha256:21c946494ca273f22e82a9d948c1db4270789d718b555854a2c74ea8e2599683",
+    "configurationDigest": "5bb1f835c3514bca7e8db5d8c01d34fb92be34b82742eed21ad2dc30a41aceb5",
+    "serviceConfigurationDigest": "435f47eab2e082d8518bfd24934b5870de83afc34528e5a3fa96b7f4b8e8a2a2",
+    "controls": {
+      "DB_POOL_MAX": "1",
+      "DB_POOL_MAX_VENUE_CATALOG": "3",
+      "DB_POOL_MAX_ANALYTICS": "2",
+      "DB_POOL_ACQUIRE_TIMEOUT_MS": "10000",
+      "DB_POOL_IDLE_TIMEOUT_MS": "60000",
+      "DB_CONNECTION_RESERVE": "36",
+      "DB_MAX_CONNECTIONS": "60",
+      "DB_DIAGNOSTICS_ENABLED": "false",
+      "DB_SAFE_READ_DEADLINE_ENABLED": "false"
+    }
+  },
+  "productionContinuity": [
+    {
+      "path": "src",
+      "accepted": "720fde7196cc57c18068a160ac0d1b0abe65e278",
+      "closed": "720fde7196cc57c18068a160ac0d1b0abe65e278",
+      "equal": true
+    },
+    {
+      "path": "prisma",
+      "accepted": "a6a0f1b7a141117f9370ea5f922c974375b81833",
+      "closed": "a6a0f1b7a141117f9370ea5f922c974375b81833",
+      "equal": true
+    },
+    {
+      "path": "openapi",
+      "accepted": "160c3bb09a500367c7fa43f050301b444ce83e04",
+      "closed": "160c3bb09a500367c7fa43f050301b444ce83e04",
+      "equal": true
+    },
+    {
+      "path": "package.json",
+      "accepted": "a165f63c0e251eee65d56fc31684b4827765e13e",
+      "closed": "a165f63c0e251eee65d56fc31684b4827765e13e",
+      "equal": true
+    },
+    {
+      "path": "package-lock.json",
+      "accepted": "661f3c1edaadcaeaca5612c2f2e2f06450cf4fe7",
+      "closed": "661f3c1edaadcaeaca5612c2f2e2f06450cf4fe7",
+      "equal": true
+    },
+    {
+      "path": ".node-version",
+      "accepted": "df6ae3370f9f89272d88629c442cf554d6c1f9fb",
+      "closed": "df6ae3370f9f89272d88629c442cf554d6c1f9fb",
+      "equal": true
+    },
+    {
+      "path": "tsconfig.build.json",
+      "accepted": "588c2458d87d500adea3b91de433b15a5cd29127",
+      "closed": "588c2458d87d500adea3b91de433b15a5cd29127",
+      "equal": true
+    },
+    {
+      "path": "Dockerfile",
+      "accepted": "aa33d79c03ffc349380167295db50b3ee8002047",
+      "closed": "aa33d79c03ffc349380167295db50b3ee8002047",
+      "equal": true
+    },
+    {
+      "path": "railway.json",
+      "accepted": "75164716ec20a78fc6ed72ac53cb9927866a0b82",
+      "closed": "75164716ec20a78fc6ed72ac53cb9927866a0b82",
+      "equal": true
+    },
+    {
+      "path": ".railway",
+      "accepted": "d662f9b7b914565b2f45b4a0abbbc00d6914ae60",
+      "closed": "d662f9b7b914565b2f45b4a0abbbc00d6914ae60",
+      "equal": true
+    },
+    {
+      "path": ".github/workflows",
+      "accepted": "5e937b867a64a4e182cea0369118ba69190ee25d",
+      "closed": "5e937b867a64a4e182cea0369118ba69190ee25d",
+      "equal": true
+    }
+  ],
+  "acceptanceReceipt": {
+    "path": "tasks/evidence/perf08-pr68-rollout-2026-10-18.json",
+    "sha256": "1f6291e3c8f775bb82c9218c5821c642cbb2647df6bcd73ba9218e5a9e544917"
+  },
+  "publicReads": 84,
+  "matchedOperations": 99,
+  "selectedTableDigestsUnchanged": 32,
+  "appliedMigrationChecksumsUnchanged": 61,
+  "sessionRevocation": true,
+  "noAdditionalVerificationReadsRequiredForDocumentationOnlyTree": true,
+  "documentationMergeCi": "Not used as a runtime gate: documentation PR exact-head CI passes before owner-authorized merge; accepted production tree is identical",
+  "productionReadiness": "NO_GO_UNCHANGED",
+  "perf13": "OPEN"
+}

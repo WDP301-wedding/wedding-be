@@ -741,3 +741,30 @@ SPEC-01–05 or replace the separate provider/runtime readiness gates.
   with bounded paid-call authorization and restart/unknown-effect evidence. Backend
   implementation tests do not establish live Gemini readiness or deployed latency.
   Frontend adoption and its browser E2E remain a separate team hand-off.
+
+## PostgreSQL best-practices review — 2026-10-21
+
+- [x] PG-01: Read-only Supabase index/advisor inspection and source query/pool review.
+  Distinguish public application tables from retained rehearsal schemas and avoid
+  mass index creation/removal based solely on advisor notices.
+- [x] PG-02: Rehearse additive unread/retention inbox indexes with before/after
+  EXPLAIN evidence, native regression tests and repository checks. See the
+  [implementation and release notes](../docs/postgres-best-practices-2026-10-21.md).
+  Candidate implementation, fresh/forward migration rehearsal, 1,465 unit tests,
+  71 contract tests and relevant native assertions pass locally. Two existing
+  integration files pass with a local 60-second cleanup-hook budget; the default
+  full-suite attempt retained timeout failures. The release CI follow-up below
+  closes this gate while preserving that earlier local checkpoint.
+- [x] PG-03: Owner-authorized migration rollout and real-workload verification.
+  Local synthetic improvements do not close deployed performance, RV/provider or
+  production-readiness gates.
+
+  2026-10-21 release follow-up: current-main exact-head CI passes static, integration,
+  full coverage and audit gates without timeout overrides. The owner-authorized
+  Prisma migration is applied to Supabase; both indexes are valid/ready, all 64
+  historical migration records and six selected data digests are preserved.
+  Actual hosted inbox page/unread SQL matches equivalent scoped Prisma reads;
+  this is database verification, not HTTP/session or provider E2E.
+  [Deployment receipt](evidence/postgres-release-2026-10-21.json). The earlier local
+  timeout checkpoint remains historical; no hosted HTTP speed or production GO
+  claim is established by index installation.
