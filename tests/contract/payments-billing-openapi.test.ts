@@ -11,6 +11,7 @@ describe('PB-C3 billing HTTP contract', () => {
       ['/bookings/{bookingId}/payments/deposit', 'post', 'createDepositPayment'],
       ['/bookings/{bookingId}/payments/balance', 'post', 'createBalancePayment'],
       ['/bookings/{bookingId}/payments/{attemptId}', 'get', 'getPaymentAttempt'],
+      ['/bookings/{bookingId}/payments/active', 'get', 'getActivePaymentAttempts'],
       ['/management/billing/payments/manual', 'post', 'recordManualPayment'],
       ['/management/billing/refunds', 'post', 'recordBillingRefund'],
       ['/management/billing/refund-approvals', 'post', 'approveBillingRefund'],
@@ -70,5 +71,15 @@ describe('PB-C3 billing HTTP contract', () => {
     });
     const data = (schema as { properties: { data: { required: string[] } } }).properties.data;
     expect(data.required).not.toContain('checkoutUrl');
+  });
+  it('publishes bounded private discovery without provider internals', () => {
+    const document = createOpenApiDocument();
+    expect(document.components?.schemas?.BillingActiveAttemptsResponse).toMatchObject({
+      additionalProperties: false,
+      properties: { data: { properties: { attempts: { type: 'array', maxItems: 2 } } } },
+    });
+    expect(JSON.stringify(document.components?.schemas?.BillingActiveAttemptsResponse)).not.toMatch(
+      /terminalEvidenceId|hashSecret|commandId|parameters/,
+    );
   });
 });

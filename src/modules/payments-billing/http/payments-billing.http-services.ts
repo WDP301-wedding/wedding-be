@@ -19,6 +19,7 @@ import {
   refundResponseSchema,
   refundApprovalResponseSchema,
   attemptResponseSchema,
+  activeAttemptsResponseSchema,
 } from './payments-billing.schemas.js';
 import type { PaymentAttemptState } from '../domain/billing-policy.js';
 
@@ -127,6 +128,7 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
       select: { consultationId: true, currentTimelineRevisionId: true, phase: true },
     });
     if (booking === null) throw new NotFoundError();
+    let accessLevel: 'RESTRICTED' | 'FULL' = 'FULL';
     if (!manager || ownOnly) {
       const grant = await prisma.consultationAccess.findUnique({
         where: {
@@ -139,6 +141,7 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
       });
       if (grant === null) throw new NotFoundError();
       if (minimum === 'FULL' && grant.level !== 'FULL') throw forbidden();
+      accessLevel = grant.level;
     }
     if (
       !manager &&
@@ -146,7 +149,7 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
       !account.roles.some(({ role }) => role === 'COUPLE')
     )
       throw forbidden();
-    return booking;
+    return { ...booking, accessLevel };
   }
   async function refundBooking(sourcePaymentId: string, actor: AuthenticatedActor) {
     // Check Manager authority before looking up a globally addressed private payment.
@@ -376,6 +379,67 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
       await authorize(bookingId, actor, 'FULL');
       return providers.views.read({ bookingId, ...query }, context(actor, requestId));
     },
+    async activeAttempts(bookingId: string, actor: AuthenticatedActor) {
+      const booking = await authorize(bookingId, actor, 'RESTRICTED');
+      const attempts = await prisma.billingPaymentAttempt.findMany({
+        where: {
+          bookingId,
+          OR: [
+            { state: { in: ['CREATED', 'PENDING', 'UNKNOWN'] } },
+            {
+              state: 'SUCCEEDED',
+              provider: 'VNPAY',
+              OR: [
+                { paymentEntries: { none: { kind: 'PAYMENT' } } },
+                {
+                  purpose: 'DEPOSIT',
+                  paymentEntries: { some: { kind: 'PAYMENT', depositApplication: { is: null } } },
+                },
+              ],
+            },
+          ],
+          ...(booking.accessLevel === 'FULL' ? {} : { purpose: 'DEPOSIT' as const }),
+        },
+        // Bound discovery to the two payment purposes, including interrupted application.
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        take: 2,
+        select: {
+          id: true,
+          state: true,
+          purpose: true,
+          amountVnd: true,
+          expiresAt: true,
+          invoiceRevisionId: true,
+          invoiceDigest: true,
+          sourceBillingRevision: true,
+        },
+      });
+      // A grant revoked/downgraded during the read cannot disclose balance data.
+      await authorize(
+        bookingId,
+        actor,
+        attempts.some((attempt) => attempt.purpose === 'BALANCE') ? 'FULL' : 'RESTRICTED',
+      );
+      return activeAttemptsResponseSchema.parse({
+        data: {
+          attempts: attempts.map((attempt) => ({
+            paymentAttemptId: attempt.id,
+            status: attempt.state,
+            purpose: attempt.purpose,
+            amountVnd: Number(attempt.amountVnd),
+            expiresAt: attempt.expiresAt.toISOString(),
+            applicationStatus: attempt.state === 'SUCCEEDED' ? 'PENDING' : null,
+            ...(attempt.invoiceRevisionId === null
+              ? {}
+              : {
+                  invoiceRevisionId: attempt.invoiceRevisionId,
+                  invoiceDigest: attempt.invoiceDigest,
+                  sourceBillingRevision: attempt.sourceBillingRevision,
+                }),
+          })),
+        },
+      });
+    },
     async attempt(
       bookingId: string,
       attemptId: string,
@@ -411,6 +475,20 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
                 : 'PENDING';
           } else {
             applicationStatus = 'SUCCEEDED';
+          }
+          if (
+            applicationStatus === 'PENDING' &&
+            attempt.provider === 'VNPAY' &&
+            providers.vnpay !== null
+          ) {
+            // A verified payment can outlive an interrupted ledger/Booking update.
+            // Reconciliation applies its retained proof idempotently; it never pays again.
+            const result = await providers.vnpay.reconcile(bookingId, attemptId, {
+              ...ctx,
+              actorAccountId: null,
+              authority: 'SYSTEM',
+            });
+            applicationStatus = result.applicationStatus;
           }
         }
       } else if (attempt.provider === 'VNPAY' && providers.vnpay !== null) {

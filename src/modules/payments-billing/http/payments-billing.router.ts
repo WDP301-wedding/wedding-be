@@ -92,6 +92,20 @@ export function createPaymentsBillingRouter(
     );
   }
   router.get(
+    '/bookings/:bookingId/payments/active',
+    authenticate,
+    validateRequest({ params: bookingParamsSchema }),
+    handle(async (_request, response) => {
+      const { params } = validatedRequest(response, { params: bookingParamsSchema });
+      response.json(
+        await services.activeAttempts(
+          params.bookingId,
+          response.locals.actor as AuthenticatedActor,
+        ),
+      );
+    }),
+  );
+  router.get(
     '/bookings/:bookingId/payments/:attemptId',
     authenticate,
     validateRequest({ params: attemptParamsSchema }),

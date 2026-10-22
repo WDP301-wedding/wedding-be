@@ -11,6 +11,7 @@ import {
   refundResponseSchema,
   refundApprovalResponseSchema,
   attemptResponseSchema,
+  activeAttemptsResponseSchema,
   billingResponseSchema,
   balancePaymentEligibilitySchema,
   ipnResponseSchema,
@@ -84,6 +85,22 @@ function mutation(
   };
 }
 export const paymentsBillingOpenApiPaths: NonNullable<ZodOpenApiObject['paths']> = {
+  '/bookings/{bookingId}/payments/active': {
+    get: {
+      operationId: 'getActivePaymentAttempts',
+      summary:
+        'Discover unresolved payment attempts without a browser-stored attempt ID. Owning RESTRICTED Couple sees deposits only; FULL Couple and Manager see deposits and balances.',
+      description:
+        'Read-only discovery returns at most two CREATED/PENDING/UNKNOWN attempts or verified VNPay successes awaiting ledger/deposit application, newest first. Applied successes and failures are excluded. Expired unresolved attempts remain visible. No checkout, provider query, settlement or release is performed. Read each existing payment attempt by ID to reconcile, retry interrupted application and recover an unexpired checkoutUrl. An empty list does not prove a previous payment failed. Provider evidence and checkout parameters are excluded.',
+      tags: ['Payments and Billing'],
+      security: bearer,
+      parameters: booking,
+      responses: {
+        '200': response('Authorized unresolved attempts; no-store.', activeAttemptsResponseSchema),
+        ...errors,
+      },
+    },
+  },
   '/bookings/{bookingId}/payments/deposit': {
     post: mutation(
       'createDepositPayment',
@@ -212,6 +229,7 @@ export const paymentsBillingOpenApiSchemas = {
   BillingRefundResponse: refundResponseSchema,
   BillingRefundApprovalResponse: refundApprovalResponseSchema,
   BillingAttemptResponse: attemptResponseSchema,
+  BillingActiveAttemptsResponse: activeAttemptsResponseSchema,
   BookingBillingResponse: billingResponseSchema,
   BalancePaymentEligibility: balancePaymentEligibilitySchema,
   BillingIpnResponse: ipnResponseSchema,
