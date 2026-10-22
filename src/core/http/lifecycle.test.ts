@@ -295,6 +295,23 @@ describe('server startup and process signals', () => {
     expect(signalTarget.exitedWith).toBe(0);
   });
 
+  it('starts and shuts down a resource-free server and preserves early startup errors', async () => {
+    const running = await startServer({ port: 0, signalTarget: new TestSignalTarget() });
+    runningServers.push(running);
+    expect((await request(running.app).get('/health/ready')).status).toBe(200);
+    await running.shutdown();
+    expect(running.httpServer.listening).toBe(false);
+    const failure = new Error('application construction failed');
+    await expect(
+      startServer({
+        port: 0,
+        createApplication: () => {
+          throw failure;
+        },
+      }),
+    ).rejects.toBe(failure);
+  });
+
   it('cleans resources and rejects when the HTTP port cannot be opened', async () => {
     const blockingServer = createServer();
     blockingServer.listen(0, '127.0.0.1');
