@@ -540,6 +540,12 @@ export class GuestService {
         const rows = parse(importRowsSchema, preview.rows);
         await this.quota(tx, bookingId, preview.createdCount);
         const references = await this.importReferences(tx, bookingId, rows);
+        const historyItems: Array<{
+          entityType: 'GUEST';
+          entityId: string;
+          revision: number;
+          snapshot: unknown;
+        }> = [];
         for (const row of rows) {
           if (!references.activeGroups.has(row.guestGroupId)) throw new NotFoundError();
           const prior = references.guests.get(row.externalRowKey);
@@ -559,15 +565,15 @@ export class GuestService {
                   where: { id: prior.id },
                   data: { ...data, revision: { increment: 1 } },
                 });
-          await this.repository.history(
-            tx,
-            scope,
-            bookingId,
-            'GUEST',
-            result.id,
-            result.revision,
-            guestDto(result),
-          );
+          historyItems.push({
+            entityType: 'GUEST',
+            entityId: result.id,
+            revision: result.revision,
+            snapshot: guestDto(result),
+          });
+        }
+        if (historyItems.length > 0) {
+          await this.repository.batchHistory(tx, scope, bookingId, historyItems);
         }
         if (preview.createdCount + preview.updatedCount > 0) await this.changed(tx, bookingId);
         return {
@@ -616,6 +622,7 @@ export class GuestService {
       where: { bookingId, status: 'ACTIVE' },
       _count: { id: true },
     });
+    const countByGroup = new Map(membership.map((m) => [m.guestGroupId, m._count.id]));
     const plan = await this.planDto(tx, workspace);
     const payload = {
       bookingId,
@@ -625,7 +632,7 @@ export class GuestService {
       listedGuestCount: membership.reduce((total, g) => total + g._count.id, 0),
       groups: groups.map((g) => ({
         ...groupDto(g),
-        listedGuestCount: membership.find((m) => m.guestGroupId === g.id)?._count.id ?? 0,
+        listedGuestCount: countByGroup.get(g.id) ?? 0,
       })),
     };
     await tx.guestOutbox.create({

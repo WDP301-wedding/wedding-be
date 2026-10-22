@@ -34,4 +34,45 @@ describe('Identity scoped authority follows only the locked immutable references
       expect(tx.$queryRaw).toHaveBeenCalledTimes(6);
     },
   );
+
+  it('reuses verified authority within the same transaction scope, avoiding redundant row locks', async () => {
+    const accountId = randomUUID(),
+      sessionId = randomUUID(),
+      credId = randomUUID();
+    const token = issueOpaqueToken('access', 32).token;
+    const tx = {
+      $queryRaw: vi
+        .fn()
+        .mockResolvedValueOnce([{ id: credId, sessionId, accountId }])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([
+          {
+            sessionId,
+            accountId,
+            accountStatus: 'ACTIVE',
+            sessionStatus: 'ACTIVE',
+            credentialStatus: 'ACTIVE',
+            roles: ['COUPLE'],
+            credentialExpiresAt: new Date(Date.now() + 60_000),
+            idleExpiresAt: new Date(Date.now() + 60_000),
+            absoluteExpiresAt: new Date(Date.now() + 60_000),
+            displayEmail: 'test@example.com',
+          },
+        ]),
+    };
+    const boundary = { current: () => tx } as unknown as PrismaBookingBoundary;
+    const reader = createScopedIdentityReaders({} as PrismaClient, boundary);
+
+    const first = await reader.resolver.resolve(token);
+    expect(first.accountId).toBe(accountId);
+    expect(tx.$queryRaw).toHaveBeenCalledTimes(6);
+
+    // Second resolution within the same transaction scope should hit cache
+    const second = await reader.resolver.resolve(token);
+    expect(second.accountId).toBe(accountId);
+    expect(tx.$queryRaw).toHaveBeenCalledTimes(6);
+  });
 });

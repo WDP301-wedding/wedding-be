@@ -1,3 +1,4 @@
+import { createHash, randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import type { PrismaBookingBoundary } from '../../../core/database/booking-boundary.js';
 
@@ -9,16 +10,21 @@ import {
 import { storageContentTypeSchema } from '../../../integrations/storage/storage.schemas.js';
 import {
   IdempotencyKeyReusedError,
+  NotFoundError,
   RequestInProgressError,
+  ValidationError,
 } from '../../../core/errors/app-error.js';
-import { MEDIA_LIMITS } from '../domain/media-policy.js';
+import { claimMediaQuota, MEDIA_LIMITS, mediaConflict } from '../domain/media-policy.js';
 import type {
+  MediaAsset,
   MediaAuditFact,
+  MediaCommandIdentity,
+  MediaFileRevision,
+  MediaPolicy,
   MediaRepository,
   MediaRequestContext,
   MediaState,
   MediaUploadAttempt,
-  MediaCommandIdentity,
 } from '../application/media.contracts.js';
 
 const assetSchema = z.strictObject({
@@ -240,6 +246,566 @@ export class PrismaMediaRepository implements MediaRepository {
     );
   }
 
+  async previewAsset(
+    bookingId: string,
+    assetId: string,
+    context?: MediaRequestContext,
+    authorize?: (scopedContext: MediaRequestContext) => Promise<void>,
+  ): Promise<{
+    readonly asset: MediaAsset;
+    readonly file: MediaFileRevision;
+    readonly policy: MediaPolicy | null;
+  }> {
+    bookingId = z.uuid().parse(bookingId).toLowerCase();
+    assetId = z.uuid().parse(assetId).toLowerCase();
+    const read = async (tx: Prisma.TransactionClient) => {
+      const asset = await tx.invitationMediaAsset.findFirst({
+        where: { bookingId, id: assetId, detachedAt: null },
+        include: { currentFile: true },
+      });
+      if (asset === null || asset.currentFile === null) throw new NotFoundError();
+      const policy = await tx.invitationMediaPolicy.findUnique({ where: { bookingId } });
+      const f = asset.currentFile;
+      return {
+        asset: {
+          id: asset.id,
+          revision: asset.revision,
+          currentFileRevisionId: asset.currentFileRevisionId,
+          detachedAt: asset.detachedAt?.toISOString() ?? null,
+        },
+        file: {
+          id: f.id,
+          assetId: f.assetId,
+          revision: f.revision,
+          object: stored(f),
+          width: f.width,
+          height: f.height,
+          altText: f.altText,
+          acceptedAt: f.acceptedAt.toISOString(),
+          policyRevision: f.policyRevision,
+          cutoffAt: f.cutoffAt.toISOString(),
+          uploadAttemptId: f.uploadAttemptId,
+        },
+        policy:
+          policy === null
+            ? null
+            : { revision: policy.revision, cutoffAt: policy.cutoffAt.toISOString() },
+      };
+    };
+    if (this.boundary !== undefined && context !== undefined) {
+      return this.boundary.runRead(
+        {
+          bookingId,
+          context: {
+            requestId: context.requestId,
+            causationId: context.causationId ?? context.requestId,
+            actorAccountId: context.actorId,
+            authority: 'AUTHENTICATED',
+            ...(context.transactionScopeId === undefined
+              ? {}
+              : { transactionScopeId: context.transactionScopeId }),
+          },
+        },
+        async (scoped) => {
+          if (authorize !== undefined) {
+            await authorize({
+              ...context,
+              ...(scoped.transactionScopeId !== undefined
+                ? { transactionScopeId: scoped.transactionScopeId }
+                : {}),
+            });
+          }
+          return read(this.boundary!.current(bookingId)!);
+        },
+      );
+    }
+    return this.prisma.$transaction(
+      async (tx) => {
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock_shared(hashtext(${bookingId}::text))`;
+        if (authorize !== undefined && context !== undefined) {
+          await authorize(context);
+        }
+        return read(tx);
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+        maxWait: 10_000,
+        timeout: 10_000,
+      },
+    );
+  }
+
+  async claimUploadLease(
+    input: {
+      bookingId: string;
+      bytes: number;
+      assetId?: string;
+      expectedRevision?: number;
+      idempotencyKey: string;
+      commandDigest: string;
+      intentKeyDigest: string;
+      object: StoredObject;
+      cutoffAt?: string;
+    },
+    context: MediaRequestContext,
+  ): Promise<
+    | { readonly replay: true; readonly asset: MediaAsset }
+    | {
+        readonly replay: false;
+        readonly leaseToken: string;
+        readonly uploadAttemptId: string;
+        readonly policyRevision: number;
+        readonly cutoffAt: string;
+        readonly prior?: MediaAsset;
+      }
+  > {
+    const bookingId = z.uuid().parse(input.bookingId).toLowerCase();
+    const hash = z.string().regex(/^[a-f0-9]{64}$/u);
+    hash.parse(input.intentKeyDigest);
+    hash.parse(input.commandDigest);
+
+    // 1. Independent durable binding before the acceptance transaction/decoder.
+    await this.prisma.invitationMediaCommand.createMany({
+      data: {
+        bookingId,
+        intentKeyDigest: input.intentKeyDigest,
+        commandDigest: input.commandDigest,
+      },
+      skipDuplicates: true,
+    });
+    const bound = await this.prisma.invitationMediaCommand.findUniqueOrThrow({
+      where: {
+        bookingId_intentKeyDigest: { bookingId, intentKeyDigest: input.intentKeyDigest },
+      },
+    });
+    if (bound.commandDigest !== input.commandDigest) throw new IdempotencyKeyReusedError();
+
+    const admit = async (tx: Prisma.TransactionClient) => {
+      const [lock] = await tx.$queryRaw<
+        Array<{ acquired: boolean }>
+      >`SELECT pg_try_advisory_xact_lock(hashtextextended(${`media-command:${bookingId}:${input.intentKeyDigest}`}, 0)) AS acquired`;
+      if (lock?.acquired !== true) throw new RequestInProgressError(1);
+    };
+
+    const runClaim = async (
+      tx: Prisma.TransactionClient,
+    ): Promise<
+      | { readonly replay: true; readonly asset: MediaAsset }
+      | {
+          readonly replay: false;
+          readonly leaseToken: string;
+          readonly uploadAttemptId: string;
+          readonly policyRevision: number;
+          readonly cutoffAt: string;
+          readonly prior?: MediaAsset;
+        }
+    > => {
+      // Replay check
+      const [receipt] = await tx.invitationMediaReceipt.findMany({
+        where: { bookingId, intentKeyDigest: input.intentKeyDigest },
+        take: 1,
+      });
+      if (receipt !== undefined) {
+        if (receipt.commandDigest !== input.commandDigest) {
+          throw new IdempotencyKeyReusedError();
+        }
+        return { replay: true as const, asset: receipt.result as unknown as MediaAsset };
+      }
+
+      const priorAttempt = await tx.invitationMediaUploadAttempt.findFirst({
+        where: { bookingId, intentKeyDigest: input.intentKeyDigest },
+      });
+      if (priorAttempt !== null && priorAttempt.commandDigest !== input.commandDigest) {
+        throw new IdempotencyKeyReusedError();
+      }
+
+      // Check in-flight lease
+      const activeLease = await tx.invitationExternalWork.findUnique({
+        where: { bookingId_intentDigest: { bookingId, intentDigest: input.intentKeyDigest } },
+      });
+      if (activeLease && activeLease.expiresAt.getTime() > Date.now()) {
+        throw new RequestInProgressError(1);
+      }
+
+      let assetLeaseDigest: string | undefined;
+      if (input.assetId !== undefined) {
+        assetLeaseDigest = createHash('sha256')
+          .update(`replace:${bookingId}:${input.assetId}`)
+          .digest('hex');
+        const activeAssetLease = await tx.invitationExternalWork.findUnique({
+          where: { bookingId_intentDigest: { bookingId, intentDigest: assetLeaseDigest } },
+        });
+        if (activeAssetLease && activeAssetLease.expiresAt.getTime() > Date.now()) {
+          throw mediaConflict('MEDIA_REVISION_STALE');
+        }
+      }
+
+      let policy = await tx.invitationMediaPolicy.findUnique({ where: { bookingId } });
+      if (policy === null && input.cutoffAt !== undefined) {
+        policy = await tx.invitationMediaPolicy.create({
+          data: {
+            bookingId,
+            revision: 0,
+            cutoffAt: new Date(input.cutoffAt),
+          },
+        });
+      }
+
+      let prior: MediaAsset | undefined;
+      if (input.assetId !== undefined) {
+        const row = await tx.invitationMediaAsset.findFirst({
+          where: { bookingId, id: input.assetId, detachedAt: null },
+        });
+        if (row === null) throw new NotFoundError();
+        if (row.revision !== input.expectedRevision) throw mediaConflict('MEDIA_REVISION_STALE');
+        prior = {
+          id: row.id,
+          revision: row.revision,
+          currentFileRevisionId: row.currentFileRevisionId,
+          detachedAt: row.detachedAt?.toISOString() ?? null,
+        };
+      }
+
+      const assets = await tx.invitationMediaAsset.findMany({
+        where: { bookingId, detachedAt: null },
+        include: { currentFile: true },
+        take: MEDIA_LIMITS.activeFiles + 1,
+      });
+      if (assets.length > MEDIA_LIMITS.activeFiles)
+        throw new Error('Persisted active media exceeds quota.');
+
+      const files = assets.map((a) => a.currentFile);
+
+      const reservations = await tx.invitationExternalWork.aggregate({
+        where: {
+          bookingId,
+          expiresAt: { gt: new Date() },
+          ...(activeLease ? { token: { not: activeLease.token } } : {}),
+        },
+        _sum: { reservedFiles: true, reservedBytes: true },
+      });
+
+      const state: MediaState = {
+        reservedFiles: reservations._sum.reservedFiles ?? 0,
+        reservedBytes: reservations._sum.reservedBytes ?? 0,
+        policy:
+          policy === null
+            ? null
+            : { revision: policy.revision, cutoffAt: policy.cutoffAt.toISOString() },
+        assets: new Map(
+          assets.map((a) => [
+            a.id,
+            {
+              id: a.id,
+              revision: a.revision,
+              currentFileRevisionId: a.currentFileRevisionId,
+              detachedAt: a.detachedAt?.toISOString() ?? null,
+            },
+          ]),
+        ),
+        files: new Map(
+          files.map((f) => [
+            f.id,
+            {
+              id: f.id,
+              assetId: f.assetId,
+              revision: f.revision,
+              object: stored(f),
+              width: f.width,
+              height: f.height,
+              altText: f.altText,
+              acceptedAt: f.acceptedAt.toISOString(),
+              policyRevision: f.policyRevision,
+              cutoffAt: f.cutoffAt.toISOString(),
+              uploadAttemptId: f.uploadAttemptId,
+            },
+          ]),
+        ),
+        receipts: new Map(),
+        audit: [],
+      };
+
+      claimMediaQuota(state, input.bytes, prior?.id);
+
+      const leaseToken = randomUUID();
+      const uploadAttemptId = randomUUID();
+      const policyRevision = policy?.revision ?? 0;
+      const cutoffAt = policy?.cutoffAt.toISOString() ?? input.cutoffAt;
+      if (cutoffAt === undefined) throw new ValidationError();
+
+      await tx.invitationExternalWork.upsert({
+        where: { bookingId_intentDigest: { bookingId, intentDigest: input.intentKeyDigest } },
+        create: {
+          bookingId,
+          intentDigest: input.intentKeyDigest,
+          token: leaseToken,
+          expiresAt: new Date(Date.now() + 120_000),
+          reservedFiles: prior ? 0 : 1,
+          reservedBytes: input.bytes,
+        },
+        update: {
+          token: leaseToken,
+          expiresAt: new Date(Date.now() + 120_000),
+          reservedFiles: prior ? 0 : 1,
+          reservedBytes: input.bytes,
+        },
+      });
+
+      if (assetLeaseDigest !== undefined) {
+        await tx.invitationExternalWork.upsert({
+          where: { bookingId_intentDigest: { bookingId, intentDigest: assetLeaseDigest } },
+          create: {
+            bookingId,
+            intentDigest: assetLeaseDigest,
+            token: randomUUID(),
+            expiresAt: new Date(Date.now() + 120_000),
+            reservedFiles: 0,
+            reservedBytes: 0,
+          },
+          update: {
+            expiresAt: new Date(Date.now() + 120_000),
+          },
+        });
+      }
+
+      return {
+        replay: false as const,
+        leaseToken,
+        uploadAttemptId,
+        policyRevision,
+        cutoffAt,
+        ...(prior === undefined ? {} : { prior }),
+      };
+    };
+
+    if (this.boundary !== undefined) {
+      return this.boundary.run(
+        {
+          bookingId,
+          context: {
+            requestId: context.requestId,
+            causationId: context.causationId ?? context.requestId,
+            actorAccountId: context.actorId,
+            authority: 'AUTHENTICATED',
+            ...(context.transactionScopeId === undefined
+              ? {}
+              : { transactionScopeId: context.transactionScopeId }),
+          },
+        },
+        (scoped) => runClaim(this.boundary!.requireScope(bookingId, scoped)),
+        admit,
+      );
+    }
+    return this.prisma.$transaction(
+      async (tx) => {
+        await admit(tx);
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${bookingId}::text))`;
+        return runClaim(tx);
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+        maxWait: 10_000,
+        timeout: 10_000,
+      },
+    );
+  }
+
+  async acceptUpload(
+    input: {
+      bookingId: string;
+      leaseToken: string;
+      intentKeyDigest: string;
+      commandDigest: string;
+      uploadAttemptId: string;
+      prior?: MediaAsset;
+      object: StoredObject;
+      dimensions: { width: number; height: number };
+      altText: string;
+      policyRevision: number;
+      cutoffAt: string;
+    },
+    context: MediaRequestContext,
+    authorize?: (scopedContext: MediaRequestContext) => Promise<void>,
+  ): Promise<MediaAsset> {
+    const bookingId = z.uuid().parse(input.bookingId).toLowerCase();
+
+    const admit = async (tx: Prisma.TransactionClient) => {
+      const [lock] = await tx.$queryRaw<
+        Array<{ acquired: boolean }>
+      >`SELECT pg_try_advisory_xact_lock(hashtextextended(${`media-command:${bookingId}:${input.intentKeyDigest}`}, 0)) AS acquired`;
+      if (lock?.acquired !== true) throw new RequestInProgressError(1);
+    };
+
+    const runAccept = async (
+      tx: Prisma.TransactionClient,
+      scopedContext?: MediaRequestContext,
+    ) => {
+      if (authorize !== undefined && scopedContext !== undefined) {
+        await authorize(scopedContext);
+      }
+      if (Date.now() >= new Date(input.cutoffAt).getTime()) {
+        throw mediaConflict('MEDIA_CUTOFF_REACHED');
+      }
+
+      // Replay check
+      const receipt = await tx.invitationMediaReceipt.findUnique({
+        where: { bookingId_intentKeyDigest: { bookingId, intentKeyDigest: input.intentKeyDigest } },
+      });
+      if (receipt) return receipt.result as unknown as MediaAsset;
+
+      // Verify lease
+      const claim = await tx.invitationExternalWork.findUnique({
+        where: { bookingId_intentDigest: { bookingId, intentDigest: input.intentKeyDigest } },
+      });
+      if (!claim || claim.token !== input.leaseToken || claim.expiresAt.getTime() <= Date.now()) {
+        throw new RequestInProgressError(1);
+      }
+
+      // Re-verify prior if replacing
+      if (input.prior !== undefined) {
+        const current = await tx.invitationMediaAsset.findFirst({
+          where: { bookingId, id: input.prior.id, detachedAt: null },
+        });
+        if (current === null || current.revision !== input.prior.revision) {
+          throw mediaConflict('MEDIA_REVISION_STALE');
+        }
+      }
+
+      const id = input.prior?.id ?? randomUUID();
+      const fileId = randomUUID();
+      const revision = (input.prior?.revision ?? 0) + 1;
+      const acceptedAt = new Date();
+
+      if (input.prior !== undefined) {
+        await tx.invitationMediaAsset.update({
+          where: { id },
+          data: { revision, currentFileRevisionId: fileId },
+        });
+      } else {
+        await tx.invitationMediaAsset.create({
+          data: {
+            id,
+            bookingId,
+            revision,
+            currentFileRevisionId: fileId,
+          },
+        });
+      }
+
+      await tx.invitationMediaFile.create({
+        data: {
+          id: fileId,
+          bookingId,
+          assetId: id,
+          revision,
+          objectKey: input.object.objectKey,
+          checksumSha256: input.object.checksumSha256,
+          contentType: input.object.contentType,
+          sizeBytes: input.object.sizeBytes,
+          width: input.dimensions.width,
+          height: input.dimensions.height,
+          altText: input.altText,
+          acceptedAt,
+          policyRevision: input.policyRevision,
+          cutoffAt: new Date(input.cutoffAt),
+          uploadAttemptId: input.uploadAttemptId,
+        },
+      });
+
+      const asset: MediaAsset = {
+        id,
+        revision,
+        currentFileRevisionId: fileId,
+        detachedAt: null,
+      };
+
+      await tx.invitationMediaReceipt.create({
+        data: {
+          bookingId,
+          intentKeyDigest: input.intentKeyDigest,
+          commandDigest: input.commandDigest,
+          result: asset as unknown as Prisma.InputJsonValue,
+        },
+      });
+
+      await appendAudit(tx, bookingId, {
+        action: input.prior === undefined ? 'media.created' : 'media.replaced',
+        actorId: context.actorId,
+        requestId: context.requestId,
+        occurredAt: acceptedAt.toISOString(),
+        assetId: id,
+        revision,
+      });
+
+      // Release lease
+      const digestsToDelete = [input.intentKeyDigest];
+      if (input.prior !== undefined) {
+        digestsToDelete.push(
+          createHash('sha256').update(`replace:${bookingId}:${input.prior.id}`).digest('hex'),
+        );
+      }
+      await tx.invitationExternalWork.deleteMany({
+        where: { bookingId, intentDigest: { in: digestsToDelete } },
+      });
+
+      return asset;
+    };
+
+    if (this.boundary !== undefined) {
+      return this.boundary.run(
+        {
+          bookingId,
+          context: {
+            requestId: context.requestId,
+            causationId: context.causationId ?? context.requestId,
+            actorAccountId: context.actorId,
+            authority: 'AUTHENTICATED',
+            ...(context.transactionScopeId === undefined
+              ? {}
+              : { transactionScopeId: context.transactionScopeId }),
+          },
+        },
+        (scoped) =>
+          runAccept(this.boundary!.requireScope(bookingId, scoped), {
+            ...context,
+            transactionScopeId: scoped.transactionScopeId!,
+          }),
+        admit,
+      );
+    }
+    return this.prisma.$transaction(
+      async (tx) => {
+        await admit(tx);
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${bookingId}::text))`;
+        return runAccept(tx, context);
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+        maxWait: 10_000,
+        timeout: 10_000,
+      },
+    );
+  }
+
+  async releaseUploadLease(
+    bookingId: string,
+    intentKeyDigest: string,
+    leaseToken?: string,
+  ): Promise<void> {
+    bookingId = z.uuid().parse(bookingId).toLowerCase();
+    await this.prisma.invitationExternalWork
+      .deleteMany({
+        where: {
+          bookingId,
+          OR: [
+            { intentDigest: intentKeyDigest },
+            ...(leaseToken !== undefined ? [{ token: leaseToken }] : []),
+          ],
+        },
+      })
+      .catch(() => undefined);
+  }
+
   async recordUploadAttempt(attempt: MediaUploadAttempt): Promise<void> {
     await this.prisma.invitationMediaUploadAttempt.create({
       data: {
@@ -291,23 +857,26 @@ export class PrismaMediaRepository implements MediaRepository {
       orderBy: { sequence: 'asc' },
       include: { files: { select: { id: true }, take: 1 } },
     });
-    return Promise.all(
-      attempts.map(async (a) => {
-        const receipt = await this.prisma.invitationMediaReceipt.findUnique({
-          where: { bookingId_intentKeyDigest: { bookingId, intentKeyDigest: a.intentKeyDigest } },
-        });
-        return {
-          attemptId: a.id,
-          object: stored(a),
-          outcome:
-            a.files.length > 0
-              ? ('ACCEPTED' as const)
-              : receipt?.commandDigest === a.commandDigest
-                ? ('REPLAY_RECONCILED' as const)
-                : ('UNRESOLVED' as const),
-        };
-      }),
-    );
+    const receipts = await this.prisma.invitationMediaReceipt.findMany({
+      where: {
+        bookingId,
+        intentKeyDigest: { in: attempts.map((a) => a.intentKeyDigest) },
+      },
+    });
+    const receiptMap = new Map(receipts.map((r) => [r.intentKeyDigest, r]));
+    return attempts.map((a) => {
+      const receipt = receiptMap.get(a.intentKeyDigest);
+      return {
+        attemptId: a.id,
+        object: stored(a),
+        outcome:
+          a.files.length > 0
+            ? ('ACCEPTED' as const)
+            : receipt?.commandDigest === a.commandDigest
+              ? ('REPLAY_RECONCILED' as const)
+              : ('UNRESOLVED' as const),
+      };
+    });
   }
 
   /** Each sweep deliberately starts from the beginning. A sequence allocated by a

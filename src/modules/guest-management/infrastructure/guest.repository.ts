@@ -95,6 +95,40 @@ export class GuestRepository {
       revision,
     );
   }
+  async batchHistory(
+    tx: Prisma.TransactionClient,
+    scope: ContractContext,
+    bookingId: string,
+    items: readonly {
+      entityType: 'GROUP' | 'GUEST';
+      entityId: string;
+      revision: number;
+      snapshot: unknown;
+    }[],
+  ) {
+    if (items.length === 0) return;
+    await tx.guestHistory.createMany({
+      data: items.map((item) => ({
+        id: randomUUID(),
+        bookingId,
+        entityType: item.entityType,
+        entityId: item.entityId,
+        revision: item.revision,
+        snapshot: json(item.snapshot),
+      })),
+    });
+    await tx.auditLog.createMany({
+      data: items.map((item) => ({
+        requestId: scope.requestId,
+        actorType: 'USER',
+        actorId: scope.actorAccountId,
+        action: `guest.${item.entityType.toLowerCase()}-changed`,
+        entityType: 'GUEST_WORKSPACE',
+        entityId: item.entityId,
+        metadata: { bookingId, revision: item.revision },
+      })),
+    });
+  }
   async audit(
     tx: Prisma.TransactionClient,
     scope: ContractContext,

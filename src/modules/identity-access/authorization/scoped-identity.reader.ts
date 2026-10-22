@@ -16,11 +16,26 @@ export function createScopedIdentityReaders(
   boundary: PrismaBookingBoundary,
   now: () => Date = () => new Date(),
 ) {
+  const transactionScopeCache = new WeakMap<object, Map<string, AccessCredentialState>>();
+
   const resolver = createAuthenticatedActorResolver(
     {
       async findActorByAccessTokenHash(tokenHash): Promise<AccessCredentialState | null> {
         const tx = boundary.current();
         const db = tx ?? prisma;
+        if (tx !== undefined) {
+          const cached = transactionScopeCache.get(tx)?.get(tokenHash);
+          if (cached !== undefined) {
+            const currentTime = now().getTime();
+            if (
+              new Date(cached.credentialExpiresAt).getTime() > currentTime &&
+              new Date(cached.idleExpiresAt).getTime() > currentTime &&
+              new Date(cached.absoluteExpiresAt).getTime() > currentTime
+            ) {
+              return cached;
+            }
+          }
+        }
         let locked: { sessionId: string; accountId: string } | undefined;
         if (tx !== undefined) {
           const [reference] = await tx.$queryRaw<
@@ -55,6 +70,16 @@ export function createScopedIdentityReaders(
           (locked.sessionId !== credential.sessionId || locked.accountId !== credential.accountId)
         )
           return null;
+
+        if (tx !== undefined) {
+          let tokenMap = transactionScopeCache.get(tx);
+          if (tokenMap === undefined) {
+            tokenMap = new Map();
+            transactionScopeCache.set(tx, tokenMap);
+          }
+          tokenMap.set(tokenHash, credential);
+        }
+
         return credential;
       },
     },

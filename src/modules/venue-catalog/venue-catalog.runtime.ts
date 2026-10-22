@@ -53,7 +53,10 @@ export async function createVenueCatalogRuntime(config: Config): Promise<VenueCa
   try {
     await prisma.$connect();
     const storage = createStorage(config);
-    const media = createCatalogMediaService(prisma, storage);
+    const media = createCatalogMediaService(prisma, storage, {
+      cacheTtlSeconds: 13 * 60,
+      maxConcurrency: 6,
+    });
     const actorResolver = createAuthenticatedActorResolver(createPrismaSessionRepository(prisma));
     const authorizer = createCatalogManagerAuthorizer(actorResolver);
     const idempotency = createIdempotencyService(createPrismaIdempotencyRepository(prisma));
