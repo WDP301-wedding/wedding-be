@@ -24,3 +24,4 @@ docs/archive/todo-2026-10-10.md
 # Operator artifacts and Prisma-generated client are not authored source.
 output/
 src/generated/prisma/
+.playwright-cli/
