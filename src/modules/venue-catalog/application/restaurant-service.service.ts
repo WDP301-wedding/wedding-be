@@ -1,6 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { AppError, NotFoundError } from '../../../core/errors/app-error.js';
-import type { PrismaClient, RestaurantServiceRevision } from '../../../generated/prisma/client.js';
+import {
+  Prisma,
+  type PrismaClient,
+  type RestaurantServiceRevision,
+} from '../../../generated/prisma/client.js';
 import type { CatalogMutationContext } from '../infrastructure/catalog-version.repository.js';
 import {
   checkedLineTotal,
@@ -29,6 +33,10 @@ function view(row: RestaurantServiceRevision, restaurantId: string) {
     active: row.active,
   });
 }
+export type ServiceSelectionFacts = ReturnType<typeof view> & {
+  quantity: number;
+  lineTotalVnd: number;
+};
 export function createRestaurantServiceService(prisma: PrismaClient) {
   return Object.freeze({
     async create(value: unknown, context: CatalogMutationContext) {
@@ -116,6 +124,46 @@ export function createRestaurantServiceService(prisma: PrismaClient) {
       if (row === null) throw new NotFoundError();
       return view(row, row.service.restaurantId);
     },
+    async requireBatchSelections(
+      values: readonly unknown[],
+    ): Promise<Map<string, ServiceSelectionFacts>> {
+      if (values.length === 0) return new Map<string, ServiceSelectionFacts>();
+      const parsed = values.map((v) => serviceSelectionSchema.parse(v));
+      const sortedInputs = [...parsed].sort((a, b) => a.serviceId.localeCompare(b.serviceId));
+      const serviceIds = [...new Set(sortedInputs.map((i) => i.serviceId))];
+      const ids = Prisma.join(serviceIds.map((id) => Prisma.sql`${id}::uuid`));
+      return prisma.$transaction(async (tx) => {
+        await tx.$queryRaw(Prisma.sql`
+          SELECT "id" FROM "RestaurantService" WHERE "id" IN (${ids}) ORDER BY "id" FOR SHARE
+        `);
+        const heads = await tx.restaurantService.findMany({
+          where: { id: { in: serviceIds } },
+          include: { revisions: { orderBy: { revision: 'desc' }, take: 1 } },
+        });
+        const headMap = new Map(heads.map((h) => [h.id, h]));
+        const result = new Map<
+          string,
+          ReturnType<typeof view> & { quantity: number; lineTotalVnd: number }
+        >();
+        for (const input of sortedInputs) {
+          const head = headMap.get(input.serviceId);
+          if (!head || !head.active) throw offeringConflict('OFFERING_NOT_SELECTABLE');
+          const current = head.revisions[0];
+          if (!current || current.id !== input.sourceRevisionId)
+            throw offeringConflict('COMMERCIAL_PRICE_REVISION_STALE');
+          const facts = view(current, head.restaurantId);
+          result.set(
+            input.serviceId,
+            Object.freeze({
+              ...facts,
+              quantity: input.quantity,
+              lineTotalVnd: checkedLineTotal(facts.unitPriceVnd, input.quantity),
+            }),
+          );
+        }
+        return result;
+      });
+    },
     async requireSelection(value: unknown) {
       const input = serviceSelectionSchema.parse(value);
       return prisma.$transaction(async (tx) => {
@@ -141,12 +189,13 @@ export function createRestaurantServiceService(prisma: PrismaClient) {
 
 export type RestaurantServiceReader = Pick<
   ReturnType<typeof createRestaurantServiceService>,
-  'resolveRevision' | 'requireSelection'
+  'resolveRevision' | 'requireSelection' | 'requireBatchSelections'
 >;
 export function createRestaurantServiceReader(prisma: PrismaClient): RestaurantServiceReader {
   const service = createRestaurantServiceService(prisma);
   return Object.freeze({
     resolveRevision: service.resolveRevision,
     requireSelection: service.requireSelection,
+    requireBatchSelections: service.requireBatchSelections,
   });
 }

@@ -467,15 +467,14 @@ export class GuestService {
       'import.preview',
       input,
       async (tx, _scope, workspace) => {
+        const references = await this.importReferences(tx, bookingId, input.rows);
         let createdCount = 0,
           updatedCount = 0,
           unchangedCount = 0;
         for (const row of input.rows) {
-          await this.activeGroup(tx, bookingId, row.guestGroupId);
-          const prior = await tx.guest.findUnique({
-            where: { bookingId_externalRowKey: { bookingId, externalRowKey: row.externalRowKey } },
-          });
-          if (prior === null) createdCount++;
+          if (!references.activeGroups.has(row.guestGroupId)) throw new NotFoundError();
+          const prior = references.guests.get(row.externalRowKey);
+          if (prior === undefined) createdCount++;
           else if (sameImport(prior, row)) unchangedCount++;
           else {
             if (!input.allowUpdates || prior.status === 'ARCHIVED')
@@ -540,13 +539,12 @@ export class GuestService {
           throw conflict('GUEST_IMPORT_PREVIEW_STALE');
         const rows = parse(importRowsSchema, preview.rows);
         await this.quota(tx, bookingId, preview.createdCount);
+        const references = await this.importReferences(tx, bookingId, rows);
         for (const row of rows) {
-          await this.activeGroup(tx, bookingId, row.guestGroupId);
-          const prior = await tx.guest.findUnique({
-            where: { bookingId_externalRowKey: { bookingId, externalRowKey: row.externalRowKey } },
-          });
-          if (prior !== null && sameImport(prior, row)) continue;
-          if (prior !== null && (!preview.allowUpdates || prior.status === 'ARCHIVED'))
+          if (!references.activeGroups.has(row.guestGroupId)) throw new NotFoundError();
+          const prior = references.guests.get(row.externalRowKey);
+          if (prior !== undefined && sameImport(prior, row)) continue;
+          if (prior !== undefined && (!preview.allowUpdates || prior.status === 'ARCHIVED'))
             throw conflict('GUEST_IMPORT_ROW_CONFLICT');
           const data = {
             ...row,
@@ -555,7 +553,7 @@ export class GuestService {
             normalizedName: normalizeGroupName(row.name),
           };
           const result =
-            prior === null
+            prior === undefined
               ? await tx.guest.create({ data: { id: randomUUID(), bookingId, ...data } })
               : await tx.guest.update({
                   where: { id: prior.id },
@@ -579,6 +577,29 @@ export class GuestService {
         };
       },
     );
+  }
+  /** Only the command's locked snapshot is shared, never a cross-request cache.
+   * Validate each row in its original order to preserve the existing error precedence. */
+  private async importReferences(
+    tx: Prisma.TransactionClient,
+    bookingId: string,
+    rows: ReturnType<typeof importRowsSchema.parse>,
+  ) {
+    const groups = await tx.guestGroup.findMany({
+      where: {
+        bookingId,
+        status: 'ACTIVE',
+        id: { in: [...new Set(rows.map((row) => row.guestGroupId))] },
+      },
+      select: { id: true },
+    });
+    const guests = await tx.guest.findMany({
+      where: { bookingId, externalRowKey: { in: rows.map((row) => row.externalRowKey) } },
+    });
+    return {
+      activeGroups: new Set(groups.map((group) => group.id)),
+      guests: new Map(guests.map((guest) => [guest.externalRowKey, guest])),
+    };
   }
   private async changed(tx: Prisma.TransactionClient, bookingId: string) {
     await tx.guestWorkspace.update({

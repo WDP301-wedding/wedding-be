@@ -16,6 +16,7 @@ import { cashWindow, sumVnd, attendanceResult } from '../domain/metrics.js';
 import {
   type AnalyticsProjector,
   type Projection,
+  type ProjectionRow,
   type ProjectionStore,
   type ProjectionReadFilter,
 } from './projection.js';
@@ -147,8 +148,17 @@ export class AnalyticsService {
         message: 'Analytics sources are unavailable.',
       });
     const meta = this.meta(projection, report, q);
+    const rowsByOwner = new Map<ReportingOwner, ProjectionRow[]>();
+    for (const r of projection.rows) {
+      let list = rowsByOwner.get(r.owner);
+      if (list === undefined) {
+        list = [];
+        rowsByOwner.set(r.owner, list);
+      }
+      list.push(r);
+    }
     const read = <T>(owner: ReportingOwner, schema: z.ZodType<T>) => {
-      const rows = projection.rows.filter((r) => r.owner === owner);
+      const rows = rowsByOwner.get(owner) ?? [];
       if (rows.length > 10000)
         throw new AppError({
           status: 422,
@@ -162,7 +172,7 @@ export class AnalyticsService {
     const ids = new Set(selected.map((b) => b.bookingId));
     if (report === 'revenue' || report === 'overview') {
       const billing = read('billing', billingAnalyticsSchema);
-      const amounts = this.money(bookings, billing, q, projection);
+      const amounts = this.money(bookings, billing, q, projection, selected);
       if (report === 'revenue') return { meta, ...amounts };
       return {
         meta,
@@ -299,28 +309,37 @@ export class AnalyticsService {
     billing: BillingAnalyticsRow[],
     q: AnalyticsQuery,
     p: Projection,
+    selectedBookings?: BookingAnalyticsRow[],
   ) {
     const window = cashWindow(q.dateFrom, q.dateTo),
       byId = new Map(bookings.map((b) => [b.bookingId, b]));
-    const eventRows = billing.filter(
-      (r) => byId.has(r.bookingId) && this.matches(byId.get(r.bookingId)!, q, true),
-    );
-    const cashRows = billing.filter(
-      (r) => byId.has(r.bookingId) && this.matches(byId.get(r.bookingId)!, q, false),
-    );
-    const entries = cashRows
-      .flatMap((r) => r.ledger)
-      .filter(
-        (e) =>
-          Date.parse(e.occurredAt) >= Date.parse(window.from) &&
-          Date.parse(e.occurredAt) < Date.parse(window.to),
-      );
-    const received = sumVnd(entries.filter((e) => e.kind === 'PAYMENT').map((e) => e.amountVnd));
-    const refunded = sumVnd(entries.filter((e) => e.kind === 'REFUND').map((e) => e.amountVnd));
-    const selected = bookings.filter((b) => this.matches(b, q, true));
+    const eventRows: BillingAnalyticsRow[] = [];
+    const cashRows: BillingAnalyticsRow[] = [];
+    for (const r of billing) {
+      const b = byId.get(r.bookingId);
+      if (!b) continue;
+      if (this.matches(b, q, true)) eventRows.push(r);
+      if (this.matches(b, q, false)) cashRows.push(r);
+    }
+    const windowFromMs = Date.parse(window.from);
+    const windowToMs = Date.parse(window.to);
+    let received = 0;
+    let refunded = 0;
+    for (const r of cashRows) {
+      for (const e of r.ledger) {
+        const occurredMs = Date.parse(e.occurredAt);
+        if (occurredMs >= windowFromMs && occurredMs < windowToMs) {
+          if (e.kind === 'PAYMENT') received = sumVnd([received, e.amountVnd]);
+          else if (e.kind === 'REFUND') refunded = sumVnd([refunded, e.amountVnd]);
+        }
+      }
+    }
+    const selected = selectedBookings ?? bookings.filter((b) => this.matches(b, q, true));
     const billingReady = Boolean(p.checkpoints.find((c) => c.owner === 'billing')?.refreshedAt);
     const bookingReady = Boolean(p.checkpoints.find((c) => c.owner === 'booking')?.refreshedAt);
     const cashReady = billingReady && bookingReady;
+    const settledPayments = cashReady ? sumVnd(eventRows.map((r) => r.paidVnd)) : null;
+    const settledRefunds = cashReady ? sumVnd(eventRows.map((r) => r.refundedVnd)) : null;
     return {
       currency: 'VND' as const,
       cashFromUtc: window.from,
@@ -331,11 +350,9 @@ export class AnalyticsService {
       receivablesVnd: cashReady ? sumVnd(eventRows.map((r) => r.outstandingVnd)) : null,
       creditBalanceVnd: cashReady ? sumVnd(eventRows.map((r) => r.creditVnd)) : null,
       acceptedChargesVnd: cashReady ? sumVnd(eventRows.map((r) => r.acceptedChargesVnd)) : null,
-      settledPaymentsVnd: cashReady ? sumVnd(eventRows.map((r) => r.paidVnd)) : null,
-      settledRefundsVnd: cashReady ? sumVnd(eventRows.map((r) => r.refundedVnd)) : null,
-      netSettledVnd: cashReady
-        ? sumVnd(eventRows.flatMap((r) => [r.paidVnd, -r.refundedVnd]))
-        : null,
+      settledPaymentsVnd: settledPayments,
+      settledRefundsVnd: settledRefunds,
+      netSettledVnd: cashReady ? sumVnd([settledPayments!, -settledRefunds!]) : null,
       originalContractTotalVnd: bookingReady
         ? sumVnd(selected.map((b) => b.originalContractTotalVnd ?? 0))
         : null,
@@ -357,9 +374,13 @@ export class AnalyticsService {
     };
   }
   private counts(statuses: string[]) {
-    return [...new Set(statuses)]
-      .sort()
-      .map((status) => ({ status, count: statuses.filter((s) => s === status).length }));
+    const map = new Map<string, number>();
+    for (const status of statuses) {
+      map.set(status, (map.get(status) ?? 0) + 1);
+    }
+    return [...map.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([status, count]) => ({ status, count }));
   }
   private bookingMetrics(
     selected: BookingAnalyticsRow[],
@@ -428,20 +449,24 @@ export class AnalyticsService {
         )
         .map((b) => b.hallId + '/' + b.eventDate + '/' + b.shiftCode),
     ).size;
+    const venueSnapshots = venue
+      .map((v) => ({
+        observedAtMs: Date.parse(v.observedAt),
+        capacity:
+          v.halls.filter((h) => h.active && (!q.hallId || h.id === q.hallId)).length *
+          v.shifts.filter((s) => s.active).length,
+      }))
+      .sort((a, b) => b.observedAtMs - a.observedAtMs);
     let available = 0,
       ready = true;
     for (let day = Date.parse(q.dateFrom); day <= Date.parse(q.dateTo); day += 86400000) {
       const midnight = day - 7 * 3600000;
-      const snapshot = venue
-        .filter((v) => Date.parse(v.observedAt) <= midnight)
-        .sort((a, b) => Date.parse(b.observedAt) - Date.parse(a.observedAt))[0];
+      const snapshot = venueSnapshots.find((v) => v.observedAtMs <= midnight);
       if (!snapshot) {
         ready = false;
         break;
       }
-      available +=
-        snapshot.halls.filter((h) => h.active && (!q.hallId || h.id === q.hallId)).length *
-        snapshot.shifts.filter((s) => s.active).length;
+      available += snapshot.capacity;
     }
     // Independent owner fences may briefly disagree about a retired/occupied slot.
     // A ratio above 100% is not evidence of historical available inventory.
@@ -487,7 +512,11 @@ export class AnalyticsService {
         });
       after = c.after;
     }
-    const rows = items.filter((r) => id(r) > after).sort((a, b) => id(a).localeCompare(id(b)));
+    const mapped = items.map((item) => ({ item, key: id(item) }));
+    const rows = mapped
+      .filter((r) => r.key > after)
+      .sort((a, b) => a.key.localeCompare(b.key))
+      .map((r) => r.item);
     return {
       items: rows.slice(0, q.pageSize),
       nextCursor:

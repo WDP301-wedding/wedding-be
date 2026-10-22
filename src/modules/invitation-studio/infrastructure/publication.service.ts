@@ -1,5 +1,7 @@
 import { randomBytes, randomUUID } from 'node:crypto';
 import { z } from 'zod';
+import { Prisma } from '../../../generated/prisma/client.js';
+import { prismaSchema } from '../../../core/database/prisma.js';
 import type {
   BookingMediaPrerequisiteReader,
   BookingTimelineSnapshotReader,
@@ -227,15 +229,22 @@ export class PublicationService implements InvitationPublicationReader {
   }
   async readPublic(slug: string) {
     if (!/^[a-f0-9]{64}$/u.test(slug)) throw new NotFoundError();
-    const identity = await this.repository.prisma.invitationPublicIdentity.findUnique({
-      where: { slug },
-    });
-    if (identity === null || identity.currentPublicationId === null) throw new NotFoundError();
-    const row = await this.repository.prisma.invitationPublishedRevision.findUniqueOrThrow({
-      where: { id: identity.currentPublicationId },
-    });
+    const schema = Prisma.raw(
+      '"' + prismaSchema(this.repository.prisma).replaceAll('"', '""') + '"',
+    );
+    const [row] = await this.repository.prisma.$queryRaw<
+      { id: string; bookingId: string; content: Prisma.JsonValue }[]
+    >(Prisma.sql`
+      SELECT r.id, i."bookingId", r.content
+      FROM ${schema}."InvitationPublicIdentity" i
+      JOIN ${schema}."InvitationPublishedRevision" r
+        ON r.id=i."currentPublicationId" AND r."bookingId"=i."bookingId"
+      WHERE i.slug=${slug}
+    `);
+    if (row === undefined) throw new NotFoundError();
     const latest = await this.repository.prisma.invitationPublicIdentity.findUnique({
-      where: { bookingId: identity.bookingId },
+      where: { bookingId: row.bookingId },
+      select: { currentPublicationId: true },
     });
     if (latest?.currentPublicationId !== row.id) throw new NotFoundError();
     return publicInvitationSchema.parse(row.content);

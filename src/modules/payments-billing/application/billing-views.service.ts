@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import type { BookingBoundaryUnitOfWork } from '../../../core/database/booking-unit-of-work.js';
 import { AppError } from '../../../core/errors/app-error.js';
-import { calculateBillingTotals } from '../domain/billing-policy.js';
 import {
   readBalancePaymentEligibility,
   type BalancePaymentDependencies,
@@ -46,7 +45,6 @@ export function createBillingViewsService(
     async read(input: z.input<typeof billingHistoryQuerySchema>, context: ContractContext) {
       const query = billingHistoryQuerySchema.parse(input);
       return authorized(query.bookingId, context, async (scoped, phase) => {
-        const ledger = await options.ledger.getLedger(query.bookingId, scoped);
         let cursor: z.infer<typeof cursorSchema> | undefined;
         if (query.cursor !== undefined) {
           try {
@@ -57,39 +55,65 @@ export function createBillingViewsService(
             throw invalidCursor();
           }
         }
-        const fence =
-          query.throughBillingRevision ?? cursor?.throughBillingRevision ?? ledger.revision;
-        const revision = cursor?.revision ?? 0;
         if (
-          fence > ledger.revision ||
-          revision > fence ||
-          (cursor !== undefined &&
-            (cursor.bookingId !== query.bookingId || cursor.throughBillingRevision !== fence))
+          cursor !== undefined &&
+          (cursor.bookingId !== query.bookingId ||
+            (query.throughBillingRevision !== undefined &&
+              cursor.throughBillingRevision !== query.throughBillingRevision) ||
+            cursor.revision > (query.throughBillingRevision ?? cursor.throughBillingRevision))
         )
           throw invalidCursor();
-        const entries = ledger.entries.filter((entry) => entry.revision <= fence);
-        const remaining = entries.filter((entry) => entry.revision > revision);
-        const page = remaining.slice(0, query.limit);
+
+        const requestedFence = query.throughBillingRevision ?? cursor?.throughBillingRevision;
+        const cursorRevision = cursor?.revision ?? 0;
+
+        const { headRevision, billingRevision, totals, page, hasMore } =
+          await options.ledger.readLedgerPage(
+            query.bookingId,
+            {
+              cursorRevision,
+              throughBillingRevision: requestedFence,
+              limit: query.limit,
+            },
+            scoped,
+          );
+
+        if (
+          (requestedFence !== undefined && requestedFence > headRevision) ||
+          cursorRevision > billingRevision
+        )
+          throw invalidCursor();
+
+        const balancePaymentEligibility = await readBalancePaymentEligibility(
+          {
+            bookingId: query.bookingId,
+            phase,
+            ledger: {
+              revision: headRevision,
+              totals,
+              entries: [],
+            },
+            throughBillingRevision: billingRevision,
+          },
+          options,
+          scoped,
+        );
+
         return Object.freeze({
           bookingId: query.bookingId,
-          billingRevision: fence,
-          totals: totals(entries),
-          balancePaymentEligibility: await readBalancePaymentEligibility(
-            { bookingId: query.bookingId, phase, ledger, throughBillingRevision: fence },
-            options,
-            scoped,
-          ),
+          billingRevision,
+          totals,
+          balancePaymentEligibility,
           history: Object.freeze(page.map(safeEntry)),
-          nextCursor:
-            remaining.length <= query.limit
-              ? null
-              : Buffer.from(
-                  JSON.stringify({
-                    bookingId: query.bookingId,
-                    throughBillingRevision: fence,
-                    revision: page.at(-1)!.revision,
-                  }),
-                ).toString('base64url'),
+          nextCursor: !hasMore
+            ? null
+            : Buffer.from(
+                JSON.stringify({
+                  bookingId: query.bookingId,
+                  throughBillingRevision: billingRevision,
+                  revision: page.at(-1)!.revision,
+                }),
+              ).toString('base64url'),
         });
       });
     },
@@ -113,7 +137,7 @@ export function createBillingViewsService(
       return Object.freeze<BillingReader>({
         getBookingReceivables(bookingId) {
           return authorized(bookingId, context, async (scoped) => {
-            const { totals } = await options.ledger.getLedger(bookingId, scoped);
+            const totals = await options.ledger.getReceivables(bookingId, scoped);
             return Object.freeze({
               acceptedChargesVnd: totals.acceptedChargesVnd,
               paidVnd: totals.paidVnd,
@@ -165,24 +189,6 @@ function safeEntry(entry: LedgerEntry) {
     sourceEntryId: entry.sourceEntryId,
     paymentAttemptId: entry.paymentAttemptId,
     revision: entry.revision,
-  });
-}
-function totals(entries: readonly LedgerEntry[]) {
-  const amounts = (kind: LedgerEntry['kind'], sourceType?: LedgerEntry['sourceType']) =>
-    entries
-      .filter(
-        (entry) =>
-          entry.kind === kind && (sourceType === undefined || entry.sourceType === sourceType),
-      )
-      .map((entry) => entry.amountVnd);
-  return calculateBillingTotals({
-    baseChargesVnd: entries
-      .filter((entry) => entry.kind === 'CHARGE' && entry.sourceType !== 'PRINT_ORDER')
-      .map((entry) => entry.amountVnd),
-    printChargesVnd: amounts('CHARGE', 'PRINT_ORDER'),
-    creditAdjustmentsVnd: amounts('CREDIT_ADJUSTMENT'),
-    settledPaymentsVnd: amounts('PAYMENT'),
-    completedRefundsVnd: amounts('REFUND'),
   });
 }
 function invalidCursor() {

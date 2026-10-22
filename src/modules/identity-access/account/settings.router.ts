@@ -32,7 +32,10 @@ export function createAccountSettingsRouter(
   router.use('/auth/password-changes', limited, authenticate);
   router.get('/auth/profile', async (_request, response) => {
     const actor = actorOf(response);
-    const account = await prisma.account.findUniqueOrThrow({ where: { id: actor.accountId } });
+    const account = await prisma.account.findUniqueOrThrow({
+      where: { id: actor.accountId },
+      select: { id: true, displayEmail: true, displayName: true, profileRevision: true },
+    });
     response.set('Cache-Control', 'no-store').json(
       profileResponseSchema.parse({
         data: {

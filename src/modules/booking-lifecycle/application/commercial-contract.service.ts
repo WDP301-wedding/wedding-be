@@ -185,19 +185,7 @@ export function createCommercialContractService(options: Options) {
       throw commercialConflict('COMMERCIAL_PREDECESSOR_STALE');
     const catalog = options.catalog(client);
     const { restaurant, hall } = await catalog.requireVenue(booking.hallId, booking.shiftCode);
-    const resolved = new Map<
-      string,
-      Awaited<ReturnType<CommercialSelectionReader['requireSelection']>>
-    >();
-    // Stable lock order across different bookings sharing catalog heads.
-    for (const line of [...input.lines].sort((a, b) =>
-      (a.category + a.sourceId).localeCompare(b.category + b.sourceId),
-    )) {
-      resolved.set(
-        line.category + line.sourceId,
-        await catalog.requireSelection(line, restaurant.id),
-      );
-    }
+    const resolved = await catalog.requireSelections(input.lines, restaurant.id);
     const lines = input.lines.map((line) => resolved.get(line.category + line.sourceId)!);
     const proposal = booking.proposalSnapshot;
     if (proposal === null) throw new NotFoundError();

@@ -50,7 +50,7 @@ export function createPrismaBillingAdapter(
     ...charges,
     async getBookingReceivables(bookingId) {
       bookingId = z.uuid().parse(bookingId).toLowerCase();
-      const { totals } = await repository.getLedger(bookingId, boundary.currentContext(bookingId));
+      const totals = await repository.getReceivables(bookingId, boundary.currentContext(bookingId));
       return {
         acceptedChargesVnd: totals.acceptedChargesVnd,
         paidVnd: totals.paidVnd,

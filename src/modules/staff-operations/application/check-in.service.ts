@@ -332,10 +332,16 @@ export class CheckInService {
             : await _tx.$queryRaw<
                 StaffCheckInRecord[]
               >`SELECT DISTINCT ON ("guestId") * FROM "StaffCheckInRecord" WHERE "bookingId"=${bookingId}::uuid AND "guestId" IN (${guestIds}) ORDER BY "guestId","ledgerRevision" DESC`;
+        const groupsById = new Map(groups.map((group) => [group.guestGroupId, group]));
+        const firstByGuest = new Map(firstRows.map((row) => [row.guestId, row]));
+        const latestByGuest = new Map(latestRows.map((row) => [row.guestId, row]));
+        const guidanceByGroup = new Map(
+          guidance.groups.map((group) => [group.guestGroupId, group]),
+        );
         const items = page.items.map((r) => {
-          const group = groups.find((g) => g.guestGroupId === r.guestGroupId)!;
-          const first = firstRows.find((row) => row.guestId === r.guestId);
-          const latest = latestRows.find((row) => row.guestId === r.guestId);
+          const group = groupsById.get(r.guestGroupId)!;
+          const first = firstByGuest.get(r.guestId);
+          const latest = latestByGuest.get(r.guestId);
           return {
             ...r,
             groupName: group.name,
@@ -349,8 +355,7 @@ export class CheckInService {
                 first.groupColorSnapshot !== group.color)
                 ? ('GUEST_GROUP_CHANGED' as const)
                 : null,
-            tableLabels:
-              guidance.groups.find((g) => g.guestGroupId === r.guestGroupId)?.tableLabels ?? [],
+            tableLabels: guidanceByGroup.get(r.guestGroupId)?.tableLabels ?? [],
           };
         });
         return {
