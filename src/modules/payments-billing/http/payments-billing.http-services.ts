@@ -20,6 +20,7 @@ import {
   refundApprovalResponseSchema,
   attemptResponseSchema,
 } from './payments-billing.schemas.js';
+import type { PaymentAttemptState } from '../domain/billing-policy.js';
 
 type Providers = ReturnType<typeof createPaymentsBillingProviders>;
 export type BillingHttpOperation = 'DEPOSIT' | 'BALANCE' | 'MANUAL' | 'REFUND' | 'APPROVAL';
@@ -56,7 +57,56 @@ function context(actor: AuthenticatedActor, requestId: string): ContractContext 
   };
 }
 
+interface ReconcileResult {
+  readonly status: PaymentAttemptState;
+  readonly applicationStatus: 'PENDING' | 'SUCCEEDED' | null;
+  readonly checkoutUrl?: string | undefined;
+}
+
+const MAX_COOLDOWNS = 500;
+const RECONCILE_COOLDOWN_MS = 3_000;
+
+class BoundedCooldownCache<T> {
+  private readonly map = new Map<string, { readonly value: T; readonly expiresAt: number }>();
+  constructor(private readonly maxEntries = MAX_COOLDOWNS) {}
+
+  get(key: string, nowMs = Date.now()): T | undefined {
+    const entry = this.map.get(key);
+    if (!entry) return undefined;
+    if (entry.expiresAt <= nowMs) {
+      this.map.delete(key);
+      return undefined;
+    }
+    return entry.value;
+  }
+
+  set(key: string, value: T, ttlMs: number, nowMs = Date.now()): void {
+    if (this.map.size >= this.maxEntries) {
+      for (const [k, v] of this.map.entries()) {
+        if (v.expiresAt <= nowMs) {
+          this.map.delete(k);
+        }
+      }
+      while (this.map.size >= this.maxEntries) {
+        const oldestKey = this.map.keys().next().value;
+        if (oldestKey !== undefined) {
+          this.map.delete(oldestKey);
+        } else {
+          break;
+        }
+      }
+    }
+    this.map.set(key, { value, expiresAt: nowMs + ttlMs });
+  }
+
+  delete(key: string): void {
+    this.map.delete(key);
+  }
+}
+
 export function createPaymentsBillingHttpServices(prisma: PrismaClient, providers: Providers) {
+  const inFlightReconciles = new Map<string, Promise<ReconcileResult>>();
+  const reconcileCooldowns = new BoundedCooldownCache<ReconcileResult>(MAX_COOLDOWNS);
   const idempotency = createBillingHttpIdempotency(prisma);
   async function authorize(
     bookingId: string,
@@ -339,26 +389,89 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
       let status = attempt.state;
       let applicationStatus: 'PENDING' | 'SUCCEEDED' | null = null;
       let checkoutUrl: string | undefined;
-      if (attempt.provider === 'VNPAY' && providers.vnpay !== null) {
-        const result = await providers.vnpay.reconcile(bookingId, attemptId, {
-          ...ctx,
-          actorAccountId: null,
-          authority: 'SYSTEM',
-        });
-        status = result.status;
-        applicationStatus = result.applicationStatus;
-        checkoutUrl = result.checkoutUrl;
+
+      const isTerminal = status === 'SUCCEEDED' || status === 'FAILED';
+      const isExpired = Date.now() > Date.parse(attempt.expiresAt);
+
+      if (isTerminal) {
+        // Persisted terminal state in ledger always wins; invalidate any stale cooldown
+        reconcileCooldowns.delete(attemptId);
+        if (status === 'SUCCEEDED') {
+          if (typeof providers.ledger.getLedger === 'function') {
+            const ledger = await providers.ledger.getLedger(bookingId, ctx);
+            const payment = ledger.entries.find(
+              (entry) => entry.kind === 'PAYMENT' && entry.paymentAttemptId === attempt.id,
+            );
+            applicationStatus =
+              payment !== undefined &&
+              (attempt.purpose === 'BALANCE' ||
+                (typeof providers.ledger.isDepositApplied === 'function' &&
+                  (await providers.ledger.isDepositApplied(bookingId, payment.id, ctx))))
+                ? 'SUCCEEDED'
+                : 'PENDING';
+          } else {
+            applicationStatus = 'SUCCEEDED';
+          }
+        }
+      } else if (attempt.provider === 'VNPAY' && providers.vnpay !== null) {
+        const nowMs = Date.now();
+        const cached = reconcileCooldowns.get(attemptId, nowMs);
+        if (cached !== undefined && !isExpired) {
+          status = cached.status;
+          applicationStatus = cached.applicationStatus;
+          checkoutUrl = cached.checkoutUrl;
+        } else {
+          let pending = inFlightReconciles.get(attemptId);
+          if (pending === undefined) {
+            pending = providers.vnpay
+              .reconcile(bookingId, attemptId, {
+                ...ctx,
+                actorAccountId: null,
+                authority: 'SYSTEM',
+              })
+              .then((result) => {
+                const res: ReconcileResult = {
+                  status: result.status,
+                  applicationStatus: result.applicationStatus,
+                  checkoutUrl: result.checkoutUrl,
+                };
+                if (result.status !== 'SUCCEEDED' && result.status !== 'FAILED') {
+                  reconcileCooldowns.set(attemptId, res, RECONCILE_COOLDOWN_MS, Date.now());
+                } else {
+                  reconcileCooldowns.delete(attemptId);
+                }
+                return res;
+              })
+              .finally(() => {
+                inFlightReconciles.delete(attemptId);
+              });
+            inFlightReconciles.set(attemptId, pending);
+          }
+          const result = await pending;
+          status = result.status;
+          applicationStatus = result.applicationStatus;
+          checkoutUrl = result.checkoutUrl;
+        }
       } else if (status === 'SUCCEEDED') {
-        const ledger = await providers.ledger.getLedger(bookingId, ctx);
-        const payment = ledger.entries.find(
-          (entry) => entry.kind === 'PAYMENT' && entry.paymentAttemptId === attempt.id,
-        );
-        applicationStatus =
-          payment !== undefined &&
-          (attempt.purpose === 'BALANCE' ||
-            (await providers.ledger.isDepositApplied(bookingId, payment.id, ctx)))
-            ? 'SUCCEEDED'
-            : 'PENDING';
+        if (typeof providers.ledger.getLedger === 'function') {
+          const ledger = await providers.ledger.getLedger(bookingId, ctx);
+          const payment = ledger.entries.find(
+            (entry) => entry.kind === 'PAYMENT' && entry.paymentAttemptId === attempt.id,
+          );
+          applicationStatus =
+            payment !== undefined &&
+            (attempt.purpose === 'BALANCE' ||
+              (typeof providers.ledger.isDepositApplied === 'function' &&
+                (await providers.ledger.isDepositApplied(bookingId, payment.id, ctx))))
+              ? 'SUCCEEDED'
+              : 'PENDING';
+        } else {
+          applicationStatus = 'SUCCEEDED';
+        }
+      }
+
+      if (status === 'SUCCEEDED' || status === 'FAILED' || isExpired) {
+        checkoutUrl = undefined;
       }
       await authorize(bookingId, actor, attempt.purpose === 'DEPOSIT' ? 'RESTRICTED' : 'FULL');
       return attemptResponseSchema.parse({

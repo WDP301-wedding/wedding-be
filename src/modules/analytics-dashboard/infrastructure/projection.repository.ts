@@ -102,6 +102,26 @@ export function createProjectionRepository(prisma: PrismaClient): ProjectionStor
         { timeout: 60000 },
       );
     },
+    async touchCheckpoints(scope, expectedGeneration, checkpoints) {
+      return prisma.$transaction(
+        async (tx) => {
+          await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'analytics/' + scope}))`;
+          const head = await tx.analyticsHead.findUnique({ where: { scope } });
+          if ((head?.generationId ?? null) !== expectedGeneration)
+            throw new AppError({
+              status: 409,
+              code: 'ANALYTICS_REFRESH_CONFLICT',
+              message: 'The projection changed during refresh. Retry.',
+            });
+          await tx.analyticsGeneration.update({
+            where: { id: expectedGeneration },
+            data: { checkpoints },
+          });
+          return expectedGeneration;
+        },
+        { timeout: 10000 },
+      );
+    },
   };
 }
 async function readFiltered(

@@ -125,6 +125,62 @@ export interface MediaRepository {
     command?: MediaCommandIdentity,
     context?: MediaRequestContext,
   ): Promise<T>;
+  previewAsset(
+    bookingId: string,
+    assetId: string,
+    context?: MediaRequestContext,
+    authorize?: (scopedContext: MediaRequestContext) => Promise<void>,
+  ): Promise<{
+    readonly asset: MediaAsset;
+    readonly file: MediaFileRevision;
+    readonly policy: MediaPolicy | null;
+  }>;
+  claimUploadLease(
+    input: {
+      bookingId: string;
+      bytes: number;
+      assetId?: string;
+      expectedRevision?: number;
+      idempotencyKey: string;
+      commandDigest: string;
+      intentKeyDigest: string;
+      object: StoredObject;
+      cutoffAt?: string;
+    },
+    context: MediaRequestContext,
+  ): Promise<
+    | { readonly replay: true; readonly asset: MediaAsset }
+    | {
+        readonly replay: false;
+        readonly leaseToken: string;
+        readonly uploadAttemptId: string;
+        readonly policyRevision: number;
+        readonly cutoffAt: string;
+        readonly prior?: MediaAsset;
+      }
+  >;
+  acceptUpload(
+    input: {
+      bookingId: string;
+      leaseToken: string;
+      intentKeyDigest: string;
+      commandDigest: string;
+      uploadAttemptId: string;
+      prior?: MediaAsset;
+      object: StoredObject;
+      dimensions: { width: number; height: number };
+      altText: string;
+      policyRevision: number;
+      cutoffAt: string;
+    },
+    context: MediaRequestContext,
+    authorize?: (scopedContext: MediaRequestContext) => Promise<void>,
+  ): Promise<MediaAsset>;
+  releaseUploadLease(
+    bookingId: string,
+    intentKeyDigest: string,
+    leaseToken?: string,
+  ): Promise<void>;
   recordUploadAttempt(attempt: MediaUploadAttempt): Promise<void>;
   recordDeniedAccess(bookingId: string, context: MediaRequestContext): Promise<void>;
 }

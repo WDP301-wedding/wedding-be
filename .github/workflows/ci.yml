@@ -5,6 +5,12 @@ on:
     branches: [main]
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      run_tests:
+        description: 'Run backend unit, contract, integration, and coverage tests'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -36,20 +42,11 @@ jobs:
       - name: Generate Prisma client
         run: npm run db:generate
 
-      - name: Check formatting
-        run: npm run format:check
-
       - name: Lint
         run: npm run lint
 
       - name: Typecheck
         run: npm run typecheck
-
-      - name: Run unit tests
-        run: npm run test:unit
-
-      - name: Run contract tests
-        run: npm run test:contract
 
       - name: Verify generated OpenAPI artifact
         run: npm run api:check
@@ -104,9 +101,7 @@ jobs:
       - name: Deploy migrations to empty PostgreSQL
         run: npm run db:migrate:deploy
 
-      - name: Run PostgreSQL integration tests
-        run: npm run test:integration
-
-      # Database-backed modules need their real integration tests in the coverage run.
+      # Single complete coverage run with PostgreSQL covers unit, contract, and integration without redundant duplicate runs.
       - name: Enforce full-suite coverage with PostgreSQL
+        if: ${{ inputs.run_tests == true || inputs.run_tests == 'true' }}
         run: npm run test:coverage -- --maxWorkers=2

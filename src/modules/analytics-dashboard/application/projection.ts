@@ -45,8 +45,15 @@ export interface ProjectionStore {
     expectedGeneration: string | null,
     projection: Omit<Projection, 'generationId'>,
   ): Promise<string>;
+  touchCheckpoints?(
+    scope: string,
+    expectedGeneration: string,
+    checkpoints: readonly Checkpoint[],
+  ): Promise<string>;
 }
 export class AnalyticsProjector {
+  private readonly inFlight = new Map<string, Promise<string>>();
+
   constructor(
     readonly sources: Record<ReportingOwner, ReportingReader>,
     readonly store: ProjectionStore,
@@ -60,6 +67,24 @@ export class AnalyticsProjector {
     rebuild = false,
     entryPoint: AnalyticsEntryPoint = 'cli',
   ) {
+    if (rebuild) {
+      return this.executeRefresh(scope, context, true, entryPoint);
+    }
+    let pending = this.inFlight.get(scope);
+    if (pending === undefined) {
+      pending = this.executeRefresh(scope, context, false, entryPoint).finally(() => {
+        if (this.inFlight.get(scope) === pending) this.inFlight.delete(scope);
+      });
+      this.inFlight.set(scope, pending);
+    }
+    return pending;
+  }
+  private async executeRefresh(
+    scope: string,
+    context: ContractContext,
+    rebuild: boolean,
+    entryPoint: AnalyticsEntryPoint,
+  ): Promise<string> {
     const observation = this.observe
       ? new AnalyticsRefreshObservation(this.observe, scope, context, entryPoint, rebuild)
       : undefined;
@@ -81,6 +106,41 @@ export class AnalyticsProjector {
     const previous = await this.store.load(scope);
     // One owner-head observation forms the common committed cut; sequences remain owner-local.
     const sourceFences = await this.fences?.();
+
+    const canNoop =
+      !rebuild &&
+      previous !== null &&
+      sourceFences !== undefined &&
+      previous.checkpoints.length === reportingOwners.length &&
+      previous.checkpoints.every(
+        (c) =>
+          c.status === 'READY' &&
+          sourceFences[c.owner] !== undefined &&
+          sourceFences[c.owner] === c.throughSequence,
+      );
+
+    if (canNoop) {
+      if (observation) {
+        for (const owner of reportingOwners) {
+          const observed = observation.owner(owner);
+          observed.status = 'READY';
+          observed.pages = 0;
+          observed.rows = 0;
+        }
+      }
+      const nowIso = this.now().toISOString();
+      const updatedCheckpoints = previous.checkpoints.map((c) => ({
+        ...c,
+        refreshedAt: nowIso,
+      }));
+      if (this.store.touchCheckpoints) {
+        return this.store.touchCheckpoints(scope, previous.generationId, updatedCheckpoints);
+      }
+      return this.store.publish(scope, previous.generationId, {
+        checkpoints: updatedCheckpoints,
+        rows: previous.rows,
+      });
+    }
     const rows = new Map(
       (rebuild ? [] : (previous?.rows ?? [])).map((r) => [r.owner + '/' + r.recordId, r]),
     );

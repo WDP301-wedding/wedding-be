@@ -115,10 +115,156 @@ type MediaRow = Readonly<{
   displayOrder: number;
 }>;
 
+export interface CatalogMediaOptions {
+  readonly cacheTtlSeconds?: number;
+  readonly maxConcurrency?: number;
+}
+
+interface CachedSignedUrl {
+  readonly url: string;
+  readonly expiresAtMs: number;
+}
+
+
+class AsyncSemaphore {
+  private active = 0;
+  private readonly queue: Array<() => void> = [];
+
+  constructor(private readonly maxConcurrency: number) {}
+
+  async acquire(): Promise<() => void> {
+    if (this.active < this.maxConcurrency) {
+      this.active++;
+      let released = false;
+      return () => {
+        if (!released) {
+          released = true;
+          this.release();
+        }
+      };
+    }
+
+    return new Promise<() => void>((resolve) => {
+      this.queue.push(() => {
+        this.active++;
+        let released = false;
+        resolve(() => {
+          if (!released) {
+            released = true;
+            this.release();
+          }
+        });
+      });
+    });
+  }
+
+  private release(): void {
+    this.active--;
+    if (this.queue.length > 0 && this.active < this.maxConcurrency) {
+      const next = this.queue.shift();
+      if (next) next();
+    }
+  }
+
+  async run<T>(fn: () => Promise<T>): Promise<T> {
+    const release = await this.acquire();
+    try {
+      return await fn();
+    } finally {
+      release();
+    }
+  }
+}
+
 export function createCatalogMediaService(
   prisma: PrismaClient,
   storage: StorageProvider,
+  options?: CatalogMediaOptions,
 ): CatalogMediaService {
+  const cacheTtlMs = (options?.cacheTtlSeconds ?? 0) * 1000;
+  const rawConcurrency = options?.maxConcurrency;
+  const concurrencyCap =
+    typeof rawConcurrency === 'number' && Number.isFinite(rawConcurrency) && rawConcurrency >= 1
+      ? Math.floor(rawConcurrency)
+      : 6;
+  const signingSemaphore = new AsyncSemaphore(concurrencyCap);
+  const urlCache = new Map<string, CachedSignedUrl>();
+  const inFlight = new Map<
+    string,
+    Promise<{ readonly url: string; readonly expiresInSeconds: number }>
+  >();
+
+  async function getSignedUrl(
+    asset: MediaRow,
+  ): Promise<{ readonly url: string; readonly expiresInSeconds: number }> {
+    const now = Date.now();
+    if (cacheTtlMs > 0) {
+      const cached = urlCache.get(asset.objectKey);
+      if (cached !== undefined && cached.expiresAtMs > now + 30_000) {
+        return {
+          url: cached.url,
+          expiresInSeconds: Math.max(1, Math.floor((cached.expiresAtMs - now) / 1000)),
+        };
+      }
+    }
+
+    let pending = inFlight.get(asset.objectKey);
+    if (pending === undefined) {
+      const reference = createStorageObjectReference({
+        objectKey: asset.objectKey,
+        purpose: CATALOG_PLATFORM_POLICY.storagePurpose,
+        resourceId: asset.resourceId,
+      });
+      pending = signingSemaphore
+        .run(() =>
+          storage.createSignedReadUrl(reference, CATALOG_PLATFORM_POLICY.signedReadTtlSeconds),
+        )
+        .then((url) => {
+          const ttlSeconds = CATALOG_PLATFORM_POLICY.signedReadTtlSeconds;
+          if (cacheTtlMs > 0) {
+            if (urlCache.size >= 2000) {
+              const first = urlCache.keys().next().value;
+              if (first !== undefined) urlCache.delete(first);
+            }
+            urlCache.set(asset.objectKey, {
+              url,
+              expiresAtMs: Date.now() + Math.min(cacheTtlMs, ttlSeconds * 1000),
+            });
+          }
+          return { url, expiresInSeconds: ttlSeconds };
+        })
+        .finally(() => {
+          inFlight.delete(asset.objectKey);
+        });
+      inFlight.set(asset.objectKey, pending);
+    }
+
+    return pending;
+  }
+
+  async function signAsset(asset: MediaRow): Promise<CatalogMediaView> {
+    const { url: signedUrl, expiresInSeconds: signedUrlExpiresInSeconds } =
+      await getSignedUrl(asset);
+    if (
+      asset.contentType !== 'image/jpeg' &&
+      asset.contentType !== 'image/png' &&
+      asset.contentType !== 'image/webp'
+    ) {
+      throw new ValidationError();
+    }
+    return Object.freeze({
+      id: asset.id,
+      resourceType: asset.resourceType,
+      resourceId: asset.resourceId,
+      contentType: asset.contentType,
+      sizeBytes: asset.sizeBytes,
+      alternativeText: asset.alternativeText,
+      displayOrder: asset.displayOrder,
+      signedUrl,
+      signedUrlExpiresInSeconds,
+    });
+  }
+
   const service: CatalogMediaService = {
     async listSignedHallPage(input) {
       const snapshot = await readCatalogHallPage(prisma, input);
@@ -129,7 +275,7 @@ export function createCatalogMediaService(
       const items = await Promise.all(
         snapshot.rows.slice(0, input.limit).map(async ({ assets, ...hall }) => ({
           ...hall,
-          media: Object.freeze(await Promise.all(assets.map((asset) => signAsset(storage, asset)))),
+          media: Object.freeze(await Promise.all(assets.map(signAsset))),
         })),
       );
       return { items, nextCursor: snapshot.rows.length > input.limit ? items.at(-1)!.id : null };
@@ -164,7 +310,7 @@ export function createCatalogMediaService(
           });
           return created;
         });
-        return signAsset(storage, asset);
+        return signAsset(asset);
       } catch (error: unknown) {
         await deleteOrphan(prisma, storage, stored);
         throw mapMediaConflict(error);
@@ -220,7 +366,7 @@ export function createCatalogMediaService(
         if (detached !== undefined) {
           await deleteIfUnreferenced(prisma, storage, detached);
         }
-        return signAsset(storage, replacement);
+        return signAsset(replacement);
       } catch (error: unknown) {
         await deleteOrphan(prisma, storage, stored);
         throw mapMediaConflict(error);
@@ -298,7 +444,7 @@ export function createCatalogMediaService(
         where: { resourceType, resourceId, detachedAt: null },
         orderBy: { displayOrder: 'asc' },
       });
-      return Object.freeze(await Promise.all(assets.map((asset) => signAsset(storage, asset))));
+      return Object.freeze(await Promise.all(assets.map(signAsset)));
     },
     async listSignedBatch(resourceTypeInput, resourceIds) {
       const resourceType = validateResourceType(resourceTypeInput);
@@ -310,7 +456,7 @@ export function createCatalogMediaService(
         where: { resourceType, resourceId: { in: ids }, detachedAt: null },
         orderBy: [{ resourceId: 'asc' }, { displayOrder: 'asc' }],
       });
-      const signed = await Promise.all(assets.map((asset) => signAsset(storage, asset)));
+      const signed = await Promise.all(assets.map(signAsset));
       for (const asset of signed) result.get(asset.resourceId)!.push(asset);
       return new Map([...result].map(([id, items]) => [id, Object.freeze(items)]));
     },
@@ -423,36 +569,6 @@ function mediaData(input: UploadCatalogMediaInput, stored: StoredObject, display
     displayOrder,
     createdByAccountId: input.context.actorId,
   } as const;
-}
-
-async function signAsset(storage: StorageProvider, asset: MediaRow): Promise<CatalogMediaView> {
-  const reference = createStorageObjectReference({
-    objectKey: asset.objectKey,
-    purpose: CATALOG_PLATFORM_POLICY.storagePurpose,
-    resourceId: asset.resourceId,
-  });
-  const signedUrl = await storage.createSignedReadUrl(
-    reference,
-    CATALOG_PLATFORM_POLICY.signedReadTtlSeconds,
-  );
-  if (
-    asset.contentType !== 'image/jpeg' &&
-    asset.contentType !== 'image/png' &&
-    asset.contentType !== 'image/webp'
-  ) {
-    throw new ValidationError();
-  }
-  return Object.freeze({
-    id: asset.id,
-    resourceType: asset.resourceType,
-    resourceId: asset.resourceId,
-    contentType: asset.contentType,
-    sizeBytes: asset.sizeBytes,
-    alternativeText: asset.alternativeText,
-    displayOrder: asset.displayOrder,
-    signedUrl,
-    signedUrlExpiresInSeconds: CATALOG_PLATFORM_POLICY.signedReadTtlSeconds,
-  });
 }
 
 async function requireResource(

@@ -5,7 +5,10 @@ import { describe, expect, it, vi } from 'vitest';
 import { NotFoundError, ProviderError, ValidationError } from '../../../core/errors/app-error.js';
 import type { PrismaClient } from '../../../generated/prisma/client.js';
 import { FakeStorageProvider } from '../../../integrations/storage/fake-storage-provider.js';
-import type { StorageProvider } from '../../../integrations/storage/storage-provider.js';
+import {
+  createStoredObject,
+  type StorageProvider,
+} from '../../../integrations/storage/storage-provider.js';
 import { createCatalogMediaService } from './catalog-media.service.js';
 
 const context = { actorId: randomUUID(), requestId: randomUUID() };
@@ -399,5 +402,61 @@ describe('catalog media service', () => {
         context,
       }),
     ).rejects.toMatchObject({ code: 'CATALOG_REVISION_CONFLICT' });
+  });
+
+  it('bounds hall page signing concurrency to configured instance cap', async () => {
+    const rows = Array.from({ length: 6 }, () => {
+      const id = randomUUID();
+      return {
+        id,
+        name: 'Hall',
+        description: '',
+        maxGuests: 100,
+        assets: Array.from({ length: 6 }, (_, displayOrder) => {
+          const object = createStoredObject({
+            bytes: new Uint8Array([
+              0x89,
+              0x50,
+              0x4e,
+              0x47,
+              0x0d,
+              0x0a,
+              0x1a,
+              0x0a,
+              displayOrder + 1,
+            ]),
+            contentType: 'image/png',
+            purpose: 'VENUE_CATALOG_MEDIA',
+            resourceId: id,
+          });
+          return {
+            id: randomUUID(),
+            resourceType: 'HALL' as const,
+            ...object,
+            alternativeText: 'Image',
+            displayOrder,
+          };
+        }),
+      };
+    });
+    let active = 0;
+    let peak = 0;
+    const storage = {
+      createSignedReadUrl: async () => {
+        active++;
+        peak = Math.max(peak, active);
+        await new Promise<void>((resolve) => setImmediate(resolve));
+        active--;
+        return 'https://storage.example.test/signed';
+      },
+    } as unknown as StorageProvider;
+    const prisma = {
+      $queryRaw: () => Promise.resolve([{ cursorValid: true, rows }]),
+    } as unknown as Parameters<typeof createCatalogMediaService>[0];
+    const service = createCatalogMediaService(prisma, storage, { maxConcurrency: 6 });
+    const result = await service.listSignedHallPage({ limit: 6 });
+    expect(result.items).toHaveLength(6);
+    expect(peak).toBeLessThanOrEqual(6);
+    expect(peak).toBeGreaterThan(0);
   });
 });

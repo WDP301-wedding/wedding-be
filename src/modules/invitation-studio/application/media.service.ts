@@ -8,7 +8,6 @@ import {
 } from '../../../integrations/storage/storage-provider.js';
 import {
   MEDIA_LIMITS,
-  claimMediaQuota,
   inspectMedia,
   mediaConflict,
   mediaUploadSchema,
@@ -55,7 +54,7 @@ export class MediaService {
     // Freeze bytes before awaiting access/decoder/storage; caller buffer mutation
     // must never change checksum, quota or the content that was actually inspected.
     const input = { ...parsed, bytes: parsed.bytes.slice() };
-    await this.requireActor(input.bookingId, context, 'COUPLE');
+    const actor = await this.requireActor(input.bookingId, context, 'COUPLE');
     const expected = createStoredObject({
       bytes: input.bytes,
       contentType: input.contentType,
@@ -64,31 +63,50 @@ export class MediaService {
     });
     const digest = this.digest({ action: 'upload', ...input, bytes: expected.checksumSha256 });
     const receiptKey = this.receiptKey(context, input.idempotencyKey);
-    // Durable intent precedes provider side effects. Failure/unknown outcomes stay
-    // recoverable without deleting a key possibly used by an immutable history.
-    return this.runCommand(input, context, digest, async (state, context) => {
-      const actor = await this.requireActor(input.bookingId, context, 'COUPLE');
-      const replay = this.replay(state, receiptKey, digest);
-      if (replay !== undefined) return replay as MediaAsset;
-      const policy = this.policy(state, actor.eventStartAt);
-      this.beforeCutoff(policy);
-      const prior = input.assetId === undefined ? undefined : this.asset(state, input.assetId);
-      if (prior !== undefined && prior.revision !== input.expectedRevision)
-        throw mediaConflict('MEDIA_REVISION_STALE');
-      claimMediaQuota(state, input.bytes.byteLength, prior?.id);
-      // Claim/serialize intent before full decoding as well as provider upload.
-      // A duplicate during decoding is in flight; a committed replay avoids decoding.
+    const cutoffAt = new Date(
+      actor.eventStartAt.getTime() - MEDIA_LIMITS.cutoffLeadMs,
+    ).toISOString();
+
+    // 1. Claim durable intent + quota reservation in short DB transaction
+    const claim = await this.repository.claimUploadLease(
+      {
+        bookingId: input.bookingId,
+        bytes: input.bytes.byteLength,
+        idempotencyKey: input.idempotencyKey,
+        commandDigest: digest,
+        intentKeyDigest: receiptKey,
+        object: expected,
+        cutoffAt,
+        ...(input.assetId !== undefined ? { assetId: input.assetId } : {}),
+        ...(input.expectedRevision !== undefined
+          ? { expectedRevision: input.expectedRevision }
+          : {}),
+      },
+      context,
+    );
+    if (claim.replay) return claim.asset;
+
+    let leaseToken: string | undefined = claim.leaseToken;
+    try {
+      if (this.now().getTime() >= Date.parse(claim.cutoffAt)) {
+        throw mediaConflict('MEDIA_CUTOFF_REACHED');
+      }
+
+      // 2. Decode/inspect media outside DB transaction
       const dimensions = await inspectMedia(input, this.inspector);
-      const uploadAttemptId = randomUUID();
+
+      // 3. Persist durable upload attempt before storage put (independent journal, no locks held)
       await this.repository.recordUploadAttempt({
-        id: uploadAttemptId,
+        id: claim.uploadAttemptId,
         bookingId: input.bookingId,
         object: expected,
         intentKeyDigest: receiptKey,
         commandDigest: digest,
         createdAt: this.now().toISOString(),
-        policyRevision: policy.revision,
+        policyRevision: claim.policyRevision,
       });
+
+      // 4. Provider upload outside DB transaction (NO LOCKS HELD!)
       const object = await this.storage.put({
         bytes: input.bytes,
         contentType: input.contentType,
@@ -109,42 +127,41 @@ export class MediaService {
           message: 'Storage acceptance could not be verified.',
         });
       }
+
+      if (this.now().getTime() >= Date.parse(claim.cutoffAt)) {
+        throw mediaConflict('MEDIA_CUTOFF_REACHED');
+      }
       await this.requireActor(input.bookingId, context, 'COUPLE');
-      this.beforeCutoff(policy);
-      const acceptedAt = this.now().toISOString(),
-        id = prior?.id ?? randomUUID(),
-        fileId = randomUUID();
-      const asset: MediaAsset = {
-        id,
-        revision: (prior?.revision ?? 0) + 1,
-        currentFileRevisionId: fileId,
-        detachedAt: null,
-      };
-      state.files.set(fileId, {
-        id: fileId,
-        assetId: id,
-        revision: asset.revision,
-        object,
-        ...dimensions,
-        altText: input.altText,
-        acceptedAt,
-        policyRevision: policy.revision,
-        cutoffAt: policy.cutoffAt,
-        uploadAttemptId,
-      });
-      state.assets.set(id, asset);
-      this.commit(
-        state,
-        receiptKey,
-        digest,
-        asset,
+
+      // 5. Short DB transaction: atomic accept with fresh scoped authorization + re-checks
+      const asset = await this.repository.acceptUpload(
+        {
+          bookingId: input.bookingId,
+          leaseToken: claim.leaseToken,
+          intentKeyDigest: receiptKey,
+          commandDigest: digest,
+          uploadAttemptId: claim.uploadAttemptId,
+          object,
+          dimensions,
+          altText: input.altText,
+          policyRevision: claim.policyRevision,
+          cutoffAt: claim.cutoffAt,
+          ...(claim.prior !== undefined ? { prior: claim.prior } : {}),
+        },
         context,
-        prior === undefined ? 'media.created' : 'media.replaced',
-        id,
-        asset.revision,
+        async (scoped) => {
+          await this.requireActor(input.bookingId, scoped, 'COUPLE');
+        },
       );
+      leaseToken = undefined;
       return asset;
-    });
+    } finally {
+      if (leaseToken !== undefined) {
+        await this.repository
+          .releaseUploadLease(input.bookingId, receiptKey, leaseToken)
+          .catch(() => undefined);
+      }
+    }
   }
 
   async authorizeUpload(bookingId: string, context: MediaRequestContext): Promise<void> {
@@ -255,29 +272,46 @@ export class MediaService {
     readonly expiresInSeconds: number;
   }> {
     const input = parseMediaInput(readSchema, value);
-    return this.repository.runLocked(
+
+    const authorize = async (scopedContext: MediaRequestContext) => {
+      await this.requireActor(input.bookingId, scopedContext);
+    };
+
+    // 1. Short read boundary: fresh authorization + exact-asset projection under scoped lock
+    const initial = await this.repository.previewAsset(
       input.bookingId,
-      async (state, scopedContext) => {
-        context = scopedContext ?? context;
-        await this.requireActor(input.bookingId, context);
-        const asset = this.asset(state, input.assetId),
-          file = state.files.get(asset.currentFileRevisionId);
-        if (file === undefined) throw new NotFoundError();
-        const signedUrl = await this.storage.createSignedReadUrl(
-          file.object,
-          MEDIA_LIMITS.signedReadSeconds,
-        );
-        await this.requireActor(input.bookingId, context);
-        return {
-          asset,
-          altText: file.altText,
-          signedUrl,
-          expiresInSeconds: MEDIA_LIMITS.signedReadSeconds,
-        };
-      },
-      undefined,
+      input.assetId,
       context,
+      authorize,
     );
+
+    // 2. Storage signing OUTSIDE ANY TRANSACTION OR LOCK
+    const signedUrl = await this.storage.createSignedReadUrl(
+      initial.file.object,
+      MEDIA_LIMITS.signedReadSeconds,
+    );
+
+    // 3. Short read boundary: fresh authorization + asset/file recheck under scoped lock
+    const final = await this.repository.previewAsset(
+      input.bookingId,
+      input.assetId,
+      context,
+      authorize,
+    );
+    if (
+      final.asset.revision !== initial.asset.revision ||
+      final.asset.currentFileRevisionId !== initial.asset.currentFileRevisionId ||
+      final.asset.detachedAt !== null
+    ) {
+      throw mediaConflict('MEDIA_REVISION_STALE');
+    }
+
+    return {
+      asset: final.asset,
+      altText: final.file.altText,
+      signedUrl,
+      expiresInSeconds: MEDIA_LIMITS.signedReadSeconds,
+    };
   }
 
   private async requireActor(
