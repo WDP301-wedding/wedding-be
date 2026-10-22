@@ -197,6 +197,50 @@ export const openApiRegistry = {
     },
   ],
   paths: {
+    '/api/v1/storage/objects/{mediaPath}': {
+      get: {
+        operationId: 'readSignedStorageObject',
+        summary: 'Read private media using a scoped expiring URL',
+        description:
+          'Available with render-disk storage. Use the complete URL returned by an authorized media/catalog operation, without modifying its path or query. The signature authorizes this object only, for at most one hour (default 15 minutes). Missing, altered or expired signatures return 404. Bytes are verified against the content-addressed key. Responses use private, no-store. No upload or directory-listing route is exposed.',
+        tags: ['Invitation Media'],
+        security: [],
+        parameters: [
+          {
+            name: 'mediaPath',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' },
+            description:
+              'Complete content key including purpose/resource directories; preserve the returned URL.',
+          },
+          {
+            name: 'expires',
+            in: 'query',
+            required: true,
+            schema: { type: 'string', pattern: '^[1-9]\\d{0,11}$' },
+          },
+          {
+            name: 'signature',
+            in: 'query',
+            required: true,
+            schema: { type: 'string', pattern: '^[a-f0-9]{64}$' },
+          },
+        ],
+        responses: {
+          '200': {
+            description: 'Verified original image bytes.',
+            content: {
+              'image/png': { schema: { type: 'string', format: 'binary' } },
+              'image/jpeg': { schema: { type: 'string', format: 'binary' } },
+              'image/webp': { schema: { type: 'string', format: 'binary' } },
+            },
+          },
+          '404': { $ref: '#/components/responses/NotFound' },
+          '502': { $ref: '#/components/responses/BadGateway' },
+        },
+      },
+    },
     ...notificationOpenApiPaths,
     ...analyticsOpenApiPaths,
     ...seatingOpenApiPaths,

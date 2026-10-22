@@ -27,7 +27,7 @@ import { createPrismaIdempotencyRepository } from '../../core/idempotency/idempo
 import { createIdempotencyService } from '../../core/idempotency/idempotency.service.js';
 import { FakeStorageProvider } from '../../integrations/storage/fake-storage-provider.js';
 import type { StorageProvider } from '../../integrations/storage/storage-provider.js';
-import { createSupabaseStorageProvider } from '../../integrations/storage/supabase-storage-provider.js';
+import { createStorageProvider } from '../../integrations/storage/storage.factory.js';
 import { createAuthenticatedActorResolver } from '../identity-access/authorization/authenticated-actor.middleware.js';
 import { createPrismaSessionRepository } from '../identity-access/session/session.repository.js';
 import { createCatalogMediaService } from './application/catalog-media.service.js';
@@ -128,9 +128,7 @@ export async function createVenueCatalogRuntime(config: Config): Promise<VenueCa
 }
 
 function createStorage(config: Config): StorageProvider {
-  return config.storage.enabled
-    ? createSupabaseStorageProvider(config.storage)
-    : new FakeStorageProvider();
+  return config.storage.enabled ? createStorageProvider(config.storage) : new FakeStorageProvider();
 }
 
 export function catalogIdempotencyPayload(request: Request): unknown {

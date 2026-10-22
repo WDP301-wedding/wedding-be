@@ -11,4 +11,7 @@ case "${MIGRATION_DATABASE_URL:?}" in
 esac
 export DATABASE_URL="${DATABASE_URL}?sslmode=require&uselibpqcompat=true"
 export MIGRATION_DATABASE_URL="${MIGRATION_DATABASE_URL}?sslmode=require&uselibpqcompat=true"
+if [ "${STORAGE_IMPORT_FROM_SUPABASE:-false}" = 'true' ]; then
+  node ./scripts/render-copy-media.mjs
+fi
 exec node --enable-source-maps --import ./dist/instrumentation.js dist/server.js

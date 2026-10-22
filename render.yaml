@@ -1,4 +1,4 @@
-# Free migration trial. See docs/render-migration-2026-10-22.md before cutover.
+# Paid backend + 1 GB disk approved by the owner; PostgreSQL remains Free.
 databases:
   - name: wedding-db-render-trial
     plan: free
@@ -14,18 +14,30 @@ services:
     runtime: docker
     repo: https://github.com/WDP301-wedding/wedding-be
     branch: codex/render-migration-20261022
-    plan: free
+    plan: starter
     region: singapore
     dockerfilePath: ./Dockerfile
     dockerContext: .
     healthCheckPath: /health/ready
     autoDeployTrigger: 'off'
     numInstances: 1
+    disk:
+      name: wedding-media
+      mountPath: /var/data
+      sizeGB: 1
     # Render's fromDatabase connectionString has no query string. Require TLS on
     # the private network; libpq-compatible require supports Render's internal CA.
     # No migration runs at startup: import and compare the new DB first.
     dockerCommand: /bin/sh ./scripts/render-start.sh
     envVars:
+      - key: STORAGE_DRIVER
+        value: render-disk
+      - key: STORAGE_DISK_PATH
+        value: /var/data/wedding-media
+      - key: STORAGE_PUBLIC_ORIGIN
+        value: https://wedding-be-render-trial.onrender.com
+      - key: STORAGE_SIGNING_KEY
+        sync: false
       - key: DATABASE_URL
         fromDatabase:
           name: wedding-db-render-trial

@@ -6,6 +6,10 @@ import type { Express } from 'express';
 import type { Logger } from 'pino';
 
 import { createApp, type CreateAppOptions } from './app.js';
+import {
+  DiskStorageProvider,
+  createDiskStorageRouter,
+} from './integrations/storage/disk-storage-provider.js';
 import type { Config } from './config/config.js';
 import { createRuntimeFeatureManifest } from './config/runtime-manifest.js';
 import {
@@ -463,6 +467,11 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
       app.use(createGuestImportBodyParser());
     },
     registerRoutes: (app) => {
+      if (config.storage.enabled && 'provider' in config.storage)
+        app.use(
+          '/api/v1/storage',
+          createDiskStorageRouter(new DiskStorageProvider(config.storage)),
+        );
       app.use('/api/v1', identityRuntime.router);
       app.use('/api/v1', venueCatalogRuntime.router);
       app.use('/api/v1', invitationStudioRuntime.router);

@@ -41,11 +41,19 @@ export function createRuntimeFeatureManifest(config: BackendConfig, revision?: s
       ),
       catalogStorage: feature(
         config.storage.enabled,
-        config.storage.enabled ? 'supabase-private' : 'development-fake',
+        config.storage.enabled
+          ? 'provider' in config.storage
+            ? config.storage.provider
+            : 'supabase-private'
+          : 'development-fake',
       ),
       invitationStorage: feature(
         config.storage.enabled,
-        config.storage.enabled ? 'supabase-private' : 'unavailable',
+        config.storage.enabled
+          ? 'provider' in config.storage
+            ? config.storage.provider
+            : 'supabase-private'
+          : 'unavailable',
       ),
       gemini: feature(
         config.aiImage.provider === 'gemini',
