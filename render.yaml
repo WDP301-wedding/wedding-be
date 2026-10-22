@@ -77,13 +77,13 @@ services:
       - key: PERF_READONLY_DB_PROBE
         value: 'false'
       - key: SEATING_RECONCILER_ENABLED
-        value: 'false'
+        sync: false
       - key: NOTIFICATIONS_WORKER_ENABLED
-        value: 'false'
+        sync: false
       - key: NOTIFICATIONS_FCM_ENABLED
-        value: 'false'
+        sync: false
       - key: AI_IMAGE_JOBS_ENABLED
-        value: 'false'
+        sync: false
       - key: CORS_ALLOWED_ORIGINS
         sync: false
       - key: AUTH_OTP_HASH_KEY

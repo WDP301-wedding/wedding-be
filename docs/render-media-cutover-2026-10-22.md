@@ -4,6 +4,10 @@ The owner authorized moving existing Supabase images to Render and connecting th
 official wedding-web deployment directly, without a frontend preview. The approved
 budget is the smallest paid backend ($7/month) plus a 1 GB disk ($0.25/month).
 PostgreSQL stays Free and expires on 2026-11-21; this is not durable paid DB hosting.
+The owner also authorized restoring email, FCM, AI and internal scheduling workers
+to the existing Railway configuration after the final data transfer. Blueprint
+worker flags use `sync: false` so applying infrastructure does not overwrite that
+operator-controlled cutover state.
 
 ## Storage contract
 
