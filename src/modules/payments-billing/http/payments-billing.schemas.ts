@@ -11,6 +11,12 @@ const evidence = {
 };
 export const bookingParamsSchema = z.strictObject({ bookingId: uuid });
 export const attemptParamsSchema = z.strictObject({ bookingId: uuid, attemptId: uuid });
+export const attemptReadQuerySchema = z.strictObject({ reconcile: z.literal('false').optional() });
+const providerFields = z.record(z.string().max(64), z.string().max(512));
+export const queryRequestResponseSchema = z.strictObject({
+  data: z.strictObject({ request: providerFields.nullable() }),
+});
+export const queryEvidenceBodySchema = z.strictObject({ response: providerFields });
 export const depositBodySchema = z.strictObject({
   timelineRevisionId: uuid,
   contractRevisionId: uuid.optional(),

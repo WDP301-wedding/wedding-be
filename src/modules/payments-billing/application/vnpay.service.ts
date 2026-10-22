@@ -186,6 +186,55 @@ export function createVnpayService(
     });
   }
   return Object.freeze({
+    async inspectCheckout(bookingId: string, paymentAttemptId: string, context: ContractContext) {
+      if (context.authority !== 'SYSTEM' || context.actorAccountId !== null)
+        throw new AppError({
+          status: 403,
+          code: 'FORBIDDEN',
+          message: 'The request is forbidden.',
+        });
+      return options.boundary.run({ bookingId, context }, async (scoped) => {
+        const attempt = await options.ledger.getAttempt(bookingId, paymentAttemptId, scoped);
+        const checkout = await options.evidence.getCheckout(bookingId, paymentAttemptId, scoped);
+        return {
+          status: attempt.state,
+          applicationStatus: null,
+          ...(!['SUCCEEDED', 'FAILED'].includes(attempt.state) &&
+          checkout !== null &&
+          now().getTime() < Date.parse(attempt.expiresAt)
+            ? { checkoutUrl: options.protocol.checkoutUrl(checkout.parameters) }
+            : {}),
+        };
+      });
+    },
+    // A relay transports this read-only signed request; it cannot choose another
+    // merchant, amount, order or original provider transaction date.
+    async prepareQuery(bookingId: string, paymentAttemptId: string, context: ContractContext) {
+      if (context.authority !== 'SYSTEM' || context.actorAccountId !== null)
+        throw new AppError({
+          status: 403,
+          code: 'FORBIDDEN',
+          message: 'The request is forbidden.',
+        });
+      const snapshot = await options.boundary.run({ bookingId, context }, async (scoped) => ({
+        attempt: await options.ledger.getAttempt(bookingId, paymentAttemptId, scoped),
+        checkout: await options.evidence.getCheckout(bookingId, paymentAttemptId, scoped),
+      }));
+      if (snapshot.attempt.state === 'SUCCEEDED' || snapshot.attempt.state === 'FAILED')
+        return null;
+      if (snapshot.attempt.provider !== 'VNPAY' || snapshot.checkout === null)
+        throw new AppError({
+          status: 503,
+          code: 'PAYMENT_PROVIDER_UNAVAILABLE',
+          message: 'The payment checkout has not been prepared.',
+        });
+      return options.protocol.createQuery({
+        paymentAttemptId,
+        transactionDate: snapshot.checkout.parameters.vnp_CreateDate!,
+        requestId: randomUUID().replaceAll('-', ''),
+        createdAt: now().toISOString(),
+      });
+    },
     async startCheckout(
       input: Parameters<Deposits['createDeposit']>[0],
       ip: string,
@@ -238,7 +287,12 @@ export function createVnpayService(
       }
     },
     // Internal SYSTEM worker port. W6 authorizes any user-triggered status read separately.
-    async reconcile(bookingId: string, paymentAttemptId: string, context: ContractContext) {
+    async reconcile(
+      bookingId: string,
+      paymentAttemptId: string,
+      context: ContractContext,
+      queryReply?: Readonly<{ raw: unknown }>,
+    ) {
       if (context.authority !== 'SYSTEM' || context.actorAccountId !== null)
         throw new AppError({
           status: 403,
@@ -260,14 +314,16 @@ export function createVnpayService(
         let proof: ProviderEvidence | null = null;
         try {
           proof = options.protocol.verifyQuery(
-            await options.gateway.query(
-              options.protocol.createQuery({
-                paymentAttemptId,
-                transactionDate: snapshot.checkout.parameters.vnp_CreateDate!,
-                requestId: randomUUID().replaceAll('-', ''),
-                createdAt: now().toISOString(),
-              }),
-            ),
+            queryReply !== undefined
+              ? queryReply.raw
+              : await options.gateway.query(
+                  options.protocol.createQuery({
+                    paymentAttemptId,
+                    transactionDate: snapshot.checkout.parameters.vnp_CreateDate!,
+                    requestId: randomUUID().replaceAll('-', ''),
+                    createdAt: now().toISOString(),
+                  }),
+                ),
             snapshot.attempt,
           );
           if (proof.paymentAttemptId !== paymentAttemptId) proof = null;

@@ -15,6 +15,8 @@ import {
   billingResponseSchema,
   balancePaymentEligibilitySchema,
   ipnResponseSchema,
+  queryEvidenceBodySchema,
+  queryRequestResponseSchema,
 } from './payments-billing.schemas.js';
 import { vnpayIpnFieldsSchema } from '../infrastructure/vnpay.protocol.js';
 
@@ -143,6 +145,45 @@ export const paymentsBillingOpenApiPaths: NonNullable<ZodOpenApiObject['paths']>
       refundResponseSchema,
     ),
   },
+  '/bookings/{bookingId}/payments/{attemptId}/query': {
+    get: {
+      operationId: 'preparePaymentQuery',
+      summary:
+        'Authorize an owned attempt and prepare its read-only signed sandbox query. Durable five-minute cooldown; terminal attempts return null. Never log the signed request.',
+      tags: ['Payments and Billing'],
+      security: bearer,
+      parameters: [...booking, path('attemptId')],
+      responses: {
+        '200': response(
+          'Signed provider query or null for a terminal attempt.',
+          queryRequestResponseSchema,
+        ),
+        ...errors,
+        '429': { $ref: '#/components/responses/TooManyRequests' },
+      },
+    },
+  },
+  '/bookings/{bookingId}/payments/{attemptId}/evidence': {
+    post: {
+      operationId: 'reconcilePaymentEvidence',
+      summary:
+        'Submit relayed querydr evidence for an owned attempt. Backend verifies provider HMAC, merchant, order and amount before serialized idempotent settlement. Unverified replies retain UNKNOWN. ReturnURL parameters are not accepted as settlement.',
+      tags: ['Payments and Billing'],
+      security: bearer,
+      parameters: [...booking, path('attemptId')],
+      requestBody: {
+        required: true,
+        content: { 'application/json': { schema: queryEvidenceBodySchema } },
+      },
+      responses: {
+        '200': response(
+          'Authoritative attempt and downstream application status.',
+          attemptResponseSchema,
+        ),
+        ...errors,
+      },
+    },
+  },
   '/bookings/{bookingId}/payments/{attemptId}': {
     get: {
       operationId: 'getPaymentAttempt',
@@ -150,7 +191,18 @@ export const paymentsBillingOpenApiPaths: NonNullable<ZodOpenApiObject['paths']>
         'Read owned deposit status with RESTRICTED/FULL access or balance status with FULL access; Managers can read either. Reopens an unexpired VNPay checkout. After expiry plus 15 minutes, authenticated missing-order or unpaid evidence resolves FAILED; unverified outcomes remain UNKNOWN.',
       tags: ['Payments and Billing'],
       security: bearer,
-      parameters: [...booking, path('attemptId')],
+      parameters: [
+        ...booking,
+        path('attemptId'),
+        {
+          name: 'reconcile',
+          in: 'query',
+          required: false,
+          schema: { type: 'string', enum: ['false'] },
+          description:
+            'Read persisted status and the original unexpired checkout without querying VNPay. Terminal downstream application may still be recovered idempotently.',
+        },
+      ],
       responses: {
         '200': response(
           'Safe attempt and downstream application status. ReturnURL never proves settlement.',
@@ -229,6 +281,8 @@ export const paymentsBillingOpenApiSchemas = {
   BillingRefundResponse: refundResponseSchema,
   BillingRefundApprovalResponse: refundApprovalResponseSchema,
   BillingAttemptResponse: attemptResponseSchema,
+  BillingQueryRequestResponse: queryRequestResponseSchema,
+  BillingQueryEvidenceBody: queryEvidenceBodySchema,
   BillingActiveAttemptsResponse: activeAttemptsResponseSchema,
   BookingBillingResponse: billingResponseSchema,
   BalancePaymentEligibility: balancePaymentEligibilitySchema,

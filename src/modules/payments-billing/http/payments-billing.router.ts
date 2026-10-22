@@ -23,6 +23,9 @@ import {
   billingQuerySchema,
   billingResponseSchema,
   ipnResponseSchema,
+  queryEvidenceBodySchema,
+  queryRequestResponseSchema,
+  attemptReadQuerySchema,
 } from './payments-billing.schemas.js';
 
 export function createPaymentsBillingRouter(
@@ -106,17 +109,66 @@ export function createPaymentsBillingRouter(
     }),
   );
   router.get(
-    '/bookings/:bookingId/payments/:attemptId',
+    '/bookings/:bookingId/payments/:attemptId/query',
     authenticate,
     validateRequest({ params: attemptParamsSchema }),
     handle(async (request, response) => {
       const { params } = validatedRequest(response, { params: attemptParamsSchema });
+      try {
+        response.json(
+          queryRequestResponseSchema.parse(
+            await services.prepareQuery(
+              params.bookingId,
+              params.attemptId,
+              response.locals.actor as AuthenticatedActor,
+              request.requestId,
+            ),
+          ),
+        );
+      } catch (error) {
+        if (error instanceof AppError && error.code === 'PAYMENT_QUERY_COOLDOWN')
+          response.set('Retry-After', '305');
+        throw error;
+      }
+    }),
+  );
+  router.post(
+    '/bookings/:bookingId/payments/:attemptId/evidence',
+    authenticate,
+    validateRequest({ params: attemptParamsSchema, body: queryEvidenceBodySchema }),
+    handle(async (request, response) => {
+      const { params, body } = validatedRequest(response, {
+        params: attemptParamsSchema,
+        body: queryEvidenceBodySchema,
+      });
       response.json(
         await services.attempt(
           params.bookingId,
           params.attemptId,
           response.locals.actor as AuthenticatedActor,
           request.requestId,
+          { raw: body.response },
+        ),
+      );
+    }),
+  );
+  router.get(
+    '/bookings/:bookingId/payments/:attemptId',
+    authenticate,
+    validateRequest({ params: attemptParamsSchema, query: attemptReadQuerySchema }),
+    handle(async (request, response) => {
+      const { params, query } = validatedRequest(response, {
+        params: attemptParamsSchema,
+        query: attemptReadQuerySchema,
+      });
+      response.json(
+        await services.attempt(
+          params.bookingId,
+          params.attemptId,
+          response.locals.actor as AuthenticatedActor,
+          request.requestId,
+          undefined,
+          query.reconcile === 'false',
         ),
       );
     }),
