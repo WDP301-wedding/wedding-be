@@ -77,7 +77,127 @@ function uploadPrisma(input: ReturnType<typeof uploadInput>, provider: FakeStora
   return { prisma, rows, transaction, provider, input };
 }
 
+async function signedReadFixture(options?: Parameters<typeof createCatalogMediaService>[2]) {
+  const input = uploadInput();
+  const provider = new FakeStorageProvider();
+  const stored = await provider.put({
+    bytes: input.bytes,
+    contentType: input.contentType,
+    purpose: 'VENUE_CATALOG_MEDIA',
+    resourceId: input.resourceId,
+  });
+  const fixture = uploadPrisma(input, provider);
+  fixture.rows.push(mediaRow(input, stored.objectKey));
+  return {
+    ...fixture,
+    signing: vi.spyOn(provider, 'createSignedReadUrl'),
+    service: createCatalogMediaService(fixture.prisma, provider, options),
+  };
+}
+
 describe('catalog media service', () => {
+  it('reuses cached signed reads with remaining lifetime and refreshes at the safety window', async () => {
+    const clock = vi.spyOn(Date, 'now').mockReturnValue(100_000);
+    try {
+      const f = await signedReadFixture({ cacheTtlSeconds: 60 });
+      const first = await f.service.listSigned('HALL', f.input.resourceId);
+      clock.mockReturnValue(110_000);
+      const cached = await f.service.listSigned('HALL', f.input.resourceId);
+      expect(cached[0]).toMatchObject({
+        signedUrl: first[0]!.signedUrl,
+        signedUrlExpiresInSeconds: 50,
+      });
+      expect(f.signing).toHaveBeenCalledOnce();
+
+      clock.mockReturnValue(130_000);
+      const refreshed = await f.service.listSigned('HALL', f.input.resourceId);
+      expect(refreshed[0]!.signedUrlExpiresInSeconds).toBe(900);
+      expect(f.signing).toHaveBeenCalledTimes(2);
+    } finally {
+      clock.mockRestore();
+    }
+  });
+
+  it('shares an in-flight signing failure and permits a later retry instead of caching rejection', async () => {
+    const f = await signedReadFixture({ maxConcurrency: 1 });
+    let rejectSigning!: (reason: Error) => void;
+    let started!: () => void;
+    const entered = new Promise<void>((resolve) => {
+      started = resolve;
+    });
+    f.signing.mockImplementationOnce(() => {
+      started();
+      return new Promise<string>((_resolve, reject) => {
+        rejectSigning = reject;
+      });
+    });
+    const pending = Promise.allSettled([
+      f.service.listSigned('HALL', f.input.resourceId),
+      f.service.listSigned('HALL', f.input.resourceId),
+    ]);
+    await entered;
+    const failure = new ProviderError('controlled signing failure');
+    rejectSigning(failure);
+    expect(await pending).toEqual([
+      { status: 'rejected', reason: failure },
+      { status: 'rejected', reason: failure },
+    ]);
+    expect(f.signing).toHaveBeenCalledOnce();
+    await expect(f.service.listSigned('HALL', f.input.resourceId)).resolves.toMatchObject([
+      { id: f.input.assetId, signedUrlExpiresInSeconds: 900 },
+    ]);
+    expect(f.signing).toHaveBeenCalledTimes(2);
+  });
+
+  it('rejects an invalid hall cursor before disclosing or signing page assets', async () => {
+    const prisma = {
+      $queryRaw: vi.fn(() => Promise.resolve([{ cursorValid: false, rows: [] }])),
+    } as unknown as PrismaClient;
+    const provider = new FakeStorageProvider();
+    const signing = vi.spyOn(provider, 'createSignedReadUrl');
+    const service = createCatalogMediaService(prisma, provider);
+    await expect(
+      service.listSignedHallPage({ limit: 1, cursor: randomUUID() }),
+    ).rejects.toMatchObject({ status: 422, code: 'VALIDATION_ERROR' });
+    expect(signing).not.toHaveBeenCalled();
+  });
+
+  it('returns only the requested hall page and uses its last visible hall as the next cursor', async () => {
+    const rows = [randomUUID(), randomUUID()].map((id) => ({
+      id,
+      name: 'Hall',
+      description: '',
+      maxGuests: 100,
+      assets: [],
+    }));
+    const prisma = {
+      $queryRaw: vi.fn(() => Promise.resolve([{ cursorValid: true, rows }])),
+    } as unknown as PrismaClient;
+    const service = createCatalogMediaService(prisma, new FakeStorageProvider());
+    expect(await service.listSignedHallPage({ limit: 1 })).toEqual({
+      items: [{ id: rows[0]!.id, name: 'Hall', description: '', maxGuests: 100, media: [] }],
+      nextCursor: rows[0]!.id,
+    });
+  });
+
+  it('rejects duplicate reorder IDs before opening a transaction', async () => {
+    const transaction = vi.fn();
+    const service = createCatalogMediaService(
+      { $transaction: transaction } as unknown as PrismaClient,
+      new FakeStorageProvider(),
+    );
+    const assetId = randomUUID();
+    await expect(
+      service.reorder({
+        resourceType: 'HALL',
+        resourceId: randomUUID(),
+        assetIds: [assetId, assetId],
+        context,
+      }),
+    ).rejects.toMatchObject({ status: 409, code: 'CATALOG_MEDIA_OWNERSHIP_CONFLICT' });
+    expect(transaction).not.toHaveBeenCalled();
+  });
+
   it('batches resource existence and empty asset facts', async () => {
     const ids = [randomUUID(), randomUUID()];
     const prisma = {
