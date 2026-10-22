@@ -42,7 +42,10 @@ Rollback application code can leave this coordination table in place.
 
 Offline tests cover relay proof validation, failure release, full/restricted
 authorization, cross-instance leases and exactly one payment/application on replay.
-Deployment and live NCB sandbox settlement remain separate acceptance evidence.
+Live NCB balance settlement through the corrected Render merchant IPN is now
+proven. The old UNKNOWN deposit was recovered using a provider-verified operator
+query. The final Vercel runtime's nonterminal provider-query round trip remains
+unverified; see the [deployment and settlement evidence](../tasks/evidence/vnpay-render-settlement-2026-10-23.md).
 
 Provider references: [querydr protocol](https://sandbox.vnpayment.vn/apis/docs/truy-van-hoan-tien/querydr%26refund.html),
 [status and duplicate-query codes](https://sandbox.vnpayment.vn/apis/docs/bang-ma-loi/).
