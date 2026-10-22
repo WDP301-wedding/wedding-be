@@ -1,0 +1,575 @@
+{
+  "date": "2026-10-22",
+  "timezone": "Asia/Saigon",
+  "scope": "Owner-authorized Render Free backend and database migration trial; source remains authoritative, no frontend/traffic cutover",
+  "workspace": {
+    "id": "tea-dbcss8ks728c73851hl0",
+    "name": "my space"
+  },
+  "backend": {
+    "id": "srv-dbct9ao473hc73a5qud0",
+    "url": "https://wedding-be-render-trial.onrender.com",
+    "region": "singapore",
+    "plan": "free",
+    "deploymentId": "dep-dbctdq6i0phs73fvqheg",
+    "deploymentStatus": "live",
+    "sourceCommit": "5a8d15488bbd2aa6473a5d95d0b8539ed08fa6a9",
+    "branch": "codex/render-migration-20261022",
+    "automaticDeploys": false,
+    "replicas": 1,
+    "healthCheckPath": "/health/ready",
+    "provisioning": "MCP/CLI with Dashboard Docker-command correction; Blueprint validated as a reproducible reference, not linked to a live Blueprint"
+  },
+  "database": {
+    "id": "dpg-dbct3l5g1s2s73eesm00-a",
+    "region": "singapore",
+    "plan": "free",
+    "version": "17.11 (Debian 17.11-1.pgdg12+2)",
+    "expiresAt": "2026-11-21T09:05:24.076181Z",
+    "externalAccessDisabled": true,
+    "connection": "private hostname with required TLS, Render internal self-signed certificate policy",
+    "integrity": {
+      "sourceSnapshotStartedAt": "2026-10-22T09:15:22.842Z",
+      "restoredAt": "2026-10-22T09:21:12.599Z",
+      "tables": 147,
+      "migrations": 65,
+      "migrationChecksumsMatch": true,
+      "allTableDigestsMatch": true,
+      "dumpBytes": 1756613,
+      "dumpSha256": "0191508dc9625ed68734587472de17371ba187be4e60c74000c101bfb6986760",
+      "targetVersion": "17.11 (Debian 17.11-1.pgdg12+2)",
+      "targetTls": {
+        "ssl": true,
+        "version": "TLSv1.3",
+        "bits": 256
+      },
+      "targetLimits": {
+        "max_connections": "100",
+        "reserved_connections": "3"
+      }
+    }
+  },
+  "configuration": {
+    "sourceKeys": 81,
+    "targetKeys": 82,
+    "missingKeys": [],
+    "intentionallyDifferentKeys": [
+      "AI_IMAGE_JOBS_ENABLED",
+      "DATABASE_URL",
+      "MIGRATION_DATABASE_URL",
+      "NOTIFICATIONS_FCM_ENABLED",
+      "NOTIFICATIONS_WORKER_ENABLED",
+      "PORT"
+    ],
+    "unexpectedDifferentKeys": [],
+    "stableSecretsPreserved": true,
+    "workersDisabled": [
+      "Notifications",
+      "FCM",
+      "Seating reconciliation",
+      "AI jobs"
+    ],
+    "supabaseStorageRetained": true
+  },
+  "verification": {
+    "smoke": {
+      "startedAt": "2026-10-22T09:28:31.580Z",
+      "base": "https://wedding-be-render-trial.onrender.com",
+      "serviceId": "srv-dbct9ao473hc73a5qud0",
+      "sourceSnapshot": "2026-10-22T09:15:22.842Z",
+      "syntheticFixture": true,
+      "samples": [
+        {
+          "name": "live",
+          "role": "public",
+          "method": "GET",
+          "path": "/health/live",
+          "status": 200,
+          "expected": 200,
+          "ms": 336.4013,
+          "requestId": "8a03bad0-978a-4989-92c9-7ecb2d2abc89",
+          "responseSha256": "a80655f9164cfe17d1b8ac08220d943df00f323470342d354ee0ec1ea2d84b1e",
+          "errorCode": null
+        },
+        {
+          "name": "ready",
+          "role": "public",
+          "method": "GET",
+          "path": "/health/ready",
+          "status": 200,
+          "expected": 200,
+          "ms": 73.36849999999998,
+          "requestId": "0950751b-b031-4109-a556-ca5cb775470a",
+          "responseSha256": "09aa0ff11f8db23c7f404ec735c660a203cbfcd2f24c296f35ee6698ce2a6e99",
+          "errorCode": null
+        },
+        {
+          "name": "openapi",
+          "role": "public",
+          "method": "GET",
+          "path": "/api/v1/openapi.json",
+          "status": 200,
+          "expected": 200,
+          "ms": 136.79539999999997,
+          "requestId": "cae80b08-7832-4423-a040-c395c700d4ab",
+          "responseSha256": "20a3df4acd167d625b7ab053eeb5b57fb315d67ef8e77a98e204021c5da1164b",
+          "errorCode": null
+        },
+        {
+          "name": "anonymous-identity",
+          "role": "public",
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 401,
+          "expected": 401,
+          "ms": 59.71370000000002,
+          "requestId": "264e000b-6069-44f0-8539-e70b04ae88d9",
+          "responseSha256": "3d948d8ddd644e7e6de924ebeeaa51f7f8d7fcb89e5a7a6e3ed813c74c01e5ae",
+          "errorCode": "AUTHENTICATION_REQUIRED"
+        },
+        {
+          "name": "metrics-disabled",
+          "role": "public",
+          "method": "GET",
+          "path": "/internal/metrics",
+          "status": 404,
+          "expected": 404,
+          "ms": 58.659599999999955,
+          "requestId": "f9316528-d51d-4942-a650-7a04e2e659bf",
+          "responseSha256": "ffcb3412584cd9dff614300cc8cb5ff08c54d8cd1a5061a92a6e14892aa5ba79",
+          "errorCode": "NOT_FOUND"
+        },
+        {
+          "name": "login-couple",
+          "role": "couple",
+          "method": "POST",
+          "path": "/api/v1/auth/web-sessions",
+          "status": 201,
+          "expected": 201,
+          "ms": 3504.7288999999996,
+          "requestId": "025429dc-7fac-4eb9-a495-d641b35ff922",
+          "responseSha256": "c846ffcad7d63e74ba8855706a81a595e2c24026a5361eae9e9d08ab0bbe8988",
+          "errorCode": null
+        },
+        {
+          "name": "login-manager",
+          "role": "manager",
+          "method": "POST",
+          "path": "/api/v1/auth/web-sessions",
+          "status": 201,
+          "expected": 201,
+          "ms": 2900.2371000000003,
+          "requestId": "7e3fd200-0a30-44da-8e80-0cc14f46a6c9",
+          "responseSha256": "89da0d3ae2b0a5ae6acf0386f7229616a4cfbc491772c03a0e59cd55a858cd36",
+          "errorCode": null
+        },
+        {
+          "name": "identity",
+          "role": "couple",
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "expected": 200,
+          "ms": 69.04179999999997,
+          "requestId": "483ff8a4-2ec9-43b4-b15f-21e0c115798a",
+          "responseSha256": "0afb1f6af51b79ad060add7e4a4ead0402571c273d608ea9b2ef0a2a3e7735af",
+          "errorCode": null
+        },
+        {
+          "name": "bookings",
+          "role": "couple",
+          "method": "GET",
+          "path": "/api/v1/couple/bookings?limit=20",
+          "status": 200,
+          "expected": 200,
+          "ms": 222.72890000000007,
+          "requestId": "1f3cbdfe-6df2-43b3-83b1-dfcc275b44d4",
+          "responseSha256": "4e34938675fb1914600d05d57e7db5924e942ea77a700ecd5e5dc7e62adaf0a4",
+          "errorCode": null
+        },
+        {
+          "name": "inbox",
+          "role": "couple",
+          "method": "GET",
+          "path": "/api/v1/notifications/inbox?limit=20",
+          "status": 200,
+          "expected": 200,
+          "ms": 105.78009999999995,
+          "requestId": "bbbf765c-2747-4d00-9c82-6e63e6a2c1e9",
+          "responseSha256": "107a74eeb96c0ecf1fc297b5721c087bef32d58ecb2333d999699994db4b9588",
+          "errorCode": null
+        },
+        {
+          "name": "unread",
+          "role": "couple",
+          "method": "GET",
+          "path": "/api/v1/notifications/unread-count",
+          "status": 200,
+          "expected": 200,
+          "ms": 89.38550000000032,
+          "requestId": "b33c54c2-a960-425c-ac75-1d475e011cdd",
+          "responseSha256": "8e820d24d79df590234b55caabca0e47d1a48cffd6128898200644ede301c199",
+          "errorCode": null
+        },
+        {
+          "name": "templates",
+          "role": "manager",
+          "method": "GET",
+          "path": "/api/v1/management/invitation-templates?limit=20",
+          "status": 200,
+          "expected": 200,
+          "ms": 151.46569999999974,
+          "requestId": "9b88e6d5-8d0b-486c-8685-921a4a2d8f8e",
+          "responseSha256": "96856e14116291c25d97183fb5632b11306c995f2f80d95e8082d83bd8ee203d",
+          "errorCode": null
+        },
+        {
+          "name": "print-orders",
+          "role": "manager",
+          "method": "GET",
+          "path": "/api/v1/management/print-orders?limit=20",
+          "status": 200,
+          "expected": 200,
+          "ms": 141.39820000000054,
+          "requestId": "b359a6aa-0a65-4ee0-848f-709792480d23",
+          "responseSha256": "5b44a622f54944a73f080191db2f2584e42f46c78575f19e0078599ea98b9231",
+          "errorCode": null
+        },
+        {
+          "name": "analytics",
+          "role": "manager",
+          "method": "GET",
+          "path": "/api/v1/management/analytics/overview?dateFrom=2026-10-01&dateTo=2026-10-31",
+          "status": 200,
+          "expected": 200,
+          "ms": 2092.616000000001,
+          "requestId": "557f49a5-c7a3-4350-a582-efcf8dd068fe",
+          "responseSha256": "e0e2bb8fc194a1096a3b27242e7d118b1a6ab1aecebe3bf48e0c08a139453e0c",
+          "errorCode": null
+        },
+        {
+          "name": "halls",
+          "role": "public",
+          "method": "GET",
+          "path": "/api/v1/catalog/halls?limit=20",
+          "status": 200,
+          "expected": 200,
+          "ms": 906.2783,
+          "requestId": "226387ee-16c1-462c-ab0f-3d1855c5971d",
+          "responseSha256": "8d636765d8363f28fb7e5881fc2efb899ca12f1584288fe9d7d1c600bf079fa9",
+          "errorCode": null
+        },
+        {
+          "name": "dishes",
+          "role": "public",
+          "method": "GET",
+          "path": "/api/v1/catalog/dishes?limit=20",
+          "status": 200,
+          "expected": 200,
+          "ms": 598.9928999999993,
+          "requestId": "6274cfdd-a2ac-4564-b243-b4d0d45c8f55",
+          "responseSha256": "addd45dc210c29f96788f6c5831242030a7fc6113c6214084d2c2bc06e8e44ee",
+          "errorCode": null
+        },
+        {
+          "name": "guest-groups",
+          "role": "couple",
+          "method": "GET",
+          "path": "/api/v1/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/guest-groups",
+          "status": 200,
+          "expected": 200,
+          "ms": 202.98220000000038,
+          "requestId": "3f2fa8a1-c551-48a1-9b2d-4c76d402247b",
+          "responseSha256": "f3b3e7c2ccbe77c6c1fae90d478803b9cf478c32f32ed099f441a19e3fda7b6d",
+          "errorCode": null
+        },
+        {
+          "name": "guests",
+          "role": "couple",
+          "method": "GET",
+          "path": "/api/v1/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/guests?limit=20",
+          "status": 200,
+          "expected": 200,
+          "ms": 195.65420000000086,
+          "requestId": "2b8513e5-fb98-4f5c-89aa-440ab2b6f6b0",
+          "responseSha256": "68d4236cfbf457a54975424c13275ed22848e2dc4efd13733479e7b6d6e9dc11",
+          "errorCode": null
+        },
+        {
+          "name": "guest-plan",
+          "role": "couple",
+          "method": "GET",
+          "path": "/api/v1/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/guest-plan",
+          "status": 200,
+          "expected": 200,
+          "ms": 101.44779999999992,
+          "requestId": "0d87bb6e-784c-483d-a65c-82586be0aa03",
+          "responseSha256": "804bc8e181fcdc534dd568cdcd052c8906fe37fd8a3e09c8dd4e9cf7ca59eda6",
+          "errorCode": null
+        },
+        {
+          "name": "seating-plans/current",
+          "role": "couple",
+          "method": "GET",
+          "path": "/api/v1/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/seating-plans/current",
+          "status": 200,
+          "expected": 200,
+          "ms": 209.17250000000058,
+          "requestId": "21ee5edf-6cf3-420d-8c7c-5d4901b65ed0",
+          "responseSha256": "d8fd5b69de9c0db896cc35234ee2261bc396555151cffc3db8c004071cffdf53",
+          "errorCode": null
+        },
+        {
+          "name": "seating-layout-options",
+          "role": "couple",
+          "method": "GET",
+          "path": "/api/v1/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/seating-layout-options",
+          "status": 200,
+          "expected": 200,
+          "ms": 193.7604999999985,
+          "requestId": "29889790-1a05-4ed3-992d-0380abab1a1e",
+          "responseSha256": "e3f5cdf79887ea2daef0b214a35c12f1abbd69c845b2434f4078dcdc386b7a21",
+          "errorCode": null
+        },
+        {
+          "name": "invitations",
+          "role": "couple",
+          "method": "GET",
+          "path": "/api/v1/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/invitations?limit=20",
+          "status": 200,
+          "expected": 200,
+          "ms": 1885.7667999999994,
+          "requestId": "725b6ecb-1919-4fb0-91b6-e127b9e7590c",
+          "responseSha256": "c3be0bd8fbffafc8e659321937f790e27cab470eb122fcd1e851a917a65ef692",
+          "errorCode": null
+        },
+        {
+          "name": "billing",
+          "role": "couple",
+          "method": "GET",
+          "path": "/api/v1/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/billing",
+          "status": 200,
+          "expected": 200,
+          "ms": 213.53899999999885,
+          "requestId": "d510bb4f-4aa2-4572-a5b2-270a4a45c248",
+          "responseSha256": "a8185255ee275049eb918b5a3d73e0f5054f8c3672a812f544e14ba478ae0fad",
+          "errorCode": null
+        },
+        {
+          "name": "parallel-attendance-summary",
+          "role": "couple",
+          "method": "GET",
+          "path": "/api/v1/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/attendance-summary",
+          "status": 200,
+          "expected": 200,
+          "ms": 181.9190000000017,
+          "requestId": "6bd7d4d9-6e8b-4f26-bb8a-19750a3ffbfa",
+          "responseSha256": "776eeacaa9678f16daa7bdb9244e50ce5dc904e5c4e07acabb93ee742e556a74",
+          "errorCode": null
+        },
+        {
+          "name": "parallel-check-in-settings",
+          "role": "couple",
+          "method": "GET",
+          "path": "/api/v1/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/check-in-settings",
+          "status": 200,
+          "expected": 200,
+          "ms": 303.255799999999,
+          "requestId": "287b3767-1839-4062-8fab-3e2a14180569",
+          "responseSha256": "3018044c4e7edff10ab03adb6c43d63320adcfe6018b7e5d5b0d78175adedd93",
+          "errorCode": null
+        },
+        {
+          "name": "parallel-guests",
+          "role": "couple",
+          "method": "GET",
+          "path": "/api/v1/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/guests?limit=50&status=ACTIVE",
+          "status": 200,
+          "expected": 200,
+          "ms": 392.6298999999999,
+          "requestId": "0a99f9e3-d23b-401d-88e7-78ffda8eec17",
+          "responseSha256": "68d4236cfbf457a54975424c13275ed22848e2dc4efd13733479e7b6d6e9dc11",
+          "errorCode": null
+        },
+        {
+          "name": "parallel-guest-groups",
+          "role": "couple",
+          "method": "GET",
+          "path": "/api/v1/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/guest-groups",
+          "status": 200,
+          "expected": 200,
+          "ms": 504.90899999999965,
+          "requestId": "26deefbe-023c-41ee-9c9a-65c09efe7253",
+          "responseSha256": "f3b3e7c2ccbe77c6c1fae90d478803b9cf478c32f32ed099f441a19e3fda7b6d",
+          "errorCode": null
+        },
+        {
+          "name": "parallel-guest-plan",
+          "role": "couple",
+          "method": "GET",
+          "path": "/api/v1/bookings/e80c6f1b-a4fc-4674-a4dd-13ef2601206b/guest-plan",
+          "status": 200,
+          "expected": 200,
+          "ms": 513.7032000000017,
+          "requestId": "78c8f541-8496-4a94-9b99-ddc6a5dec81e",
+          "responseSha256": "804bc8e181fcdc534dd568cdcd052c8906fe37fd8a3e09c8dd4e9cf7ca59eda6",
+          "errorCode": null
+        },
+        {
+          "name": "logout-couple",
+          "role": "couple",
+          "method": "DELETE",
+          "path": "/api/v1/auth/sessions/current",
+          "status": 204,
+          "expected": 204,
+          "ms": 127.08320000000094,
+          "requestId": "5c0774cc-017f-4910-b2bd-64d9f632a79f",
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "errorCode": null
+        },
+        {
+          "name": "revoked-couple",
+          "role": "couple",
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 401,
+          "expected": 401,
+          "ms": 62.760699999998906,
+          "requestId": "5c407403-b345-4255-934e-94860310fa36",
+          "responseSha256": "91e6c4ba8f17e9b3bfd7ca8a7680954f799a9160d9730af1533e1451d5b61a8a",
+          "errorCode": "AUTHENTICATION_REQUIRED"
+        },
+        {
+          "name": "logout-manager",
+          "role": "manager",
+          "method": "DELETE",
+          "path": "/api/v1/auth/sessions/current",
+          "status": 204,
+          "expected": 204,
+          "ms": 68.45210000000225,
+          "requestId": "4dfc7ee4-6896-4018-8d80-e6b49dd37019",
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "errorCode": null
+        },
+        {
+          "name": "revoked-manager",
+          "role": "manager",
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 401,
+          "expected": 401,
+          "ms": 82.1153000000013,
+          "requestId": "41fa22b3-180e-4637-8ae1-98da086807b0",
+          "responseSha256": "4de9ec9a9007161ef2834472d5fd8fbd3d0fa93cef52ff50f594f0d463a7dc91",
+          "errorCode": "AUTHENTICATION_REQUIRED"
+        }
+      ],
+      "paidProviderOperations": false,
+      "businessMutations": false,
+      "backgroundWorkersEnabled": false,
+      "openapiSha256": "3949341cd948244e99dbdce9dd7405017d1f60f71146e1db36d961daacc3b0e7",
+      "parallelGuestWaveMs": 518.2476000000006,
+      "existingStorageRead": {
+        "status": 200,
+        "bytes": 237,
+        "sha256": "7dfc8d5e2dcb1acb6556bf9e4e237d19385f7d3bf744ccbc6488be9406bc575d"
+      },
+      "cors": {
+        "status": 204,
+        "originMatches": true,
+        "credentials": "true"
+      },
+      "passed": true,
+      "finishedAt": "2026-10-22T09:28:49.587Z"
+    },
+    "logs": {
+      "matched": 32,
+      "expected": 32,
+      "errors": []
+    },
+    "postSmoke": {
+      "changedTables": [
+        "AccessCredential",
+        "AnalyticsGeneration",
+        "AnalyticsHead",
+        "AnalyticsProjection",
+        "AuditLog",
+        "RefreshCredential",
+        "Session"
+      ],
+      "expectedChangesOnly": true,
+      "unchangedTables": 140,
+      "migrationChecksumsMatch": true
+    },
+    "finalReadiness": {
+      "at": "2026-10-22T09:32:44.535Z",
+      "externalDatabaseAccessDisabled": true,
+      "plan": "free",
+      "region": "singapore",
+      "expiresAt": "2026-11-21T09:05:24.076181Z",
+      "readinessStatus": 200,
+      "readinessMs": 309.7084,
+      "readinessBody": {
+        "data": {
+          "status": "ready",
+          "requestId": "8fca88bc-cfd6-477f-a5da-b25655784b5c"
+        }
+      }
+    },
+    "ci": {
+      "head": "5a8d15488bbd2aa6473a5d95d0b8539ed08fa6a9",
+      "run": "https://github.com/WDP301-wedding/wedding-be/actions/runs/39755204922",
+      "quality": "success",
+      "postgresqlIntegrationAndCoverage": "success"
+    }
+  },
+  "credentialIncident": {
+    "detail": "An initial diagnostic mistakenly included the trial database connection string in tool output. No credential is included in this evidence or Git.",
+    "rotationComplete": true,
+    "oldCredentialNoLogin": true,
+    "newManagedCredentialActive": true,
+    "originalRoleAndObjectsPreserved": true
+  },
+  "failuresRetained": [
+    {
+      "phase": "restore attempt 1",
+      "reason": "Windows libpq root CA missing",
+      "targetDataWritten": false
+    },
+    {
+      "phase": "restore attempt 2",
+      "reason": "Default public schema already existed; transaction rolled back",
+      "targetDataWritten": false
+    },
+    {
+      "phase": "initial deploy",
+      "reason": "CLI start-command did not set Docker override; application rejected URLs without required TLS"
+    },
+    {
+      "phase": "deploy 2",
+      "reason": "Inline shell Docker command quoting was not interpreted as expected; exit 127",
+      "resolution": "Use committed Render-only shell entrypoint, retaining exec/signal delivery"
+    }
+  ],
+  "limitations": [
+    "Application public schema copied from snapshot at 2026-10-22T09:15:22.842Z; this is not continuous replication or a final write-frozen cutover.",
+    "Free service can sleep after inactivity. Free database expires after 30 days and has no managed backup. Verified export is local and ignored by Git.",
+    "No FE repository or deployed client configuration was changed. Existing Railway/Supabase database remain authoritative.",
+    "Mail, paid AI, FCM delivery, VNPay callbacks/egress and real-money operations were not exercised.",
+    "Workers intentionally disabled on Render trial; free web cannot ensure always-running background work.",
+    "Five parallel Guest GETs measured once from this workstation; 518 ms is a smoke observation, not p95, browser/Vercel E2E or an SLA.",
+    "Configuration/CI/read verification do not change historical provider RV/PERF acceptance or production NO_GO."
+  ],
+  "handoff": {
+    "backendOrigin": "https://wedding-be-render-trial.onrender.com",
+    "apiBase": "https://wedding-be-render-trial.onrender.com/api/v1",
+    "webConfigurationKey": "BACKEND_ORIGIN",
+    "finalCutoverPending": [
+      "Freeze source writes/jobs and take a fresh final export.",
+      "Restore/compare final data, preserve all credential keys and immutable history.",
+      "Update deployed client backend origin; verify browser login/refresh/Guest/media/billing.",
+      "Review provider callback/egress settings and authorize bounded provider tests.",
+      "Enable background work only with an appropriate hosting plan and validated targets."
+    ]
+  }
+}

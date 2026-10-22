@@ -1,4 +1,5 @@
 import { isIP } from 'node:net';
+import { isAbsolute } from 'node:path';
 
 import { z } from 'zod';
 import type { VnpaySettings } from '../modules/payments-billing/application/vnpay.port.js';
@@ -248,6 +249,12 @@ const rawEnvironmentSchema = z
     ),
     DATABASE_URL: optionalString.pipe(databaseUrl.optional()),
     MIGRATION_DATABASE_URL: optionalString.pipe(databaseUrl.optional()),
+    STORAGE_DRIVER: z.enum(['supabase', 'render-disk']).default('supabase'),
+    STORAGE_DISK_PATH: optionalString.pipe(z.string().refine(isAbsolute).optional()),
+    STORAGE_PUBLIC_ORIGIN: optionalString.pipe(
+      httpsUrl.refine((value) => new URL(value).origin === value).optional(),
+    ),
+    STORAGE_SIGNING_KEY: optionalString.pipe(z.string().min(32).max(1024).optional()),
     SUPABASE_URL: optionalString.pipe(httpsUrl.optional()),
     SUPABASE_SERVICE_ROLE_KEY: optionalString,
     SUPABASE_STORAGE_BUCKET: optionalString,
@@ -314,6 +321,8 @@ const rawEnvironmentSchema = z
 
     if (deployed) {
       for (const variableName of productionRequiredVariables) {
+        if (environment.STORAGE_DRIVER === 'render-disk' && variableName.startsWith('SUPABASE_'))
+          continue;
         const value = environment[variableName];
 
         if (value === undefined || (Array.isArray(value) && value.length === 0)) {
@@ -347,6 +356,12 @@ const rawEnvironmentSchema = z
       }
     }
 
+    if (environment.STORAGE_DRIVER === 'render-disk')
+      requireVariables(
+        environment,
+        ['STORAGE_DISK_PATH', 'STORAGE_PUBLIC_ORIGIN', 'STORAGE_SIGNING_KEY'],
+        context,
+      );
     const uniqueOrigins = new Set(environment.CORS_ALLOWED_ORIGINS);
     if (uniqueOrigins.size !== environment.CORS_ALLOWED_ORIGINS.length) {
       context.addIssue({
@@ -439,6 +454,13 @@ export type LogLevel = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace' |
 type DisabledProvider = Readonly<{ enabled: false }>;
 type StorageConfig =
   | DisabledProvider
+  | Readonly<{
+      enabled: true;
+      provider: 'render-disk';
+      root: string;
+      publicOrigin: string;
+      signingKey: string;
+    }>
   | Readonly<{
       enabled: true;
       supabaseUrl: string;
@@ -613,6 +635,10 @@ function pickEnvironment(source: EnvironmentSource): EnvironmentSource {
     AUTH_DISABLED_ACCOUNT_PII_RETENTION_DAYS: source.AUTH_DISABLED_ACCOUNT_PII_RETENTION_DAYS,
     DATABASE_URL: source.DATABASE_URL,
     MIGRATION_DATABASE_URL: source.MIGRATION_DATABASE_URL,
+    STORAGE_DRIVER: source.STORAGE_DRIVER,
+    STORAGE_DISK_PATH: source.STORAGE_DISK_PATH,
+    STORAGE_PUBLIC_ORIGIN: source.STORAGE_PUBLIC_ORIGIN,
+    STORAGE_SIGNING_KEY: source.STORAGE_SIGNING_KEY,
     SUPABASE_URL: source.SUPABASE_URL,
     PUBLIC_INVITATION_ORIGIN: source.PUBLIC_INVITATION_ORIGIN,
     SEATING_RECONCILER_ENABLED: source.SEATING_RECONCILER_ENABLED,
@@ -685,16 +711,27 @@ function rejectVariables<const Key extends EnvironmentKey>(
 
 function createConfig(environment: RawEnvironment): Omit<BackendConfig, 'notifications'> {
   const storage: StorageConfig =
-    environment.SUPABASE_URL !== undefined &&
-    environment.SUPABASE_SERVICE_ROLE_KEY !== undefined &&
-    environment.SUPABASE_STORAGE_BUCKET !== undefined
+    environment.STORAGE_DRIVER === 'render-disk' &&
+    environment.STORAGE_DISK_PATH &&
+    environment.STORAGE_PUBLIC_ORIGIN &&
+    environment.STORAGE_SIGNING_KEY
       ? Object.freeze({
           enabled: true,
-          supabaseUrl: environment.SUPABASE_URL,
-          serviceRoleKey: environment.SUPABASE_SERVICE_ROLE_KEY,
-          bucket: environment.SUPABASE_STORAGE_BUCKET,
+          provider: 'render-disk',
+          root: environment.STORAGE_DISK_PATH,
+          publicOrigin: environment.STORAGE_PUBLIC_ORIGIN,
+          signingKey: environment.STORAGE_SIGNING_KEY,
         })
-      : Object.freeze({ enabled: false });
+      : environment.SUPABASE_URL !== undefined &&
+          environment.SUPABASE_SERVICE_ROLE_KEY !== undefined &&
+          environment.SUPABASE_STORAGE_BUCKET !== undefined
+        ? Object.freeze({
+            enabled: true,
+            supabaseUrl: environment.SUPABASE_URL,
+            serviceRoleKey: environment.SUPABASE_SERVICE_ROLE_KEY,
+            bucket: environment.SUPABASE_STORAGE_BUCKET,
+          })
+        : Object.freeze({ enabled: false });
   const email: EmailConfig =
     environment.BREVO_API_KEY !== undefined && environment.BREVO_FROM_EMAIL !== undefined
       ? Object.freeze({

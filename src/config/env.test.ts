@@ -83,6 +83,31 @@ const validProductionEnvironment = {
 } as const;
 
 describe('parseEnvironment', () => {
+  it('selects persistent Render storage without requiring Supabase credentials and fails closed on incomplete disk configuration', () => {
+    const disk = {
+      ...validProductionEnvironment,
+      STORAGE_DRIVER: 'render-disk',
+      STORAGE_DISK_PATH: '/var/data/wedding-media',
+      STORAGE_PUBLIC_ORIGIN: 'https://api.example.test',
+      STORAGE_SIGNING_KEY: 'controlled-disk-signing-key-at-least-32-bytes',
+      SUPABASE_URL: undefined,
+      SUPABASE_SERVICE_ROLE_KEY: undefined,
+      SUPABASE_STORAGE_BUCKET: undefined,
+    };
+    expect(parseEnvironment(disk).storage).toMatchObject({
+      enabled: true,
+      provider: 'render-disk',
+      root: disk.STORAGE_DISK_PATH,
+    });
+    for (const change of [
+      { STORAGE_SIGNING_KEY: undefined },
+      { STORAGE_SIGNING_KEY: 'short' },
+      { STORAGE_PUBLIC_ORIGIN: 'http://api.example.test' },
+      { STORAGE_DISK_PATH: 'relative/path' },
+    ]) {
+      expect(() => parseEnvironment({ ...disk, ...change })).toThrow(EnvironmentConfigurationError);
+    }
+  });
   it('keeps VNPay disabled by default and requires complete backend-only sandbox configuration', () => {
     const settings = {
       VNPAY_TMN_CODE: 'CTTVNP01',

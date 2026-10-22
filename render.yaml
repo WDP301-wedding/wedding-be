@@ -1,0 +1,200 @@
+# Paid backend + 1 GB disk approved by the owner; PostgreSQL remains Free.
+databases:
+  - name: wedding-db-render-trial
+    plan: free
+    region: singapore
+    postgresMajorVersion: '17'
+    databaseName: wedding_db_render_trial
+    user: wedding_db_render_trial_user
+    ipAllowList: []
+
+services:
+  - type: web
+    name: wedding-be-render-trial
+    runtime: docker
+    repo: https://github.com/WDP301-wedding/wedding-be
+    branch: codex/render-migration-20261022
+    plan: starter
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health/ready
+    autoDeployTrigger: 'off'
+    numInstances: 1
+    disk:
+      name: wedding-media
+      mountPath: /var/data
+      sizeGB: 1
+    # Render's fromDatabase connectionString has no query string. Require TLS on
+    # the private network; libpq-compatible require supports Render's internal CA.
+    # No migration runs at startup: import and compare the new DB first.
+    dockerCommand: /bin/sh ./scripts/render-start.sh
+    envVars:
+      - key: STORAGE_DRIVER
+        value: render-disk
+      - key: STORAGE_DISK_PATH
+        value: /var/data/wedding-media
+      - key: STORAGE_PUBLIC_ORIGIN
+        value: https://wedding-be-render-trial.onrender.com
+      - key: STORAGE_SIGNING_KEY
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: wedding-db-render-trial
+          property: connectionString
+      - key: MIGRATION_DATABASE_URL
+        fromDatabase:
+          name: wedding-db-render-trial
+          property: connectionString
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: '10000'
+      - key: BACKEND_REPLICA_COUNT
+        value: '1'
+      - key: AUTH_TRUST_PROXY_HOPS
+        value: '1'
+      - key: DB_POOL_MAX
+        value: '1'
+      - key: DB_POOL_MAX_VENUE_CATALOG
+        value: '3'
+      - key: DB_POOL_MAX_ANALYTICS
+        value: '2'
+      - key: DB_POOL_ACQUIRE_TIMEOUT_MS
+        value: '10000'
+      - key: DB_POOL_IDLE_TIMEOUT_MS
+        value: '60000'
+      - key: DB_PLANNED_PROCESSES
+        value: '2'
+      - key: DB_MAX_CONNECTIONS
+        value: '60'
+      - key: DB_CONNECTION_RESERVE
+        value: '36'
+      - key: DB_DIAGNOSTICS_ENABLED
+        value: 'false'
+      - key: DB_SAFE_READ_DEADLINE_ENABLED
+        value: 'false'
+      - key: PERF_READONLY_DB_PROBE
+        value: 'false'
+      - key: SEATING_RECONCILER_ENABLED
+        sync: false
+      - key: NOTIFICATIONS_WORKER_ENABLED
+        sync: false
+      - key: NOTIFICATIONS_FCM_ENABLED
+        sync: false
+      - key: AI_IMAGE_JOBS_ENABLED
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: AUTH_OTP_HASH_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_STORAGE_BUCKET
+        sync: false
+      # Preserve the approved identity policy and existing provider secrets via
+      # a secure config transfer before starting. Never place values in Git.
+      - key: LOG_LEVEL
+        value: 'info'
+      - key: RESTAURANT_TIME_ZONE
+        value: 'Asia/Ho_Chi_Minh'
+      - key: HTTP_BODY_LIMIT_BYTES
+        value: '1048576'
+      - key: HTTP_REQUEST_TIMEOUT_MS
+        value: '60000'
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: '100'
+      - key: RATE_LIMIT_WINDOW_MS
+        value: '60000'
+      - key: OPENAPI_ENABLED
+        value: 'true'
+      - key: AUTH_ACCESS_TOKEN_TTL_SECONDS
+        value: '1800'
+      - key: AUTH_DISABLED_ACCOUNT_PII_RETENTION_DAYS
+        value: '365'
+      - key: AUTH_INVITATION_REISSUE_LIMIT
+        value: '3'
+      - key: AUTH_INVITATION_REISSUE_WINDOW_SECONDS
+        value: '86400'
+      - key: AUTH_INVITATION_RETENTION_DAYS
+        value: '180'
+      - key: AUTH_INVITATION_TTL_SECONDS
+        value: '259200'
+      - key: AUTH_LOGIN_RATE_LIMIT_MAX
+        value: '10'
+      - key: AUTH_LOGIN_RATE_LIMIT_WINDOW_SECONDS
+        value: '900'
+      - key: AUTH_PASSWORD_MAX_BYTES
+        value: '512'
+      - key: AUTH_PASSWORD_MAX_CHARACTERS
+        value: '128'
+      - key: AUTH_PASSWORD_MIN_CHARACTERS
+        value: '12'
+      - key: AUTH_PASSWORD_RESET_RETENTION_DAYS
+        value: '30'
+      - key: AUTH_PASSWORD_RESET_TTL_SECONDS
+        value: '1800'
+      - key: AUTH_REFRESH_ABSOLUTE_TTL_SECONDS
+        value: '7776000'
+      - key: AUTH_REFRESH_IDLE_TTL_SECONDS
+        value: '2592000'
+      - key: AUTH_REFRESH_RATE_LIMIT_MAX
+        value: '60'
+      - key: AUTH_REFRESH_RATE_LIMIT_WINDOW_SECONDS
+        value: '900'
+      - key: AUTH_RESET_REQUEST_RATE_LIMIT_MAX
+        value: '3'
+      - key: AUTH_RESET_REQUEST_RATE_LIMIT_WINDOW_SECONDS
+        value: '3600'
+      - key: AUTH_SCRYPT_BLOCK_SIZE
+        value: '8'
+      - key: AUTH_SCRYPT_COST
+        value: '131072'
+      - key: AUTH_SCRYPT_KEY_LENGTH_BYTES
+        value: '64'
+      - key: AUTH_SCRYPT_MAX_MEMORY_BYTES
+        value: '268435456'
+      - key: AUTH_SCRYPT_PARALLELIZATION
+        value: '1'
+      - key: AUTH_SESSION_RETENTION_DAYS
+        value: '90'
+      - key: AUTH_TOKEN_CONSUME_RATE_LIMIT_MAX
+        value: '10'
+      - key: AUTH_TOKEN_CONSUME_RATE_LIMIT_WINDOW_SECONDS
+        value: '900'
+      - key: AUTH_TOKEN_ENTROPY_BYTES
+        value: '32'
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_FROM_EMAIL
+        sync: false
+      - key: PUBLIC_INVITATION_ORIGIN
+        sync: false
+      - key: AI_IMAGE_PROVIDER
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_IMAGE_MODEL
+        sync: false
+      - key: NOTIFICATIONS_CREDENTIAL_KEYS
+        sync: false
+      - key: NOTIFICATIONS_ACTIVE_KEY_VERSION
+        sync: false
+      - key: NOTIFICATIONS_EMAIL_ALLOWLIST
+        sync: false
+      - key: NOTIFICATIONS_BOOKING_ALLOWLIST
+        sync: false
+      - key: NOTIFICATIONS_GUEST_LINK_URL
+        sync: false
+      - key: NOTIFICATIONS_FCM_SERVICE_ACCOUNT
+        sync: false
+      - key: VNPAY_TMN_CODE
+        sync: false
+      - key: VNPAY_HASH_SECRET
+        sync: false
+      - key: VNPAY_RETURN_URL
+        sync: false
+      - key: VNPAY_QUERY_IP
+        sync: false

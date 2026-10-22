@@ -6311,6 +6311,77 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/storage/objects/{mediaPath}": {
+      "get": {
+        "description": "Available with render-disk storage. Use the complete URL returned by an authorized media/catalog operation, without modifying its path or query. The signature authorizes this object only, for at most one hour (default 15 minutes). Missing, altered or expired signatures return 404. Bytes are verified against the content-addressed key. Responses use private, no-store. No upload or directory-listing route is exposed.",
+        "operationId": "readSignedStorageObject",
+        "parameters": [
+          {
+            "description": "Complete content key including purpose/resource directories; preserve the returned URL.",
+            "in": "path",
+            "name": "mediaPath",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "expires",
+            "required": true,
+            "schema": {
+              "pattern": "^[1-9]\\d{0,11}$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "signature",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Verified original image bytes."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          }
+        },
+        "security": [],
+        "summary": "Read private media using a scoped expiring URL",
+        "tags": [
+          "Invitation Media"
+        ]
+      }
+    },
     "/auth/android-session-refreshes": {
       "post": {
         "description": "Unsafe to replay after an unknown outcome; clients must fall back to login.",

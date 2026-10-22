@@ -27,5 +27,7 @@ COPY --chown=node:node openapi ./openapi
 COPY --chown=node:node certs ./certs
 COPY --chown=node:node assets ./assets
 COPY --chown=node:node scripts/performance-db-probe.mjs ./scripts/performance-db-probe.mjs
+COPY --chown=node:node scripts/render-start.sh ./scripts/render-start.sh
+COPY --chown=node:node scripts/render-copy-media.mjs ./scripts/render-copy-media.mjs
 USER node
 CMD ["node", "--enable-source-maps", "--import", "./dist/instrumentation.js", "dist/server.js"]

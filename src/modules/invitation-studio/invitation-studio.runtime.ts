@@ -7,7 +7,7 @@ import { createPrismaClient } from '../../core/database/prisma.js';
 import { ProviderError } from '../../core/errors/app-error.js';
 import type { ShutdownResource } from '../../core/http/lifecycle.js';
 import type { StorageProvider } from '../../integrations/storage/storage-provider.js';
-import { createSupabaseStorageProvider } from '../../integrations/storage/supabase-storage-provider.js';
+import { createStorageProvider } from '../../integrations/storage/storage.factory.js';
 import { createMediaRouter } from './http/media.router.js';
 import { createInvitationStudioServices } from './infrastructure/studio.composition.js';
 import { createStudioRouter } from './http/studio.router.js';
@@ -44,7 +44,7 @@ export async function createInvitationStudioRuntime(
     await prisma.$connect();
     const unavailable = () => Promise.reject(new ProviderError('unavailable'));
     const storage: StorageProvider = config.storage.enabled
-      ? createSupabaseStorageProvider(config.storage)
+      ? createStorageProvider(config.storage)
       : {
           put: unavailable,
           createSignedReadUrl: unavailable,
