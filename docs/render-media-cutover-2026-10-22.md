@@ -68,3 +68,18 @@ tests do not establish live email, push, generation or payment readiness.
 Render disk snapshots are daily and retained seven days. Keep an independent
 verified export of media and a PostgreSQL-native backup; disk snapshots do not back
 up managed PostgreSQL. Runtime results and exact revisions are recorded separately.
+
+## Deployment from main
+
+The owner authorized switching the backend's deployment branch to `main` and
+enabling automatic deployments after the cutover. `render.yaml` records
+`branch: main` and `autoDeployTrigger: checksPass` (After CI Checks Pass).
+Pushes and merges to `main` deploy after all GitHub CI checks pass; failed checks
+or commits with no checks do not deploy. The existing Render service must also
+have these settings applied because the Blueprint is not linked for automatic
+infrastructure synchronization.
+
+Automatic deployment builds the application image; it does not apply database
+migrations. Continue to handle new migrations through the controlled database
+release procedure. The attached media disk and operator-managed secrets and
+worker flags remain in place across deployments.
