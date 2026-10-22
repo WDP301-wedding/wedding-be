@@ -15,6 +15,8 @@ import {
   invoiceSnapshotSchema,
   type BillingLedgerRepository,
   type LedgerEntry,
+  type LedgerHistoryQuery,
+  type LedgerPageSnapshot,
   type LedgerSnapshot,
   type NewLedgerFact,
   type PaymentAttempt,
@@ -26,6 +28,7 @@ import { createEffectiveCommercialReader } from '../../booking-lifecycle/infrast
 import { finalInvoiceDocumentSchema, finalInvoiceDigest } from '../domain/final-invoice.js';
 import {
   calculateBillingTotals,
+  type BillingTotals,
   transitionPaymentAttempt,
   validateRefund,
 } from '../domain/billing-policy.js';
@@ -128,6 +131,12 @@ export function createPrismaBillingPersistence(
     },
     getLedger(bookingId: string, context?: ContractContext) {
       return transact(bookingId, context, (tx) => readLedger(tx, bookingId));
+    },
+    getReceivables(bookingId: string, context?: ContractContext) {
+      return transact(bookingId, context, (tx) => readReceivables(tx, bookingId));
+    },
+    readLedgerPage(bookingId: string, query: LedgerHistoryQuery, context?: ContractContext) {
+      return transact(bookingId, context, (tx) => readLedgerPage(tx, bookingId, query));
     },
 
     append(input: NewLedgerFact, context: ContractContext) {
@@ -417,6 +426,149 @@ function totalsFrom(entries: readonly LedgerEntry[]) {
     creditAdjustmentsVnd: amounts('CREDIT_ADJUSTMENT'),
     settledPaymentsVnd: amounts('PAYMENT'),
     completedRefundsVnd: amounts('REFUND'),
+  });
+}
+
+function safeAggregateSum(value: unknown): number {
+  if (value === null || value === undefined) return 0;
+  const num =
+    typeof value === 'number'
+      ? value
+      : typeof value === 'bigint'
+        ? Number(value)
+        : typeof (value as { toNumber?: () => number }).toNumber === 'function'
+          ? (value as { toNumber: () => number }).toNumber()
+          : Number(value);
+  if (!Number.isSafeInteger(num) || num < 0) {
+    throw new BillingPersistenceConflict('BILLING_LEDGER_INCONSISTENT');
+  }
+  return num;
+}
+
+function totalsFromAggregateRow(row: {
+  baseChargesVnd: unknown;
+  printChargesVnd: unknown;
+  creditAdjustmentsVnd: unknown;
+  settledPaymentsVnd: unknown;
+  completedRefundsVnd: unknown;
+}): BillingTotals {
+  const base = safeAggregateSum(row.baseChargesVnd);
+  const print = safeAggregateSum(row.printChargesVnd);
+  const credit = safeAggregateSum(row.creditAdjustmentsVnd);
+  const payments = safeAggregateSum(row.settledPaymentsVnd);
+  const refunds = safeAggregateSum(row.completedRefundsVnd);
+
+  return calculateBillingTotals({
+    baseChargesVnd: base > 0 ? [base] : [],
+    printChargesVnd: print > 0 ? [print] : [],
+    creditAdjustmentsVnd: credit > 0 ? [credit] : [],
+    settledPaymentsVnd: payments > 0 ? [payments] : [],
+    completedRefundsVnd: refunds > 0 ? [refunds] : [],
+  });
+}
+
+async function readReceivables(tx: Transaction, bookingId: string): Promise<BillingTotals> {
+  const [summary] = await tx.$queryRaw<
+    Array<{
+      baseChargesVnd: unknown;
+      printChargesVnd: unknown;
+      creditAdjustmentsVnd: unknown;
+      settledPaymentsVnd: unknown;
+      completedRefundsVnd: unknown;
+    }>
+  >`
+    SELECT
+      COALESCE(SUM(CASE WHEN "kind" = 'CHARGE' AND "sourceType" <> 'PRINT_ORDER' THEN "amountVnd" ELSE 0 END), 0) AS "baseChargesVnd",
+      COALESCE(SUM(CASE WHEN "kind" = 'CHARGE' AND "sourceType" = 'PRINT_ORDER' THEN "amountVnd" ELSE 0 END), 0) AS "printChargesVnd",
+      COALESCE(SUM(CASE WHEN "kind" = 'CREDIT_ADJUSTMENT' THEN "amountVnd" ELSE 0 END), 0) AS "creditAdjustmentsVnd",
+      COALESCE(SUM(CASE WHEN "kind" = 'PAYMENT' THEN "amountVnd" ELSE 0 END), 0) AS "settledPaymentsVnd",
+      COALESCE(SUM(CASE WHEN "kind" = 'REFUND' THEN "amountVnd" ELSE 0 END), 0) AS "completedRefundsVnd"
+    FROM "BillingLedgerEntry"
+    WHERE "bookingId" = ${bookingId}::uuid
+  `;
+  return totalsFromAggregateRow(
+    summary ?? {
+      baseChargesVnd: 0,
+      printChargesVnd: 0,
+      creditAdjustmentsVnd: 0,
+      settledPaymentsVnd: 0,
+      completedRefundsVnd: 0,
+    },
+  );
+}
+
+async function readLedgerPage(
+  tx: Transaction,
+  bookingId: string,
+  query: LedgerHistoryQuery,
+): Promise<LedgerPageSnapshot> {
+  const [summary] = await tx.$queryRaw<
+    Array<{
+      headRevision: number | bigint | null;
+      baseChargesVnd: unknown;
+      printChargesVnd: unknown;
+      creditAdjustmentsVnd: unknown;
+      settledPaymentsVnd: unknown;
+      completedRefundsVnd: unknown;
+    }>
+  >`
+    SELECT
+      COALESCE(MAX("revision"), 0)::int AS "headRevision",
+      COALESCE(SUM(CASE WHEN (${query.throughBillingRevision ?? null}::bigint IS NULL OR "revision" <= ${query.throughBillingRevision ?? null}::bigint) AND "kind" = 'CHARGE' AND "sourceType" <> 'PRINT_ORDER' THEN "amountVnd" ELSE 0 END), 0) AS "baseChargesVnd",
+      COALESCE(SUM(CASE WHEN (${query.throughBillingRevision ?? null}::bigint IS NULL OR "revision" <= ${query.throughBillingRevision ?? null}::bigint) AND "kind" = 'CHARGE' AND "sourceType" = 'PRINT_ORDER' THEN "amountVnd" ELSE 0 END), 0) AS "printChargesVnd",
+      COALESCE(SUM(CASE WHEN (${query.throughBillingRevision ?? null}::bigint IS NULL OR "revision" <= ${query.throughBillingRevision ?? null}::bigint) AND "kind" = 'CREDIT_ADJUSTMENT' THEN "amountVnd" ELSE 0 END), 0) AS "creditAdjustmentsVnd",
+      COALESCE(SUM(CASE WHEN (${query.throughBillingRevision ?? null}::bigint IS NULL OR "revision" <= ${query.throughBillingRevision ?? null}::bigint) AND "kind" = 'PAYMENT' THEN "amountVnd" ELSE 0 END), 0) AS "settledPaymentsVnd",
+      COALESCE(SUM(CASE WHEN (${query.throughBillingRevision ?? null}::bigint IS NULL OR "revision" <= ${query.throughBillingRevision ?? null}::bigint) AND "kind" = 'REFUND' THEN "amountVnd" ELSE 0 END), 0) AS "completedRefundsVnd"
+    FROM "BillingLedgerEntry"
+    WHERE "bookingId" = ${bookingId}::uuid
+  `;
+
+  const headRevision = Number(summary?.headRevision ?? 0);
+  const billingRevision = query.throughBillingRevision ?? headRevision;
+  const totals = totalsFromAggregateRow(
+    summary ?? {
+      baseChargesVnd: 0,
+      printChargesVnd: 0,
+      creditAdjustmentsVnd: 0,
+      settledPaymentsVnd: 0,
+      completedRefundsVnd: 0,
+    },
+  );
+
+  if (
+    (query.throughBillingRevision !== undefined && query.throughBillingRevision > headRevision) ||
+    query.cursorRevision > billingRevision
+  ) {
+    return Object.freeze({
+      headRevision,
+      billingRevision,
+      totals,
+      page: Object.freeze([]),
+      hasMore: false,
+    });
+  }
+
+  const rows = await tx.billingLedgerEntry.findMany({
+    where: {
+      bookingId,
+      revision: {
+        gt: query.cursorRevision,
+        lte: billingRevision,
+      },
+    },
+    orderBy: { revision: 'asc' },
+    take: query.limit + 1,
+  });
+
+  const hasMore = rows.length > query.limit;
+  const page = Object.freeze(rows.slice(0, query.limit).map(toEntry));
+
+  return Object.freeze({
+    headRevision,
+    billingRevision,
+    totals,
+    page,
+    hasMore,
   });
 }
 

@@ -229,23 +229,24 @@ export function createCommercialAppendixService(options: Options) {
             access.booking.hallId,
             access.booking.shiftCode,
           );
-          const resolved = new Map<string, (typeof effective.lines)[number]>();
-          for (const selection of [...input.lines].sort((a, b) =>
-            (a.category + a.sourceId).localeCompare(b.category + b.sourceId),
-          )) {
-            const frozen = effective.lines.find(
-              (l) =>
-                l.category === selection.category &&
-                l.sourceId === selection.sourceId &&
-                l.sourceRevisionId === selection.sourceRevisionId &&
-                l.quantity === selection.quantity,
-            );
-            resolved.set(
-              selection.category + selection.sourceId,
-              frozen ?? (await catalog.requireSelection(selection, restaurant.id)),
-            );
+          const frozenMap = new Map<string, (typeof effective.lines)[number]>();
+          for (const l of effective.lines) {
+            frozenMap.set(`${l.category}:${l.sourceId}:${l.sourceRevisionId}:${l.quantity}`, l);
           }
-          const afterLines = input.lines.map((l) => resolved.get(l.category + l.sourceId)!);
+          const unfrozenSelections = input.lines.filter(
+            (s) =>
+              !frozenMap.has(`${s.category}:${s.sourceId}:${s.sourceRevisionId}:${s.quantity}`),
+          );
+          const resolvedUnfrozen =
+            unfrozenSelections.length > 0
+              ? await catalog.requireSelections(unfrozenSelections, restaurant.id)
+              : new Map<string, (typeof effective.lines)[number]>();
+          const afterLines = input.lines.map((l) => {
+            const frozen = frozenMap.get(
+              `${l.category}:${l.sourceId}:${l.sourceRevisionId}:${l.quantity}`,
+            );
+            return frozen ?? resolvedUnfrozen.get(l.category + l.sourceId)!;
+          });
           if (access.booking.planningHeadcount > hall.maxGuests)
             throw commercialConflict('CONTRACT_CAPACITY_EXCEEDED');
           const document = appendixDocumentSchema.parse({
@@ -320,12 +321,20 @@ export function createCommercialAppendixService(options: Options) {
             throw commercialConflict('COMMERCIAL_PREDECESSOR_STALE');
           const catalog = options.catalog(client);
           const original = effective.contract.document;
-          for (const line of document.afterLines) {
-            if (document.beforeLines.some((old) => JSON.stringify(old) === JSON.stringify(line)))
-              continue;
-            const resolved = await catalog.requireSelection(line, original.restaurantId);
-            if (JSON.stringify(resolved) !== JSON.stringify(line))
-              throw commercialConflict('FINANCIAL_SOURCE_CONFLICT');
+          const beforeSet = new Set(document.beforeLines.map((old) => JSON.stringify(old)));
+          const changedLines = document.afterLines.filter(
+            (line) => !beforeSet.has(JSON.stringify(line)),
+          );
+          if (changedLines.length > 0) {
+            const resolvedMap = await catalog.requireSelections(
+              changedLines,
+              original.restaurantId,
+            );
+            for (const line of changedLines) {
+              const resolved = resolvedMap.get(line.category + line.sourceId);
+              if (!resolved || JSON.stringify(resolved) !== JSON.stringify(line))
+                throw commercialConflict('FINANCIAL_SOURCE_CONFLICT');
+            }
           }
           return client.commercialAppendixRevision.update({
             where: { id: row.id },

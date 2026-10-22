@@ -226,6 +226,9 @@ export function createBookingExperienceRouter(
         ...(query.cursor === undefined ? {} : { cursor: { id: query.cursor }, skip: 1 }),
       });
       const items = rows.slice(0, query.limit);
+      const accessByConsultation = new Map(
+        grants.map((grant) => [grant.consultationId, grant.level]),
+      );
       response.set('Cache-Control', 'no-store').json(
         overviewResponseSchema.parse({
           data: items.map((booking) => ({
@@ -233,8 +236,7 @@ export function createBookingExperienceRouter(
             consultationId: booking.consultationId,
             eventDate: booking.eventDate.toISOString().slice(0, 10),
             phase: booking.phase,
-            accessLevel: grants.find((grant) => grant.consultationId === booking.consultationId)!
-              .level,
+            accessLevel: accessByConsultation.get(booking.consultationId)!,
             hallName: booking.proposalSnapshot?.hallName ?? '',
             shiftCode: booking.shiftCode,
             planningHeadcount: booking.planningHeadcount,

@@ -166,7 +166,7 @@ describe('print file integrity failures', () => {
     await expect(f.read()).rejects.toMatchObject({ status: 502 });
     expect(f.originalRead).not.toHaveBeenCalled();
   });
-  it('bounds aggregate declared retained bytes before reading the next object', async () => {
+  it('bounds aggregate declared retained bytes before any storage IO', async () => {
     const f = await fixture(),
       secondId = randomUUID();
     f.setContent({
@@ -178,7 +178,33 @@ describe('print file integrity failures', () => {
       object: { ...f.object, resourceId: secondId, sizeBytes: PRINT_MAX_IMAGE_BYTES },
     });
     await expect(f.read()).rejects.toMatchObject({ code: 'PRINT_ASSET_LIMIT' });
-    expect(f.originalRead).toHaveBeenCalledTimes(1);
+    expect(f.originalRead).not.toHaveBeenCalled();
+  });
+  it('limits concurrent original reads and drains the current batch before rejecting', async () => {
+    const f = await fixture();
+    const ids = [f.assetId, randomUUID(), randomUUID()];
+    f.state.assets = ids.map((id) => ({
+      id,
+      object: createStoredObject({
+        bytes: f.bytes,
+        purpose: 'PRIVATE_WEDDING_MEDIA',
+        resourceId: id,
+        contentType: 'image/png',
+      }),
+    }));
+    f.setContent({ ...f.content, design: { ...f.content.design, derivedAssetIds: ids } });
+    const pending: { resolve: (bytes: Buffer) => void; reject: (error: Error) => void }[] = [];
+    const read = vi.fn(
+      () => new Promise<Buffer>((resolve, reject) => pending.push({ resolve, reject })),
+    );
+    f.storage.read = read;
+    const result = f.read();
+    const rejected = expect(result).rejects.toThrow('Storage unavailable');
+    await vi.waitFor(() => expect(pending).toHaveLength(2));
+    pending[0]!.reject(new Error('Storage unavailable'));
+    pending[1]!.resolve(f.bytes);
+    await rejected;
+    expect(read).toHaveBeenCalledTimes(2);
   });
   it('rejects truncated and same-length corrupted original bytes', async () => {
     const f = await fixture();

@@ -22,6 +22,7 @@ const storedImage = z.strictObject({
   checksumSha256: z.string().regex(/^[a-f0-9]{64}$/u),
   sizeBytes: z.int().positive().max(PRINT_MAX_IMAGE_BYTES),
 });
+const imageReadConcurrency = 2;
 export class PrintFileService {
   constructor(
     readonly repository: StudioRepository,
@@ -57,7 +58,7 @@ export class PrintFileService {
     const { row, assets } = await load();
     const images = new Map<string, Uint8Array>();
     let total = 0;
-    for (const asset of assets) {
+    const sources = assets.map((asset) => {
       if (this.storage.read === undefined) throw new ProviderError('unavailable');
       const parsed = storedImage.safeParse(asset.object);
       if (!parsed.success || parsed.data.resourceId !== asset.id)
@@ -73,13 +74,28 @@ export class PrintFileService {
       }
       if (!reference.objectKey.endsWith(`/${object.checksumSha256}.png`))
         throw new ProviderError('failure');
-      const bytes = await this.storage.read(reference);
-      if (
-        bytes.byteLength !== object.sizeBytes ||
-        createHash('sha256').update(bytes).digest('hex') !== object.checksumSha256
-      )
-        throw new ProviderError('failure');
-      images.set(asset.id, bytes);
+      return { assetId: asset.id, reference, object };
+    });
+    // Validate the complete retained byte budget before any external IO. Keep a
+    // small bounded fan-out rather than creating one provider request per asset at once.
+    for (let offset = 0; offset < sources.length; offset += imageReadConcurrency) {
+      const results = await Promise.allSettled(
+        sources
+          .slice(offset, offset + imageReadConcurrency)
+          .map(async ({ assetId, reference, object }) => {
+            const bytes = await this.storage.read!(reference);
+            if (
+              bytes.byteLength !== object.sizeBytes ||
+              createHash('sha256').update(bytes).digest('hex') !== object.checksumSha256
+            )
+              throw new ProviderError('failure');
+            return { assetId, bytes };
+          }),
+      );
+      for (const result of results) {
+        if (result.status === 'rejected') throw result.reason;
+        images.set(result.value.assetId, result.value.bytes);
+      }
     }
     const output = await renderPrintablePdf({
       content: row.content,

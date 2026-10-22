@@ -173,6 +173,20 @@ export type InvoiceRecord = Readonly<{
   snapshot: LedgerSnapshot;
 }>;
 
+export interface LedgerHistoryQuery {
+  readonly cursorRevision: number;
+  readonly throughBillingRevision?: number | undefined;
+  readonly limit: number;
+}
+
+export interface LedgerPageSnapshot {
+  readonly headRevision: number;
+  readonly billingRevision: number;
+  readonly totals: BillingTotals;
+  readonly page: readonly LedgerEntry[];
+  readonly hasMore: boolean;
+}
+
 // Internal persistence port: callers must authorize and supply owner-approved facts.
 // The opaque context enlists owner work; no ORM client crosses this boundary.
 export interface BillingLedgerRepository {
@@ -198,6 +212,12 @@ export interface BillingLedgerRepository {
     context?: ContractContext,
   ): Promise<PaymentAttempt>;
   getLedger(bookingId: string, context?: ContractContext): Promise<LedgerSnapshot>;
+  getReceivables(bookingId: string, context?: ContractContext): Promise<BillingTotals>;
+  readLedgerPage(
+    bookingId: string,
+    query: LedgerHistoryQuery,
+    context?: ContractContext,
+  ): Promise<LedgerPageSnapshot>;
   append(
     input: NewLedgerFact,
     context: ContractContext,

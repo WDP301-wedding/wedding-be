@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import { NotFoundError } from '../../../core/errors/app-error.js';
-import type {
+import {
   Prisma,
-  PrismaClient,
-  PrintOfferingRevision,
+  type PrismaClient,
+  type PrintOfferingRevision,
 } from '../../../generated/prisma/client.js';
 import type { InvitationTemplateSelectionReader } from '../../invitation-studio/application/template-selection.port.js';
 import type { CatalogMutationContext } from '../infrastructure/catalog-version.repository.js';
@@ -35,6 +35,10 @@ function view(row: PrintOfferingRevision, restaurantId: string) {
     active: row.active,
   });
 }
+export type PrintSelectionFacts = ReturnType<typeof view> & {
+  quantity: number;
+  lineTotalVnd: number;
+};
 export function createPrintOfferingService(prisma: PrismaClient, templates: TemplateReaderFactory) {
   async function templateTitle(
     tx: Prisma.TransactionClient,
@@ -165,6 +169,64 @@ export function createPrintOfferingService(prisma: PrismaClient, templates: Temp
       if (row === null) throw new NotFoundError();
       return view(row, row.offering.restaurantId);
     },
+    requireBatchSelections(values: readonly unknown[]): Promise<Map<string, PrintSelectionFacts>> {
+      if (values.length === 0) return Promise.resolve(new Map<string, PrintSelectionFacts>());
+      const parsed = values.map((v) => printSelectionSchema.parse(v));
+      const sortedInputs = [...parsed].sort((a, b) => a.offeringId.localeCompare(b.offeringId));
+      const offeringIds = [...new Set(sortedInputs.map((i) => i.offeringId))];
+      const ids = Prisma.join(offeringIds.map((id) => Prisma.sql`${id}::uuid`));
+      return prisma.$transaction(async (tx) => {
+        await tx.$queryRaw(Prisma.sql`
+          SELECT "id" FROM "PrintOffering" WHERE "id" IN (${ids}) ORDER BY "id" FOR SHARE
+        `);
+        const heads = await tx.printOffering.findMany({
+          where: { id: { in: offeringIds } },
+          include: { revisions: { orderBy: { revision: 'desc' }, take: 1 } },
+        });
+        const headMap = new Map(heads.map((h) => [h.id, h]));
+        const templateReader = templates(tx);
+        const activeRows = heads
+          .filter((h) => h.active && h.revisions.length > 0)
+          .map((h) => h.revisions[0]!);
+        const distinctRefs = [
+          ...new Map(
+            activeRows.map((r) => [
+              `${r.templateId}/${r.templateVersionId}`,
+              { templateId: r.templateId, templateVersionId: r.templateVersionId },
+            ]),
+          ).values(),
+        ];
+        const selectableTemplates = await templateReader.findSelectableSelections(distinctRefs);
+        const selectableSet = new Set(
+          selectableTemplates.map((t) => `${t.templateId}/${t.templateVersionId}`),
+        );
+        const result = new Map<
+          string,
+          ReturnType<typeof view> & { quantity: number; lineTotalVnd: number }
+        >();
+        for (const input of sortedInputs) {
+          const head = headMap.get(input.offeringId);
+          if (head === null || head === undefined || !head.active)
+            throw offeringConflict('OFFERING_NOT_SELECTABLE');
+          const row = head.revisions[0];
+          if (!row || row.id !== input.sourceRevisionId)
+            throw offeringConflict('COMMERCIAL_PRICE_REVISION_STALE');
+          if (!selectableSet.has(`${row.templateId}/${row.templateVersionId}`)) {
+            await templateReader.requireSelection(row);
+          }
+          const facts = view(row, head.restaurantId);
+          result.set(
+            input.offeringId,
+            Object.freeze({
+              ...facts,
+              quantity: input.quantity,
+              lineTotalVnd: checkedLineTotal(facts.unitPriceVnd, input.quantity),
+            }),
+          );
+        }
+        return result;
+      });
+    },
     requireSelection(value: unknown) {
       const input = printSelectionSchema.parse(value);
       return prisma.$transaction(async (tx) => {
@@ -190,7 +252,7 @@ export function createPrintOfferingService(prisma: PrismaClient, templates: Temp
 }
 export type PrintOfferingReader = Pick<
   ReturnType<typeof createPrintOfferingService>,
-  'requireSelection' | 'resolveRevision'
+  'requireSelection' | 'requireBatchSelections' | 'resolveRevision'
 >;
 export function createPrintOfferingReader(
   prisma: PrismaClient,
@@ -199,6 +261,7 @@ export function createPrintOfferingReader(
   const service = createPrintOfferingService(prisma, templates);
   return Object.freeze({
     requireSelection: service.requireSelection,
+    requireBatchSelections: service.requireBatchSelections,
     resolveRevision: service.resolveRevision,
   });
 }

@@ -120,7 +120,18 @@ export interface MenuService {
     input: LifecycleInput,
   ): ReturnType<CatalogVersionRepository['changeLifecycle']>;
   requireCurrentMenuPackageVersion(menuPackageId: string): Promise<MenuPackageSnapshot>;
+  requireCurrentMenuPackageHeaders(
+    menuPackageIds: readonly string[],
+  ): Promise<Map<string, MenuPackageHeaderSnapshot>>;
   resolveMenuPackageVersion(versionId: string): Promise<MenuPackageSnapshot>;
+}
+
+export interface MenuPackageHeaderSnapshot {
+  readonly id: string;
+  readonly menuPackageId: string;
+  readonly name: string;
+  readonly description: string;
+  readonly priceVndPerTable: number;
 }
 
 export interface LifecycleInput {
@@ -431,6 +442,39 @@ export function createMenuService(
       });
       if (version === null) throw new NotFoundError();
       return toMenuSnapshot(version);
+    },
+
+    async requireCurrentMenuPackageHeaders(menuPackageIds) {
+      if (menuPackageIds.length === 0) return new Map();
+      const distinctIds = [...new Set(menuPackageIds)].sort();
+      const versions = await prisma.menuPackageVersion.findMany({
+        where: {
+          menuPackageId: { in: distinctIds },
+          state: 'PUBLISHED',
+          currentFor: { is: { lifecycle: 'ACTIVE' } },
+        },
+        select: {
+          id: true,
+          menuPackageId: true,
+          name: true,
+          description: true,
+          priceVndPerTable: true,
+        },
+      });
+      const map = new Map<string, MenuPackageHeaderSnapshot>();
+      for (const version of versions) {
+        map.set(
+          version.menuPackageId,
+          Object.freeze({
+            id: version.id,
+            menuPackageId: version.menuPackageId,
+            name: version.name,
+            description: version.description,
+            priceVndPerTable: decimalToNumber(version.priceVndPerTable)!,
+          }),
+        );
+      }
+      return map;
     },
 
     async resolveMenuPackageVersion(versionId) {

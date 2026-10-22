@@ -76,7 +76,10 @@ describe('account settings HTTP authority', () => {
       },
     });
     expect(response.headers['cache-control']).toBe('no-store');
-    expect(tx.account.findUniqueOrThrow).toHaveBeenCalledWith({ where: { id: actor.accountId } });
+    expect(tx.account.findUniqueOrThrow).toHaveBeenCalledWith({
+      where: { id: actor.accountId },
+      select: { id: true, displayEmail: true, displayName: true, profileRevision: true },
+    });
   });
 
   it('locks account before session and audits a normalized profile update', async () => {
