@@ -136,7 +136,7 @@ describe('catalog media service', () => {
       f.service.listSigned('HALL', f.input.resourceId),
     ]);
     await entered;
-    const failure = new ProviderError('controlled signing failure');
+    const failure = new ProviderError('unavailable');
     rejectSigning(failure);
     expect(await pending).toEqual([
       { status: 'rejected', reason: failure },
