@@ -300,10 +300,7 @@ export class MemoryMediaRepository implements MediaRepository {
     });
   }
 
-  releaseUploadLease(
-    bookingId: string,
-    intentKeyDigest: string,
-  ): Promise<void> {
+  releaseUploadLease(bookingId: string, intentKeyDigest: string): Promise<void> {
     const intent = `${bookingId}:${intentKeyDigest}`;
     this.#intents.delete(intent);
     for (const [assetId, activeIntent] of this.#activeReplacements.entries()) {

@@ -12,6 +12,8 @@ export default defineConfig(
     'playwright-report/**',
     'test-results/**',
     '.local-demo/**',
+    'output/**',
+    'src/generated/prisma/**',
   ]),
   {
     linterOptions: {

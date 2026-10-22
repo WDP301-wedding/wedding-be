@@ -63,14 +63,14 @@ Cách sửa: một semaphore/provider-work queue chia sẻ ở service/provider 
 
 ## Verification do Codex tự chạy
 
-| Kiểm tra | Kết quả |
-| --- | --- |
-| TypeScript `tsc --project tsconfig.json --noEmit` | exit 0 |
-| ESLint toàn repo `eslint . --max-warnings 0` | exit 0 |
-| Prettier check 13 file tracked đang thay đổi | exit 0 |
-| `git diff --check` | exit 0 |
-| Targeted regression suite | **9 files / 119 tests passed**, exit 0, 55,84 giây |
-| Audit probes bổ sung | **5 probes matched observed behavior**, exit 0, 5,64 giây |
+| Kiểm tra                                          | Kết quả                                                   |
+| ------------------------------------------------- | --------------------------------------------------------- |
+| TypeScript `tsc --project tsconfig.json --noEmit` | exit 0                                                    |
+| ESLint toàn repo `eslint . --max-warnings 0`      | exit 0                                                    |
+| Prettier check 13 file tracked đang thay đổi      | exit 0                                                    |
+| `git diff --check`                                | exit 0                                                    |
+| Targeted regression suite                         | **9 files / 119 tests passed**, exit 0, 55,84 giây        |
+| Audit probes bổ sung                              | **5 probes matched observed behavior**, exit 0, 5,64 giây |
 
 9 regression files:
 

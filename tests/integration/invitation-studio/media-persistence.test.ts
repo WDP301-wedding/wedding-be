@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import sharp from 'sharp';
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { FakeStorageProvider } from '../../../src/integrations/storage/fake-storage-provider.js';
 import type { StorageProvider } from '../../../src/integrations/storage/storage-provider.js';
@@ -53,10 +53,14 @@ describeDatabase(
         .toBuffer();
     }, 60_000);
     beforeEach(async () => {
+      // The service and fresh repository cutoff/lease checks share fixture time.
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(new Date('2026-10-09T00:00:00Z'));
       await database.prisma.$executeRawUnsafe(
         'TRUNCATE "InvitationMediaAudit", "InvitationMediaReceipt", "InvitationMediaFile", "InvitationMediaAsset", "InvitationMediaUploadAttempt", "InvitationMediaPolicy", "InvitationMediaCommand" CASCADE',
       );
     });
+    afterEach(() => vi.useRealTimers());
     afterAll(async () => {
       await database.disconnect();
     });
@@ -174,6 +178,22 @@ describeDatabase(
       expect(sdk.bucket.remove).not.toHaveBeenCalled();
     });
 
+    it('rejects fresh acceptance at the cutoff even when the injected service clock remains earlier', async () => {
+      const h = harness();
+      const put = h.storage.put.bind(h.storage);
+      vi.spyOn(h.storage, 'put').mockImplementationOnce(async (input) => {
+        const object = await put(input);
+        // The event is October 15; the repository must enforce the exact 72-hour cutoff.
+        vi.setSystemTime(new Date('2026-10-12T00:00:00Z'));
+        return object;
+      });
+      await expect(h.upload()).rejects.toMatchObject({ code: 'MEDIA_CUTOFF_REACHED' });
+      expect(await database.prisma.invitationMediaAsset.count()).toBe(0);
+      expect(await database.prisma.invitationMediaFile.count()).toBe(0);
+      expect(await database.prisma.invitationMediaReceipt.count()).toBe(0);
+      expect((await h.repository.recoveryPage(bookingId, 100))[0]!.outcome).toBe('UNRESOLVED');
+    });
+
     it('persists originals, immutable metadata and receipts across repository instances', async () => {
       const h = harness(),
         asset = await h.upload({ idempotencyKey: 'stable' });
@@ -215,17 +235,23 @@ describeDatabase(
     });
 
     it('rolls back acceptance on a deferred commit failure, retaining the pre-upload journal', async () => {
-      const h = harness(),
-        locked = h.repository.runLocked.bind(h.repository);
-      vi.spyOn(h.repository, 'runLocked').mockImplementationOnce((id, work) =>
-        locked(id, async (state) => {
-          const result = await work(state);
-          const first = [...state.assets.values()][0]!;
-          state.assets.set(first.id, { ...first, currentFileRevisionId: randomUUID() });
-          return result;
-        }),
+      const h = harness();
+      await database.prisma.$executeRawUnsafe(`
+        CREATE FUNCTION media_acceptance_commit_fault() RETURNS trigger LANGUAGE plpgsql AS $$
+        BEGIN RAISE EXCEPTION 'controlled deferred acceptance failure'; END $$`);
+      await database.prisma.$executeRawUnsafe(
+        'CREATE CONSTRAINT TRIGGER media_acceptance_commit_fault AFTER INSERT ON "InvitationMediaReceipt" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION media_acceptance_commit_fault()',
       );
-      await expect(h.upload({ idempotencyKey: 'retry' })).rejects.toThrow();
+      try {
+        await expect(h.upload({ idempotencyKey: 'retry' })).rejects.toThrow(
+          'controlled deferred acceptance failure',
+        );
+      } finally {
+        await database.prisma.$executeRawUnsafe(
+          'DROP TRIGGER media_acceptance_commit_fault ON "InvitationMediaReceipt"',
+        );
+        await database.prisma.$executeRawUnsafe('DROP FUNCTION media_acceptance_commit_fault()');
+      }
       expect(await database.prisma.invitationMediaAsset.count()).toBe(0);
       expect(await database.prisma.invitationMediaFile.count()).toBe(0);
       expect(await database.prisma.invitationMediaReceipt.count()).toBe(0);
@@ -420,6 +446,8 @@ describeDatabase(
     });
 
     it('checks real Identity/session/FULL access state; Booking/calendar remain doubles', async () => {
+      // Credential timestamps default to the real PostgreSQL clock in this case.
+      vi.useRealTimers();
       const consultationId = randomUUID();
       await database.prisma.account.create({
         data: {

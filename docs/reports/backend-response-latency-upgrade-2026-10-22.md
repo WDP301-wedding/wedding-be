@@ -5,6 +5,7 @@
 Theo chỉ thị trực tiếp từ chủ dự án (`BE_LATENCY_REVIEW_FIX_AND_FAST_CI_20261022`), toàn bộ các phát hiện F1–F4 từ đợt review của Codex (`docs/reports/codex-review-latency-upgrade-2026-10-22.md`) đã được xử lý triệt để trong repository `wedding-be`. Đồng thời, workflow CI backend (`.github/workflows/ci.yml`) đã được cấu hình tối ưu để chạy nhanh mặc định trên push/pull_request, loại bỏ kiểm tra format check khỏi CI, và đưa toàn bộ test suites thành tùy chọn qua `workflow_dispatch` với input `run_tests` (default: `false`).
 
 Tất cả các thay đổi tuân thủ nghiêm ngặt các quy tắc:
+
 - Chỉ chỉnh sửa backend `wedding-be`; không chạm vào bất kỳ frontend code nào (`wedding-web`, `wedding-manage-web`, `wedding-app`).
 - Giữ nguyên các tối ưu trước đó; không reset/discard git history.
 - Không tự động commit, push, merge, deploy hay can thiệp branch protection/repository settings.
@@ -15,6 +16,7 @@ Tất cả các thay đổi tuân thủ nghiêm ngặt các quy tắc:
 ## 2. Chi tiết sửa đổi F1–F4 & Callsites
 
 ### F1 / P1: Preview Revoke Race
+
 - **Nguyên nhân gốc:** `media.service.ts` gọi `requireActor` hai lần trước và sau `createSignedReadUrl`, nhưng cả hai lần đều nằm bên ngoài database transaction của `repository.previewAsset`. Khi session bị revoke ngay trước lần đọc thứ hai, transaction thứ hai chỉ đọc asset/file mà không re-check quyền sở hữu và hiệu lực session, dẫn đến việc API vẫn trả về signed URL.
 - **Giải pháp xử lý:**
   - Bổ sung callback `authorize?: (scopedContext: MediaRequestContext) => Promise<void>` vào contract `previewAsset` của `MediaRepository`.
@@ -28,6 +30,7 @@ Tất cả các thay đổi tuân thủ nghiêm ngặt các quy tắc:
   - [`src/modules/invitation-studio/infrastructure/prisma-media.repository.ts`](file:///c:/Users/Admin/Desktop/BE/wedding-be/src/modules/invitation-studio/infrastructure/prisma-media.repository.ts) (dòng 295–325): Thực thi `await authorize(scopedContext)` bên trong transaction scope.
 
 ### F2 / P1: Upload Lease Wiring & IO Outside Database Transaction
+
 - **Nguyên nhân gốc:** `upload()` trước đây vẫn gói toàn bộ luồng trong `runCommand`/`runLocked` của repository. Do đó, các tác vụ decode/inspect hình ảnh và `Storage.put` (IO mạng bên ngoài) diễn ra trong khi đang giữ exclusive lock của booking. Ba phương thức `claimUploadLease`, `acceptUpload`, `releaseUploadLease` đã được tạo ra trước đó nhưng chưa được nối vào service.
 - **Giải pháp xử lý:**
   - Tái cấu trúc hoàn chỉnh phương thức `upload()` trong `media.service.ts`:
@@ -46,6 +49,7 @@ Tất cả các thay đổi tuân thủ nghiêm ngặt các quy tắc:
   - [`src/modules/invitation-studio/infrastructure/prisma-media.repository.ts`](file:///c:/Users/Admin/Desktop/BE/wedding-be/src/modules/invitation-studio/infrastructure/prisma-media.repository.ts): Hỗ trợ `authorize` callback và cutoff re-check bên trong `runAccept`.
 
 ### F3 / P1: VNPay Stale Cooldown Cache
+
 - **Nguyên nhân gốc:** Cooldown cache 3 giây trong `PaymentsBillingHttpServices` ghi đè trạng thái `PENDING` cũ lên kết quả mới của `ledger.getAttempt`, ngay cả khi ledger đã ghi nhận thanh toán thành công (`SUCCEEDED`) qua IPN hoặc callback. Ngoài ra, cache dùng `Map` không có giới hạn dung lượng và không có cơ chế dọn dẹp TTL, gây rò rỉ bộ nhớ.
 - **Giải pháp xử lý:**
   - Cài đặt `BoundedCooldownCache`: giới hạn tối đa 500 entries, tự động xóa entry hết hạn khi truy cập hoặc dọn dẹp entry cũ nhất (FIFO/LRU eviction) khi đạt ngưỡng capacity.
@@ -56,6 +60,7 @@ Tất cả các thay đổi tuân thủ nghiêm ngặt các quy tắc:
   - [`src/modules/payments-billing/http/payments-billing.http-services.test.ts`](file:///c:/Users/Admin/Desktop/BE/wedding-be/src/modules/payments-billing/http/payments-billing.http-services.test.ts): Bổ sung 2 regression test độc lập kiểm tra race condition và expiry.
 
 ### F4 / P2: Catalog Media Concurrency Multiplication
+
 - **Nguyên nhân gốc:** Trong `catalog-media.service.ts:listSignedHallPage`, mapper ngoài giới hạn 6 hall song song, và mỗi hall lại dùng limiter trong giới hạn 6 asset calls song song. Hai limiter lồng nhau dẫn đến peak $6 \times 6 = 36$ active signing calls tới storage provider.
 - **Giải pháp xử lý:**
   - Cài đặt class `AsyncSemaphore` gắn trực tiếp tại provider boundary (`this.storage.createSignedReadUrl`). Semaphore này được chia sẻ trên toàn bộ instance của service và áp dụng cho tất cả các request đồng thời.
@@ -71,6 +76,7 @@ Tất cả các thay đổi tuân thủ nghiêm ngặt các quy tắc:
 ## 3. Cấu hình CI Nhanh & Tùy Chọn Test (.github/workflows/ci.yml)
 
 Theo chỉ thị mới nhất của chủ dự án, workflow `.github/workflows/ci.yml` được cấu hình lại với các nguyên tắc:
+
 1. **Xóa hoàn toàn bước `npm run format:check`** khỏi CI pipeline của backend.
 2. **Chạy nhanh mặc định (Test-OFF) trên push và pull_request:**
    - Thêm `workflow_dispatch` với input boolean `run_tests` (default: `false`).
@@ -85,6 +91,7 @@ Theo chỉ thị mới nhất của chủ dự án, workflow `.github/workflows/
    - Khi bật `run_tests`, lệnh `npm run test:coverage` chạy một lần duy nhất với PostgreSQL container; Vitest tự động include toàn bộ unit tests (`src/**/*.test.ts`), contract tests (`tests/contract/*.test.ts`) và integration tests (`tests/integration/*.test.ts`), đồng thời áp dụng ngưỡng coverage per-file. Loại bỏ các bước chạy riêng rẽ `test:unit`, `test:contract`, `test:integration` gây tốn kém thời gian runner.
 
 ### Hướng dẫn bật Test trong CI (Manual Run):
+
 1. Vào tab **Actions** trên GitHub repository.
 2. Chọn workflow **Backend CI** ở danh sách bên trái.
 3. Nhấn nút **Run workflow** (bên phải giao diện).
@@ -97,16 +104,17 @@ Theo chỉ thị mới nhất của chủ dự án, workflow `.github/workflows/
 
 Các lệnh kiểm tra đã được thực hiện trực tiếp trên workspace cục bộ với kết quả 100% pass:
 
-| Lệnh | Mô tả | Mã thoát (Exit Code) | Thời gian thực thi |
-| --- | --- | --- | --- |
-| `npm run api:check` | Kiểm tra tính nhất quán của OpenAPI manifest | 0 | ~4 giây |
-| `npm run typecheck` | TypeScript compiler type-check (`tsc --noEmit`) | 0 | ~35 giây |
-| `npm run lint` | ESLint kiểm tra toàn bộ codebase (`--max-warnings 0`) | 0 | ~1 phút 35 giây |
-| `npm run build` | Build production bundle (`tsc -p tsconfig.build.json`) | 0 | ~25 giây |
-| `npm run audit:ci` | Dependency audit không có lỗ hổng bảo mật | 0 | ~4 giây |
-| `npx vitest run ...` | 6 targeted regression suites (85 tests) | 0 | ~3.12 giây |
+| Lệnh                 | Mô tả                                                  | Mã thoát (Exit Code) | Thời gian thực thi |
+| -------------------- | ------------------------------------------------------ | -------------------- | ------------------ |
+| `npm run api:check`  | Kiểm tra tính nhất quán của OpenAPI manifest           | 0                    | ~4 giây            |
+| `npm run typecheck`  | TypeScript compiler type-check (`tsc --noEmit`)        | 0                    | ~35 giây           |
+| `npm run lint`       | ESLint kiểm tra toàn bộ codebase (`--max-warnings 0`)  | 0                    | ~1 phút 35 giây    |
+| `npm run build`      | Build production bundle (`tsc -p tsconfig.build.json`) | 0                    | ~25 giây           |
+| `npm run audit:ci`   | Dependency audit không có lỗ hổng bảo mật              | 0                    | ~4 giây            |
+| `npx vitest run ...` | 6 targeted regression suites (85 tests)                | 0                    | ~3.12 giây         |
 
 ### Danh sách 6 Targeted Regression Test Suites đã pass:
+
 1. `src/modules/invitation-studio/application/media.service.test.ts` (44 tests) — Pass
    - Bao gồm test: `serializes 101 concurrent originals across service instances: exactly 100 accept`.
    - Bao gồm test: `failed replacement preserves original, revision, quota and audit; pending intent survives`.

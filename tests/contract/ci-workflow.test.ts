@@ -40,6 +40,8 @@ describe('backend CI contract', () => {
     expect(workflow).not.toContain('continue-on-error');
     expect(workflow).not.toContain('secrets.');
     expect(workflow).not.toContain('pull_request_target');
+    // Required checks also run for main pushes/PRs, which have no dispatch inputs.
+    expect(workflow).not.toContain('inputs.run_tests');
   });
 
   it('keeps monthly npm and GitHub Actions updates independent with bounded PR counts', async () => {
