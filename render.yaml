@@ -13,13 +13,13 @@ services:
     name: wedding-be-render-trial
     runtime: docker
     repo: https://github.com/WDP301-wedding/wedding-be
-    branch: codex/render-migration-20261022
+    branch: main
     plan: starter
     region: singapore
     dockerfilePath: ./Dockerfile
     dockerContext: .
     healthCheckPath: /health/ready
-    autoDeployTrigger: 'off'
+    autoDeployTrigger: checksPass
     numInstances: 1
     disk:
       name: wedding-media
