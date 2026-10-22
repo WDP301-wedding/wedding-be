@@ -69,5 +69,39 @@ References: [Render Free](https://render.com/docs/free),
 [PostgreSQL connections](https://render.com/docs/postgresql-creating-connecting),
 [Blueprint specification](https://render.com/docs/blueprint-spec).
 
-Status: configuration prepared; data import, deployment and live verification
-are tracked separately in the migration evidence.
+## Verified trial result
+
+Backend is Live at [wedding-be-render-trial.onrender.com](https://wedding-be-render-trial.onrender.com),
+using deployment `dep-dbctdq6i0phs73fvqheg`, source `5a8d15488bbd2aa6473a5d95d0b8539ed08fa6a9`.
+Resources were provisioned with MCP/CLI and the final Docker command was corrected
+in the Dashboard. The validated Blueprint records matching desired settings; it is
+not currently linked as the cloud resources' management source.
+
+The consistent source snapshot started at **16:15:22 on 22 October (Asia/Saigon)**.
+All **147 tables** matched row counts and content digests after restore; all
+**65 migration records/checksums** matched. Target is PostgreSQL 17.11, with TLS 1.3
+verified for the external import. Temporary external DB access is now closed and
+application readiness remains 200 over the private connection.
+
+All **32 authenticated/public smoke operations** returned expected statuses and
+matched completion logs. Existing signed Storage download succeeded. CORS with the
+existing frontend origin, secure refresh-cookie attributes, logout and token
+revocation passed. One five-request parallel Guest wave took **518 ms**; this is
+not a p95, browser end-to-end result or capacity claim. The post-smoke differences
+are confined to seven expected security/audit/Analytics tables; the other 140
+tables and migration checksums remain unchanged. Both deployed-commit CI jobs
+passed, including PostgreSQL integration and coverage.
+
+An initial diagnostic mistakenly printed the trial DB connection string in tool
+output. Its credential has been replaced using Render-managed rotation; the old
+role now has NOLOGIN and retains its owned objects. The new credential and copied
+OTP/notification keys were verified without including their values in Git.
+
+Free DB expiry: **21 November 2026**, approximately 16:05 Asia/Saigon. Workers remain
+disabled on the trial. The existing Railway/Supabase deployment remains authoritative;
+no frontend or traffic cutover has happened. To point a website preview to this API,
+set its server-side `BACKEND_ORIGIN=https://wedding-be-render-trial.onrender.com`
+and rebuild/redeploy that preview. Keep the frontend's same-origin API proxy.
+
+[Sanitized migration evidence](../tasks/evidence/render-migration-trial-2026-10-22.json)
+records failed attempts, successful verification and final-cutover prerequisites.
