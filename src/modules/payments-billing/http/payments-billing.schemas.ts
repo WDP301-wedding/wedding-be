@@ -82,6 +82,9 @@ export const attemptResponseSchema = z.strictObject({
     expiresAt: instant,
   }),
 });
+export const activeAttemptsResponseSchema = z.strictObject({
+  data: z.strictObject({ attempts: z.array(attemptResponseSchema.shape.data).max(2) }),
+});
 export const paymentResponseSchema = z.strictObject({
   data: z.strictObject({ paymentId: uuid, paymentAttemptId: uuid }),
 });

@@ -636,10 +636,7 @@ export class PrismaMediaRepository implements MediaRepository {
       if (lock?.acquired !== true) throw new RequestInProgressError(1);
     };
 
-    const runAccept = async (
-      tx: Prisma.TransactionClient,
-      scopedContext?: MediaRequestContext,
-    ) => {
+    const runAccept = async (tx: Prisma.TransactionClient, scopedContext?: MediaRequestContext) => {
       if (authorize !== undefined && scopedContext !== undefined) {
         await authorize(scopedContext);
       }

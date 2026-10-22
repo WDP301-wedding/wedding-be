@@ -54,22 +54,27 @@ describeDb('GM retained migrations, credential expiry and import rollback', () =
       history: await db.prisma.guestHistory.count(),
       outbox: await db.prisma.guestOutbox.count(),
       commands: await db.prisma.guestCommand.count(),
+      audit: await db.prisma.auditLog.count(),
     };
-    const original = s.repository.history.bind(s.repository);
-    let calls = 0;
-    const fault = vi.spyOn(s.repository, 'history').mockImplementation(async (...args) => {
+    const original = s.repository.batchHistory.bind(s.repository);
+    const fault = vi.spyOn(s.repository, 'batchHistory').mockImplementation(async (...args) => {
+      expect(args[3]).toHaveLength(2);
       await original(...args);
-      if (++calls === 2) throw Error('second row failure');
+      throw Error('batch history failure');
     });
-    await expect(s.guests.import(f.bookingId, input, randomUUID(), f.couple)).rejects.toThrow(
-      'second row failure',
-    );
-    fault.mockRestore();
+    try {
+      await expect(s.guests.import(f.bookingId, input, randomUUID(), f.couple)).rejects.toThrow(
+        'batch history failure',
+      );
+    } finally {
+      fault.mockRestore();
+    }
     expect({
       guests: await db.prisma.guest.count(),
       history: await db.prisma.guestHistory.count(),
       outbox: await db.prisma.guestOutbox.count(),
       commands: await db.prisma.guestCommand.count(),
+      audit: await db.prisma.auditLog.count(),
     }).toEqual(before);
     now = new Date(now.getTime() + 31 * 60000);
     await expect(s.guests.import(f.bookingId, input, randomUUID(), f.couple)).rejects.toMatchObject(

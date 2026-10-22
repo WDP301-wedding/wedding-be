@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import sharp from 'sharp';
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import request from 'supertest';
 import { parseEnvironment } from '../../../src/config/env.js';
 import { startServer } from '../../../src/server.js';
@@ -62,6 +62,10 @@ describeDatabase('W1 native owner readers/shared transaction, controlled Storage
       .toBuffer();
   }, 60_000);
   beforeEach(async () => {
+    // Keep service time, repository cutoff checks and upload leases on one clock.
+    // Timers remain real so PostgreSQL/provider concurrency is exercised normally.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(now);
     await db().$executeRawUnsafe(
       'TRUNCATE "InvitationMediaAudit", "InvitationMediaReceipt", "InvitationMediaFile", "InvitationMediaAsset", "InvitationMediaUploadAttempt", "InvitationMediaPolicy", "InvitationMediaCommand", "Booking", "Account" CASCADE',
     );
@@ -80,6 +84,7 @@ describeDatabase('W1 native owner readers/shared transaction, controlled Storage
       now: new Date('2026-10-08T00:00:00Z'),
     });
   });
+  afterEach(() => vi.useRealTimers());
   afterAll(async () => database.disconnect());
 
   function harness(clock: () => Date = () => now) {
@@ -529,14 +534,17 @@ describeDatabase('W1 native owner readers/shared transaction, controlled Storage
       const gate = new Promise<void>((r) => {
         release = r;
       });
-      const put = h.storage.provider.put.bind(h.storage.provider);
-      vi.spyOn(h.storage.provider, 'put').mockImplementationOnce(async (command) => {
-        entered();
-        await gate;
-        return put(command);
-      });
+      const accept = h.repository.acceptUpload.bind(h.repository);
+      vi.spyOn(h.repository, 'acceptUpload').mockImplementationOnce((input, context, authorize) =>
+        accept(input, context, async (scoped) => {
+          await authorize!(scoped);
+          entered();
+          await gate;
+        }),
+      );
       const pending = h.upload();
       await enteredGate;
+      expect(h.storage.bucket.upload).toHaveBeenCalledOnce();
       const query = {
         account: `UPDATE "Account" SET status='DISABLED', "disabledAt"=CURRENT_TIMESTAMP WHERE id=$1::uuid`,
         session: `UPDATE "Session" SET status='REVOKED', "revokedAt"=CURRENT_TIMESTAMP, "revocationReason"='test' WHERE id=$1::uuid`,

@@ -125,7 +125,6 @@ interface CachedSignedUrl {
   readonly expiresAtMs: number;
 }
 
-
 class AsyncSemaphore {
   private active = 0;
   private readonly queue: Array<() => void> = [];
