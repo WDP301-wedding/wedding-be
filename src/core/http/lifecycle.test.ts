@@ -1,6 +1,8 @@
 import { createServer, Server } from 'node:http';
 import { EventEmitter, once } from 'node:events';
-import { resolve } from 'node:path';
+import { join, resolve } from 'node:path';
+import { mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { Writable } from 'node:stream';
 import { pathToFileURL } from 'node:url';
 
@@ -8,6 +10,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createApp } from '../../app.js';
 import { parseEnvironment } from '../../config/env.js';
+import { DiskStorageProvider } from '../../integrations/storage/disk-storage-provider.js';
 import { bootstrap, isMainModule, runMain, startServer, type RunningServer } from '../../server.js';
 import { createVenueCatalogRuntime } from '../../modules/venue-catalog/venue-catalog.runtime.js';
 import { createIdentityRuntime } from '../../modules/identity-access/identity.runtime.js';
@@ -415,6 +418,43 @@ describe('server startup and process signals', () => {
     expect(vi.mocked(database.resource).close.mock.calls).toHaveLength(1);
   });
 
+  it('mounts signed disk media in the configured server without exposing unsigned originals', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'wedding-bootstrap-disk-'));
+    const config = parseEnvironment({
+      NODE_ENV: 'test',
+      LOG_LEVEL: 'silent',
+      STORAGE_DRIVER: 'render-disk',
+      STORAGE_DISK_PATH: root,
+      STORAGE_PUBLIC_ORIGIN: 'https://api.example.test',
+      STORAGE_SIGNING_KEY: 'test-signing-key-at-least-32-bytes-long',
+    });
+    if (!config.storage.enabled || !('provider' in config.storage))
+      throw new Error('Disk configuration required');
+    const disk = new DiskStorageProvider(config.storage);
+    const bytes = Uint8Array.from([137, 80, 78, 71, 13, 10, 26, 10, 1]);
+    try {
+      const object = await disk.put({
+        bytes,
+        contentType: 'image/png',
+        purpose: 'PRIVATE_WEDDING_MEDIA',
+        resourceId: '984bd852-853b-4c21-82d1-e7f43c442a81',
+      });
+      const signed = new URL(await disk.createSignedReadUrl(object));
+      const running = await bootstrap({
+        loadConfig: () => Promise.resolve({ ...config, runtime: { ...config.runtime, port: 0 } }),
+      });
+      runningServers.push(running);
+      const response = await request(running.app).get(signed.pathname + signed.search);
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(Buffer.from(bytes));
+      expect((await request(running.app).get(signed.pathname)).status).toBe(404);
+      expect((await request(running.app).get('/health/ready')).status).toBe(200);
+      await running.shutdown();
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
   it('closes all initialized owners and readiness when analytics startup fails', async () => {
     vi.mocked(createAnalyticsRuntime).mockRejectedValueOnce(new Error('analytics startup failed'));
     await expect(
@@ -427,6 +467,40 @@ describe('server startup and process signals', () => {
     >;
     expect(notifications.resource.close).toHaveBeenCalledOnce();
     expect(vi.spyOn(database.resource, 'close')).toHaveBeenCalledOnce();
+  });
+  it('keeps Supabase startup compatible without the Render disk route', async () => {
+    const config = parseEnvironment({
+      NODE_ENV: 'test',
+      LOG_LEVEL: 'silent',
+      SUPABASE_URL: 'https://storage.example.test',
+      SUPABASE_SERVICE_ROLE_KEY: 'test-key',
+      SUPABASE_STORAGE_BUCKET: 'private-media',
+    });
+    const running = await bootstrap({
+      loadConfig: () => Promise.resolve({ ...config, runtime: { ...config.runtime, port: 0 } }),
+    });
+    runningServers.push(running);
+    expect((await request(running.app).get('/health/ready')).status).toBe(200);
+    expect((await request(running.app).get('/api/v1/storage/objects/anything')).status).toBe(404);
+    await running.shutdown();
+  });
+  it('releases initialized owners and readiness if notification startup fails', async () => {
+    vi.mocked(createNotificationsRuntime).mockRejectedValueOnce(
+      new Error('notification startup failed'),
+    );
+    await expect(
+      bootstrap({
+        loadConfig: () =>
+          Promise.resolve(parseEnvironment({ NODE_ENV: 'test', LOG_LEVEL: 'silent' })),
+      }),
+    ).rejects.toThrow('notification startup failed');
+    const database = vi.mocked(createDatabaseReadiness).mock.results.at(-1)!.value as ReturnType<
+      typeof createDatabaseReadiness
+    >;
+    const invitation = await (vi.mocked(createInvitationStudioRuntime).mock.results.at(-1)!
+      .value as ReturnType<typeof createInvitationStudioRuntime>);
+    expect(vi.spyOn(database.resource, 'close')).toHaveBeenCalledOnce();
+    expect(vi.spyOn(invitation.resource, 'close')).toHaveBeenCalledOnce();
   });
   it('closes earlier owner resources when invitation composition fails', async () => {
     vi.mocked(createInvitationStudioRuntime).mockRejectedValueOnce(
