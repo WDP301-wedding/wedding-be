@@ -24,10 +24,7 @@ services:
     # Render's fromDatabase connectionString has no query string. Require TLS on
     # the private network; libpq-compatible require supports Render's internal CA.
     # No migration runs at startup: import and compare the new DB first.
-    dockerCommand: >-
-      /bin/sh -c 'export DATABASE_URL="${DATABASE_URL}?sslmode=require&uselibpqcompat=true";
-      export MIGRATION_DATABASE_URL="${MIGRATION_DATABASE_URL}?sslmode=require&uselibpqcompat=true";
-      exec node --enable-source-maps --import ./dist/instrumentation.js dist/server.js'
+    dockerCommand: /bin/sh ./scripts/render-start.sh
     envVars:
       - key: DATABASE_URL
         fromDatabase:

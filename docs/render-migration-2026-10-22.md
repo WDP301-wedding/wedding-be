@@ -16,8 +16,9 @@ Postgres documents 100 connections; the application deliberately retains its
 more conservative 60-slot declared ceiling until live verification.
 
 Render's generated internal connection strings do not include a TLS query.
-The Docker command appends `sslmode=require&uselibpqcompat=true` before the
-unchanged application entrypoint. TLS is required over the private network;
+The Render-only startup script appends `sslmode=require&uselibpqcompat=true`
+before the unchanged application entrypoint. It rejects already customized URLs
+instead of creating a second query string. TLS is required over the private network;
 Render documents self-signed internal certificates. This is scoped to the new
 Render service and does not change external/Supabase TLS verification.
 
