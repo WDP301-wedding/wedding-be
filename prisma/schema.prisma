@@ -1095,6 +1095,7 @@ model BillingPaymentAttempt {
   booking               Booking                      @relation(fields: [bookingId], references: [id], onDelete: Restrict)
   paymentEntries        BillingLedgerEntry[]
   vnpayCheckout         BillingVnpayCheckout?
+  vnpayQueryLease       BillingVnpayQueryLease?
   providerEvidence      BillingProviderEvidence[]
   providerTransactions  BillingProviderTransaction[]
   invoiceRevision       FinalInvoiceRevision?        @relation(fields: [invoiceRevisionId, bookingId], references: [id, bookingId], onDelete: Restrict, onUpdate: NoAction)
@@ -1146,6 +1147,12 @@ model BillingDepositApplication {
 model BillingVnpayCheckout {
   paymentAttemptId String                @id @db.Uuid
   parameters       Json                  @db.JsonB
+  attempt          BillingPaymentAttempt @relation(fields: [paymentAttemptId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+}
+
+model BillingVnpayQueryLease {
+  paymentAttemptId String                @id @db.Uuid
+  nextQueryAt      DateTime              @db.Timestamptz(6)
   attempt          BillingPaymentAttempt @relation(fields: [paymentAttemptId], references: [id], onDelete: Restrict, onUpdate: NoAction)
 }
 

@@ -65,7 +65,7 @@ interface ReconcileResult {
 }
 
 const MAX_COOLDOWNS = 500;
-const RECONCILE_COOLDOWN_MS = 3_000;
+const RECONCILE_COOLDOWN_MS = 5 * 60_000;
 
 class BoundedCooldownCache<T> {
   private readonly map = new Map<string, { readonly value: T; readonly expiresAt: number }>();
@@ -440,11 +440,53 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
         },
       });
     },
+    async prepareQuery(
+      bookingId: string,
+      attemptId: string,
+      actor: AuthenticatedActor,
+      requestId: string,
+    ) {
+      await authorize(bookingId, actor, 'RESTRICTED');
+      const ctx = context(actor, requestId);
+      const attempt = await providers.ledger.getAttempt(bookingId, attemptId, ctx);
+      const minimum = attempt.purpose === 'BALANCE' ? 'FULL' : 'RESTRICTED';
+      await authorize(bookingId, actor, minimum);
+      if (attempt.provider !== 'VNPAY' || ['SUCCEEDED', 'FAILED'].includes(attempt.state))
+        return { data: { request: null } };
+      if (providers.vnpay === null) throw unavailable();
+      const request = await providers.vnpay.prepareQuery(bookingId, attemptId, {
+        ...ctx,
+        actorAccountId: null,
+        authority: 'SYSTEM',
+      });
+      if (request !== null) {
+        // This database lease spans relay requests across API processes/restarts.
+        // VNPay rejects duplicate order queries within five minutes with unsigned code 94.
+        const claimed = await prisma.$queryRaw<Array<{ paymentAttemptId: string }>>`
+          INSERT INTO "BillingVnpayQueryLease" ("paymentAttemptId", "nextQueryAt")
+          VALUES (${attemptId}::uuid, NOW() + INTERVAL '305 seconds')
+          ON CONFLICT ("paymentAttemptId") DO UPDATE
+          SET "nextQueryAt" = EXCLUDED."nextQueryAt"
+          WHERE "BillingVnpayQueryLease"."nextQueryAt" <= NOW()
+          RETURNING "paymentAttemptId"
+        `;
+        if (claimed.length === 0)
+          throw new AppError({
+            status: 429,
+            code: 'PAYMENT_QUERY_COOLDOWN',
+            message: 'VNPay permits one order query every five minutes. Please check again later.',
+          });
+      }
+      await authorize(bookingId, actor, minimum);
+      return { data: { request } };
+    },
     async attempt(
       bookingId: string,
       attemptId: string,
       actor: AuthenticatedActor,
       requestId: string,
+      queryReply?: Readonly<{ raw: unknown }>,
+      readOnly = false,
     ) {
       await authorize(bookingId, actor, 'RESTRICTED');
       const ctx = context(actor, requestId);
@@ -491,22 +533,35 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
             applicationStatus = result.applicationStatus;
           }
         }
+      } else if (readOnly && attempt.provider === 'VNPAY' && providers.vnpay !== null) {
+        const result = await providers.vnpay.inspectCheckout(bookingId, attemptId, {
+          ...ctx,
+          actorAccountId: null,
+          authority: 'SYSTEM',
+        });
+        status = result.status;
+        checkoutUrl = result.checkoutUrl;
       } else if (attempt.provider === 'VNPAY' && providers.vnpay !== null) {
         const nowMs = Date.now();
         const cached = reconcileCooldowns.get(attemptId, nowMs);
-        if (cached !== undefined && !isExpired) {
+        if (cached !== undefined && queryReply === undefined) {
           status = cached.status;
           applicationStatus = cached.applicationStatus;
           checkoutUrl = cached.checkoutUrl;
         } else {
-          let pending = inFlightReconciles.get(attemptId);
+          let pending = queryReply === undefined ? inFlightReconciles.get(attemptId) : undefined;
           if (pending === undefined) {
             pending = providers.vnpay
-              .reconcile(bookingId, attemptId, {
-                ...ctx,
-                actorAccountId: null,
-                authority: 'SYSTEM',
-              })
+              .reconcile(
+                bookingId,
+                attemptId,
+                {
+                  ...ctx,
+                  actorAccountId: null,
+                  authority: 'SYSTEM',
+                },
+                queryReply,
+              )
               .then((result) => {
                 const res: ReconcileResult = {
                   status: result.status,
