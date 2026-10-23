@@ -63,6 +63,7 @@ export type BookingLifecycleRuntime = Readonly<{
   router: Router;
   resource: ShutdownResource;
   providers: BookingLifecycleProviders;
+  prisma: ReturnType<typeof createPrismaClient>;
 }>;
 
 export async function createBookingLifecycleRuntime(
@@ -266,6 +267,7 @@ export async function createBookingLifecycleRuntime(
         scope,
         config.identityAccess.retentionDays.disabledAccountPii,
       ),
+      prisma,
       resource: Object.freeze({
         name: 'booking-lifecycle-database',
         close: () => prisma.$disconnect(),

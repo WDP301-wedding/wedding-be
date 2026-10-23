@@ -1,5 +1,7 @@
 import { type Request, type RequestHandler } from 'express';
 import rateLimit, { type RateLimitInfo } from 'express-rate-limit';
+import RedisStore, { type RedisReply } from 'rate-limit-redis';
+import type { Redis } from 'ioredis';
 
 import type { BackendConfig } from '../../config/env.js';
 import { RateLimitError } from '../errors/app-error.js';
@@ -8,10 +10,20 @@ type RateLimitedRequest = Request & { readonly rateLimit: RateLimitInfo };
 
 export function createGeneralRateLimit(
   config: BackendConfig['security']['rateLimit'],
+  redisClient?: Redis | null,
 ): RequestHandler {
+  const store = redisClient
+    ? new RedisStore({
+        sendCommand: (cmd: string, ...args: string[]) =>
+          redisClient.call(cmd, ...args) as Promise<RedisReply>,
+        prefix: 'rl:http:',
+      })
+    : undefined;
+
   return rateLimit({
+    ...(store !== undefined ? { store } : {}),
     handler(request, _response, next) {
-      next(new RateLimitError(retryAfterSeconds(request as RateLimitedRequest)));
+      next(new RateLimitError(retryAfterSeconds(request as RateLimitedRequest, config.windowMs)));
     },
     legacyHeaders: false,
     limit: config.maxRequests,
@@ -20,8 +32,10 @@ export function createGeneralRateLimit(
   });
 }
 
-function retryAfterSeconds(request: RateLimitedRequest): number {
-  // This baseline intentionally uses express-rate-limit's in-process MemoryStore,
-  // which always supplies the reset time used for its standard headers.
-  return Math.max(1, Math.ceil((request.rateLimit.resetTime!.getTime() - Date.now()) / 1_000));
+function retryAfterSeconds(request: RateLimitedRequest, defaultWindowMs: number): number {
+  if (request.rateLimit?.resetTime) {
+    return Math.max(1, Math.ceil((request.rateLimit.resetTime.getTime() - Date.now()) / 1_000));
+  }
+  return Math.max(1, Math.ceil(defaultWindowMs / 1_000));
 }
+

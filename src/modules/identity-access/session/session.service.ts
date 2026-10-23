@@ -140,6 +140,8 @@ export function createSessionService(
     throttle: AttemptThrottle;
     config: SessionServiceConfig;
     recordSecurityEvent(event: IdentitySecurityEvent): Promise<void>;
+    onSessionRevoked?: ((sessionId: string, accountId?: string) => void | Promise<void>) | undefined;
+    onAccountRevoked?: ((accountId: string) => void | Promise<void>) | undefined;
     now?: () => Date;
   }>,
 ) {
@@ -310,6 +312,7 @@ export function createSessionService(
           sessionId: outcome.sessionId,
           reasonCode: 'refresh-reuse',
         });
+        void options.onSessionRevoked?.(outcome.sessionId, outcome.accountId);
         throw new RefreshReplayError();
       }
       await options.recordSecurityEvent({
@@ -347,6 +350,7 @@ export function createSessionService(
         accountId: input.accountId,
         sessionId: input.sessionId,
       });
+      void options.onSessionRevoked?.(input.sessionId, input.accountId);
     },
 
     async revokeOwnedSession(
@@ -371,6 +375,7 @@ export function createSessionService(
         accountId: input.accountId,
         sessionId: input.sessionId,
       });
+      void options.onSessionRevoked?.(input.sessionId, input.accountId);
     },
 
     listSessions(
@@ -405,6 +410,7 @@ export function createSessionService(
         accountId: input.accountId,
         reasonCode: input.reason,
       });
+      void options.onAccountRevoked?.(input.accountId);
       return count;
     },
   });

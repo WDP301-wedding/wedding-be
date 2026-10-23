@@ -303,6 +303,11 @@ const rawEnvironmentSchema = z
       .transform((value) => value === 'true')
       .default(false),
     OTEL_EXPORTER_OTLP_ENDPOINT: optionalString.pipe(httpUrl.optional()),
+    REDIS_URL: optionalString,
+    REALTIME_ENABLED: z
+      .enum(['true', 'false'])
+      .transform((value) => value === 'true')
+      .default(true),
   })
   .superRefine((environment, context) => {
     const deployed = deployedEnvironments.has(environment.NODE_ENV);
@@ -550,6 +555,13 @@ export type BackendConfig = Readonly<{
   }>;
   telemetry: Readonly<{ otlpEndpoint: string | undefined }>;
   notifications: NotificationConfiguration;
+  redis: Readonly<{
+    enabled: boolean;
+    url: string | undefined;
+  }>;
+  realtime: Readonly<{
+    enabled: boolean;
+  }>;
 }>;
 
 export class EnvironmentConfigurationError extends Error {
@@ -660,6 +672,8 @@ function pickEnvironment(source: EnvironmentSource): EnvironmentSource {
     METRICS_TOKEN: source.METRICS_TOKEN,
     OPENAPI_ENABLED: source.OPENAPI_ENABLED,
     OTEL_EXPORTER_OTLP_ENDPOINT: source.OTEL_EXPORTER_OTLP_ENDPOINT,
+    REDIS_URL: source.REDIS_URL,
+    REALTIME_ENABLED: source.REALTIME_ENABLED,
   };
 }
 
@@ -913,6 +927,13 @@ function createConfig(environment: RawEnvironment): Omit<BackendConfig, 'notific
     }),
     telemetry: Object.freeze({
       otlpEndpoint: environment.OTEL_EXPORTER_OTLP_ENDPOINT,
+    }),
+    redis: Object.freeze({
+      enabled: Boolean(environment.REDIS_URL && environment.REDIS_URL.trim().length > 0),
+      url: environment.REDIS_URL,
+    }),
+    realtime: Object.freeze({
+      enabled: environment.REALTIME_ENABLED,
     }),
   });
 }

@@ -15,10 +15,14 @@ import { createIdentityRouter } from './identity.router.js';
 import { AppError } from '../../core/errors/app-error.js';
 import { createPasswordOtpService } from './password-otp/password-otp.service.js';
 import { createPasswordOtpRouter } from './password-otp/password-otp.router.js';
-import { createPrismaSessionRepository } from './session/session.repository.js';
+import {
+  createPrismaSessionRepository,
+  type SessionRepository,
+} from './session/session.repository.js';
 import {
   createInMemoryAttemptThrottle,
   createSessionService,
+  type AttemptThrottle,
   type IdentitySecurityEvent,
 } from './session/session.service.js';
 import { createWorkspaceInvitationAcceptanceService } from './workspace-invitation/workspace-invitation.acceptance.js';
@@ -26,10 +30,18 @@ import { createPrismaWorkspaceInvitationRepository } from './workspace-invitatio
 
 export type IdentityRuntime = Readonly<{
   router: Router;
+  sessionRepository: Pick<SessionRepository, 'findActorByAccessTokenHash'>;
   resource: ShutdownResource;
 }>;
 
-export async function createIdentityRuntime(config: Config): Promise<IdentityRuntime> {
+export async function createIdentityRuntime(
+  config: Config,
+  dependencies?: {
+    throttle?: AttemptThrottle | undefined;
+    onSessionRevoked?: ((sessionId: string, accountId?: string) => void | Promise<void>) | undefined;
+    onAccountRevoked?: ((accountId: string) => void | Promise<void>) | undefined;
+  },
+): Promise<IdentityRuntime> {
   const prisma = createPrismaClient(config.database.url);
   try {
     await prisma.$connect();
@@ -54,7 +66,7 @@ export async function createIdentityRuntime(config: Config): Promise<IdentityRun
       disabledAccountRetentionDays: config.identityAccess.retentionDays.disabledAccountPii,
     });
     const sessionRepository = createPrismaSessionRepository(prisma);
-    const throttle = createInMemoryAttemptThrottle();
+    const throttle = dependencies?.throttle ?? createInMemoryAttemptThrottle();
     const sessionService = createSessionService({
       repository: sessionRepository,
       authenticate: accountService.authenticate,
@@ -68,6 +80,8 @@ export async function createIdentityRuntime(config: Config): Promise<IdentityRun
         refreshRateLimit: config.identityAccess.rateLimits.refresh,
       },
       recordSecurityEvent: (event) => recordSecurityEvent(prisma, event),
+      ...(dependencies?.onSessionRevoked ? { onSessionRevoked: dependencies.onSessionRevoked } : {}),
+      ...(dependencies?.onAccountRevoked ? { onAccountRevoked: dependencies.onAccountRevoked } : {}),
     });
     const emailProvider = createEmailProvider(config.email);
     const otpKey = config.identityAccess.passwordOtpHashKey;
@@ -125,6 +139,7 @@ export async function createIdentityRuntime(config: Config): Promise<IdentityRun
     router.use(createAccountSettingsRouter(prisma, actorResolver, passwordOtpService, schema));
     return Object.freeze({
       router,
+      sessionRepository,
       resource: Object.freeze({
         name: 'identity-database',
         close: () => prisma.$disconnect(),

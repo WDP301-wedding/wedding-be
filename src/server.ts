@@ -4,6 +4,7 @@ import { pathToFileURL } from 'node:url';
 
 import type { Express } from 'express';
 import type { Logger } from 'pino';
+import type { Redis } from 'ioredis';
 
 import { createApp, type CreateAppOptions } from './app.js';
 import {
@@ -39,6 +40,16 @@ import {
   createObservabilityMetrics,
   type ObservabilityMetrics,
 } from './core/observability/metrics.js';
+import { createRedisManager } from './core/redis/redis-client.js';
+import { createRedisAttemptThrottle } from './core/redis/redis-attempt-throttle.js';
+import {
+  createRealtimeServer,
+  type RealtimeServerInstance,
+} from './core/realtime/realtime-server.js';
+import {
+  createRealtimeOutboxRelay,
+  type OutboxRelayInstance,
+} from './core/realtime/realtime-outbox-relay.js';
 
 type ProcessExitCode = NodeJS.Process['exitCode'];
 type ProcessSignal = 'SIGINT' | 'SIGTERM';
@@ -78,6 +89,8 @@ export interface StartServerOptions {
   readonly registerRoutes?: CreateAppOptions['registerRoutes'];
   readonly registerBodyParsers?: CreateAppOptions['registerBodyParsers'];
   readonly trustedProxyHops?: 0 | 1;
+  readonly redisClient?: Redis | null;
+  readonly onHttpServerCreated?: (httpServer: Server) => Promise<void> | void;
 }
 
 export interface BootstrapDependencies {
@@ -116,8 +129,12 @@ export async function startServer(options: StartServerOptions): Promise<RunningS
       ...(options.trustedProxyHops === undefined
         ? {}
         : { trustedProxyHops: options.trustedProxyHops }),
+      ...(options.redisClient === undefined ? {} : { redisClient: options.redisClient }),
     });
     httpServer = (options.createHttpServer ?? createServer)(app as RequestListener);
+    if (options.onHttpServerCreated) {
+      await options.onHttpServerCreated(httpServer);
+    }
     lifecycle = createHttpLifecycle({
       httpServer,
       readiness,
@@ -325,7 +342,32 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     },
     'runtime feature configuration; verification requires separate evidence',
   );
-  const identityRuntime = await createIdentityRuntime(config);
+
+  const redisManager = createRedisManager({
+    url: config.redis.url,
+    environment: config.runtime.environment,
+    logger,
+  });
+  if (redisManager.isConfigured) {
+    await redisManager.init();
+  }
+
+  const redisThrottle = redisManager.isConfigured
+    ? createRedisAttemptThrottle({ client: redisManager.getClient()!, logger })
+    : undefined;
+
+  let realtimeInstance: RealtimeServerInstance | undefined;
+  let outboxRelay: OutboxRelayInstance | undefined;
+
+  const identityRuntime = await createIdentityRuntime(config, {
+    ...(redisThrottle !== undefined ? { throttle: redisThrottle } : {}),
+    onSessionRevoked: (sessionId) => {
+      realtimeInstance?.broker.revokeSession(sessionId);
+    },
+    onAccountRevoked: (accountId) => {
+      realtimeInstance?.broker.revokeAccount(accountId);
+    },
+  });
   let venueCatalogRuntime: Awaited<ReturnType<typeof createVenueCatalogRuntime>>;
   try {
     venueCatalogRuntime = await createVenueCatalogRuntime(config);
@@ -428,6 +470,26 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     ]);
     throw error;
   }
+
+  const realtimeResource: ShutdownResource = {
+    name: 'realtime-and-redis',
+    close: async () => {
+      if (outboxRelay) await outboxRelay.stop();
+      if (realtimeInstance) await realtimeInstance.close();
+      await redisManager.close();
+    },
+  };
+
+  const combinedReadinessProbe: ReadinessProbe = async (signal) => {
+    await databaseReadiness.probe(signal);
+    if (redisManager.isConfigured) {
+      const redisHealthy = await redisManager.healthCheck();
+      if (!redisHealthy) {
+        throw new Error('Redis readiness check failed.');
+      }
+    }
+  };
+
   const running = await startServer({
     observabilityMetrics: metrics,
     ...(config.notifications.workerEnabled ? { shutdownTimeoutMs: 30000 } : {}),
@@ -436,11 +498,34 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     logger,
     metricsConfig: config.metrics,
     port: config.runtime.port,
-    readinessProbe: databaseReadiness.probe,
+    readinessProbe: combinedReadinessProbe,
     readinessTimeoutMs: DATABASE_READINESS_TIMEOUT_MS,
+    redisClient: redisManager.getClient(),
+    onHttpServerCreated: (server) => {
+      if (config.realtime.enabled) {
+        // Reuse bookingLifecycleRuntime.prisma to avoid exceeding database connection pool budget
+        const sharedPrisma = bookingLifecycleRuntime.prisma;
+        realtimeInstance = createRealtimeServer({
+          httpServer: server,
+          config,
+          sessionRepository: identityRuntime.sessionRepository,
+          prisma: sharedPrisma,
+          redisManager,
+          logger,
+        });
+        outboxRelay = createRealtimeOutboxRelay({
+          prisma: sharedPrisma,
+          broker: realtimeInstance.broker,
+          redisManager,
+          logger,
+        });
+        outboxRelay.start();
+      }
+    },
     resources:
       tracingResource === undefined
         ? [
+            realtimeResource,
             analyticsRuntime.resource,
             notificationsRuntime.resource,
             databaseReadiness.resource,
@@ -452,6 +537,7 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
             paymentsBillingRuntime.resource,
           ]
         : [
+            realtimeResource,
             analyticsRuntime.resource,
             notificationsRuntime.resource,
             databaseReadiness.resource,

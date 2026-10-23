@@ -1,5 +1,6 @@
 import express, { type Express } from 'express';
 import type { Logger } from 'pino';
+import type { Redis } from 'ioredis';
 
 import type { BackendConfig, RuntimeEnvironment } from './config/env.js';
 import {
@@ -46,6 +47,7 @@ export interface CreateAppOptions {
   readonly securityConfig?: BackendConfig['security'];
   readonly trustedProxyHops?: 0 | 1;
   readonly databaseDiagnosticsEnabled?: boolean;
+  readonly redisClient?: Redis | null;
 }
 
 export function createApp(options: CreateAppOptions = {}): Express {
@@ -74,7 +76,7 @@ export function createApp(options: CreateAppOptions = {}): Express {
   });
   app.use(createCorsMiddleware(options.corsConfig ?? { allowedOrigins: [] }));
   app.use(createRequestDeadline(securityConfig.requestTimeoutMs));
-  app.use(createGeneralRateLimit(securityConfig.rateLimit));
+  app.use(createGeneralRateLimit(securityConfig.rateLimit, options.redisClient));
   options.registerBodyParsers?.(app);
   app.use(express.json({ limit: securityConfig.bodyLimitBytes }));
   app.use('/health', createHealthRouter(options));

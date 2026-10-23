@@ -231,6 +231,8 @@ describe('parseEnvironment', () => {
       metrics: { enabled: false },
       vnpay: { enabled: false },
       openApi: { enabledInProduction: false },
+      realtime: { enabled: true },
+      redis: { enabled: false, url: undefined },
       telemetry: { otlpEndpoint: undefined },
       notifications: {
         fcm: { enabled: false },
