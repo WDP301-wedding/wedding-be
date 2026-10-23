@@ -46,7 +46,7 @@ class FakeAcceptanceRepository implements WorkspaceInvitationAcceptanceRepositor
             account: {
               accountId: input.expectedAccountId ?? randomUUID(),
               displayEmail: 'Couple@example.com',
-              roles: [] as const,
+              roles: ['COUPLE'] as const,
             },
             consultationAccessId: randomUUID(),
             sessionId: randomUUID(),
@@ -78,6 +78,26 @@ function service(repository: FakeAcceptanceRepository) {
 }
 
 describe('IA-11 workspace invitation acceptance', () => {
+  it('issues an Android session when accepting directly from the app', async () => {
+    const repository = new FakeAcceptanceRepository();
+    repository.preview = {
+      invitationId: randomUUID(),
+      consultationId: randomUUID(),
+      recipientEmailNormalized: 'couple@example.com',
+      displayEmail: 'Couple@example.com',
+      account: null,
+    };
+    const result = await service(repository).accept({
+      invitationToken: `wii_${'n'.repeat(43)}`,
+      password: 'new-password-123',
+      clientKind: 'ANDROID',
+      clientIp: '127.0.0.1',
+      requestId: randomUUID(),
+    });
+    expect(result.clientKind).toBe('ANDROID');
+    expect(repository.accepted[0]).toMatchObject({ clientKind: 'ANDROID' });
+  });
+
   it('sets the first password and creates a restricted Web session for a new account', async () => {
     const repository = new FakeAcceptanceRepository();
     repository.preview = {
@@ -97,7 +117,7 @@ describe('IA-11 workspace invitation acceptance', () => {
     });
 
     expect(result.clientKind).toBe('WEB');
-    expect(result.account.roles).toEqual([]);
+    expect(result.account.roles).toEqual(['COUPLE']);
     expect(result.accessToken).toMatch(/^wia_/u);
     expect(result.refreshToken).toMatch(/^wir_/u);
     expect(repository.accepted).toHaveLength(1);

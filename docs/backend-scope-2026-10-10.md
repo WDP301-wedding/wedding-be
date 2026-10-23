@@ -15,6 +15,19 @@ evidence and frontend source. New requirements are extensions to completed work.
 
 ## 1. Team Boundary
 
+Pre-deposit mobile amendment confirmed by the owner on **2026-10-23**: Couple may
+use Android before paying the deposit, including existing profile, proposal,
+commercial contract, timeline and deposit workflows. Invitation acceptance grants
+the account role `COUPLE` with consultation access still `RESTRICTED`; existing
+workspace owners receive the role through a forward data migration. Android lists
+the same owned bookings as Web, including pre-deposit and terminal phases. `COUPLE`
+is no longer evidence of payment. Only verified deposit settlement promotes an
+owned consultation to `FULL`; media, invitations, guests, seating and production
+retain their post-deposit guards. The owner subsequently authorized deployment of
+this backend and its migration to the existing server on 2026-10-23, subject to the
+normal exact-head release gates. Frontend changes remain outside this request. See
+[API, migration and app hand-off](./couple-predeposit-app-access.md).
+
 Payment recovery amendment approved by the owner on **2026-10-19**: implement the
 frontend's payment-attempt reopen/expiry request. An authenticated VNPay missing-order
 or unpaid response may close an unresolved attempt only after `expiresAt + 15 minutes`;

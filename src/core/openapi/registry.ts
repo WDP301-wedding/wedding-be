@@ -393,7 +393,7 @@ export const openApiRegistry = {
         operationId: 'acceptWorkspaceInvitation',
         summary: 'Accept a workspace invitation',
         description:
-          'Unsafe to replay after an unknown outcome; success consumes the invitation and creates one restricted Web session.',
+          'Unsafe to replay after an unknown outcome; success consumes the invitation, grants the COUPLE role and creates one Web session with RESTRICTED consultation access. The role does not prove a deposit; FULL access still requires verified settlement.',
         tags: ['Identity'],
         requestBody: {
           required: true,
@@ -402,6 +402,29 @@ export const openApiRegistry = {
         responses: {
           '201': identitySuccessResponse(
             'The invitation was consumed and a restricted Web session was created.',
+            issuedSessionResponseSchema,
+          ),
+          '401': { $ref: '#/components/responses/Unauthorized' },
+          '422': { $ref: '#/components/responses/UnprocessableEntity' },
+          '429': { $ref: '#/components/responses/TooManyRequests' },
+          '500': { $ref: '#/components/responses/InternalServerError' },
+        },
+      },
+    },
+    '/auth/android-workspace-invitation-acceptances': {
+      post: {
+        operationId: 'acceptAndroidWorkspaceInvitation',
+        summary: 'Accept a workspace invitation from Android before deposit',
+        description:
+          'Unsafe to replay after an unknown outcome. Consumes the invitation once, grants COUPLE and RESTRICTED consultation access, and returns an ANDROID session with access/refresh credentials in the body and no Web cookie. Existing FULL grants and roles are preserved. Invalid, expired or consumed invitations return 401; the same invitation cannot be consumed on Web and Android.',
+        tags: ['Identity'],
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: invitationAcceptanceBodySchema } },
+        },
+        responses: {
+          '201': identitySuccessResponse(
+            'An Android session was created; both credentials are returned once.',
             issuedSessionResponseSchema,
           ),
           '401': { $ref: '#/components/responses/Unauthorized' },

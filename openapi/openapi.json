@@ -6648,6 +6648,61 @@
         ]
       }
     },
+    "/auth/android-workspace-invitation-acceptances": {
+      "post": {
+        "description": "Unsafe to replay after an unknown outcome. Consumes the invitation once, grants COUPLE and RESTRICTED consultation access, and returns an ANDROID session with access/refresh credentials in the body and no Web cookie. Existing FULL grants and roles are preserved. Invalid, expired or consumed invitations return 401; the same invitation cannot be consumed on Web and Android.",
+        "operationId": "acceptAndroidWorkspaceInvitation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvitationAcceptanceBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuedSessionResponse"
+                }
+              }
+            },
+            "description": "An Android session was created; both credentials are returned once.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store",
+                  "type": "string"
+                }
+              },
+              "x-request-id": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "summary": "Accept a workspace invitation from Android before deposit",
+        "tags": [
+          "Identity"
+        ]
+      }
+    },
     "/auth/me": {
       "get": {
         "operationId": "getCurrentUser",
@@ -26111,6 +26166,7 @@
     },
     "/couple/bookings": {
       "get": {
+        "description": "Lists only bookings for the authenticated account consultation grants, with identical Web and Android scope and pagination. Includes RESTRICTED DRAFT/AWAITING_DEPOSIT bookings as well as confirmed and terminal history. client is a compatibility hint, never authorization. COUPLE is an account role, not deposit evidence; use accessLevel and phase to gate actions.",
         "operationId": "listOwnBookings",
         "parameters": [
           {
@@ -46396,7 +46452,7 @@
     },
     "/workspace-invitation-acceptances": {
       "post": {
-        "description": "Unsafe to replay after an unknown outcome; success consumes the invitation and creates one restricted Web session.",
+        "description": "Unsafe to replay after an unknown outcome; success consumes the invitation, grants the COUPLE role and creates one Web session with RESTRICTED consultation access. The role does not prove a deposit; FULL access still requires verified settlement.",
         "operationId": "acceptWorkspaceInvitation",
         "requestBody": {
           "content": {

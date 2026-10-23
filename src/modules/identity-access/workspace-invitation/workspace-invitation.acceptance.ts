@@ -38,6 +38,7 @@ export function createWorkspaceInvitationAcceptanceService(
       input: Readonly<{
         invitationToken: string;
         password: string;
+        clientKind?: 'WEB' | 'ANDROID';
         clientIp: string;
         requestId: string;
       }>,
@@ -110,13 +111,14 @@ export function createWorkspaceInvitationAcceptanceService(
         absoluteExpiresAt,
         now: acceptedAt,
         requestId: input.requestId,
+        clientKind: input.clientKind ?? 'WEB',
       });
       if (stored === null) throw new InvalidOrExpiredInvitationError();
 
       return Object.freeze({
         account: stored.account,
         sessionId: stored.sessionId,
-        clientKind: 'WEB' as const,
+        clientKind: input.clientKind ?? 'WEB',
         accessToken: access.token,
         accessExpiresAt,
         refreshToken: refresh.token,

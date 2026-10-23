@@ -30,12 +30,14 @@ function operation(
     accepted?: boolean;
     paged?: boolean;
     android?: boolean;
+    description?: string;
     id?: boolean;
   } = {},
 ): ZodOpenApiOperationObject {
   return {
     operationId,
     tags: ['Product experience'],
+    ...(options.description ? { description: options.description } : {}),
     security: options.public ? [] : [{ bearerAuth: [] }],
     ...(options.body
       ? {
@@ -131,7 +133,12 @@ export const experienceOpenApiPaths = {
     post: operation('closeConsultationRequest', intakeActionSchema, { id: true }),
   },
   '/couple/bookings': {
-    get: operation('listOwnBookings', overviewResponseSchema, { paged: true, android: true }),
+    get: operation('listOwnBookings', overviewResponseSchema, {
+      paged: true,
+      android: true,
+      description:
+        'Lists only bookings for the authenticated account consultation grants, with identical Web and Android scope and pagination. Includes RESTRICTED DRAFT/AWAITING_DEPOSIT bookings as well as confirmed and terminal history. client is a compatibility hint, never authorization. COUPLE is an account role, not deposit evidence; use accessLevel and phase to gate actions.',
+    }),
   },
   '/auth/profile': {
     get: operation('getOwnProfile', profileResponseSchema),

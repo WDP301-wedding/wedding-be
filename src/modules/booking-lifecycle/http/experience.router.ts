@@ -194,7 +194,6 @@ export function createBookingExperienceRouter(
       const grants = await prisma.consultationAccess.findMany({
         where: {
           accountId: actorOf(response).accountId,
-          ...(query.client === 'ANDROID' ? { level: 'FULL' as const } : {}),
         },
         select: { consultationId: true, level: true },
       });
@@ -207,9 +206,6 @@ export function createBookingExperienceRouter(
       const rows = await prisma.booking.findMany({
         where: {
           consultationId: { in: grants.map((grant) => grant.consultationId) },
-          ...(query.client === 'ANDROID'
-            ? { phase: { in: ['CONFIRMED' as const, 'COMPLETED' as const] } }
-            : {}),
         },
         select: {
           id: true,

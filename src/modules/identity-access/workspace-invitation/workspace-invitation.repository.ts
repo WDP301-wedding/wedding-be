@@ -50,6 +50,7 @@ export type InvitationAcceptancePreview = Readonly<{
 }>;
 
 export type AcceptInvitationInput = Readonly<{
+  clientKind?: 'WEB' | 'ANDROID';
   invitationTokenHash: string;
   expectedAccountId: string | null;
   expectedPasswordUpdatedAt: Date | null;
@@ -248,6 +249,12 @@ async function acceptWithRetry(
           });
           if (account === null) return null;
 
+          await transaction.accountRole.upsert({
+            where: { accountId_role: { accountId: account.id, role: 'COUPLE' } },
+            create: { accountId: account.id, role: 'COUPLE' },
+            update: {},
+          });
+
           const access = await transaction.consultationAccess.upsert({
             where: {
               accountId_consultationId: {
@@ -266,7 +273,7 @@ async function acceptWithRetry(
           const session = await transaction.session.create({
             data: {
               accountId: account.id,
-              clientKind: 'WEB',
+              clientKind: input.clientKind ?? 'WEB',
               refreshFamilyId: randomUUID(),
               idleExpiresAt: input.idleExpiresAt,
               absoluteExpiresAt: input.absoluteExpiresAt,
@@ -310,7 +317,9 @@ async function acceptWithRetry(
             account: Object.freeze({
               accountId: account.id,
               displayEmail: account.displayEmail,
-              roles: Object.freeze(account.roles.map(({ role }) => role)),
+              roles: Object.freeze([
+                ...new Set([...account.roles.map(({ role }) => role), 'COUPLE' as const]),
+              ]),
             }),
             consultationAccessId: access.id,
             sessionId: session.id,
