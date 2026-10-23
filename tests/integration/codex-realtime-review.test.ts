@@ -33,7 +33,10 @@ function outboxRows(count: number) {
   }));
 }
 
-function relayFixture(rows: ReturnType<typeof outboxRows>, publish = vi.fn<[RealtimeEvent], void>()) {
+function relayFixture(
+  rows: ReturnType<typeof outboxRows>,
+  publish = vi.fn<(event: RealtimeEvent) => void>(),
+) {
   const sortedRows = [...rows].sort((a, b) => a.occurredAt.getTime() - b.occurredAt.getTime());
   const prisma = {
     bookingOutboxEvent: {
@@ -75,7 +78,7 @@ it('audit: newest-50 relay reaches all 51 committed events in chronological orde
 
 it('audit: lease-before-publish with receipt-after-publish retries event after publish failure', async () => {
   let attempt = 0;
-  const publish = vi.fn<[RealtimeEvent], void>().mockImplementation(() => {
+  const publish = vi.fn<(event: RealtimeEvent) => void>().mockImplementation(() => {
     attempt++;
     if (attempt === 1) {
       throw new Error('Controlled publish failure');
@@ -164,7 +167,7 @@ it('audit: actual Manager socket receives BE packet and callbacks trigger; revok
   };
 
   const manager = new ManagementRealtimeManager();
-  const listener = vi.fn<[RealtimeEvent], void>();
+  const listener = vi.fn<(event: RealtimeEvent) => void>();
   const resync = vi.fn();
   manager.addEventListener(listener);
   manager.addResyncListener(resync);

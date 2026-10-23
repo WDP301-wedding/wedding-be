@@ -22,9 +22,7 @@ export interface RedisAttemptThrottleOptions {
   readonly failClosedOnOutage?: boolean;
 }
 
-export function createRedisAttemptThrottle(
-  options: RedisAttemptThrottleOptions,
-): AttemptThrottle {
+export function createRedisAttemptThrottle(options: RedisAttemptThrottleOptions): AttemptThrottle {
   const { client, prefix = 'auth_throttle', logger, failClosedOnOutage = true } = options;
 
   return Object.freeze({
@@ -33,12 +31,10 @@ export function createRedisAttemptThrottle(
       const windowSec = Math.max(1, Math.ceil(input.windowSeconds));
 
       try {
-        const result = (await client.eval(
-          ATOMIC_THROTTLE_LUA,
-          1,
-          key,
-          windowSec.toString(),
-        )) as [number, number];
+        const result = (await client.eval(ATOMIC_THROTTLE_LUA, 1, key, windowSec.toString())) as [
+          number,
+          number,
+        ];
 
         const [count, ttl] = result;
         const allowed = count <= input.maxAttempts;

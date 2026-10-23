@@ -85,10 +85,10 @@ Cần nối lifecycle revoke/expiry/access changes và current authorization đ�
 
 Probes đã xác nhận:
 
-| Probe | Kết quả |
-| --- | --- |
+| Probe                                     | Kết quả                                          |
+| ----------------------------------------- | ------------------------------------------------ |
 | 51 committed synthetic events, poll 2 lần | chỉ 50 được phát; oldest không bao giờ được chọn |
-| publish ném lỗi sau claim, rồi poll lại | event không retry, publish chỉ được gọi 1 lần |
+| publish ném lỗi sau claim, rồi poll lại   | event không retry, publish chỉ được gọi 1 lần    |
 
 Cần independent durable delivery state/lease + retry, backlog pagination đúng commit/order semantics, bounded concurrency và restart recovery; event duplicate được chấp nhận/dedup, mất invalidation phải có authoritative gap/resync bù. Không coi NX receipt-before-send là delivery guarantee.
 
@@ -137,19 +137,19 @@ Native Redis/two-process quota/fanout **chưa chạy được**: không có redi
 
 ## Kiểm chứng do Codex tự thực hiện
 
-| Check | Kết quả |
-| --- | --- |
-| BE TypeScript tsc --project tsconfig.json --noEmit | PASS exit 0 |
-| Couple tsc --noEmit --incremental false --project tsconfig.json | PASS exit 0 |
-| Manager tsc --noEmit --incremental false --project tsconfig.json | PASS exit 0 |
-| BE ESLint sau khi xóa probes tạm | PASS exit 0 |
-| Couple / Manager ESLint toàn repo | cả hai PASS exit 0 |
-| Sáu tests mới của Anti | 6/6 PASS; mock io và mock Redis.eval, không phải native integration |
-| Existing BE env tests | 121 PASS / 1 FAIL: defaults expected chưa được cập nhật cho redis/realtime |
-| Existing Couple bootstrap-regression suite | FAIL lúc import, WebIdentitySession is not a constructor; 0 test chạy |
-| Codex audit probes | 5/5 match observed behavior; gồm các hành vi lỗi, không phải acceptance pass |
-| git diff --check BE | FAIL: new blank line at EOF rate-limit.ts:41 |
-| git diff --check hai web | PASS |
+| Check                                                            | Kết quả                                                                      |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| BE TypeScript tsc --project tsconfig.json --noEmit               | PASS exit 0                                                                  |
+| Couple tsc --noEmit --incremental false --project tsconfig.json  | PASS exit 0                                                                  |
+| Manager tsc --noEmit --incremental false --project tsconfig.json | PASS exit 0                                                                  |
+| BE ESLint sau khi xóa probes tạm                                 | PASS exit 0                                                                  |
+| Couple / Manager ESLint toàn repo                                | cả hai PASS exit 0                                                           |
+| Sáu tests mới của Anti                                           | 6/6 PASS; mock io và mock Redis.eval, không phải native integration          |
+| Existing BE env tests                                            | 121 PASS / 1 FAIL: defaults expected chưa được cập nhật cho redis/realtime   |
+| Existing Couple bootstrap-regression suite                       | FAIL lúc import, WebIdentitySession is not a constructor; 0 test chạy        |
+| Codex audit probes                                               | 5/5 match observed behavior; gồm các hành vi lỗi, không phải acceptance pass |
+| git diff --check BE                                              | FAIL: new blank line at EOF rate-limit.ts:41                                 |
+| git diff --check hai web                                         | PASS                                                                         |
 
 5 probes: Manager packet mismatch + no-resync + revoke delivery (socket thật/controlled auth); relay 51→50; publish-failure no retry; production missing Redis fallback; Couple import cycle. File tạm đã xóa khỏi source, bản tái lập `C:/Users/Admin/AppData/Local/Temp/codex-realtime-review-2026-10-23.test.ts`, SHA256 `CF4B992407B63931B389A7B5F3BB697F236E440CA6C7525ABA1FB2294790C556`; đặt lại dưới tests/integration để giữ relative imports.
 

@@ -173,7 +173,10 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
           cursors.booking.cursorId = row.id;
         } catch (err) {
           await releaseLease('booking', row.id);
-          logger?.error({ err, eventId: row.id }, 'Broker publish failed; lease released for retry.');
+          logger?.error(
+            { err, eventId: row.id },
+            'Broker publish failed; lease released for retry.',
+          );
           break; // Stop batch to retry from this event
         }
       }
@@ -215,7 +218,10 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
           cursors.billing.cursorId = row.id;
         } catch (err) {
           await releaseLease('billing', row.id);
-          logger?.error({ err, eventId: row.id }, 'Broker publish failed; lease released for retry.');
+          logger?.error(
+            { err, eventId: row.id },
+            'Broker publish failed; lease released for retry.',
+          );
           break;
         }
       }
@@ -240,10 +246,7 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
             entityType: 'booking',
             bookingId: row.bookingId,
           },
-          resources: [
-            `/bookings/${row.bookingId}/guests`,
-            `/bookings/${row.bookingId}/groups`,
-          ],
+          resources: [`/bookings/${row.bookingId}/guests`, `/bookings/${row.bookingId}/groups`],
           occurredAt: row.createdAt.toISOString(),
           payload: { eventType: row.eventType },
         };
@@ -255,7 +258,10 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
           cursors.guest.cursorId = row.eventId;
         } catch (err) {
           await releaseLease('guest', row.eventId);
-          logger?.error({ err, eventId: row.eventId }, 'Broker publish failed; lease released for retry.');
+          logger?.error(
+            { err, eventId: row.eventId },
+            'Broker publish failed; lease released for retry.',
+          );
           break;
         }
       }
@@ -295,7 +301,10 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
           cursors.seating.cursorId = row.id;
         } catch (err) {
           await releaseLease('seating', row.id);
-          logger?.error({ err, eventId: row.id }, 'Broker publish failed; lease released for retry.');
+          logger?.error(
+            { err, eventId: row.id },
+            'Broker publish failed; lease released for retry.',
+          );
           break;
         }
       }
@@ -320,10 +329,7 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
             entityType: 'print_order',
             bookingId: row.bookingId,
           },
-          resources: [
-            `/management/print-orders`,
-            `/bookings/${row.bookingId}/invitation-studio`,
-          ],
+          resources: [`/management/print-orders`, `/bookings/${row.bookingId}/invitation-studio`],
           occurredAt: row.createdAt.toISOString(),
           payload: { eventType: row.eventType },
         };
@@ -335,7 +341,10 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
           cursors.studio.cursorId = row.eventId;
         } catch (err) {
           await releaseLease('studio', row.eventId);
-          logger?.error({ err, eventId: row.eventId }, 'Broker publish failed; lease released for retry.');
+          logger?.error(
+            { err, eventId: row.eventId },
+            'Broker publish failed; lease released for retry.',
+          );
           break;
         }
       }

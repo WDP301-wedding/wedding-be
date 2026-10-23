@@ -38,7 +38,8 @@ export async function createIdentityRuntime(
   config: Config,
   dependencies?: {
     throttle?: AttemptThrottle | undefined;
-    onSessionRevoked?: ((sessionId: string, accountId?: string) => void | Promise<void>) | undefined;
+    onSessionRevoked?:
+      ((sessionId: string, accountId?: string) => void | Promise<void>) | undefined;
     onAccountRevoked?: ((accountId: string) => void | Promise<void>) | undefined;
   },
 ): Promise<IdentityRuntime> {
@@ -80,8 +81,12 @@ export async function createIdentityRuntime(
         refreshRateLimit: config.identityAccess.rateLimits.refresh,
       },
       recordSecurityEvent: (event) => recordSecurityEvent(prisma, event),
-      ...(dependencies?.onSessionRevoked ? { onSessionRevoked: dependencies.onSessionRevoked } : {}),
-      ...(dependencies?.onAccountRevoked ? { onAccountRevoked: dependencies.onAccountRevoked } : {}),
+      ...(dependencies?.onSessionRevoked
+        ? { onSessionRevoked: dependencies.onSessionRevoked }
+        : {}),
+      ...(dependencies?.onAccountRevoked
+        ? { onAccountRevoked: dependencies.onAccountRevoked }
+        : {}),
     });
     const emailProvider = createEmailProvider(config.email);
     const otpKey = config.identityAccess.passwordOtpHashKey;

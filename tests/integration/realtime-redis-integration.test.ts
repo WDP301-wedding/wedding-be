@@ -1,5 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { createRealtimeBroker, type RealtimeBroker } from '../../src/core/realtime/realtime-broker.js';
+import {
+  createRealtimeBroker,
+  type RealtimeBroker,
+} from '../../src/core/realtime/realtime-broker.js';
 import { createRedisAttemptThrottle } from '../../src/core/redis/redis-attempt-throttle.js';
 import type {
   ClientToServerEvents,

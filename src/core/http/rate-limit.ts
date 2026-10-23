@@ -38,4 +38,3 @@ function retryAfterSeconds(request: RateLimitedRequest, defaultWindowMs: number)
   }
   return Math.max(1, Math.ceil(defaultWindowMs / 1_000));
 }
-

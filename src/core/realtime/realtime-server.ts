@@ -376,10 +376,12 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
       if (socketsByIp.get(clientIp)?.size === 0) socketsByIp.delete(clientIp);
 
       socketsByAccount.get(actor.accountId)?.delete(socket.id);
-      if (socketsByAccount.get(actor.accountId)?.size === 0) socketsByAccount.delete(actor.accountId);
+      if (socketsByAccount.get(actor.accountId)?.size === 0)
+        socketsByAccount.delete(actor.accountId);
 
       socketsBySession.get(actor.sessionId)?.delete(socket.id);
-      if (socketsBySession.get(actor.sessionId)?.size === 0) socketsBySession.delete(actor.sessionId);
+      if (socketsBySession.get(actor.sessionId)?.size === 0)
+        socketsBySession.delete(actor.sessionId);
 
       logger?.debug(
         { accountId: actor.accountId, socketId: socket.id, reason },

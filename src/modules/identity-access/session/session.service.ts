@@ -140,7 +140,8 @@ export function createSessionService(
     throttle: AttemptThrottle;
     config: SessionServiceConfig;
     recordSecurityEvent(event: IdentitySecurityEvent): Promise<void>;
-    onSessionRevoked?: ((sessionId: string, accountId?: string) => void | Promise<void>) | undefined;
+    onSessionRevoked?:
+      ((sessionId: string, accountId?: string) => void | Promise<void>) | undefined;
     onAccountRevoked?: ((accountId: string) => void | Promise<void>) | undefined;
     now?: () => Date;
   }>,
