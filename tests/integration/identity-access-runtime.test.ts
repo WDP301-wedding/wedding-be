@@ -20,6 +20,8 @@ import {
   type IdentityRuntime,
 } from '../../src/modules/identity-access/identity.runtime.js';
 import { issuedSessionResponseSchema } from '../../src/modules/identity-access/identity.schemas.js';
+import { createPrismaWorkspaceInvitationRepository } from '../../src/modules/identity-access/workspace-invitation/workspace-invitation.repository.js';
+import { hashOpaqueToken } from '../../src/modules/identity-access/crypto/token.js';
 
 const execFileAsync = promisify(execFile);
 const migrationDatabaseUrl = process.env.TEST_MIGRATION_DATABASE_URL?.trim();
@@ -114,6 +116,79 @@ describeWithDatabase('IA-08 identity runtime composition', () => {
       data: { displayEmail: 'Couple@example.com', roles: ['COUPLE'] },
     });
     expect(failedLogin.status).toBe(401);
+  });
+
+  it('accepts, logs in and refreshes a pre-deposit Couple on Android without granting FULL', async () => {
+    const prisma = createPrismaClient(scopedUrl);
+    try {
+      const issuer = await prisma.account.findUniqueOrThrow({
+        where: { emailNormalized: 'couple@example.com' },
+      });
+      const consultationId = randomUUID();
+      const invitationToken = `wii_${'n'.repeat(43)}`;
+      const now = new Date();
+      await createPrismaWorkspaceInvitationRepository(prisma).issue({
+        consultationId,
+        recipientEmailNormalized: 'native-prospect@example.com',
+        issuedByAccountId: issuer.id,
+        tokenHash: hashOpaqueToken(invitationToken, 'invitation'),
+        expiresAt: new Date(now.getTime() + 3600_000),
+        now,
+        requestId: randomUUID(),
+        reissueLimit: 3,
+        reissueWindowSeconds: 86400,
+      });
+      const app = createApp({
+        runtimeEnvironment: 'test',
+        registerRoutes: (server) => server.use('/api/v1', runtime.router),
+      });
+      const path = '/api/v1/auth/android-workspace-invitation-acceptances';
+      const body = { invitationToken, password: 'native-password-123' };
+      const accepted = await request(app).post(path).send(body);
+      expect(accepted.status).toBe(201);
+      expect(accepted.headers['set-cookie']).toBeUndefined();
+      const issued = issuedSessionResponseSchema.parse(accepted.body).data;
+      expect(issued).toMatchObject({ clientKind: 'ANDROID', account: { roles: ['COUPLE'] } });
+      expect(issued.refreshToken).toMatch(/^wir_/u);
+      const me = await request(app)
+        .get('/api/v1/auth/me')
+        .auth(issued.accessToken, { type: 'bearer' });
+      expect(me.status).toBe(200);
+      expect(me.body).toMatchObject({ data: { roles: ['COUPLE'] } });
+      const login = await request(app)
+        .post('/api/v1/auth/android-sessions')
+        .send({ email: 'native-prospect@example.com', password: body.password });
+      expect(login.status).toBe(201);
+      expect(login.body).toMatchObject({
+        data: { account: { accountId: issued.account.accountId, roles: ['COUPLE'] } },
+      });
+      const refreshed = await request(app)
+        .post('/api/v1/auth/android-session-refreshes')
+        .send({ refreshToken: issued.refreshToken });
+      expect(refreshed.status).toBe(200);
+      expect(refreshed.body).toMatchObject({ data: { clientKind: 'ANDROID' } });
+      for (const replayPath of [path, '/api/v1/workspace-invitation-acceptances']) {
+        const replay = await request(app).post(replayPath).send(body);
+        expect(replay.status).toBe(401);
+        expect(replay.body).toMatchObject({ error: { code: 'INVALID_OR_EXPIRED_TOKEN' } });
+      }
+      const grant = await prisma.consultationAccess.findUniqueOrThrow({
+        where: {
+          accountId_consultationId: { accountId: issued.account.accountId, consultationId },
+        },
+      });
+      expect(grant).toMatchObject({
+        level: 'RESTRICTED',
+        bookingId: null,
+        sourcePaymentId: null,
+        promotedAt: null,
+      });
+      expect(await prisma.identityOutbox.count({ where: { consultationId } })).toBe(0);
+      const session = await prisma.session.findUniqueOrThrow({ where: { id: issued.sessionId } });
+      expect(session.clientKind).toBe('ANDROID');
+    } finally {
+      await prisma.$disconnect();
+    }
   });
 
   it('locks profile and OTP mutations inside the configured schema', async () => {

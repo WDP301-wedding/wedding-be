@@ -17,6 +17,7 @@ import { controlledStorage } from './invitation-studio/controlled-storage.js';
 import { parseEnvironment } from '../../src/config/env.js';
 import { CATALOG_SEED_IDS, seedVenueCatalog } from '../../scripts/catalog-seed.js';
 import { createBookingLifecycleRuntime } from '../../src/modules/booking-lifecycle/booking-lifecycle.runtime.js';
+import { overviewResponseSchema } from '../../src/modules/booking-lifecycle/http/experience.schemas.js';
 import { createVenueCatalogRuntime } from '../../src/modules/venue-catalog/venue-catalog.runtime.js';
 import { createPaymentsBillingProviders } from '../../src/modules/payments-billing/payments-billing.providers.js';
 import { createPaymentsBillingHttpServices } from '../../src/modules/payments-billing/http/payments-billing.http-services.js';
@@ -153,6 +154,19 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
       });
       tokens[who] = token;
     }
+    const nativeNow = new Date(),
+      nativeExpires = new Date(nativeNow.getTime() + 3_600_000);
+    tokens.android = 'wia_' + randomBytes(32).toString('base64url');
+    await sessions.createSession({
+      accountId: accounts.own,
+      clientKind: 'ANDROID',
+      accessTokenHash: hashOpaqueToken(tokens.android, 'access'),
+      refreshTokenHash: hashOpaqueToken(randomBytes(32).toString('hex'), 'refresh'),
+      accessExpiresAt: nativeExpires,
+      idleExpiresAt: nativeExpires,
+      absoluteExpiresAt: nativeExpires,
+      now: nativeNow,
+    });
     url.pathname = '/' + database.databaseName;
     url.searchParams.delete('schema');
     url.searchParams.delete('options');
@@ -292,7 +306,7 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     await lockObserver?.end();
     await database.disconnect();
   });
-  async function fixture(names = true) {
+  async function fixture(names = true, couple = 'own') {
     const c = await post('/management/consultations', {
       intendedEmail: `${accounts.own}@example.com`,
       displayName: 'Cặp đôi thử',
@@ -335,11 +349,11 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
           { order: 1, startTime: '19:00', title: 'Lễ cưới', description: 'Gia đình chung vui' },
         ],
       },
-      'own',
+      couple,
     );
     expect(saved.status).toBe(201);
     let timeline = timelineResultResponseSchema.parse(saved.body as unknown).data;
-    for (const who of ['manager', 'own']) {
+    for (const who of ['manager', couple]) {
       const a = await post(
         `/bookings/${id}/timeline-revisions/${timeline.revision.revisionId}/approvals`,
         { expectedRevision: timeline.bookingRevision },
@@ -388,17 +402,17 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     timelineRevisionId: f.timelineId,
     lines,
   });
-  async function draft(f: Fixture) {
-    const r = await post(f.path, draftBody(f), 'own');
+  async function draft(f: Fixture, couple = 'own') {
+    const r = await post(f.path, draftBody(f), couple);
     expect(r.status).toBe(201);
     return contractResponseSchema.parse(r.body as unknown).data;
   }
-  async function approved(f: Fixture, initial?: Awaited<ReturnType<typeof draft>>) {
-    let d = initial ?? (await draft(f));
+  async function approved(f: Fixture, initial?: Awaited<ReturnType<typeof draft>>, couple = 'own') {
+    let d = initial ?? (await draft(f, couple));
     for (const [action, who] of [
-      ['submissions', 'own'],
+      ['submissions', couple],
       ['approvals', 'manager'],
-      ['approvals', 'own'],
+      ['approvals', couple],
     ] as const) {
       const r = await post(
         `${f.path}/${d.contract.revisionId}/${action}`,
@@ -492,6 +506,66 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
       requestId: randomUUID(),
     }),
   }));
+  it('allows an Android Couple to complete the pre-deposit contract and checkout while retaining deposit gates', async () => {
+    await database.prisma.accountRole.upsert({
+      where: { accountId_role: { accountId: accounts.own, role: 'COUPLE' } },
+      create: { accountId: accounts.own, role: 'COUPLE' },
+      update: {},
+    });
+    const f = await fixture(true, 'android');
+    const overview = await get('/couple/bookings?client=ANDROID', 'android');
+    expect(overview.status).toBe(200);
+    expect(
+      overviewResponseSchema.parse(overview.body).data.find((item) => item.bookingId === f.id),
+    ).toMatchObject({
+      accessLevel: 'RESTRICTED',
+      phase: 'DRAFT',
+    });
+    expect((await get(`/consultations/${f.consultationId}/couple-profile`, 'android')).status).toBe(
+      200,
+    );
+    expect((await get(`/bookings/${f.id}/proposal`, 'android')).status).toBe(200);
+    const initial = await draft(f, 'android');
+    expect(
+      (
+        await post(
+          `/bookings/${f.id}/payments/deposit`,
+          { timelineRevisionId: f.timelineId },
+          'android',
+        )
+      ).status,
+    ).toBe(409);
+    const d = await approved(f, initial, 'android');
+    expect((await get(`${f.path}/${d.contract.revisionId}/pdf`, 'android')).status).toBe(200);
+    const path = `/bookings/${f.id}/payments/deposit`;
+    const body = {
+      timelineRevisionId: f.timelineId,
+      contractRevisionId: d.contract.revisionId,
+      documentDigest: d.contract.documentDigest,
+    };
+    const key = randomUUID();
+    const checkout = await post(path, body, 'android', key);
+    expect(checkout.status).toBe(201);
+    expect((await post(path, body, 'android', key)).body).toEqual(checkout.body);
+    const attempt = checkoutResponseSchema.parse(checkout.body).data;
+    const status = await get(`/bookings/${f.id}/payments/${attempt.paymentAttemptId}`, 'android');
+    expect(status.status).toBe(200);
+    expect(attemptResponseSchema.parse(status.body).data).toMatchObject({
+      purpose: 'DEPOSIT',
+      amountVnd: deposit,
+    });
+    const grant = await database.prisma.consultationAccess.findUniqueOrThrow({
+      where: {
+        accountId_consultationId: { accountId: accounts.own, consultationId: f.consultationId },
+      },
+    });
+    expect(grant).toMatchObject({ level: 'RESTRICTED', sourcePaymentId: null, promotedAt: null });
+    expect(
+      (await get(`/bookings/${f.id}/payments/${attempt.paymentAttemptId}`, 'outsider')).status,
+    ).toBe(404);
+    expect((await get(`/bookings/${f.id}/billing`, 'android')).status).toBe(403);
+  });
+
   it('lists, creates, submits, approves, downloads and withdraws the exact contract with retained PDF history', async () => {
     const f = await fixture();
     const empty = await get(f.path, 'own', 'List before conversion');

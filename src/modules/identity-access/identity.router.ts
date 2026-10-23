@@ -87,6 +87,7 @@ export interface IdentityHttpServices {
     input: Readonly<{
       invitationToken: string;
       password: string;
+      clientKind?: 'WEB' | 'ANDROID';
       clientIp: string;
       requestId: string;
     }>,
@@ -163,6 +164,25 @@ export function createIdentityRouter(
       response
         .status(201)
         .json(issuedSessionResponseSchema.parse({ data: serializeIssuedSession(issued, false) }));
+    }),
+  );
+
+  router.post(
+    '/auth/android-workspace-invitation-acceptances',
+    validateRequest({ body: invitationAcceptanceBodySchema }),
+    asyncHandler(async (request, response) => {
+      const { body } = validatedRequest(response, { body: invitationAcceptanceBodySchema });
+      const issued = await mapIdentityErrors(() =>
+        options.services.acceptInvitation({
+          ...body,
+          clientKind: 'ANDROID',
+          clientIp: readClientIp(request),
+          requestId: request.requestId,
+        }),
+      );
+      response
+        .status(201)
+        .json(issuedSessionResponseSchema.parse({ data: serializeIssuedSession(issued, true) }));
     }),
   );
 

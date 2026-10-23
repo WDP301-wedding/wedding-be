@@ -14,13 +14,14 @@ Deliver the authoritative account, authentication, session, role, restricted-wor
 and Couple-access-promotion boundary for the single-restaurant system.
 
 The module must let an invited prospective couple establish an authenticated Web
-session without turning the invitation token into a permanent credential. Before a
-successful deposit, that identity receives only consultation proposal and timeline
-collaboration access. A successful deposit promotes the same account and consultation
+or Android session without turning the invitation token into a permanent credential.
+Before a successful deposit, that identity receives `COUPLE` plus `RESTRICTED` access
+for the proposal, profile, commercial contract, timeline and deposit workflows.
+A successful deposit promotes the same account and consultation
 access grant to full Couple access without copying the account or consultation data.
 
 The same identity boundary authenticates Manager and Staff users for the Management
-Web and full Couple users for Public Web and Android. All authorization remains
+Web and restricted/full Couple users for Public Web and Android. All authorization remains
 backend-enforced from current account, session, role, and resource state.
 
 ## 2. Requirement Trace
@@ -175,8 +176,12 @@ foreign keys after the owning tables exist without moving policy ownership.
 - `PasswordCredential`: one current scrypt verifier and parameter/version metadata.
 - `AccountRole`: unique `(accountId, role)` where role is `MANAGER`, `STAFF`, or
   `COUPLE`. `PROSPECT` is not a global role; it is a consultation access level.
-- A restricted prospect does not gain `COUPLE` solely by accepting an invitation.
-  Promotion of any consultation to `FULL` atomically upserts the account's `COUPLE`
+- Owner amendment 2026-10-23: accepting a workspace invitation grants `COUPLE`
+  immediately while consultation access remains `RESTRICTED`, enabling pre-deposit
+  Web and Android workflows. `COUPLE` is not proof of payment. Existing owners are
+  backfilled by a new migration; only verified settlement grants `FULL`. See
+  [the API and migration hand-off](docs/couple-predeposit-app-access.md).
+  Promotion of any consultation to `FULL` still atomically upserts the account's `COUPLE`
   role; the account keeps that role while another authorized business record may
   still require it.
 - Account status is `ACTIVE`, `SUSPENDED`, or `DISABLED`. Only `ACTIVE` accounts may

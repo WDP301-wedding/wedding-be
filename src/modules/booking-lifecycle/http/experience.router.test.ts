@@ -278,14 +278,13 @@ describe('booking intake and couple overview HTTP contract', () => {
         nextCursor: id,
       });
       expect(db.consultationAccess.findMany).toHaveBeenCalledWith({
-        where: { accountId: actor.accountId, ...(client === 'ANDROID' ? { level: 'FULL' } : {}) },
+        where: { accountId: actor.accountId },
         select: { consultationId: true, level: true },
       });
       expect(db.booking.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: {
             consultationId: { in: [consultationId] },
-            ...(client === 'ANDROID' ? { phase: { in: ['CONFIRMED', 'COMPLETED'] } } : {}),
           },
           cursor: { id: secondId },
           skip: 1,

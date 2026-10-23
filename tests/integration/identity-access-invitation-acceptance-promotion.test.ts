@@ -95,7 +95,13 @@ describeWithDatabase('IA-11 and IA-12 identity transitions', () => {
     expect(account.consultationAccesses).toHaveLength(1);
     expect(account.consultationAccesses[0]?.level).toBe('RESTRICTED');
     expect(account.sessions).toHaveLength(1);
-    expect(account.roles).toHaveLength(0);
+    expect(account.roles.map(({ role }) => role)).toEqual(['COUPLE']);
+    expect(account.consultationAccesses[0]).toMatchObject({
+      level: 'RESTRICTED',
+      sourcePaymentId: null,
+      promotedAt: null,
+      bookingId: null,
+    });
     const storedInvitation = await prisma.workspaceInvitation.findUniqueOrThrow({
       where: { tokenHash: hashOpaqueToken(token, 'invitation') },
     });
@@ -111,6 +117,7 @@ describeWithDatabase('IA-11 and IA-12 identity transitions', () => {
       data: {
         emailNormalized: 'existing@example.com',
         displayEmail: 'Existing@example.com',
+        roles: { create: { role: 'STAFF' } },
         passwordCredential: { create: verifierData(verifier) },
       },
       include: { passwordCredential: true },
@@ -123,13 +130,14 @@ describeWithDatabase('IA-11 and IA-12 identity transitions', () => {
       InvalidOrExpiredInvitationError,
     );
     await expect(acceptance.accept(command(token, 'existing-password'))).resolves.toMatchObject({
-      account: { accountId: account.id },
+      account: { accountId: account.id, roles: ['STAFF', 'COUPLE'] },
       clientKind: 'WEB',
     });
     const after = await prisma.passwordCredential.findUniqueOrThrow({
       where: { accountId: account.id },
     });
     expect(after.derivedKeyEncoded).toBe(account.passwordCredential?.derivedKeyEncoded);
+    expect(await prisma.accountRole.count({ where: { accountId: account.id } })).toBe(2);
 
     const expiredToken = await issueInvitation(
       'expired@example.com',
@@ -198,6 +206,23 @@ describeWithDatabase('IA-11 and IA-12 identity transitions', () => {
     await expect(
       prisma.accountRole.count({ where: { accountId: account.id, role: 'COUPLE' } }),
     ).resolves.toBe(1);
+
+    const anotherInvitation = await issueInvitation(
+      'promotion@example.com',
+      consultationId,
+      'f',
+      now,
+    );
+    await acceptance.accept({
+      ...command(anotherInvitation, 'new-password-123'),
+      clientKind: 'ANDROID',
+    });
+    expect(await prisma.consultationAccess.findUniqueOrThrow({ where: { id: access.id } })).toEqual(
+      access,
+    );
+    expect(
+      await prisma.accountRole.count({ where: { accountId: account.id, role: 'COUPLE' } }),
+    ).toBe(1);
 
     const other = await prisma.account.create({
       data: {

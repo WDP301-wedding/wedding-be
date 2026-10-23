@@ -197,12 +197,15 @@ suite('post-booking experience persistence and authority', () => {
       (await db.prisma.account.findUniqueOrThrow({ where: { id: otherId } })).displayName,
     ).toBeNull();
   });
-  it('scopes the overview by actor and only lists FULL confirmed events on Android', async () => {
+  it('lists owned pre-deposit and confirmed bookings equally on Web and Android', async () => {
     const ids: string[] = [];
     for (const [owner, level, phase] of [
       [managerId, 'RESTRICTED', 'DRAFT'],
       [managerId, 'FULL', 'CONFIRMED'],
       [otherId, 'FULL', 'CONFIRMED'],
+      [managerId, 'RESTRICTED', 'AWAITING_DEPOSIT'],
+      [managerId, 'RESTRICTED', 'CANCELLED'],
+      [managerId, 'FULL', 'COMPLETED'],
     ] as const) {
       const consultationId = randomUUID(),
         bookingId = randomUUID();
@@ -243,15 +246,33 @@ suite('post-booking experience persistence and authority', () => {
       .get('/api/v1/couple/bookings?client=WEB')
       .set('Authorization', 'Bearer test-manager');
     expect(web.status).toBe(200);
-    expect(overviewResponseSchema.parse(web.body).data).toHaveLength(2);
+    expect(overviewResponseSchema.parse(web.body).data).toHaveLength(5);
     expect(JSON.stringify(web.body)).not.toContain(ids[2]);
     const native = await request(server)
       .get('/api/v1/couple/bookings?client=ANDROID')
       .set('Authorization', 'Bearer test-manager');
     expect(native.status).toBe(200);
     const nativePage = overviewResponseSchema.parse(native.body);
-    expect(nativePage.data).toHaveLength(1);
-    expect(nativePage.data[0]!.bookingId).toBe(ids[1]);
+    expect(nativePage).toEqual(overviewResponseSchema.parse(web.body));
+    expect(nativePage.data).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ bookingId: ids[0], phase: 'DRAFT', accessLevel: 'RESTRICTED' }),
+        expect.objectContaining({ bookingId: ids[1], phase: 'CONFIRMED', accessLevel: 'FULL' }),
+      ]),
+    );
+    expect(JSON.stringify(native.body)).not.toContain(ids[2]);
+    const pagedIds: string[] = [];
+    let cursor: string | null = null;
+    do {
+      const page = await request(server)
+        .get('/api/v1/couple/bookings?client=ANDROID&limit=2' + (cursor ? `&cursor=${cursor}` : ''))
+        .set('Authorization', 'Bearer test-manager');
+      expect(page.status).toBe(200);
+      const parsed = overviewResponseSchema.parse(page.body);
+      pagedIds.push(...parsed.data.map((item) => item.bookingId));
+      cursor = parsed.nextCursor;
+    } while (cursor !== null && pagedIds.length < 10);
+    expect(pagedIds).toEqual(nativePage.data.map((item) => item.bookingId));
     expect(
       (
         await request(server)

@@ -74,7 +74,7 @@ function services(): IdentityHttpServices {
     completePasswordReset: vi.fn(() => Promise.resolve({ completed: true as const })),
     acceptInvitation: vi.fn(() =>
       Promise.resolve({
-        account: { accountId, displayEmail: 'couple@example.com', roles: [] as const },
+        account: { accountId, displayEmail: 'couple@example.com', roles: ['COUPLE'] as const },
         sessionId,
         clientKind: 'WEB' as const,
         accessToken,
@@ -106,6 +106,54 @@ function appWith(serviceOverrides: Partial<IdentityHttpServices> = {}) {
 }
 
 describe('IA-08 identity HTTP contract', () => {
+  it.each(['/workspace-invitation-acceptances', '/auth/android-workspace-invitation-acceptances'])(
+    'rejects caller-selected roles, access and transport at %s',
+    async (path) => {
+      const { app, identityServices } = appWith();
+      const body = { invitationToken: `wii_${'i'.repeat(43)}`, password: 'new-password-123' };
+      for (const extra of [
+        { roles: ['COUPLE'] },
+        { accessLevel: 'FULL' },
+        { clientKind: 'ANDROID' },
+      ]) {
+        expect(
+          (
+            await request(app)
+              .post('/api/v1' + path)
+              .send({ ...body, ...extra })
+          ).status,
+        ).toBe(422);
+      }
+      expect(identityServices.acceptInvitation).not.toHaveBeenCalled();
+    },
+  );
+  it('accepts invitations on Android with body credentials and no Web cookie', async () => {
+    const issued = await services().acceptInvitation({
+      invitationToken: `wii_${'i'.repeat(43)}`,
+      password: 'new-password-123',
+      clientIp: '127.0.0.1',
+      requestId: randomUUID(),
+    });
+    const acceptInvitation = vi.fn().mockResolvedValue({
+      ...issued,
+      clientKind: 'ANDROID',
+      account: { ...issued.account, roles: ['COUPLE'] },
+    });
+    const { app } = appWith({ acceptInvitation });
+    const response = await request(app)
+      .post('/api/v1/auth/android-workspace-invitation-acceptances')
+      .send({ invitationToken: `wii_${'i'.repeat(43)}`, password: 'new-password-123' });
+    expect(response.status).toBe(201);
+    expect(response.body).toMatchObject({
+      data: { clientKind: 'ANDROID', refreshToken, account: { roles: ['COUPLE'] } },
+    });
+    expect(response.headers['cache-control']).toBe('no-store');
+    expect(response.headers['set-cookie']).toBeUndefined();
+    expect(acceptInvitation).toHaveBeenCalledWith(
+      expect.objectContaining({ clientKind: 'ANDROID' }),
+    );
+  });
+
   it('keeps the Web refresh credential only in the secure host cookie', async () => {
     const { app, identityServices } = appWith();
 
@@ -416,6 +464,11 @@ describe('IA-13 reset and invitation HTTP contract', () => {
       'invitation',
       new InvalidOrExpiredInvitationError(),
       '/api/v1/workspace-invitation-acceptances',
+    ],
+    [
+      'android invitation',
+      new InvalidOrExpiredInvitationError(),
+      '/api/v1/auth/android-workspace-invitation-acceptances',
     ],
   ])('maps invalid or replayed %s credentials to one generic error', async (kind, error, path) => {
     const resetToken = `wip_${'p'.repeat(43)}`;
