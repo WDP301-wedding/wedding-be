@@ -143,3 +143,13 @@ The app team must adopt pre-deposit navigation and remove its local FULL-only
 planning/proposal guard, using real booking capabilities instead. Frontend source
 is untouched. Shared migration/deployment, exact-head CI, native UI and real
 provider sandbox verification remain separate release gates.
+
+## Subsequent owner-authorized server release
+
+The owner subsequently requested deployment of this backend and migration to the
+existing server. Exact-head Linux CI for PR #92 and its main merge passed all
+314 files / 2,350 tests, 716 PostgreSQL integration tests and all coverage/audit
+gates. This closes the earlier full-project verification gap without changing the
+retained Windows-run results above. The controlled migration and exact deployed
+HTTP checks are recorded in the
+[separate server release evidence](./couple-predeposit-server-release-2026-10-23.md).

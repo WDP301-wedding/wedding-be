@@ -775,7 +775,7 @@ SPEC-01–05 or replace the separate provider/runtime readiness gates.
   support native acceptance and equal owned Web/Android booking scope; add a
   forward migration for existing owners. Preserve commercial/payment and
   post-deposit authorization. [API and client hand-off](../docs/couple-predeposit-app-access.md).
-- [ ] CAP-BE-02: Finish local regression/coverage and change review, retaining
+- [x] CAP-BE-02: Finish regression/coverage and change review, retaining
   fresh/forward migration and native pre-deposit API proof. Current results and
   Windows cleanup/worker failures are in the
   [verification record](evidence/couple-predeposit-app-access-2026-10-23.md).
@@ -785,8 +785,13 @@ SPEC-01–05 or replace the separate provider/runtime readiness gates.
   this gate open until complete regression/coverage succeeds on the exact source.
   The three interrupted files subsequently passed 22 tests in a single-worker
   recovery; their fresh coverage was not measured, so that recovery does not
-  silently close the full-project coverage gate.
-- [ ] CAP-REL-01: After authorized release, apply the new migration with the
-  matching backend, verify the exact deployed API and backfilled owners, then
-  complete app-team adoption/native provider-browser return and sandbox checks.
+  silently close the full-project coverage gate. Exact-head Linux CI for PR #92
+  subsequently passed all 314 files / 2,350 tests, 716 PostgreSQL integration tests
+  and every existing coverage/audit gate. Independent change review found no
+  blocking defect; the earlier Windows failures remain historical evidence.
+- [x] CAP-REL-01: After authorized release, apply the new migration with the
+  matching backend and verify the exact deployed API and backfilled owners.
+  [Server release evidence](evidence/couple-predeposit-server-release-2026-10-23.md).
+- [ ] CAP-CLIENT-01: App/Web teams adopt per-booking access gates and complete
+  native provider-browser return and sandbox integration checks.
   Local controlled-provider proof does not establish a live deposit or deployed UI.

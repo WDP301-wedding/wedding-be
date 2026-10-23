@@ -160,3 +160,7 @@ delivery, hosted Android UI, gateway transactions or deployment readiness. No pa
 generation or real-money payment is authorized here. The owner subsequently
 authorized deploying this backend and its additive migration to the existing
 server on 2026-10-23; release evidence is recorded separately from local tests.
+The [verified server release](../tasks/evidence/couple-predeposit-server-release-2026-10-23.md)
+records the exact main CI, applied migration, deployed commit and authenticated
+pre-deposit/settled-owner probes. Client UI and native provider-return acceptance
+remain separate from those backend checks.
