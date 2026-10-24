@@ -24,10 +24,17 @@ const titles: Record<NotificationInput['purpose'], string> = {
 };
 export function notificationTemplate(purpose: NotificationInput['purpose'], value: unknown) {
   const data = parse(notificationData, value);
+  const contextPrefix = data.eventTitle
+    ? `[${data.eventTitle}] `
+    : data.hallName
+      ? `[${data.hallName}] `
+      : '';
+  const dateSuffix = data.eventDate ? ` (Ngày: ${data.eventDate})` : '';
+  const subject = `${contextPrefix}${titles[purpose]}${dateSuffix}`;
   return {
-    subject: titles[purpose],
+    subject,
     text:
-      `${titles[purpose]}. Đăng nhập để xem thông tin và thực hiện thao tác cần thiết.` +
+      `${subject}. Đăng nhập để xem thông tin và thực hiện thao tác cần thiết.` +
       (data.totalVnd === undefined ? '' : ` Số tiền: ${data.totalVnd} VND.`) +
       (data.referenceId === undefined ? '' : ` Mã tham chiếu: ${data.referenceId}.`),
     data,

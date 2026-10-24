@@ -103,10 +103,16 @@ export function notificationEvent(owner: Owner, value: unknown) {
   }
   const rawRevision = facts['bookingRevision'] ?? facts['planRevision'];
   const rawTotal = facts['amountVnd'] ?? facts['totalVnd'];
+  const rawHall = facts['hallName'];
+  const rawTitle = facts['eventTitle'] ?? facts['alias'];
+  const rawDate = facts['eventDate'];
   const data = parse(notificationData, {
     referenceId,
     ...(rawRevision === undefined ? {} : { revision: parse(revision, rawRevision) }),
     ...(rawTotal === undefined ? {} : { totalVnd: parse(z.int().nonnegative(), rawTotal) }),
+    ...(typeof rawHall === 'string' ? { hallName: rawHall } : {}),
+    ...(typeof rawTitle === 'string' ? { eventTitle: rawTitle } : {}),
+    ...(typeof rawDate === 'string' ? { eventDate: rawDate } : {}),
   });
   return { ...e, purpose: handler.purpose, audience, data };
 }

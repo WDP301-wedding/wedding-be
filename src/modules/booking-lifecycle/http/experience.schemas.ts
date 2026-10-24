@@ -94,8 +94,37 @@ export const overviewItemSchema = z.strictObject({
   managerApproved: z.boolean(),
   coupleApproved: z.boolean(),
   hasTimeline: z.boolean(),
+  revision: z.number().int().positive().optional(),
+  eventType: z.enum(['WEDDING', 'ENGAGEMENT', 'RECEPTION', 'ANNIVERSARY', 'OTHER']).default('WEDDING'),
+  alias: z.string().nullable().optional(),
+  brideName: coupleNameSchema.nullable().optional(),
+  groomName: coupleNameSchema.nullable().optional(),
+  totalVnd: z.number().int().nonnegative().optional(),
+  depositPaidVnd: z.number().int().nonnegative().optional(),
 });
 export const overviewResponseSchema = z.strictObject({
   data: z.array(overviewItemSchema),
   nextCursor: z.uuid().nullable(),
+});
+export const updateBookingAliasParamsSchema = z.strictObject({
+  bookingId: z.uuid(),
+});
+export const updateBookingAliasBodySchema = z.strictObject({
+  expectedRevision: z.number().int().positive().optional(),
+  alias: z
+    .string()
+    .trim()
+    .max(120)
+    .transform((value) => value.normalize('NFC'))
+    .nullable()
+    .optional(),
+  eventType: z.enum(['WEDDING', 'ENGAGEMENT', 'RECEPTION', 'ANNIVERSARY', 'OTHER']).optional(),
+});
+export const updateBookingAliasResponseSchema = z.strictObject({
+  data: z.strictObject({
+    bookingId: z.uuid(),
+    revision: z.number().int().positive(),
+    alias: z.string().nullable(),
+    eventType: z.enum(['WEDDING', 'ENGAGEMENT', 'RECEPTION', 'ANNIVERSARY', 'OTHER']),
+  }),
 });

@@ -20,6 +20,8 @@ import {
   intakeListSchema,
   intakeQuerySchema,
   overviewResponseSchema,
+  updateBookingAliasBodySchema,
+  updateBookingAliasResponseSchema,
 } from './experience.schemas.js';
 import {
   passwordChangeSchema,
@@ -39,6 +41,7 @@ function operation(
     android?: boolean;
     description?: string;
     id?: boolean;
+    bookingId?: boolean;
   } = {},
 ): ZodOpenApiOperationObject {
   return {
@@ -59,6 +62,16 @@ function operation(
         ? [
             {
               name: 'id',
+              in: 'path' as const,
+              required: true,
+              schema: { type: 'string' as const, format: 'uuid' },
+            },
+          ]
+        : []),
+      ...(options.bookingId
+        ? [
+            {
+              name: 'bookingId',
               in: 'path' as const,
               required: true,
               schema: { type: 'string' as const, format: 'uuid' },
@@ -172,6 +185,13 @@ export const experienceOpenApiPaths: NonNullable<ZodOpenApiObject['paths']> = {
         'Lists only bookings for the authenticated account consultation grants, with identical Web and Android scope and pagination. Includes RESTRICTED DRAFT/AWAITING_DEPOSIT bookings as well as confirmed and terminal history. client is a compatibility hint, never authorization. COUPLE is an account role, not deposit evidence; use accessLevel and phase to gate actions.',
     }),
   },
+  '/couple/bookings/{bookingId}/alias': {
+    patch: operation('updateBookingAlias', updateBookingAliasResponseSchema, {
+      bookingId: true,
+      body: updateBookingAliasBodySchema,
+      description: 'Update human-readable alias or eventType of booking for Couple or Manager.',
+    }),
+  },
   '/auth/profile': {
     get: operation('getOwnProfile', profileResponseSchema),
     patch: operation('updateOwnProfile', profileResponseSchema, { body: profileWriteSchema }),
@@ -188,6 +208,8 @@ export const experienceOpenApiSchemas = {
   ConsultationRequestBody: consultationRequestBodySchema,
   ConsultationRequestList: intakeListSchema,
   CoupleOverviewResponse: overviewResponseSchema,
+  UpdateBookingAliasBody: updateBookingAliasBodySchema,
+  UpdateBookingAliasResponse: updateBookingAliasResponseSchema,
   ProfileResponse: profileResponseSchema,
   ProfileWriteBody: profileWriteSchema,
   PasswordChangeBody: passwordChangeSchema,

@@ -30,6 +30,8 @@ export const notificationData = z.strictObject({
   revision: z.int().positive().optional(),
   totalVnd: z.int().nonnegative().optional(),
   eventDate: z.iso.date().optional(),
+  hallName: z.string().trim().max(120).optional(),
+  eventTitle: z.string().trim().max(120).optional(),
 });
 export const intentInput = z
   .strictObject({

@@ -183,7 +183,57 @@ export function createCommercialAppendixService(options: Options) {
     async list(bookingId: string, actor: AuthenticatedActor, cursor?: string) {
       return options.scope.withClient(bookingId, undefined, async (client) => {
         const { booking } = await authorized(client, bookingId, actor);
-        const effective = await createEffectiveCommercialReader(client).getEffective(bookingId);
+        let effectiveRevisionId: string;
+        let effectiveTotalVnd: number;
+        try {
+          const effective = await createEffectiveCommercialReader(client).getEffective(bookingId);
+          effectiveRevisionId = effective.revisionId;
+          effectiveTotalVnd = effective.totalVnd;
+        } catch {
+          const finalInvoice = await client.finalInvoiceRevision.findFirst({
+            where: { bookingId },
+            orderBy: { revisionNumber: 'desc' },
+          });
+          const invoiceDoc = finalInvoice?.document as
+            | { effectiveCommercialRevisionId?: string; commercialTotalVnd?: number }
+            | undefined;
+          if (
+            invoiceDoc?.effectiveCommercialRevisionId &&
+            typeof invoiceDoc.commercialTotalVnd === 'number'
+          ) {
+            effectiveRevisionId = invoiceDoc.effectiveCommercialRevisionId;
+            effectiveTotalVnd = invoiceDoc.commercialTotalVnd;
+          } else {
+            const lastApproved = await client.commercialAppendixRevision.findFirst({
+              where: { bookingId, state: 'APPROVED' },
+              orderBy: { revisionNumber: 'desc' },
+            });
+            if (lastApproved) {
+              effectiveRevisionId = lastApproved.id;
+              effectiveTotalVnd = lastApproved.effectiveTotalVnd.toNumber();
+            } else {
+              const contract = await client.commercialContractRevision.findFirst({
+                where: { bookingId, state: 'APPROVED' },
+                orderBy: { revisionNumber: 'desc' },
+              });
+              if (contract) {
+                effectiveRevisionId = contract.id;
+                effectiveTotalVnd = contract.contractTotalVnd.toNumber();
+              } else {
+                const anyContract = await client.commercialContractRevision.findFirst({
+                  where: { bookingId },
+                  orderBy: { revisionNumber: 'desc' },
+                });
+                if (anyContract) {
+                  effectiveRevisionId = anyContract.id;
+                  effectiveTotalVnd = anyContract.contractTotalVnd.toNumber();
+                } else {
+                  throw commercialConflict('SETTLED_CONTRACT_REQUIRED');
+                }
+              }
+            }
+          }
+        }
         const head = await client.commercialAppendixHead.findUnique({ where: { bookingId } });
         if (
           cursor &&
@@ -201,8 +251,8 @@ export function createCommercialAppendixService(options: Options) {
           bookingId,
           bookingRevision: booking.revision,
           currentRevisionId: head?.currentRevisionId ?? null,
-          effectiveRevisionId: effective.revisionId,
-          effectiveTotalVnd: effective.totalVnd,
+          effectiveRevisionId,
+          effectiveTotalVnd,
           revisions: rows.slice(0, 50).map(view),
           nextCursor: rows.length > 50 ? rows[49]!.id : null,
         };

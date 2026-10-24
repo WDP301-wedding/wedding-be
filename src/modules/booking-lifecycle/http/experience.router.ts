@@ -20,6 +20,9 @@ import {
   intakeParamsSchema,
   overviewQuerySchema,
   overviewResponseSchema,
+  updateBookingAliasParamsSchema,
+  updateBookingAliasBodySchema,
+  updateBookingAliasResponseSchema,
 } from './experience.schemas.js';
 
 export function createBookingExperienceRouter(
@@ -273,7 +276,12 @@ export function createBookingExperienceRouter(
           phase: true,
           shiftCode: true,
           planningHeadcount: true,
-          proposalSnapshot: { select: { hallName: true } },
+          revision: true,
+          eventType: true,
+          alias: true,
+          consultation: { select: { brideName: true, groomName: true } },
+          proposalSnapshot: { select: { hallName: true, baseChargeVnd: true } },
+          depositSettlement: { select: { amountVnd: true } },
           currentTimelineRevision: { select: { managerApprovedAt: true, coupleApprovedAt: true } },
         },
         orderBy: [{ eventDate: 'desc' }, { id: 'desc' }],
@@ -302,8 +310,98 @@ export function createBookingExperienceRouter(
             coupleApproved:
               booking.currentTimelineRevision !== null &&
               booking.currentTimelineRevision.coupleApprovedAt !== null,
+            revision: booking.revision,
+            eventType: booking.eventType,
+            alias: booking.alias,
+            brideName: booking.consultation.brideName,
+            groomName: booking.consultation.groomName,
+            totalVnd: booking.proposalSnapshot?.baseChargeVnd
+              ? Number(booking.proposalSnapshot.baseChargeVnd)
+              : undefined,
+            depositPaidVnd: booking.depositSettlement?.amountVnd
+              ? Number(booking.depositSettlement.amountVnd)
+              : 0,
           })),
           nextCursor: rows.length > query.limit ? (items.at(-1)?.id ?? null) : null,
+        }),
+      );
+    },
+  );
+  router.patch(
+    '/couple/bookings/:bookingId/alias',
+    authenticate,
+    validateRequest({
+      params: updateBookingAliasParamsSchema,
+      body: updateBookingAliasBodySchema,
+    }),
+    async (request, response) => {
+      const { params, body } = validatedRequest(response, {
+        params: updateBookingAliasParamsSchema,
+        body: updateBookingAliasBodySchema,
+      });
+      const actor = actorOf(response);
+      const booking = await prisma.booking.findUnique({
+        where: { id: params.bookingId },
+        select: { id: true, consultationId: true, revision: true },
+      });
+      if (!booking) throw failure(404, 'BOOKING_NOT_FOUND');
+      if (body.expectedRevision !== undefined && booking.revision !== body.expectedRevision) {
+        throw new AppError({
+          status: 409,
+          code: 'STALE_BOOKING_REVISION',
+          message: 'Dữ liệu tiệc cưới đã thay đổi. Vui lòng tải lại trang.',
+        });
+      }
+      const isManager = actor.roles.includes('MANAGER');
+      if (!isManager) {
+        const access = await prisma.consultationAccess.findUnique({
+          where: {
+            accountId_consultationId: {
+              accountId: actor.accountId,
+              consultationId: booking.consultationId,
+            },
+          },
+        });
+        if (!access) throw failure(403, 'FORBIDDEN');
+      }
+      const updated = await prisma.$transaction(async (tx) => {
+        const result = await tx.booking.update({
+          where: {
+            id: params.bookingId,
+            ...(body.expectedRevision !== undefined ? { revision: body.expectedRevision } : {}),
+          },
+          data: {
+            revision: { increment: 1 },
+            ...(body.alias !== undefined ? { alias: body.alias } : {}),
+            ...(body.eventType !== undefined ? { eventType: body.eventType } : {}),
+          },
+          select: { id: true, revision: true, alias: true, eventType: true },
+        });
+        await tx.auditLog.create({
+          data: {
+            requestId: request.requestId,
+            actorType: 'USER',
+            actorId: actor.accountId,
+            action: 'booking.alias-updated',
+            entityType: 'booking',
+            entityId: params.bookingId,
+            metadata: {
+              alias: result.alias,
+              eventType: result.eventType,
+              actorRole: isManager ? 'MANAGER' : 'COUPLE',
+            },
+          },
+        });
+        return result;
+      });
+      response.json(
+        updateBookingAliasResponseSchema.parse({
+          data: {
+            bookingId: updated.id,
+            revision: updated.revision,
+            alias: updated.alias,
+            eventType: updated.eventType,
+          },
         }),
       );
     },

@@ -372,6 +372,14 @@ enum BookingPhase {
   COMPLETED
 }
 
+enum BookingEventType {
+  WEDDING
+  ENGAGEMENT
+  RECEPTION
+  ANNIVERSARY
+  OTHER
+}
+
 enum BookingInvitationIntentStatus {
   PENDING
   ISSUED
@@ -712,6 +720,8 @@ model Booking {
   phase                       BookingPhase                 @default(DRAFT)
   revision                    Int                          @default(1)
   planningHeadcount           Int
+  eventType                   BookingEventType             @default(WEDDING)
+  alias                       String?                      @db.VarChar(120)
   cancelledAt                 DateTime?                    @db.Timestamptz(6)
   completedAt                 DateTime?                    @db.Timestamptz(6)
   currentTimelineRevisionId   String?                      @unique @db.Uuid

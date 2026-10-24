@@ -1,0 +1,7 @@
+-- CreateEnum
+CREATE TYPE "BookingEventType" AS ENUM ('WEDDING', 'ENGAGEMENT', 'RECEPTION', 'ANNIVERSARY', 'OTHER');
+
+-- AlterTable
+ALTER TABLE "Booking"
+ADD COLUMN "eventType" "BookingEventType" NOT NULL DEFAULT 'WEDDING',
+ADD COLUMN "alias" VARCHAR(120);
