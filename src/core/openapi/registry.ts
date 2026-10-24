@@ -172,7 +172,7 @@ const idempotencyResponses = {
   ),
 } satisfies Record<string, ZodOpenApiResponseObject>;
 
-export const openApiRegistry = {
+export const openApiRegistry: ZodOpenApiObject = {
   openapi: '3.1.0',
   info: {
     title: 'Wedding Management API',

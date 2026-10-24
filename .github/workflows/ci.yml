@@ -16,8 +16,8 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  quality:
-    name: Static, test, build, and audit gates
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -28,30 +28,26 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version-file: '.node-version'
-          cache: npm
-
-      - name: Restore node_modules cache
-        id: node-modules-cache
-        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-backend-node-modules-${{ hashFiles('package-lock.json', '.node-version') }}
-          restore-keys: |
-            ${{ runner.os }}-backend-node-modules-
-
-      - name: Install locked dependencies
-        if: steps.node-modules-cache.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline --no-audit --no-fund
-
-      - name: Generate Prisma client
-        run: npm run db:generate
+      - name: Prepare backend dependencies
+        uses: ./.github/actions/backend-setup
 
       - name: Lint
         run: npm run lint
+
+  production:
+    name: Production build, contract, and audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CI: true
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Prepare backend dependencies
+        uses: ./.github/actions/backend-setup
 
       - name: Typecheck
         run: npm run typecheck
@@ -63,13 +59,30 @@ jobs:
         run: npm run build
 
       - name: Audit locked dependencies
+        if: ${{ !cancelled() }}
         run: npm run audit:ci
+
+  quality:
+    # Preserve the existing check name for branch protection and release consumers.
+    name: Static, test, build, and audit gates
+    needs: [lint, production, postgresql-integration]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Require every backend gate
+        env:
+          LINT_RESULT: ${{ needs.lint.result }}
+          PRODUCTION_RESULT: ${{ needs.production.result }}
+          MIGRATIONS_RESULT: ${{ needs.postgresql-integration.result }}
+        run: |
+          printf 'Lint: %s; production: %s; migrations: %s\n' "$LINT_RESULT" "$PRODUCTION_RESULT" "$MIGRATIONS_RESULT"
+          [[ "$LINT_RESULT" == success && "$PRODUCTION_RESULT" == success && "$MIGRATIONS_RESULT" == success ]]
 
   postgresql-integration:
     name: PostgreSQL migration and integration gates
     runs-on: ubuntu-latest
-    # Native owner integration (~5 minutes) plus the full coverage rerun exceed 10.
-    timeout-minutes: 20
+    timeout-minutes: 10
     services:
       postgres:
         image: mirror.gcr.io/library/postgres:17@sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3
@@ -95,27 +108,10 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      - name: Prepare backend dependencies
+        uses: ./.github/actions/backend-setup
         with:
-          node-version-file: '.node-version'
-          cache: npm
-
-      - name: Restore node_modules cache
-        id: node-modules-cache
-        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-backend-node-modules-${{ hashFiles('package-lock.json', '.node-version') }}
-          restore-keys: |
-            ${{ runner.os }}-backend-node-modules-
-
-      - name: Install locked dependencies
-        if: steps.node-modules-cache.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline --no-audit --no-fund
-
-      - name: Generate Prisma client
-        run: npm run db:generate
+          generate-client: 'false'
 
       - name: Deploy migrations to empty PostgreSQL
         run: npm run db:migrate:deploy

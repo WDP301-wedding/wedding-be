@@ -103,7 +103,7 @@ function operation(
     },
   };
 }
-export const experienceOpenApiPaths = {
+export const experienceOpenApiPaths: NonNullable<ZodOpenApiObject['paths']> = {
   '/management/consultations/{consultationId}/activation-status': {
     get: {
       ...operation('getConsultationActivationStatus', activationResponse),
