@@ -230,6 +230,19 @@ export function createCommercialContractService(options: Options) {
       }),
     );
   }
+  async function prepareDraft(
+    client: PrismaClient,
+    access: Authorized,
+    input: z.infer<typeof contractDraftSchema>,
+  ) {
+    if (
+      (access.booking.commercialContract?.currentRevisionId ?? null) !== input.predecessorRevisionId
+    )
+      throw commercialConflict('COMMERCIAL_PREDECESSOR_STALE');
+    if (access.booking.commercialContract === null)
+      await options.conversion(client).requireConvertible(access.booking.id);
+    return buildDocument(client, access, input);
+  }
   async function createRevision(
     client: PrismaClient,
     access: Authorized,
@@ -337,17 +350,21 @@ export function createCommercialContractService(options: Options) {
           }),
       );
     },
+    async preview(bookingId: string, value: unknown, actor: AuthenticatedActor, requestId: string) {
+      const input = contractDraftSchema.parse(value);
+      // Reuse the exact edit guards/pricing under the same booking transaction.
+      // No revision, approval, ledger entry or evidence is created by a preview.
+      return write(bookingId, actor, requestId, input.expectedRevision, async (client, access) => {
+        return deepFreeze({
+          bookingRevision: access.booking.revision,
+          document: await prepareDraft(client, access, input),
+        });
+      });
+    },
     async create(bookingId: string, value: unknown, actor: AuthenticatedActor, requestId: string) {
       const input = contractDraftSchema.parse(value);
       return write(bookingId, actor, requestId, input.expectedRevision, async (client, access) => {
-        if (
-          (access.booking.commercialContract?.currentRevisionId ?? null) !==
-          input.predecessorRevisionId
-        )
-          throw commercialConflict('COMMERCIAL_PREDECESSOR_STALE');
-        if (access.booking.commercialContract === null)
-          await options.conversion(client).requireConvertible(bookingId);
-        const document = await buildDocument(client, access, input);
+        const document = await prepareDraft(client, access, input);
         const row = await createRevision(client, access, document, actor);
         return evidence(client, access, row, actor, requestId, 'draft-created');
       });

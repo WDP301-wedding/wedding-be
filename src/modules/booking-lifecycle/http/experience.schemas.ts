@@ -32,6 +32,7 @@ export const consultationRequestBodySchema = z.strictObject({
 export const intakeAcknowledgementSchema = z.strictObject({
   data: z.strictObject({ accepted: z.literal(true) }),
 });
+export const intakeStatusSchema = z.enum(['NEW', 'CONVERTED', 'CLOSED']);
 export const intakeRecordSchema = consultationRequestBodySchema
   .omit({ submissionId: true })
   .extend({
@@ -40,7 +41,7 @@ export const intakeRecordSchema = consultationRequestBodySchema
     groomName: coupleNameSchema.nullable(),
     preferredDate: z.iso.date().nullable(),
     id: z.uuid(),
-    status: z.enum(['NEW', 'CONVERTED', 'CLOSED']),
+    status: intakeStatusSchema,
     consultationId: z.uuid().nullable(),
     consultationRevision: z.number().int().positive().nullable(),
     createdAt: z.iso.datetime(),
@@ -48,13 +49,34 @@ export const intakeRecordSchema = consultationRequestBodySchema
 export const intakeListSchema = z.strictObject({
   data: z.array(intakeRecordSchema),
   nextCursor: z.uuid().nullable(),
+  totalMatches: z.int().nonnegative().optional(),
+  counts: z
+    .strictObject({
+      NEW: z.int().nonnegative(),
+      CONVERTED: z.int().nonnegative(),
+      CLOSED: z.int().nonnegative(),
+    })
+    .optional(),
 });
 export const intakeActionSchema = z.strictObject({
-  data: z.strictObject({ consultationId: z.uuid().nullable() }),
+  data: z.strictObject({
+    consultationId: z.uuid().nullable(),
+    consultationRevision: z.int().positive().optional(),
+  }),
 });
 export const experienceQuerySchema = z.strictObject({
   cursor: z.uuid().optional(),
   limit: z.coerce.number().int().min(1).max(50).default(20),
+});
+export const intakeQuerySchema = experienceQuerySchema.extend({
+  status: z.enum(['ALL', 'NEW', 'CONVERTED', 'CLOSED']).default('ALL'),
+  q: z
+    .string()
+    .trim()
+    .max(120)
+    .transform((value) => value.normalize('NFC'))
+    .default(''),
+  sort: z.enum(['newest', 'oldest', 'date-asc', 'guests-desc', 'name-asc']).default('newest'),
 });
 export const intakeParamsSchema = z.strictObject({ id: z.uuid() });
 export const overviewQuerySchema = experienceQuerySchema.extend({

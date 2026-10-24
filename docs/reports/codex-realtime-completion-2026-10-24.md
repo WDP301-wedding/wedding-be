@@ -59,3 +59,15 @@ Commands: BE `tsc --project tsconfig.json --noEmit`; hai web `tsc --project tsco
 - Thu hồi phiên qua UI đã có: phiên bị thu hồi dừng nhận dữ liệu, clear auth và hiện login/access gate. Đổi role/grant/phân công trong sandbox: socket đang mở không tiếp tục nhận nội dung đã mất quyền.
 - Ngắt mạng rồi kết nối lại, hoặc để access token hết hạn: session refresh còn hợp lệ thì reconnect và resync; session đã revoke không được resurrect bởi response refresh đang bay.
 - Late-commit, worker crash/lease expiry và fanout nhiều node cần kiểm chứng riêng trong môi trường staging được phép. Chưa thực hiện các kiểm chứng này do chỉ thị không chạy test.
+
+## Tài liệu hiện hành sau khi dọn tài liệu
+
+Báo cáo này thay các bản giao việc realtime, báo cáo implementation Anti và hai
+review source trung gian ngày 2026-10-24 đã được dọn. Bảng nguyên nhân/giải pháp,
+điều kiện migration, namespace môi trường và giới hạn kiểm chứng ở trên là trạng
+thái bàn giao hiện hành; dọn tài liệu không phải một lượt kiểm chứng mới.
+
+Hai review ngày 2026-10-23 được giữ riêng vì chứa kết quả probes/kiểm chứng lịch sử.
+Các lỗi và kết luận tại thời điểm review đó không được dùng thay trạng thái source
+hiện hành. Migration, multi-node, late-commit recovery và UI có xác thực vẫn cần
+nghiệm thu đúng môi trường; không suy ra runtime PASS từ lint/typecheck.

@@ -47,7 +47,7 @@ export function capacityProblem(
     hallMaxGuests: number;
   },
   exception = false,
-) {
+): 'EXCEPTION_EXCEEDS_PHYSICAL_CAPACITY' | 'HEADCOUNT_OUTSIDE_LAYOUT_RANGE' | null {
   if (count > Math.min(bounds.hallMaxGuests, bounds.totalSeatCapacity))
     return 'EXCEPTION_EXCEEDS_PHYSICAL_CAPACITY';
   if (count < 1 || (!exception && (count < bounds.minGuests || count > bounds.maxGuests)))

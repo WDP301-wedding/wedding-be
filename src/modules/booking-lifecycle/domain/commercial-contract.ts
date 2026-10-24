@@ -74,6 +74,9 @@ export const contractDocumentSchema = z.strictObject({
   depositAmountVnd: vnd.positive(),
   incidentalClause: z.literal(INCIDENTAL_CLAUSE),
 });
+export const contractPreviewResponseSchema = z.strictObject({
+  data: z.strictObject({ bookingRevision: z.int().positive(), document: contractDocumentSchema }),
+});
 export const contractApprovalSchema = z.strictObject({
   party: z.enum(['MANAGER', 'COUPLE']),
   actorAccountId: z.uuid(),

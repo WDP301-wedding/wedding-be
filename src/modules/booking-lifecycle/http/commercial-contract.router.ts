@@ -13,6 +13,7 @@ import {
   contractWithdrawalSchema,
   contractsResponseSchema,
   contractResponseSchema,
+  contractPreviewResponseSchema,
 } from '../domain/commercial-contract.js';
 
 const paramsSchema = z.strictObject({ bookingId: z.uuid() });
@@ -26,6 +27,27 @@ export function createCommercialContractRouter(
   const router = Router();
   const authenticate = createAuthenticatedActorMiddleware(resolver);
   const path = '/bookings/:bookingId/contracts';
+  router.post(
+    path + '/preview',
+    authenticate,
+    validateRequest({ params: paramsSchema, query: z.strictObject({}), body: contractDraftSchema }),
+    async (request, response) => {
+      const { params, body } = validatedRequest(response, {
+        params: paramsSchema,
+        body: contractDraftSchema,
+      });
+      response.set('Cache-Control', 'no-store').json(
+        contractPreviewResponseSchema.parse({
+          data: await service.preview(
+            params.bookingId,
+            body,
+            response.locals.actor as AuthenticatedActor,
+            request.requestId,
+          ),
+        }),
+      );
+    },
+  );
   router.get(
     path,
     authenticate,

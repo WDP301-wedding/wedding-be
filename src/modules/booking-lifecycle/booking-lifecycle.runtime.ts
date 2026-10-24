@@ -13,6 +13,7 @@ import { createCoupleProfileService } from './application/couple-profile.service
 
 import type { Config } from '../../config/config.js';
 import { createBookingExperienceRouter } from './http/experience.router.js';
+import { createActivationRouter } from './http/activation.router.js';
 import { createPrismaClient } from '../../core/database/prisma.js';
 import { createPrismaConsultationRetentionRecorder } from '../identity-access/account/retention-eligibility.port.js';
 import type { ShutdownResource } from '../../core/http/lifecycle.js';
@@ -214,6 +215,19 @@ export async function createBookingLifecycleRuntime(
         }),
     });
     router.use(createBookingExperienceRouter(prisma, actorResolver, dependencies?.redisClient));
+    router.use(
+      createActivationRouter(prisma, actorResolver, identityInvitations, (normalizedRoute) =>
+        createIdempotencyMiddleware({
+          service: idempotency,
+          policy: defineIdempotencyPolicy({
+            actorScope: (request) => (request.res!.locals.actor as { accountId: string }).accountId,
+            normalizedRoute,
+            operationVersion: 'v1',
+            payload: bookingIdempotencyPayload,
+          }),
+        }),
+      ),
+    );
     router.use(
       createCommercialAppendixRouter(
         createCommercialAppendixService({

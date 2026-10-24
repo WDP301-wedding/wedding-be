@@ -6,7 +6,7 @@
 
 Review source chưa commit tại baseline `dea2f59`: BE, wedding-web và wedding-manage-web. Wedding-app có working tree sạch khi kiểm tra. Codex không sửa implementation ba repo, không commit/push/deploy, không gửi Anti đợt sửa mới trong lượt review này. Chỉ tạo báo cáo và probes tạm để xác minh.
 
-Đối chiếu với `docs/realtime-redis-task-2026-10-23.md` và báo cáo Anti `docs/reports/realtime-redis-implementation-2026-10-23.md`. Các câu “mọi thao tác nghiệp vụ cập nhật tức thời”, “phân quyền nghiêm ngặt”, “không mất dữ liệu khi reconnect” trong báo cáo Anti chưa được bằng chứng hỗ trợ, có điểm bị source/probes bác bỏ.
+Tại thời điểm review, đã đối chiếu bản giao việc realtime và báo cáo Anti đợt đầu. Hai bản trung gian đó đã được dọn; trạng thái sửa hiện hành nằm ở [báo cáo tiếp quản Codex](./codex-realtime-completion-2026-10-24.md). Kết quả kiểm chứng lịch sử bên dưới được giữ nguyên. Các câu “mọi thao tác nghiệp vụ cập nhật tức thời”, “phân quyền nghiêm ngặt”, “không mất dữ liệu khi reconnect” trong báo cáo Anti chưa được bằng chứng hỗ trợ, có điểm bị source/probes bác bỏ.
 
 ## F1 — P1: Vòng import session/realtime làm hỏng khởi tạo Couple
 

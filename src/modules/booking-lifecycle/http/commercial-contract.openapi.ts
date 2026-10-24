@@ -5,6 +5,7 @@ import {
   contractWithdrawalSchema,
   contractsResponseSchema,
   contractResponseSchema,
+  contractPreviewResponseSchema,
 } from '../domain/commercial-contract.js';
 
 const security = [{ bearerAuth: [] }];
@@ -34,6 +35,27 @@ const success = {
   content: { 'application/json': { schema: contractResponseSchema } },
 };
 export const commercialContractOpenApiPaths = {
+  '/bookings/{bookingId}/contracts/preview': {
+    parameters,
+    post: {
+      operationId: 'previewCommercialContract',
+      tags: ['Booking lifecycle'],
+      security,
+      description:
+        'Read-only server-priced draft preview for the owning Manager/Couple. Same revision, predecessor, phase, payment-pin and catalog eligibility guards as draft creation. No saved revision, approval, invoice or financial write. Private no-store. Saving revalidates independently.',
+      requestBody: {
+        required: true,
+        content: { 'application/json': { schema: contractDraftSchema } },
+      },
+      responses: {
+        '200': {
+          description: 'Unsaved preview; amounts are integer VND.',
+          content: { 'application/json': { schema: contractPreviewResponseSchema } },
+        },
+        ...errors,
+      },
+    },
+  },
   '/bookings/{bookingId}/contracts': {
     parameters,
     get: {

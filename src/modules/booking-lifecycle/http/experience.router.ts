@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { Router, type Response } from 'express';
-import type { PrismaClient } from '../../../generated/prisma/client.js';
+import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
 import { AppError } from '../../../core/errors/app-error.js';
 import { createGeneralRateLimit } from '../../../core/http/rate-limit.js';
 import { validateRequest, validatedRequest } from '../../../core/http/validate.js';
@@ -15,7 +15,8 @@ import {
   intakeAcknowledgementSchema,
   intakeActionSchema,
   intakeListSchema,
-  experienceQuerySchema,
+  intakeStatusSchema,
+  intakeQuerySchema,
   intakeParamsSchema,
   overviewQuerySchema,
   overviewResponseSchema,
@@ -76,16 +77,64 @@ export function createBookingExperienceRouter(
   });
   router.get(
     '/management/consultation-requests',
-    validateRequest({ query: experienceQuerySchema }),
+    validateRequest({ query: intakeQuerySchema }),
     async (_request, response) => {
-      const { query } = validatedRequest(response, { query: experienceQuerySchema });
-      const rows = await prisma.consultationRequest.findMany({
-        include: { consultation: { select: { revision: true } } },
-        where: { createdAt: { gt: new Date(Date.now() - 180 * 86400_000) } },
-        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-        take: query.limit + 1,
-        ...(query.cursor === undefined ? {} : { cursor: { id: query.cursor }, skip: 1 }),
-      });
+      const { query } = validatedRequest(response, { query: intakeQuerySchema });
+      const baseWhere: Prisma.ConsultationRequestWhereInput = {
+        createdAt: { gt: new Date(Date.now() - 180 * 86400_000) },
+        ...(query.q
+          ? {
+              OR: ['displayName', 'email', 'phone', 'message'].map((field) => ({
+                [field]: { contains: query.q, mode: 'insensitive' as const },
+              })),
+            }
+          : {}),
+      };
+      const where: Prisma.ConsultationRequestWhereInput = {
+        ...baseWhere,
+        ...(query.status === 'ALL' ? {} : { status: query.status }),
+      };
+      const primary: Prisma.ConsultationRequestOrderByWithRelationInput =
+        query.sort === 'oldest'
+          ? { createdAt: 'asc' }
+          : query.sort === 'date-asc'
+            ? { preferredDate: { sort: 'asc', nulls: 'last' } }
+            : query.sort === 'guests-desc'
+              ? { expectedGuests: { sort: 'desc', nulls: 'last' } }
+              : query.sort === 'name-asc'
+                ? { displayName: 'asc' }
+                : { createdAt: 'desc' };
+      const { rows, counts } = await prisma.$transaction(
+        async (tx) => {
+          if (
+            query.cursor &&
+            !(await tx.consultationRequest.findFirst({
+              where: { ...where, id: query.cursor },
+              select: { id: true },
+            }))
+          )
+            throw failure(409, 'CONSULTATION_LIST_CHANGED');
+          const [rows, grouped] = await Promise.all([
+            tx.consultationRequest.findMany({
+              include: { consultation: { select: { revision: true } } },
+              where,
+              orderBy: [primary, { id: 'desc' }],
+              take: query.limit + 1,
+              ...(query.cursor ? { cursor: { id: query.cursor }, skip: 1 } : {}),
+            }),
+            tx.consultationRequest.groupBy({
+              by: ['status'],
+              where: baseWhere,
+              _count: { _all: true },
+            }),
+          ]);
+          const counts = { NEW: 0, CONVERTED: 0, CLOSED: 0 };
+          for (const group of grouped)
+            counts[intakeStatusSchema.parse(group.status)] = group._count._all;
+          return { rows, counts };
+        },
+        { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
+      );
       const items = rows.slice(0, query.limit);
       response.json(
         intakeListSchema.parse({
@@ -104,6 +153,11 @@ export function createBookingExperienceRouter(
             consultationRevision: item.consultation?.revision ?? null,
             createdAt: item.createdAt.toISOString(),
           })),
+          counts,
+          totalMatches:
+            query.status === 'ALL'
+              ? counts.NEW + counts.CONVERTED + counts.CLOSED
+              : counts[query.status],
           nextCursor: rows.length > query.limit ? (items.at(-1)?.id ?? null) : null,
         }),
       );
@@ -115,18 +169,21 @@ export function createBookingExperienceRouter(
     async (request, response) => {
       const { params } = validatedRequest(response, { params: intakeParamsSchema });
       const actor = actorOf(response);
-      const consultationId = await prisma.$transaction(async (tx) => {
+      const converted = await prisma.$transaction(async (tx) => {
         await tx.$queryRaw`SELECT "id" FROM "ConsultationRequest" WHERE "id" = ${params.id}::uuid FOR UPDATE`;
         const item = await tx.consultationRequest.findUnique({
           where: { id: params.id },
-          include: { consultation: { select: { managerAccountId: true } } },
+          include: { consultation: { select: { managerAccountId: true, revision: true } } },
         });
         if (item === null || item.createdAt.getTime() <= Date.now() - 180 * 86400_000)
           throw failure(404, 'CONSULTATION_REQUEST_NOT_FOUND');
         if (item.status === 'CONVERTED') {
           if (item.consultation?.managerAccountId !== actor.accountId)
             throw failure(404, 'CONSULTATION_REQUEST_NOT_FOUND');
-          return item.consultationId;
+          return {
+            consultationId: item.consultationId,
+            consultationRevision: item.consultation.revision,
+          };
         }
         if (item.status !== 'NEW') throw failure(409, 'CONSULTATION_REQUEST_CLOSED');
         const consultation = await tx.consultation.create({
@@ -156,9 +213,9 @@ export function createBookingExperienceRouter(
             metadata: { intakeRequestId: item.id },
           },
         });
-        return consultation.id;
+        return { consultationId: consultation.id, consultationRevision: consultation.revision };
       });
-      response.json(intakeActionSchema.parse({ data: { consultationId } }));
+      response.json(intakeActionSchema.parse({ data: converted }));
     },
   );
   router.post(

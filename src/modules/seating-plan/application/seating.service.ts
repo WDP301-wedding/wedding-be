@@ -1,3 +1,4 @@
+import type { SeatingLayoutOptions } from '../domain/layout-options.js';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import type { Prisma, SeatingPlan, SeatingPlanRevision } from '../../../generated/prisma/client.js';
@@ -300,7 +301,7 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
       scope,
     );
   }
-  options(bookingId: string, context: SeatingRequestContext) {
+  options(bookingId: string, context: SeatingRequestContext): Promise<SeatingLayoutOptions> {
     return this.run(
       bookingId,
       context,
@@ -318,7 +319,7 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
               ).map((facts) => [facts.layoutTemplateVersionId, facts]),
             )
           : undefined;
-        const items = [];
+        const items: SeatingLayoutOptions['items'] = [];
         for (const layout of layouts) {
           const eligibility =
             batch?.get(layout.id) ?? (await this.venue.getLayoutEligibility(layout.id, scope));
@@ -339,6 +340,18 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
             maxGuests: layout.maxGuests,
             totalSeatCapacity: layout.totalSeatCapacity,
             compatible: warning === null,
+            description: layout.description,
+            tables: layout.tables.map((table) => ({
+              layoutTableId: table.tableId,
+              tableLabel: table.label,
+              shape: table.shape,
+              x: table.x,
+              y: table.y,
+              width: table.width,
+              height: table.height,
+              rotationDegrees: table.rotationDegrees,
+              seatCapacity: table.seatCapacity,
+            })),
             warning,
           });
         }

@@ -1,3 +1,5 @@
+import { optionsSchema } from '../domain/layout-options.js';
+export { optionsSchema } from '../domain/layout-options.js';
 import { Router, type Request, type Response } from 'express';
 import { z } from 'zod';
 import {
@@ -23,23 +25,6 @@ export const bookingParams = z.strictObject({ bookingId: id });
 export const planParams = bookingParams.extend({ planId: id });
 export const exceptionParams = z.strictObject({ planId: id });
 export const emptyQuery = z.strictObject({});
-export const optionsSchema = z.strictObject({
-  planningHeadcount: z.int().nonnegative(),
-  bookingRevision: z.int().positive(),
-  items: z.array(
-    z.strictObject({
-      layoutTemplateVersionId: id,
-      name: z.string(),
-      minGuests: z.int().positive(),
-      maxGuests: z.int().positive(),
-      totalSeatCapacity: z.int().positive(),
-      compatible: z.boolean(),
-      warning: z
-        .enum(['HEADCOUNT_OUTSIDE_LAYOUT_RANGE', 'EXCEPTION_EXCEEDS_PHYSICAL_CAPACITY'])
-        .nullable(),
-    }),
-  ),
-});
 export function createSeatingRouter(service: SeatingService, resolver: AuthenticatedActorResolver) {
   const router = Router(),
     authenticate = createAuthenticatedActorMiddleware(resolver);

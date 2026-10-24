@@ -1,4 +1,10 @@
 import type { z } from 'zod';
+import {
+  activationParams,
+  activationBody,
+  activationResponse,
+  activationSentResponse,
+} from './activation.schemas.js';
 import type { ZodOpenApiObject, ZodOpenApiOperationObject } from 'zod-openapi';
 import {
   changeOtpRequestSchema,
@@ -12,6 +18,7 @@ import {
   intakeAcknowledgementSchema,
   intakeActionSchema,
   intakeListSchema,
+  intakeQuerySchema,
   overviewResponseSchema,
 } from './experience.schemas.js';
 import {
@@ -97,6 +104,26 @@ function operation(
   };
 }
 export const experienceOpenApiPaths = {
+  '/management/consultations/{consultationId}/activation-status': {
+    get: {
+      ...operation('getConsultationActivationStatus', activationResponse),
+      requestParams: { path: activationParams },
+      description:
+        'Owning Manager only. Concealed foreign resources. Current grant/account and invitation evidence; does not infer delivery or deposit from issuance. Private no-store.',
+    },
+  },
+  '/management/consultations/{consultationId}/activation-invitations': {
+    post: {
+      ...operation('sendConsultationActivationInvitation', activationSentResponse, {
+        body: activationBody,
+        accepted: true,
+      }),
+      requestParams: { path: activationParams },
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }],
+      description:
+        'Owning Manager. Expected consultation revision and Idempotency-Key required. Explicit send/reissue, using existing lifetime and reissue limits. A replacement invalidates the previous link. Activated/revoked resources cannot be reissued. Unknown delivery retries retain the same key. No password or token is returned.',
+    },
+  },
   '/auth/password-otp-requests': {
     post: operation('requestPasswordResetOtp', otpRequestResponseSchema, {
       body: resetOtpRequestSchema,
@@ -124,7 +151,12 @@ export const experienceOpenApiPaths = {
     }),
   },
   '/management/consultation-requests': {
-    get: operation('listConsultationRequests', intakeListSchema, { paged: true }),
+    get: {
+      ...operation('listConsultationRequests', intakeListSchema),
+      requestParams: { query: intakeQuerySchema },
+      description:
+        'Manager intake search, status filter and stable sorting across the full retained dataset. Counts apply to the search across all statuses; totalMatches applies to the selected status. Cursor belongs to the same filter/sort; a changed cursor returns 409. Private no-store.',
+    },
   },
   '/management/consultation-requests/{id}/conversion': {
     post: operation('convertConsultationRequest', intakeActionSchema, { id: true }),
