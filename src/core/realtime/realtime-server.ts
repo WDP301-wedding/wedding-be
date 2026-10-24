@@ -14,6 +14,8 @@ import {
   type SocketData,
 } from './realtime-types.js';
 import { createRealtimeBroker, type RealtimeBroker } from './realtime-broker.js';
+import { createRealtimeAudience } from './realtime-audience.js';
+import { createRealtimeLimits } from './realtime-limits.js';
 
 export interface RealtimeServerOptions {
   readonly httpServer: HttpServer;
@@ -36,16 +38,13 @@ export interface RealtimeServerInstance {
 }
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const MAX_SOCKETS_PER_IP = 50;
-const MAX_SOCKETS_PER_ACCOUNT = 10;
 const MAX_SUBSCRIPTIONS_PER_SOCKET = 20;
 
 export function createRealtimeServer(options: RealtimeServerOptions): RealtimeServerInstance {
   const { httpServer, config, sessionRepository, prisma, redisManager, logger } = options;
 
-  const socketsByIp = new Map<string, Set<string>>();
-  const socketsByAccount = new Map<string, Set<string>>();
-  const socketsBySession = new Map<string, Set<string>>();
+  const authorizeAudience = createRealtimeAudience(prisma);
+  const limits = createRealtimeLimits(redisManager.getClient(), config.runtime.environment);
 
   const io = new SocketIOServer<
     ClientToServerEvents,
@@ -75,7 +74,7 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
   if (redisManager.isConfigured) {
     const pubSub = redisManager.createPubSubPair();
     if (pubSub) {
-      io.adapter(createAdapter(pubSub.pub, pubSub.sub));
+      io.adapter(createAdapter(pubSub.pub, pubSub.sub, { key: `wedding:${config.runtime.environment}:socket.io` }));
       logger?.info('Socket.IO Redis multi-instance fanout adapter enabled.');
     }
   }
@@ -89,12 +88,23 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
     SocketData
   >;
 
+  function extractClientIp(socket: Socket): string {
+    const trustedHops = config.identityAccess?.trustedProxyHops ?? 0;
+    if (trustedHops === 1) {
+      const forwarded = socket.handshake.headers['x-forwarded-for'];
+      if (typeof forwarded === 'string' && forwarded.trim()) {
+        const parts = forwarded.split(',').map((p) => p.trim()).filter(Boolean);
+        if (parts.length > 0) {
+          return parts[parts.length - 1]!;
+        }
+      }
+    }
+    return socket.handshake.address || 'unknown';
+  }
+
   async function validateSocketSession(socket: ConnectedSocket): Promise<boolean> {
     const now = Date.now();
-    // Cache positive session validation for 2 seconds to avoid DB N+1 per message
-    if (now - socket.data.lastSessionValidatedAt < 2000) {
-      return true;
-    }
+    // 1. Expiry check MUST happen before positive cache check
     if (now > socket.data.tokenExpiresAt) {
       logger?.info(
         { socketId: socket.id, sessionId: socket.data.actor.sessionId },
@@ -103,25 +113,45 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
       socket.disconnect(true);
       return false;
     }
+
     try {
-      const actor = await sessionRepository.findActorByAccessTokenHash(socket.data.tokenHash);
-      if (!actor || actor.sessionStatus !== 'ACTIVE' || actor.accountStatus !== 'ACTIVE') {
+      const state = await sessionRepository.findActorByAccessTokenHash(socket.data.tokenHash);
+      if (
+        !state ||
+        state.credentialStatus !== 'ACTIVE' ||
+        state.sessionStatus !== 'ACTIVE' ||
+        state.accountStatus !== 'ACTIVE' ||
+        state.credentialExpiresAt.getTime() <= now ||
+        state.idleExpiresAt.getTime() <= now ||
+        state.absoluteExpiresAt.getTime() <= now
+      ) {
         logger?.info(
           {
             socketId: socket.id,
             sessionId: socket.data.actor.sessionId,
-            status: actor?.sessionStatus,
+            status: state?.sessionStatus,
           },
-          'Socket evicted: session or account is no longer active.',
+          'Socket evicted: credential/session is no longer active or expired.',
         );
         socket.disconnect(true);
         return false;
       }
+      socket.data.tokenExpiresAt = Math.min(
+        state.credentialExpiresAt.getTime(),
+        state.idleExpiresAt.getTime(),
+        state.absoluteExpiresAt.getTime(),
+      );
+      socket.data.actor = {
+        ...socket.data.actor,
+        roles: state.roles,
+      };
       socket.data.lastSessionValidatedAt = now;
       return true;
     } catch (err) {
       logger?.warn({ err, socketId: socket.id }, 'Session validation lookup failed.');
-      return true;
+      // FAIL-CLOSED: disconnect socket on authority lookup failure
+      socket.disconnect(true);
+      return false;
     }
   }
 
@@ -140,41 +170,57 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
         return next(new Error('AUTHENTICATION_REQUIRED'));
       }
 
-      // 3. IP connection limit check
-      const clientIp =
-        socket.handshake.headers['x-forwarded-for']?.toString().split(',')[0]?.trim() ||
-        socket.handshake.address ||
-        'unknown';
-      const ipSockets = socketsByIp.get(clientIp);
-      if (ipSockets && ipSockets.size >= MAX_SOCKETS_PER_IP) {
-        logger?.warn({ clientIp }, 'Handshake rejected: IP socket connection limit reached.');
-        return next(new Error('IP_CONNECTION_LIMIT_EXCEEDED'));
-      }
-
+      // 3. IP connection limit check with trusted proxy policy
+      const clientIp = extractClientIp(socket);
       try {
         const actor = await actorResolver.resolve(token);
-
-        // Account connection limit check
-        const accountSockets = socketsByAccount.get(actor.accountId);
-        if (accountSockets && accountSockets.size >= MAX_SOCKETS_PER_ACCOUNT) {
-          logger?.warn(
-            { accountId: actor.accountId },
-            'Handshake rejected: account socket connection limit reached.',
-          );
-          return next(new Error('ACCOUNT_CONNECTION_LIMIT_EXCEEDED'));
+        const tokenHash = hashOpaqueToken(token, 'access');
+        const state = await sessionRepository.findActorByAccessTokenHash(tokenHash);
+        if (!state) {
+          return next(new Error('AUTHENTICATION_REQUIRED'));
         }
+
+        const now = Date.now();
+        if (
+          state.credentialStatus !== 'ACTIVE' ||
+          state.sessionStatus !== 'ACTIVE' ||
+          state.accountStatus !== 'ACTIVE' ||
+          state.credentialExpiresAt.getTime() <= now ||
+          state.idleExpiresAt.getTime() <= now ||
+          state.absoluteExpiresAt.getTime() <= now
+        ) {
+          return next(new Error('TOKEN_EXPIRED'));
+        }
+
+        const actualTokenExpiry = Math.min(
+          state.credentialExpiresAt.getTime(),
+          state.idleExpiresAt.getTime(),
+          state.absoluteExpiresAt.getTime(),
+        );
+
+        // Reserve IP/account slots atomically across nodes; failures are fail-closed.
+        if (!await limits.reserve(clientIp, actor.accountId, socket.id)) {
+          return next(new Error('CONNECTION_LIMIT_EXCEEDED'));
+        }
+        const release = () => { void limits.release(clientIp, actor.accountId, socket.id)
+          .catch(err => logger?.warn({ err }, 'Socket reservation release failed; TTL will expire it.')); };
+        socket.once('disconnect', release);
+        socket.conn.once('close', release);
 
         // Check couple access level if role is COUPLE
         let accessLevel: 'restricted' | 'full' | undefined;
         if (actor.roles.includes('COUPLE')) {
-          const grants = await prisma.consultationAccess.findMany({
-            where: { accountId: actor.accountId },
-            select: { level: true },
-          });
-          accessLevel = grants.some((g) => g.level === 'FULL') ? 'full' : 'restricted';
+          if (prisma.consultationAccess?.findMany) {
+            const grants = await prisma.consultationAccess.findMany({
+              where: { accountId: actor.accountId },
+              select: { level: true },
+            });
+            accessLevel = grants.some((g) => g.level === 'FULL') ? 'full' : 'restricted';
+          } else {
+            accessLevel = 'restricted';
+          }
         }
 
-        const tokenHash = hashOpaqueToken(token, 'access');
         socket.data = {
           actor: {
             accountId: actor.accountId,
@@ -184,10 +230,10 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
             ...(accessLevel ? { access: accessLevel } : {}),
           },
           tokenHash,
-          tokenExpiresAt: Date.now() + 15 * 60 * 1000,
-          lastSessionValidatedAt: Date.now(),
+          tokenExpiresAt: actualTokenExpiry,
+          lastSessionValidatedAt: now,
           messageCount: 0,
-          lastMessageReset: Date.now(),
+          lastMessageReset: now,
           subscriptions: new Set(),
         };
 
@@ -199,78 +245,69 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
     })();
   });
 
-  // Broker with pre-dispatch verification hook: validates sockets in target rooms before delivery
-  const broker = createRealtimeBroker(io, logger, async (rooms) => {
-    for (const room of rooms) {
-      const socketIds = io.sockets.adapter.rooms.get(room);
-      if (socketIds) {
-        for (const socketId of Array.from(socketIds)) {
-          const targetSocket = io.sockets.sockets.get(socketId);
-          if (targetSocket) {
-            await validateSocketSession(targetSocket);
-          }
-        }
-      }
+  // fetchSockets reaches every Redis adapter node. Check authority in batches,
+  // then dispatch only to authorized socket IDs, never to unchecked room members.
+  const broker = createRealtimeBroker(io, logger, undefined, async (rooms, event) => {
+    const sockets = await io.in([...rooms]).fetchSockets();
+    const ids = await authorizeAudience(sockets, rooms, event);
+    for (let offset = 0; offset < ids.length; offset += 200) {
+      io.to(ids.slice(offset, offset + 200)).emit('realtime:event', event);
     }
   });
 
-  // Periodic session audit to evict expired or revoked sockets even during low traffic
+  let auditing = false;
   const sweepTimer = setInterval(() => {
-    for (const socket of io.sockets.sockets.values()) {
-      void validateSocketSession(socket);
-    }
+    if (auditing) return;
+    auditing = true;
+    const sockets = [...io.sockets.sockets.values()];
+    void (async () => {
+      await authorizeAudience(sockets, []);
+      for (const socket of sockets) {
+        if (socket.connected && !await limits.reserve(extractClientIp(socket), socket.data.actor.accountId, socket.id)) {
+          socket.disconnect(true);
+        }
+      }
+    })().catch(err => {
+      logger?.warn({ err }, 'Realtime authorization audit failed closed.');
+      for (const socket of sockets) socket.disconnect(true);
+    }).finally(() => { auditing = false; });
   }, 5_000);
 
   // Connection Lifecycle
   io.on('connection', async (socket) => {
-    const actor = socket.data.actor;
-    const clientIp =
-      socket.handshake.headers['x-forwarded-for']?.toString().split(',')[0]?.trim() ||
-      socket.handshake.address ||
-      'unknown';
-
-    // Track active socket connections by IP, account, and session
-    if (!socketsByIp.has(clientIp)) socketsByIp.set(clientIp, new Set());
-    socketsByIp.get(clientIp)!.add(socket.id);
-
-    if (!socketsByAccount.has(actor.accountId)) socketsByAccount.set(actor.accountId, new Set());
-    socketsByAccount.get(actor.accountId)!.add(socket.id);
-
-    if (!socketsBySession.has(actor.sessionId)) socketsBySession.set(actor.sessionId, new Set());
-    socketsBySession.get(actor.sessionId)!.add(socket.id);
-
+    // Do NOT capture actor into a closure-level const here.
+    // validateSocketSession() refreshes socket.data.actor.roles on each check;
+    // if handlers captured actor at connect-time they would see stale roles after
+    // a role change.  Each handler must read socket.data.actor at call time.
     logger?.debug(
-      { accountId: actor.accountId, roles: actor.roles, socketId: socket.id },
+      { accountId: socket.data.actor.accountId, roles: socket.data.actor.roles, socketId: socket.id },
       'Realtime socket connected.',
     );
 
     // 1. Automatically join personal and session rooms
-    await socket.join(`account:${actor.accountId}`);
-    await socket.join(`session:${actor.sessionId}`);
+    await socket.join(`account:${socket.data.actor.accountId}`);
+    await socket.join(`session:${socket.data.actor.sessionId}`);
     await socket.join('public:catalog');
 
     // 2. Automatically join role rooms
-    if (actor.roles.includes('MANAGER')) {
+    if (socket.data.actor.roles.includes('MANAGER')) {
       await socket.join('role:manager');
     }
-    if (actor.roles.includes('STAFF')) {
+    if (socket.data.actor.roles.includes('STAFF')) {
       await socket.join('role:staff');
     }
 
-    // 3. Message Rate Limiting Middleware per socket
-    socket.use(([event], next) => {
-      const now = Date.now();
-      if (now - socket.data.lastMessageReset > 10_000) {
-        socket.data.messageCount = 0;
-        socket.data.lastMessageReset = now;
-      }
-      socket.data.messageCount += 1;
-      if (socket.data.messageCount > 30) {
-        logger?.warn({ accountId: actor.accountId, event }, 'Socket message rate limit exceeded.');
+    // Preserve the per-socket policy, with Redis as the shared counter authority.
+    socket.use((_packet, next) => {
+      void limits.acceptMessage(socket.data.actor.accountId, socket.id).then(accepted => {
+        if (accepted) { next(); return; }
         socket.disconnect(true);
-        return next(new Error('RATE_LIMIT_EXCEEDED'));
-      }
-      next();
+        next(new Error('RATE_LIMIT_EXCEEDED'));
+      }).catch(err => {
+        logger?.warn({ err }, 'Realtime rate limiter failed closed.');
+        socket.disconnect(true);
+        next(new Error('RATE_LIMIT_UNAVAILABLE'));
+      });
     });
 
     // 4. Booking subscription handler with shape validation and authorization
@@ -282,7 +319,7 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
           return;
         }
 
-        if (socket.data.subscriptions.size >= MAX_SUBSCRIPTIONS_PER_SOCKET) {
+        if (!socket.data.subscriptions.has(bookingId) && socket.data.subscriptions.size >= MAX_SUBSCRIPTIONS_PER_SOCKET) {
           socket.emit('subscription:denied', {
             reason: 'SUBSCRIPTION_LIMIT_EXCEEDED',
             bookingId,
@@ -294,15 +331,18 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
         const active = await validateSocketSession(socket);
         if (!active) return;
 
+        // Read roles from socket.data.actor AFTER the session validation refresh
+        const currentActor = socket.data.actor;
+
         // Authorization check
-        if (actor.roles.includes('MANAGER')) {
+        if (currentActor.roles.includes('MANAGER')) {
           await socket.join(`booking:${bookingId}`);
           socket.data.subscriptions.add(bookingId);
           socket.emit('subscription:confirmed', { room: `booking:${bookingId}` });
           return;
         }
 
-        if (actor.roles.includes('COUPLE')) {
+        if (currentActor.roles.includes('COUPLE')) {
           // Verify booking belongs to this couple account
           const booking = await prisma.booking.findUnique({
             where: { id: bookingId },
@@ -317,7 +357,7 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
           const grant = await prisma.consultationAccess.findFirst({
             where: {
               consultationId: booking.consultationId,
-              accountId: actor.accountId,
+              accountId: currentActor.accountId,
               level: { in: ['RESTRICTED', 'FULL'] },
             },
           });
@@ -333,11 +373,11 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
           return;
         }
 
-        if (actor.roles.includes('STAFF')) {
+        if (currentActor.roles.includes('STAFF')) {
           const assignment = await prisma.staffAssignment.findFirst({
             where: {
               bookingId,
-              staffAccountId: actor.accountId,
+              staffAccountId: currentActor.accountId,
               status: 'ACTIVE',
             },
           });
@@ -372,19 +412,8 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
     });
 
     socket.on('disconnect', (reason) => {
-      socketsByIp.get(clientIp)?.delete(socket.id);
-      if (socketsByIp.get(clientIp)?.size === 0) socketsByIp.delete(clientIp);
-
-      socketsByAccount.get(actor.accountId)?.delete(socket.id);
-      if (socketsByAccount.get(actor.accountId)?.size === 0)
-        socketsByAccount.delete(actor.accountId);
-
-      socketsBySession.get(actor.sessionId)?.delete(socket.id);
-      if (socketsBySession.get(actor.sessionId)?.size === 0)
-        socketsBySession.delete(actor.sessionId);
-
       logger?.debug(
-        { accountId: actor.accountId, socketId: socket.id, reason },
+        { accountId: socket.data.actor.accountId, socketId: socket.id, reason },
         'Realtime socket disconnected.',
       );
     });

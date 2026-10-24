@@ -8,11 +8,11 @@ import type {
 } from './realtime-types.js';
 
 export interface RealtimeBroker {
-  publish(event: RealtimeEvent): void;
-  publishToBooking(bookingId: string, event: RealtimeEvent): void;
-  publishToAccount(accountId: string, event: RealtimeEvent): void;
-  publishToRole(role: string, event: RealtimeEvent): void;
-  publishToCatalog(event: RealtimeEvent): void;
+  publish(event: RealtimeEvent): Promise<void>;
+  publishToBooking(bookingId: string, event: RealtimeEvent): Promise<void>;
+  publishToAccount(accountId: string, event: RealtimeEvent): Promise<void>;
+  publishToRole(role: string, event: RealtimeEvent): Promise<void>;
+  publishToCatalog(event: RealtimeEvent): Promise<void>;
   revokeSession(sessionId: string): void;
   revokeAccount(accountId: string): void;
 }
@@ -21,6 +21,7 @@ export function createRealtimeBroker(
   io: SocketIOServer<ClientToServerEvents, ServerToClientEvents, Record<string, never>, SocketData>,
   logger?: Logger,
   onBeforeDispatch?: (rooms: readonly string[]) => void | Promise<void>,
+  authorizedDispatch?: (rooms: readonly string[], event: RealtimeEvent) => Promise<void>,
 ): RealtimeBroker {
   // Deduplication cache to prevent echo or replay storms
   const seenEventIds = new Set<string>();
@@ -43,33 +44,31 @@ export function createRealtimeBroker(
     return false;
   }
 
-  function dispatchToRooms(rooms: readonly string[], event: RealtimeEvent): void {
+  async function dispatchToRooms(rooms: readonly string[], event: RealtimeEvent): Promise<void> {
     if (rooms.length === 0) return;
-    void (async () => {
-      try {
-        if (onBeforeDispatch) {
-          await onBeforeDispatch(rooms);
-        }
-      } catch (err) {
-        logger?.warn({ err }, 'Error in realtime pre-dispatch validation hook.');
-      }
+    if (authorizedDispatch) {
+      await authorizedDispatch(rooms, event);
+      return;
+    }
+    if (onBeforeDispatch) {
+      await onBeforeDispatch(rooms);
+    }
 
-      const firstRoom = rooms[0];
-      if (!firstRoom) return;
-      let broadcaster = io.to(firstRoom);
-      for (let i = 1; i < rooms.length; i++) {
-        const nextRoom = rooms[i];
-        if (nextRoom) {
-          broadcaster = broadcaster.to(nextRoom);
-        }
+    const firstRoom = rooms[0];
+    if (!firstRoom) return;
+    let broadcaster = io.to(firstRoom);
+    for (let i = 1; i < rooms.length; i++) {
+      const nextRoom = rooms[i];
+      if (nextRoom) {
+        broadcaster = broadcaster.to(nextRoom);
       }
-      broadcaster.emit('realtime:event', event);
-    })();
+    }
+    broadcaster.emit('realtime:event', event);
   }
 
   return {
-    publish(event: RealtimeEvent) {
-      if (markAndCheckDuplicate(event.eventId)) {
+    async publish(event: RealtimeEvent): Promise<void> {
+      if (seenEventIds.has(event.eventId)) {
         return;
       }
 
@@ -79,43 +78,63 @@ export function createRealtimeBroker(
       );
 
       // Targeted routing based on scope with union rooms
-      if (event.scope.bookingId) {
-        dispatchToRooms([`booking:${event.scope.bookingId}`, 'role:manager'], event);
+      const targetRooms: string[] = [];
+      if (event.scope.entityType === 'account') {
+        // Account events are private even when a booking reference is present.
+        // An unresolved account must never fall back to a broader audience.
+        if (!event.scope.entityId) throw new Error('ACCOUNT_EVENT_REQUIRES_RECIPIENT');
+        targetRooms.push(`account:${event.scope.entityId}`);
+      } else if (event.scope.bookingId) {
+        targetRooms.push(`booking:${event.scope.bookingId}`, 'role:manager');
       } else if (event.scope.entityType === 'catalog') {
-        dispatchToRooms(['public:catalog', 'role:manager'], event);
-      } else if (event.scope.entityType === 'account' && event.scope.entityId) {
-        dispatchToRooms([`account:${event.scope.entityId}`], event);
+        targetRooms.push('public:catalog', 'role:manager');
       } else {
-        dispatchToRooms(['role:manager'], event);
+        targetRooms.push('role:manager');
       }
+
+      await dispatchToRooms(targetRooms, event);
+      markAndCheckDuplicate(event.eventId);
     },
 
-    publishToBooking(bookingId: string, event: RealtimeEvent) {
-      if (markAndCheckDuplicate(event.eventId)) return;
-      dispatchToRooms([`booking:${bookingId}`, 'role:manager'], event);
+    async publishToBooking(bookingId: string, event: RealtimeEvent): Promise<void> {
+      if (seenEventIds.has(event.eventId)) return;
+      await dispatchToRooms([`booking:${bookingId}`, 'role:manager'], event);
+      markAndCheckDuplicate(event.eventId);
     },
 
-    publishToAccount(accountId: string, event: RealtimeEvent) {
-      if (markAndCheckDuplicate(event.eventId)) return;
-      dispatchToRooms([`account:${accountId}`], event);
+    async publishToAccount(accountId: string, event: RealtimeEvent): Promise<void> {
+      if (seenEventIds.has(event.eventId)) return;
+      await dispatchToRooms([`account:${accountId}`], event);
+      markAndCheckDuplicate(event.eventId);
     },
 
-    publishToRole(role: string, event: RealtimeEvent) {
-      if (markAndCheckDuplicate(event.eventId)) return;
-      dispatchToRooms([`role:${role}`], event);
+    async publishToRole(role: string, event: RealtimeEvent): Promise<void> {
+      if (seenEventIds.has(event.eventId)) return;
+      await dispatchToRooms([`role:${role}`], event);
+      markAndCheckDuplicate(event.eventId);
     },
 
-    publishToCatalog(event: RealtimeEvent) {
-      if (markAndCheckDuplicate(event.eventId)) return;
-      dispatchToRooms(['public:catalog', 'role:manager'], event);
+    async publishToCatalog(event: RealtimeEvent): Promise<void> {
+      if (seenEventIds.has(event.eventId)) return;
+      await dispatchToRooms(['public:catalog', 'role:manager'], event);
+      markAndCheckDuplicate(event.eventId);
     },
 
     revokeSession(sessionId: string) {
-      // Send revocation signal then disconnect sockets associated with the session
+      io.to(`session:${sessionId}`).emit('realtime:event', {
+        eventId: crypto.randomUUID(), schemaVersion: 1, type: 'session.revoked',
+        scope: { entityType: 'session', entityId: sessionId },
+        resources: [], occurredAt: new Date().toISOString(),
+      });
       io.in(`session:${sessionId}`).disconnectSockets(true);
     },
 
     revokeAccount(accountId: string) {
+      io.to(`account:${accountId}`).emit('realtime:event', {
+        eventId: crypto.randomUUID(), schemaVersion: 1, type: 'session.revoked',
+        scope: { entityType: 'account', entityId: accountId },
+        resources: [], occurredAt: new Date().toISOString(),
+      });
       io.in(`account:${accountId}`).disconnectSockets(true);
     },
   };

@@ -28,6 +28,8 @@ import {
 import { createWorkspaceInvitationAcceptanceService } from './workspace-invitation/workspace-invitation.acceptance.js';
 import { createPrismaWorkspaceInvitationRepository } from './workspace-invitation/workspace-invitation.repository.js';
 
+import type { Redis } from 'ioredis';
+
 export type IdentityRuntime = Readonly<{
   router: Router;
   sessionRepository: Pick<SessionRepository, 'findActorByAccessTokenHash'>;
@@ -38,6 +40,7 @@ export async function createIdentityRuntime(
   config: Config,
   dependencies?: {
     throttle?: AttemptThrottle | undefined;
+    redisClient?: Redis | null | undefined;
     onSessionRevoked?:
       ((sessionId: string, accountId?: string) => void | Promise<void>) | undefined;
     onAccountRevoked?: ((accountId: string) => void | Promise<void>) | undefined;
@@ -140,8 +143,18 @@ export async function createIdentityRuntime(
       allowedWebOrigins: config.cors.allowedOrigins,
       refreshCookieName: config.identityAccess.refreshCookie.name,
     });
-    router.use(createPasswordOtpRouter(passwordOtpService, actorResolver));
-    router.use(createAccountSettingsRouter(prisma, actorResolver, passwordOtpService, schema));
+    router.use(
+      createPasswordOtpRouter(passwordOtpService, actorResolver, dependencies?.redisClient),
+    );
+    router.use(
+      createAccountSettingsRouter(
+        prisma,
+        actorResolver,
+        passwordOtpService,
+        schema,
+        dependencies?.redisClient,
+      ),
+    );
     return Object.freeze({
       router,
       sessionRepository,

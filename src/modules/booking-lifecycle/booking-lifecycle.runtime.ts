@@ -59,6 +59,8 @@ import {
   type BookingLifecycleProviders,
 } from './booking-lifecycle.providers.js';
 
+import type { Redis } from 'ioredis';
+
 export type BookingLifecycleRuntime = Readonly<{
   router: Router;
   resource: ShutdownResource;
@@ -68,6 +70,9 @@ export type BookingLifecycleRuntime = Readonly<{
 
 export async function createBookingLifecycleRuntime(
   config: Config,
+  dependencies?: {
+    redisClient?: Redis | null | undefined;
+  },
 ): Promise<BookingLifecycleRuntime> {
   const prisma = createPrismaClient(config.database.url);
   try {
@@ -208,7 +213,7 @@ export async function createBookingLifecycleRuntime(
           }),
         }),
     });
-    router.use(createBookingExperienceRouter(prisma, actorResolver));
+    router.use(createBookingExperienceRouter(prisma, actorResolver, dependencies?.redisClient));
     router.use(
       createCommercialAppendixRouter(
         createCommercialAppendixService({

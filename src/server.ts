@@ -361,6 +361,7 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
 
   const identityRuntime = await createIdentityRuntime(config, {
     ...(redisThrottle !== undefined ? { throttle: redisThrottle } : {}),
+    redisClient: redisManager.getClient(),
     onSessionRevoked: (sessionId) => {
       realtimeInstance?.broker.revokeSession(sessionId);
     },
@@ -377,7 +378,9 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
   }
   let bookingLifecycleRuntime: Awaited<ReturnType<typeof createBookingLifecycleRuntime>>;
   try {
-    bookingLifecycleRuntime = await createBookingLifecycleRuntime(config);
+    bookingLifecycleRuntime = await createBookingLifecycleRuntime(config, {
+      redisClient: redisManager.getClient(),
+    });
   } catch (error: unknown) {
     await Promise.allSettled([
       identityRuntime.resource.close(),

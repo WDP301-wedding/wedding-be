@@ -60,22 +60,37 @@ export function createRedisManager(options: RedisManagerOptions): RedisManager {
     logger?.error({ err }, 'Redis connection error.');
   });
 
-  const allClients: Redis[] = [client];
+  const pubClient = new Redis(trimmedUrl, baseOptions);
+  const subClient = new Redis(trimmedUrl, baseOptions);
+  pubClient.on('error', (err) => logger?.error({ err }, 'Redis pub client error.'));
+  subClient.on('error', (err) => logger?.error({ err }, 'Redis sub client error.'));
+
+  const allClients: Redis[] = [client, pubClient, subClient];
 
   return {
     isConfigured: true,
     async init() {
       try {
-        if (client.status !== 'ready' && client.status !== 'connecting') {
-          await client.connect();
-        }
-        const pong = await Promise.race([
-          client.ping(),
-          new Promise<string>((_, reject) =>
-            setTimeout(() => reject(new Error('Redis connection timeout')), 3000),
-          ),
+        const connectAndPing = async (c: Redis, name: string) => {
+          if (c.status !== 'ready' && c.status !== 'connecting') {
+            await c.connect();
+          }
+          const pong = await Promise.race([
+            c.ping(),
+            new Promise<string>((_, reject) =>
+              setTimeout(() => reject(new Error(`Redis ${name} connection timeout`)), 3000),
+            ),
+          ]);
+          return pong;
+        };
+
+        const [generalPong, pubPong, subPong] = await Promise.all([
+          connectAndPing(client, 'general'),
+          connectAndPing(pubClient, 'pub'),
+          connectAndPing(subClient, 'sub'),
         ]);
-        return pong === 'PONG';
+
+        return generalPong === 'PONG' && pubPong === 'PONG' && subPong === 'PONG';
       } catch (err) {
         logger?.error({ err }, 'Redis connection initialization failed.');
         if (environment === 'production' || process.env.REDIS_REQUIRED === 'true') {
@@ -91,13 +106,8 @@ export function createRedisManager(options: RedisManagerOptions): RedisManager {
       return client;
     },
     createPubSubPair() {
-      // Sub and Pub connections must be dedicated and not multiplex general commands
-      const pub = new Redis(trimmedUrl, baseOptions);
-      const sub = new Redis(trimmedUrl, baseOptions);
-      pub.on('error', (err) => logger?.error({ err }, 'Redis pub client error.'));
-      sub.on('error', (err) => logger?.error({ err }, 'Redis sub client error.'));
-      allClients.push(pub, sub);
-      return { pub, sub };
+      // Return dedicated Pub/Sub pair initialized and verified ready
+      return { pub: pubClient, sub: subClient };
     },
     async healthCheck() {
       try {

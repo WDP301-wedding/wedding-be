@@ -16,6 +16,7 @@ import {
   profileWriteSchema,
 } from './settings.schemas.js';
 
+import type { Redis } from 'ioredis';
 import type { PasswordOtpService } from '../password-otp/password-otp.service.js';
 
 export function createAccountSettingsRouter(
@@ -23,11 +24,12 @@ export function createAccountSettingsRouter(
   resolver: AuthenticatedActorResolver,
   otp: PasswordOtpService,
   schema = 'public',
+  redisClient?: Redis | null,
 ) {
   const router = Router();
   const locks = createIdentityLocks(schema);
   const authenticate = createAuthenticatedActorMiddleware(resolver);
-  const limited = createGeneralRateLimit({ maxRequests: 10, windowMs: 15 * 60_000 });
+  const limited = createGeneralRateLimit({ maxRequests: 10, windowMs: 15 * 60_000 }, redisClient, 'settings');
   router.use('/auth/profile', authenticate);
   router.use('/auth/password-changes', limited, authenticate);
   router.get('/auth/profile', async (_request, response) => {

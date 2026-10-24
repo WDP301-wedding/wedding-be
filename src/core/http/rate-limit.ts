@@ -11,12 +11,18 @@ type RateLimitedRequest = Request & { readonly rateLimit: RateLimitInfo };
 export function createGeneralRateLimit(
   config: BackendConfig['security']['rateLimit'],
   redisClient?: Redis | null,
+  /** Stable namespace that isolates this limiter's Redis keys from all others.
+   *  Use a short, lowercase, hyphen-separated identifier (e.g. 'general', 'otp',
+   *  'settings', 'experience').  Defaults to 'general' for the app-wide limiter.
+   */
+  namespace = 'general',
 ): RequestHandler {
   const store = redisClient
     ? new RedisStore({
         sendCommand: (cmd: string, ...args: string[]) =>
           redisClient.call(cmd, ...args) as Promise<RedisReply>,
-        prefix: 'rl:http:',
+        // Each namespace gets its own key space: rl:<namespace>:<ip>
+        prefix: `rl:${namespace}:`,
       })
     : undefined;
 

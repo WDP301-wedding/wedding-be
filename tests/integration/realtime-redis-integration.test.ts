@@ -53,7 +53,7 @@ describe('Realtime & Redis Core Integration', () => {
       );
     });
 
-    it('deduplicates events by eventId using LRU cache', () => {
+    it('deduplicates events by eventId using LRU cache', async () => {
       const event: RealtimeEvent = {
         eventId: 'evt-001',
         schemaVersion: 1,
@@ -67,19 +67,19 @@ describe('Realtime & Redis Core Integration', () => {
         occurredAt: new Date().toISOString(),
       };
 
-      broker.publish(event);
+      await broker.publish(event);
       // Single broadcast to union of rooms (booking:b-123 and role:manager) prevents duplicate packets
       expect(emittedEvents).toHaveLength(1);
       expect(targetedRooms).toContain('booking:b-123');
       expect(targetedRooms).toContain('role:manager');
 
       // Publish exact same event again
-      broker.publish(event);
+      await broker.publish(event);
       // Must not emit duplicate events (remains 1)
       expect(emittedEvents).toHaveLength(1);
     });
 
-    it('targets booking and manager rooms for booking events', () => {
+    it('targets booking and manager rooms for booking events', async () => {
       const event: RealtimeEvent = {
         eventId: 'evt-002',
         schemaVersion: 1,
@@ -93,14 +93,14 @@ describe('Realtime & Redis Core Integration', () => {
         occurredAt: new Date().toISOString(),
       };
 
-      broker.publish(event);
+      await broker.publish(event);
       // Emits single union packet to both target rooms
       expect(emittedEvents).toHaveLength(1);
       expect(targetedRooms).toContain('booking:b-456');
       expect(targetedRooms).toContain('role:manager');
     });
 
-    it('targets public catalog room for catalog updates', () => {
+    it('targets public catalog room for catalog updates', async () => {
       const event: RealtimeEvent = {
         eventId: 'evt-003',
         schemaVersion: 1,
@@ -113,7 +113,7 @@ describe('Realtime & Redis Core Integration', () => {
         occurredAt: new Date().toISOString(),
       };
 
-      broker.publishToCatalog(event);
+      await broker.publishToCatalog(event);
       expect(emittedEvents).toHaveLength(1);
       expect(targetedRooms).toContain('public:catalog');
       expect(targetedRooms).toContain('role:manager');

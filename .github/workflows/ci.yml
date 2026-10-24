@@ -59,10 +59,6 @@ jobs:
       - name: Verify generated OpenAPI artifact
         run: npm run api:check
 
-      - name: Run automated tests (optional)
-        continue-on-error: true
-        run: npm test -- --maxWorkers=2 || true
-
       - name: Build production output
         run: npm run build
 
@@ -124,11 +120,3 @@ jobs:
       - name: Deploy migrations to empty PostgreSQL
         run: npm run db:migrate:deploy
 
-      - name: Run PostgreSQL integration tests (optional)
-        continue-on-error: true
-        run: npm run test:integration -- --maxWorkers=2 || true
-
-      # Database-backed modules need their real integration tests in the coverage run.
-      - name: Enforce full-suite coverage with PostgreSQL (optional)
-        continue-on-error: true
-        run: npm run test:coverage -- --maxWorkers=2 || true

@@ -3,6 +3,8 @@ import type { Logger } from 'pino';
 import type { RedisManager } from '../redis/redis-client.js';
 import type { RealtimeBroker } from './realtime-broker.js';
 import type { RealtimeEvent, RealtimeEventType } from './realtime-types.js';
+import { createDeliveryQueue } from './delivery-queue.js';
+import { catalogResources, resourcesForCatalogEntity } from './catalog-events.js';
 
 export interface OutboxRelayOptions {
   readonly prisma: PrismaClient;
@@ -18,182 +20,146 @@ export interface OutboxRelayInstance {
   pollOnce(): Promise<number>;
 }
 
-interface StreamCursor {
-  cursorId: string | null;
-  watermarkDate: Date | null;
-}
-
 export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRelayInstance {
-  const { prisma, broker, redisManager, logger, pollIntervalMs = 2_000 } = options;
+  const { prisma, broker, logger, pollIntervalMs = 2_000 } = options;
+  const queue = createDeliveryQueue(prisma);
   let timer: ReturnType<typeof setInterval> | null = null;
   let isRunning = false;
   let isPolling = false;
   let activePollPromise: Promise<number> | null = null;
 
-  // Track stream cursor/watermark to drain backlogs without scanning full history
-  type StreamKey = 'booking' | 'billing' | 'guest' | 'seating' | 'studio';
-  const cursors: Record<StreamKey, StreamCursor> = {
-    booking: { cursorId: null, watermarkDate: null },
-    billing: { cursorId: null, watermarkDate: null },
-    guest: { cursorId: null, watermarkDate: null },
-    seating: { cursorId: null, watermarkDate: null },
-    studio: { cursorId: null, watermarkDate: null },
-  };
-
-  // In-memory fallback stores when Redis is not available
-  const localReceipts = new Set<string>();
-  const localLeases = new Map<string, number>();
-  const MAX_LOCAL_ENTRIES = 50_000;
-
-  async function tryAcquireLease(stream: string, eventId: string): Promise<boolean> {
-    const key = `${stream}:${eventId}`;
-    const redis = redisManager.getClient();
-
-    if (redis && redis.status === 'ready') {
-      try {
-        // If already has durable receipt, do not lease
-        const receipt = await redis.get(`rt:receipt:${key}`);
-        if (receipt !== null) return false;
-
-        // Acquire short-lived lease (30s)
-        const leased = await redis.set(`rt:lease:${key}`, '1', 'EX', 30, 'NX');
-        return leased === 'OK';
-      } catch (err) {
-        logger?.warn({ err, eventId }, 'Redis lease acquire failed, falling back to local.');
+  async function processStreamBatch<T>(
+    stream: string,
+    fetchBatch: (ids: string[]) => Promise<T[]>,
+    getId: (row: T) => string,
+    toEvent: (row: T) => RealtimeEvent | readonly RealtimeEvent[] | null,
+  ): Promise<number> {
+    const claims = await queue.claim(stream);
+    if (claims.length === 0) return 0;
+    let dispatched = 0;
+    try {
+      const rows = new Map((await fetchBatch([...new Set(claims.map(c => c.eventId))]))
+        .map(row => [getId(row), row]));
+      for (const claim of claims) {
+        try {
+          if (!await queue.renew(stream, claim)) continue;
+          const row = rows.get(claim.eventId);
+          const converted = row ? toEvent(row) : null;
+          const events: readonly RealtimeEvent[] = converted === null
+            ? [] : 'eventId' in converted ? [converted] : converted;
+          for (const event of events) {
+            // A notification row can change revision between claim and read. Its
+            // queued revision remains a distinct invalidation, never a cursor fence.
+            await broker.publish({ ...event, eventId: event.eventId + ':' + claim.revision });
+            dispatched++;
+          }
+          await queue.finish(stream, claim, true);
+        } catch (err) {
+          await queue.finish(stream, claim, false);
+          logger?.error({ err, stream, eventId: claim.eventId }, 'Realtime delivery will retry.');
+        }
       }
+    } finally {
+      // Token check makes release harmless for delivered/reclaimed claims.
+      await Promise.all(claims.map(claim => queue.finish(stream, claim, false)));
     }
-
-    if (localReceipts.has(key)) return false;
-    const now = Date.now();
-    const existingLease = localLeases.get(key);
-    if (existingLease && existingLease > now) return false;
-
-    if (localLeases.size >= MAX_LOCAL_ENTRIES) {
-      const it = localLeases.entries();
-      for (let i = 0; i < 5_000; i++) {
-        const n = it.next();
-        if (n.done) break;
-        if (n.value[1] <= now) localLeases.delete(n.value[0]);
-      }
-    }
-    localLeases.set(key, now + 30_000);
-    return true;
+    return dispatched;
   }
 
-  async function markReceipt(stream: string, eventId: string): Promise<void> {
-    const key = `${stream}:${eventId}`;
-    const redis = redisManager.getClient();
-
-    if (redis && redis.status === 'ready') {
-      try {
-        // Set durable receipt for 7 days (604,800s) and release lease
-        await redis.set(`rt:receipt:${key}`, '1', 'EX', 604_800);
-        await redis.del(`rt:lease:${key}`);
-        return;
-      } catch (err) {
-        logger?.warn({ err, eventId }, 'Redis mark receipt failed, falling back to local.');
-      }
+  const identityRecipients = new Map<string, readonly string[]>();
+  const bookingRecipients = new Map<string, readonly string[]>();
+  async function resolveRecipients(ids: string[], kind: 'consultation' | 'booking') {
+    const bookings = kind === 'booking' ? await prisma.booking.findMany({
+      where: { id: { in: ids } }, select: { id: true, consultationId: true },
+    }) : [];
+    const grants = await prisma.consultationAccess.findMany({
+      where: kind === 'consultation'
+        ? { consultationId: { in: ids } }
+        : { consultationId: { in: bookings.map(row => row.consultationId) } },
+      select: { accountId: true, consultationId: true },
+    });
+    const byConsultation = new Map<string, string[]>();
+    for (const grant of grants) {
+      const recipients = byConsultation.get(grant.consultationId) ?? [];
+      recipients.push(grant.accountId);
+      byConsultation.set(grant.consultationId, recipients);
     }
-
-    if (localReceipts.size >= MAX_LOCAL_ENTRIES) {
-      const it = localReceipts.values();
-      for (let i = 0; i < 5_000; i++) {
-        const n = it.next();
-        if (n.done) break;
-        localReceipts.delete(n.value);
-      }
+    if (kind === 'consultation') {
+      identityRecipients.clear();
+      for (const id of ids) identityRecipients.set(id, byConsultation.get(id) ?? []);
+    } else {
+      bookingRecipients.clear();
+      for (const row of bookings) bookingRecipients.set(row.id, byConsultation.get(row.consultationId) ?? []);
     }
-    localReceipts.add(key);
-    localLeases.delete(key);
-  }
-
-  async function releaseLease(stream: string, eventId: string): Promise<void> {
-    const key = `${stream}:${eventId}`;
-    const redis = redisManager.getClient();
-    if (redis && redis.status === 'ready') {
-      try {
-        await redis.del(`rt:lease:${key}`);
-      } catch {
-        // Ignore deletion error on release
-      }
-    }
-    localLeases.delete(key);
   }
 
   async function scanAndRelay(): Promise<number> {
     let dispatched = 0;
 
     try {
-      // 1. Scan BookingOutboxEvents in chronological order (asc)
-      const bookingCursor = cursors.booking.cursorId;
-      const bookingEvents = await prisma.bookingOutboxEvent.findMany({
-        take: 50,
-        orderBy: [{ occurredAt: 'asc' }, { id: 'asc' }],
-        ...(bookingCursor ? { cursor: { id: bookingCursor }, skip: 1 } : {}),
-      });
+      // 1. BookingOutboxEvents
+      dispatched += await processStreamBatch(
+        'booking',
+        async (ids) => {
+          const rows = await prisma.bookingOutboxEvent.findMany({
+            take: 50,
+            orderBy: [{ occurredAt: 'asc' }, { id: 'asc' }],
+            where: { id: { in: ids } },
+          });
+          await resolveRecipients(rows.map(row => row.aggregateId), 'booking');
+          return rows;
+        },
+        (row) => row.id,
+        (row) => {
+          let eventType: RealtimeEventType = 'booking.updated';
+          if (row.eventType.includes('timeline')) {
+            eventType = 'timeline.updated';
+          } else if (row.eventType.includes('contract')) {
+            eventType = 'contract.updated';
+          } else if (row.eventType.includes('deposit')) {
+            eventType = 'deposit.received';
+          } else if (row.eventType.includes('proposal')) {
+            eventType = 'proposal.updated';
+          }
+          return [{
+            eventId: row.id,
+            schemaVersion: 1,
+            type: eventType,
+            scope: {
+              entityType: 'booking',
+              bookingId: row.aggregateId,
+              revision: row.aggregateRevision,
+            },
+            resources: [
+              `/bookings/${row.aggregateId}`,
+              `/bookings/${row.aggregateId}/timeline`,
+              `/bookings/${row.aggregateId}/proposal`,
+              `/couple/bookings`,
+            ],
+            occurredAt: row.occurredAt.toISOString(),
+            payload: { eventType: row.eventType },
+          }, ...(bookingRecipients.get(row.aggregateId) ?? []).map(accountId => ({
+            eventId: row.id + ':' + accountId,
+            schemaVersion: 1 as const,
+            type: 'booking.updated' as const,
+            scope: { entityType: 'account' as const, entityId: accountId },
+            resources: ['/couple/bookings'],
+            occurredAt: row.occurredAt.toISOString(),
+          }))];
+        },
+      );
 
-      for (const row of bookingEvents) {
-        const leased = await tryAcquireLease('booking', row.id);
-        if (!leased) continue;
-
-        let eventType: RealtimeEventType = 'booking.updated';
-        if (row.eventType.includes('timeline')) {
-          eventType = 'timeline.updated';
-        } else if (row.eventType.includes('contract')) {
-          eventType = 'contract.updated';
-        } else if (row.eventType.includes('deposit')) {
-          eventType = 'deposit.received';
-        } else if (row.eventType.includes('proposal')) {
-          eventType = 'proposal.updated';
-        }
-
-        const event: RealtimeEvent = {
-          eventId: row.id,
-          schemaVersion: 1,
-          type: eventType,
-          scope: {
-            entityType: 'booking',
-            bookingId: row.aggregateId,
-            revision: row.aggregateRevision,
-          },
-          resources: [
-            `/bookings/${row.aggregateId}`,
-            `/bookings/${row.aggregateId}/timeline`,
-            `/bookings/${row.aggregateId}/proposal`,
-            `/couple/bookings`,
-          ],
-          occurredAt: row.occurredAt.toISOString(),
-          payload: { eventType: row.eventType },
-        };
-
-        try {
-          broker.publish(event);
-          dispatched++;
-          await markReceipt('booking', row.id);
-          cursors.booking.cursorId = row.id;
-        } catch (err) {
-          await releaseLease('booking', row.id);
-          logger?.error(
-            { err, eventId: row.id },
-            'Broker publish failed; lease released for retry.',
-          );
-          break; // Stop batch to retry from this event
-        }
-      }
-
-      // 2. Scan BillingOutboxEvents
-      const billingCursor = cursors.billing.cursorId;
-      const billingEvents = await prisma.billingOutboxEvent.findMany({
-        take: 50,
-        orderBy: [{ occurredAt: 'asc' }, { id: 'asc' }],
-        ...(billingCursor ? { cursor: { id: billingCursor }, skip: 1 } : {}),
-      });
-
-      for (const row of billingEvents) {
-        const leased = await tryAcquireLease('billing', row.id);
-        if (!leased) continue;
-
-        const event: RealtimeEvent = {
+      // 2. BillingOutboxEvents
+      dispatched += await processStreamBatch(
+        'billing',
+        (ids) =>
+          prisma.billingOutboxEvent.findMany({
+            take: 50,
+            orderBy: [{ occurredAt: 'asc' }, { id: 'asc' }],
+            where: { id: { in: ids } },
+          }),
+        (row) => row.id,
+        (row) => ({
           eventId: row.id,
           schemaVersion: 1,
           type: 'billing.updated',
@@ -209,36 +175,20 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
           ],
           occurredAt: row.occurredAt.toISOString(),
           payload: { eventType: row.eventType },
-        };
+        }),
+      );
 
-        try {
-          broker.publish(event);
-          dispatched++;
-          await markReceipt('billing', row.id);
-          cursors.billing.cursorId = row.id;
-        } catch (err) {
-          await releaseLease('billing', row.id);
-          logger?.error(
-            { err, eventId: row.id },
-            'Broker publish failed; lease released for retry.',
-          );
-          break;
-        }
-      }
-
-      // 3. Scan GuestOutbox
-      const guestCursor = cursors.guest.cursorId;
-      const guestEvents = await prisma.guestOutbox.findMany({
-        take: 50,
-        orderBy: [{ createdAt: 'asc' }, { eventId: 'asc' }],
-        ...(guestCursor ? { cursor: { eventId: guestCursor }, skip: 1 } : {}),
-      });
-
-      for (const row of guestEvents) {
-        const leased = await tryAcquireLease('guest', row.eventId);
-        if (!leased) continue;
-
-        const event: RealtimeEvent = {
+      // 3. GuestOutbox
+      dispatched += await processStreamBatch(
+        'guest',
+        (ids) =>
+          prisma.guestOutbox.findMany({
+            take: 50,
+            orderBy: [{ createdAt: 'asc' }, { eventId: 'asc' }],
+            where: { eventId: { in: ids } },
+          }),
+        (row) => row.eventId,
+        (row) => ({
           eventId: row.eventId,
           schemaVersion: 1,
           type: 'guest.updated',
@@ -249,36 +199,20 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
           resources: [`/bookings/${row.bookingId}/guests`, `/bookings/${row.bookingId}/groups`],
           occurredAt: row.createdAt.toISOString(),
           payload: { eventType: row.eventType },
-        };
+        }),
+      );
 
-        try {
-          broker.publish(event);
-          dispatched++;
-          await markReceipt('guest', row.eventId);
-          cursors.guest.cursorId = row.eventId;
-        } catch (err) {
-          await releaseLease('guest', row.eventId);
-          logger?.error(
-            { err, eventId: row.eventId },
-            'Broker publish failed; lease released for retry.',
-          );
-          break;
-        }
-      }
-
-      // 4. Scan SeatingOutbox
-      const seatingCursor = cursors.seating.cursorId;
-      const seatingEvents = await prisma.seatingOutbox.findMany({
-        take: 50,
-        orderBy: [{ occurredAt: 'asc' }, { id: 'asc' }],
-        ...(seatingCursor ? { cursor: { id: seatingCursor }, skip: 1 } : {}),
-      });
-
-      for (const row of seatingEvents) {
-        const leased = await tryAcquireLease('seating', row.id);
-        if (!leased) continue;
-
-        const event: RealtimeEvent = {
+      // 4. SeatingOutbox
+      dispatched += await processStreamBatch(
+        'seating',
+        (ids) =>
+          prisma.seatingOutbox.findMany({
+            take: 50,
+            orderBy: [{ occurredAt: 'asc' }, { id: 'asc' }],
+            where: { id: { in: ids } },
+          }),
+        (row) => row.id,
+        (row) => ({
           eventId: row.id,
           schemaVersion: 1,
           type: 'seating.updated',
@@ -292,36 +226,20 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
           ],
           occurredAt: row.occurredAt.toISOString(),
           payload: { eventType: row.eventType },
-        };
+        }),
+      );
 
-        try {
-          broker.publish(event);
-          dispatched++;
-          await markReceipt('seating', row.id);
-          cursors.seating.cursorId = row.id;
-        } catch (err) {
-          await releaseLease('seating', row.id);
-          logger?.error(
-            { err, eventId: row.id },
-            'Broker publish failed; lease released for retry.',
-          );
-          break;
-        }
-      }
-
-      // 5. Scan InvitationStudioOutbox
-      const studioCursor = cursors.studio.cursorId;
-      const studioEvents = await prisma.invitationStudioOutbox.findMany({
-        take: 50,
-        orderBy: [{ createdAt: 'asc' }, { eventId: 'asc' }],
-        ...(studioCursor ? { cursor: { eventId: studioCursor }, skip: 1 } : {}),
-      });
-
-      for (const row of studioEvents) {
-        const leased = await tryAcquireLease('studio', row.eventId);
-        if (!leased) continue;
-
-        const event: RealtimeEvent = {
+      // 5. InvitationStudioOutbox
+      dispatched += await processStreamBatch(
+        'studio',
+        (ids) =>
+          prisma.invitationStudioOutbox.findMany({
+            take: 50,
+            orderBy: [{ createdAt: 'asc' }, { eventId: 'asc' }],
+            where: { eventId: { in: ids } },
+          }),
+        (row) => row.eventId,
+        (row) => ({
           eventId: row.eventId,
           schemaVersion: 1,
           type: 'print_order.updated',
@@ -332,21 +250,123 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
           resources: [`/management/print-orders`, `/bookings/${row.bookingId}/invitation-studio`],
           occurredAt: row.createdAt.toISOString(),
           payload: { eventType: row.eventType },
-        };
+        }),
+      );
 
-        try {
-          broker.publish(event);
-          dispatched++;
-          await markReceipt('studio', row.eventId);
-          cursors.studio.cursorId = row.eventId;
-        } catch (err) {
-          await releaseLease('studio', row.eventId);
-          logger?.error(
-            { err, eventId: row.eventId },
-            'Broker publish failed; lease released for retry.',
-          );
-          break;
-        }
+      // Consultation authority is resolved once per batch; manager and account
+      // invalidations are separate envelopes with no guessed booking identity.
+      if (prisma.identityOutbox?.findMany) {
+        dispatched += await processStreamBatch(
+          'identity',
+          async (ids) => {
+            const rows = await prisma.identityOutbox.findMany({
+              take: 50,
+              orderBy: [{ occurredAt: 'asc' }, { eventId: 'asc' }],
+              where: { eventId: { in: ids } },
+            });
+            await resolveRecipients(rows.map(row => row.consultationId), 'consultation');
+            return rows;
+          },
+          (row) => row.eventId,
+          (row) => [{
+            eventId: row.eventId,
+            schemaVersion: 1,
+            type: 'booking.updated' as const,
+            scope: { entityType: 'booking' as const },
+            resources: ['/couple/bookings', '/management/consultations'],
+            occurredAt: row.occurredAt.toISOString(),
+            payload: { eventType: row.eventType },
+          }, ...(identityRecipients.get(row.consultationId) ?? []).map(accountId => ({
+            eventId: row.eventId + ':' + accountId,
+            schemaVersion: 1 as const,
+            type: 'booking.updated' as const,
+            scope: { entityType: 'account' as const, entityId: accountId },
+            resources: ['/couple/bookings'],
+            occurredAt: row.occurredAt.toISOString(),
+          }))],
+        );
+      }
+
+      // 7. StaffOutbox (Optional stream: check-in events)
+      if (prisma.staffOutbox?.findMany) {
+        dispatched += await processStreamBatch(
+          'staff',
+          (ids) =>
+            prisma.staffOutbox.findMany({
+              take: 50,
+              orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+              where: { id: { in: ids } },
+            }),
+          (row) => row.id,
+          (row) => ({
+            eventId: row.id,
+            schemaVersion: 1,
+            type: 'guest.updated',
+            scope: {
+              entityType: 'booking',
+              bookingId: row.bookingId,
+            },
+            resources: [`/bookings/${row.bookingId}/guests`, `/bookings/${row.bookingId}/check-in`],
+            occurredAt: row.createdAt.toISOString(),
+            payload: { eventType: row.eventType },
+          }),
+        );
+      }
+
+      // 8. NotificationInbox (Optional stream: notification events)
+      // AUDIENCE RESTRICTION: Notification inbox rows are owner-private.
+      // The REST inbox always filters by n.accountId = currentAccountId, so
+      // the realtime invalidation must match: route ONLY to account:<accountId>.
+      // Broker prioritizes the private account audience even with a booking reference.
+      if (prisma.notificationInbox?.findMany) {
+        dispatched += await processStreamBatch(
+          'notification',
+          (ids) =>
+            prisma.notificationInbox.findMany({
+              take: 50,
+              orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+              where: { id: { in: ids } },
+            }),
+          (row) => row.id,
+          (row) => ({
+            eventId: row.id,
+            schemaVersion: 1,
+            type: 'notification.received',
+            scope: {
+              entityType: 'account',
+              entityId: row.accountId,
+              ...(row.bookingId ? { bookingId: row.bookingId } : {}),
+              revision: row.revision,
+            },
+            resources: ['/notifications', '/account/notifications'],
+            occurredAt: row.createdAt.toISOString(),
+            payload: { intentId: row.intentId },
+          }),
+        );
+      }
+
+      // Catalog invalidation contains no draft entity ID, action or private payload.
+      if (prisma.auditLog?.findMany) {
+        dispatched += await processStreamBatch(
+          'audit',
+          (ids) =>
+            prisma.auditLog.findMany({
+              take: 50,
+              orderBy: [{ occurredAt: 'asc' }, { id: 'asc' }],
+              where: { id: { in: ids } },
+            }),
+          (row) => row.id,
+          (row) => Object.hasOwn(catalogResources, row.entityType) ? ({
+            eventId: row.id,
+            schemaVersion: 1,
+            type: 'catalog.updated',
+            scope: {
+              entityType: 'catalog',
+            },
+            resources: resourcesForCatalogEntity(row.entityType) ?? [],
+            occurredAt: row.occurredAt.toISOString(),
+          }) : null,
+        );
       }
     } catch (err) {
       logger?.error({ err }, 'Realtime outbox relay encountered an error during polling.');

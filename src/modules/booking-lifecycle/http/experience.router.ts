@@ -9,6 +9,7 @@ import {
   type AuthenticatedActorResolver,
   type AuthenticatedActor,
 } from '../../identity-access/authorization/authenticated-actor.middleware.js';
+import type { Redis } from 'ioredis';
 import {
   consultationRequestBodySchema,
   intakeAcknowledgementSchema,
@@ -23,12 +24,13 @@ import {
 export function createBookingExperienceRouter(
   prisma: PrismaClient,
   resolver: AuthenticatedActorResolver,
+  redisClient?: Redis | null,
 ) {
   const router = Router();
   const authenticate = createAuthenticatedActorMiddleware(resolver);
   router.post(
     '/consultation-requests',
-    createGeneralRateLimit({ maxRequests: 5, windowMs: 60 * 60_000 }),
+    createGeneralRateLimit({ maxRequests: 5, windowMs: 60 * 60_000 }, redisClient, 'experience'),
     validateRequest({ body: consultationRequestBodySchema }),
     async (request, response) => {
       const { body } = validatedRequest(response, { body: consultationRequestBodySchema });

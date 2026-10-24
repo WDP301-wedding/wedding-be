@@ -7,6 +7,7 @@ import {
   type AuthenticatedActorResolver,
 } from '../authorization/authenticated-actor.middleware.js';
 import type { PasswordOtpService } from './password-otp.service.js';
+import type { Redis } from 'ioredis';
 import {
   changeOtpRequestSchema,
   otpCompletionSchema,
@@ -18,10 +19,11 @@ import {
 export function createPasswordOtpRouter(
   service: PasswordOtpService,
   resolver: AuthenticatedActorResolver,
+  redisClient?: Redis | null,
 ) {
   const router = Router();
   const authenticate = createAuthenticatedActorMiddleware(resolver);
-  const limited = createGeneralRateLimit({ maxRequests: 30, windowMs: 15 * 60_000 });
+  const limited = createGeneralRateLimit({ maxRequests: 30, windowMs: 15 * 60_000 }, redisClient, 'otp');
   router.post(
     '/auth/password-otp-requests',
     limited,

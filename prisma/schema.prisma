@@ -8,6 +8,18 @@ datasource db {
   provider = "postgresql"
 }
 
+model RealtimeDelivery {
+  stream String
+  eventId String @db.Uuid
+  revision Int @default(1)
+  enqueuedAt DateTime @default(dbgenerated("clock_timestamp()")) @db.Timestamptz(6)
+  leaseToken String? @db.Uuid
+  leaseUntil DateTime? @db.Timestamptz(6)
+  deliveredAt DateTime? @db.Timestamptz(6)
+  @@id([stream, eventId, revision])
+  @@index([stream, enqueuedAt, eventId, revision], map: "RealtimeDelivery_pending_idx", where: raw("\"deliveredAt\" IS NULL"))
+}
+
 model IdentityOutbox {
   eventId String @id @db.Uuid
   eventType String
