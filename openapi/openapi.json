@@ -3981,10 +3981,28 @@
                   ],
                   "type": "string"
                 },
+                "alias": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "bookingId": {
                   "format": "uuid",
                   "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                   "type": "string"
+                },
+                "brideName": {
+                  "anyOf": [
+                    {
+                      "maxLength": 120,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "consultationId": {
                   "format": "uuid",
@@ -3994,10 +4012,38 @@
                 "coupleApproved": {
                   "type": "boolean"
                 },
+                "depositPaidVnd": {
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
                 "eventDate": {
                   "format": "date",
                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
                   "type": "string"
+                },
+                "eventType": {
+                  "default": "WEDDING",
+                  "enum": [
+                    "WEDDING",
+                    "ENGAGEMENT",
+                    "RECEPTION",
+                    "ANNIVERSARY",
+                    "OTHER"
+                  ],
+                  "type": "string"
+                },
+                "groomName": {
+                  "anyOf": [
+                    {
+                      "maxLength": 120,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "hallName": {
                   "type": "string"
@@ -4023,12 +4069,22 @@
                   "minimum": -9007199254740991,
                   "type": "integer"
                 },
+                "revision": {
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991,
+                  "type": "integer"
+                },
                 "shiftCode": {
                   "enum": [
                     "LUNCH",
                     "DINNER"
                   ],
                   "type": "string"
+                },
+                "totalVnd": {
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
                 }
               },
               "required": [
@@ -4042,7 +4098,8 @@
                 "planningHeadcount",
                 "managerApproved",
                 "coupleApproved",
-                "hasTimeline"
+                "hasTimeline",
+                "eventType"
               ],
               "type": "object"
             },
@@ -6132,6 +6189,85 @@
           "expectedRevision",
           "predecessorRevisionId",
           "items"
+        ],
+        "type": "object"
+      },
+      "UpdateBookingAliasBody": {
+        "additionalProperties": false,
+        "properties": {
+          "alias": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "eventType": {
+            "enum": [
+              "WEDDING",
+              "ENGAGEMENT",
+              "RECEPTION",
+              "ANNIVERSARY",
+              "OTHER"
+            ],
+            "type": "string"
+          },
+          "expectedRevision": {
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "UpdateBookingAliasResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "additionalProperties": false,
+            "properties": {
+              "alias": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "bookingId": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "eventType": {
+                "enum": [
+                  "WEDDING",
+                  "ENGAGEMENT",
+                  "RECEPTION",
+                  "ANNIVERSARY",
+                  "OTHER"
+                ],
+                "type": "string"
+              },
+              "revision": {
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "bookingId",
+              "revision",
+              "alias",
+              "eventType"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
         ],
         "type": "object"
       },
@@ -26737,6 +26873,71 @@
         ]
       }
     },
+    "/couple/bookings/{bookingId}/alias": {
+      "patch": {
+        "description": "Update human-readable alias or eventType of booking for Couple or Manager.",
+        "operationId": "updateBookingAlias",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookingId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBookingAliasBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateBookingAliasResponse"
+                }
+              }
+            },
+            "description": "Successful operation"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Product experience"
+        ]
+      }
+    },
     "/guest/invitation": {
       "get": {
         "description": "Bearer wgs_ capability valid at most 15 minutes. Current approved public Invitation and recipient greeting only; no private media, groups/list, contacts, notes, planning, billing or attendance writes.",
@@ -45367,6 +45568,14 @@
                                       "eventDate": {
                                         "format": "date",
                                         "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                        "type": "string"
+                                      },
+                                      "eventTitle": {
+                                        "maxLength": 120,
+                                        "type": "string"
+                                      },
+                                      "hallName": {
+                                        "maxLength": 120,
                                         "type": "string"
                                       },
                                       "referenceId": {

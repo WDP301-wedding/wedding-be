@@ -364,6 +364,12 @@ export function createBookingExperienceRouter(
         });
         if (!access) throw failure(403, 'FORBIDDEN');
       }
+      const normalizedAlias =
+        body.alias !== undefined
+          ? body.alias
+            ? body.alias.normalize('NFC')
+            : null
+          : undefined;
       const updated = await prisma.$transaction(async (tx) => {
         const result = await tx.booking.update({
           where: {
@@ -372,7 +378,7 @@ export function createBookingExperienceRouter(
           },
           data: {
             revision: { increment: 1 },
-            ...(body.alias !== undefined ? { alias: body.alias } : {}),
+            ...(normalizedAlias !== undefined ? { alias: normalizedAlias } : {}),
             ...(body.eventType !== undefined ? { eventType: body.eventType } : {}),
           },
           select: { id: true, revision: true, alias: true, eventType: true },

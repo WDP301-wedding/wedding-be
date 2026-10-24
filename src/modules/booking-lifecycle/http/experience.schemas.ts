@@ -111,13 +111,7 @@ export const updateBookingAliasParamsSchema = z.strictObject({
 });
 export const updateBookingAliasBodySchema = z.strictObject({
   expectedRevision: z.number().int().positive().optional(),
-  alias: z
-    .string()
-    .trim()
-    .max(120)
-    .transform((value) => value.normalize('NFC'))
-    .nullable()
-    .optional(),
+  alias: z.string().trim().max(120).nullable().optional(),
   eventType: z.enum(['WEDDING', 'ENGAGEMENT', 'RECEPTION', 'ANNIVERSARY', 'OTHER']).optional(),
 });
 export const updateBookingAliasResponseSchema = z.strictObject({
