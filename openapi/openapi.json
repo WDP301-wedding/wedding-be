@@ -39909,6 +39909,7 @@
             "in": "query",
             "name": "q",
             "schema": {
+              "default": "",
               "maxLength": 120,
               "type": "string"
             }

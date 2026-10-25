@@ -83,13 +83,16 @@ export function createBookingExperienceRouter(
     validateRequest({ query: intakeQuerySchema }),
     async (_request, response) => {
       const { query } = validatedRequest(response, { query: intakeQuerySchema });
+      const normalizedSearch = query.q ? query.q.normalize('NFC') : '';
       const baseWhere: Prisma.ConsultationRequestWhereInput = {
         createdAt: { gt: new Date(Date.now() - 180 * 86400_000) },
-        ...(query.q
+        ...(normalizedSearch
           ? {
-              OR: ['displayName', 'email', 'phone', 'message'].map((field) => ({
-                [field]: { contains: query.q, mode: 'insensitive' as const },
-              })),
+              OR: ['displayName', 'brideName', 'groomName', 'email', 'phone', 'message'].map(
+                (field) => ({
+                  [field]: { contains: normalizedSearch, mode: 'insensitive' as const },
+                }),
+              ),
             }
           : {}),
       };
@@ -194,7 +197,7 @@ export function createBookingExperienceRouter(
             id: randomUUID(),
             managerAccountId: actor.accountId,
             intendedEmail: item.email,
-            intendedEmailNormalized: item.email,
+            intendedEmailNormalized: item.email.trim().toLowerCase(),
             displayName: item.displayName,
             brideName: item.brideName,
             groomName: item.groomName,
@@ -313,8 +316,8 @@ export function createBookingExperienceRouter(
             revision: booking.revision,
             eventType: booking.eventType,
             alias: booking.alias,
-            brideName: booking.consultation.brideName,
-            groomName: booking.consultation.groomName,
+            brideName: booking.consultation?.brideName ?? '',
+            groomName: booking.consultation?.groomName ?? '',
             totalVnd: booking.proposalSnapshot?.baseChargeVnd
               ? Number(booking.proposalSnapshot.baseChargeVnd)
               : undefined,

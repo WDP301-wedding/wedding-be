@@ -70,12 +70,7 @@ export const experienceQuerySchema = z.strictObject({
 });
 export const intakeQuerySchema = experienceQuerySchema.extend({
   status: z.enum(['ALL', 'NEW', 'CONVERTED', 'CLOSED']).default('ALL'),
-  q: z
-    .string()
-    .trim()
-    .max(120)
-    .transform((value) => value.normalize('NFC'))
-    .default(''),
+  q: z.string().trim().max(120).default(''),
   sort: z.enum(['newest', 'oldest', 'date-asc', 'guests-desc', 'name-asc']).default('newest'),
 });
 export const intakeParamsSchema = z.strictObject({ id: z.uuid() });
