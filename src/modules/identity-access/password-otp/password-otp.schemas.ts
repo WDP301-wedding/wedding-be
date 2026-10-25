@@ -7,7 +7,7 @@ export const changeOtpRequestSchema = z.strictObject({
 export const otpCompletionSchema = z.strictObject({
   challengeId: z.uuid(),
   code: z.string().regex(/^\d{6}$/u),
-  newPassword: z.string().min(12).max(128),
+  newPassword: z.string().min(1).max(128),
 });
 export const otpRequestResponseSchema = z.strictObject({
   data: z.strictObject({

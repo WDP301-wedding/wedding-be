@@ -26,12 +26,12 @@ export const passwordResetRequestBodySchema = strictWriteSchema({
 
 export const passwordResetCompletionBodySchema = strictWriteSchema({
   resetToken: z.string().regex(/^wip_[A-Za-z0-9_-]{43}$/u),
-  newPassword: z.string().min(12).max(128),
+  newPassword: z.string().min(1).max(128),
 });
 
 export const invitationAcceptanceBodySchema = strictWriteSchema({
   invitationToken: z.string().regex(/^wii_[A-Za-z0-9_-]{43}$/u),
-  password: z.string().min(12).max(128),
+  password: z.string().min(1).max(128),
 });
 
 export const passwordResetRequestResponseSchema = z.strictObject({

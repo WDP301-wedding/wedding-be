@@ -17,7 +17,7 @@ const managerEmail = z.email().parse(process.env.DEMO_MANAGER_EMAIL).trim().toLo
 const coupleEmail = z.email().parse(process.env.DEMO_COUPLE_EMAIL).trim().toLowerCase();
 if (managerEmail === coupleEmail)
   throw new Error('Manager and Couple need distinct email addresses.');
-const passwordSchema = z.string().min(12).max(128);
+const passwordSchema = z.string().min(1).max(128);
 const managerPassword = passwordSchema.parse(process.env.DEMO_MANAGER_PASSWORD);
 const couplePassword = passwordSchema.parse(process.env.DEMO_COUPLE_PASSWORD);
 const prisma = createPrismaClient();

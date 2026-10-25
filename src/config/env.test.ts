@@ -199,7 +199,7 @@ describe('parseEnvironment', () => {
           reissueWindowSeconds: 86_400,
         },
         password: {
-          minimumCharacters: 12,
+          minimumCharacters: 1,
           maximumCharacters: 128,
           maximumBytes: 512,
           scrypt: {

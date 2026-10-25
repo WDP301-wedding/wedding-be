@@ -60,7 +60,7 @@ const approvedIdentityPolicy = Object.freeze({
   invitationTtlSeconds: 259_200,
   invitationReissueLimit: 3,
   invitationReissueWindowSeconds: 86_400,
-  passwordMinimumCharacters: 12,
+  passwordMinimumCharacters: 1,
   passwordMaximumCharacters: 128,
   passwordMaximumBytes: 512,
   scryptCost: 131_072,
@@ -210,7 +210,10 @@ const rawEnvironmentSchema = z
     AUTH_INVITATION_REISSUE_WINDOW_SECONDS: approvedInteger(
       approvedIdentityPolicy.invitationReissueWindowSeconds,
     ),
-    AUTH_PASSWORD_MIN_CHARACTERS: approvedInteger(approvedIdentityPolicy.passwordMinimumCharacters),
+    AUTH_PASSWORD_MIN_CHARACTERS: z
+      .enum(['1', '5', '12'])
+      .transform(Number)
+      .optional(),
     AUTH_PASSWORD_MAX_CHARACTERS: approvedInteger(approvedIdentityPolicy.passwordMaximumCharacters),
     AUTH_PASSWORD_MAX_BYTES: approvedInteger(approvedIdentityPolicy.passwordMaximumBytes),
     AUTH_SCRYPT_COST: approvedInteger(approvedIdentityPolicy.scryptCost),
