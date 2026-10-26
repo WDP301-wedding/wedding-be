@@ -131,7 +131,7 @@ services:
       - key: AUTH_PASSWORD_MAX_CHARACTERS
         value: '128'
       - key: AUTH_PASSWORD_MIN_CHARACTERS
-        value: '5'
+        value: '1'
       - key: AUTH_PASSWORD_RESET_RETENTION_DAYS
         value: '30'
       - key: AUTH_PASSWORD_RESET_TTL_SECONDS
