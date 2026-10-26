@@ -9,10 +9,14 @@ import type {
 } from '../application/consultation.service.js';
 
 type BookingLifecycleConflictCode =
-  'CONSULTATION_ALREADY_EXISTS' | 'STALE_BOOKING_REVISION' | 'INVITATION_INTENT_CONFLICT';
+  | 'CONSULTATION_ALREADY_EXISTS'
+  | 'STALE_BOOKING_REVISION'
+  | 'INVITATION_INTENT_CONFLICT'
+  | 'BOOKING_ALREADY_EXISTS';
 
 const conflictMessages: Readonly<Record<BookingLifecycleConflictCode, string>> = {
   CONSULTATION_ALREADY_EXISTS: 'The consultation already exists.',
+  BOOKING_ALREADY_EXISTS: 'This consultation already has a booking. Resume its existing booking.',
   STALE_BOOKING_REVISION: 'The booking changed after it was loaded.',
   INVITATION_INTENT_CONFLICT: 'The invitation request conflicts with its durable intent.',
 };
@@ -279,10 +283,9 @@ export function createPrismaConsultationWorkspaceRepository(
           if (consultation === null || consultation.managerAccountId !== record.managerAccountId) {
             throw new BookingLifecycleNotFoundError();
           }
-          if (
-            consultation.revision !== record.expectedConsultationRevision ||
-            consultation.booking !== null
-          ) {
+          if (consultation.booking !== null)
+            throw new BookingLifecycleConflictError('BOOKING_ALREADY_EXISTS');
+          if (consultation.revision !== record.expectedConsultationRevision) {
             throw new BookingLifecycleConflictError('STALE_BOOKING_REVISION');
           }
           await transaction.booking.create({

@@ -5,6 +5,7 @@ import { createApp } from '../../../app.js';
 import type { Prisma, PrismaClient } from '../../../generated/prisma/client.js';
 import type { AuthenticatedActor } from '../../identity-access/authorization/authenticated-actor.middleware.js';
 import { createBookingExperienceRouter } from './experience.router.js';
+import { consultationRequestBodySchema } from './experience.schemas.js';
 
 const id = '00000000-0000-4000-8000-000000000001';
 const secondId = '00000000-0000-4000-8000-000000000002';
@@ -44,12 +45,16 @@ function fixture(currentActor = actor) {
     consultationRequest: {
       createMany: vi.fn().mockResolvedValue({ count: 1 }),
       findUniqueOrThrow: vi.fn().mockResolvedValue(record()),
-      findUnique: vi.fn().mockResolvedValue(record()),
+      findUnique: vi.fn().mockResolvedValue(null),
       findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue({ id: secondId }),
+      groupBy: vi.fn().mockResolvedValue([]),
       update: vi.fn().mockResolvedValue({}),
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
     },
     consultation: { create: vi.fn().mockResolvedValue({ id: consultationId }) },
+    hall: { findFirst: vi.fn().mockResolvedValue({ id: secondId }) },
+    menuPackage: { findFirst: vi.fn().mockResolvedValue({ id: secondId }) },
     consultationAccess: {
       findMany: vi.fn().mockResolvedValue([{ consultationId, level: 'FULL' }]),
     },
@@ -99,6 +104,7 @@ describe('booking intake and couple overview HTTP contract', () => {
 
   it('accepts identical retries without duplicating audit and rejects a changed payload', async () => {
     const { app, db } = fixture();
+    db.consultationRequest.findUnique.mockResolvedValue(record());
     db.consultationRequest.createMany.mockResolvedValue({ count: 0 });
     expect((await request(app).post('/api/v1/consultation-requests').send(intake)).status).toBe(
       202,
@@ -109,6 +115,41 @@ describe('booking intake and couple overview HTTP contract', () => {
     expect(conflict.status).toBe(409);
     expect(conflict.body).toMatchObject({ error: { code: 'SUBMISSION_KEY_REUSED' } });
     expect(db.auditLog.create).not.toHaveBeenCalled();
+  });
+
+  it('persists both independent catalog choices and the selected shift', async () => {
+    const { app, db } = fixture();
+    const body = {
+      ...intake,
+      preferredHallId: id,
+      preferredMenuVersionId: secondId,
+      preferredShift: 'LUNCH',
+    };
+    db.consultationRequest.findUniqueOrThrow.mockResolvedValue({
+      ...record(),
+      payloadHash: createHash('sha256')
+        .update(JSON.stringify(consultationRequestBodySchema.parse(body)))
+        .digest('hex'),
+    });
+    const response = await request(app).post('/api/v1/consultation-requests').send(body);
+    expect(response.status).toBe(202);
+    expect(db.consultationRequest.createMany.mock.calls).toMatchObject([
+      [
+        {
+          data: { preferredHallId: id, preferredMenuVersionId: secondId, preferredShift: 'LUNCH' },
+        },
+      ],
+    ]);
+  });
+
+  it('rejects a retired selection without writing an intake', async () => {
+    const { app, db } = fixture();
+    db.hall.findFirst.mockResolvedValue(null);
+    const response = await request(app)
+      .post('/api/v1/consultation-requests')
+      .send({ ...intake, preferredHallId: id });
+    expect(response.status).toBe(422);
+    expect(db.consultationRequest.createMany).not.toHaveBeenCalled();
   });
 
   it('does not expose management intake to a couple', async () => {
@@ -253,6 +294,7 @@ describe('booking intake and couple overview HTTP contract', () => {
         id,
         consultationId,
         eventDate: new Date('2026-12-20T00:00:00Z'),
+        consultation: { brideName: 'Lan', groomName: 'Minh' },
         phase: 'CONFIRMED',
         shiftCode: 'DINNER',
         planningHeadcount: 200,
@@ -299,6 +341,7 @@ describe('booking intake and couple overview HTTP contract', () => {
       id,
       consultationId,
       eventDate: new Date('2026-12-20T00:00:00Z'),
+      consultation: { brideName: 'Lan', groomName: 'Minh' },
       phase: 'DRAFT',
       shiftCode: 'LUNCH',
       planningHeadcount: 200,

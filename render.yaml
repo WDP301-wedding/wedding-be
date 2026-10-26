@@ -27,7 +27,7 @@ services:
       sizeGB: 1
     # Render's fromDatabase connectionString has no query string. Require TLS on
     # the private network; libpq-compatible require supports Render's internal CA.
-    # No migration runs at startup: import and compare the new DB first.
+    # The initial data import is complete. Apply pending migrations before API startup.
     dockerCommand: /bin/sh ./scripts/render-start.sh
     envVars:
       - key: STORAGE_DRIVER

@@ -11,6 +11,9 @@ case "${MIGRATION_DATABASE_URL:?}" in
 esac
 export DATABASE_URL="${DATABASE_URL}?sslmode=require&uselibpqcompat=true"
 export MIGRATION_DATABASE_URL="${MIGRATION_DATABASE_URL}?sslmode=require&uselibpqcompat=true"
+# Apply additive releases against this service's configured database. Prisma's
+# migration lock serializes retries; set -e prevents starting an incompatible API.
+npm run db:migrate:deploy
 if [ "${STORAGE_IMPORT_FROM_SUPABASE:-false}" = 'true' ]; then
   node ./scripts/render-copy-media.mjs
 fi

@@ -701,6 +701,9 @@ model ConsultationRequest {
   phone          String
   preferredDate  DateTime?     @db.Date
   expectedGuests Int?
+  preferredHallId String? @db.Uuid
+  preferredMenuVersionId String? @db.Uuid
+  preferredShift RestaurantShiftCode?
   message        String
   status         String        @default("NEW")
   consultationId String?       @unique @db.Uuid

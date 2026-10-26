@@ -108,7 +108,9 @@ describe('PrismaConsultationRepository', () => {
         code:
           stored === null || stored.managerAccountId === 'outsider'
             ? 'BOOKING_NOT_FOUND'
-            : 'STALE_BOOKING_REVISION',
+            : stored.booking !== null
+              ? 'BOOKING_ALREADY_EXISTS'
+              : 'STALE_BOOKING_REVISION',
       });
     }
     transaction.consultation.findUnique.mockResolvedValue(consultation);

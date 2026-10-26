@@ -19,6 +19,10 @@ import {
   intakeActionSchema,
   intakeListSchema,
   intakeQuerySchema,
+  consultationWorkspaceParamsSchema,
+  consultationWorkspaceResponseSchema,
+  consultationCustomerQuerySchema,
+  consultationCustomersResponseSchema,
   overviewResponseSchema,
   updateBookingAliasBodySchema,
   updateBookingAliasResponseSchema,
@@ -117,6 +121,22 @@ function operation(
   };
 }
 export const experienceOpenApiPaths: NonNullable<ZodOpenApiObject['paths']> = {
+  '/management/consultations/{consultationId}/workspace': {
+    get: {
+      ...operation('getConsultationWorkspace', consultationWorkspaceResponseSchema),
+      requestParams: { path: consultationWorkspaceParamsSchema },
+      description:
+        'Owning Manager only; private no-store. Resolves the current consultation and its existing booking before resuming work. Foreign resources are concealed.',
+    },
+  },
+  '/management/consultation-customers': {
+    get: {
+      ...operation('searchConsultationCustomers', consultationCustomersResponseSchema),
+      requestParams: { query: consultationCustomerQuerySchema },
+      description:
+        'Search only the Manager own consultation contacts by name, email or intake phone. At most 15 distinct emails. Reusing contact details never grants account access or reuses a booking.',
+    },
+  },
   '/management/consultations/{consultationId}/activation-status': {
     get: {
       ...operation('getConsultationActivationStatus', activationResponse),
@@ -207,6 +227,8 @@ export const experienceOpenApiSchemas = {
   PasswordOtpCompletionBody: otpCompletionSchema,
   ConsultationRequestBody: consultationRequestBodySchema,
   ConsultationRequestList: intakeListSchema,
+  ConsultationWorkspaceResponse: consultationWorkspaceResponseSchema,
+  ConsultationCustomersResponse: consultationCustomersResponseSchema,
   CoupleOverviewResponse: overviewResponseSchema,
   UpdateBookingAliasBody: updateBookingAliasBodySchema,
   UpdateBookingAliasResponse: updateBookingAliasResponseSchema,

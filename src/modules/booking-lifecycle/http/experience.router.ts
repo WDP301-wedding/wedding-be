@@ -3,6 +3,7 @@ import { Router, type Response } from 'express';
 import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
 import { AppError } from '../../../core/errors/app-error.js';
 import { createGeneralRateLimit } from '../../../core/http/rate-limit.js';
+import { createConsultationWorkspaceRouter } from './consultation-workspace.router.js';
 import { validateRequest, validatedRequest } from '../../../core/http/validate.js';
 import {
   createAuthenticatedActorMiddleware,
@@ -31,6 +32,7 @@ export function createBookingExperienceRouter(
   redisClient?: Redis | null,
 ) {
   const router = Router();
+  router.use('/management', createConsultationWorkspaceRouter(prisma, resolver));
   const authenticate = createAuthenticatedActorMiddleware(resolver);
   router.post(
     '/consultation-requests',
@@ -41,9 +43,37 @@ export function createBookingExperienceRouter(
       const payloadHash = createHash('sha256').update(JSON.stringify(body)).digest('hex');
       const { preferredDate, ...fields } = body;
       await prisma.$transaction(async (tx) => {
+        // Check selections only for a new submission; identical durable retries remain valid
+        // even when the catalog has since changed.
+        const replay = await tx.consultationRequest.findUnique({
+          where: { submissionId: body.submissionId },
+        });
+        if (replay) {
+          if (replay.payloadHash !== payloadHash) throw failure(409, 'SUBMISSION_KEY_REUSED');
+          return;
+        }
+        if (
+          body.preferredHallId &&
+          !(await tx.hall.findFirst({
+            where: { id: body.preferredHallId, lifecycle: 'ACTIVE' },
+            select: { id: true },
+          }))
+        )
+          throw failure(422, 'CONSULTATION_HALL_UNAVAILABLE');
+        if (
+          body.preferredMenuVersionId &&
+          !(await tx.menuPackage.findFirst({
+            where: { lifecycle: 'ACTIVE', currentPublishedVersionId: body.preferredMenuVersionId },
+            select: { id: true },
+          }))
+        )
+          throw failure(422, 'CONSULTATION_MENU_UNAVAILABLE');
         const created = await tx.consultationRequest.createMany({
           data: {
             ...fields,
+            preferredHallId: fields.preferredHallId ?? null,
+            preferredMenuVersionId: fields.preferredMenuVersionId ?? null,
+            preferredShift: fields.preferredShift ?? null,
             brideName: fields.brideName ?? null,
             groomName: fields.groomName ?? null,
             payloadHash,
@@ -122,7 +152,11 @@ export function createBookingExperienceRouter(
             throw failure(409, 'CONSULTATION_LIST_CHANGED');
           const [rows, grouped] = await Promise.all([
             tx.consultationRequest.findMany({
-              include: { consultation: { select: { revision: true } } },
+              include: {
+                consultation: {
+                  select: { revision: true, booking: { select: { id: true, phase: true } } },
+                },
+              },
               where,
               orderBy: [primary, { id: 'desc' }],
               take: query.limit + 1,
@@ -157,6 +191,11 @@ export function createBookingExperienceRouter(
             status: item.status,
             consultationId: item.consultationId,
             consultationRevision: item.consultation?.revision ?? null,
+            bookingId: item.consultation?.booking?.id ?? null,
+            bookingPhase: item.consultation?.booking?.phase ?? null,
+            preferredHallId: item.preferredHallId ?? null,
+            preferredMenuVersionId: item.preferredMenuVersionId ?? null,
+            preferredShift: item.preferredShift ?? null,
             createdAt: item.createdAt.toISOString(),
           })),
           counts,
@@ -368,11 +407,7 @@ export function createBookingExperienceRouter(
         if (!access) throw failure(403, 'FORBIDDEN');
       }
       const normalizedAlias =
-        body.alias !== undefined
-          ? body.alias
-            ? body.alias.normalize('NFC')
-            : null
-          : undefined;
+        body.alias !== undefined ? (body.alias ? body.alias.normalize('NFC') : null) : undefined;
       const updated = await prisma.$transaction(async (tx) => {
         const result = await tx.booking.update({
           where: {

@@ -27,6 +27,9 @@ export const consultationRequestBodySchema = z.strictObject({
     })
     .nullable(),
   expectedGuests: z.number().int().min(1).max(10000).nullable(),
+  preferredHallId: z.uuid().nullable().optional(),
+  preferredMenuVersionId: z.uuid().nullable().optional(),
+  preferredShift: z.enum(['LUNCH', 'DINNER']).nullable().optional(),
   message: z.string().trim().max(2000),
 });
 export const intakeAcknowledgementSchema = z.strictObject({
@@ -44,6 +47,8 @@ export const intakeRecordSchema = consultationRequestBodySchema
     status: intakeStatusSchema,
     consultationId: z.uuid().nullable(),
     consultationRevision: z.number().int().positive().nullable(),
+    bookingId: z.uuid().nullable().optional(),
+    bookingPhase: z.string().nullable().optional(),
     createdAt: z.iso.datetime(),
   });
 export const intakeListSchema = z.strictObject({
@@ -74,6 +79,31 @@ export const intakeQuerySchema = experienceQuerySchema.extend({
   sort: z.enum(['newest', 'oldest', 'date-asc', 'guests-desc', 'name-asc']).default('newest'),
 });
 export const intakeParamsSchema = z.strictObject({ id: z.uuid() });
+export const consultationWorkspaceParamsSchema = z.strictObject({ consultationId: z.uuid() });
+export const consultationWorkspaceResponseSchema = z.strictObject({
+  data: z.strictObject({
+    consultationId: z.uuid(),
+    revision: z.int().positive(),
+    displayName: z.string(),
+    email: z.string(),
+    note: z.string().nullable(),
+    bookingId: z.uuid().nullable(),
+    bookingPhase: z.string().nullable(),
+    preferredDate: z.iso.date().nullable(),
+    expectedGuests: z.int().nullable(),
+    preferredHallId: z.uuid().nullable(),
+    preferredMenuVersionId: z.uuid().nullable(),
+    preferredShift: z.enum(['LUNCH', 'DINNER']).nullable(),
+  }),
+});
+export const consultationCustomerQuerySchema = z.strictObject({
+  q: z.string().trim().min(2).max(120),
+});
+export const consultationCustomersResponseSchema = z.strictObject({
+  data: z.array(
+    z.strictObject({ consultationId: z.uuid(), displayName: z.string(), email: z.string() }),
+  ),
+});
 export const overviewQuerySchema = experienceQuerySchema.extend({
   client: z.enum(['WEB', 'ANDROID']).default('WEB'),
 });
@@ -90,7 +120,9 @@ export const overviewItemSchema = z.strictObject({
   coupleApproved: z.boolean(),
   hasTimeline: z.boolean(),
   revision: z.number().int().positive().optional(),
-  eventType: z.enum(['WEDDING', 'ENGAGEMENT', 'RECEPTION', 'ANNIVERSARY', 'OTHER']).default('WEDDING'),
+  eventType: z
+    .enum(['WEDDING', 'ENGAGEMENT', 'RECEPTION', 'ANNIVERSARY', 'OTHER'])
+    .default('WEDDING'),
   alias: z.string().nullable().optional(),
   brideName: coupleNameSchema.nullable().optional(),
   groomName: coupleNameSchema.nullable().optional(),
