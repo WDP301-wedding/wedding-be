@@ -18,15 +18,11 @@ RUN npm install --global npm@11.19.0
 COPY package.json package-lock.json ./
 RUN npm ci --include=dev
 
-# Prisma client generation layer (cached unless prisma schema or config changes)
+# Source code & Prisma schema (tsconfig.json is required by Prisma for NodeNext .js imports)
 COPY prisma ./prisma
-COPY prisma.config.ts ./
-RUN npm run db:generate
-
-# Source code & compilation layer
-COPY tsconfig.json tsconfig.build.json ./
+COPY prisma.config.ts tsconfig.json tsconfig.build.json ./
 COPY src ./src
-RUN npm run build
+RUN npm run db:generate && npm run build
 
 # ------------------------------------------------------------------------------
 # 3. Production runtime stage
