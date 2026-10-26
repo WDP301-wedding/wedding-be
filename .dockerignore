@@ -19,3 +19,7 @@ playwright-report
 *.p12
 credentials.json
 service-account*.json
+docs
+tasks
+tests
+.vscode
