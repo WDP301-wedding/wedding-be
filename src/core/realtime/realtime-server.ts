@@ -1,3 +1,4 @@
+import { readPublicationSnapshots } from './invitation-publication-snapshot.js';
 import type { Server as HttpServer } from 'node:http';
 import { Server as SocketIOServer, type Socket } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
@@ -74,7 +75,11 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
   if (redisManager.isConfigured) {
     const pubSub = redisManager.createPubSubPair();
     if (pubSub) {
-      io.adapter(createAdapter(pubSub.pub, pubSub.sub, { key: `wedding:${config.runtime.environment}:socket.io` }));
+      io.adapter(
+        createAdapter(pubSub.pub, pubSub.sub, {
+          key: `wedding:${config.runtime.environment}:socket.io`,
+        }),
+      );
       logger?.info('Socket.IO Redis multi-instance fanout adapter enabled.');
     }
   }
@@ -93,7 +98,10 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
     if (trustedHops === 1) {
       const forwarded = socket.handshake.headers['x-forwarded-for'];
       if (typeof forwarded === 'string' && forwarded.trim()) {
-        const parts = forwarded.split(',').map((p) => p.trim()).filter(Boolean);
+        const parts = forwarded
+          .split(',')
+          .map((p) => p.trim())
+          .filter(Boolean);
         if (parts.length > 0) {
           return parts[parts.length - 1]!;
         }
@@ -199,11 +207,16 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
         );
 
         // Reserve IP/account slots atomically across nodes; failures are fail-closed.
-        if (!await limits.reserve(clientIp, actor.accountId, socket.id)) {
+        if (!(await limits.reserve(clientIp, actor.accountId, socket.id))) {
           return next(new Error('CONNECTION_LIMIT_EXCEEDED'));
         }
-        const release = () => { void limits.release(clientIp, actor.accountId, socket.id)
-          .catch(err => logger?.warn({ err }, 'Socket reservation release failed; TTL will expire it.')); };
+        const release = () => {
+          void limits
+            .release(clientIp, actor.accountId, socket.id)
+            .catch((err) =>
+              logger?.warn({ err }, 'Socket reservation release failed; TTL will expire it.'),
+            );
+        };
         socket.once('disconnect', release);
         socket.conn.once('close', release);
 
@@ -263,15 +276,42 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
     void (async () => {
       await authorizeAudience(sockets, []);
       for (const socket of sockets) {
-        if (socket.connected && !await limits.reserve(extractClientIp(socket), socket.data.actor.accountId, socket.id)) {
+        if (
+          socket.connected &&
+          !(await limits.reserve(extractClientIp(socket), socket.data.actor.accountId, socket.id))
+        ) {
           socket.disconnect(true);
         }
       }
-    })().catch(err => {
-      logger?.warn({ err }, 'Realtime authorization audit failed closed.');
-      for (const socket of sockets) socket.disconnect(true);
-    }).finally(() => { auditing = false; });
+    })()
+      .catch((err) => {
+        logger?.warn({ err }, 'Realtime authorization audit failed closed.');
+        for (const socket of sockets) socket.disconnect(true);
+      })
+      .finally(() => {
+        auditing = false;
+      });
   }, 5_000);
+
+  async function emitPublicationSnapshot(socket: ConnectedSocket, bookingId: string) {
+    try {
+      const publication = (await readPublicationSnapshots(prisma, [bookingId])).get(bookingId);
+      if (socket.connected && (await validateSocketSession(socket))) {
+        // Reuse authorized dispatch so grant revocation between subscribe and read stays fail-closed.
+        await broker.publish({
+          eventId: crypto.randomUUID(),
+          schemaVersion: 1,
+          type: 'print_order.updated',
+          scope: { entityType: 'account', entityId: socket.data.actor.accountId, bookingId },
+          resources: [`/bookings/${bookingId}/invitations`],
+          occurredAt: new Date().toISOString(),
+          payload: { publication },
+        });
+      }
+    } catch (err) {
+      logger?.warn({ err, bookingId }, 'Publication resync failed.');
+    }
+  }
 
   // Connection Lifecycle
   io.on('connection', async (socket) => {
@@ -280,7 +320,11 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
     // if handlers captured actor at connect-time they would see stale roles after
     // a role change.  Each handler must read socket.data.actor at call time.
     logger?.debug(
-      { accountId: socket.data.actor.accountId, roles: socket.data.actor.roles, socketId: socket.id },
+      {
+        accountId: socket.data.actor.accountId,
+        roles: socket.data.actor.roles,
+        socketId: socket.id,
+      },
       'Realtime socket connected.',
     );
 
@@ -299,15 +343,21 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
 
     // Preserve the per-socket policy, with Redis as the shared counter authority.
     socket.use((_packet, next) => {
-      void limits.acceptMessage(socket.data.actor.accountId, socket.id).then(accepted => {
-        if (accepted) { next(); return; }
-        socket.disconnect(true);
-        next(new Error('RATE_LIMIT_EXCEEDED'));
-      }).catch(err => {
-        logger?.warn({ err }, 'Realtime rate limiter failed closed.');
-        socket.disconnect(true);
-        next(new Error('RATE_LIMIT_UNAVAILABLE'));
-      });
+      void limits
+        .acceptMessage(socket.data.actor.accountId, socket.id)
+        .then((accepted) => {
+          if (accepted) {
+            next();
+            return;
+          }
+          socket.disconnect(true);
+          next(new Error('RATE_LIMIT_EXCEEDED'));
+        })
+        .catch((err) => {
+          logger?.warn({ err }, 'Realtime rate limiter failed closed.');
+          socket.disconnect(true);
+          next(new Error('RATE_LIMIT_UNAVAILABLE'));
+        });
     });
 
     // 4. Booking subscription handler with shape validation and authorization
@@ -319,7 +369,10 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
           return;
         }
 
-        if (!socket.data.subscriptions.has(bookingId) && socket.data.subscriptions.size >= MAX_SUBSCRIPTIONS_PER_SOCKET) {
+        if (
+          !socket.data.subscriptions.has(bookingId) &&
+          socket.data.subscriptions.size >= MAX_SUBSCRIPTIONS_PER_SOCKET
+        ) {
           socket.emit('subscription:denied', {
             reason: 'SUBSCRIPTION_LIMIT_EXCEEDED',
             bookingId,
@@ -339,6 +392,7 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
           await socket.join(`booking:${bookingId}`);
           socket.data.subscriptions.add(bookingId);
           socket.emit('subscription:confirmed', { room: `booking:${bookingId}` });
+          await emitPublicationSnapshot(socket, bookingId);
           return;
         }
 
@@ -370,6 +424,7 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
           await socket.join(`booking:${bookingId}`);
           socket.data.subscriptions.add(bookingId);
           socket.emit('subscription:confirmed', { room: `booking:${bookingId}` });
+          if (grant.level === 'FULL') await emitPublicationSnapshot(socket, bookingId);
           return;
         }
 

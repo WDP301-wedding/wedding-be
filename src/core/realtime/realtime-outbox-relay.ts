@@ -1,3 +1,4 @@
+import { readPublicationSnapshots } from './invitation-publication-snapshot.js';
 import type { PrismaClient } from '../../generated/prisma/client.js';
 import type { Logger } from 'pino';
 import type { RedisManager } from '../redis/redis-client.js';
@@ -38,15 +39,19 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
     if (claims.length === 0) return 0;
     let dispatched = 0;
     try {
-      const rows = new Map((await fetchBatch([...new Set(claims.map(c => c.eventId))]))
-        .map(row => [getId(row), row]));
+      const rows = new Map(
+        (await fetchBatch([...new Set(claims.map((c) => c.eventId))])).map((row) => [
+          getId(row),
+          row,
+        ]),
+      );
       for (const claim of claims) {
         try {
-          if (!await queue.renew(stream, claim)) continue;
+          if (!(await queue.renew(stream, claim))) continue;
           const row = rows.get(claim.eventId);
           const converted = row ? toEvent(row) : null;
-          const events: readonly RealtimeEvent[] = converted === null
-            ? [] : 'eventId' in converted ? [converted] : converted;
+          const events: readonly RealtimeEvent[] =
+            converted === null ? [] : 'eventId' in converted ? [converted] : converted;
           for (const event of events) {
             // A notification row can change revision between claim and read. Its
             // queued revision remains a distinct invalidation, never a cursor fence.
@@ -61,7 +66,7 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
       }
     } finally {
       // Token check makes release harmless for delivered/reclaimed claims.
-      await Promise.all(claims.map(claim => queue.finish(stream, claim, false)));
+      await Promise.all(claims.map((claim) => queue.finish(stream, claim, false)));
     }
     return dispatched;
   }
@@ -69,13 +74,18 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
   const identityRecipients = new Map<string, readonly string[]>();
   const bookingRecipients = new Map<string, readonly string[]>();
   async function resolveRecipients(ids: string[], kind: 'consultation' | 'booking') {
-    const bookings = kind === 'booking' ? await prisma.booking.findMany({
-      where: { id: { in: ids } }, select: { id: true, consultationId: true },
-    }) : [];
+    const bookings =
+      kind === 'booking'
+        ? await prisma.booking.findMany({
+            where: { id: { in: ids } },
+            select: { id: true, consultationId: true },
+          })
+        : [];
     const grants = await prisma.consultationAccess.findMany({
-      where: kind === 'consultation'
-        ? { consultationId: { in: ids } }
-        : { consultationId: { in: bookings.map(row => row.consultationId) } },
+      where:
+        kind === 'consultation'
+          ? { consultationId: { in: ids } }
+          : { consultationId: { in: bookings.map((row) => row.consultationId) } },
       select: { accountId: true, consultationId: true },
     });
     const byConsultation = new Map<string, string[]>();
@@ -89,7 +99,8 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
       for (const id of ids) identityRecipients.set(id, byConsultation.get(id) ?? []);
     } else {
       bookingRecipients.clear();
-      for (const row of bookings) bookingRecipients.set(row.id, byConsultation.get(row.consultationId) ?? []);
+      for (const row of bookings)
+        bookingRecipients.set(row.id, byConsultation.get(row.consultationId) ?? []);
     }
   }
 
@@ -106,7 +117,10 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
             orderBy: [{ occurredAt: 'asc' }, { id: 'asc' }],
             where: { id: { in: ids } },
           });
-          await resolveRecipients(rows.map(row => row.aggregateId), 'booking');
+          await resolveRecipients(
+            rows.map((row) => row.aggregateId),
+            'booking',
+          );
           return rows;
         },
         (row) => row.id,
@@ -114,38 +128,43 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
           let eventType: RealtimeEventType = 'booking.updated';
           if (row.eventType.includes('timeline')) {
             eventType = 'timeline.updated';
-          } else if (row.eventType.includes('contract')) {
+          } else if (row.eventType.includes('contract') || row.eventType.includes('appendix')) {
             eventType = 'contract.updated';
           } else if (row.eventType.includes('deposit')) {
             eventType = 'deposit.received';
           } else if (row.eventType.includes('proposal')) {
             eventType = 'proposal.updated';
           }
-          return [{
-            eventId: row.id,
-            schemaVersion: 1,
-            type: eventType,
-            scope: {
-              entityType: 'booking',
-              bookingId: row.aggregateId,
-              revision: row.aggregateRevision,
+          return [
+            {
+              eventId: row.id,
+              schemaVersion: 1,
+              type: eventType,
+              scope: {
+                entityType: 'booking',
+                bookingId: row.aggregateId,
+                revision: row.aggregateRevision,
+              },
+              resources: [
+                `/bookings/${row.aggregateId}`,
+                `/bookings/${row.aggregateId}/timeline`,
+                `/bookings/${row.aggregateId}/proposal`,
+                `/bookings/${row.aggregateId}/contracts`,
+                `/bookings/${row.aggregateId}/contract-appendices`,
+                `/couple/bookings`,
+              ],
+              occurredAt: row.occurredAt.toISOString(),
+              payload: { eventType: row.eventType },
             },
-            resources: [
-              `/bookings/${row.aggregateId}`,
-              `/bookings/${row.aggregateId}/timeline`,
-              `/bookings/${row.aggregateId}/proposal`,
-              `/couple/bookings`,
-            ],
-            occurredAt: row.occurredAt.toISOString(),
-            payload: { eventType: row.eventType },
-          }, ...(bookingRecipients.get(row.aggregateId) ?? []).map(accountId => ({
-            eventId: row.id + ':' + accountId,
-            schemaVersion: 1 as const,
-            type: 'booking.updated' as const,
-            scope: { entityType: 'account' as const, entityId: accountId },
-            resources: ['/couple/bookings'],
-            occurredAt: row.occurredAt.toISOString(),
-          }))];
+            ...(bookingRecipients.get(row.aggregateId) ?? []).map((accountId) => ({
+              eventId: row.id + ':' + accountId,
+              schemaVersion: 1 as const,
+              type: 'booking.updated' as const,
+              scope: { entityType: 'account' as const, entityId: accountId },
+              resources: ['/couple/bookings'],
+              occurredAt: row.occurredAt.toISOString(),
+            })),
+          ];
         },
       );
 
@@ -232,12 +251,18 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
       // 5. InvitationStudioOutbox
       dispatched += await processStreamBatch(
         'studio',
-        (ids) =>
-          prisma.invitationStudioOutbox.findMany({
+        async (ids) => {
+          const rows = await prisma.invitationStudioOutbox.findMany({
             take: 50,
             orderBy: [{ createdAt: 'asc' }, { eventId: 'asc' }],
             where: { eventId: { in: ids } },
-          }),
+          });
+          const snapshots = await readPublicationSnapshots(
+            prisma,
+            rows.map((row) => row.bookingId),
+          );
+          return rows.map((row) => ({ ...row, publication: snapshots.get(row.bookingId) }));
+        },
         (row) => row.eventId,
         (row) => ({
           eventId: row.eventId,
@@ -249,7 +274,7 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
           },
           resources: [`/management/print-orders`, `/bookings/${row.bookingId}/invitation-studio`],
           occurredAt: row.createdAt.toISOString(),
-          payload: { eventType: row.eventType },
+          payload: { eventType: row.eventType, publication: row.publication },
         }),
       );
 
@@ -264,26 +289,32 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
               orderBy: [{ occurredAt: 'asc' }, { eventId: 'asc' }],
               where: { eventId: { in: ids } },
             });
-            await resolveRecipients(rows.map(row => row.consultationId), 'consultation');
+            await resolveRecipients(
+              rows.map((row) => row.consultationId),
+              'consultation',
+            );
             return rows;
           },
           (row) => row.eventId,
-          (row) => [{
-            eventId: row.eventId,
-            schemaVersion: 1,
-            type: 'booking.updated' as const,
-            scope: { entityType: 'booking' as const },
-            resources: ['/couple/bookings', '/management/consultations'],
-            occurredAt: row.occurredAt.toISOString(),
-            payload: { eventType: row.eventType },
-          }, ...(identityRecipients.get(row.consultationId) ?? []).map(accountId => ({
-            eventId: row.eventId + ':' + accountId,
-            schemaVersion: 1 as const,
-            type: 'booking.updated' as const,
-            scope: { entityType: 'account' as const, entityId: accountId },
-            resources: ['/couple/bookings'],
-            occurredAt: row.occurredAt.toISOString(),
-          }))],
+          (row) => [
+            {
+              eventId: row.eventId,
+              schemaVersion: 1,
+              type: 'booking.updated' as const,
+              scope: { entityType: 'booking' as const },
+              resources: ['/couple/bookings', '/management/consultations'],
+              occurredAt: row.occurredAt.toISOString(),
+              payload: { eventType: row.eventType },
+            },
+            ...(identityRecipients.get(row.consultationId) ?? []).map((accountId) => ({
+              eventId: row.eventId + ':' + accountId,
+              schemaVersion: 1 as const,
+              type: 'booking.updated' as const,
+              scope: { entityType: 'account' as const, entityId: accountId },
+              resources: ['/couple/bookings'],
+              occurredAt: row.occurredAt.toISOString(),
+            })),
+          ],
         );
       }
 
@@ -356,16 +387,60 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
               where: { id: { in: ids } },
             }),
           (row) => row.id,
-          (row) => Object.hasOwn(catalogResources, row.entityType) ? ({
-            eventId: row.id,
-            schemaVersion: 1,
-            type: 'catalog.updated',
-            scope: {
-              entityType: 'catalog',
-            },
-            resources: resourcesForCatalogEntity(row.entityType) ?? [],
-            occurredAt: row.occurredAt.toISOString(),
-          }) : null,
+          (row) => {
+            if (
+              ['consultation-request', 'STAFF_OPERATIONS', 'invitation-design'].includes(
+                row.entityType,
+              )
+            ) {
+              const metadata =
+                row.metadata !== null &&
+                typeof row.metadata === 'object' &&
+                !Array.isArray(row.metadata)
+                  ? row.metadata
+                  : {};
+              const candidate = metadata['bookingId'];
+              const bookingId =
+                typeof candidate === 'string' &&
+                /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/iu.test(candidate)
+                  ? candidate
+                  : undefined;
+              if (row.entityType !== 'consultation-request' && !bookingId) return null;
+              return {
+                eventId: row.id,
+                schemaVersion: 1,
+                type:
+                  row.entityType === 'invitation-design'
+                    ? 'print_order.updated'
+                    : 'booking.updated',
+                scope: {
+                  entityType: row.entityType === 'invitation-design' ? 'print_order' : 'booking',
+                  ...(bookingId ? { bookingId } : {}),
+                },
+                resources: !bookingId
+                  ? ['/management/consultation-requests']
+                  : row.entityType === 'invitation-design'
+                    ? [`/bookings/${bookingId}/invitations`]
+                    : [
+                        `/bookings/${bookingId}/staff-assignments`,
+                        `/bookings/${bookingId}/check-in-configuration`,
+                      ],
+                occurredAt: row.occurredAt.toISOString(),
+              };
+            }
+            return Object.hasOwn(catalogResources, row.entityType)
+              ? {
+                  eventId: row.id,
+                  schemaVersion: 1,
+                  type: 'catalog.updated',
+                  scope: {
+                    entityType: 'catalog',
+                  },
+                  resources: resourcesForCatalogEntity(row.entityType) ?? [],
+                  occurredAt: row.occurredAt.toISOString(),
+                }
+              : null;
+          },
         );
       }
     } catch (err) {

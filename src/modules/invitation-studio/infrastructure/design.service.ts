@@ -256,7 +256,14 @@ export class DesignService {
             currentRevisionId: revisionId,
           },
         });
-        await this.repository.audit(tx, scoped, 'invitation.design-created', designId, 1);
+        await this.repository.audit(
+          tx,
+          scoped,
+          'invitation.design-created',
+          designId,
+          1,
+          input.bookingId,
+        );
         return designViewSchema.parse({
           ...content,
           designId,
@@ -315,7 +322,14 @@ export class DesignService {
           where: { id: current.id },
           data: { revision: number, currentRevisionId: revisionId },
         });
-        await this.repository.audit(tx, scoped, 'invitation.design-revised', current.id, number);
+        await this.repository.audit(
+          tx,
+          scoped,
+          'invitation.design-revised',
+          current.id,
+          number,
+          input.bookingId,
+        );
         return designViewSchema.parse({
           ...content,
           designId: current.id,

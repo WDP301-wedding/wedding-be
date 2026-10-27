@@ -258,6 +258,17 @@ export function createBookingExperienceRouter(
             metadata: { intakeRequestId: item.id },
           },
         });
+        await tx.auditLog.create({
+          data: {
+            requestId: request.requestId,
+            actorType: 'USER',
+            actorId: actor.accountId,
+            action: 'booking.intake-converted',
+            entityType: 'consultation-request',
+            entityId: item.id,
+            metadata: {},
+          },
+        });
         return { consultationId: consultation.id, consultationRevision: consultation.revision };
       });
       response.json(intakeActionSchema.parse({ data: converted }));

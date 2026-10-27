@@ -146,6 +146,7 @@ export class StudioRepository {
     action: string,
     entityId: string,
     revision: number,
+    bookingId?: string,
   ) {
     await createPrismaAuditRepository(tx).append({
       occurredAt: new Date(),
@@ -157,6 +158,18 @@ export class StudioRepository {
       entityId,
       metadata: { revision },
     });
+    if (bookingId)
+      await tx.auditLog.create({
+        data: {
+          requestId: context.requestId,
+          actorType: 'USER',
+          actorId: context.actorId,
+          action: 'invitation.design-invalidated',
+          entityType: 'invitation-design',
+          entityId,
+          metadata: { bookingId, revision },
+        },
+      });
   }
   async publicationEvent(
     tx: Prisma.TransactionClient,
