@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import { AppError } from '../../../core/errors/app-error.js';
-import {
+import type {
   Prisma,
-  type BillingLedgerEntry as StoredEntry,
-  type BillingPaymentAttempt as StoredAttempt,
+  BillingLedgerEntry as StoredEntry,
+  BillingPaymentAttempt as StoredAttempt,
 } from '../../../generated/prisma/client.js';
 import type {
   LedgerEntry,

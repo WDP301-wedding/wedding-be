@@ -42,6 +42,22 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
               },
             ]
           : proposalMenuLinesSchema.parse(snapshot.menus);
+      const approvedContract =
+        booking.commercialContract?.currentRevision?.state === 'APPROVED'
+          ? booking.commercialContract.currentRevision
+          : null;
+      const baseChargeVnd =
+        approvedContract !== null
+          ? decimalNumber(approvedContract.contractTotalVnd)
+          : decimalNumber(snapshot.baseChargeVnd);
+      const depositAmountVnd =
+        approvedContract !== null
+          ? decimalNumber(approvedContract.depositAmountVnd)
+          : decimalNumber(snapshot.depositAmountVnd);
+      const contractDocument = approvedContract?.document as
+        | Readonly<{ tableCount?: number }>
+        | undefined;
+      const tableCount = contractDocument?.tableCount ?? snapshot.tableCount;
       return immutable({
         bookingId: booking.id,
         consultationId: booking.consultationId,
@@ -68,9 +84,9 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
           },
           menu,
           menus,
-          tableCount: snapshot.tableCount,
-          baseChargeVnd: decimalNumber(snapshot.baseChargeVnd),
-          depositAmountVnd: decimalNumber(snapshot.depositAmountVnd),
+          tableCount,
+          baseChargeVnd,
+          depositAmountVnd,
         },
         timeline: timelineView(booking.currentTimelineRevision),
         effectiveTimeline: timelineView(booking.effectiveTimelineRevision),
@@ -137,6 +153,18 @@ async function requireProposal(prisma: PrismaClient, bookingId: string) {
         select: { id: true, reason: true, requestedAt: true },
       },
       consultation: { select: { managerAccountId: true } },
+      commercialContract: {
+        select: {
+          currentRevision: {
+            select: {
+              state: true,
+              contractTotalVnd: true,
+              depositAmountVnd: true,
+              document: true,
+            },
+          },
+        },
+      },
       proposalSnapshot: true,
       currentTimelineRevision: {
         select: {
