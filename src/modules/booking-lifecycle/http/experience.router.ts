@@ -355,8 +355,8 @@ export function createBookingExperienceRouter(
             revision: booking.revision,
             eventType: booking.eventType,
             alias: booking.alias,
-            brideName: booking.consultation?.brideName ?? '',
-            groomName: booking.consultation?.groomName ?? '',
+            brideName: booking.consultation?.brideName ?? null,
+            groomName: booking.consultation?.groomName ?? null,
             totalVnd: booking.proposalSnapshot?.baseChargeVnd
               ? Number(booking.proposalSnapshot.baseChargeVnd)
               : undefined,

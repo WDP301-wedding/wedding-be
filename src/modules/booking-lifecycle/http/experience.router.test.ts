@@ -5,7 +5,7 @@ import { createApp } from '../../../app.js';
 import type { Prisma, PrismaClient } from '../../../generated/prisma/client.js';
 import type { AuthenticatedActor } from '../../identity-access/authorization/authenticated-actor.middleware.js';
 import { createBookingExperienceRouter } from './experience.router.js';
-import { consultationRequestBodySchema } from './experience.schemas.js';
+import { consultationRequestBodySchema, overviewResponseSchema } from './experience.schemas.js';
 
 const id = '00000000-0000-4000-8000-000000000001';
 const secondId = '00000000-0000-4000-8000-000000000002';
@@ -332,6 +332,47 @@ describe('booking intake and couple overview HTTP contract', () => {
           skip: 1,
         }),
       );
+    },
+  );
+
+  it.each(['WEB', 'ANDROID'] as const)(
+    'preserves nullable couple names in the %s overview without failing other bookings',
+    async (client) => {
+      const { app, db } = fixture();
+      const profiles = [
+        { brideName: null, groomName: null },
+        { brideName: 'Lan', groomName: null },
+        { brideName: null, groomName: 'Minh' },
+        { brideName: 'Lan', groomName: 'Minh' },
+      ];
+      db.booking.findMany.mockResolvedValue(
+        profiles.map((consultation, index) => ({
+          id: `00000000-0000-4000-8000-00000000000${index + 1}`,
+          consultationId,
+          eventDate: new Date('2026-12-20T00:00:00Z'),
+          consultation,
+          phase: 'DRAFT',
+          shiftCode: 'LUNCH',
+          planningHeadcount: 200,
+          revision: 1,
+          eventType: 'WEDDING',
+          alias: null,
+          proposalSnapshot: null,
+          depositSettlement: null,
+          currentTimelineRevision: null,
+        })),
+      );
+      const response = await request(app)
+        .get(`/api/v1/couple/bookings?client=${client}&limit=50`)
+        .set('Authorization', 'Bearer token');
+      expect(response.status).toBe(200);
+      expect(response.headers['cache-control']).toBe('no-store');
+      const body = overviewResponseSchema.parse(response.body);
+      expect(body.data).toHaveLength(profiles.length);
+      profiles.forEach((profile, index) => {
+        expect(body.data[index]).toMatchObject(profile);
+      });
+      expect(body.nextCursor).toBeNull();
     },
   );
 
