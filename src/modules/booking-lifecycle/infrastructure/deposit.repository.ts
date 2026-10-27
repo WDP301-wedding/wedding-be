@@ -1,46 +1,24 @@
 import { randomUUID } from 'node:crypto';
-
-import { AppError } from '../../../core/errors/app-error.js';
-import { bookingEventMetadata } from '../../../core/integration-events/booking-event.js';
 import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
-import type {
-  BookingDepositRepository,
-  DepositEligibility,
-} from '../application/deposit.service.js';
-import { evaluateDepositEligibility } from '../domain/deposit.policy.js';
-import { contractDocumentSchema, documentDigest } from '../domain/commercial-contract.js';
+import type { BookingDepositRepository } from '../application/deposit.service.js';
 import { BookingLifecycleNotFoundError } from './consultation.repository.js';
+import {
+  appendEvidence,
+  decimalNumber,
+  readEligibility,
+} from './deposit-eligibility.reader.js';
+import {
+  BookingDepositConflictError,
+  type DepositConflictCode,
+} from './deposit-repository.errors.js';
+import {
+  markPromotionSucceededDeposit,
+  recordUnknownDeposit,
+  releaseVerifiedFailureDeposit,
+  settleDeposit,
+} from './deposit-settlement.handler.js';
 
-type DepositConflictCode =
-  | 'TIMELINE_NOT_MUTUALLY_APPROVED'
-  | 'REVISION_SUPERSEDED'
-  | 'SLOT_NOT_AVAILABLE'
-  | 'BOOKING_NOT_PAYABLE'
-  | 'CONTRACT_APPROVAL_REQUIRED'
-  | 'STALE_BOOKING_REVISION'
-  | 'DEPOSIT_INTENT_ACTIVE'
-  | 'PAYMENT_EVIDENCE_CONFLICT';
-
-export class BookingDepositConflictError extends AppError {
-  constructor(code: DepositConflictCode) {
-    super({
-      status: 409,
-      code,
-      message: depositMessages[code],
-    });
-  }
-}
-
-const depositMessages: Readonly<Record<DepositConflictCode, string>> = {
-  TIMELINE_NOT_MUTUALLY_APPROVED: 'The current timeline is not mutually approved.',
-  REVISION_SUPERSEDED: 'The requested timeline revision is no longer current.',
-  SLOT_NOT_AVAILABLE: 'The booking slot is not available.',
-  BOOKING_NOT_PAYABLE: 'The booking cannot accept a deposit.',
-  CONTRACT_APPROVAL_REQUIRED: 'The current commercial contract is not mutually approved.',
-  STALE_BOOKING_REVISION: 'The booking changed after it was loaded.',
-  DEPOSIT_INTENT_ACTIVE: 'An unresolved deposit attempt already pins this booking.',
-  PAYMENT_EVIDENCE_CONFLICT: 'The payment evidence conflicts with an existing settlement.',
-};
+export { BookingDepositConflictError, type DepositConflictCode };
 
 export function createPrismaBookingDepositRepository(
   prisma: PrismaClient,
@@ -243,415 +221,25 @@ export function createPrismaBookingDepositRepository(
       );
     },
 
-    async recordUnknown(input: Parameters<BookingDepositRepository['recordUnknown']>[0]) {
-      await prisma.$transaction(async (transaction) => {
-        const updated = await transaction.bookingDepositIntent.updateMany({
-          where: { id: input.paymentAttemptId, bookingId: input.bookingId, status: 'ACTIVE' },
-          data: { status: 'UNKNOWN' },
-        });
-        if (updated.count !== 1) {
-          const current = await transaction.bookingDepositIntent.findUnique({
-            where: { id: input.paymentAttemptId },
-          });
-          if (current?.bookingId !== input.bookingId || current.status !== 'UNKNOWN') {
-            throw new BookingDepositConflictError('PAYMENT_EVIDENCE_CONFLICT');
-          }
-        }
-        await transaction.bookingSlotHold.updateMany({
-          where: { bookingId: input.bookingId, status: 'ACTIVE' },
-          data: { depositIntentPin: 'UNKNOWN' },
-        });
-      });
+    recordUnknown(input: Parameters<BookingDepositRepository['recordUnknown']>[0]) {
+      return recordUnknownDeposit(prisma, input);
     },
 
-    async releaseVerifiedFailure(
+    releaseVerifiedFailure(
       input: Parameters<BookingDepositRepository['releaseVerifiedFailure']>[0],
     ) {
-      await prisma.$transaction(async (transaction) => {
-        const intent = await transaction.bookingDepositIntent.findUnique({
-          where: { id: input.paymentAttemptId },
-        });
-        if (intent === null || intent.bookingId !== input.bookingId) {
-          throw new BookingDepositConflictError('PAYMENT_EVIDENCE_CONFLICT');
-        }
-        if (intent.status === 'RELEASED') {
-          if (intent.providerEvidenceId !== input.providerEvidenceId) {
-            throw new BookingDepositConflictError('PAYMENT_EVIDENCE_CONFLICT');
-          }
-          return;
-        }
-        if (intent.status !== 'ACTIVE' && intent.status !== 'UNKNOWN') {
-          throw new BookingDepositConflictError('PAYMENT_EVIDENCE_CONFLICT');
-        }
-        const releasedAt = now();
-        await transaction.bookingDepositIntent.update({
-          where: { id: input.paymentAttemptId },
-          data: {
-            status: 'RELEASED',
-            providerEvidenceId: input.providerEvidenceId,
-            releasedAt,
-          },
-        });
-        await transaction.bookingSlotHold.updateMany({
-          where: { bookingId: input.bookingId, status: 'ACTIVE' },
-          data: { depositIntentPin: 'FAILED' },
-        });
-        await transaction.booking.updateMany({
-          where: { id: input.bookingId, phase: 'AWAITING_DEPOSIT' },
-          data: { phase: 'DRAFT', revision: { increment: 1 } },
-        });
-      });
+      return releaseVerifiedFailureDeposit(prisma, input, now);
     },
 
     settle(input: Parameters<BookingDepositRepository['settle']>[0]) {
-      return prisma.$transaction(
-        async (transaction) => {
-          const existing = await transaction.bookingDepositSettlement.findUnique({
-            where: { paymentId: input.paymentId },
-          });
-          if (existing !== null) {
-            if (
-              existing.bookingId !== input.bookingId ||
-              existing.timelineRevisionId !== input.timelineRevisionId ||
-              existing.contractRevisionId !== (input.contractRevisionId ?? null) ||
-              existing.documentDigest !== (input.documentDigest ?? null) ||
-              decimalNumber(existing.amountVnd) !== input.amountVnd ||
-              existing.settledAt.getTime() !== input.settledAt.getTime()
-            ) {
-              throw new BookingDepositConflictError('PAYMENT_EVIDENCE_CONFLICT');
-            }
-            const evidence = await transaction.bookingDepositIntent.findFirst({
-              where: { bookingId: input.bookingId, timelineRevisionId: input.timelineRevisionId },
-              orderBy: { createdAt: 'desc' },
-            });
-            if (evidence === null)
-              throw new BookingDepositConflictError('PAYMENT_EVIDENCE_CONFLICT');
-            const booking = await transaction.booking.findUnique({
-              where: { id: input.bookingId },
-              select: { consultationId: true },
-            });
-            if (booking === null) throw new BookingLifecycleNotFoundError();
-            return Object.freeze({
-              phase: 'CONFIRMED' as const,
-              replayed: true,
-              promotionPending: existing.promotionStatus === 'PENDING',
-              accountId: evidence.coupleAccountId,
-              consultationId: booking.consultationId,
-              requestId: evidence.requestId,
-            });
-          }
-
-          const booking = await transaction.booking.findUnique({
-            where: { id: input.bookingId },
-            select: {
-              consultationId: true,
-              phase: true,
-              revision: true,
-              currentTimelineRevisionId: true,
-            },
-          });
-          if (booking === null) throw new BookingLifecycleNotFoundError();
-          const intent = await transaction.bookingDepositIntent.findFirst({
-            where: { bookingId: input.bookingId, status: { in: ['ACTIVE', 'UNKNOWN'] } },
-            orderBy: { createdAt: 'desc' },
-          });
-          if (
-            intent === null ||
-            booking.phase !== 'AWAITING_DEPOSIT' ||
-            booking.currentTimelineRevisionId !== input.timelineRevisionId ||
-            intent.timelineRevisionId !== input.timelineRevisionId ||
-            intent.contractRevisionId !== (input.contractRevisionId ?? null) ||
-            intent.documentDigest !== (input.documentDigest ?? null) ||
-            decimalNumber(intent.amountVnd) !== input.amountVnd
-          ) {
-            throw new BookingDepositConflictError('PAYMENT_EVIDENCE_CONFLICT');
-          }
-          const eligibility = await readEligibility(
-            transaction,
-            input,
-            now(),
-            intent.coupleAccountId,
-          );
-          if (
-            !eligibility.eligible ||
-            eligibility.depositAmountVnd !== input.amountVnd ||
-            (eligibility.contractRevisionId ?? null) !== intent.contractRevisionId ||
-            (eligibility.documentDigest ?? null) !== intent.documentDigest
-          )
-            throw new BookingDepositConflictError('PAYMENT_EVIDENCE_CONFLICT');
-          await transaction.bookingDepositSettlement.create({
-            data: {
-              paymentId: input.paymentId,
-              bookingId: input.bookingId,
-              timelineRevisionId: input.timelineRevisionId,
-              contractRevisionId: input.contractRevisionId ?? null,
-              documentDigest: input.documentDigest ?? null,
-              amountVnd: input.amountVnd,
-              settledAt: input.settledAt,
-              promotionStatus: 'PENDING',
-            },
-          });
-          await transaction.bookingDepositIntent.updateMany({
-            where: { id: intent.id, status: { in: ['ACTIVE', 'UNKNOWN'] } },
-            data: { status: 'SETTLED', settledAt: input.settledAt },
-          });
-          await transaction.bookingSlotHold.updateMany({
-            where: { bookingId: input.bookingId, status: 'ACTIVE' },
-            data: { status: 'CONSUMED', depositIntentPin: 'SETTLED', terminalAt: input.settledAt },
-          });
-          await transaction.bookingTimelineRevision.updateMany({
-            where: { id: input.timelineRevisionId, bookingId: input.bookingId, state: 'CURRENT' },
-            data: { state: 'EFFECTIVE' },
-          });
-          const updated = await transaction.booking.updateMany({
-            where: { id: input.bookingId, revision: booking.revision, phase: 'AWAITING_DEPOSIT' },
-            data: {
-              phase: 'CONFIRMED',
-              effectiveTimelineRevisionId: input.timelineRevisionId,
-              revision: { increment: 1 },
-            },
-          });
-          if (updated.count !== 1) throw new BookingDepositConflictError('STALE_BOOKING_REVISION');
-          await appendEvidence(transaction, createId, {
-            action: 'booking.deposit-recorded',
-            eventType: 'booking.deposit-recorded',
-            bookingId: input.bookingId,
-            bookingRevision: booking.revision + 1,
-            timelineRevisionId: input.timelineRevisionId,
-            requestId: intent.requestId,
-            actorAccountId: intent.coupleAccountId,
-            occurredAt: input.settledAt,
-          });
-          return Object.freeze({
-            phase: 'CONFIRMED' as const,
-            replayed: false,
-            promotionPending: true,
-            accountId: intent.coupleAccountId,
-            consultationId: booking.consultationId,
-            requestId: intent.requestId,
-          });
-        },
-        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
-      );
+      return settleDeposit(prisma, input, now, createId);
     },
 
-    async markPromotionSucceeded(
+    markPromotionSucceeded(
       paymentId: Parameters<BookingDepositRepository['markPromotionSucceeded']>[0],
       promotedAt: Parameters<BookingDepositRepository['markPromotionSucceeded']>[1],
     ) {
-      const updated = await prisma.bookingDepositSettlement.updateMany({
-        where: { paymentId, promotionStatus: 'PENDING' },
-        data: { promotionStatus: 'SUCCEEDED', promotedAt },
-      });
-      if (updated.count === 0) {
-        const current = await prisma.bookingDepositSettlement.findUnique({
-          where: { paymentId },
-          select: { promotionStatus: true },
-        });
-        if (current?.promotionStatus !== 'SUCCEEDED') {
-          throw new BookingDepositConflictError('PAYMENT_EVIDENCE_CONFLICT');
-        }
-      }
+      return markPromotionSucceededDeposit(prisma, paymentId, promotedAt);
     },
   });
-}
-
-type EligibilityClient = Pick<
-  PrismaClient | Prisma.TransactionClient,
-  'booking' | 'consultationAccess'
-> & {
-  bookingSlotHold?: Pick<PrismaClient['bookingSlotHold'], 'findFirst' | 'updateMany'>;
-};
-
-async function readEligibility(
-  client: EligibilityClient,
-  input: Readonly<{ bookingId: string; timelineRevisionId: string }>,
-  databaseNow: Date,
-  actorAccountId: string | null = null,
-): Promise<DepositEligibility> {
-  const booking = await client.booking.findUnique({
-    where: { id: input.bookingId },
-    select: {
-      hallId: true,
-      eventDate: true,
-      shiftCode: true,
-      consultationId: true,
-      consultation: { select: { intendedEmailNormalized: true } },
-      phase: true,
-      revision: true,
-      currentTimelineRevisionId: true,
-      currentTimelineRevision: {
-        select: { id: true, managerApprovedAt: true, coupleApprovedAt: true },
-      },
-      proposalSnapshot: { select: { depositAmountVnd: true } },
-      commercialContract: { include: { currentRevision: { include: { approvals: true } } } },
-      slotHolds: {
-        where: { status: 'ACTIVE' },
-        select: { expiresAt: true, depositIntentPin: true },
-        take: 1,
-      },
-    },
-  });
-  if (booking === null || booking.proposalSnapshot === null) {
-    throw new BookingLifecycleNotFoundError();
-  }
-  const access = await client.consultationAccess.findFirst({
-    where: {
-      consultationId: booking.consultationId,
-      ...(actorAccountId === null
-        ? {
-            account: {
-              emailNormalized: booking.consultation.intendedEmailNormalized,
-              status: 'ACTIVE',
-            },
-          }
-        : { accountId: actorAccountId, account: { status: 'ACTIVE' } }),
-    },
-    select: { accountId: true },
-  });
-  if (access === null) throw new BookingLifecycleNotFoundError();
-  const hold = booking.slotHolds[0];
-  let hasActiveSlotHold =
-    hold !== undefined &&
-    (hold.expiresAt.getTime() > databaseNow.getTime() ||
-      hold.depositIntentPin === 'ACTIVE' ||
-      hold.depositIntentPin === 'UNKNOWN');
-  if (!hasActiveSlotHold && booking.hallId && booking.eventDate && booking.shiftCode) {
-    if (typeof client.booking.findFirst === 'function') {
-      const confirmedOther = await client.booking.findFirst({
-        where: {
-          id: { not: input.bookingId },
-          hallId: booking.hallId,
-          eventDate: booking.eventDate,
-          shiftCode: booking.shiftCode,
-          phase: { in: ['CONFIRMED', 'COMPLETED'] },
-        },
-        select: { id: true },
-      });
-      const activeOtherHold =
-        typeof client.bookingSlotHold?.findFirst === 'function'
-          ? await client.bookingSlotHold.findFirst({
-              where: {
-                hallId: booking.hallId,
-                eventDate: booking.eventDate,
-                shiftCode: booking.shiftCode,
-                status: 'ACTIVE',
-                bookingId: { not: input.bookingId },
-                OR: [
-                  { expiresAt: { gt: databaseNow } },
-                  { depositIntentPin: { in: ['ACTIVE', 'UNKNOWN'] } },
-                ],
-              },
-              select: { id: true },
-            })
-          : null;
-
-      if (confirmedOther === null && activeOtherHold === null) {
-        hasActiveSlotHold = true;
-      }
-    }
-  }
-  let reasonCode = evaluateDepositEligibility({
-    bookingPhase: booking.phase,
-    requestedTimelineRevisionId: input.timelineRevisionId,
-    currentTimelineRevisionId: booking.currentTimelineRevisionId,
-    managerApproved: booking.currentTimelineRevision?.managerApprovedAt != null,
-    coupleApproved: booking.currentTimelineRevision?.coupleApprovedAt != null,
-    hasActiveSlotHold,
-  });
-  const contract = booking.commercialContract?.currentRevision;
-  if (booking.commercialContract !== null) {
-    const document = contract == null ? null : contractDocumentSchema.parse(contract.document);
-    if (
-      contract?.state !== 'APPROVED' ||
-      contract.timelineRevisionId !== input.timelineRevisionId ||
-      contract.approvals.length !== 2 ||
-      document?.brideName == null ||
-      document.groomName === null ||
-      documentDigest(document) !== contract.documentDigest ||
-      contract.approvals.some((approval) => approval.documentDigest !== contract.documentDigest)
-    ) {
-      if (reasonCode === 'ELIGIBLE') reasonCode = 'CONTRACT_APPROVAL_REQUIRED';
-    }
-  }
-  return Object.freeze({
-    eligible: reasonCode === 'ELIGIBLE',
-    reasonCode,
-    consultationId: booking.consultationId,
-    coupleAccountId: access.accountId,
-    bookingRevision: booking.revision,
-    depositAmountVnd: decimalNumber(
-      contract?.depositAmountVnd ?? booking.proposalSnapshot.depositAmountVnd,
-    ),
-    contractRevisionId: contract?.id ?? null,
-    documentDigest: contract?.documentDigest ?? null,
-    ...(contract == null ? {} : { contractTotalVnd: decimalNumber(contract.contractTotalVnd) }),
-    ...(booking.hallId && booking.eventDate && booking.shiftCode
-      ? {
-          slot: {
-            hallId: booking.hallId,
-            eventDate: booking.eventDate,
-            shiftCode: booking.shiftCode,
-          },
-        }
-      : {}),
-  });
-}
-
-async function appendEvidence(
-  transaction: Prisma.TransactionClient,
-  createId: () => string,
-  input: Readonly<{
-    action: string;
-    eventType: string;
-    bookingId: string;
-    bookingRevision: number;
-    timelineRevisionId: string;
-    requestId: string;
-    causationId?: string | null;
-    actorAccountId: string | null;
-    occurredAt: Date;
-  }>,
-): Promise<void> {
-  await transaction.auditLog.create({
-    data: {
-      occurredAt: input.occurredAt,
-      requestId: input.requestId,
-      actorType: input.actorAccountId === null ? 'SYSTEM' : 'USER',
-      actorId: input.actorAccountId,
-      action: input.action,
-      entityType: 'booking',
-      entityId: input.bookingId,
-      metadata: {
-        bookingRevision: input.bookingRevision,
-        timelineRevisionId: input.timelineRevisionId,
-      },
-    },
-  });
-  await transaction.bookingOutboxEvent.create({
-    data: {
-      ...bookingEventMetadata(input),
-      id: createId(),
-      eventType: input.eventType,
-      aggregateId: input.bookingId,
-      aggregateRevision: input.bookingRevision,
-      occurredAt: input.occurredAt,
-      payload: {
-        bookingId: input.bookingId,
-        timelineRevisionId: input.timelineRevisionId,
-        bookingRevision: input.bookingRevision,
-        ...(input.eventType === 'booking.deposit-eligible'
-          ? { eligibleAt: input.occurredAt.toISOString() }
-          : {}),
-      },
-    },
-  });
-}
-
-function decimalNumber(value: unknown): number {
-  if (typeof value === 'number') return value;
-  if (typeof value === 'object' && value !== null && 'toNumber' in value) {
-    return (value as Readonly<{ toNumber(): number }>).toNumber();
-  }
-  return Number(value);
 }
