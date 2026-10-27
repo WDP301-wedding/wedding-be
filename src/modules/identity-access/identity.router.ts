@@ -399,7 +399,14 @@ async function mapIdentityErrors<T>(operation: () => Promise<T>): Promise<T> {
       throw new AppError({
         status: 422,
         code: 'VALIDATION_ERROR',
-        message: 'The request is invalid.',
+        message: 'Mật khẩu không đáp ứng chính sách bảo mật.',
+        details: [
+          {
+            path: 'password',
+            code: 'invalid_password',
+            message: 'Mật khẩu phải từ 1 đến 128 ký tự.',
+          },
+        ],
       });
     }
     if (error instanceof OwnedSessionNotFoundError) {

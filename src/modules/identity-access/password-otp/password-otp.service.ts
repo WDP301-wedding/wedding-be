@@ -170,7 +170,20 @@ export function createPasswordOtpService(options: {
     try {
       verifier = await options.passwordCrypto.hash(input.newPassword);
     } catch (error) {
-      if (error instanceof PasswordPolicyError) throw failure(422, 'VALIDATION_ERROR');
+      if (error instanceof PasswordPolicyError) {
+        throw new AppError({
+          status: 422,
+          code: 'VALIDATION_ERROR',
+          message: 'Mật khẩu không đáp ứng chính sách bảo mật.',
+          details: [
+            {
+              path: 'newPassword',
+              code: 'invalid_password',
+              message: 'Mật khẩu phải từ 1 đến 128 ký tự.',
+            },
+          ],
+        });
+      }
       throw error;
     }
     // Account lock serializes issuance, consumption, password mutation, and revocation.

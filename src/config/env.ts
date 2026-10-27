@@ -832,9 +832,7 @@ function createConfig(environment: RawEnvironment): Omit<BackendConfig, 'notific
           approvedIdentityPolicy.invitationReissueWindowSeconds,
       }),
       password: Object.freeze({
-        minimumCharacters:
-          environment.AUTH_PASSWORD_MIN_CHARACTERS ??
-          approvedIdentityPolicy.passwordMinimumCharacters,
+        minimumCharacters: 1,
         maximumCharacters:
           environment.AUTH_PASSWORD_MAX_CHARACTERS ??
           approvedIdentityPolicy.passwordMaximumCharacters,
