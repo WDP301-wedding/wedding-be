@@ -14,6 +14,11 @@ export type DepositEligibility = Readonly<{
   contractRevisionId?: string | null;
   documentDigest?: string | null;
   contractTotalVnd?: number;
+  slot?: Readonly<{
+    hallId: string;
+    eventDate: Date;
+    shiftCode: string;
+  }> | null;
 }>;
 
 export type ReserveDepositInput = Readonly<{

@@ -100,9 +100,22 @@ export function createPrismaBookingDepositRepository(
           }
           const unresolved = await transaction.bookingDepositIntent.findFirst({
             where: { bookingId: input.bookingId, status: { in: ['ACTIVE', 'UNKNOWN'] } },
-            select: { id: true },
+            select: { id: true, status: true, expiresAt: true },
           });
-          if (unresolved !== null) throw new BookingDepositConflictError('DEPOSIT_INTENT_ACTIVE');
+          if (unresolved !== null) {
+            if (unresolved.status === 'ACTIVE' && unresolved.expiresAt.getTime() <= now().getTime()) {
+              await transaction.bookingDepositIntent.update({
+                where: { id: unresolved.id },
+                data: { status: 'RELEASED', releasedAt: now() },
+              });
+              await transaction.bookingSlotHold.updateMany({
+                where: { bookingId: input.bookingId, status: 'ACTIVE' },
+                data: { depositIntentPin: 'FAILED' },
+              });
+            } else {
+              throw new BookingDepositConflictError('DEPOSIT_INTENT_ACTIVE');
+            }
+          }
 
           const eligibility = await readEligibility(
             transaction,
@@ -150,12 +163,62 @@ export function createPrismaBookingDepositRepository(
               createdAt: now(),
             },
           });
-          await transaction.bookingSlotHold.updateMany({
-            where: { bookingId: input.bookingId, status: 'ACTIVE' },
-            data: { depositIntentPin: 'ACTIVE' },
-          });
+          const existingHold =
+            typeof transaction.bookingSlotHold.findFirst === 'function'
+              ? await transaction.bookingSlotHold.findFirst({
+                  where: { bookingId: input.bookingId, status: 'ACTIVE' },
+                })
+              : null;
+          if (existingHold !== null) {
+            if (typeof transaction.bookingSlotHold.update === 'function') {
+              await transaction.bookingSlotHold.update({
+                where: { id: existingHold.id },
+                data: { expiresAt, depositIntentPin: 'ACTIVE' },
+              });
+            } else {
+              await transaction.bookingSlotHold.updateMany({
+                where: { bookingId: input.bookingId, status: 'ACTIVE' },
+                data: { depositIntentPin: 'ACTIVE' },
+              });
+            }
+          } else if (eligibility.slot && typeof transaction.bookingSlotHold.create === 'function') {
+            await transaction.bookingSlotHold.updateMany({
+              where: {
+                hallId: eligibility.slot.hallId,
+                eventDate: eligibility.slot.eventDate,
+                shiftCode: eligibility.slot.shiftCode as never,
+                status: 'ACTIVE',
+                expiresAt: { lte: now() },
+                depositIntentPin: { notIn: ['ACTIVE', 'UNKNOWN'] },
+              },
+              data: { status: 'EXPIRED', terminalAt: now() },
+            });
+            await transaction.bookingSlotHold.create({
+              data: {
+                id: createId(),
+                bookingId: input.bookingId,
+                hallId: eligibility.slot.hallId,
+                eventDate: eligibility.slot.eventDate,
+                shiftCode: eligibility.slot.shiftCode as never,
+                status: 'ACTIVE',
+                depositIntentPin: 'ACTIVE',
+                expiresAt,
+                acquiredByAccountId: reservationAccountId ?? eligibility.coupleAccountId,
+                createdAt: now(),
+              },
+            });
+          } else {
+            await transaction.bookingSlotHold.updateMany({
+              where: { bookingId: input.bookingId, status: 'ACTIVE' },
+              data: { depositIntentPin: 'ACTIVE' },
+            });
+          }
           const updated = await transaction.booking.updateMany({
-            where: { id: input.bookingId, revision: input.expectedBookingRevision, phase: 'DRAFT' },
+            where: {
+              id: input.bookingId,
+              revision: input.expectedBookingRevision,
+              phase: { in: ['DRAFT', 'AWAITING_DEPOSIT'] },
+            },
             data: { phase: 'AWAITING_DEPOSIT', revision: { increment: 1 } },
           });
           if (updated.count !== 1) throw new BookingDepositConflictError('STALE_BOOKING_REVISION');
@@ -396,7 +459,9 @@ export function createPrismaBookingDepositRepository(
 type EligibilityClient = Pick<
   PrismaClient | Prisma.TransactionClient,
   'booking' | 'consultationAccess'
->;
+> & {
+  bookingSlotHold?: Pick<PrismaClient['bookingSlotHold'], 'findFirst' | 'updateMany'>;
+};
 
 async function readEligibility(
   client: EligibilityClient,
@@ -407,6 +472,9 @@ async function readEligibility(
   const booking = await client.booking.findUnique({
     where: { id: input.bookingId },
     select: {
+      hallId: true,
+      eventDate: true,
+      shiftCode: true,
       consultationId: true,
       consultation: { select: { intendedEmailNormalized: true } },
       phase: true,
@@ -443,11 +511,46 @@ async function readEligibility(
   });
   if (access === null) throw new BookingLifecycleNotFoundError();
   const hold = booking.slotHolds[0];
-  const hasActiveSlotHold =
+  let hasActiveSlotHold =
     hold !== undefined &&
     (hold.expiresAt.getTime() > databaseNow.getTime() ||
       hold.depositIntentPin === 'ACTIVE' ||
       hold.depositIntentPin === 'UNKNOWN');
+  if (!hasActiveSlotHold && booking.hallId && booking.eventDate && booking.shiftCode) {
+    if (typeof client.booking.findFirst === 'function') {
+      const confirmedOther = await client.booking.findFirst({
+        where: {
+          id: { not: input.bookingId },
+          hallId: booking.hallId,
+          eventDate: booking.eventDate,
+          shiftCode: booking.shiftCode,
+          phase: { in: ['CONFIRMED', 'COMPLETED'] },
+        },
+        select: { id: true },
+      });
+      const activeOtherHold =
+        typeof client.bookingSlotHold?.findFirst === 'function'
+          ? await client.bookingSlotHold.findFirst({
+              where: {
+                hallId: booking.hallId,
+                eventDate: booking.eventDate,
+                shiftCode: booking.shiftCode,
+                status: 'ACTIVE',
+                bookingId: { not: input.bookingId },
+                OR: [
+                  { expiresAt: { gt: databaseNow } },
+                  { depositIntentPin: { in: ['ACTIVE', 'UNKNOWN'] } },
+                ],
+              },
+              select: { id: true },
+            })
+          : null;
+
+      if (confirmedOther === null && activeOtherHold === null) {
+        hasActiveSlotHold = true;
+      }
+    }
+  }
   let reasonCode = evaluateDepositEligibility({
     bookingPhase: booking.phase,
     requestedTimelineRevisionId: input.timelineRevisionId,
@@ -483,6 +586,15 @@ async function readEligibility(
     contractRevisionId: contract?.id ?? null,
     documentDigest: contract?.documentDigest ?? null,
     ...(contract == null ? {} : { contractTotalVnd: decimalNumber(contract.contractTotalVnd) }),
+    ...(booking.hallId && booking.eventDate && booking.shiftCode
+      ? {
+          slot: {
+            hallId: booking.hallId,
+            eventDate: booking.eventDate,
+            shiftCode: booking.shiftCode,
+          },
+        }
+      : {}),
   });
 }
 

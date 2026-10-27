@@ -210,16 +210,30 @@ export function createPrismaBillingPersistence(
             throw new BillingPersistenceConflict('PAYMENT_EVIDENCE_CONFLICT');
           return Object.freeze({ attempt, replayed: true });
         }
-        if (
-          (await tx.billingPaymentAttempt.findFirst({
-            where: {
-              bookingId: snapshot.bookingId,
-              purpose: snapshot.purpose,
-              state: { in: ['CREATED', 'PENDING', 'UNKNOWN'] },
-            },
-          })) !== null
-        )
-          throw new BillingPersistenceConflict('PAYMENT_ATTEMPT_ACTIVE');
+        const activeAttempt = await tx.billingPaymentAttempt.findFirst({
+          where: {
+            bookingId: snapshot.bookingId,
+            purpose: snapshot.purpose,
+            state: { in: ['CREATED', 'PENDING', 'UNKNOWN'] },
+          },
+        });
+        if (activeAttempt !== null) {
+          if (
+            (activeAttempt.state === 'CREATED' || activeAttempt.state === 'PENDING') &&
+            activeAttempt.expiresAt.getTime() <= new Date().getTime()
+          ) {
+            await tx.billingPaymentAttempt.update({
+              where: { id: activeAttempt.id },
+              data: { state: 'FAILED' },
+            });
+            await audit(tx, context, snapshot.bookingId, activeAttempt.id, 'billing.attempt-expired', {
+              purpose: activeAttempt.purpose,
+              state: 'FAILED',
+            });
+          } else {
+            throw new BillingPersistenceConflict('PAYMENT_ATTEMPT_ACTIVE');
+          }
+        }
         const stored = await tx.billingPaymentAttempt.create({
           data: {
             ...snapshot,

@@ -167,6 +167,76 @@ describe('PrismaBookingDepositRepository', () => {
     }
   });
 
+  it('automatically verifies slot availability and allows deposit when no manual hold was created', async () => {
+    const transaction = fixture();
+    const repository = createPrismaBookingDepositRepository(client(transaction), () => now);
+    const booking = await transaction.booking.findUnique();
+    const input = { bookingId: 'booking', timelineRevisionId: 'timeline' };
+    transaction.consultationAccess.findFirst.mockResolvedValue({ accountId: 'couple' });
+
+    // When slot is free (no confirmed booking and no active hold from other bookings)
+    transaction.booking.findUnique.mockResolvedValue({
+      ...booking,
+      hallId: 'hall-1',
+      eventDate: new Date('2026-12-01'),
+      shiftCode: 'EVENING',
+      slotHolds: [], // No manual hold
+    });
+    transaction.booking.findFirst = vi.fn().mockResolvedValue(null);
+    transaction.bookingSlotHold.findFirst = vi.fn().mockResolvedValue(null);
+
+    const eligible = await repository.requireDepositEligibility(input);
+    expect(eligible.eligible).toBe(true);
+    expect(eligible.reasonCode).toBe('ELIGIBLE');
+
+    // When slot is taken by another confirmed booking
+    transaction.booking.findFirst = vi.fn().mockResolvedValue({ id: 'other-booking' });
+    const blockedByBooking = await repository.requireDepositEligibility(input);
+    expect(blockedByBooking.eligible).toBe(false);
+    expect(blockedByBooking.reasonCode).toBe('SLOT_NOT_AVAILABLE');
+
+    // When slot is held by another booking
+    transaction.booking.findFirst = vi.fn().mockResolvedValue(null);
+    transaction.bookingSlotHold.findFirst = vi.fn().mockResolvedValue({ id: 'other-hold' });
+    const blockedByHold = await repository.requireDepositEligibility(input);
+    expect(blockedByHold.eligible).toBe(false);
+    expect(blockedByHold.reasonCode).toBe('SLOT_NOT_AVAILABLE');
+  });
+
+  it('automatically releases expired active deposit intent and reserves a fresh attempt', async () => {
+    const transaction = fixture();
+    const repository = createPrismaBookingDepositRepository(client(transaction), () => now, ids());
+    const input = {
+      bookingId: 'booking',
+      timelineRevisionId: 'timeline',
+      paymentAttemptId: 'new-attempt',
+      expectedBookingRevision: 4,
+      amountVnd: 3_000_001,
+      expiresAt: '2026-10-07T10:15:00.000Z',
+      requestId: 'request',
+      actorAccountId: 'couple',
+    };
+    // Previous attempt that expired 5 minutes ago
+    transaction.bookingDepositIntent.findFirst.mockResolvedValue({
+      id: 'expired-attempt',
+      status: 'ACTIVE',
+      expiresAt: new Date('2026-10-07T09:55:00.000Z'),
+    });
+    transaction.bookingDepositIntent.findUnique.mockResolvedValue(null);
+    transaction.bookingSlotHold.findFirst = vi.fn().mockResolvedValue(null);
+    transaction.bookingSlotHold.create = vi.fn().mockResolvedValue({});
+
+    const result = await repository.reserve(input);
+    expect(transaction.bookingDepositIntent.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'expired-attempt' },
+        data: expect.objectContaining({ status: 'RELEASED' }),
+      }),
+    );
+    expect(result.paymentAttemptId).toBe('new-attempt');
+    expect(result.replayed).toBe(false);
+  });
+
   it('only releases a verified matching failure, replays its evidence, and refuses mismatched UNKNOWN outcomes', async () => {
     const transaction = fixture();
     const repository = createPrismaBookingDepositRepository(client(transaction), () => now);
@@ -456,6 +526,7 @@ function fixture() {
     account: { findFirst: vi.fn().mockResolvedValue(null) },
     booking: {
       findUnique: vi.fn().mockResolvedValue(booking),
+      findFirst: vi.fn().mockResolvedValue(null),
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
     },
     consultationAccess: {
@@ -473,7 +544,12 @@ function fixture() {
       create: vi.fn().mockResolvedValue({}),
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
     },
-    bookingSlotHold: { updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
+    bookingSlotHold: {
+      findFirst: vi.fn().mockResolvedValue(null),
+      create: vi.fn().mockResolvedValue({}),
+      update: vi.fn().mockResolvedValue({}),
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+    },
     bookingTimelineRevision: { updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
     auditLog: { create: vi.fn().mockResolvedValue({}) },
     bookingOutboxEvent: { create: vi.fn().mockResolvedValue({}) },
@@ -486,6 +562,7 @@ function client(transaction: object) {
     booking: value.booking,
     consultationAccess: value.consultationAccess,
     bookingDepositSettlement: value.bookingDepositSettlement,
+    bookingSlotHold: value.bookingSlotHold,
     $transaction: vi.fn(async (operation: (client_: object) => Promise<unknown>) =>
       operation(transaction),
     ),
