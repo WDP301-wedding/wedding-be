@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 import { randomUUID } from 'node:crypto';
 import sharp from 'sharp';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -5,7 +6,7 @@ import request from 'supertest';
 import { parseEnvironment } from '../../../src/config/env.js';
 import { startServer } from '../../../src/server.js';
 import { createInvitationStudioRuntime } from '../../../src/modules/invitation-studio/invitation-studio.runtime.js';
-import * as storageModule from '../../../src/integrations/storage/supabase-storage-provider.js';
+import * as storageModule from '../../../src/integrations/storage/storage.factory.js';
 import {
   mediaAssetResponseSchema,
   mediaPreviewResponseSchema,
@@ -121,17 +122,16 @@ describeDatabase('W1 native owner readers/shared transaction, controlled Storage
     url.searchParams.delete('schema');
     url.searchParams.delete('options');
     const sdk = controlledStorage();
-    const factory = vi
-      .spyOn(storageModule, 'createSupabaseStorageProvider')
-      .mockReturnValue(sdk.provider);
+    const factory = vi.spyOn(storageModule, 'createStorageProvider').mockReturnValue(sdk.provider);
     const runtime = await createInvitationStudioRuntime(
       {
         ...parseEnvironment({ NODE_ENV: 'test', DATABASE_URL: url.toString() }),
         storage: {
           enabled: true,
-          supabaseUrl: 'https://storage.example.test',
-          serviceRoleKey: 'fixture-key',
-          bucket: 'private-media',
+          provider: 'render-disk' as const,
+          root: tmpdir(),
+          publicOrigin: 'https://storage.example.test',
+          signingKey: 'controlled-storage-fixture-key-at-least-32-bytes',
         },
       },
       () => now,

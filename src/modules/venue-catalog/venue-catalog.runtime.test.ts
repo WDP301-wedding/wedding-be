@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
 
 import type { Request } from 'express';
@@ -44,13 +45,14 @@ describe('VenueCatalogRuntime', () => {
     expect(prisma.$disconnect).toHaveBeenCalledOnce();
   });
 
-  it('composes Supabase storage when explicitly enabled', async () => {
+  it('composes persistent disk storage when explicitly enabled', async () => {
     const runtime = await createVenueCatalogRuntime(
       runtimeConfig({
         enabled: true,
-        supabaseUrl: 'https://storage.example.com',
-        serviceRoleKey: 'test-service-role-key',
-        bucket: 'catalog-media',
+        provider: 'render-disk' as const,
+        root: tmpdir(),
+        publicOrigin: 'https://storage.example.test',
+        signingKey: 'controlled-storage-fixture-key-at-least-32-bytes',
       }),
     );
 

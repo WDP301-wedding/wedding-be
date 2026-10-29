@@ -485,21 +485,8 @@ describe('server startup and process signals', () => {
     expect(notifications.resource.close).toHaveBeenCalledOnce();
     expect(vi.spyOn(database.resource, 'close')).toHaveBeenCalledOnce();
   });
-  it('keeps Supabase startup compatible without the Render disk route', async () => {
-    const config = parseEnvironment({
-      NODE_ENV: 'test',
-      LOG_LEVEL: 'silent',
-      SUPABASE_URL: 'https://storage.example.test',
-      SUPABASE_SERVICE_ROLE_KEY: 'test-key',
-      SUPABASE_STORAGE_BUCKET: 'private-media',
-    });
-    const running = await bootstrap({
-      loadConfig: () => Promise.resolve({ ...config, runtime: { ...config.runtime, port: 0 } }),
-    });
-    runningServers.push(running);
-    expect((await request(running.app).get('/health/ready')).status).toBe(200);
-    expect((await request(running.app).get('/api/v1/storage/objects/anything')).status).toBe(404);
-    await running.shutdown();
+  it('rejects the retired storage driver before starting the API', () => {
+    expect(() => parseEnvironment({ NODE_ENV: 'test', STORAGE_DRIVER: 'supabase' })).toThrow();
   });
   it('releases initialized owners and readiness if notification startup fails', async () => {
     vi.mocked(createNotificationsRuntime).mockRejectedValueOnce(

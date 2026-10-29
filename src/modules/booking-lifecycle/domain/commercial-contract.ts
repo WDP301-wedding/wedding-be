@@ -40,6 +40,14 @@ export const contractLineSchema = commercialSelectionSchema.extend({
   unitPriceVnd: vnd,
   lineTotalVnd: vnd,
 });
+export const customerSelectionViewSchema = z.strictObject({
+  revisionId: z.uuid().nullable(),
+  revisionNumber: z.int().nonnegative(),
+  status: z.enum(['NOT_STARTED', 'DRAFT', 'SUBMITTED']),
+  lines: z.array(contractLineSchema).min(1).max(50),
+  totalVnd: z.int().nonnegative(),
+  submittedAt: z.iso.datetime({ offset: true }).nullable(),
+});
 export const contractDocumentSchema = z.strictObject({
   modelVersion: z.literal('FULL_CONTRACT_V1'),
   bookingId: z.uuid(),
@@ -106,10 +114,13 @@ export const contractsResponseSchema = z.strictObject({
     modelVersion: z.enum(['LEGACY_PROPOSAL_V1', 'FULL_CONTRACT_V1']),
     currentRevisionId: z.uuid().nullable(),
     eligibleForDeposit: z.boolean(),
+    customerSelection: customerSelectionViewSchema,
+    draftSeed: z.array(contractLineSchema).min(1).max(50),
     capabilities: z.strictObject({
       canManageDraft: z.boolean(),
       canApprove: z.boolean(),
       canWithdrawApproval: z.boolean(),
+      canEditSelections: z.boolean(),
     }),
     revisions: z.array(contractViewSchema).max(50),
     nextCursor: z.uuid().nullable(),

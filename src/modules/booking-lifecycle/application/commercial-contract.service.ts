@@ -25,6 +25,10 @@ import {
 } from '../domain/commercial-contract.js';
 import { renderContractPdf } from '../infrastructure/contract-pdf.renderer.js';
 import { retryCommercialWrite } from '../infrastructure/commercial-write.retry.js';
+import {
+  createCustomerSelectionWorkflow,
+  readCustomerSelection,
+} from './commercial-selection-workflow.js';
 
 const include = {
   approvals: { orderBy: { party: 'asc' as const } },
@@ -240,6 +244,8 @@ export function createCommercialContractService(options: Options) {
   ) {
     requireManager(access);
     const current = access.booking.commercialContract?.currentRevision;
+    if (!current && (await readCustomerSelection(client, access)).status !== 'SUBMITTED')
+      throw commercialConflict('CUSTOMER_SELECTION_REQUIRED');
     if (current?.state === 'APPROVED' || (current?.approvals.length ?? 0) > 0)
       throw commercialConflict('CONTRACT_NOT_EDITABLE');
     if (
@@ -299,7 +305,19 @@ export function createCommercialContractService(options: Options) {
     if (row === null || row === undefined || row.id !== revisionId) throw new NotFoundError();
     return row;
   }
+  const customerSelections = createCustomerSelectionWorkflow({
+    write: (bookingId, actor, requestId, expectedRevision, work) =>
+      write(bookingId, actor, requestId, expectedRevision, (client, access) =>
+        work(client, access),
+      ),
+    catalog: options.catalog,
+    conversion: options.conversion,
+    now,
+  });
   return Object.freeze({
+    selectionPreview: customerSelections.preview,
+    selectionSave: customerSelections.save,
+    selectionSubmit: customerSelections.submit,
     async authorize(bookingId: string, actor: AuthenticatedActor, revisionId?: string) {
       return options.scope.withClient(bookingId, undefined, async (client) => {
         await authorized(client, bookingId, actor);
@@ -335,6 +353,7 @@ export function createCommercialContractService(options: Options) {
             });
             const current = booking.commercialContract?.currentRevision;
             const timeline = booking.currentTimelineRevision;
+            const customerSelection = await readCustomerSelection(client, { booking, party });
             const pinned = await client.bookingDepositIntent.findFirst({
               where: { bookingId, status: { in: ['ACTIVE', 'UNKNOWN', 'SETTLED'] } },
               select: { id: true },
@@ -358,10 +377,15 @@ export function createCommercialContractService(options: Options) {
                   : ('FULL_CONTRACT_V1' as const),
               currentRevisionId: booking.commercialContract?.currentRevisionId ?? null,
               eligibleForDeposit: eligible,
+              customerSelection,
+              draftSeed: current
+                ? contractDocumentSchema.parse(current.document).lines
+                : customerSelection.lines,
               capabilities: {
                 canManageDraft:
                   editable &&
                   party === 'MANAGER' &&
+                  (current != null || customerSelection.status === 'SUBMITTED') &&
                   current?.state !== 'APPROVED' &&
                   (current?.approvals.length ?? 0) === 0,
                 canApprove:
@@ -370,6 +394,11 @@ export function createCommercialContractService(options: Options) {
                   !ownApproval &&
                   current.timelineRevisionId === timeline?.id,
                 canWithdrawApproval: editable && ownApproval,
+                canEditSelections:
+                  editable &&
+                  party === 'COUPLE' &&
+                  current == null &&
+                  customerSelection.status !== 'SUBMITTED',
               },
               revisions: rows.slice(0, 50).map(contractView),
               nextCursor: rows.length > 50 ? rows[49]!.id : null,

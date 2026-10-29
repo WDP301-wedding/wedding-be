@@ -15,6 +15,11 @@ import {
   contractResponseSchema,
   contractPreviewResponseSchema,
 } from '../domain/commercial-contract.js';
+import {
+  selectionDraftSchema,
+  selectionSubmitSchema,
+  selectionResponseSchema,
+} from '../domain/commercial-selections.js';
 
 const paramsSchema = z.strictObject({ bookingId: z.uuid() });
 const revisionParamsSchema = paramsSchema.extend({ revisionId: z.uuid() });
@@ -80,6 +85,36 @@ export function createCommercialContractRouter(
     );
     next();
   };
+  for (const [action, schema, operation] of [
+    ['preview', selectionDraftSchema, service.selectionPreview],
+    ['drafts', selectionDraftSchema, service.selectionSave],
+    ['submissions', selectionSubmitSchema, service.selectionSubmit],
+  ] as const) {
+    router.post(
+      '/bookings/:bookingId/contract-selections/' + action,
+      authenticate,
+      validateRequest({ params: paramsSchema, query: z.strictObject({}), body: schema }),
+      scope,
+      ...(action === 'preview'
+        ? []
+        : [idempotent('/bookings/{bookingId}/contract-selections/' + action)]),
+      async (request, response) => {
+        const { params, body } = validatedRequest(response, { params: paramsSchema, body: schema });
+        response
+          .set('Cache-Control', 'no-store')
+          .json(
+            selectionResponseSchema.parse({
+              data: await operation(
+                params.bookingId,
+                body,
+                response.locals.actor as AuthenticatedActor,
+                request.requestId,
+              ),
+            }),
+          );
+      },
+    );
+  }
   router.post(
     path,
     authenticate,

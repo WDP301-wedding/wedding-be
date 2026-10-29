@@ -74,25 +74,22 @@ const validProductionEnvironment = {
   CORS_ALLOWED_ORIGINS: 'https://wedding.example.com, https://manage.example.com',
   DATABASE_URL: 'postgresql://runtime:secret@db.example.com:5432/wedding?sslmode=require',
   MIGRATION_DATABASE_URL: 'postgresql://migrate:secret@db.example.com:5432/wedding?sslmode=require',
-  SUPABASE_URL: 'https://project.supabase.co',
-  SUPABASE_SERVICE_ROLE_KEY: 'service-role-secret',
-  SUPABASE_STORAGE_BUCKET: 'wedding-media',
+  STORAGE_PUBLIC_ORIGIN: 'https://storage.example.test',
+  STORAGE_SIGNING_KEY: 'service-role-secret-at-least-32-bytes',
+  STORAGE_DISK_PATH: '/var/data/wedding-media',
   RESEND_API_KEY: 'resend-secret',
   RESEND_FROM_EMAIL: 'Wedding Restaurant <notifications@example.com>',
   ...approvedIdentityEnvironment,
 } as const;
 
 describe('parseEnvironment', () => {
-  it('selects persistent Render storage without requiring Supabase credentials and fails closed on incomplete disk configuration', () => {
+  it('selects persistent Render storage without a retired provider fallback and fails closed on incomplete disk configuration', () => {
     const disk = {
       ...validProductionEnvironment,
       STORAGE_DRIVER: 'render-disk',
       STORAGE_DISK_PATH: '/var/data/wedding-media',
       STORAGE_PUBLIC_ORIGIN: 'https://api.example.test',
       STORAGE_SIGNING_KEY: 'controlled-disk-signing-key-at-least-32-bytes',
-      SUPABASE_URL: undefined,
-      SUPABASE_SERVICE_ROLE_KEY: undefined,
-      SUPABASE_STORAGE_BUCKET: undefined,
     };
     expect(parseEnvironment(disk).storage).toMatchObject({
       enabled: true,
@@ -263,9 +260,9 @@ describe('parseEnvironment', () => {
       CORS_ALLOWED_ORIGINS: 'http://localhost:3000,http://127.0.0.1:3002',
       DATABASE_URL: 'postgresql://test:test@localhost:5432/wedding',
       MIGRATION_DATABASE_URL: 'postgres://test:test@localhost:5432/wedding',
-      SUPABASE_URL: 'https://project.supabase.co/',
-      SUPABASE_SERVICE_ROLE_KEY: 'service-role-secret',
-      SUPABASE_STORAGE_BUCKET: 'wedding-media',
+      STORAGE_PUBLIC_ORIGIN: 'https://storage.example.test',
+      STORAGE_SIGNING_KEY: 'service-role-secret-at-least-32-bytes',
+      STORAGE_DISK_PATH: '/var/data/wedding-media',
       RESEND_API_KEY: 'resend-secret',
       RESEND_FROM_EMAIL: 'notifications@example.com',
       AI_IMAGE_PROVIDER: 'gemini',
@@ -301,9 +298,10 @@ describe('parseEnvironment', () => {
     });
     expect(parsed.storage).toEqual({
       enabled: true,
-      supabaseUrl: 'https://project.supabase.co/',
-      serviceRoleKey: 'service-role-secret',
-      bucket: 'wedding-media',
+      provider: 'render-disk',
+      publicOrigin: 'https://storage.example.test',
+      signingKey: 'service-role-secret-at-least-32-bytes',
+      root: '/var/data/wedding-media',
     });
     expect(parsed.email).toEqual({
       enabled: true,
@@ -353,9 +351,9 @@ describe('parseEnvironment', () => {
     'CORS_ALLOWED_ORIGINS',
     'DATABASE_URL',
     'MIGRATION_DATABASE_URL',
-    'SUPABASE_URL',
-    'SUPABASE_SERVICE_ROLE_KEY',
-    'SUPABASE_STORAGE_BUCKET',
+    'STORAGE_PUBLIC_ORIGIN',
+    'STORAGE_SIGNING_KEY',
+    'STORAGE_DISK_PATH',
     'RESEND_API_KEY',
     'RESEND_FROM_EMAIL',
     ...Object.keys(approvedIdentityEnvironment),
@@ -422,7 +420,7 @@ describe('parseEnvironment', () => {
   it.each([
     ['DATABASE_URL', 'https://db.example.com'],
     ['MIGRATION_DATABASE_URL', 'mysql://db.example.com/wedding'],
-    ['SUPABASE_URL', 'http://project.supabase.co'],
+    ['STORAGE_PUBLIC_ORIGIN', 'http://storage.example.test'],
     ['OTEL_EXPORTER_OTLP_ENDPOINT', 'ftp://telemetry.example.com'],
   ])('rejects an invalid %s URL', (variableName, value) => {
     expect(() => parseEnvironment({ [variableName]: value })).toThrow(
@@ -506,9 +504,9 @@ describe('parseEnvironment', () => {
   });
 
   it.each([
-    ['SUPABASE_URL', 'https://project.supabase.co'],
-    ['SUPABASE_SERVICE_ROLE_KEY', 'service-role-secret'],
-    ['SUPABASE_STORAGE_BUCKET', 'wedding-media'],
+    ['STORAGE_PUBLIC_ORIGIN', 'https://storage.example.test'],
+    ['STORAGE_SIGNING_KEY', 'service-role-secret-at-least-32-bytes'],
+    ['STORAGE_DISK_PATH', '/var/data/wedding-media'],
   ])('rejects partial storage provider configuration starting with %s', (key, value) => {
     expect(() => parseEnvironment({ [key]: value })).toThrow(EnvironmentConfigurationError);
   });
@@ -662,7 +660,7 @@ describe('parseEnvironment', () => {
     try {
       parseEnvironment({
         NODE_ENV: 'production',
-        SUPABASE_SERVICE_ROLE_KEY: secretValue,
+        STORAGE_SIGNING_KEY: secretValue,
       });
       throw new Error('Expected configuration parsing to fail.');
     } catch (error: unknown) {

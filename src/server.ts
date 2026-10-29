@@ -13,6 +13,7 @@ import {
 } from './integrations/storage/disk-storage-provider.js';
 import type { Config } from './config/config.js';
 import { createRuntimeFeatureManifest } from './config/runtime-manifest.js';
+import { EnvironmentConfigurationError } from './config/env.js';
 import {
   createDatabaseReadiness,
   DATABASE_READINESS_TIMEOUT_MS,
@@ -328,6 +329,9 @@ async function loadEnvironmentConfig(): Promise<Config> {
 }
 
 async function startFromConfig(config: Config): Promise<RunningServer> {
+  // Starting the real API without its database must not silently use in-memory data.
+  // Programmatic test servers remain available through startServer/createApp.
+  if (!config.database.url) throw new EnvironmentConfigurationError(['DATABASE_URL']);
   const logger = createLogger({
     level: config.runtime.logLevel,
     runtimeEnvironment: config.runtime.environment,
@@ -556,7 +560,7 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
       app.use(createGuestImportBodyParser());
     },
     registerRoutes: (app) => {
-      if (config.storage.enabled && 'provider' in config.storage)
+      if (config.storage.enabled)
         app.use(
           '/api/v1/storage',
           createDiskStorageRouter(new DiskStorageProvider(config.storage)),

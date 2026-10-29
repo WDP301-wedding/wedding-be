@@ -7,6 +7,11 @@ import {
   contractResponseSchema,
   contractPreviewResponseSchema,
 } from '../domain/commercial-contract.js';
+import {
+  selectionDraftSchema,
+  selectionSubmitSchema,
+  selectionResponseSchema,
+} from '../domain/commercial-selections.js';
 
 const security = [{ bearerAuth: [] }];
 const parameters = [
@@ -35,6 +40,54 @@ const success = {
   content: { 'application/json': { schema: contractResponseSchema } },
 };
 export const commercialContractOpenApiPaths = {
+  ...Object.fromEntries(
+    (
+      [
+        [
+          'preview',
+          'previewCustomerCommercialSelections',
+          selectionDraftSchema,
+          'Read-only current server-priced preview.',
+        ],
+        [
+          'drafts',
+          'saveCustomerCommercialSelections',
+          selectionDraftSchema,
+          'Append immutable customer draft. Saving does not lock customer editing.',
+        ],
+        [
+          'submissions',
+          'submitCustomerCommercialSelections',
+          selectionSubmitSchema,
+          'Submit the exact saved draft after current price revalidation. Permanently locks customer selection edits; this is not contract approval.',
+        ],
+      ] as const
+    ).map(([action, operationId, schema, description]) => [
+      '/bookings/{bookingId}/contract-selections/' + action,
+      {
+        parameters,
+        post: {
+          operationId,
+          tags: ['Booking lifecycle'],
+          security,
+          description:
+            'Own Couple before deposit and before a manager contract exists. Optimistic Booking revision, payment pins and scope are revalidated. ' +
+            description,
+          ...(action === 'preview'
+            ? {}
+            : { parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }] }),
+          requestBody: { required: true, content: { 'application/json': { schema } } },
+          responses: {
+            '200': {
+              description: 'Exact server-priced customer selections and Booking revision.',
+              content: { 'application/json': { schema: selectionResponseSchema } },
+            },
+            ...errors,
+          },
+        },
+      },
+    ]),
+  ),
   '/bookings/{bookingId}/contracts/preview': {
     parameters,
     post: {
@@ -63,7 +116,7 @@ export const commercialContractOpenApiPaths = {
       tags: ['Booking lifecycle'],
       security,
       description:
-        'Own Manager or consultation account, including restricted prospect. Staff and cross-scope reads are concealed. Private no-store, newest revisions first, up to 50 per page. eligibleForDeposit expresses commercial/timeline approval readiness; slot/account/payment eligibility is rechecked at reservation.',
+        'Own Manager or consultation account, including restricted prospect. Staff and cross-scope reads are concealed. Private no-store, newest revisions first, up to 50 per page. Includes immutable customer selections, exact draftSeed and actor capabilities. First manager contract requires submitted customer selections; existing contract histories are preserved. eligibleForDeposit expresses commercial/timeline approval readiness; slot/account/payment eligibility is rechecked at reservation.',
       parameters: [{ name: 'cursor', in: 'query', schema: { type: 'string', format: 'uuid' } }],
       responses: {
         '200': {

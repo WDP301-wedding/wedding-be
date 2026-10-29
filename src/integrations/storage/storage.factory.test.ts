@@ -2,7 +2,6 @@ import { tmpdir } from 'node:os';
 import { describe, expect, it } from 'vitest';
 import { createStorageProvider } from './storage.factory.js';
 import { DiskStorageProvider } from './disk-storage-provider.js';
-import { SupabaseStorageProvider } from './supabase-storage-provider.js';
 import { parseEnvironment } from '../../config/env.js';
 import { createRuntimeFeatureManifest } from '../../config/runtime-manifest.js';
 
@@ -21,14 +20,7 @@ describe('configured storage provider', () => {
     expect(manifest.features.invitationStorage.mode).toBe('render-disk');
     expect(JSON.stringify(manifest)).not.toContain('private-sentinel');
   });
-  it('keeps existing Supabase configuration compatible', () => {
-    expect(
-      createStorageProvider({
-        enabled: true,
-        supabaseUrl: 'https://storage.example.test',
-        serviceRoleKey: 'test-key',
-        bucket: 'private-media',
-      }),
-    ).toBeInstanceOf(SupabaseStorageProvider);
+  it('rejects the retired storage driver', () => {
+    expect(() => parseEnvironment({ STORAGE_DRIVER: 'supabase' })).toThrow();
   });
 });

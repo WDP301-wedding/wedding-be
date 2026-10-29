@@ -2,9 +2,9 @@ import { vi } from 'vitest';
 import {
   SupabaseStorageProvider,
   type SupabaseStorageClientLike,
-} from '../../../src/integrations/storage/supabase-storage-provider.js';
+} from '../../fixtures/legacy-supabase-storage-provider.js';
 
-/** Controlled SDK boundary, NOT live Supabase evidence. Executes the production
+/** Controlled SDK boundary, NOT live Supabase evidence. Executes a test-only historical
  * Storage adapter's upload/info/duplicate/signed-path validation without network. */
 export function controlledStorage() {
   const objects = new Map<

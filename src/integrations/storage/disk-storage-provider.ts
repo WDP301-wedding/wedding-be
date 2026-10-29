@@ -28,7 +28,7 @@ const signedQuery = z.strictObject({
   signature: z.string().regex(/^[a-f0-9]{64}$/u),
 });
 
-/** Content keys and domain metadata stay unchanged when moving from Supabase. */
+/** Content keys and domain metadata stay unchanged across storage infrastructure changes. */
 export class DiskStorageProvider implements StorageProvider {
   readonly #root: string;
   readonly #origin: string;

@@ -27,7 +27,7 @@ describe('RED metrics', () => {
       durationSeconds: 0.08,
       module: 'storage',
       outcome: 'success',
-      provider: 'supabase_storage',
+      provider: 'disk_storage',
     };
     const timeout: ProviderObservation = {
       durationSeconds: 1.2,
@@ -41,7 +41,7 @@ describe('RED metrics', () => {
 
     const output = await metrics.registry.metrics();
     expect(output).toContain(
-      'wedding_provider_requests_total{module="storage",provider="supabase_storage",outcome="success"} 1',
+      'wedding_provider_requests_total{module="storage",provider="disk_storage",outcome="success"} 1',
     );
     expect(output).toContain(
       'wedding_provider_errors_total{module="email",provider="resend",error_kind="timeout"} 1',

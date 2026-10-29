@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import express from 'express';
@@ -25,7 +26,7 @@ import { createInvitationEditorReader } from '../../../src/modules/identity-acce
 import { createInvitationStudioRuntime } from '../../../src/modules/invitation-studio/invitation-studio.runtime.js';
 import { parseEnvironment } from '../../../src/config/env.js';
 import * as aiModule from '../../../src/integrations/ai-image/gemini-ai-image-provider.js';
-import * as storageModule from '../../../src/integrations/storage/supabase-storage-provider.js';
+import * as storageModule from '../../../src/integrations/storage/storage.factory.js';
 
 const database = new CatalogTestDatabase('isw234');
 const suite = catalogMigrationDatabaseUrl ? describe : describe.skip;
@@ -303,7 +304,7 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
     });
     const aiFactory = vi.spyOn(aiModule, 'createGeminiAiImageProvider').mockReturnValue(adapter);
     const storageFactory = vi
-      .spyOn(storageModule, 'createSupabaseStorageProvider')
+      .spyOn(storageModule, 'createStorageProvider')
       .mockReturnValue(f.storage.provider);
     let runtime: Awaited<ReturnType<typeof createInvitationStudioRuntime>> | undefined;
     try {
@@ -316,9 +317,10 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
         aiImage: { provider: 'gemini', apiKey: 'controlled-test-key', model: 'fixture-image' },
         storage: {
           enabled: true,
-          supabaseUrl: 'https://storage.example.test',
-          serviceRoleKey: 'controlled-test-key',
-          bucket: 'private-media',
+          provider: 'render-disk' as const,
+          root: tmpdir(),
+          publicOrigin: 'https://storage.example.test',
+          signingKey: 'controlled-storage-fixture-key-at-least-32-bytes',
         },
       });
       const app = express();

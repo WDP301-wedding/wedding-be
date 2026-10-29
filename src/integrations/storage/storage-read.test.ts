@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   SupabaseStorageProvider,
   type SupabaseStorageClientLike,
-} from './supabase-storage-provider.js';
+} from '../../../tests/fixtures/legacy-supabase-storage-provider.js';
 import { FakeStorageProvider } from './fake-storage-provider.js';
 import { createStoredObject } from './storage-provider.js';
 describe('Private content-addressed reads for derived invitation assets', () => {

@@ -11,10 +11,9 @@ import {
   type StorageObjectReference,
 } from './storage-provider.js';
 import {
-  createSupabaseStorageProvider,
   SupabaseStorageProvider,
   type SupabaseStorageClientLike,
-} from './supabase-storage-provider.js';
+} from '../../../tests/fixtures/legacy-supabase-storage-provider.js';
 
 const resourceId = '11111111-1111-4111-8111-111111111111';
 const pngBytes = Uint8Array.from([
@@ -551,16 +550,5 @@ describe('SupabaseStorageProvider', () => {
 
     await expect(promise).rejects.toBeInstanceOf(ProviderError);
     await expect(promise).rejects.toMatchObject({ code: 'PROVIDER_UNAVAILABLE' });
-  });
-
-  it('constructs the official standalone SDK adapter without issuing a request', () => {
-    const provider = createSupabaseStorageProvider({
-      bucket: 'wedding-private',
-      serviceRoleKey: 'test-service-key',
-      supabaseUrl: 'https://project.supabase.co/',
-      timeoutMs: 25,
-    });
-
-    expect(provider).toBeInstanceOf(SupabaseStorageProvider);
   });
 });

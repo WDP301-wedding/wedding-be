@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 import { describe, expect, it } from 'vitest';
 import { parseEnvironment } from '../../config/env.js';
 import {
@@ -194,9 +195,10 @@ describe('backend release evidence gates', () => {
       cors: { allowedOrigins: [plan.publicWebOrigin, plan.managementWebOrigin] },
       storage: {
         enabled: true as const,
-        supabaseUrl: 'https://storage.test',
-        serviceRoleKey: 'fixture',
-        bucket: 'private',
+        provider: 'render-disk' as const,
+        root: tmpdir(),
+        publicOrigin: 'https://storage.example.test',
+        signingKey: 'controlled-storage-fixture-key-at-least-32-bytes',
       },
       email: {
         enabled: true as const,

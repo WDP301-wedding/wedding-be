@@ -46,9 +46,9 @@ const productionRequiredVariables = [
   'CORS_ALLOWED_ORIGINS',
   'DATABASE_URL',
   'MIGRATION_DATABASE_URL',
-  'SUPABASE_URL',
-  'SUPABASE_SERVICE_ROLE_KEY',
-  'SUPABASE_STORAGE_BUCKET',
+  'STORAGE_DISK_PATH',
+  'STORAGE_PUBLIC_ORIGIN',
+  'STORAGE_SIGNING_KEY',
   ...identityRequiredVariables,
 ] as const;
 
@@ -210,10 +210,7 @@ const rawEnvironmentSchema = z
     AUTH_INVITATION_REISSUE_WINDOW_SECONDS: approvedInteger(
       approvedIdentityPolicy.invitationReissueWindowSeconds,
     ),
-    AUTH_PASSWORD_MIN_CHARACTERS: z
-      .enum(['1', '5', '12'])
-      .transform(Number)
-      .optional(),
+    AUTH_PASSWORD_MIN_CHARACTERS: z.enum(['1', '5', '12']).transform(Number).optional(),
     AUTH_PASSWORD_MAX_CHARACTERS: approvedInteger(approvedIdentityPolicy.passwordMaximumCharacters),
     AUTH_PASSWORD_MAX_BYTES: approvedInteger(approvedIdentityPolicy.passwordMaximumBytes),
     AUTH_SCRYPT_COST: approvedInteger(approvedIdentityPolicy.scryptCost),
@@ -252,15 +249,12 @@ const rawEnvironmentSchema = z
     ),
     DATABASE_URL: optionalString.pipe(databaseUrl.optional()),
     MIGRATION_DATABASE_URL: optionalString.pipe(databaseUrl.optional()),
-    STORAGE_DRIVER: z.enum(['supabase', 'render-disk']).default('supabase'),
+    STORAGE_DRIVER: z.literal('render-disk').optional(),
     STORAGE_DISK_PATH: optionalString.pipe(z.string().refine(isAbsolute).optional()),
     STORAGE_PUBLIC_ORIGIN: optionalString.pipe(
       httpsUrl.refine((value) => new URL(value).origin === value).optional(),
     ),
     STORAGE_SIGNING_KEY: optionalString.pipe(z.string().min(32).max(1024).optional()),
-    SUPABASE_URL: optionalString.pipe(httpsUrl.optional()),
-    SUPABASE_SERVICE_ROLE_KEY: optionalString,
-    SUPABASE_STORAGE_BUCKET: optionalString,
     RESEND_API_KEY: optionalString,
     VNPAY_TMN_CODE: optionalString.pipe(
       z
@@ -329,8 +323,6 @@ const rawEnvironmentSchema = z
 
     if (deployed) {
       for (const variableName of productionRequiredVariables) {
-        if (environment.STORAGE_DRIVER === 'render-disk' && variableName.startsWith('SUPABASE_'))
-          continue;
         const value = environment[variableName];
 
         if (value === undefined || (Array.isArray(value) && value.length === 0)) {
@@ -364,8 +356,14 @@ const rawEnvironmentSchema = z
       }
     }
 
-    if (environment.STORAGE_DRIVER === 'render-disk')
+    if (!deployed && environment.STORAGE_DRIVER === 'render-disk')
       requireVariables(
+        environment,
+        ['STORAGE_DISK_PATH', 'STORAGE_PUBLIC_ORIGIN', 'STORAGE_SIGNING_KEY'],
+        context,
+      );
+    else
+      requireAllOrNone(
         environment,
         ['STORAGE_DISK_PATH', 'STORAGE_PUBLIC_ORIGIN', 'STORAGE_SIGNING_KEY'],
         context,
@@ -397,11 +395,6 @@ const rawEnvironmentSchema = z
       }
     }
 
-    requireAllOrNone(
-      environment,
-      ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_STORAGE_BUCKET'],
-      context,
-    );
     requireAllOrNone(environment, ['RESEND_API_KEY', 'RESEND_FROM_EMAIL'], context);
     requireAllOrNone(
       environment,
@@ -468,12 +461,6 @@ type StorageConfig =
       root: string;
       publicOrigin: string;
       signingKey: string;
-    }>
-  | Readonly<{
-      enabled: true;
-      supabaseUrl: string;
-      serviceRoleKey: string;
-      bucket: string;
     }>;
 type EmailConfig =
   | DisabledProvider
@@ -654,12 +641,9 @@ function pickEnvironment(source: EnvironmentSource): EnvironmentSource {
     STORAGE_DISK_PATH: source.STORAGE_DISK_PATH,
     STORAGE_PUBLIC_ORIGIN: source.STORAGE_PUBLIC_ORIGIN,
     STORAGE_SIGNING_KEY: source.STORAGE_SIGNING_KEY,
-    SUPABASE_URL: source.SUPABASE_URL,
     PUBLIC_INVITATION_ORIGIN: source.PUBLIC_INVITATION_ORIGIN,
     SEATING_RECONCILER_ENABLED: source.SEATING_RECONCILER_ENABLED,
     AI_IMAGE_JOBS_ENABLED: source.AI_IMAGE_JOBS_ENABLED,
-    SUPABASE_SERVICE_ROLE_KEY: source.SUPABASE_SERVICE_ROLE_KEY,
-    SUPABASE_STORAGE_BUCKET: source.SUPABASE_STORAGE_BUCKET,
     RESEND_API_KEY: source.RESEND_API_KEY,
     VNPAY_TMN_CODE: source.VNPAY_TMN_CODE,
     VNPAY_HASH_SECRET: source.VNPAY_HASH_SECRET,
@@ -728,7 +712,6 @@ function rejectVariables<const Key extends EnvironmentKey>(
 
 function createConfig(environment: RawEnvironment): Omit<BackendConfig, 'notifications'> {
   const storage: StorageConfig =
-    environment.STORAGE_DRIVER === 'render-disk' &&
     environment.STORAGE_DISK_PATH &&
     environment.STORAGE_PUBLIC_ORIGIN &&
     environment.STORAGE_SIGNING_KEY
@@ -739,16 +722,7 @@ function createConfig(environment: RawEnvironment): Omit<BackendConfig, 'notific
           publicOrigin: environment.STORAGE_PUBLIC_ORIGIN,
           signingKey: environment.STORAGE_SIGNING_KEY,
         })
-      : environment.SUPABASE_URL !== undefined &&
-          environment.SUPABASE_SERVICE_ROLE_KEY !== undefined &&
-          environment.SUPABASE_STORAGE_BUCKET !== undefined
-        ? Object.freeze({
-            enabled: true,
-            supabaseUrl: environment.SUPABASE_URL,
-            serviceRoleKey: environment.SUPABASE_SERVICE_ROLE_KEY,
-            bucket: environment.SUPABASE_STORAGE_BUCKET,
-          })
-        : Object.freeze({ enabled: false });
+      : Object.freeze({ enabled: false });
   const email: EmailConfig =
     environment.BREVO_API_KEY !== undefined && environment.BREVO_FROM_EMAIL !== undefined
       ? Object.freeze({

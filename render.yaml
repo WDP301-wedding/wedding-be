@@ -88,12 +88,6 @@ services:
         sync: false
       - key: AUTH_OTP_HASH_KEY
         sync: false
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_SERVICE_ROLE_KEY
-        sync: false
-      - key: SUPABASE_STORAGE_BUCKET
-        sync: false
       # Preserve the approved identity policy and existing provider secrets via
       # a secure config transfer before starting. Never place values in Git.
       - key: LOG_LEVEL

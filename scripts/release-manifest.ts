@@ -141,15 +141,9 @@ async function main() {
         pinnedRuntimeVersion: (await readFile('.node-version', 'utf8')).trim(),
         selectedGeminiModel: config.aiImage.provider === 'gemini' ? config.aiImage.model : null,
         providerDependencies: Object.fromEntries(
-          [
-            '@google/genai',
-            '@supabase/storage-js',
-            '@prisma/client',
-            '@prisma/adapter-pg',
-            'pg',
-            'zod',
-            'express',
-          ].map((name) => [name, packageVersions[name]]),
+          ['@google/genai', '@prisma/client', '@prisma/adapter-pg', 'pg', 'zod', 'express'].map(
+            (name) => [name, packageVersions[name]],
+          ),
         ),
         evidence: receipts,
         routeInventory,

@@ -38,11 +38,10 @@ COPY --from=build --chown=node:node /app/prisma ./prisma
 COPY --from=build --chown=node:node /app/prisma.config.ts ./prisma.config.ts
 COPY --from=build --chown=node:node /app/package.json /app/package-lock.json ./
 COPY --chown=node:node openapi ./openapi
-COPY --chown=node:node certs ./certs
+COPY --chown=node:node certs/railway-spec11-root-ca.crt ./certs/railway-spec11-root-ca.crt
 COPY --chown=node:node assets ./assets
 COPY --chown=node:node scripts/performance-db-probe.mjs ./scripts/performance-db-probe.mjs
 COPY --chown=node:node scripts/render-start.sh ./scripts/render-start.sh
-COPY --chown=node:node scripts/render-copy-media.mjs ./scripts/render-copy-media.mjs
 
 USER node
 CMD ["node", "--enable-source-maps", "--import", "./dist/instrumentation.js", "dist/server.js"]

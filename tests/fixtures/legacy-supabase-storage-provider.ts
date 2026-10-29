@@ -1,12 +1,12 @@
-import { StorageClient } from '@supabase/storage-js';
-
-import { AppError, NotFoundError, ProviderError } from '../../core/errors/app-error.js';
+// Test-only compatibility fixture. Not imported by src or included in production builds.
+// Preserves historical storage-contract coverage without a Supabase SDK or network client.
+import { AppError, NotFoundError, ProviderError } from '../../src/core/errors/app-error.js';
 import {
   providerInfoResponseSchema,
   providerRemoveResponseSchema,
   providerSignedUrlResponseSchema,
   providerUploadResponseSchema,
-} from './storage.schemas.js';
+} from '../../src/integrations/storage/storage.schemas.js';
 import {
   createStoredObject,
   createStorageObjectReference,
@@ -16,7 +16,7 @@ import {
   type StorageObjectReference,
   type StorageProvider,
   type StoredObject,
-} from './storage-provider.js';
+} from '../../src/integrations/storage/storage-provider.js';
 
 const DEFAULT_PROVIDER_TIMEOUT_MS = 10_000;
 const bucketPattern = /^[a-z\d][a-z\d_-]{2,62}$/u;
@@ -46,13 +46,6 @@ interface SupabaseStorageProviderOptions {
   readonly bucket: string;
   readonly client: SupabaseStorageClientLike;
   readonly providerOrigin: string;
-  readonly timeoutMs?: number;
-}
-
-export interface SupabaseStorageConfiguration {
-  readonly bucket: string;
-  readonly serviceRoleKey: string;
-  readonly supabaseUrl: string;
   readonly timeoutMs?: number;
 }
 
@@ -235,35 +228,6 @@ export class SupabaseStorageProvider implements StorageProvider {
       }
     }
   }
-}
-
-export function createSupabaseStorageProvider(
-  configuration: SupabaseStorageConfiguration,
-): SupabaseStorageProvider {
-  const providerOrigin = new URL(configuration.supabaseUrl).origin;
-  const timeoutMs = configuration.timeoutMs ?? DEFAULT_PROVIDER_TIMEOUT_MS;
-  const client = new StorageClient(
-    `${providerOrigin}/storage/v1`,
-    {
-      apikey: configuration.serviceRoleKey,
-      Authorization: `Bearer ${configuration.serviceRoleKey}`,
-    },
-    createTimeoutFetch(timeoutMs),
-  );
-  return new SupabaseStorageProvider({
-    bucket: configuration.bucket,
-    client,
-    providerOrigin,
-    timeoutMs,
-  });
-}
-
-function createTimeoutFetch(timeoutMs: number): typeof fetch {
-  return (input, init) => {
-    const timeoutSignal = AbortSignal.timeout(timeoutMs);
-    const signal = init?.signal ? AbortSignal.any([init.signal, timeoutSignal]) : timeoutSignal;
-    return fetch(input, { ...init, signal });
-  };
 }
 
 function parseProviderResponse<T>(

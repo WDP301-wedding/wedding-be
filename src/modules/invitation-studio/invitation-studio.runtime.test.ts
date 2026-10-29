@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Config } from '../../config/config.js';
 import { createPrismaClient } from '../../core/database/prisma.js';
@@ -109,9 +110,10 @@ describe('InvitationStudioRuntime', () => {
     const runtime = await createInvitationStudioRuntime(
       config({
         enabled: true,
-        supabaseUrl: 'https://storage.example.test',
-        serviceRoleKey: 'test-key',
-        bucket: 'private-media',
+        provider: 'render-disk' as const,
+        root: tmpdir(),
+        publicOrigin: 'https://storage.example.test',
+        signingKey: 'controlled-storage-fixture-key-at-least-32-bytes',
       }),
     );
     expect(storage().constructor.name).toBe('SupabaseStorageProvider');
@@ -121,9 +123,10 @@ describe('InvitationStudioRuntime', () => {
     const runtime = await createInvitationStudioRuntime({
       ...config({
         enabled: true,
-        supabaseUrl: 'https://storage.example.test',
-        serviceRoleKey: 'test-key',
-        bucket: 'private-media',
+        provider: 'render-disk' as const,
+        root: tmpdir(),
+        publicOrigin: 'https://storage.example.test',
+        signingKey: 'controlled-storage-fixture-key-at-least-32-bytes',
       }),
       aiImage: { provider: 'gemini', apiKey: 'test-key', model: 'gemini-2.5-flash-image' },
       invitationStudio: { publicOrigin: null, reconcilerEnabled: true, imageJobsEnabled: true },
@@ -146,9 +149,10 @@ describe('InvitationStudioRuntime', () => {
       createInvitationStudioRuntime(
         config({
           enabled: true,
-          supabaseUrl: 'http://invalid.test',
-          serviceRoleKey: 'test-key',
-          bucket: 'private-media',
+          provider: 'render-disk' as const,
+          root: tmpdir(),
+          publicOrigin: 'https://storage.example.test',
+          signingKey: 'controlled-storage-fixture-key-at-least-32-bytes',
         }),
       ),
     ).rejects.toThrow();

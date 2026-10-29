@@ -19,7 +19,4 @@ npx prisma migrate resolve --rolled-back 20261029010000_booking_business_codes -
 # Apply additive releases against this service's configured database. Prisma's
 # migration lock serializes retries; set -e prevents starting an incompatible API.
 npm run db:migrate:deploy
-if [ "${STORAGE_IMPORT_FROM_SUPABASE:-false}" = 'true' ]; then
-  node ./scripts/render-copy-media.mjs
-fi
 exec node --enable-source-maps --import ./dist/instrumentation.js dist/server.js

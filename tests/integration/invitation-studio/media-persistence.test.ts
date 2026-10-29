@@ -132,7 +132,7 @@ describeDatabase(
       expect(await database.prisma.invitationMediaUploadAttempt.count()).toBe(1);
     });
 
-    it('executes production Supabase adapter with real PostgreSQL/decoder and redacted private reads', async () => {
+    it('executes the historical storage fixture with PostgreSQL/decoder and redacted private reads', async () => {
       const sdk = controlledStorage(),
         h = harness(sdk.provider);
       const asset = await h.upload({ idempotencyKey: 'production-adapter' });
@@ -158,7 +158,7 @@ describeDatabase(
       expect(sdk.objects.size).toBe(1);
     });
 
-    it('reconciles a Supabase object uploaded before info failure, without blind overwrite/deletion', async () => {
+    it('reconciles a controlled storage object uploaded before info failure, without blind overwrite/deletion', async () => {
       const sdk = controlledStorage(),
         h = harness(sdk.provider);
       vi.spyOn(sdk.bucket, 'info').mockResolvedValueOnce({

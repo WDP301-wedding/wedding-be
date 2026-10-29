@@ -749,6 +749,7 @@ model Booking {
   billingCommands             BillingOperationCommand[]
   billingRefundApprovals      BillingRefundApproval[]
   commercialContract          CommercialContract?
+  commercialSelections        BookingCommercialSelectionRevision[]
   commercialAppendices        CommercialAppendixHead?
   incidentalExpenses          IncidentalExpenseDraft?
   finalInvoices               FinalInvoiceHead?
@@ -769,6 +770,21 @@ enum CommercialLineCategory {
   MENU
   PRINT
   SERVICE
+}
+
+model BookingCommercialSelectionRevision {
+  id                 String    @id @db.Uuid
+  bookingId          String    @db.Uuid
+  revisionNumber     Int
+  status             String    @db.VarChar(16)
+  lines              Json
+  totalVnd           Decimal   @db.Decimal(18, 0)
+  createdAt          DateTime  @db.Timestamptz(6)
+  createdByAccountId String    @db.Uuid
+  submittedAt        DateTime? @db.Timestamptz(6)
+  booking            Booking   @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+
+  @@unique([bookingId, revisionNumber])
 }
 
 model CommercialContract {
