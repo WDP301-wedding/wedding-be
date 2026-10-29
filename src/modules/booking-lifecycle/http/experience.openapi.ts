@@ -1,4 +1,5 @@
 import type { z } from 'zod';
+import { bookingLookupQuerySchema, bookingLookupResponseSchema } from './booking-lookup.schemas.js';
 import {
   activationParams,
   activationBody,
@@ -121,6 +122,14 @@ function operation(
   };
 }
 export const experienceOpenApiPaths: NonNullable<ZodOpenApiObject['paths']> = {
+  '/management/booking-lookups': {
+    get: {
+      ...operation('lookupManagedBookings', bookingLookupResponseSchema),
+      requestParams: { query: bookingLookupQuerySchema },
+      description:
+        'Owning Manager only; private no-store. Supply q (2–120 characters: exact HY code, name, alias, intake phone or legacy UUID) or ids (at most 20 comma-separated UUIDs). Returns at most 20 current booking identities. Foreign resources are omitted. This read does not modify assignments or bookings.',
+    },
+  },
   '/management/consultations/{consultationId}/workspace': {
     get: {
       ...operation('getConsultationWorkspace', consultationWorkspaceResponseSchema),

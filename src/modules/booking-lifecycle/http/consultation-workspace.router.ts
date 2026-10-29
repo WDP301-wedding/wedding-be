@@ -1,6 +1,7 @@
 import { Router, type Response } from 'express';
 import type { PrismaClient } from '../../../generated/prisma/client.js';
 import { AppError } from '../../../core/errors/app-error.js';
+import { registerBookingLookup } from './booking-lookup.route.js';
 import { validateRequest, validatedRequest } from '../../../core/http/validate.js';
 import {
   createAuthenticatedActorMiddleware,
@@ -21,7 +22,7 @@ export function createConsultationWorkspaceRouter(
 ) {
   const router = Router();
   router.use(
-    ['/consultations/:consultationId/workspace', '/consultation-customers'],
+    ['/consultations/:consultationId/workspace', '/consultation-customers', '/booking-lookups'],
     createAuthenticatedActorMiddleware(resolver),
     (_request, response, next) => {
       if (!(response.locals.actor as AuthenticatedActor).roles.includes('MANAGER')) {
@@ -34,6 +35,7 @@ export function createConsultationWorkspaceRouter(
     },
   );
   const managerId = (response: Response) => (response.locals.actor as AuthenticatedActor).accountId;
+  registerBookingLookup(router, prisma);
   router.get(
     '/consultations/:consultationId/workspace',
     validateRequest({ params: consultationWorkspaceParamsSchema }),
