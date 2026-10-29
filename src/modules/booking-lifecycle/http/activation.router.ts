@@ -17,6 +17,7 @@ import {
 } from '../../identity-access/workspace-invitation/workspace-invitation.repository.js';
 import {
   activationParams,
+  activationStatusQuery,
   activationBody,
   activationResponse,
   activationSentResponse,
@@ -40,34 +41,47 @@ export function createActivationRouter(
       include: { invitationIntent: { select: { status: true } } },
     });
     if (!consultation) throw failure(404, 'NOT_FOUND');
-    const [grant, latest] = await Promise.all([
+    const [grant, latest, account] = await Promise.all([
       prisma.consultationAccess.findFirst({
         where: {
           consultationId,
           account: { emailNormalized: consultation.intendedEmailNormalized },
         },
-        select: { account: { select: { status: true } } },
+        select: { id: true },
       }),
       prisma.workspaceInvitation.findFirst({
         where: { consultationId, recipientEmailNormalized: consultation.intendedEmailNormalized },
         orderBy: { sequence: 'desc' },
         select: { id: true, status: true, expiresAt: true, acceptedAt: true },
       }),
+      prisma.account.findUnique({
+        where: { emailNormalized: consultation.intendedEmailNormalized },
+        select: { status: true, passwordCredential: { select: { accountId: true } } },
+      }),
     ]);
-    return { consultation, grant, latest };
+    const accountState =
+      account === null
+        ? ('NOT_REGISTERED' as const)
+        : account.status === 'ACTIVE' && account.passwordCredential !== null
+          ? ('ACTIVE' as const)
+          : ('UNAVAILABLE' as const);
+    return { consultation, grant, latest, accountState };
   }
   router.get(
     root + '/activation-status',
     authenticate,
-    validateRequest({ params: activationParams, query: z.strictObject({}) }),
+    validateRequest({ params: activationParams, query: activationStatusQuery }),
     async (_request, response) => {
-      const { params } = validatedRequest(response, { params: activationParams });
-      const { consultation, grant, latest } = await context(
+      const { params, query } = validatedRequest(response, {
+        params: activationParams,
+        query: activationStatusQuery,
+      });
+      const { consultation, grant, latest, accountState } = await context(
         params.consultationId,
         response.locals.actor as AuthenticatedActor,
       );
       const state = grant
-        ? grant.account.status === 'ACTIVE'
+        ? accountState === 'ACTIVE'
           ? 'ACTIVATED'
           : 'ACCOUNT_UNAVAILABLE'
         : latest?.status === 'ACCEPTED'
@@ -88,9 +102,24 @@ export function createActivationRouter(
             consultationRevision: consultation.revision,
             recipientEmail: consultation.intendedEmail,
             state,
+            ...(query.includeAccountState === 'true'
+              ? {
+                  accountState,
+                  accessState:
+                    accountState === 'UNAVAILABLE' || state === 'ACCESS_UNAVAILABLE'
+                      ? 'UNAVAILABLE'
+                      : grant
+                        ? 'GRANTED'
+                        : 'NOT_GRANTED',
+                }
+              : {}),
             expiresAt: latest?.expiresAt.toISOString() ?? null,
             acceptedAt: latest?.acceptedAt?.toISOString() ?? null,
-            canSend: !grant && latest?.status !== 'ACCEPTED' && latest?.status !== 'REVOKED',
+            canSend:
+              accountState !== 'UNAVAILABLE' &&
+              !grant &&
+              latest?.status !== 'ACCEPTED' &&
+              latest?.status !== 'REVOKED',
           },
         }),
       );
@@ -121,10 +150,14 @@ export function createActivationRouter(
         body: activationBody,
       });
       const actor = response.locals.actor as AuthenticatedActor;
-      const { consultation, grant, latest } = await context(params.consultationId, actor);
+      const { consultation, grant, latest, accountState } = await context(
+        params.consultationId,
+        actor,
+      );
       if (consultation.revision !== body.expectedRevision)
         throw failure(409, 'CONSULTATION_REVISION_STALE');
       if (grant || latest?.status === 'ACCEPTED') throw failure(409, 'ACCOUNT_ALREADY_ACTIVATED');
+      if (accountState === 'UNAVAILABLE') throw failure(409, 'ACCOUNT_UNAVAILABLE');
       if (latest?.status === 'REVOKED') throw failure(409, 'INVITATION_REVOKED');
       const hex = createHash('sha256')
         .update(actor.accountId + ':' + consultation.id + ':' + request.get('idempotency-key'))

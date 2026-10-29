@@ -11,25 +11,33 @@ export function registerBookingLookup(router: Router, prisma: PrismaClient) {
     validateRequest({ query: bookingLookupQuerySchema }),
     async (_request, response) => {
       const { query } = validatedRequest(response, { query: bookingLookupQuerySchema });
-      const managerAccountId = (response.locals.actor as AuthenticatedActor).accountId;
       const q = query.q?.normalize('NFC') ?? '';
       const code = q?.toUpperCase();
+      const qDigits = q.replace(/\D+/g, '');
       const identityFilter: Prisma.BookingWhereInput = query.ids
         ? { id: { in: [...new Set(query.ids.split(','))] } }
-        : code && /^HY-\d+$/u.test(code)
-          ? { bookingCode: code }
-          : {
-              OR: [
-                { alias: { contains: q, mode: 'insensitive' } },
-                { consultation: { displayName: { contains: q, mode: 'insensitive' } } },
-                { consultation: { brideName: { contains: q, mode: 'insensitive' } } },
-                { consultation: { groomName: { contains: q, mode: 'insensitive' } } },
-                { consultation: { intakeRequest: { phone: { contains: q } } } },
-                ...(q && zUuid(q) ? [{ id: q }] : []),
-              ],
-            };
+        : {
+            OR: [
+              ...(code && /^HY-\d+$/u.test(code) ? [{ bookingCode: code }] : []),
+              { bookingCode: { contains: q, mode: 'insensitive' } },
+              { alias: { contains: q, mode: 'insensitive' } },
+              { consultation: { displayName: { contains: q, mode: 'insensitive' } } },
+              { consultation: { brideName: { contains: q, mode: 'insensitive' } } },
+              { consultation: { groomName: { contains: q, mode: 'insensitive' } } },
+              { consultation: { intendedEmail: { contains: q, mode: 'insensitive' } } },
+              { consultation: { intakeRequest: { displayName: { contains: q, mode: 'insensitive' } } } },
+              { consultation: { intakeRequest: { brideName: { contains: q, mode: 'insensitive' } } } },
+              { consultation: { intakeRequest: { groomName: { contains: q, mode: 'insensitive' } } } },
+              { consultation: { intakeRequest: { phone: { contains: q } } } },
+              ...(qDigits.length >= 4
+                ? [{ consultation: { intakeRequest: { phone: { contains: qDigits } } } }]
+                : []),
+              { consultation: { intakeRequest: { email: { contains: q, mode: 'insensitive' } } } },
+              ...(q && zUuid(q) ? [{ id: q }] : []),
+            ],
+          };
       const rows = await prisma.booking.findMany({
-        where: { AND: [{ consultation: { managerAccountId } }, identityFilter] },
+        where: identityFilter,
         take: 20,
         orderBy: [{ eventDate: 'desc' }, { id: 'desc' }],
         select: {
@@ -38,7 +46,23 @@ export function registerBookingLookup(router: Router, prisma: PrismaClient) {
           eventDate: true,
           shiftCode: true,
           alias: true,
-          consultation: { select: { displayName: true } },
+          consultation: {
+            select: {
+              displayName: true,
+              brideName: true,
+              groomName: true,
+              intendedEmail: true,
+              intakeRequest: {
+                select: {
+                  phone: true,
+                  email: true,
+                  brideName: true,
+                  groomName: true,
+                  displayName: true,
+                },
+              },
+            },
+          },
           proposalSnapshot: { select: { hallName: true } },
         },
       });
@@ -47,7 +71,11 @@ export function registerBookingLookup(router: Router, prisma: PrismaClient) {
           data: rows.map((row) => ({
             bookingId: row.id,
             bookingCode: row.bookingCode,
-            customerName: row.consultation.displayName,
+            customerName: row.consultation.displayName || row.consultation.intakeRequest?.displayName || '',
+            brideName: row.consultation.brideName || row.consultation.intakeRequest?.brideName || null,
+            groomName: row.consultation.groomName || row.consultation.intakeRequest?.groomName || null,
+            phone: row.consultation.intakeRequest?.phone ?? null,
+            email: row.consultation.intendedEmail || row.consultation.intakeRequest?.email || null,
             eventDate: row.eventDate.toISOString().slice(0, 10),
             hallName: row.proposalSnapshot?.hallName ?? '',
             shiftCode: row.shiftCode,

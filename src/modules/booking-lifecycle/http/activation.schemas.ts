@@ -1,5 +1,8 @@
 import { z } from 'zod';
 export const activationParams = z.strictObject({ consultationId: z.uuid() });
+export const activationStatusQuery = z.strictObject({
+  includeAccountState: z.enum(['true']).optional(),
+});
 export const activationBody = z.strictObject({ expectedRevision: z.int().positive() });
 export const activationResponse = z.strictObject({
   data: z.strictObject({
@@ -19,6 +22,8 @@ export const activationResponse = z.strictObject({
     expiresAt: z.iso.datetime().nullable(),
     acceptedAt: z.iso.datetime().nullable(),
     canSend: z.boolean(),
+    accountState: z.enum(['NOT_REGISTERED', 'ACTIVE', 'UNAVAILABLE']).optional(),
+    accessState: z.enum(['NOT_GRANTED', 'GRANTED', 'UNAVAILABLE']).optional(),
   }),
 });
 export const activationSentResponse = z.strictObject({

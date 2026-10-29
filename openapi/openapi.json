@@ -41801,7 +41801,7 @@
     },
     "/management/consultations/{consultationId}/activation-status": {
       "get": {
-        "description": "Owning Manager only. Concealed foreign resources. Current grant/account and invitation evidence; does not infer delivery or deposit from issuance. Private no-store.",
+        "description": "Owning Manager only. Concealed foreign resources. Optional includeAccountState=true separates recipient account readiness from access to this consultation. Without it, the legacy response shape is preserved. Existing accounts accept invitations with their current password; no duplicate account or automatic grant is created. Private no-store.",
         "operationId": "getConsultationActivationStatus",
         "parameters": [
           {
@@ -41811,6 +41811,16 @@
             "schema": {
               "format": "uuid",
               "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "includeAccountState",
+            "schema": {
+              "enum": [
+                "true"
+              ],
               "type": "string"
             }
           }
@@ -41836,6 +41846,22 @@
                               "type": "null"
                             }
                           ]
+                        },
+                        "accessState": {
+                          "enum": [
+                            "NOT_GRANTED",
+                            "GRANTED",
+                            "UNAVAILABLE"
+                          ],
+                          "type": "string"
+                        },
+                        "accountState": {
+                          "enum": [
+                            "NOT_REGISTERED",
+                            "ACTIVE",
+                            "UNAVAILABLE"
+                          ],
+                          "type": "string"
                         },
                         "canSend": {
                           "type": "boolean"

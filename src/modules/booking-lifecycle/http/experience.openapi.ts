@@ -2,6 +2,7 @@ import type { z } from 'zod';
 import { bookingLookupQuerySchema, bookingLookupResponseSchema } from './booking-lookup.schemas.js';
 import {
   activationParams,
+  activationStatusQuery,
   activationBody,
   activationResponse,
   activationSentResponse,
@@ -149,9 +150,9 @@ export const experienceOpenApiPaths: NonNullable<ZodOpenApiObject['paths']> = {
   '/management/consultations/{consultationId}/activation-status': {
     get: {
       ...operation('getConsultationActivationStatus', activationResponse),
-      requestParams: { path: activationParams },
+      requestParams: { path: activationParams, query: activationStatusQuery },
       description:
-        'Owning Manager only. Concealed foreign resources. Current grant/account and invitation evidence; does not infer delivery or deposit from issuance. Private no-store.',
+        'Owning Manager only. Concealed foreign resources. Optional includeAccountState=true separates recipient account readiness from access to this consultation. Without it, the legacy response shape is preserved. Existing accounts accept invitations with their current password; no duplicate account or automatic grant is created. Private no-store.',
     },
   },
   '/management/consultations/{consultationId}/activation-invitations': {
