@@ -299,6 +299,7 @@ export function createPrismaConsultationWorkspaceRepository(
               revision: 1,
               planningHeadcount: record.proposal.planningHeadcount,
               proposalSnapshot: { create: proposalSnapshotData(record.proposal) },
+              commercialContract: { create: { modelVersion: 'FULL_CONTRACT_V1' } },
             },
           });
           const updated = await transaction.consultation.updateMany({

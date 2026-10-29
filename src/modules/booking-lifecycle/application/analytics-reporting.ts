@@ -9,6 +9,13 @@ export const commercialMetricLineSchema = z.strictObject({
   quantity: z.int().positive(),
 });
 export const bookingAnalyticsSchema = bookingReportRowSchema.extend({
+  bookingCode: z
+    .string()
+    .regex(/^HY-\d{6,}$/)
+    .nullable()
+    .optional(),
+  customerName: z.string().nullable().optional(),
+  alias: z.string().nullable().optional(),
   planningHeadcount: z.int().nonnegative(),
   originalContractTotalVnd: vnd.nullable(),
   approvedAppendixDeltaVnd: z.int(),

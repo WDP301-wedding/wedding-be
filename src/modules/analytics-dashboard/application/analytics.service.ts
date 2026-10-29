@@ -48,6 +48,8 @@ const filterDigest = (q: AnalyticsQuery, report: AnalyticsReport, scope: string)
   createHash('sha256')
     .update(JSON.stringify({ ...q, cursor: undefined, report, scope }))
     .digest('hex');
+const searchText = (value: string) =>
+  value.toLocaleLowerCase('vi-VN').normalize('NFD').replace(/\p{M}/gu, '').replaceAll('đ', 'd');
 const dependencies: Record<AnalyticsReport, ReportingOwner[]> = {
   overview: ['booking', 'billing', 'venue'],
   revenue: ['booking', 'billing'],
@@ -186,6 +188,9 @@ export class AnalyticsService {
         ...this.page(
           selected.map((b) => ({
             bookingId: b.bookingId,
+            bookingCode: b.bookingCode ?? null,
+            customerName: b.customerName ?? null,
+            alias: b.alias ?? null,
             eventDate: b.eventDate,
             hallId: b.hallId,
             hallNameSnapshot: b.hallNameSnapshot,
@@ -295,7 +300,12 @@ export class AnalyticsService {
     };
   }
   private matches(b: BookingAnalyticsRow, q: AnalyticsQuery, eventDate: boolean) {
+    const search = q.search ? searchText(q.search) : null;
     return (
+      (!search ||
+        [b.bookingCode, b.customerName, b.alias, b.hallNameSnapshot, b.bookingId].some(
+          (value) => value != null && searchText(value).includes(search),
+        )) &&
       (!eventDate || (b.eventDate >= q.dateFrom && b.eventDate <= q.dateTo)) &&
       (!q.hallId || q.hallId === b.hallId) &&
       (!q.phase || q.phase === b.phase) &&

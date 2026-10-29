@@ -106,6 +106,11 @@ export const contractsResponseSchema = z.strictObject({
     modelVersion: z.enum(['LEGACY_PROPOSAL_V1', 'FULL_CONTRACT_V1']),
     currentRevisionId: z.uuid().nullable(),
     eligibleForDeposit: z.boolean(),
+    capabilities: z.strictObject({
+      canManageDraft: z.boolean(),
+      canApprove: z.boolean(),
+      canWithdrawApproval: z.boolean(),
+    }),
     revisions: z.array(contractViewSchema).max(50),
     nextCursor: z.uuid().nullable(),
   }),

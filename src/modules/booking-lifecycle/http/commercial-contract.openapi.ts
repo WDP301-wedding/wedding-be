@@ -42,7 +42,7 @@ export const commercialContractOpenApiPaths = {
       tags: ['Booking lifecycle'],
       security,
       description:
-        'Read-only server-priced draft preview for the owning Manager/Couple. Same revision, predecessor, phase, payment-pin and catalog eligibility guards as draft creation. No saved revision, approval, invoice or financial write. Private no-store. Saving revalidates independently.',
+        'Read-only server-priced draft preview for the owning Manager only. Same revision, predecessor, phase, payment-pin and catalog eligibility guards as draft creation. No saved revision, approval, invoice or financial write. Private no-store. Saving revalidates independently.',
       requestBody: {
         required: true,
         content: { 'application/json': { schema: contractDraftSchema } },
@@ -78,7 +78,7 @@ export const commercialContractOpenApiPaths = {
       tags: ['Booking lifecycle'],
       security,
       description:
-        'Explicit FULL_CONTRACT_V1 conversion for uncharged/unsettled legacy drafts, or successor replacing the current revision. expectedRevision is the Booking revision. Null predecessor only for the first draft. Server freezes current catalog/profile/venue/timeline facts and checked totals; MENU quantities are tables, PRINT copies. No inherited approvals. Reject monetary history or active/unknown pins.',
+        'Owning Manager only. New bookings start as FULL_CONTRACT_V1 even without a draft. Explicit conversion for uncharged/unsettled legacy drafts, or successor replacing an unapproved current revision; withdraw own approval before editing any approved document. expectedRevision is the Booking revision. Null predecessor only for the first draft. Server freezes current catalog/profile/venue/timeline facts and checked totals; MENU quantities are tables, PRINT copies. No inherited approvals. Reject monetary history or active/unknown pins.',
       parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }],
       requestBody: {
         required: true,
@@ -94,7 +94,7 @@ export const commercialContractOpenApiPaths = {
           'submissions',
           'submitCommercialContract',
           contractDecisionSchema,
-          'Revalidate current selections and exact draft digest. Catalog/profile changes require explicit successor/reselection. Both names required. Submits for two approvals; never silently reprices.',
+          'Owning Manager only. Revalidate current selections and exact draft digest. Catalog/profile changes require explicit successor/reselection. Both names required. Submits for two approvals; never silently reprices.',
         ],
         [
           'approvals',

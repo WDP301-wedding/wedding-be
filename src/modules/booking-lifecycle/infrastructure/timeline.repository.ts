@@ -56,6 +56,18 @@ export function createPrismaTimelineRepository(
             input.expectedBookingRevision,
           );
           await requireNoDepositIntent(transaction, input.revision.bookingId);
+          if (booking.phase !== 'CONFIRMED' && input.revision.predecessorRevisionId !== null) {
+            const predecessor = await transaction.bookingTimelineRevision.findUnique({
+              where: { id: input.revision.predecessorRevisionId },
+              select: { managerApprovedAt: true, coupleApprovedAt: true },
+            });
+            if (predecessor?.managerApprovedAt && predecessor.coupleApprovedAt)
+              throw new AppError({
+                status: 409,
+                code: 'TIMELINE_APPROVAL_WITHDRAWAL_REQUIRED',
+                message: 'Withdraw timeline approval before preparing a new revision.',
+              });
+          }
           if ((booking.phase === 'CONFIRMED') !== (input.changeReason !== undefined)) {
             throw new AppError({
               status: 409,

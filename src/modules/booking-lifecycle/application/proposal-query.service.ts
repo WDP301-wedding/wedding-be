@@ -55,9 +55,16 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
           ? decimalNumber(approvedContract.depositAmountVnd)
           : decimalNumber(snapshot.depositAmountVnd);
       const contractDocument = approvedContract?.document as
-        | Readonly<{ tableCount?: number }>
-        | undefined;
+        Readonly<{ tableCount?: number }> | undefined;
       const tableCount = contractDocument?.tableCount ?? snapshot.tableCount;
+      const paymentPending = booking.depositIntents.length > 0;
+      const mutuallyApproved = Boolean(
+        booking.currentTimelineRevision?.managerApprovedAt &&
+        booking.currentTimelineRevision.coupleApprovedAt,
+      );
+      const ownApproval = manager
+        ? booking.currentTimelineRevision?.managerApprovedAt
+        : booking.currentTimelineRevision?.coupleApprovedAt;
       return immutable({
         bookingId: booking.id,
         consultationId: booking.consultationId,
@@ -92,11 +99,19 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
         effectiveTimeline: timelineView(booking.effectiveTimelineRevision),
         capabilities: {
           accessLevel: grant.level,
-          canEditTimeline: ['DRAFT', 'AWAITING_DEPOSIT', 'CONFIRMED'].includes(booking.phase),
+          canEditTimeline:
+            !paymentPending &&
+            (booking.phase === 'CONFIRMED' ||
+              (['DRAFT', 'AWAITING_DEPOSIT'].includes(booking.phase) && !mutuallyApproved)),
           canApproveTimeline:
+            !paymentPending &&
+            !ownApproval &&
             ['DRAFT', 'AWAITING_DEPOSIT', 'CONFIRMED'].includes(booking.phase) &&
             booking.currentTimelineRevision?.state === 'CURRENT',
-          canWithdrawApproval: ['DRAFT', 'AWAITING_DEPOSIT'].includes(booking.phase),
+          canWithdrawApproval:
+            !paymentPending &&
+            Boolean(ownApproval) &&
+            ['DRAFT', 'AWAITING_DEPOSIT'].includes(booking.phase),
           canRequestCancellation:
             !manager && grant.level === 'FULL' && booking.phase === 'CONFIRMED',
         },
@@ -153,6 +168,11 @@ async function requireProposal(prisma: PrismaClient, bookingId: string) {
         select: { id: true, reason: true, requestedAt: true },
       },
       consultation: { select: { managerAccountId: true } },
+      depositIntents: {
+        where: { status: { in: ['ACTIVE', 'UNKNOWN'] } },
+        take: 1,
+        select: { id: true },
+      },
       commercialContract: {
         select: {
           currentRevision: {

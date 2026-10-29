@@ -16,6 +16,7 @@ export const analyticsQuerySchema = z
       .optional(),
     pageSize: z.coerce.number().int().min(1).max(100).default(20),
     cursor: z.string().max(2048).optional(),
+    search: z.string().trim().max(120).optional(),
   })
   .refine(
     (q) => {
@@ -68,6 +69,13 @@ const popularity = z.strictObject({
 });
 export const bookingRowSchema = z.strictObject({
   bookingId: z.uuid(),
+  bookingCode: z
+    .string()
+    .regex(/^HY-\d{6,}$/)
+    .nullable()
+    .optional(),
+  customerName: z.string().nullable().optional(),
+  alias: z.string().nullable().optional(),
   eventDate: z.iso.date(),
   hallId: z.uuid(),
   hallNameSnapshot: z.string(),

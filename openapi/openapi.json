@@ -10877,6 +10877,26 @@
                           "maximum": 9007199254740991,
                           "type": "integer"
                         },
+                        "capabilities": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "canApprove": {
+                              "type": "boolean"
+                            },
+                            "canManageDraft": {
+                              "type": "boolean"
+                            },
+                            "canWithdrawApproval": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "canManageDraft",
+                            "canApprove",
+                            "canWithdrawApproval"
+                          ],
+                          "type": "object"
+                        },
                         "currentRevisionId": {
                           "anyOf": [
                             {
@@ -11307,6 +11327,7 @@
                         "modelVersion",
                         "currentRevisionId",
                         "eligibleForDeposit",
+                        "capabilities",
                         "revisions",
                         "nextCursor"
                       ],
@@ -11359,7 +11380,7 @@
         }
       ],
       "post": {
-        "description": "Explicit FULL_CONTRACT_V1 conversion for uncharged/unsettled legacy drafts, or successor replacing the current revision. expectedRevision is the Booking revision. Null predecessor only for the first draft. Server freezes current catalog/profile/venue/timeline facts and checked totals; MENU quantities are tables, PRINT copies. No inherited approvals. Reject monetary history or active/unknown pins.",
+        "description": "Owning Manager only. New bookings start as FULL_CONTRACT_V1 even without a draft. Explicit conversion for uncharged/unsettled legacy drafts, or successor replacing an unapproved current revision; withdraw own approval before editing any approved document. expectedRevision is the Booking revision. Null predecessor only for the first draft. Server freezes current catalog/profile/venue/timeline facts and checked totals; MENU quantities are tables, PRINT copies. No inherited approvals. Reject monetary history or active/unknown pins.",
         "operationId": "createCommercialContractRevision",
         "parameters": [
           {
@@ -11903,7 +11924,7 @@
         }
       ],
       "post": {
-        "description": "Read-only server-priced draft preview for the owning Manager/Couple. Same revision, predecessor, phase, payment-pin and catalog eligibility guards as draft creation. No saved revision, approval, invoice or financial write. Private no-store. Saving revalidates independently.",
+        "description": "Read-only server-priced draft preview for the owning Manager only. Same revision, predecessor, phase, payment-pin and catalog eligibility guards as draft creation. No saved revision, approval, invoice or financial write. Private no-store. Saving revalidates independently.",
         "operationId": "previewCommercialContract",
         "requestBody": {
           "content": {
@@ -12882,7 +12903,7 @@
         }
       ],
       "post": {
-        "description": "Revalidate current selections and exact draft digest. Catalog/profile changes require explicit successor/reselection. Both names required. Submits for two approvals; never silently reprices.",
+        "description": "Owning Manager only. Revalidate current selections and exact draft digest. Catalog/profile changes require explicit successor/reselection. Both names required. Submits for two approvals; never silently reprices.",
         "operationId": "submitCommercialContract",
         "parameters": [
           {
@@ -28017,6 +28038,14 @@
               "maxLength": 2048,
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "maxLength": 120,
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -28395,6 +28424,14 @@
               "maxLength": 2048,
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "maxLength": 120,
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -28481,10 +28518,33 @@
                           "items": {
                             "additionalProperties": false,
                             "properties": {
+                              "alias": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "bookingCode": {
+                                "anyOf": [
+                                  {
+                                    "pattern": "^HY-\\d{6,}$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
                               "bookingId": {
                                 "format": "uuid",
                                 "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                                 "type": "string"
+                              },
+                              "customerName": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
                               },
                               "eventDate": {
                                 "format": "date",
@@ -28887,6 +28947,14 @@
             "name": "cursor",
             "schema": {
               "maxLength": 2048,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "maxLength": 120,
               "type": "string"
             }
           }
@@ -29528,6 +29596,14 @@
               "maxLength": 2048,
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "maxLength": 120,
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -30167,6 +30243,14 @@
               "maxLength": 2048,
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "maxLength": 120,
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -30605,6 +30689,14 @@
             "name": "cursor",
             "schema": {
               "maxLength": 2048,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "maxLength": 120,
               "type": "string"
             }
           }
