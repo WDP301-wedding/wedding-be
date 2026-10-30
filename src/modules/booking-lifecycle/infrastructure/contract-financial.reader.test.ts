@@ -23,10 +23,15 @@ function fixture() {
     state: 'SUPERSEDED',
   };
   const revision = vi.fn().mockResolvedValue(row),
-    head = vi.fn().mockResolvedValue(null);
+    head = vi.fn<() => Promise<{ bookingId: string } | null>>().mockResolvedValue(null);
   const prisma = {
     commercialContractRevision: { findFirst: revision },
-    commercialContract: { findUnique: head },
+    booking: {
+      findUnique: vi.fn(async () => ({
+        commercialModelVersion: 'LEGACY_PROPOSAL_V1',
+        commercialContract: await head(),
+      })),
+    },
   } as unknown as PrismaClient;
   return { row, revision, head, reader: createContractFinancialReader(prisma) };
 }

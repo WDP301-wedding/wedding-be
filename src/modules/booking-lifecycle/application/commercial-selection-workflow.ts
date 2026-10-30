@@ -137,9 +137,6 @@ export function createCustomerSelectionWorkflow(options: {
     const at = options.now();
     if (access.booking.commercialContract === null) {
       await options.conversion(client).requireConvertible(access.booking.id);
-      await client.commercialContract.create({
-        data: { bookingId: access.booking.id, modelVersion: 'FULL_CONTRACT_V1' },
-      });
     }
     const row = await client.bookingCommercialSelectionRevision.create({
       data: {
@@ -156,7 +153,7 @@ export function createCustomerSelectionWorkflow(options: {
     });
     const booking = await client.booking.update({
       where: { id: access.booking.id, revision: access.booking.revision },
-      data: { revision: { increment: 1 } },
+      data: { revision: { increment: 1 }, commercialModelVersion: 'FULL_CONTRACT_V1' },
     });
     const action = 'booking.contract-selection-' + (submit ? 'submitted' : 'draft-saved');
     const payload = { bookingId: booking.id, selectionRevisionId: row.id, status: row.status };

@@ -145,7 +145,7 @@ export function createCommercialContractService(options: Options) {
   ) {
     const booking = await client.booking.update({
       where: { id: access.booking.id, revision: access.booking.revision },
-      data: { revision: { increment: 1 } },
+      data: { revision: { increment: 1 }, commercialModelVersion: 'FULL_CONTRACT_V1' },
     });
     const payload = {
       bookingId: booking.id,
@@ -372,9 +372,9 @@ export function createCommercialContractService(options: Options) {
               bookingId,
               bookingRevision: booking.revision,
               modelVersion:
-                booking.commercialContract === null
-                  ? ('LEGACY_PROPOSAL_V1' as const)
-                  : ('FULL_CONTRACT_V1' as const),
+                booking.commercialContract !== null
+                  ? ('FULL_CONTRACT_V1' as const)
+                  : booking.commercialModelVersion,
               currentRevisionId: booking.commercialContract?.currentRevisionId ?? null,
               eligibleForDeposit: eligible,
               customerSelection,

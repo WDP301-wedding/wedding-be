@@ -4,6 +4,10 @@ export const activationStatusQuery = z.strictObject({
   includeAccountState: z.enum(['true']).optional(),
 });
 export const activationBody = z.strictObject({ expectedRevision: z.int().positive() });
+export const existingCustomerLinkBody = activationBody.extend({ sourceConsultationId: z.uuid() });
+export const existingCustomerLinkResponse = z.strictObject({
+  data: z.strictObject({ consultationId: z.uuid(), linked: z.literal(true) }),
+});
 export const activationResponse = z.strictObject({
   data: z.strictObject({
     consultationId: z.uuid(),
@@ -24,6 +28,7 @@ export const activationResponse = z.strictObject({
     canSend: z.boolean(),
     accountState: z.enum(['NOT_REGISTERED', 'ACTIVE', 'UNAVAILABLE']).optional(),
     accessState: z.enum(['NOT_GRANTED', 'GRANTED', 'UNAVAILABLE']).optional(),
+    linkSourceConsultationId: z.uuid().nullable().optional(),
   }),
 });
 export const activationSentResponse = z.strictObject({

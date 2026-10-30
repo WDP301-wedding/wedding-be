@@ -1,6 +1,8 @@
 import { createHash } from 'node:crypto';
 import { Router, type RequestHandler } from 'express';
 import { z } from 'zod';
+import { findLinkableCustomer } from '../infrastructure/existing-customer-access.js';
+import { registerExistingCustomerAccess } from './existing-customer-access.route.js';
 import type { PrismaClient } from '../../../generated/prisma/client.js';
 import { AppError } from '../../../core/errors/app-error.js';
 import { validateRequest, validatedRequest } from '../../../core/http/validate.js';
@@ -34,6 +36,7 @@ export function createActivationRouter(
   const router = Router(),
     authenticate = createAuthenticatedActorMiddleware(resolver);
   const root = '/management/consultations/:consultationId';
+  registerExistingCustomerAccess(router, prisma, authenticate, idempotent);
   async function context(consultationId: string, actor: AuthenticatedActor) {
     if (!actor.roles.includes('MANAGER')) throw failure(404, 'NOT_FOUND');
     const consultation = await prisma.consultation.findFirst({
@@ -95,6 +98,19 @@ export function createActivationRouter(
                 : consultation.invitationIntent?.status === 'PENDING'
                   ? 'DELIVERY_PENDING'
                   : 'NOT_ISSUED';
+      const linkable =
+        query.includeAccountState === 'true' &&
+        !grant &&
+        accountState === 'ACTIVE' &&
+        latest?.status !== 'REVOKED' &&
+        latest?.status !== 'ACCEPTED'
+          ? await findLinkableCustomer(
+              prisma,
+              consultation.managerAccountId,
+              consultation.intendedEmailNormalized,
+              consultation.id,
+            )
+          : null;
       response.set('Cache-Control', 'no-store').json(
         activationResponse.parse({
           data: {
@@ -105,6 +121,7 @@ export function createActivationRouter(
             ...(query.includeAccountState === 'true'
               ? {
                   accountState,
+                  linkSourceConsultationId: linkable?.sourceConsultationId ?? null,
                   accessState:
                     accountState === 'UNAVAILABLE' || state === 'ACCESS_UNAVAILABLE'
                       ? 'UNAVAILABLE'
@@ -117,6 +134,7 @@ export function createActivationRouter(
             acceptedAt: latest?.acceptedAt?.toISOString() ?? null,
             canSend:
               accountState !== 'UNAVAILABLE' &&
+              !linkable &&
               !grant &&
               latest?.status !== 'ACCEPTED' &&
               latest?.status !== 'REVOKED',

@@ -8,6 +8,7 @@ import type { ProposalCatalogPort } from './consultation.service.js';
 export type { ProposalCatalogPort } from './consultation.service.js';
 
 export type ConsultationWorkspaceRecord = Readonly<{
+  sourceConsultationId?: string | undefined;
   consultationId: string;
   intendedEmail: string;
   displayName: string;
@@ -48,6 +49,7 @@ export function createConsultationWorkspaceService(
   return Object.freeze({
     createConsultation(
       input: Readonly<{
+        sourceConsultationId?: string | undefined;
         intendedEmail: string;
         displayName: string;
         brideName?: string | undefined;
@@ -58,6 +60,7 @@ export function createConsultationWorkspaceService(
       }>,
     ) {
       return options.repository.createConsultation({
+        ...(input.sourceConsultationId ? { sourceConsultationId: input.sourceConsultationId } : {}),
         consultationId: createId(),
         intendedEmail: input.intendedEmail,
         displayName: input.displayName,

@@ -62,6 +62,7 @@ export interface BookingLifecycleHttpServices {
   readonly resolveActor: AuthenticatedActorResolver;
   createConsultation(
     input: Readonly<{
+      sourceConsultationId?: string | undefined;
       intendedEmail: string;
       displayName: string;
       brideName?: string | undefined;

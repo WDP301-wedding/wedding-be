@@ -2,6 +2,8 @@ import type { z } from 'zod';
 import { bookingLookupQuerySchema, bookingLookupResponseSchema } from './booking-lookup.schemas.js';
 import {
   activationParams,
+  existingCustomerLinkBody,
+  existingCustomerLinkResponse,
   activationStatusQuery,
   activationBody,
   activationResponse,
@@ -123,6 +125,17 @@ function operation(
   };
 }
 export const experienceOpenApiPaths: NonNullable<ZodOpenApiObject['paths']> = {
+  '/management/consultations/{consultationId}/existing-customer-access': {
+    post: {
+      ...operation('linkExistingCustomerAccess', existingCustomerLinkResponse, {
+        body: existingCustomerLinkBody,
+      }),
+      requestParams: { path: activationParams },
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }],
+      description:
+        'Owning Manager explicitly links an existing consultation to an active customer already granted access under that same Manager and normalized email. Requires a valid owned sourceConsultationId and expectedRevision. Creates only RESTRICTED access; preserves existing FULL grants and payment history. No signup, password change, invitation delivery or new session. Revoked/missing prior authority and disabled accounts cannot be linked. Private no-store. 409 on stale selection or unavailable authority.',
+    },
+  },
   '/management/booking-lookups': {
     get: {
       ...operation('lookupManagedBookings', bookingLookupResponseSchema),

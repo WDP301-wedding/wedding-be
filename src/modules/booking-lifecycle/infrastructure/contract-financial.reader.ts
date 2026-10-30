@@ -10,16 +10,21 @@ import {
   deepFreeze,
 } from '../domain/commercial-contract.js';
 export function createContractFinancialReader(
-  prisma: Pick<
-    PrismaClient | Prisma.TransactionClient,
-    'commercialContractRevision' | 'commercialContract'
-  >,
+  prisma: Pick<PrismaClient | Prisma.TransactionClient, 'commercialContractRevision' | 'booking'>,
 ): CommercialContractReader {
   return Object.freeze({
     async getModel(bookingId: string) {
-      return (await prisma.commercialContract.findUnique({ where: { bookingId } })) === null
-        ? ('LEGACY_PROPOSAL_V1' as const)
-        : ('FULL_CONTRACT_V1' as const);
+      const booking = await prisma.booking.findUnique({
+        where: { id: bookingId },
+        select: {
+          commercialModelVersion: true,
+          commercialContract: { select: { bookingId: true } },
+        },
+      });
+      if (booking === null) throw new NotFoundError();
+      return booking.commercialContract !== null
+        ? ('FULL_CONTRACT_V1' as const)
+        : booking.commercialModelVersion;
     },
     async resolveApproved(bookingId: string, revisionId: string) {
       const row = await prisma.commercialContractRevision.findFirst({

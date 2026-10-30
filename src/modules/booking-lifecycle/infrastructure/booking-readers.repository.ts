@@ -180,6 +180,7 @@ export function createPrismaBookingCommercialSnapshotReader(
         where: { id: input.bookingId },
         select: {
           id: true,
+          commercialModelVersion: true,
           revision: true,
           timelineRevisions: {
             where: { id: input.timelineRevisionId },
@@ -200,6 +201,8 @@ export function createPrismaBookingCommercialSnapshotReader(
         },
       });
       const timeline = booking?.timelineRevisions[0];
+      if (booking?.commercialModelVersion === 'FULL_CONTRACT_V1')
+        throw commercialConflict('CONTRACT_APPROVAL_REQUIRED');
       if (
         booking === null ||
         booking.proposalSnapshot === null ||

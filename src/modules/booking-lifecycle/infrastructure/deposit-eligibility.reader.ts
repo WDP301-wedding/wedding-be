@@ -25,6 +25,7 @@ export async function readEligibility(
       eventDate: true,
       shiftCode: true,
       consultationId: true,
+      commercialModelVersion: true,
       consultation: { select: { intendedEmailNormalized: true } },
       phase: true,
       revision: true,
@@ -109,7 +110,10 @@ export async function readEligibility(
     hasActiveSlotHold,
   });
   const contract = booking.commercialContract?.currentRevision;
-  if (booking.commercialContract !== null) {
+  if (
+    booking.commercialModelVersion === 'FULL_CONTRACT_V1' ||
+    booking.commercialContract !== null
+  ) {
     const document = contract == null ? null : contractDocumentSchema.parse(contract.document);
     if (
       contract?.state !== 'APPROVED' ||

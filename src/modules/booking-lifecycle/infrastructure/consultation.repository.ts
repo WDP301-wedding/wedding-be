@@ -1,6 +1,7 @@
 import { AppError } from '../../../core/errors/app-error.js';
 import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
 import { normalizeEmail } from '../../identity-access/account/account.service.js';
+import { linkExistingCustomer } from './existing-customer-access.js';
 import type { ConsultationWorkspaceRepository } from '../application/consultation-workspace.service.js';
 import type {
   ConsultationRecord,
@@ -246,6 +247,15 @@ export function createPrismaConsultationWorkspaceRepository(
               revision: record.revision,
             },
           });
+          if (record.sourceConsultationId) {
+            await linkExistingCustomer(transaction, {
+              consultationId: record.consultationId,
+              sourceConsultationId: record.sourceConsultationId,
+              managerAccountId: record.managerAccountId,
+              emailNormalized: email.normalized,
+              requestId: record.requestId,
+            });
+          }
           await transaction.auditLog.create({
             data: {
               occurredAt: now(),
@@ -299,7 +309,7 @@ export function createPrismaConsultationWorkspaceRepository(
               revision: 1,
               planningHeadcount: record.proposal.planningHeadcount,
               proposalSnapshot: { create: proposalSnapshotData(record.proposal) },
-              commercialContract: { create: { modelVersion: 'FULL_CONTRACT_V1' } },
+              commercialModelVersion: 'FULL_CONTRACT_V1',
             },
           });
           const updated = await transaction.consultation.updateMany({

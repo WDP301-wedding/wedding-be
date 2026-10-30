@@ -717,6 +717,7 @@ model ConsultationRequest {
 model Booking {
   id                          String                       @id @db.Uuid
   bookingCode                 String                       @unique @default(dbgenerated("new_booking_code()")) @db.VarChar(32)
+  commercialModelVersion      BookingCommercialModelVersion @default(FULL_CONTRACT_V1)
   consultationId              String                       @unique @db.Uuid
   hallId                      String                       @db.Uuid
   eventDate                   DateTime                     @db.Date
@@ -757,6 +758,11 @@ model Booking {
   @@unique([hallId, eventDate, shiftCode], map: "Booking_one_confirmed_slot_key", where: raw("\"phase\" IN ('CONFIRMED', 'COMPLETED')"))
   @@index([hallId, eventDate, shiftCode])
   @@index([phase, eventDate])
+}
+
+enum BookingCommercialModelVersion {
+  LEGACY_PROPOSAL_V1
+  FULL_CONTRACT_V1
 }
 
 enum CommercialContractState {
