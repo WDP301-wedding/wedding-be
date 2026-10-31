@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import { selectionAccessSchema } from './selection-access.js';
 import { AppError } from '../../../core/errors/app-error.js';
 import { coupleNameSchema } from './couple-profile.js';
 
@@ -115,6 +116,7 @@ export const contractsResponseSchema = z.strictObject({
     currentRevisionId: z.uuid().nullable(),
     eligibleForDeposit: z.boolean(),
     customerSelection: customerSelectionViewSchema,
+    selectionAccess: selectionAccessSchema.optional(),
     draftSeed: z.array(contractLineSchema).min(1).max(50),
     capabilities: z.strictObject({
       canManageDraft: z.boolean(),

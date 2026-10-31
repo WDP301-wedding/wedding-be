@@ -28,6 +28,7 @@ import { retryCommercialWrite } from '../infrastructure/commercial-write.retry.j
 import {
   createCustomerSelectionWorkflow,
   readCustomerSelection,
+  type SelectionConversionGuard,
 } from './commercial-selection-workflow.js';
 
 const include = {
@@ -39,9 +40,7 @@ type Scope = ReturnType<typeof createBookingBoundaryUnitOfWork>;
 type Options = Readonly<{
   scope: Scope;
   catalog: (client: PrismaClient) => CommercialSelectionReader;
-  conversion: (
-    client: PrismaClient,
-  ) => Readonly<{ requireConvertible(bookingId: string): Promise<void> }>;
+  conversion: (client: PrismaClient) => SelectionConversionGuard;
   now?: () => Date;
 }>;
 export function contractView(row: Stored) {
@@ -76,6 +75,11 @@ export function createCommercialContractService(options: Options) {
         proposalSnapshot: true,
         currentTimelineRevision: { include: { items: { orderBy: { displayOrder: 'asc' } } } },
         commercialContract: { include: { currentRevision: { include } } },
+        depositIntents: {
+          where: { status: { in: ['ACTIVE', 'UNKNOWN', 'SETTLED'] } },
+          select: { status: true },
+        },
+        depositSettlement: { select: { bookingId: true } },
       },
     });
     if (booking === null) throw new NotFoundError();
@@ -98,15 +102,10 @@ export function createCommercialContractService(options: Options) {
   function requireManager(access: Authorized) {
     if (access.party !== 'MANAGER') throw new NotFoundError();
   }
-  async function unpinned(client: PrismaClient, bookingId: string, access: Authorized) {
+  function unpinned(access: Authorized) {
     if (access.booking.phase !== 'DRAFT') throw commercialConflict('CONTRACT_NOT_EDITABLE');
-    if (
-      (await client.bookingDepositIntent.findFirst({
-        where: { bookingId, status: { in: ['ACTIVE', 'UNKNOWN', 'SETTLED'] } },
-      })) !== null
-    )
-      throw commercialConflict('DEPOSIT_INTENT_ACTIVE');
-    if ((await client.bookingDepositSettlement.findUnique({ where: { bookingId } })) !== null)
+    if (access.booking.depositIntents.length > 0) throw commercialConflict('DEPOSIT_INTENT_ACTIVE');
+    if (access.booking.depositSettlement !== null)
       throw commercialConflict('CONTRACT_NOT_EDITABLE');
   }
   const context = (actor: AuthenticatedActor, requestId: string) => ({
@@ -121,6 +120,7 @@ export function createCommercialContractService(options: Options) {
     requestId: string,
     expectedRevision: number,
     work: (client: PrismaClient, access: Authorized) => Promise<T>,
+    checkContractGuards = true,
   ) {
     return retryCommercialWrite(() =>
       options.scope.boundary.run({ bookingId, context: context(actor, requestId) }, (scoped) =>
@@ -128,7 +128,7 @@ export function createCommercialContractService(options: Options) {
           const access = await authorized(client, bookingId, actor);
           if (access.booking.revision !== expectedRevision)
             throw commercialConflict('CONTRACT_REVISION_STALE');
-          await unpinned(client, bookingId, access);
+          if (checkContractGuards) unpinned(access);
           return work(client, access);
         }),
       ),
@@ -252,8 +252,15 @@ export function createCommercialContractService(options: Options) {
       (access.booking.commercialContract?.currentRevisionId ?? null) !== input.predecessorRevisionId
     )
       throw commercialConflict('COMMERCIAL_PREDECESSOR_STALE');
-    if (access.booking.commercialContract === null)
-      await options.conversion(client).requireConvertible(access.booking.id);
+    if (access.booking.commercialContract === null) {
+      const guard = options.conversion(client);
+      if (access.booking.commercialModelVersion === 'LEGACY_PROPOSAL_V1')
+        await guard.requireConvertible(access.booking.id);
+      else {
+        const reason = await guard.selectionBlockReason(access.booking.id, 'FULL_CONTRACT_V1');
+        if (reason) throw commercialConflict(reason);
+      }
+    }
     return buildDocument(client, access, input);
   }
   async function createRevision(
@@ -307,8 +314,13 @@ export function createCommercialContractService(options: Options) {
   }
   const customerSelections = createCustomerSelectionWorkflow({
     write: (bookingId, actor, requestId, expectedRevision, work) =>
-      write(bookingId, actor, requestId, expectedRevision, (client, access) =>
-        work(client, access),
+      write(
+        bookingId,
+        actor,
+        requestId,
+        expectedRevision,
+        (client, access) => work(client, access),
+        false,
       ),
     catalog: options.catalog,
     conversion: options.conversion,
@@ -354,11 +366,29 @@ export function createCommercialContractService(options: Options) {
             const current = booking.commercialContract?.currentRevision;
             const timeline = booking.currentTimelineRevision;
             const customerSelection = await readCustomerSelection(client, { booking, party });
-            const pinned = await client.bookingDepositIntent.findFirst({
-              where: { bookingId, status: { in: ['ACTIVE', 'UNKNOWN', 'SETTLED'] } },
-              select: { id: true },
-            });
-            const editable = booking.phase === 'DRAFT' && pinned === null;
+            const selectionAccess = await customerSelections.selectionAccess(
+              client,
+              { booking, party },
+              customerSelection,
+            );
+            const editable =
+              booking.phase === 'DRAFT' &&
+              booking.depositIntents.length === 0 &&
+              booking.depositSettlement === null;
+            const managerFinancialBlock =
+              party === 'MANAGER' &&
+              editable &&
+              !current &&
+              customerSelection.status === 'SUBMITTED'
+                ? await options
+                    .conversion(client)
+                    .selectionBlockReason(
+                      bookingId,
+                      booking.commercialContract !== null
+                        ? 'FULL_CONTRACT_V1'
+                        : booking.commercialModelVersion,
+                    )
+                : null;
             const ownApproval =
               current?.approvals.some((approval) => approval.party === party) ?? false;
             const eligible =
@@ -378,6 +408,7 @@ export function createCommercialContractService(options: Options) {
               currentRevisionId: booking.commercialContract?.currentRevisionId ?? null,
               eligibleForDeposit: eligible,
               customerSelection,
+              selectionAccess,
               draftSeed: current
                 ? contractDocumentSchema.parse(current.document).lines
                 : customerSelection.lines,
@@ -385,6 +416,7 @@ export function createCommercialContractService(options: Options) {
                 canManageDraft:
                   editable &&
                   party === 'MANAGER' &&
+                  managerFinancialBlock === null &&
                   (current != null || customerSelection.status === 'SUBMITTED') &&
                   current?.state !== 'APPROVED' &&
                   (current?.approvals.length ?? 0) === 0,
@@ -394,11 +426,7 @@ export function createCommercialContractService(options: Options) {
                   !ownApproval &&
                   current.timelineRevisionId === timeline?.id,
                 canWithdrawApproval: editable && ownApproval,
-                canEditSelections:
-                  editable &&
-                  party === 'COUPLE' &&
-                  current == null &&
-                  customerSelection.status !== 'SUBMITTED',
+                canEditSelections: selectionAccess.canEdit,
               },
               revisions: rows.slice(0, 50).map(contractView),
               nextCursor: rows.length > 50 ? rows[49]!.id : null,

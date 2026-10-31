@@ -12,6 +12,10 @@ import {
 } from '../domain/commercial-contract.js';
 import { proposalMenuLinesSchema } from '../domain/booking-policy.js';
 import {
+  evaluateSelectionAccess,
+  type SelectionFinancialBlockReason,
+} from '../domain/selection-access.js';
+import {
   selectionDraftSchema,
   selectionSubmitSchema,
   selectionViewSchema,
@@ -25,8 +29,15 @@ type Access = Readonly<{
     hallId: string;
     shiftCode: 'LUNCH' | 'DINNER';
     planningHeadcount: number;
+    phase: string;
+    commercialModelVersion: 'LEGACY_PROPOSAL_V1' | 'FULL_CONTRACT_V1';
+    depositIntents: readonly { status: string }[];
+    depositSettlement: { bookingId: string } | null;
     proposalSnapshot: BookingProposalSnapshot | null;
-    commercialContract: { currentRevisionId: string | null } | null;
+    commercialContract: {
+      currentRevisionId: string | null;
+      currentRevision?: { state: string } | null;
+    } | null;
   };
 }>;
 export async function readCustomerSelection(client: PrismaClient, access: Access) {
@@ -88,20 +99,62 @@ type Write = <T>(
   expectedRevision: number,
   work: (client: PrismaClient, access: Access) => Promise<T>,
 ) => Promise<T>;
+export type SelectionConversionGuard = Readonly<{
+  requireConvertible(bookingId: string): Promise<void>;
+  selectionBlockReason(
+    bookingId: string,
+    model: 'LEGACY_PROPOSAL_V1' | 'FULL_CONTRACT_V1',
+  ): Promise<SelectionFinancialBlockReason | null>;
+}>;
 export function createCustomerSelectionWorkflow(options: {
   write: Write;
   catalog: (client: PrismaClient) => CommercialSelectionReader;
-  conversion: (
-    client: PrismaClient,
-  ) => Readonly<{ requireConvertible(bookingId: string): Promise<void> }>;
+  conversion: (client: PrismaClient) => SelectionConversionGuard;
   now: () => Date;
 }) {
+  const decision = (
+    access: Access,
+    selection: z.infer<typeof selectionViewSchema>,
+    financialBlock: SelectionFinancialBlockReason | null = null,
+  ) =>
+    evaluateSelectionAccess({
+      party: access.party,
+      phase: access.booking.phase,
+      selectionStatus: selection.status,
+      commercialModelVersion:
+        access.booking.commercialContract !== null
+          ? 'FULL_CONTRACT_V1'
+          : access.booking.commercialModelVersion,
+      contractState:
+        access.booking.commercialContract?.currentRevision?.state ??
+        (access.booking.commercialContract?.currentRevisionId ? 'DRAFT' : null),
+      hasSettlement: access.booking.depositSettlement !== null,
+      depositStatuses: access.booking.depositIntents.map((intent) => intent.status),
+      financialBlock,
+    });
+  async function selectionAccess(
+    client: PrismaClient,
+    access: Access,
+    selection: z.infer<typeof selectionViewSchema>,
+  ) {
+    const basic = decision(access, selection);
+    if (!basic.canEdit) return basic;
+    const model =
+      access.booking.commercialContract !== null
+        ? 'FULL_CONTRACT_V1'
+        : access.booking.commercialModelVersion;
+    return decision(
+      access,
+      selection,
+      await options.conversion(client).selectionBlockReason(access.booking.id, model),
+    );
+  }
   async function editable(client: PrismaClient, access: Access) {
     if (access.party !== 'COUPLE') throw new NotFoundError();
-    if (access.booking.commercialContract?.currentRevisionId)
-      throw commercialConflict('CUSTOMER_SELECTION_LOCKED');
     const selection = await readCustomerSelection(client, access);
-    if (selection.status === 'SUBMITTED') throw commercialConflict('CUSTOMER_SELECTION_LOCKED');
+    const allowed = await selectionAccess(client, access, selection);
+    if (!allowed.canEdit)
+      throw commercialConflict(allowed.blockReason ?? 'CUSTOMER_SELECTION_LOCKED');
     return selection;
   }
   async function price(
@@ -135,9 +188,6 @@ export function createCustomerSelectionWorkflow(options: {
     submit: boolean,
   ) {
     const at = options.now();
-    if (access.booking.commercialContract === null) {
-      await options.conversion(client).requireConvertible(access.booking.id);
-    }
     const row = await client.bookingCommercialSelectionRevision.create({
       data: {
         id: randomUUID(),
@@ -194,6 +244,7 @@ export function createCustomerSelectionWorkflow(options: {
     });
   }
   return {
+    selectionAccess,
     async preview(
       this: void,
       bookingId: string,

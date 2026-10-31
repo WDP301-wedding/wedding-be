@@ -12278,6 +12278,55 @@
                           },
                           "maxItems": 50,
                           "type": "array"
+                        },
+                        "selectionAccess": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "blockReason": {
+                              "anyOf": [
+                                {
+                                  "enum": [
+                                    "NOT_CUSTOMER",
+                                    "BOOKING_CLOSED",
+                                    "BOOKING_NOT_EDITABLE",
+                                    "CUSTOMER_SELECTION_SUBMITTED",
+                                    "CONTRACT_DRAFT_EXISTS",
+                                    "CONTRACT_APPROVED",
+                                    "DEPOSIT_SETTLED",
+                                    "DEPOSIT_IN_PROGRESS",
+                                    "PAYMENT_OUTCOME_UNKNOWN",
+                                    "LEGACY_COMMERCIAL_CONVERSION_BLOCKED",
+                                    "FINANCIAL_REVIEW_REQUIRED"
+                                  ],
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "canEdit": {
+                              "type": "boolean"
+                            },
+                            "nextAction": {
+                              "enum": [
+                                "EDIT_SELECTIONS",
+                                "WAIT_FOR_RESTAURANT",
+                                "VIEW_CONTRACT",
+                                "VIEW_PAYMENTS",
+                                "VIEW_APPENDICES",
+                                "CONTACT_RESTAURANT",
+                                "VIEW_BOOKING"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "canEdit",
+                            "blockReason",
+                            "nextAction"
+                          ],
+                          "type": "object"
                         }
                       },
                       "required": [
