@@ -1,7 +1,6 @@
 import type { Router } from 'express';
 import type { Prisma, PrismaClient } from '../../../generated/prisma/client.js';
 import { validateRequest, validatedRequest } from '../../../core/http/validate.js';
-import type { AuthenticatedActor } from '../../identity-access/authorization/authenticated-actor.middleware.js';
 import { bookingLookupQuerySchema, bookingLookupResponseSchema } from './booking-lookup.schemas.js';
 
 /** Read-only identity lookup; scoped identically to consultation workspace access. */
