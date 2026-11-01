@@ -12,6 +12,12 @@ esac
 export DATABASE_URL="${DATABASE_URL}?sslmode=require&uselibpqcompat=true"
 export MIGRATION_DATABASE_URL="${MIGRATION_DATABASE_URL}?sslmode=require&uselibpqcompat=true"
 
+# Ensure http://localhost:3201 is allowed in CORS origins
+case ",${CORS_ALLOWED_ORIGINS:-}," in
+  *",http://localhost:3201,"*) ;;
+  *) export CORS_ALLOWED_ORIGINS="${CORS_ALLOWED_ORIGINS:+$CORS_ALLOWED_ORIGINS,}http://localhost:3201" ;;
+esac
+
 # Automatically resolve failed migration 20261029010000_booking_business_codes if present
 # so Render deploy does not get blocked by Prisma error P3009.
 npx prisma migrate resolve --rolled-back 20261029010000_booking_business_codes --config prisma.config.ts 2>/dev/null || true
