@@ -16,7 +16,7 @@ export type ContractedPrintOwners = {
   contractObligation(client: Client, bookingId: string): Promise<string>;
 };
 export class ContractedPrintFulfillment {
-  constructor(readonly owners: ContractedPrintOwners) {}
+  constructor(readonly owners: ContractedPrintOwners) { }
   async requireTemplate(client: Client, bookingId: string, templateVersionId: string) {
     const effective = await this.owners.commercial(client).getEffective(bookingId);
     for (const line of effective.lines.filter((l) => l.category === 'PRINT')) {
