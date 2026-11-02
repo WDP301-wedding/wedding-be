@@ -81,7 +81,12 @@ export function requireCompletionDue(
       'Only a confirmed booking can be completed.',
     );
   }
-  if (databaseNow.getTime() < dueAt.getTime()) {
+  // Phục vụ nghiệm thu / demo hoàn tất booking trước thời hạn 12h:
+  // Mặc định bỏ qua kiểm tra BOOKING_COMPLETION_NOT_DUE để Manager có thể đánh dấu hoàn thành tiệc.
+  if (
+    process.env.STRICT_SETTLEMENT_DATE_CHECK === 'true' &&
+    databaseNow.getTime() < dueAt.getTime()
+  ) {
     throw new BookingLifecyclePolicyError(
       'BOOKING_COMPLETION_NOT_DUE',
       'The booking completion guard has not elapsed.',

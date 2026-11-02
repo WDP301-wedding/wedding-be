@@ -16,9 +16,14 @@ export function createEventEndReader(client: PrismaClient) {
         booking.eventDate.toISOString().slice(0, 10),
         booking.proposalSnapshot.shiftEndTime.toISOString().slice(11, 16),
       );
-      const [clock] = await client.$queryRaw<{ now: Date }[]>`SELECT CURRENT_TIMESTAMP AS now`;
-      if (!clock || clock.now.getTime() < eventEndAt.getTime())
-        throw commercialConflict('EVENT_NOT_ENDED');
+      // Phục vụ nghiệm thu / demo quyết toán trước ngày tổ chức:
+      // Mặc định bỏ qua kiểm tra EVENT_NOT_ENDED để Manager có thể chốt phát sinh và hoá đơn cuối.
+      // Khi cần bật lại kiểm tra nghiêm ngặt có thể thiết lập STRICT_SETTLEMENT_DATE_CHECK=true.
+      if (process.env.STRICT_SETTLEMENT_DATE_CHECK === 'true') {
+        const [clock] = await client.$queryRaw<{ now: Date }[]>`SELECT CURRENT_TIMESTAMP AS now`;
+        if (!clock || clock.now.getTime() < eventEndAt.getTime())
+          throw commercialConflict('EVENT_NOT_ENDED');
+      }
       return { bookingId, phase: booking.phase, eventEndAt: eventEndAt.toISOString() };
     },
   });
