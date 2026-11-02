@@ -36,8 +36,8 @@ export function createIdentityEmailNotificationPort(
           entityId: command.credentialId,
           intentType: 'password-reset',
         }),
-        subject: 'Reset your password',
-        text: `Open this link to reset your password: ${link.toString()}`,
+        subject: 'Đặt lại mật khẩu tài khoản Hỷ Yến',
+        text: `Mở liên kết này để đặt lại mật khẩu: ${link.toString()}`,
         to: [command.recipientEmail],
       });
     },
@@ -50,8 +50,8 @@ export function createIdentityEmailNotificationPort(
           entityId: command.deliveryIntentId ?? command.invitationId,
           intentType: 'workspace-invitation',
         }),
-        subject: 'Your wedding workspace invitation',
-        text: `Open this link to accept your invitation: ${link.toString()}`,
+        subject: 'Lời mời tham gia không gian tiệc cưới Hỷ Yến',
+        text: `Mở liên kết này để nhận lời mời tham gia quản lý tiệc cưới: ${link.toString()}`,
         to: [command.recipientEmail],
       });
     },

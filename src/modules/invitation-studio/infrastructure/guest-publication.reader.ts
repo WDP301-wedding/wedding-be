@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import type { PrismaClient } from '../../../generated/prisma/client.js';
 import type { PrismaBookingBoundary } from '../../../core/database/booking-boundary.js';
 import type { GuestInvitationReader } from '../../guest-management/application/guest.contracts.js';
@@ -23,7 +24,14 @@ export function createGuestPublicationReader(
         where: { id: identity.currentPublicationId, bookingId },
       });
       if (row === null) throw new NotFoundError();
-      return publicInvitationSchema.parse(row.content);
+      try {
+        return publicInvitationSchema.parse(row.content);
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          throw new NotFoundError();
+        }
+        throw error;
+      }
     },
   };
 }

@@ -22,12 +22,26 @@ export function createConsultationWorkspaceRouter(
 ) {
   const router = Router();
   router.use(
-    ['/consultations/:consultationId/workspace', '/consultation-customers', '/booking-lookups'],
+    ['/consultations/:consultationId/workspace', '/consultation-customers'],
     createAuthenticatedActorMiddleware(resolver),
     (_request, response, next) => {
       if (!(response.locals.actor as AuthenticatedActor).roles.includes('MANAGER')) {
         return next(
           new AppError({ status: 403, code: 'FORBIDDEN', message: 'Manager access required.' }),
+        );
+      }
+      response.set('Cache-Control', 'no-store');
+      next();
+    },
+  );
+  router.use(
+    '/booking-lookups',
+    createAuthenticatedActorMiddleware(resolver),
+    (_request, response, next) => {
+      const actor = response.locals.actor as AuthenticatedActor;
+      if (!actor.roles.includes('MANAGER') && !actor.roles.includes('STAFF')) {
+        return next(
+          new AppError({ status: 403, code: 'FORBIDDEN', message: 'Staff or Manager access required.' }),
         );
       }
       response.set('Cache-Control', 'no-store');

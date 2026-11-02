@@ -34,6 +34,17 @@ export const invitationAcceptanceBodySchema = strictWriteSchema({
   password: z.string().min(1).max(128),
 });
 
+export const invitationDetailsQuerySchema = z.strictObject({
+  invitationToken: z.string().regex(/^wii_[A-Za-z0-9_-]{43}$/u),
+});
+
+export const invitationDetailsResponseSchema = z.strictObject({
+  data: z.strictObject({
+    maskedEmail: z.string(),
+    hasExistingAccount: z.boolean(),
+  }),
+});
+
 export const passwordResetRequestResponseSchema = z.strictObject({
   data: z.strictObject({ accepted: z.literal(true) }),
 });

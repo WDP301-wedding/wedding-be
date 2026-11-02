@@ -1176,7 +1176,7 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
     ).toBe(409);
     await expect(
       database.prisma.commercialAppendixRevision.update({
-        where: { id: state.effectiveRevisionId },
+        where: { id: state.effectiveRevisionId! },
         data: { deltaVnd: 1 },
       }),
     ).rejects.toThrow();

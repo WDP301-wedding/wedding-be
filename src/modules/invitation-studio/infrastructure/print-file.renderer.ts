@@ -111,7 +111,7 @@ export async function renderPrintablePdf(input: {
     pdf.rect(0, 0, mm(154), mm(216)).fill('#fffdf9');
     y = left;
   };
-  const text = (value: string | undefined, heading = false) => {
+  const text = (value: string | null | undefined, heading = false) => {
     if (!value) return;
     pdf
       .fillColor('#342a29')

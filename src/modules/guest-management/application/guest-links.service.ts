@@ -184,6 +184,7 @@ export class GuestLinksService {
       return await this.guests.owners.invitation.getCurrent(bookingId, publicInvitationId);
     } catch (error) {
       if (error instanceof AppError && error.status === 404) throw unavailable();
+      if (error instanceof z.ZodError) throw unavailable();
       throw error;
     }
   }

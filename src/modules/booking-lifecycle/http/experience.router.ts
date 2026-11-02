@@ -306,9 +306,54 @@ export function createBookingExperienceRouter(
     validateRequest({ query: overviewQuerySchema }),
     async (_request, response) => {
       const { query } = validatedRequest(response, { query: overviewQuerySchema });
+      const actor = actorOf(response);
+      const account = await prisma.account.findUnique({
+        where: { id: actor.accountId },
+        select: { emailNormalized: true },
+      });
+      if (account) {
+        const pendingInvitations = await prisma.workspaceInvitation.findMany({
+          where: {
+            recipientEmailNormalized: account.emailNormalized,
+            status: 'ACTIVE',
+            expiresAt: { gt: new Date() },
+          },
+        });
+        for (const invitation of pendingInvitations) {
+          await prisma.$transaction(async (tx) => {
+            await tx.accountRole.upsert({
+              where: { accountId_role: { accountId: actor.accountId, role: 'COUPLE' } },
+              create: { accountId: actor.accountId, role: 'COUPLE' },
+              update: {},
+            });
+            await tx.consultationAccess.upsert({
+              where: {
+                accountId_consultationId: {
+                  accountId: actor.accountId,
+                  consultationId: invitation.consultationId,
+                },
+              },
+              create: {
+                accountId: actor.accountId,
+                consultationId: invitation.consultationId,
+                level: 'RESTRICTED',
+              },
+              update: {},
+            });
+            await tx.workspaceInvitation.update({
+              where: { id: invitation.id },
+              data: {
+                status: 'ACCEPTED',
+                acceptedAt: new Date(),
+                resolvedAccountId: actor.accountId,
+              },
+            });
+          });
+        }
+      }
       const grants = await prisma.consultationAccess.findMany({
         where: {
-          accountId: actorOf(response).accountId,
+          accountId: actor.accountId,
         },
         select: { consultationId: true, level: true },
       });

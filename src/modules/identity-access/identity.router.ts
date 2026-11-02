@@ -18,6 +18,8 @@ import {
   emptyWriteBodySchema,
   identityLoginBodySchema,
   invitationAcceptanceBodySchema,
+  invitationDetailsQuerySchema,
+  invitationDetailsResponseSchema,
   issuedSessionResponseSchema,
   passwordResetCompletionBodySchema,
   passwordResetCompletionResponseSchema,
@@ -92,6 +94,9 @@ export interface IdentityHttpServices {
       requestId: string;
     }>,
   ): Promise<IssuedSession>;
+  getInvitationDetails?(
+    invitationToken: string,
+  ): Promise<Readonly<{ maskedEmail: string; hasExistingAccount: boolean }>>;
 }
 
 export function createIdentityRouter(
@@ -105,7 +110,10 @@ export function createIdentityRouter(
   const allowedOrigins = new Set(options.allowedWebOrigins);
   const authenticate = createActorMiddleware(options.services);
   router.use((request, response, next) => {
-    if (request.path.startsWith('/auth') || request.path === '/workspace-invitation-acceptances') {
+    if (
+      request.path.startsWith('/auth') ||
+      request.path.startsWith('/workspace-invitation')
+    ) {
       response.set('Cache-Control', 'no-store');
     }
     next();
@@ -164,6 +172,21 @@ export function createIdentityRouter(
       response
         .status(201)
         .json(issuedSessionResponseSchema.parse({ data: serializeIssuedSession(issued, false) }));
+    }),
+  );
+
+  router.get(
+    '/workspace-invitations/details',
+    validateRequest({ query: invitationDetailsQuerySchema }),
+    asyncHandler(async (request, response) => {
+      const { query } = validatedRequest(response, { query: invitationDetailsQuerySchema });
+      if (!options.services.getInvitationDetails) {
+        throw new InvalidOrExpiredInvitationError();
+      }
+      const result = await mapIdentityErrors(() =>
+        options.services.getInvitationDetails!(query.invitationToken),
+      );
+      response.json(invitationDetailsResponseSchema.parse({ data: result }));
     }),
   );
 

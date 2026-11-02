@@ -126,7 +126,35 @@ export function createWorkspaceInvitationAcceptanceService(
         absoluteExpiresAt,
       });
     },
+
+    async getInvitationDetails(
+      invitationToken: string,
+    ): Promise<Readonly<{ maskedEmail: string; hasExistingAccount: boolean }>> {
+      if (!/^wii_[A-Za-z0-9_-]{43}$/u.test(invitationToken)) {
+        throw new InvalidOrExpiredInvitationError();
+      }
+      const invitationTokenHash = hashOpaqueToken(invitationToken, 'invitation');
+      const preview = await options.repository.previewAcceptance(invitationTokenHash, now());
+      if (preview === null) throw new InvalidOrExpiredInvitationError();
+      return Object.freeze({
+        maskedEmail: maskEmail(preview.displayEmail),
+        hasExistingAccount: preview.account !== null && preview.account.passwordVerifier !== null,
+      });
+    },
   });
+}
+
+export function maskEmail(email: string): string {
+  const atIndex = email.indexOf('@');
+  if (atIndex <= 1) return email;
+  const user = email.slice(0, atIndex);
+  const domain = email.slice(atIndex);
+  if (user.length <= 2) {
+    return `${user[0]}*${domain}`;
+  }
+  const visiblePrefix = user.slice(0, 2);
+  const visibleSuffix = user.slice(-1);
+  return `${visiblePrefix}${'*'.repeat(Math.max(1, Math.min(user.length - 3, 5)))}${visibleSuffix}${domain}`;
 }
 
 function fingerprint(purpose: string, value: string): string {

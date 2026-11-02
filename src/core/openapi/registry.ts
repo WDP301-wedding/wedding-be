@@ -34,6 +34,7 @@ import {
   emptyWriteBodySchema,
   identityLoginBodySchema,
   invitationAcceptanceBodySchema,
+  invitationDetailsResponseSchema,
   issuedSessionResponseSchema,
   passwordResetCompletionBodySchema,
   passwordResetCompletionResponseSchema,
@@ -385,6 +386,32 @@ export const openApiRegistry: ZodOpenApiObject = {
             content: { 'application/json': { schema: errorResponseSchema } },
           },
           '422': { $ref: '#/components/responses/UnprocessableEntity' },
+        },
+      },
+    },
+    '/workspace-invitations/details': {
+      get: {
+        operationId: 'getWorkspaceInvitationDetails',
+        summary: 'Get masked recipient email and account status for a workspace invitation',
+        description:
+          'Allows the recipient to preview the masked email and determine whether to login or create a password.',
+        tags: ['Identity'],
+        parameters: [
+          {
+            name: 'invitationToken',
+            in: 'query',
+            required: true,
+            schema: { type: 'string', pattern: '^wii_[A-Za-z0-9_-]{43}$' },
+          },
+        ],
+        responses: {
+          '200': identitySuccessResponse(
+            'The invitation details were returned.',
+            invitationDetailsResponseSchema,
+          ),
+          '401': { $ref: '#/components/responses/Unauthorized' },
+          '422': { $ref: '#/components/responses/UnprocessableEntity' },
+          '500': { $ref: '#/components/responses/InternalServerError' },
         },
       },
     },

@@ -139,6 +139,7 @@ export async function createIdentityRuntime(
         requestPasswordReset: retiredReset,
         completePasswordReset: retiredReset,
         acceptInvitation: invitationAcceptanceService.accept,
+        getInvitationDetails: invitationAcceptanceService.getInvitationDetails,
       },
       allowedWebOrigins: config.cors.allowedOrigins,
       refreshCookieName: config.identityAccess.refreshCookie.name,

@@ -15,12 +15,12 @@ const safeText = (max: number, min = 0) =>
         !containsAuthenticationMaterial(value) &&
         !/<\/?[a-z!]|(?:https?|data|javascript):|\b(?:accessToken|refreshToken)\b/iu.test(value),
     );
-export const textFieldsSchema = z.strictObject({
-  brideName: safeText(2000).optional(),
-  groomName: safeText(2000).optional(),
-  greeting: safeText(2000).optional(),
-  message: safeText(2000).optional(),
-  footer: safeText(2000).optional(),
+export const textFieldsSchema = z.object({
+  brideName: safeText(2000).nullish(),
+  groomName: safeText(2000).nullish(),
+  greeting: safeText(2000).nullish(),
+  message: safeText(2000).nullish(),
+  footer: safeText(2000).nullish(),
 });
 export const sectionSchema = z.strictObject({
   kind: z.enum(['HERO', 'MESSAGE', 'EVENT', 'TIMELINE', 'SEATING', 'FOOTER']),

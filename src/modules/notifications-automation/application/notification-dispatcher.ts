@@ -52,6 +52,7 @@ export class NotificationDispatcher {
     if (!recipient?.enabled || !recipient.purposes.includes(purpose))
       return cancelled('RECIPIENT_REVOKED');
     if (
+      row.channel !== 'IN_APP' &&
       this.policy.bookingAllowlist &&
       (!row.bookingId || !this.policy.bookingAllowlist.includes(row.bookingId))
     )

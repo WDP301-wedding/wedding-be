@@ -51,7 +51,8 @@ export class ContractedPrintFulfillment {
       where: { id: design.currentRevisionId },
     });
     if (
-      content.sourceTemplateVersionId !== facts.templateVersionId ||
+      (content.sourceTemplateVersionId !== null &&
+        content.sourceTemplateVersionId !== facts.templateVersionId) ||
       facts.offeringId !== binding.offeringId ||
       facts.unitPriceVnd !== line.unitPriceVnd
     )

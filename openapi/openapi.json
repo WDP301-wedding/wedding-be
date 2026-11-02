@@ -4757,29 +4757,64 @@
                 "additionalProperties": false,
                 "properties": {
                   "brideName": {
-                    "maxLength": 2000,
-                    "minLength": 0,
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   },
                   "footer": {
-                    "maxLength": 2000,
-                    "minLength": 0,
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   },
                   "greeting": {
-                    "maxLength": 2000,
-                    "minLength": 0,
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   },
                   "groomName": {
-                    "maxLength": 2000,
-                    "minLength": 0,
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   },
                   "message": {
-                    "maxLength": 2000,
-                    "minLength": 0,
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   }
                 },
                 "type": "object"
@@ -6133,9 +6168,7 @@
                     }
                   },
                   "required": [
-                    "kind",
-                    "textKey",
-                    "imageUrl"
+                    "kind"
                   ],
                   "type": "object"
                 },
@@ -6146,29 +6179,64 @@
                 "additionalProperties": false,
                 "properties": {
                   "brideName": {
-                    "maxLength": 2000,
-                    "minLength": 0,
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   },
                   "footer": {
-                    "maxLength": 2000,
-                    "minLength": 0,
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   },
                   "greeting": {
-                    "maxLength": 2000,
-                    "minLength": 0,
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   },
                   "groomName": {
-                    "maxLength": 2000,
-                    "minLength": 0,
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   },
                   "message": {
-                    "maxLength": 2000,
-                    "minLength": 0,
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   }
                 },
                 "type": "object"
@@ -6206,8 +6274,7 @@
                   "required": [
                     "order",
                     "startTime",
-                    "title",
-                    "description"
+                    "title"
                   ],
                   "type": "object"
                 },
@@ -6628,29 +6695,64 @@
                 "additionalProperties": false,
                 "properties": {
                   "brideName": {
-                    "maxLength": 2000,
-                    "minLength": 0,
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   },
                   "footer": {
-                    "maxLength": 2000,
-                    "minLength": 0,
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   },
                   "greeting": {
-                    "maxLength": 2000,
-                    "minLength": 0,
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   },
                   "groomName": {
-                    "maxLength": 2000,
-                    "minLength": 0,
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   },
                   "message": {
-                    "maxLength": 2000,
-                    "minLength": 0,
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   }
                 },
                 "type": "object"
@@ -9154,9 +9256,16 @@
                           ]
                         },
                         "effectiveRevisionId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
+                          "anyOf": [
+                            {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         },
                         "effectiveTotalVnd": {
                           "maximum": 9007199254740991,
@@ -20927,29 +21036,64 @@
                                 "additionalProperties": false,
                                 "properties": {
                                   "brideName": {
-                                    "maxLength": 2000,
-                                    "minLength": 0,
-                                    "type": "string"
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 2000,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "footer": {
-                                    "maxLength": 2000,
-                                    "minLength": 0,
-                                    "type": "string"
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 2000,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "greeting": {
-                                    "maxLength": 2000,
-                                    "minLength": 0,
-                                    "type": "string"
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 2000,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "groomName": {
-                                    "maxLength": 2000,
-                                    "minLength": 0,
-                                    "type": "string"
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 2000,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "message": {
-                                    "maxLength": 2000,
-                                    "minLength": 0,
-                                    "type": "string"
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 2000,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   }
                                 },
                                 "type": "object"
@@ -21147,32 +21291,66 @@
                         "type": "array"
                       },
                       "textFields": {
-                        "additionalProperties": false,
                         "properties": {
                           "brideName": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "footer": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "greeting": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "groomName": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "message": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           }
                         },
                         "type": "object"
@@ -21694,32 +21872,66 @@
                         "type": "array"
                       },
                       "textFields": {
-                        "additionalProperties": false,
                         "properties": {
                           "brideName": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "footer": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "greeting": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "groomName": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "message": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           }
                         },
                         "type": "object"
@@ -21745,32 +21957,66 @@
                     "type": "integer"
                   },
                   "textFields": {
-                    "additionalProperties": false,
                     "properties": {
                       "brideName": {
-                        "maxLength": 2000,
-                        "minLength": 0,
-                        "type": "string"
+                        "anyOf": [
+                          {
+                            "maxLength": 2000,
+                            "minLength": 0,
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       },
                       "footer": {
-                        "maxLength": 2000,
-                        "minLength": 0,
-                        "type": "string"
+                        "anyOf": [
+                          {
+                            "maxLength": 2000,
+                            "minLength": 0,
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       },
                       "greeting": {
-                        "maxLength": 2000,
-                        "minLength": 0,
-                        "type": "string"
+                        "anyOf": [
+                          {
+                            "maxLength": 2000,
+                            "minLength": 0,
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       },
                       "groomName": {
-                        "maxLength": 2000,
-                        "minLength": 0,
-                        "type": "string"
+                        "anyOf": [
+                          {
+                            "maxLength": 2000,
+                            "minLength": 0,
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       },
                       "message": {
-                        "maxLength": 2000,
-                        "minLength": 0,
-                        "type": "string"
+                        "anyOf": [
+                          {
+                            "maxLength": 2000,
+                            "minLength": 0,
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       }
                     },
                     "type": "object"
@@ -28366,9 +28612,7 @@
                                   }
                                 },
                                 "required": [
-                                  "kind",
-                                  "textKey",
-                                  "imageUrl"
+                                  "kind"
                                 ],
                                 "type": "object"
                               },
@@ -28379,29 +28623,64 @@
                               "additionalProperties": false,
                               "properties": {
                                 "brideName": {
-                                  "maxLength": 2000,
-                                  "minLength": 0,
-                                  "type": "string"
+                                  "anyOf": [
+                                    {
+                                      "maxLength": 2000,
+                                      "minLength": 0,
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
                                 },
                                 "footer": {
-                                  "maxLength": 2000,
-                                  "minLength": 0,
-                                  "type": "string"
+                                  "anyOf": [
+                                    {
+                                      "maxLength": 2000,
+                                      "minLength": 0,
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
                                 },
                                 "greeting": {
-                                  "maxLength": 2000,
-                                  "minLength": 0,
-                                  "type": "string"
+                                  "anyOf": [
+                                    {
+                                      "maxLength": 2000,
+                                      "minLength": 0,
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
                                 },
                                 "groomName": {
-                                  "maxLength": 2000,
-                                  "minLength": 0,
-                                  "type": "string"
+                                  "anyOf": [
+                                    {
+                                      "maxLength": 2000,
+                                      "minLength": 0,
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
                                 },
                                 "message": {
-                                  "maxLength": 2000,
-                                  "minLength": 0,
-                                  "type": "string"
+                                  "anyOf": [
+                                    {
+                                      "maxLength": 2000,
+                                      "minLength": 0,
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
                                 }
                               },
                               "type": "object"
@@ -28439,8 +28718,7 @@
                                 "required": [
                                   "order",
                                   "startTime",
-                                  "title",
-                                  "description"
+                                  "title"
                                 ],
                                 "type": "object"
                               },
@@ -28847,29 +29125,64 @@
                                 "additionalProperties": false,
                                 "properties": {
                                   "brideName": {
-                                    "maxLength": 2000,
-                                    "minLength": 0,
-                                    "type": "string"
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 2000,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "footer": {
-                                    "maxLength": 2000,
-                                    "minLength": 0,
-                                    "type": "string"
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 2000,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "greeting": {
-                                    "maxLength": 2000,
-                                    "minLength": 0,
-                                    "type": "string"
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 2000,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "groomName": {
-                                    "maxLength": 2000,
-                                    "minLength": 0,
-                                    "type": "string"
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 2000,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "message": {
-                                    "maxLength": 2000,
-                                    "minLength": 0,
-                                    "type": "string"
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 2000,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   }
                                 },
                                 "type": "object"
@@ -42960,29 +43273,64 @@
                                 "additionalProperties": false,
                                 "properties": {
                                   "brideName": {
-                                    "maxLength": 2000,
-                                    "minLength": 0,
-                                    "type": "string"
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 2000,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "footer": {
-                                    "maxLength": 2000,
-                                    "minLength": 0,
-                                    "type": "string"
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 2000,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "greeting": {
-                                    "maxLength": 2000,
-                                    "minLength": 0,
-                                    "type": "string"
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 2000,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "groomName": {
-                                    "maxLength": 2000,
-                                    "minLength": 0,
-                                    "type": "string"
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 2000,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "message": {
-                                    "maxLength": 2000,
-                                    "minLength": 0,
-                                    "type": "string"
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 2000,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   }
                                 },
                                 "type": "object"
@@ -43173,32 +43521,66 @@
                         "type": "array"
                       },
                       "textFields": {
-                        "additionalProperties": false,
                         "properties": {
                           "brideName": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "footer": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "greeting": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "groomName": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "message": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           }
                         },
                         "type": "object"
@@ -43465,32 +43847,66 @@
                         "type": "array"
                       },
                       "textFields": {
-                        "additionalProperties": false,
                         "properties": {
                           "brideName": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "footer": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "greeting": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "groomName": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "message": {
-                            "maxLength": 2000,
-                            "minLength": 0,
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           }
                         },
                         "type": "object"
@@ -49257,6 +49673,81 @@
           }
         },
         "summary": "Accept a workspace invitation",
+        "tags": [
+          "Identity"
+        ]
+      }
+    },
+    "/workspace-invitations/details": {
+      "get": {
+        "description": "Allows the recipient to preview the masked email and determine whether to login or create a password.",
+        "operationId": "getWorkspaceInvitationDetails",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "invitationToken",
+            "required": true,
+            "schema": {
+              "pattern": "^wii_[A-Za-z0-9_-]{43}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "hasExistingAccount": {
+                          "type": "boolean"
+                        },
+                        "maskedEmail": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "maskedEmail",
+                        "hasExistingAccount"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The invitation details were returned.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store",
+                  "type": "string"
+                }
+              },
+              "x-request-id": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "summary": "Get masked recipient email and account status for a workspace invitation",
         "tags": [
           "Identity"
         ]

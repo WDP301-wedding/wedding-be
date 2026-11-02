@@ -228,7 +228,15 @@ export function createCommercialAppendixService(options: Options) {
                   effectiveRevisionId = anyContract.id;
                   effectiveTotalVnd = anyContract.contractTotalVnd.toNumber();
                 } else {
-                  throw commercialConflict('SETTLED_CONTRACT_REQUIRED');
+                  return {
+                    bookingId,
+                    bookingRevision: booking.revision,
+                    currentRevisionId: null,
+                    effectiveRevisionId: null,
+                    effectiveTotalVnd: 0,
+                    revisions: [],
+                    nextCursor: null,
+                  };
                 }
               }
             }

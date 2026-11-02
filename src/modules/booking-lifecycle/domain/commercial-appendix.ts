@@ -62,7 +62,7 @@ export const appendicesResponseSchema = z.strictObject({
     bookingId: z.uuid(),
     bookingRevision: z.int().positive(),
     currentRevisionId: z.uuid().nullable(),
-    effectiveRevisionId: z.uuid(),
+    effectiveRevisionId: z.uuid().nullable(),
     effectiveTotalVnd: z.int().nonnegative(),
     revisions: z.array(appendixViewSchema).max(50),
     nextCursor: z.uuid().nullable(),
