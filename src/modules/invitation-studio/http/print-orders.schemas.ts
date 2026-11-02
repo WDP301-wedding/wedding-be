@@ -1,3 +1,4 @@
+import { printPurchaseMetadataSchema } from '../domain/print-purchase.js';
 import { z } from 'zod';
 import { id, revision } from '../domain/studio-policy.js';
 import { commercialPrintSnapshotSchema } from '../domain/contracted-print.js';
@@ -48,12 +49,13 @@ export const commercialRevisionViewSchema = z.strictObject({
   revisionNumber: revision,
   lines: z.array(quotedLineViewSchema),
   orderTotalVnd: z.int().nonnegative().max(Number.MAX_SAFE_INTEGER),
-  estimatedHandoverAt: z.iso.datetime(),
+  estimatedHandoverAt: z.iso.datetime().nullable(),
   expiresAt: z.iso.datetime(),
   createdAt: z.iso.datetime(),
 });
 
 export const printOrderViewSchema = z.strictObject({
+  purchase: printPurchaseMetadataSchema.optional(),
   orderId: id,
   bookingId: id,
   status: z.enum(PRINT_ORDER_STATUSES),

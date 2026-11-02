@@ -254,6 +254,27 @@ export class PrintableService implements PrintableSeatingContentRegistry {
     );
     return { invalidated: true, replayed: false };
   }
+  async readSeating(bookingId: string, context: ContractContext) {
+    const tx = this.repository.boundary.requireScope(bookingId, context);
+    await this.authorize(bookingId, context);
+    const state = await tx.invitationSeatingState.findUnique({ where: { bookingId } });
+    if (!state || state.status !== 'ELIGIBLE')
+      throw studioConflict('PRINTABLE_SEATING_REQUIRES_REVIEW');
+    const row = await tx.invitationSeatingRevision.findUniqueOrThrow({
+      where: { id: state.revisionId },
+    });
+    if (!row.validityProof) throw studioConflict('PRINTABLE_SEATING_REQUIRES_REVIEW');
+    await this.checkProof(
+      bookingId,
+      row.layoutTemplateVersionId,
+      parseStudio(validityProofSchema, row.validityProof),
+      context,
+    );
+    return {
+      seatingPlanRevisionId: row.id,
+      renderSnapshot: parseStudio(seatingRenderSchema, row.renderSnapshot),
+    };
+  }
   /** Internal print-capture port, enlisted by W5 approval; no HTTP approval bypass. */
   async capture(value: unknown, context: ContractContext) {
     const input = parseStudio(captureSchema, value);
@@ -285,23 +306,7 @@ export class PrintableService implements PrintableSeatingContentRegistry {
       seatingPlanRevisionId: string;
       renderSnapshot: z.output<typeof seatingRenderSchema>;
     } | null = null;
-    if (design.includesSeating) {
-      const state = await tx.invitationSeatingState.findUnique({
-        where: { bookingId: input.bookingId },
-      });
-      if (state === null || state.status !== 'ELIGIBLE')
-        throw studioConflict('PRINTABLE_SEATING_REQUIRES_REVIEW');
-      const row = await tx.invitationSeatingRevision.findUniqueOrThrow({
-        where: { id: state.revisionId },
-      });
-      if (row.validityProof === null) throw studioConflict('PRINTABLE_SEATING_REQUIRES_REVIEW');
-      const proof = parseStudio(validityProofSchema, row.validityProof);
-      await this.checkProof(input.bookingId, row.layoutTemplateVersionId, proof, context);
-      seating = {
-        seatingPlanRevisionId: row.id,
-        renderSnapshot: parseStudio(seatingRenderSchema, row.renderSnapshot),
-      };
-    }
+    if (design.includesSeating) seating = await this.readSeating(input.bookingId, context);
     const content = {
       design,
       timeline,

@@ -16,15 +16,27 @@ export type ContractedPrintOwners = {
   contractObligation(client: Client, bookingId: string): Promise<string>;
 };
 export class ContractedPrintFulfillment {
-  constructor(readonly owners: ContractedPrintOwners) { }
+  constructor(readonly owners: ContractedPrintOwners) {}
   async requireTemplate(client: Client, bookingId: string, templateVersionId: string) {
-    const effective = await this.owners.commercial(client).getEffective(bookingId);
-    for (const line of effective.lines.filter((l) => l.category === 'PRINT')) {
-      const offering = await this.owners.offerings(client).resolveRevision(line.sourceRevisionId);
-      if (offering.templateVersionId === templateVersionId) return;
+    const template = await client.invitationTemplateVersion.findUnique({
+      where: { id: templateVersionId },
+    });
+    const head =
+      template &&
+      (await client.invitationTemplate.findUnique({ where: { id: template.templateId } }));
+    if (template && head?.active && head.currentVersionId === template.id) return;
+    // Historical paid template versions remain usable through their retained obligation.
+    if (template && (await this.owners.model(client, bookingId)) === 'FULL_CONTRACT_V1') {
+      const effective = await this.owners.commercial(client).getEffective(bookingId);
+      const references = effective.lines.filter((line) => line.category === 'PRINT');
+      const offerings = await client.printOfferingRevision.findMany({
+        where: { id: { in: references.map((line) => line.sourceRevisionId) }, templateVersionId },
+      });
+      if (offerings.length) return;
     }
     throw printOrderConflict('CONTRACT_PRINT_TEMPLATE_CONFLICT');
   }
+
   async snapshot(
     client: Client,
     bookingId: string,
@@ -106,13 +118,14 @@ export class ContractedPrintFulfillment {
         (sums.get(binding.offeringId) ?? 0) - l.quantity,
         prices?.get(l.id) ?? binding.unitPriceVnd,
       );
-      await this.snapshot(
-        client,
-        bookingId,
-        l.designId,
-        l.quantity,
-        exactRevision ? binding : { ...binding, agreementRevisionId: effective.revisionId },
-      );
+      if (exactRevision)
+        await this.snapshot(
+          client,
+          bookingId,
+          l.designId,
+          l.quantity,
+          exactRevision ? binding : { ...binding, agreementRevisionId: effective.revisionId },
+        );
     }
     return this.owners.contractObligation(client, bookingId);
   }

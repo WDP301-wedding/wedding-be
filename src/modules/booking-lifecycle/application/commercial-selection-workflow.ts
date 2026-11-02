@@ -167,6 +167,8 @@ export function createCustomerSelectionWorkflow(options: {
       access.booking.hallId,
       access.booking.shiftCode,
     );
+    if (lines.some((line) => line.category === 'PRINT'))
+      throw commercialConflict('PRINT_POST_DEPOSIT_ONLY');
     const resolved = await catalog.requireSelections(lines, restaurant.id);
     const priced = lines.map((line) =>
       contractLineSchema.parse(resolved.get(line.category + line.sourceId)),

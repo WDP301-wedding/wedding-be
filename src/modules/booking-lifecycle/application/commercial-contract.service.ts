@@ -192,6 +192,8 @@ export function createCommercialContractService(options: Options) {
       throw commercialConflict('COMMERCIAL_PREDECESSOR_STALE');
     const catalog = options.catalog(client);
     const { restaurant, hall } = await catalog.requireVenue(booking.hallId, booking.shiftCode);
+    if (input.lines.some((line) => line.category === 'PRINT'))
+      throw commercialConflict('PRINT_POST_DEPOSIT_ONLY');
     const resolved = await catalog.requireSelections(input.lines, restaurant.id);
     const lines = input.lines.map((line) => resolved.get(line.category + line.sourceId)!);
     const proposal = booking.proposalSnapshot;

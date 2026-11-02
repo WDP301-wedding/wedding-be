@@ -24,8 +24,9 @@ import { retryCommercialWrite } from '../infrastructure/commercial-write.retry.j
 
 const include = { approvals: { orderBy: { party: 'asc' as const } } } as const;
 type Stored = Prisma.CommercialAppendixRevisionGetPayload<{ include: typeof include }>;
-function view(row: Stored) {
+function view(row: Stored, printOrderId?: string) {
   return appendixViewSchema.parse({
+    ...(printOrderId ? { printOrderId } : {}),
     revisionId: row.id,
     revisionNumber: row.revisionNumber,
     state: row.state,
@@ -115,6 +116,21 @@ export function createCommercialAppendixService(options: Options) {
             if (!['CONFIRMED', 'COMPLETED'].includes(access.booking.phase))
               throw commercialConflict('APPENDIX_NOT_EDITABLE');
             await options.financial.requireMutable(bookingId, scoped);
+            const purchase = await client.invitationPrintPurchase.findFirst({
+              where: {
+                bookingId,
+                orderId: {
+                  in: (
+                    await client.invitationPrintOrder.findMany({
+                      where: { bookingId, status: 'REQUESTED' },
+                      select: { id: true },
+                    })
+                  ).map((order) => order.id),
+                },
+              },
+            });
+            if (purchase) throw commercialConflict('PRINT_APPENDIX_PENDING');
+
             const row = await operation(client, access, scoped);
             const booking = await client.booking.update({
               where: { id: bookingId, revision: expectedRevision },
@@ -195,8 +211,7 @@ export function createCommercialAppendixService(options: Options) {
             orderBy: { revisionNumber: 'desc' },
           });
           const invoiceDoc = finalInvoice?.document as
-            | { effectiveCommercialRevisionId?: string; commercialTotalVnd?: number }
-            | undefined;
+            { effectiveCommercialRevisionId?: string; commercialTotalVnd?: number } | undefined;
           if (
             invoiceDoc?.effectiveCommercialRevisionId &&
             typeof invoiceDoc.commercialTotalVnd === 'number'
@@ -255,13 +270,31 @@ export function createCommercialAppendixService(options: Options) {
           take: 51,
           ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
         });
+        const purchases = await client.invitationPrintPurchase.findMany({
+          where: {
+            bookingId,
+            OR: [
+              { appendixRevisionId: { in: rows.map((row) => row.id) } },
+              { cancellationAppendixRevisionId: { in: rows.map((row) => row.id) } },
+            ],
+          },
+          select: { orderId: true, appendixRevisionId: true, cancellationAppendixRevisionId: true },
+        });
+        const printOrders = new Map(
+          purchases.flatMap((p) => [
+            [p.appendixRevisionId, p.orderId] as const,
+            ...(p.cancellationAppendixRevisionId
+              ? [[p.cancellationAppendixRevisionId, p.orderId] as const]
+              : []),
+          ]),
+        );
         return {
           bookingId,
           bookingRevision: booking.revision,
           currentRevisionId: head?.currentRevisionId ?? null,
           effectiveRevisionId,
           effectiveTotalVnd,
-          revisions: rows.slice(0, 50).map(view),
+          revisions: rows.slice(0, 50).map((row) => view(row, printOrders.get(row.id))),
           nextCursor: rows.length > 50 ? rows[49]!.id : null,
         };
       });

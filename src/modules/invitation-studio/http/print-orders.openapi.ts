@@ -1,3 +1,11 @@
+import { z } from 'zod';
+import {
+  printPurchaseAccessSchema,
+  printPurchaseInputSchema,
+  printPurchaseConfirmSchema,
+  printPurchaseQuoteSchema,
+} from '../domain/print-purchase.js';
+import { publicSeatingSchema } from '../domain/public-invitation.js';
 import type { ZodOpenApiObject } from 'zod-openapi';
 import type { ZodType } from 'zod';
 import * as s from './print-orders.schemas.js';
@@ -50,6 +58,51 @@ function operation(
 }
 
 export const invitationPrintOrdersOpenApiPaths = {
+  '/bookings/{bookingId}/print-orders/purchase-options': {
+    get: operation(
+      'getPrintPurchaseAccess',
+      'Authoritative post-deposit purchase eligibility and legacy workflow',
+      z.object({ data: printPurchaseAccessSchema }),
+      ['bookingId'],
+    ),
+  },
+  '/bookings/{bookingId}/print-orders/price-preview': {
+    post: operation(
+      'previewPrintPurchase',
+      'Retain exact post-deposit print content and catalogue price, without creating an order or approval',
+      z.object({ data: printPurchaseQuoteSchema }),
+      ['bookingId'],
+      printPurchaseInputSchema,
+    ),
+  },
+  '/bookings/{bookingId}/print-orders/confirm-purchase': {
+    post: operation(
+      'confirmPrintPurchase',
+      'Explicit Couple cost consent atomically creates order and appendix with Couple approval; no charge yet',
+      s.printOrderResponseSchema,
+      ['bookingId'],
+      printPurchaseConfirmSchema,
+      '201',
+    ),
+  },
+  '/management/print-orders/{orderId}/purchase-approval': {
+    post: operation(
+      'approvePrintPurchase',
+      'Owning Manager approves exact purchase appendix and posts its delta once, authorizing production',
+      s.printOrderResponseSchema,
+      ['orderId'],
+      s.transitionOrderBodySchema,
+    ),
+  },
+  '/bookings/{bookingId}/print-orders/seating-preview': {
+    get: operation(
+      'getInvitationSeatingPreview',
+      'Confirmed public-safe table geometry and group legend; no guest identities',
+      z.object({ data: publicSeatingSchema }),
+      ['bookingId'],
+    ),
+  },
+
   '/bookings/{bookingId}/print-orders': {
     post: operation(
       'requestPrintOrder',

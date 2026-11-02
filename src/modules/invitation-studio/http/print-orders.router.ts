@@ -1,3 +1,11 @@
+import {
+  printPurchaseAccessSchema,
+  printPurchaseInputSchema,
+  printPurchaseConfirmSchema,
+  printPurchaseQuoteSchema,
+} from '../domain/print-purchase.js';
+import { publicSeating, publicSeatingSchema } from '../domain/public-invitation.js';
+import { contractContext } from '../infrastructure/studio.repository.js';
 import { Router, type RequestHandler, type Request, type Response } from 'express';
 import { z } from 'zod';
 import {
@@ -65,6 +73,70 @@ export function createPrintOrdersRouter(
         .catch(next);
     });
   }
+
+  route(
+    'post',
+    '/bookings/:bookingId/print-orders/price-preview',
+    z.object({ data: printPurchaseQuoteSchema }),
+    (req, res) => {
+      const { bookingId } = parseStudio(bookParams, req.params);
+      return services.printPurchases.quote(
+        bookingId,
+        parseStudio(printPurchaseInputSchema, req.body),
+        key(req),
+        context(res),
+      );
+    },
+  );
+  route(
+    'post',
+    '/bookings/:bookingId/print-orders/confirm-purchase',
+    schemas.printOrderResponseSchema,
+    (req, res) => {
+      const { bookingId } = parseStudio(bookParams, req.params);
+      return services.printPurchases.confirm(
+        bookingId,
+        parseStudio(printPurchaseConfirmSchema, req.body),
+        key(req),
+        context(res),
+      );
+    },
+    201,
+  );
+  route(
+    'post',
+    '/management/print-orders/:orderId/purchase-approval',
+    schemas.printOrderResponseSchema,
+    (req, res) => {
+      const { orderId } = parseStudio(orderParams, req.params);
+      return services.printPurchases.approve(orderId, req.body, key(req), context(res));
+    },
+  );
+  route(
+    'get',
+    '/bookings/:bookingId/print-orders/seating-preview',
+    z.object({ data: publicSeatingSchema }),
+    async (req, res) => {
+      const { bookingId } = parseStudio(bookParams, req.params),
+        ctx = context(res);
+      return services.studioRepository.boundary.run(
+        { bookingId, context: contractContext(ctx) },
+        async (scope) =>
+          publicSeating((await services.printable.readSeating(bookingId, scope)).renderSnapshot),
+      );
+    },
+  );
+
+  route(
+    'get',
+    '/bookings/:bookingId/print-orders/purchase-options',
+    z.object({ data: printPurchaseAccessSchema }),
+    (req, res) =>
+      services.printPurchases.availability(
+        parseStudio(bookParams, req.params).bookingId,
+        context(res),
+      ),
+  );
 
   // 1. Couple requests print order
   route(

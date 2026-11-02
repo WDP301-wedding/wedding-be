@@ -1,3 +1,5 @@
+import type { ContractContext } from '../../../core/database/booking-boundary.js';
+import type { seatingRenderSchema } from '../domain/studio-policy.js';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { Prisma } from '../../../generated/prisma/client.js';
@@ -16,7 +18,7 @@ import {
   designContentSchema,
   studioConflict,
 } from '../domain/studio-policy.js';
-import { publicInvitationSchema } from '../domain/public-invitation.js';
+import { publicInvitationSchema, publicSeating } from '../domain/public-invitation.js';
 import { asJson, contractContext, type StudioRepository } from './studio.repository.js';
 import { type StudioAuthorization } from './studio-authorization.js';
 
@@ -43,6 +45,12 @@ export class PublicationService implements InvitationPublicationReader {
     readonly timeline: BookingTimelineSnapshotReader,
     readonly publicOrigin: string | null,
     readonly now: () => Date = () => new Date(),
+    readonly seating?: (
+      bookingId: string,
+      context: ContractContext,
+    ) => Promise<{
+      renderSnapshot: z.infer<typeof seatingRenderSchema>;
+    }>,
   ) {}
   async publish(value: unknown, context: MediaRequestContext) {
     const input = parseStudio(publishSchema, value);
@@ -104,11 +112,18 @@ export class PublicationService implements InvitationPublicationReader {
         const urls = new Map(
           assets.map((asset) => [asset.id, `/api/v1/public/invitation-assets/${asset.publicSlug}`]),
         );
+        if (content.includesSeating && !this.seating)
+          throw studioConflict('PRINTABLE_SEATING_REQUIRES_REVIEW');
         const publishedRevisionId = randomUUID();
         const publicContent = publicInvitationSchema.parse({
           publicInvitationId: identity.id,
           publishedRevisionId,
           title: content.title,
+          seating: content.includesSeating
+            ? publicSeating(
+                (await this.seating!(input.bookingId, contractContext(scoped))).renderSnapshot,
+              )
+            : null,
           textFields: content.textFields,
           sections: content.sections.map((section) => ({
             kind: section.kind,

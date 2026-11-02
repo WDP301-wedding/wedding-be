@@ -44,6 +44,7 @@ export const appendixDocumentSchema = z.strictObject({
   tableCount: z.int().positive().max(500),
 });
 export const appendixViewSchema = z.strictObject({
+  printOrderId: z.uuid().optional(),
   revisionId: z.uuid(),
   revisionNumber: z.int().positive(),
   state: z.enum(['DRAFT', 'AWAITING_APPROVAL', 'APPROVED', 'SUPERSEDED']),

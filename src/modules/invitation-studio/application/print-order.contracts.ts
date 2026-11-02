@@ -24,12 +24,20 @@ export interface CommercialRevisionView {
   revisionNumber: number;
   lines: QuotedLineView[];
   orderTotalVnd: number;
-  estimatedHandoverAt: string;
+  estimatedHandoverAt: string | null;
   expiresAt: string;
   createdAt: string;
 }
 
 export interface PrintOrderView {
+  purchase?: {
+    cancellationRequested?: boolean;
+    appendixRevisionId: string;
+    quoteId: string;
+    material: string;
+    printType: string;
+    cancellationAppendixRevisionId: string | null;
+  };
   orderId: string;
   bookingId: string;
   status: PrintOrderStatus;

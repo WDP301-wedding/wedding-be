@@ -246,6 +246,11 @@ export function createFinalInvoiceService(options: Options) {
             return existing;
           throw commercialConflict('INVOICE_FINALIZED');
         }
+        const pendingPrint = await client.invitationPrintOrder.findFirst({
+          where: { bookingId, status: { in: ['REQUESTED', 'QUOTED'] } },
+          select: { id: true },
+        });
+        if (pendingPrint) throw commercialConflict('PRINT_ORDERS_PENDING');
         const draft = await readExpenseDraft(client, bookingId);
         if (draft.revision !== input.expectedDraftRevision)
           throw commercialConflict('EXPENSE_REVISION_STALE');

@@ -1,3 +1,5 @@
+import { createPrintAppendixWorkflow } from '../../booking-lifecycle/application/print-appendix.workflow.js';
+import { printPurchaseDocumentSchema } from '../domain/print-purchase.js';
 import { randomUUID } from 'node:crypto';
 import { Prisma, type InvitationPrintOrder } from '../../../generated/prisma/client.js';
 import { prismaSchema } from '../../../core/database/prisma.js';
@@ -76,7 +78,7 @@ export class PrintOrderService {
       revisionNumber: number;
       linesJson: Prisma.JsonValue;
       orderTotalVnd: Prisma.Decimal;
-      estimatedHandoverAt: Date;
+      estimatedHandoverAt: Date | null;
       expiresAt: Date;
       createdAt: Date;
     } | null,
@@ -85,7 +87,7 @@ export class PrintOrderService {
       revisionNumber: number;
       linesJson: Prisma.JsonValue;
       orderTotalVnd: Prisma.Decimal;
-      estimatedHandoverAt: Date;
+      estimatedHandoverAt: Date | null;
       expiresAt: Date;
       createdAt: Date;
     } | null = null,
@@ -111,7 +113,8 @@ export class PrintOrderService {
             revisionNumber: currentCommercialRevision.revisionNumber,
             lines: currentCommercialRevision.linesJson as unknown as QuotedLineView[],
             orderTotalVnd: currentCommercialRevision.orderTotalVnd.toNumber(),
-            estimatedHandoverAt: currentCommercialRevision.estimatedHandoverAt.toISOString(),
+            estimatedHandoverAt:
+              currentCommercialRevision.estimatedHandoverAt?.toISOString() ?? null,
             expiresAt: currentCommercialRevision.expiresAt.toISOString(),
             createdAt: currentCommercialRevision.createdAt.toISOString(),
           }
@@ -122,7 +125,8 @@ export class PrintOrderService {
             revisionNumber: pendingReplacementProposal.revisionNumber,
             lines: pendingReplacementProposal.linesJson as unknown as QuotedLineView[],
             orderTotalVnd: pendingReplacementProposal.orderTotalVnd.toNumber(),
-            estimatedHandoverAt: pendingReplacementProposal.estimatedHandoverAt.toISOString(),
+            estimatedHandoverAt:
+              pendingReplacementProposal.estimatedHandoverAt?.toISOString() ?? null,
             expiresAt: pendingReplacementProposal.expiresAt.toISOString(),
             createdAt: pendingReplacementProposal.createdAt.toISOString(),
           }
@@ -249,6 +253,8 @@ export class PrintOrderService {
         await this.authorization.manager(scoped);
       },
       async (tx, scoped) => {
+        if (await tx.invitationPrintPurchase.findUnique({ where: { orderId: parsedOrderId } }))
+          throw printOrderConflict('PRINT_PURCHASE_USE_APPROVAL');
         const order = await tx.invitationPrintOrder.findUniqueOrThrow({
           where: { id: parsedOrderId },
         });
@@ -390,6 +396,8 @@ export class PrintOrderService {
         await this.authorization.booking(parsedBookingId, scoped, 'COUPLE');
       },
       async (tx, scoped) => {
+        if (await tx.invitationPrintPurchase.findUnique({ where: { orderId: parsedOrderId } }))
+          throw printOrderConflict('PRINT_PURCHASE_USE_APPROVAL');
         const order = await tx.invitationPrintOrder.findFirst({
           where: { id: parsedOrderId, bookingId: parsedBookingId },
         });
@@ -551,6 +559,24 @@ export class PrintOrderService {
           throw printOrderConflict('PRINT_ORDER_STATE_INVALID');
         }
 
+        const purchase = await tx.invitationPrintPurchase.findUnique({
+          where: { orderId: parsedOrderId },
+        });
+        if (purchase) {
+          await this.authorization.booking(bookingId, scoped, 'MANAGER');
+          const intent = await tx.invitationPrintAudit.findFirst({
+            where: {
+              orderId: parsedOrderId,
+              action: 'invitation.print-cancellation-intent-confirmed',
+            },
+            orderBy: { createdAt: 'desc' },
+          });
+          if (
+            intent &&
+            (intent.metadata as { revision?: number } | null)?.revision === order.revision
+          )
+            throw printOrderConflict('PRINT_CANCELLATION_PENDING');
+        }
         await this.fulfillment?.validateOrder(tx, bookingId, parsedOrderId, undefined, false);
 
         const approvedRevision = await tx.invitationCommercialRevision.findUniqueOrThrow({
@@ -820,6 +846,26 @@ export class PrintOrderService {
           },
         });
 
+        const eventId = randomUUID();
+        await tx.invitationStudioOutbox.create({
+          data: {
+            eventId,
+            bookingId: parsedBookingId,
+            eventType: 'invitation.print-cancellation-requested',
+            envelope: {
+              eventId,
+              eventType: 'invitation.print-cancellation-requested',
+              eventVersion: 1,
+              occurredAt: this.now().toISOString(),
+              producerModule: 'invitation-studio',
+              aggregateType: 'BOOKING',
+              aggregateId: parsedBookingId,
+              correlationId: scoped.requestId,
+              causationId: scoped.causationId ?? scoped.requestId,
+              payload: { bookingId: parsedBookingId, printOrderId: parsedOrderId },
+            },
+          },
+        });
         return { confirmed: true, orderId: parsedOrderId };
       },
       { action: 'print-order.cancellation-intent', resourceId: parsedOrderId },
@@ -887,7 +933,7 @@ export class PrintOrderService {
           revisionNumber: number;
           linesJson: Prisma.JsonValue;
           orderTotalVnd: Prisma.Decimal;
-          estimatedHandoverAt: Date;
+          estimatedHandoverAt: Date | null;
           expiresAt: Date;
           createdAt: Date;
         } | null = null;
@@ -898,6 +944,15 @@ export class PrintOrderService {
         }
 
         if (order.status === 'REQUESTED' || order.status === 'QUOTED') {
+          const purchase = await tx.invitationPrintPurchase.findUnique({
+            where: { orderId: parsedOrderId },
+          });
+          if (purchase)
+            await createPrintAppendixWorkflow(tx, contractContext(scoped)).withdraw(
+              resolvedBookingId,
+              purchase.appendixRevisionId,
+            );
+
           const nextRevision = order.revision + 1;
           const updatedOrder = await tx.invitationPrintOrder.update({
             where: { id: parsedOrderId },
@@ -957,6 +1012,35 @@ export class PrintOrderService {
 
           const adjustmentId = randomUUID();
           const contracted = lines.some((l) => l.commercialSource !== null);
+          const purchase = await tx.invitationPrintPurchase.findUnique({
+            where: { orderId: parsedOrderId },
+          });
+          if (purchase) {
+            await this.authorization.booking(resolvedBookingId, scoped, 'MANAGER');
+            const quote = await tx.invitationPrintPurchaseQuote.findUniqueOrThrow({
+              where: { id: purchase.quoteId },
+            });
+            const document = printPurchaseDocumentSchema.parse(quote.document);
+            // Remove only this allocation before validating the remaining contracted quantities.
+            await tx.invitationPrintOrder.update({
+              where: { id: parsedOrderId },
+              data: { status: 'CANCELLED' },
+            });
+            const workflow = createPrintAppendixWorkflow(tx, contractContext(scoped));
+            const correction = await workflow.create(
+              resolvedBookingId,
+              document.line,
+              intentAudit.actorId,
+              input.reason ?? 'Hủy đơn in trước sản xuất',
+              true,
+            );
+            await workflow.approve(resolvedBookingId, correction.id, scoped.actorId);
+            await tx.invitationPrintPurchase.update({
+              where: { orderId: parsedOrderId },
+              data: { cancellationAppendixRevisionId: correction.id },
+            });
+          }
+
           if (!contracted)
             await this.billing.registerCredit(
               {
@@ -990,7 +1074,8 @@ export class PrintOrderService {
               toStatus: 'CANCELLED',
               metadata: asJson({
                 adjustmentId,
-                creditedAmountVnd: contracted ? 0 : currentRev.orderTotalVnd.toNumber(),
+                creditedAmountVnd:
+                  contracted && !purchase ? 0 : currentRev.orderTotalVnd.toNumber(),
                 reason: input.reason ?? null,
               }),
             },
@@ -1031,6 +1116,8 @@ export class PrintOrderService {
         await this.authorization.manager(scoped);
       },
       async (tx, scoped) => {
+        if (await tx.invitationPrintPurchase.findUnique({ where: { orderId: parsedOrderId } }))
+          throw printOrderConflict('PRINT_PURCHASE_USE_APPROVAL');
         const order = await tx.invitationPrintOrder.findUniqueOrThrow({
           where: { id: parsedOrderId },
         });
@@ -1172,6 +1259,8 @@ export class PrintOrderService {
         await this.authorization.booking(parsedBookingId, scoped, 'COUPLE');
       },
       async (tx, scoped) => {
+        if (await tx.invitationPrintPurchase.findUnique({ where: { orderId: parsedOrderId } }))
+          throw printOrderConflict('PRINT_PURCHASE_USE_APPROVAL');
         const order = await tx.invitationPrintOrder.findFirst({
           where: { id: parsedOrderId, bookingId: parsedBookingId },
         });
@@ -1346,7 +1435,7 @@ export class PrintOrderService {
       revisionNumber: number;
       linesJson: Prisma.JsonValue;
       orderTotalVnd: Prisma.Decimal;
-      estimatedHandoverAt: Date;
+      estimatedHandoverAt: Date | null;
       expiresAt: Date;
       createdAt: Date;
     } | null = null;
@@ -1368,7 +1457,9 @@ export class PrintOrderService {
       });
     }
 
-    return this.mapOrderView(order, lines, currentRev, pendingProposal);
+    return (
+      await this.withPurchases([this.mapOrderView(order, lines, currentRev, pendingProposal)])
+    )[0]!;
   }
 
   async listPrintOrders(
@@ -1468,6 +1559,47 @@ export class PrintOrderService {
     return { items, nextCursor };
   }
 
+  private async withPurchases(items: PrintOrderView[]): Promise<PrintOrderView[]> {
+    const rows = await this.repository.prisma.invitationPrintPurchase.findMany({
+      where: { orderId: { in: items.map((item) => item.orderId) } },
+    });
+    const quotes = await this.repository.prisma.invitationPrintPurchaseQuote.findMany({
+      where: { id: { in: rows.map((row) => row.quoteId) } },
+    });
+    const intents = await this.repository.prisma.invitationPrintAudit.findMany({
+      where: {
+        orderId: { in: rows.map((row) => row.orderId) },
+        action: 'invitation.print-cancellation-intent-confirmed',
+      },
+    });
+    const byQuote = new Map(
+      quotes.map((q) => [q.id, printPurchaseDocumentSchema.parse(q.document)]),
+    );
+    const byOrder = new Map(rows.map((row) => [row.orderId, row]));
+    return items.map((item) => {
+      const row = byOrder.get(item.orderId),
+        document = row && byQuote.get(row.quoteId);
+      return row && document
+        ? {
+            ...item,
+            purchase: {
+              appendixRevisionId: row.appendixRevisionId,
+              cancellationRequested:
+                item.status === 'APPROVED' &&
+                intents.some(
+                  (intent) =>
+                    intent.orderId === item.orderId &&
+                    (intent.metadata as { revision?: number } | null)?.revision === item.revision,
+                ),
+              quoteId: row.quoteId,
+              material: document.material,
+              printType: document.printType,
+              cancellationAppendixRevisionId: row.cancellationAppendixRevisionId,
+            },
+          }
+        : item;
+    });
+  }
   private async pageViews(pageOrders: InvitationPrintOrder[]): Promise<PrintOrderView[]> {
     const lines = await this.repository.prisma.invitationPrintLine.findMany({
       where: { orderId: { in: pageOrders.map((order) => order.id) } },
@@ -1529,6 +1661,6 @@ export class PrintOrderService {
         proposalByOrder.get(order.id) ?? null,
       ),
     );
-    return items;
+    return this.withPurchases(items);
   }
 }

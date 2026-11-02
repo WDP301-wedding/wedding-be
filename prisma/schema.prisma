@@ -2244,6 +2244,30 @@ model InvitationDerivedUploadAttempt {
   @@id([bookingId, intentDigest])
 }
 
+// Additive purchase records; historical contract-funded orders retain their workflow.
+model InvitationPrintPurchaseQuote {
+  id        String   @id @db.Uuid
+  bookingId String   @db.Uuid
+  actorId   String   @db.Uuid
+  document  Json     @db.JsonB
+  digest    String
+  expiresAt DateTime @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([bookingId, createdAt])
+}
+
+model InvitationPrintPurchase {
+  orderId                        String   @id @db.Uuid
+  bookingId                      String   @db.Uuid
+  quoteId                        String   @unique @db.Uuid
+  appendixRevisionId             String   @unique @db.Uuid
+  cancellationAppendixRevisionId String?  @unique @db.Uuid
+  createdAt                      DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([bookingId])
+}
+
 model InvitationPrintOrder {
   id                          String    @id @db.Uuid
   bookingId                   String    @db.Uuid
@@ -2282,7 +2306,7 @@ model InvitationCommercialRevision {
   revisionNumber      Int
   linesJson           Json     @db.JsonB
   orderTotalVnd       Decimal  @db.Decimal(18, 0)
-  estimatedHandoverAt DateTime @db.Timestamptz(6)
+  estimatedHandoverAt DateTime? @db.Timestamptz(6)
   expiresAt           DateTime @db.Timestamptz(6)
   createdAt           DateTime @default(now()) @db.Timestamptz(6)
 

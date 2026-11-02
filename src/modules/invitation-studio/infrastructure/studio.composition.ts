@@ -17,6 +17,7 @@ import { PrintableService } from './printable.service.js';
 import { PrintFileService } from './print-file.service.js';
 import { PrintOrderService } from './print-order.service.js';
 import { createContractedPrintFulfillment } from './contracted-print.providers.js';
+import { PrintPurchaseService } from './print-purchase.service.js';
 import { PrismaInvitationAutomationReader } from './prisma-automation.reader.js';
 import { PrismaInvitationReportingReader } from './prisma-reporting.reader.js';
 import { ImageJobsService } from './image-jobs.service.js';
@@ -42,18 +43,19 @@ export function createInvitationStudioServices(
   const designs = new DesignService(repository, authorization, now, fulfillment);
   const derivedAssets = new DerivedAssetsService(repository, authorization, storage);
   const generation = new GenerationService(repository, authorization, media.service, ai);
-  const publication = new PublicationService(
+  const publication: PublicationService = new PublicationService(
     repository,
     authorization,
     media.booking,
     media.timeline,
     publicOrigin,
     now,
+    (bookingId, context) => printable.readSeating(bookingId, context),
   );
   const planning = createPrismaPlanningSnapshotReader(media.boundary);
   const venue = createPrismaSelectionEligibilityReader(media.boundary);
   const layout = createScopedLayoutReader(prisma, media.boundary);
-  const printable = new PrintableService(
+  const printable: PrintableService = new PrintableService(
     repository,
     editor,
     media.booking,
@@ -99,6 +101,13 @@ export function createInvitationStudioServices(
     printable,
     billing,
     printOrders,
+    printPurchases: new PrintPurchaseService(
+      repository,
+      authorization,
+      printable,
+      printOrders,
+      now,
+    ),
     automation,
     reporting,
     editor,
