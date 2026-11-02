@@ -168,12 +168,9 @@ services:
         sync: false
       - key: PUBLIC_INVITATION_WEB_ORIGIN
         value: https://wedding-web-silk.vercel.app
-      # Render resolves this secret inside the service; no copied key in Git.
+      # Optional dedicated override; runtime otherwise reuses GEMINI_API_KEY.
       - key: GEMINI_DESIGN_API_KEY
-        fromService:
-          name: wedding-be-render-trial
-          type: web
-          envVarKey: GEMINI_API_KEY
+        sync: false
       - key: GEMINI_DESIGN_MODEL
         value: gemini-3.8-flash
       - key: AI_IMAGE_PROVIDER

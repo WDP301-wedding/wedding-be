@@ -449,7 +449,14 @@ const rawEnvironmentSchema = z
     }
 
     if (environment.GEMINI_DESIGN_API_KEY || environment.GEMINI_DESIGN_MODEL) {
-      requireVariables(environment, ['GEMINI_DESIGN_API_KEY', 'GEMINI_DESIGN_MODEL'], context);
+      requireVariables(environment, ['GEMINI_DESIGN_MODEL'], context);
+      if (!environment.GEMINI_DESIGN_API_KEY && !environment.GEMINI_API_KEY) {
+        context.addIssue({
+          code: 'custom',
+          path: ['GEMINI_DESIGN_API_KEY'],
+          message: 'Configure a dedicated design key or reuse the configured Gemini provider key.',
+        });
+      }
     }
     if (environment.AI_IMAGE_PROVIDER === 'gemini') {
       requireVariables(environment, ['GEMINI_API_KEY', 'GEMINI_IMAGE_MODEL'], context);
@@ -735,6 +742,8 @@ function rejectVariables<const Key extends EnvironmentKey>(
 }
 
 function createConfig(environment: RawEnvironment): Omit<BackendConfig, 'notifications'> {
+  // Dedicated credentials override the existing server-side Gemini provider key.
+  const designApiKey = environment.GEMINI_DESIGN_API_KEY ?? environment.GEMINI_API_KEY;
   const storage: StorageConfig =
     environment.STORAGE_DISK_PATH &&
     environment.STORAGE_PUBLIC_ORIGIN &&
@@ -902,10 +911,10 @@ function createConfig(environment: RawEnvironment): Omit<BackendConfig, 'notific
     storage,
     email,
     aiImage,
-    ...(environment.GEMINI_DESIGN_API_KEY && environment.GEMINI_DESIGN_MODEL
+    ...(designApiKey && environment.GEMINI_DESIGN_MODEL
       ? {
           aiDesign: Object.freeze({
-            apiKey: environment.GEMINI_DESIGN_API_KEY,
+            apiKey: designApiKey,
             model: environment.GEMINI_DESIGN_MODEL,
           }),
         }

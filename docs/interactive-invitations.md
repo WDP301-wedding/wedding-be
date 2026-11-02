@@ -16,9 +16,10 @@ Không viết lại revision, PDF, phụ lục, giá hoặc chứng từ đã c�
 
 ## Cấu hình BE
 
-- `GEMINI_DESIGN_API_KEY`: khóa Gemini phía máy chủ, không đưa vào NEXT_PUBLIC.
+- `GEMINI_DESIGN_API_KEY`: khóa riêng tùy chọn phía máy chủ, không đưa vào NEXT_PUBLIC.
+  Khi để trống, dùng lại `GEMINI_API_KEY` của provider Gemini hiện có.
 - `GEMINI_DESIGN_MODEL`: tên model có structured JSON output được tài khoản hỗ trợ.
-  Hai biến cần có cùng nhau. Không mặc định đoán model, không phụ thuộc model tạo ảnh.
+  Phải có model và ít nhất một khóa Gemini hợp lệ. Model thiết kế tách biệt model tạo ảnh.
 - `PUBLIC_INVITATION_WEB_ORIGIN`: origin web khách, ví dụ
   `https://wedding-web-silk.vercel.app`; local có thể là `http://localhost:3000`.
   Dùng để chuyển link QR render sang `/t/:slug` cho thiệp có presentation mới.
@@ -82,9 +83,9 @@ kiểm tra AI thực tế. Không cần migration DB mới cho riêng tính năn
 ## Cấu hình bổ sung — 2026-11-03
 
 - `render.yaml`: model thiết kế `gemini-3.8-flash`, web origin
-  `https://wedding-web-silk.vercel.app`. Khóa thiết kế tham chiếu biến
-  `GEMINI_API_KEY` của chính dịch vụ bằng `fromService.envVarKey`, không ghi giá trị
-  khóa vào Git. Biến nguồn phải tồn tại trong dịch vụ Render.
+  `https://wedding-web-silk.vercel.app`. Bộ đọc cấu hình dùng lại biến
+  `GEMINI_API_KEY` của chính dịch vụ khi không có khóa riêng, không ghi giá trị
+  khóa vào Git. Khóa nguồn phải tồn tại trong dịch vụ Render.
 - `.env` local: public BE origin `http://localhost:3001`, web origin
   `http://localhost:3000`; không thay URL proxy hay kết nối DB.
 - Local chưa có khóa Gemini nên giữ cả hai biến thiết kế trống để không làm BE
@@ -114,3 +115,19 @@ Kết nối MCP cập nhật biến nhưng không có thao tác đọc/sao chép
 Cần thêm khóa thiết kế qua Environment bằng giá trị Gemini key hiện có trên
 chính dịch vụ; không đưa khóa vào chat, Git, tài liệu hoặc log.
 Chưa xác minh AI/provider; không gọi generation trả phí.
+
+## Bản sửa dùng lại khóa hiện có — chờ phát hành
+
+Bộ đọc cấu hình ưu tiên `GEMINI_DESIGN_API_KEY` nếu có; nếu không, dùng
+`GEMINI_API_KEY` đã được cấu hình hợp lệ cho provider Gemini hiện tại.
+`GEMINI_DESIGN_MODEL` vẫn là điều kiện bật thiết kế AI; không tự bật AI khi chưa
+chọn model. Không tạo, in, đọc ngược hay sao chép giá trị khóa qua kết nối Render.
+Blueprint giữ khóa riêng là tùy chọn `sync: false`; không cần tham chiếu/copy khóa
+khi đồng bộ. Các cấu hình và kiểm soát của provider tạo ảnh giữ nguyên.
+
+Bản sửa này cần được phát hành lên BE trước khi deployment có model
+`gemini-3.8-flash` chạy được mà không có khóa thiết kế riêng. Deployment thất bại
+ở trên chưa chứng minh model hoặc Gemini provider hoạt động.
+
+Kiểm tra bản sửa dùng lại khóa: `npm run typecheck` exit 0; ESLint riêng
+`src/config/env.ts --max-warnings=0` exit 0. Không chạy test hay Gemini generation.
