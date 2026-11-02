@@ -1,3 +1,4 @@
+import { invitationPresentationSchema } from './invitation-presentation.js';
 import { z } from 'zod';
 import { AppError, ValidationError } from '../../../core/errors/app-error.js';
 import { hashCanonicalRequest } from '../../../core/idempotency/request-hash.js';
@@ -34,6 +35,7 @@ export const designContentSchema = z
     sections: z.array(sectionSchema).max(20),
     derivedAssetIds: z.array(id).max(100),
     includesSeating: z.boolean(),
+    presentation: invitationPresentationSchema.optional(),
   })
   .superRefine((value, ctx) => {
     if (

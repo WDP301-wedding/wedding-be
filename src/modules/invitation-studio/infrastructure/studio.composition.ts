@@ -1,3 +1,4 @@
+import { DesignSuggestionService } from './design-suggestion.service.js';
 import type { PrismaClient } from '../../../generated/prisma/client.js';
 import type { StorageProvider } from '../../../integrations/storage/storage-provider.js';
 import type { AiImageProvider } from '../../../integrations/ai-image/ai-image-provider.js';
@@ -29,6 +30,7 @@ export function createInvitationStudioServices(
   publicOrigin: string | null,
   now: () => Date = () => new Date(),
   imageJobsEnabled = true,
+  aiDesign?: Readonly<{ apiKey: string; model: string }>,
 ) {
   const media = createPersistentMediaService(prisma, storage, now);
   const editor = createInvitationEditorReader(prisma, media.boundary, media.identity.resolver);
@@ -83,6 +85,7 @@ export function createInvitationStudioServices(
     studioRepository: repository,
     printFiles: new PrintFileService(repository, authorization, storage),
     designs,
+    designSuggestions: new DesignSuggestionService(repository, authorization, aiDesign),
     derivedAssets,
     generation,
     imageJobs: new ImageJobsService(

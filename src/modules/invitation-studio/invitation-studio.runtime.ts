@@ -62,10 +62,17 @@ export async function createInvitationStudioRuntime(
       config.invitationStudio?.publicOrigin ?? null,
       now,
       config.invitationStudio.imageJobsEnabled === true && ai !== null && config.storage.enabled,
+      config.aiDesign,
     );
     const router = Router();
     router.use(createMediaRouter(composition.service, composition.identity.resolver));
-    router.use(createStudioRouter(composition, composition.identity.resolver));
+    router.use(
+      createStudioRouter(
+        composition,
+        composition.identity.resolver,
+        config.invitationStudio.webOrigin,
+      ),
+    );
     const { staff, seating } = createStaffSeatingServices(prisma, composition, now);
     router.use(createSeatingRouter(seating.seating, seating.resolver));
     router.use(createStaffRouter(staff));

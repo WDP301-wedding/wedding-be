@@ -125,6 +125,7 @@ export class PublicationService implements InvitationPublicationReader {
               )
             : null,
           textFields: content.textFields,
+          ...(content.presentation ? { presentation: content.presentation } : {}),
           sections: content.sections.map((section) => ({
             kind: section.kind,
             textKey: section.textKey,

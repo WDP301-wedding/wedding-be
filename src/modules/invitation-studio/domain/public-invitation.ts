@@ -1,3 +1,4 @@
+import { invitationPresentationSchema } from './invitation-presentation.js';
 import { z } from 'zod';
 import { textFieldsSchema, escapeText, type seatingRenderSchema } from './studio-policy.js';
 
@@ -41,6 +42,7 @@ export const publicInvitationSchema = z.object({
   publishedRevisionId: z.uuid(),
   seating: publicSeatingSchema.nullable().optional(),
   title: z.string().min(1).max(120),
+  presentation: invitationPresentationSchema.optional(),
   textFields: textFieldsSchema,
   sections: z
     .array(

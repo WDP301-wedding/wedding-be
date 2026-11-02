@@ -3,7 +3,7 @@ import { currentRequestDeadline, remainingReadTime } from '../../../core/http/re
 import type { MediaRequestContext } from '../application/media.contracts.js';
 import { databaseDiagnosticsSnapshot } from '../../../core/database/diagnostics.js';
 
-type Operation = 'ai.generate' | 'asset.derive' | 'design.list' | 'print.list';
+type Operation = 'ai.design' | 'ai.generate' | 'asset.derive' | 'design.list' | 'print.list';
 type Phase =
   | 'authorization'
   | 'claim'

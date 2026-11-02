@@ -1,3 +1,7 @@
+import {
+  invitationDesignPromptSchema,
+  invitationDesignSuggestionResponse,
+} from '../domain/invitation-presentation.js';
 import type { ZodOpenApiObject } from 'zod-openapi';
 import { z } from 'zod';
 import * as s from './studio.schemas.js';
@@ -58,6 +62,15 @@ function list(operationId: string, response: z.ZodType, query: z.ZodObject) {
   };
 }
 export const invitationStudioOpenApiPaths = {
+  '/bookings/{bookingId}/invitation-design-suggestions': {
+    post: operation(
+      'generateInvitationDesignSuggestion',
+      'Generate a declarative invitation recipe; same key replays without paid redispatch',
+      invitationDesignSuggestionResponse,
+      ['bookingId'],
+      invitationDesignPromptSchema,
+    ),
+  },
   '/bookings/{bookingId}/invitation-image-jobs': {
     post: {
       ...operation(

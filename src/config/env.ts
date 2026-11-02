@@ -281,6 +281,8 @@ const rawEnvironmentSchema = z
     AI_IMAGE_PROVIDER: optionalString.pipe(z.literal('gemini').optional()),
     GEMINI_API_KEY: optionalString,
     GEMINI_IMAGE_MODEL: optionalString,
+    GEMINI_DESIGN_API_KEY: optionalString,
+    GEMINI_DESIGN_MODEL: optionalString,
     METRICS_ENABLED: z
       .enum(['true', 'false'])
       .default('false')
@@ -291,6 +293,7 @@ const rawEnvironmentSchema = z
       .default('false')
       .transform((value) => value === 'true'),
     PUBLIC_INVITATION_ORIGIN: optionalString.pipe(corsOrigin.optional()),
+    PUBLIC_INVITATION_WEB_ORIGIN: optionalString.pipe(corsOrigin.optional()),
     SEATING_RECONCILER_ENABLED: z
       .enum(['true', 'false'])
       .transform((value) => value === 'true')
@@ -321,6 +324,19 @@ const rawEnvironmentSchema = z
         });
     }
 
+    if (
+      environment.PUBLIC_INVITATION_WEB_ORIGIN &&
+      URL.canParse(environment.PUBLIC_INVITATION_WEB_ORIGIN)
+    ) {
+      const origin = new URL(environment.PUBLIC_INVITATION_WEB_ORIGIN);
+      if (origin.protocol !== 'https:' && (deployed || !loopbackHosts.has(origin.hostname))) {
+        context.addIssue({
+          code: 'custom',
+          path: ['PUBLIC_INVITATION_WEB_ORIGIN'],
+          message: 'Interactive invitation origin requires HTTPS outside loopback development.',
+        });
+      }
+    }
     if (deployed) {
       for (const variableName of productionRequiredVariables) {
         const value = environment[variableName];
@@ -432,6 +448,9 @@ const rawEnvironmentSchema = z
       requireVariables(environment, ['BREVO_API_KEY', 'BREVO_FROM_EMAIL'], context);
     }
 
+    if (environment.GEMINI_DESIGN_API_KEY || environment.GEMINI_DESIGN_MODEL) {
+      requireVariables(environment, ['GEMINI_DESIGN_API_KEY', 'GEMINI_DESIGN_MODEL'], context);
+    }
     if (environment.AI_IMAGE_PROVIDER === 'gemini') {
       requireVariables(environment, ['GEMINI_API_KEY', 'GEMINI_IMAGE_MODEL'], context);
     } else {
@@ -535,11 +554,13 @@ export type BackendConfig = Readonly<{
   storage: StorageConfig;
   email: EmailConfig;
   aiImage: AiImageConfig;
+  aiDesign?: Readonly<{ apiKey: string; model: string }>;
   metrics: MetricsConfig;
   vnpay: DisabledProvider | (Readonly<{ enabled: true }> & VnpaySettings);
   openApi: Readonly<{ enabledInProduction: boolean }>;
   invitationStudio: Readonly<{
     publicOrigin: string | null;
+    webOrigin?: string | null;
     reconcilerEnabled: boolean;
     imageJobsEnabled?: boolean;
   }>;
@@ -642,6 +663,7 @@ function pickEnvironment(source: EnvironmentSource): EnvironmentSource {
     STORAGE_PUBLIC_ORIGIN: source.STORAGE_PUBLIC_ORIGIN,
     STORAGE_SIGNING_KEY: source.STORAGE_SIGNING_KEY,
     PUBLIC_INVITATION_ORIGIN: source.PUBLIC_INVITATION_ORIGIN,
+    PUBLIC_INVITATION_WEB_ORIGIN: source.PUBLIC_INVITATION_WEB_ORIGIN,
     SEATING_RECONCILER_ENABLED: source.SEATING_RECONCILER_ENABLED,
     AI_IMAGE_JOBS_ENABLED: source.AI_IMAGE_JOBS_ENABLED,
     RESEND_API_KEY: source.RESEND_API_KEY,
@@ -655,6 +677,8 @@ function pickEnvironment(source: EnvironmentSource): EnvironmentSource {
     AI_IMAGE_PROVIDER: source.AI_IMAGE_PROVIDER,
     GEMINI_API_KEY: source.GEMINI_API_KEY,
     GEMINI_IMAGE_MODEL: source.GEMINI_IMAGE_MODEL,
+    GEMINI_DESIGN_API_KEY: source.GEMINI_DESIGN_API_KEY,
+    GEMINI_DESIGN_MODEL: source.GEMINI_DESIGN_MODEL,
     METRICS_ENABLED: source.METRICS_ENABLED,
     METRICS_TOKEN: source.METRICS_TOKEN,
     OPENAPI_ENABLED: source.OPENAPI_ENABLED,
@@ -878,6 +902,14 @@ function createConfig(environment: RawEnvironment): Omit<BackendConfig, 'notific
     storage,
     email,
     aiImage,
+    ...(environment.GEMINI_DESIGN_API_KEY && environment.GEMINI_DESIGN_MODEL
+      ? {
+          aiDesign: Object.freeze({
+            apiKey: environment.GEMINI_DESIGN_API_KEY,
+            model: environment.GEMINI_DESIGN_MODEL,
+          }),
+        }
+      : {}),
     metrics,
     vnpay:
       environment.VNPAY_TMN_CODE !== undefined &&
@@ -897,6 +929,7 @@ function createConfig(environment: RawEnvironment): Omit<BackendConfig, 'notific
     }),
     invitationStudio: Object.freeze({
       publicOrigin: environment.PUBLIC_INVITATION_ORIGIN ?? null,
+      webOrigin: environment.PUBLIC_INVITATION_WEB_ORIGIN ?? null,
       reconcilerEnabled: environment.SEATING_RECONCILER_ENABLED,
       imageJobsEnabled: environment.AI_IMAGE_JOBS_ENABLED,
     }),

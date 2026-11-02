@@ -1,3 +1,7 @@
+import {
+  invitationDesignPromptSchema,
+  invitationDesignSuggestionResponse,
+} from '../domain/invitation-presentation.js';
 import { createHash } from 'node:crypto';
 import { Router, type RequestHandler, type Request, type Response } from 'express';
 import QRCode from 'qrcode';
@@ -31,6 +35,7 @@ const key = (req: Request) => {
 export function createStudioRouter(
   services: Services,
   resolver: AuthenticatedActorResolver,
+  interactiveOrigin?: string | null,
 ): Router {
   const router = Router();
   const auth: RequestHandler = (req, res, next) => {
@@ -65,6 +70,7 @@ export function createStudioRouter(
       '/management/invitation-templates',
       '/bookings/:bookingId/invitations',
       '/bookings/:bookingId/invitation-image-generations',
+      '/bookings/:bookingId/invitation-design-suggestions',
       '/bookings/:bookingId/invitation-image-jobs',
       '/bookings/:bookingId/invitation-derived-assets',
       '/bookings/:bookingId/printable-revisions',
@@ -85,6 +91,21 @@ export function createStudioRouter(
     });
   }
   const noQuery = (req: Request) => parseStudio(empty, req.query);
+  route(
+    'post',
+    '/bookings/:bookingId/invitation-design-suggestions',
+    invitationDesignSuggestionResponse,
+    (req, res) => {
+      noQuery(req);
+      const p = parseStudio(bookParams, req.params);
+      return services.designSuggestions.generate(
+        p.bookingId,
+        parseStudio(invitationDesignPromptSchema, req.body),
+        key(req),
+        context(res),
+      );
+    },
+  );
   router.get(
     '/bookings/:bookingId/printable-revisions/:printableRevisionId/file',
     (req, res, next) => {
@@ -392,6 +413,15 @@ export function createStudioRouter(
     void (async () => {
       noQuery(req);
       const dto = await services.publication.readPublic(req.params.slug);
+      if (dto.presentation && interactiveOrigin) {
+        res
+          .set('Cache-Control', 'no-store')
+          .redirect(
+            302,
+            new URL(`/t/${encodeURIComponent(req.params.slug)}`, interactiveOrigin).href,
+          );
+        return;
+      }
       res
         .set('Cache-Control', 'no-store')
         .set(

@@ -15,7 +15,7 @@ interface Command {
   bookingId: string;
   idempotencyKey: string;
   payload: unknown;
-  operation: { action: 'ai.generate' | 'asset.derive'; resourceId?: string };
+  operation: { action: 'ai.generate' | 'ai.design' | 'asset.derive'; resourceId?: string };
 }
 
 // Longer than the 60s HTTP budget, bounded so a crashed process cannot reserve

@@ -56,8 +56,22 @@ export async function renderPrintablePdf(input: {
   if (digest(input.content) !== input.contentDigest)
     throw studioConflict('PRINTABLE_DIGEST_CONFLICT');
   const content = parseStudio(printableFileContentSchema, input.content);
-  const rendererVersion =
-    content.seating === null ? PRINT_RENDERER_VERSION : SEATING_PRINT_RENDERER_VERSION;
+  const presentation = content.design.presentation;
+  const palettes = {
+    'royal-burgundy': ['#65203c', '#fff9f2', '#b58951'],
+    'sage-minimalist': ['#284d41', '#fbfdf7', '#6b8261'],
+    'blush-floral': ['#723e52', '#fff8fb', '#ab697c'],
+    'traditional-red': ['#8b2025', '#fff6eb', '#a97732'],
+    'celestial-navy': ['#243252', '#f8faff', '#7d6c42'],
+    'champagne-luxury': ['#5b4831', '#fffcf5', '#927342'],
+  } as const;
+  const palette = presentation ? palettes[presentation.theme] : null;
+  // New recipes have their own renderer version; old retained PDFs keep the v1/v2 path.
+  const rendererVersion = presentation
+    ? 'invitation-a5-v3-presentation'
+    : content.seating === null
+      ? PRINT_RENDERER_VERSION
+      : SEATING_PRINT_RENDERER_VERSION;
   const ids = content.design.derivedAssetIds;
   if (ids.length > 8 || input.images.size !== ids.length) printLimit('PRINT_ASSET_LIMIT');
   const images: Array<{ bytes: Buffer; width: number; height: number }> = [];
@@ -108,13 +122,22 @@ export async function renderPrintablePdf(input: {
     const dictionary = pdf.page.dictionary.data as Record<string, unknown>;
     dictionary.TrimBox = [mm(3), mm(3), mm(151), mm(213)];
     dictionary.BleedBox = [0, 0, mm(154), mm(216)];
-    pdf.rect(0, 0, mm(154), mm(216)).fill('#fffdf9');
+    pdf.rect(0, 0, mm(154), mm(216)).fill(palette?.[1] ?? '#fffdf9');
+    if (palette) {
+      pdf.lineWidth(0.6).strokeColor(palette[2]).rect(mm(7), mm(7), mm(140), mm(202)).stroke();
+      if (presentation?.layout === 'gatefold') {
+        pdf.moveTo(mm(10), mm(12)).lineTo(mm(10), mm(204)).stroke();
+        pdf.moveTo(mm(144), mm(12)).lineTo(mm(144), mm(204)).stroke();
+      } else if (presentation?.layout === 'album') {
+        pdf.rect(mm(7), mm(7), mm(3), mm(202)).fill(palette[2]);
+      }
+    }
     y = left;
   };
   const text = (value: string | null | undefined, heading = false) => {
     if (!value) return;
     pdf
-      .fillColor('#342a29')
+      .fillColor(palette?.[0] ?? '#342a29')
       .font(heading ? 'Heading' : 'Body')
       .fontSize(heading ? 18 : 10);
     const options = { width, lineGap: 3, align: 'center' as const };

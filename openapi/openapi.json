@@ -4688,6 +4688,40 @@
               "includesSeating": {
                 "type": "boolean"
               },
+              "presentation": {
+                "additionalProperties": false,
+                "properties": {
+                  "layout": {
+                    "enum": [
+                      "envelope",
+                      "gatefold",
+                      "album"
+                    ],
+                    "type": "string"
+                  },
+                  "theme": {
+                    "enum": [
+                      "royal-burgundy",
+                      "sage-minimalist",
+                      "blush-floral",
+                      "traditional-red",
+                      "celestial-navy",
+                      "champagne-luxury"
+                    ],
+                    "type": "string"
+                  },
+                  "version": {
+                    "const": 1,
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "version",
+                  "theme",
+                  "layout"
+                ],
+                "type": "object"
+              },
               "revisionNumber": {
                 "exclusiveMinimum": 0,
                 "maximum": 9007199254740991,
@@ -6229,6 +6263,40 @@
                 "format": "uri",
                 "type": "string"
               },
+              "presentation": {
+                "additionalProperties": false,
+                "properties": {
+                  "layout": {
+                    "enum": [
+                      "envelope",
+                      "gatefold",
+                      "album"
+                    ],
+                    "type": "string"
+                  },
+                  "theme": {
+                    "enum": [
+                      "royal-burgundy",
+                      "sage-minimalist",
+                      "blush-floral",
+                      "traditional-red",
+                      "celestial-navy",
+                      "champagne-luxury"
+                    ],
+                    "type": "string"
+                  },
+                  "version": {
+                    "const": 1,
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "version",
+                  "theme",
+                  "layout"
+                ],
+                "type": "object"
+              },
               "publicInvitationId": {
                 "format": "uuid",
                 "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
@@ -6829,6 +6897,40 @@
               },
               "includesSeating": {
                 "type": "boolean"
+              },
+              "presentation": {
+                "additionalProperties": false,
+                "properties": {
+                  "layout": {
+                    "enum": [
+                      "envelope",
+                      "gatefold",
+                      "album"
+                    ],
+                    "type": "string"
+                  },
+                  "theme": {
+                    "enum": [
+                      "royal-burgundy",
+                      "sage-minimalist",
+                      "blush-floral",
+                      "traditional-red",
+                      "celestial-navy",
+                      "champagne-luxury"
+                    ],
+                    "type": "string"
+                  },
+                  "version": {
+                    "const": 1,
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "version",
+                  "theme",
+                  "layout"
+                ],
+                "type": "object"
               },
               "revisionId": {
                 "format": "uuid",
@@ -19203,6 +19305,172 @@
         ]
       }
     },
+    "/bookings/{bookingId}/invitation-design-suggestions": {
+      "post": {
+        "operationId": "generateInvitationDesignSuggestion",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookingId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "prompt": {
+                    "maxLength": 2000,
+                    "minLength": 10,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "prompt"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "footer": {
+                          "maxLength": 500,
+                          "type": "string"
+                        },
+                        "greeting": {
+                          "maxLength": 300,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "message": {
+                          "maxLength": 2000,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "presentation": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "layout": {
+                              "enum": [
+                                "envelope",
+                                "gatefold",
+                                "album"
+                              ],
+                              "type": "string"
+                            },
+                            "theme": {
+                              "enum": [
+                                "royal-burgundy",
+                                "sage-minimalist",
+                                "blush-floral",
+                                "traditional-red",
+                                "celestial-navy",
+                                "champagne-luxury"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "const": 1,
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "version",
+                            "theme",
+                            "layout"
+                          ],
+                          "type": "object"
+                        },
+                        "title": {
+                          "maxLength": 120,
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "presentation",
+                        "title",
+                        "greeting",
+                        "message",
+                        "footer"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Validated response."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          },
+          "504": {
+            "$ref": "#/components/responses/GatewayTimeout"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Generate a declarative invitation recipe; same key replays without paid redispatch",
+        "tags": [
+          "Invitation Studio"
+        ]
+      }
+    },
     "/bookings/{bookingId}/invitation-image-generations": {
       "get": {
         "operationId": "listPendingInvitationImageGenerations",
@@ -21191,6 +21459,40 @@
                               "includesSeating": {
                                 "type": "boolean"
                               },
+                              "presentation": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "layout": {
+                                    "enum": [
+                                      "envelope",
+                                      "gatefold",
+                                      "album"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "theme": {
+                                    "enum": [
+                                      "royal-burgundy",
+                                      "sage-minimalist",
+                                      "blush-floral",
+                                      "traditional-red",
+                                      "celestial-navy",
+                                      "champagne-luxury"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "version": {
+                                    "const": 1,
+                                    "type": "number"
+                                  }
+                                },
+                                "required": [
+                                  "version",
+                                  "theme",
+                                  "layout"
+                                ],
+                                "type": "object"
+                              },
                               "revisionId": {
                                 "format": "uuid",
                                 "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
@@ -21458,6 +21760,40 @@
                       },
                       "includesSeating": {
                         "type": "boolean"
+                      },
+                      "presentation": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "layout": {
+                            "enum": [
+                              "envelope",
+                              "gatefold",
+                              "album"
+                            ],
+                            "type": "string"
+                          },
+                          "theme": {
+                            "enum": [
+                              "royal-burgundy",
+                              "sage-minimalist",
+                              "blush-floral",
+                              "traditional-red",
+                              "celestial-navy",
+                              "champagne-luxury"
+                            ],
+                            "type": "string"
+                          },
+                          "version": {
+                            "const": 1,
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "version",
+                          "theme",
+                          "layout"
+                        ],
+                        "type": "object"
                       },
                       "sections": {
                         "items": {
@@ -22039,6 +22375,40 @@
                       },
                       "includesSeating": {
                         "type": "boolean"
+                      },
+                      "presentation": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "layout": {
+                            "enum": [
+                              "envelope",
+                              "gatefold",
+                              "album"
+                            ],
+                            "type": "string"
+                          },
+                          "theme": {
+                            "enum": [
+                              "royal-burgundy",
+                              "sage-minimalist",
+                              "blush-floral",
+                              "traditional-red",
+                              "celestial-navy",
+                              "champagne-luxury"
+                            ],
+                            "type": "string"
+                          },
+                          "version": {
+                            "const": 1,
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "version",
+                          "theme",
+                          "layout"
+                        ],
+                        "type": "object"
                       },
                       "sections": {
                         "items": {
@@ -29425,6 +29795,40 @@
                               "format": "uri",
                               "type": "string"
                             },
+                            "presentation": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "layout": {
+                                  "enum": [
+                                    "envelope",
+                                    "gatefold",
+                                    "album"
+                                  ],
+                                  "type": "string"
+                                },
+                                "theme": {
+                                  "enum": [
+                                    "royal-burgundy",
+                                    "sage-minimalist",
+                                    "blush-floral",
+                                    "traditional-red",
+                                    "celestial-navy",
+                                    "champagne-luxury"
+                                  ],
+                                  "type": "string"
+                                },
+                                "version": {
+                                  "const": 1,
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "version",
+                                "theme",
+                                "layout"
+                              ],
+                              "type": "object"
+                            },
                             "publicInvitationId": {
                               "format": "uuid",
                               "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
@@ -30011,6 +30415,40 @@
                               },
                               "includesSeating": {
                                 "type": "boolean"
+                              },
+                              "presentation": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "layout": {
+                                    "enum": [
+                                      "envelope",
+                                      "gatefold",
+                                      "album"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "theme": {
+                                    "enum": [
+                                      "royal-burgundy",
+                                      "sage-minimalist",
+                                      "blush-floral",
+                                      "traditional-red",
+                                      "celestial-navy",
+                                      "champagne-luxury"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "version": {
+                                    "const": 1,
+                                    "type": "number"
+                                  }
+                                },
+                                "required": [
+                                  "version",
+                                  "theme",
+                                  "layout"
+                                ],
+                                "type": "object"
                               },
                               "revisionNumber": {
                                 "exclusiveMinimum": 0,
@@ -44160,6 +44598,40 @@
                               "includesSeating": {
                                 "type": "boolean"
                               },
+                              "presentation": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "layout": {
+                                    "enum": [
+                                      "envelope",
+                                      "gatefold",
+                                      "album"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "theme": {
+                                    "enum": [
+                                      "royal-burgundy",
+                                      "sage-minimalist",
+                                      "blush-floral",
+                                      "traditional-red",
+                                      "celestial-navy",
+                                      "champagne-luxury"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "version": {
+                                    "const": 1,
+                                    "type": "number"
+                                  }
+                                },
+                                "required": [
+                                  "version",
+                                  "theme",
+                                  "layout"
+                                ],
+                                "type": "object"
+                              },
                               "revisionNumber": {
                                 "exclusiveMinimum": 0,
                                 "maximum": 9007199254740991,
@@ -44420,6 +44892,40 @@
                       },
                       "includesSeating": {
                         "type": "boolean"
+                      },
+                      "presentation": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "layout": {
+                            "enum": [
+                              "envelope",
+                              "gatefold",
+                              "album"
+                            ],
+                            "type": "string"
+                          },
+                          "theme": {
+                            "enum": [
+                              "royal-burgundy",
+                              "sage-minimalist",
+                              "blush-floral",
+                              "traditional-red",
+                              "celestial-navy",
+                              "champagne-luxury"
+                            ],
+                            "type": "string"
+                          },
+                          "version": {
+                            "const": 1,
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "version",
+                          "theme",
+                          "layout"
+                        ],
+                        "type": "object"
                       },
                       "sections": {
                         "items": {
@@ -44746,6 +45252,40 @@
                       },
                       "includesSeating": {
                         "type": "boolean"
+                      },
+                      "presentation": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "layout": {
+                            "enum": [
+                              "envelope",
+                              "gatefold",
+                              "album"
+                            ],
+                            "type": "string"
+                          },
+                          "theme": {
+                            "enum": [
+                              "royal-burgundy",
+                              "sage-minimalist",
+                              "blush-floral",
+                              "traditional-red",
+                              "celestial-navy",
+                              "champagne-luxury"
+                            ],
+                            "type": "string"
+                          },
+                          "version": {
+                            "const": 1,
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "version",
+                          "theme",
+                          "layout"
+                        ],
+                        "type": "object"
                       },
                       "sections": {
                         "items": {
