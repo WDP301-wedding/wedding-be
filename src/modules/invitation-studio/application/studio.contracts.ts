@@ -11,6 +11,7 @@ export interface InvitationPublicationReader {
   requirePublishedPublicInvitation(bookingId: string): Promise<{
     publicInvitationId: string;
     publicSlug: string;
+    genericQrPayload?: string;
     publishedRevisionId: string;
   }>;
   resolvePrintableRevision(printableRevisionId: string): Promise<{

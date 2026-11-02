@@ -31,6 +31,7 @@ export function createInvitationStudioServices(
   now: () => Date = () => new Date(),
   imageJobsEnabled = true,
   aiDesign?: Readonly<{ apiKey: string; model: string }>,
+  publicWebOrigin?: string | null,
 ) {
   const media = createPersistentMediaService(prisma, storage, now);
   const editor = createInvitationEditorReader(prisma, media.boundary, media.identity.resolver);
@@ -53,6 +54,7 @@ export function createInvitationStudioServices(
     publicOrigin,
     now,
     (bookingId, context) => printable.readSeating(bookingId, context),
+    publicWebOrigin,
   );
   const planning = createPrismaPlanningSnapshotReader(media.boundary);
   const venue = createPrismaSelectionEligibilityReader(media.boundary);

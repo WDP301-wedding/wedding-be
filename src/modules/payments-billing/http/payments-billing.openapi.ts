@@ -140,7 +140,7 @@ export const paymentsBillingOpenApiPaths: NonNullable<ZodOpenApiObject['paths']>
   '/management/billing/refunds': {
     post: mutation(
       'recordBillingRefund',
-      'Manager records a manual refund against an existing approved cancellation or credit decision. Source and approval caps are rechecked transactionally.',
+      'Manager confirms an already completed external refund. The server reuses an existing decision or records a credit/cancellation-based decision atomically with the refund. Source and entitlement caps remain enforced. Evidence fields are optional; omitted values become internal recording metadata, not fabricated external receipts.',
       refundBodySchema,
       refundResponseSchema,
     ),
@@ -218,7 +218,7 @@ export const paymentsBillingOpenApiPaths: NonNullable<ZodOpenApiObject['paths']>
       summary:
         'Read exact ledger totals and ascending revision history with own FULL access or Manager. Pagination binds the booking and a fixed billing revision.',
       description:
-        'Includes advisory VNPay balancePaymentEligibility computed in the authorized booking snapshot. A missing final invoice blocks full-contract checkout without failing this GET. Historical ledger pages report STALE_BILLING_REVISION with the current billing revision. POST balance still revalidates all authority, invoice, attempt and amount facts; canPay does not reserve or settle money or prove provider availability.',
+        'Includes current financialOverview (contract or legacy proposal, required deposit, recorded gross deposit receipts, remaining deposit and application status) in the authorized booking snapshot, including pre-deposit Manager reads. Draft amounts are estimates, not receivables or collection authorization. Settled contracts retain the settlement revision. This overview stays current even on historical ledger pages; totals/history retain their billing fence. Includes advisory VNPay balancePaymentEligibility; POST balance still revalidates authority, invoice, attempt and amount facts. Reading never creates charges or payment evidence.',
       tags: ['Payments and Billing'],
       security: bearer,
       parameters: [

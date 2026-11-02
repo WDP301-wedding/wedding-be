@@ -63,6 +63,7 @@ export async function createInvitationStudioRuntime(
       now,
       config.invitationStudio.imageJobsEnabled === true && ai !== null && config.storage.enabled,
       config.aiDesign,
+      config.invitationStudio.webOrigin,
     );
     const router = Router();
     router.use(createMediaRouter(composition.service, composition.identity.resolver));

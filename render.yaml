@@ -165,7 +165,7 @@ services:
       - key: BREVO_FROM_EMAIL
         sync: false
       - key: PUBLIC_INVITATION_ORIGIN
-        sync: false
+        value: https://wedding-be-render-trial.onrender.com
       - key: PUBLIC_INVITATION_WEB_ORIGIN
         value: https://wedding-web-silk.vercel.app
       # Optional dedicated override; runtime otherwise reuses GEMINI_API_KEY.

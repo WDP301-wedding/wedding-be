@@ -1,3 +1,5 @@
+import { createManualRefundDecisionResolver } from './infrastructure/manual-refund-decision.js';
+import { createBillingFinancialOverviewReader } from './infrastructure/billing-financial-overview.reader.js';
 import { randomUUID } from 'node:crypto';
 
 import { config } from '../../config/config.js';
@@ -81,6 +83,7 @@ export function createPaymentsBillingProviders(
   const operationsRepository = createBillingOperationsRepository(prisma, scope);
   const invoice = createInvoiceBalanceReader(prisma, scope);
   const operations = createBillingOperationsService({
+    resolveManualRefundDecision: createManualRefundDecisionResolver(scope),
     ledger: billing.repository,
     operations: operationsRepository,
     invoice,
@@ -109,6 +112,7 @@ export function createPaymentsBillingProviders(
     }),
     operations,
     views: createBillingViewsService({
+      financialOverview: createBillingFinancialOverviewReader(scope),
       ledger: billing.repository,
       operations: operationsRepository,
       boundary: readBoundary,

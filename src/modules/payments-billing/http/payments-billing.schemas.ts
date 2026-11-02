@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { billingFinancialOverviewSchema } from '../application/billing-financial-overview.js';
 import { balancePaymentBlockActions } from '../application/balance-payment-eligibility.js';
 
 const uuid = z.uuid();
@@ -36,13 +37,15 @@ export const manualBodySchema = z.strictObject({
     .optional(),
   amountVnd: vnd.positive(),
   settledAt: instant,
-  ...evidence,
+  reason: evidence.reason.optional(),
+  evidenceReference: evidence.evidenceReference.optional(),
 });
 export const refundBodySchema = z.strictObject({
   sourcePaymentId: uuid,
   amountVnd: vnd.positive(),
   expectedBillingRevision: revision,
-  ...evidence,
+  reason: evidence.reason.optional(),
+  evidenceReference: evidence.evidenceReference.optional(),
 });
 export const refundApprovalBodySchema = z.strictObject({
   bookingId: uuid,
@@ -156,6 +159,7 @@ export const billingResponseSchema = z.strictObject({
     bookingId: uuid,
     billingRevision: z.int().nonnegative(),
     totals: billingTotalsSchema,
+    financialOverview: billingFinancialOverviewSchema.optional(),
     history: z.array(historyEntrySchema),
     nextCursor: z.string().nullable(),
     balancePaymentEligibility: balancePaymentEligibilitySchema,

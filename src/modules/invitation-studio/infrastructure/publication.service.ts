@@ -51,7 +51,18 @@ export class PublicationService implements InvitationPublicationReader {
     ) => Promise<{
       renderSnapshot: z.infer<typeof seatingRenderSchema>;
     }>,
+    readonly webOrigin?: string | null,
   ) {}
+  /** Resolve the current delivery address without rewriting immutable published/print content. */
+  publicUrlForSlug(slug: string): string {
+    if (!/^[a-f0-9]{64}$/u.test(slug)) throw new NotFoundError();
+    const origin = this.webOrigin ?? this.publicOrigin;
+    if (!origin) throw new ServiceUnavailableError();
+    return new URL(
+      this.webOrigin ? `/t/${slug}` : `/api/v1/public/invitations/${slug}/render`,
+      origin,
+    ).href;
+  }
   async publish(value: unknown, context: MediaRequestContext) {
     const input = parseStudio(publishSchema, value);
     return this.repository.command(
@@ -61,7 +72,7 @@ export class PublicationService implements InvitationPublicationReader {
       { action: 'publication.publish', ...input },
       (ctx) => this.access.booking(input.bookingId, ctx),
       async (tx, scoped) => {
-        if (this.publicOrigin === null) throw new ServiceUnavailableError();
+        if (!this.publicOrigin && !this.webOrigin) throw new ServiceUnavailableError();
         const design = await tx.invitationDesign.findFirst({
           where: { id: input.designId, bookingId: input.bookingId },
         });
@@ -87,10 +98,7 @@ export class PublicationService implements InvitationPublicationReader {
               bookingId: input.bookingId,
               id: randomUUID(),
               slug,
-              publicUrl: new URL(
-                `/api/v1/public/invitations/${slug}/render`,
-                this.publicOrigin,
-              ).toString(),
+              publicUrl: this.publicUrlForSlug(slug),
             },
           });
         }
@@ -151,7 +159,7 @@ export class PublicationService implements InvitationPublicationReader {
               contentType: 'image/png',
             };
           }),
-          genericQrPayload: identity.publicUrl,
+          genericQrPayload: this.publicUrlForSlug(identity.slug),
         });
         await tx.invitationPublishedRevision.create({
           data: {
@@ -185,7 +193,7 @@ export class PublicationService implements InvitationPublicationReader {
           publicSlug: identity.slug,
           publishedRevisionId,
           publicationRevision,
-          genericQrPayload: identity.publicUrl,
+          genericQrPayload: this.publicUrlForSlug(identity.slug),
         };
       },
       { action: 'publication.publish', resourceId: input.designId },
@@ -263,7 +271,10 @@ export class PublicationService implements InvitationPublicationReader {
       select: { currentPublicationId: true },
     });
     if (latest?.currentPublicationId !== row.id) throw new NotFoundError();
-    return publicInvitationSchema.parse(row.content);
+    return publicInvitationSchema.parse({
+      ...publicInvitationSchema.parse(row.content),
+      genericQrPayload: this.publicUrlForSlug(slug),
+    });
   }
   async requirePublishedPublicInvitation(value: string) {
     const bookingId = parseStudio(id, value);
@@ -273,6 +284,7 @@ export class PublicationService implements InvitationPublicationReader {
     return {
       publicInvitationId: row.id,
       publicSlug: row.slug,
+      genericQrPayload: this.publicUrlForSlug(row.slug),
       publishedRevisionId: row.currentPublicationId,
     };
   }

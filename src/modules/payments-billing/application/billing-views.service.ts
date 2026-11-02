@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { BillingFinancialOverviewReader } from './billing-financial-overview.js';
 import type { BookingBoundaryUnitOfWork } from '../../../core/database/booking-unit-of-work.js';
 import { AppError } from '../../../core/errors/app-error.js';
 import {
@@ -27,6 +28,7 @@ export function createBillingViewsService(
     operations: BillingOperationsRepository;
     boundary: BookingBoundaryUnitOfWork;
     providerEnabled: boolean;
+    financialOverview?: BillingFinancialOverviewReader;
     invoice: NonNullable<BalancePaymentDependencies['invoice']>;
   }>,
 ) {
@@ -101,6 +103,11 @@ export function createBillingViewsService(
 
         return Object.freeze({
           bookingId: query.bookingId,
+          ...(options.financialOverview === undefined
+            ? {}
+            : {
+                financialOverview: await options.financialOverview(query.bookingId, scoped),
+              }),
           billingRevision,
           totals,
           balancePaymentEligibility,

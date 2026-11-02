@@ -52,7 +52,7 @@ export const refundCommandSchema = z.strictObject({
   ...identity,
   ...evidence,
   sourcePaymentId: z.uuid(),
-  decisionId: z.uuid(),
+  decisionId: z.uuid().optional(),
   amountVnd: vnd,
   expectedBillingRevision: z.int().positive(),
   recordedAt: instant,

@@ -311,7 +311,7 @@ export class PrintableService implements PrintableSeatingContentRegistry {
       design,
       timeline,
       seating,
-      genericQrPayload: identity.publicUrl,
+      genericQrPayload: publicIdentity.genericQrPayload ?? identity.publicUrl,
       publicInvitationId: publicIdentity.publicInvitationId,
       publishedRevisionId: publicIdentity.publishedRevisionId,
     };

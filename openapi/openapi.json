@@ -856,9 +856,7 @@
           "bookingId",
           "purpose",
           "amountVnd",
-          "settledAt",
-          "reason",
-          "evidenceReference"
+          "settledAt"
         ],
         "type": "object"
       },
@@ -1078,9 +1076,7 @@
         "required": [
           "sourcePaymentId",
           "amountVnd",
-          "expectedBillingRevision",
-          "reason",
-          "evidenceReference"
+          "expectedBillingRevision"
         ],
         "type": "object"
       },
@@ -1125,6 +1121,126 @@
                 "format": "uuid",
                 "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                 "type": "string"
+              },
+              "financialOverview": {
+                "additionalProperties": false,
+                "properties": {
+                  "bookingRevision": {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  },
+                  "depositApplied": {
+                    "type": "boolean"
+                  },
+                  "depositReceivedVnd": {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "depositRemainingVnd": {
+                    "anyOf": [
+                      {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "phase": {
+                    "enum": [
+                      "DRAFT",
+                      "AWAITING_DEPOSIT",
+                      "CONFIRMED",
+                      "COMPLETED",
+                      "CANCELLED"
+                    ],
+                    "type": "string"
+                  },
+                  "requiredDepositVnd": {
+                    "anyOf": [
+                      {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "revisionId": {
+                    "anyOf": [
+                      {
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "revisionNumber": {
+                    "anyOf": [
+                      {
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "source": {
+                    "enum": [
+                      "CONTRACT",
+                      "LEGACY_PROPOSAL",
+                      "NONE"
+                    ],
+                    "type": "string"
+                  },
+                  "state": {
+                    "enum": [
+                      "NOT_CREATED",
+                      "DRAFT",
+                      "AWAITING_APPROVAL",
+                      "APPROVED",
+                      "SUPERSEDED"
+                    ],
+                    "type": "string"
+                  },
+                  "totalVnd": {
+                    "anyOf": [
+                      {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "bookingRevision",
+                  "phase",
+                  "source",
+                  "state",
+                  "revisionId",
+                  "revisionNumber",
+                  "totalVnd",
+                  "requiredDepositVnd",
+                  "depositReceivedVnd",
+                  "depositRemainingVnd",
+                  "depositApplied"
+                ],
+                "type": "object"
               },
               "history": {
                 "items": {
@@ -8728,7 +8844,7 @@
     },
     "/bookings/{bookingId}/billing": {
       "get": {
-        "description": "Includes advisory VNPay balancePaymentEligibility computed in the authorized booking snapshot. A missing final invoice blocks full-contract checkout without failing this GET. Historical ledger pages report STALE_BILLING_REVISION with the current billing revision. POST balance still revalidates all authority, invoice, attempt and amount facts; canPay does not reserve or settle money or prove provider availability.",
+        "description": "Includes current financialOverview (contract or legacy proposal, required deposit, recorded gross deposit receipts, remaining deposit and application status) in the authorized booking snapshot, including pre-deposit Manager reads. Draft amounts are estimates, not receivables or collection authorization. Settled contracts retain the settlement revision. This overview stays current even on historical ledger pages; totals/history retain their billing fence. Includes advisory VNPay balancePaymentEligibility; POST balance still revalidates authority, invoice, attempt and amount facts. Reading never creates charges or payment evidence.",
         "operationId": "getBookingBilling",
         "parameters": [
           {
@@ -34170,7 +34286,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Manager records a manual refund against an existing approved cancellation or credit decision. Source and approval caps are rechecked transactionally.",
+        "summary": "Manager confirms an already completed external refund. The server reuses an existing decision or records a credit/cancellation-based decision atomically with the refund. Source and entitlement caps remain enforced. Evidence fields are optional; omitted values become internal recording metadata, not fabricated external receipts.",
         "tags": [
           "Payments and Billing"
         ]

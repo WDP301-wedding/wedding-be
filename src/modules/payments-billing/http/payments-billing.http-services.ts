@@ -259,7 +259,12 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
               });
             result = billingCommandResultSchema.parse(previous.result);
           } else if (input.operation === 'MANUAL') {
-            const manual = manualBodySchema.parse(body);
+            const submitted = manualBodySchema.parse(body);
+            const manual = {
+              ...submitted,
+              reason: submitted.reason ?? 'Ghi nhận khoản thu ngoài hệ thống',
+              evidenceReference: submitted.evidenceReference ?? commandId,
+            };
             if (manual.purpose === 'DEPOSIT') {
               if (booking.currentTimelineRevisionId === null)
                 throw new AppError({
@@ -316,32 +321,17 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
               ctx,
             );
           } else {
-            const refund = refundBodySchema.parse(body);
-            const ledger = await providers.ledger.getLedger(bookingId, ctx);
-            const decisions = await prisma.billingRefundApproval.findMany({
-              where: { bookingId },
-              orderBy: [{ approvedAt: 'asc' }, { id: 'asc' }],
-            });
-            const decision = decisions.find(
-              (row) =>
-                Number(row.approvedRefundableVnd) -
-                  ledger.entries
-                    .filter((entry) => entry.kind === 'REFUND' && entry.decisionId === row.id)
-                    .reduce((sum, entry) => sum + entry.amountVnd, 0) >=
-                refund.amountVnd,
-            );
-            if (decision === undefined)
-              throw new AppError({
-                status: 409,
-                code: 'BILLING_REFUND_APPROVAL_REQUIRED',
-                message: 'A recorded refund approval is required.',
-              });
+            const submitted = refundBodySchema.parse(body);
+            const refund = {
+              ...submitted,
+              reason: submitted.reason ?? 'Ghi nhận khoản hoàn ngoài hệ thống',
+              evidenceReference: submitted.evidenceReference ?? commandId,
+            };
             result = await providers.operations.recordRefund(
               {
                 ...refund,
                 bookingId,
                 commandId,
-                decisionId: decision.id,
                 recordedAt: new Date().toISOString(),
               },
               ctx,

@@ -20,6 +20,7 @@ import {
   type BillingCommandKind,
   type BillingCommandResult,
   type BillingOperationsRepository,
+  type RefundApproval,
 } from './billing-operations.port.js';
 import type {
   ContractContext,
@@ -41,6 +42,17 @@ export function createBillingOperationsService(
     invoice?: {
       getApplicable(bookingId: string, context: ContractContext): Promise<InvoiceBalancePin | null>;
     };
+    resolveManualRefundDecision?: (
+      input: {
+        bookingId: string;
+        commandId: string;
+        amountVnd: number;
+        reason: string;
+        evidenceReference: string;
+        ledger: Awaited<ReturnType<BillingLedgerRepository['getLedger']>>;
+      },
+      context: ContractContext,
+    ) => Promise<RefundApproval>;
     now?: () => Date;
   }>,
 ) {
@@ -180,13 +192,27 @@ export function createBillingOperationsService(
           if (command.amountVnd > due.amountVnd) throw error('BILLING_BALANCE_LIMIT_EXCEEDED');
         } else {
           timelineRevisionId = command.timelineRevisionId;
-          eligibility = await options.booking.requireDepositEligibility(command);
+          const commercial = await options.commercial.getAccepted(command, scoped);
+          // The manager records an external receipt against the current agreement.
+          // Explicit pins from older clients remain strict; the simplified UI needs no UUID fields.
+          const suppliedPin =
+            command.contractRevisionId !== undefined || command.documentDigest !== undefined;
+          const depositCommand = suppliedPin
+            ? command
+            : {
+                ...command,
+                ...(commercial.contractRevisionId
+                  ? { contractRevisionId: commercial.contractRevisionId }
+                  : {}),
+                ...(commercial.documentDigest ? { documentDigest: commercial.documentDigest } : {}),
+              };
+          eligibility = await options.booking.requireDepositEligibility(depositCommand);
           if (!eligibility.eligible || command.amountVnd !== eligibility.depositAmountVnd)
             throw error('DEPOSIT_NOT_ELIGIBLE');
-          const commercial = await options.commercial.getAccepted(command, scoped);
           if (
-            (commercial.contractRevisionId ?? null) !== (command.contractRevisionId ?? null) ||
-            (commercial.documentDigest ?? null) !== (command.documentDigest ?? null)
+            (commercial.contractRevisionId ?? null) !==
+              (depositCommand.contractRevisionId ?? null) ||
+            (commercial.documentDigest ?? null) !== (depositCommand.documentDigest ?? null)
           )
             throw error('CONTRACT_REVISION_STALE');
           if (commercial.contractRevisionId != null) {
@@ -273,6 +299,10 @@ export function createBillingOperationsService(
           const current = await options.booking.requireDepositEligibility({
             bookingId: command.bookingId,
             timelineRevisionId,
+            ...(eligibility?.contractRevisionId
+              ? { contractRevisionId: eligibility.contractRevisionId }
+              : {}),
+            ...(eligibility?.documentDigest ? { documentDigest: eligibility.documentDigest } : {}),
           });
           if (!current.eligible || current.depositAmountVnd !== command.amountVnd)
             throw error('DEPOSIT_NOT_ELIGIBLE');
@@ -425,11 +455,13 @@ export function createBillingOperationsService(
         const ledger = await options.ledger.getLedger(command.bookingId, scoped);
         if (ledger.revision !== command.expectedBillingRevision)
           throw error('STALE_BILLING_REVISION');
-        const decision = await options.operations.getApproval(
-          command.bookingId,
-          command.decisionId,
-          scoped,
-        );
+        const decision = command.decisionId
+          ? await options.operations.getApproval(command.bookingId, command.decisionId, scoped)
+          : options.resolveManualRefundDecision
+            ? await options.resolveManualRefundDecision({ ...command, ledger }, scoped)
+            : (() => {
+                throw error('BILLING_REFUND_APPROVAL_REQUIRED');
+              })();
         const source = ledger.entries.find(
           (entry) => entry.id === command.sourcePaymentId && entry.kind === 'PAYMENT',
         );
