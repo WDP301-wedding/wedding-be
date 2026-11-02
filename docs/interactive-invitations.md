@@ -98,3 +98,19 @@ kiểm tra AI thực tế. Không cần migration DB mới cho riêng tính năn
 Nguồn: [Google model capabilities](https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash),
 [Render service variable references](https://render.com/docs/blueprint-spec),
 [Render environment save options](https://render.com/docs/configure-environment-variables).
+
+## Trạng thái lưu trực tiếp trên Render — 2026-11-03
+
+Đã xác nhận workspace `my space` và dịch vụ `wedding-be-render-trial`
+(`srv-dbct9ao473hc73a5qud0`). Đã merge hai biến, giữ nguyên các biến khác:
+
+- `GEMINI_DESIGN_MODEL=gemini-3.8-flash`.
+- `PUBLIC_INVITATION_WEB_ORIGIN=https://wedding-web-silk.vercel.app`.
+
+Render tự kích hoạt deployment `dep-dbkcv5o8v5cc73b2khrg` cho commit
+`eea6346d7d5a9dc7c1291cc09bbe93a530105a6a`. Deployment bị `update_failed`
+vì thiếu `GEMINI_DESIGN_API_KEY`; bản live trước đó vẫn được Render giữ lại.
+Kết nối MCP cập nhật biến nhưng không có thao tác đọc/sao chép khóa hiện có.
+Cần thêm khóa thiết kế qua Environment bằng giá trị Gemini key hiện có trên
+chính dịch vụ; không đưa khóa vào chat, Git, tài liệu hoặc log.
+Chưa xác minh AI/provider; không gọi generation trả phí.
