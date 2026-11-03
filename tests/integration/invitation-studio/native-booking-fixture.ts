@@ -108,6 +108,8 @@ export async function nativeBookingFixture(
       booking: {
         create: {
           id: input.bookingId,
+          // This fixture retains proposal acceptance/deposit, not a full contract.
+          commercialModelVersion: 'LEGACY_PROPOSAL_V1',
           hallId,
           shiftCode: 'LUNCH',
           eventDate: input.eventDate,

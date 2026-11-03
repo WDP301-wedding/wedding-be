@@ -35,6 +35,12 @@ print/invoice history remain unchanged. This amendment supersedes the conflictin
 print/pre-deposit clauses below for new purchases, not historical evidence.
 See [API, migration and verification](./print-appendix-flow-2026-11-04.md).
 
+Print-format correction confirmed on **2026-11-04**: Nội dung thiệp is the visual
+source of truth. New PDFs use its reading pages, including a separate Seating page,
+rather than forcing all content onto two A5 faces. Preserve saved content, exact
+Seating coordinates, prior print/consent history and the 5,000 VND/copy price.
+See [renderer versioning and verification](./invitation-content-print-2026-11-04.md).
+
 Pre-deposit mobile amendment confirmed by the owner on **2026-10-23**: Couple may
 use Android before paying the deposit, including existing profile, proposal,
 commercial contract, timeline and deposit workflows. Invitation acceptance grants

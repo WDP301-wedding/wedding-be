@@ -7,6 +7,11 @@ import {
 } from './venue-catalog/catalog-test-database.js';
 import { studioFixture } from './invitation-studio/studio-fixture.js';
 import { createSeatingServices } from '../../src/modules/seating-plan/infrastructure/seating.composition.js';
+import { PDFDocument } from 'pdf-lib';
+import express from 'express';
+import request from 'supertest';
+import { createStudioRouter } from '../../src/modules/invitation-studio/http/studio.router.js';
+import { createErrorHandler } from '../../src/core/errors/error-handler.js';
 
 (catalogMigrationDatabaseUrl ? describe : describe.skip)(
   'RV-19 files from real accepted Seating owner',
@@ -99,7 +104,27 @@ import { createSeatingServices } from '../../src/modules/seating-plan/infrastruc
         printed.printableRevisionId,
         f.couple,
       );
-      expect(file.bytes.toString('latin1').match(/\/Type \/Page\b/gu)).toHaveLength(2);
+      expect((await PDFDocument.load(file.bytes)).getPageCount()).toBeGreaterThanOrEqual(2);
+      expect(file.rendererVersion).toBe('invitation-content-v1');
+      const app = express();
+      app.use((req, _res, next) => {
+        req.requestId = randomUUID();
+        next();
+      });
+      app.use(createStudioRouter(f.services, f.services.identity.resolver));
+      app.use(createErrorHandler());
+      const path = `/bookings/${f.bookingId}/printable-revisions/${printed.printableRevisionId}/file`;
+      const preview = await request(app)
+        .get(path)
+        .auth(f.couple.accessToken, { type: 'bearer' })
+        .expect(200);
+      const download = await request(app)
+        .get(path + '?disposition=attachment')
+        .auth(f.manager.accessToken, { type: 'bearer' })
+        .expect(200);
+      expect(preview.headers['content-type']).toContain('application/pdf');
+      expect(download.headers['x-content-sha256']).toBe(preview.headers['x-content-sha256']);
+      expect(preview.headers['x-renderer-version']).toBe('invitation-content-v1');
       await mkdir('.local-demo/sea/pdf', { recursive: true });
       await writeFile('.local-demo/sea/pdf/seating-accepted.pdf', file.bytes);
       await writeFile(
@@ -201,7 +226,7 @@ import { createSeatingServices } from '../../src/modules/seating-plan/infrastruc
         approved.lines[0]!.printableRevisionId!,
         f.couple,
       );
-      expect(file.rendererVersion).toBe('invitation-a5-v2-seating');
+      expect(file.rendererVersion).toBe('invitation-content-v1');
       const pending = await quotation();
       await s.guests.guests.updatePlan(
         f.bookingId,

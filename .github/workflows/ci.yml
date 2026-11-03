@@ -58,8 +58,15 @@ jobs:
       - name: Verify generated OpenAPI artifact
         run: npm run api:check
 
+      - name: Verify pinned canonical Content renderer
+        run: npm run print:check
+
       - name: Verify backend unit regressions
-        run: npm run test:unit -- --maxWorkers=2
+        # New snapshots use the same offline Content-tab DOM/CSS as the web.
+        # Historical PDFKit snapshots still run through their retained renderer.
+        run: |
+          npx playwright-core install --with-deps --only-shell chromium
+          npm run test:unit -- --maxWorkers=2
 
       - name: Build production output
         run: npm run build
@@ -125,6 +132,9 @@ jobs:
       - name: Generate Prisma client for native acceptance
         run: npm run db:generate
 
+      - name: Install retained-content print browser
+        run: npx playwright-core install --with-deps --only-shell chromium
+
       - name: Verify booking overview and invitation publication through native owners
         run: |
           npx vitest run tests/integration/booking-lifecycle/experience.test.ts --maxWorkers=1
@@ -132,3 +142,6 @@ jobs:
 
       - name: Verify appendix print consent, production synchronization and money races
         run: npx vitest run tests/integration/commercial-contracts-api.test.ts --maxWorkers=1 -t 'appendix print requests:'
+
+      - name: Verify authenticated retained PDF and Seating downloads
+        run: npx vitest run tests/integration/invitation-studio/print-file.test.ts tests/integration/seating-print-files.test.ts --maxWorkers=1
