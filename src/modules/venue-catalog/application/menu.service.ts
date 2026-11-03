@@ -91,6 +91,10 @@ export interface CloneVersionInput {
 }
 
 export interface MenuService {
+  archiveDish(input: Omit<LifecycleInput, 'transition'>): Promise<Readonly<{ revision: number }>>;
+  archiveMenuPackage(
+    input: Omit<LifecycleInput, 'transition'>,
+  ): Promise<Readonly<{ revision: number }>>;
   createDish(input: CreateDishInput): Promise<Readonly<CreateDishInput & { revision: number }>>;
   cloneDishVersion(
     input: CloneVersionInput & { readonly dishId: string },
@@ -161,6 +165,12 @@ export function createMenuService(
   versions: CatalogVersionRepository = createPrismaCatalogVersionRepository(prisma),
 ): MenuService {
   const service: MenuService = {
+    archiveDish(input) {
+      return versions.archiveFood({ kind: 'DISH', ...input });
+    },
+    archiveMenuPackage(input) {
+      return versions.archiveFood({ kind: 'MENU_PACKAGE', ...input });
+    },
     async createDish(input) {
       const content = validateDishContent(input);
       const displayOrder = requireDisplayOrder(input.displayOrder);

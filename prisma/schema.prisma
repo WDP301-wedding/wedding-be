@@ -1566,6 +1566,7 @@ model Dish {
   currentPublishedVersionId String?          @db.Uuid
   draftVersionId            String?          @db.Uuid
   retiredAt                 DateTime?        @db.Timestamptz(6)
+  archivedAt                DateTime?        @db.Timestamptz(6)
   createdByAccountId        String           @db.Uuid
   updatedByAccountId        String           @db.Uuid
   createdAt                 DateTime         @default(now()) @db.Timestamptz(6)
@@ -1613,6 +1614,7 @@ model MenuPackage {
   currentPublishedVersionId String?              @db.Uuid
   draftVersionId            String?              @db.Uuid
   retiredAt                 DateTime?            @db.Timestamptz(6)
+  archivedAt                DateTime?            @db.Timestamptz(6)
   createdByAccountId        String               @db.Uuid
   updatedByAccountId        String               @db.Uuid
   createdAt                 DateTime             @default(now()) @db.Timestamptz(6)

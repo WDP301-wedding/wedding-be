@@ -25,6 +25,52 @@ function context() {
 }
 
 describe('Prisma catalog version repository', () => {
+  it.each(['DISH', 'MENU_PACKAGE'] as const)(
+    'soft-deletes %s with revision protection and audit',
+    async (kind) => {
+      const auditCreate = vi.fn(() => Promise.resolve({}));
+      const query = vi.fn(() => Promise.resolve([{ revision: 5 }]));
+      const repository = createPrismaCatalogVersionRepository(
+        prismaWithTransaction({
+          $executeRaw: vi.fn(() => Promise.resolve(0)),
+          $queryRaw: query,
+          auditLog: { create: auditCreate },
+        }),
+      );
+      await expect(
+        repository.archiveFood({
+          kind,
+          aggregateId: randomUUID(),
+          expectedRevision: 4,
+          context: context(),
+        }),
+      ).resolves.toEqual({ revision: 5 });
+      expect(auditCreate).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ action: 'catalog.archived' }) }),
+      );
+    },
+  );
+
+  it('does not audit a stale or already deleted food record', async () => {
+    const auditCreate = vi.fn();
+    const repository = createPrismaCatalogVersionRepository(
+      prismaWithTransaction({
+        $executeRaw: vi.fn(() => Promise.resolve(0)),
+        $queryRaw: vi.fn(() => Promise.resolve([])),
+        auditLog: { create: auditCreate },
+      }),
+    );
+    await expect(
+      repository.archiveFood({
+        kind: 'DISH',
+        aggregateId: randomUUID(),
+        expectedRevision: 4,
+        context: context(),
+      }),
+    ).rejects.toMatchObject({ code: 'CATALOG_LIFECYCLE_CONFLICT' });
+    expect(auditCreate).not.toHaveBeenCalled();
+  });
+
   it('runs draft mutation only after winning the expected-revision CAS and audits it', async () => {
     const aggregateId = randomUUID();
     const versionId = randomUUID();
