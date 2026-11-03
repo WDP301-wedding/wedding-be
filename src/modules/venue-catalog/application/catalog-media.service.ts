@@ -179,7 +179,7 @@ export function createCatalogMediaService(
   prisma: PrismaClient,
   storage: StorageProvider,
   options?: CatalogMediaOptions,
-): CatalogMediaService {
+): CatalogMediaService & { pruneSignedUrlCache(): number; dispose(): void } {
   const cacheTtlMs = (options?.cacheTtlSeconds ?? 0) * 1000;
   const rawConcurrency = options?.maxConcurrency;
   const concurrencyCap =
@@ -188,10 +188,23 @@ export function createCatalogMediaService(
       : 6;
   const signingSemaphore = new AsyncSemaphore(concurrencyCap);
   const urlCache = new Map<string, CachedSignedUrl>();
+  let cacheDisposed = false;
   const inFlight = new Map<
     string,
     Promise<{ readonly url: string; readonly expiresInSeconds: number }>
   >();
+
+  function pruneSignedUrlCache(): number {
+    const reusableAfter = Date.now() + 30_000;
+    let removed = 0;
+    for (const [key, entry] of urlCache) {
+      if (entry.expiresAtMs <= reusableAfter) {
+        urlCache.delete(key);
+        removed++;
+      }
+    }
+    return removed;
+  }
 
   async function getSignedUrl(
     asset: MediaRow,
@@ -220,8 +233,9 @@ export function createCatalogMediaService(
         )
         .then((url) => {
           const ttlSeconds = CATALOG_PLATFORM_POLICY.signedReadTtlSeconds;
-          if (cacheTtlMs > 0) {
-            if (urlCache.size >= 2000) {
+          if (cacheTtlMs > 0 && !cacheDisposed) {
+            if (urlCache.size >= 2000) pruneSignedUrlCache();
+            if (!urlCache.has(asset.objectKey) && urlCache.size >= 2000) {
               const first = urlCache.keys().next().value;
               if (first !== undefined) urlCache.delete(first);
             }
@@ -264,7 +278,12 @@ export function createCatalogMediaService(
     });
   }
 
-  const service: CatalogMediaService = {
+  const service: CatalogMediaService & { pruneSignedUrlCache(): number; dispose(): void } = {
+    pruneSignedUrlCache,
+    dispose() {
+      cacheDisposed = true;
+      urlCache.clear();
+    },
     async listSignedHallPage(input) {
       const snapshot = await readCatalogHallPage(prisma, input);
       if (!snapshot.cursorValid)

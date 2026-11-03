@@ -2,10 +2,11 @@ import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
 
 import type { Request } from 'express';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Config } from '../../config/config.js';
 import { createPrismaClient } from '../../core/database/prisma.js';
+import * as mediaService from './application/catalog-media.service.js';
 import { catalogIdempotencyPayload, createVenueCatalogRuntime } from './venue-catalog.runtime.js';
 
 const prisma = vi.hoisted(() => ({
@@ -25,6 +26,33 @@ function runtimeConfig(storage: Config['storage'] = { enabled: false }): Config 
 }
 
 describe('VenueCatalogRuntime', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
+  it('periodically prunes unused signed URLs and stops cleanup when closed', async () => {
+    vi.useFakeTimers();
+    const createMedia = mediaService.createCatalogMediaService;
+    const prune = vi.fn(() => 0);
+    const dispose = vi.fn();
+    vi.spyOn(mediaService, 'createCatalogMediaService').mockImplementation((...args) => ({
+      ...createMedia(...args),
+      pruneSignedUrlCache: prune,
+      dispose,
+    }));
+    const runtime = await createVenueCatalogRuntime(runtimeConfig());
+    try {
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(prune).toHaveBeenCalledOnce();
+    } finally {
+      await runtime.resource.close();
+    }
+    expect(dispose).toHaveBeenCalledOnce();
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(prune).toHaveBeenCalledOnce();
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     prisma.$connect.mockResolvedValue();

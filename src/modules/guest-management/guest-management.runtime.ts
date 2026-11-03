@@ -3,8 +3,11 @@ import { createPrismaClient } from '../../core/database/prisma.js';
 import { createGuestServices } from './infrastructure/guest.composition.js';
 import { createGuestRouter } from './http/guest.router.js';
 
-export async function createGuestManagementRuntime(config: Config) {
-  const prisma = createPrismaClient(config.database.url);
+export async function createGuestManagementRuntime(
+  config: Config,
+  sharedPrisma?: ReturnType<typeof createPrismaClient>,
+) {
+  const prisma = sharedPrisma ?? createPrismaClient(config.database.url);
   try {
     await prisma.$connect();
     const services = createGuestServices(prisma);
@@ -13,11 +16,13 @@ export async function createGuestManagementRuntime(config: Config) {
       providers: services.readers,
       resource: Object.freeze({
         name: 'guest-management-database',
-        close: () => prisma.$disconnect(),
+        close: async () => {
+          if (!sharedPrisma) await prisma.$disconnect();
+        },
       }),
     });
   } catch (error) {
-    await prisma.$disconnect();
+    if (!sharedPrisma) await prisma.$disconnect();
     throw error;
   }
 }

@@ -50,6 +50,7 @@ export type VenueCatalogRuntime = Readonly<{
 
 export async function createVenueCatalogRuntime(config: Config): Promise<VenueCatalogRuntime> {
   const prisma = createPrismaClient(config.database.url, undefined, 'venue-catalog');
+  let cacheCleanup: ReturnType<typeof setInterval> | undefined;
   try {
     await prisma.$connect();
     const storage = createStorage(config);
@@ -113,6 +114,7 @@ export async function createVenueCatalogRuntime(config: Config): Promise<VenueCa
           }),
       ),
     );
+    cacheCleanup = setInterval(() => media.pruneSignedUrlCache(), 30_000).unref();
     return Object.freeze({
       router,
       providers: Object.freeze({
@@ -121,10 +123,15 @@ export async function createVenueCatalogRuntime(config: Config): Promise<VenueCa
       }),
       resource: Object.freeze({
         name: 'venue-catalog-database',
-        close: () => prisma.$disconnect(),
+        close: () => {
+          clearInterval(cacheCleanup);
+          media.dispose();
+          return prisma.$disconnect();
+        },
       }),
     });
   } catch (error: unknown) {
+    clearInterval(cacheCleanup);
     await prisma.$disconnect();
     throw error;
   }

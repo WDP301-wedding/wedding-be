@@ -20,6 +20,19 @@ afterEach(() => {
   captured.length = 0;
 });
 describe('runtime driver pool options', () => {
+  it('shares six default owners without reducing their combined connection capacity', async () => {
+    vi.stubEnv('DB_POOL_MAX', '1');
+    const client = createPrismaClient(
+      'postgresql://runtime:secret@localhost:5432/wedding',
+      false,
+      'shared-default',
+    );
+    try {
+      expect(captured[0]).toMatchObject({ max: 6 });
+    } finally {
+      await client.$disconnect();
+    }
+  });
   it.each(['unexpected', 'toString', '__proto__'])(
     'rejects an unrecognized JavaScript pool owner %s before creating an adapter',
     (owner) => {
