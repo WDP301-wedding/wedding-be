@@ -52,6 +52,9 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Verify realtime authentication admission
+        run: npx vitest run tests/integration/realtime-auth-admission.test.ts --maxWorkers=1
+
       - name: Verify generated OpenAPI artifact
         run: npm run api:check
 
@@ -115,4 +118,3 @@ jobs:
 
       - name: Deploy migrations to empty PostgreSQL
         run: npm run db:migrate:deploy
-
