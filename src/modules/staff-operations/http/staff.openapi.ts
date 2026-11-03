@@ -1,3 +1,15 @@
+import {
+  eventListQuery,
+  eventListSchema,
+  workspaceSchema,
+  workPageQuery,
+  workPageSchema,
+  workCreateInput,
+  workUpdateInput,
+  workItemSchema,
+  workHistoryQuery,
+  workHistorySchema,
+} from '../domain/workspace-policy.js';
 import { z } from 'zod';
 import type { ZodOpenApiObject } from 'zod-openapi';
 import {
@@ -80,6 +92,63 @@ const guestPath = '/staff/events/{bookingId}/guests/{guestId}';
 const operationDescription =
   'Current Staff role, active event assignment and BY_GUEST_NAME required. Staff writes within event start - 2h through end + 12h; Manager writes require explicit overrideReason and may override the window only. One listed identity, never all-person attendance; companions are not counted by this API. No invitation/QR authority.';
 export const staffOpenApiPaths: NonNullable<ZodOpenApiObject['paths']> = {
+  '/staff/events': {
+    get: {
+      ...op(
+        'listStaffEvents',
+        eventListSchema,
+        'Manager sees settled events; Staff sees only currently active assigned settled events. Keyset pagination by booking UUID; no cross-account event lookup.',
+      ),
+      requestParams: { query: eventListQuery },
+    },
+  },
+  '/staff/events/{bookingId}/workspace': {
+    parameters: [booking],
+    get: op(
+      'readStaffWorkspace',
+      workspaceSchema,
+      'Assigned Staff or Manager. Read-only operational context independent of check-in mode/window: approved timeline, seating, safe attendance, settings and assigned team. No financial data or contract mutation.',
+    ),
+  },
+  '/staff/events/{bookingId}/work-items': {
+    parameters: [booking],
+    get: {
+      ...op(
+        'listStaffWorkItems',
+        workPageSchema,
+        'Assigned Staff or Manager. Bounded newest-first keyset pagination by creation time and UUID; afterId must identify an item in this booking/kind.',
+      ),
+      requestParams: { query: workPageQuery },
+    },
+    post: op(
+      'createStaffWorkItem',
+      workItemSchema,
+      'Manager creates TASK; assigned Staff/Manager may report INCIDENT or HANDOVER. Assignees must be current active staff assigned to the same booking. Immutable audit snapshot.',
+      workCreateInput,
+      '201',
+    ),
+  },
+  '/staff/events/{bookingId}/work-items/{itemId}': {
+    parameters: [booking, parameter('itemId')],
+    patch: op(
+      'updateStaffWorkItem',
+      workItemSchema,
+      'Exact expectedRevision required. Manager coordinates incidents/tasks. Staff updates own assigned tasks; handover acknowledgement requires a different recipient. No deletion or financial effect.',
+      workUpdateInput,
+    ),
+  },
+  '/staff/events/{bookingId}/work-items/{itemId}/history': {
+    parameters: [booking, parameter('itemId')],
+    get: {
+      ...op(
+        'readStaffWorkHistory',
+        workHistorySchema,
+        'Append-only history in ascending revision, maximum 25 rows.',
+      ),
+      requestParams: { query: workHistoryQuery },
+    },
+  },
+
   '/management/staff-accounts': {
     post: op(
       'provisionStaffAccount',

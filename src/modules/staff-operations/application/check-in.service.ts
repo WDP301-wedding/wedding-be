@@ -36,6 +36,7 @@ export const recordDto = (r: StaffCheckInRecord) => ({
 });
 export class CheckInService {
   private readonly operationsScopes = new WeakSet<ContractContext>();
+  private readonly checkInScopes = new WeakSet<ContractContext>();
   constructor(
     readonly staff: StaffService,
     readonly seating?: StaffSeatingGuidance,
@@ -51,12 +52,7 @@ export class CheckInService {
     );
     return isWindowOpen(at, timeline.eventDate, timeline.shiftStartTime, timeline.shiftEndTime);
   }
-  async access(
-    bookingId: string,
-    context: StaffRequestContext,
-    overrideReason?: string,
-    write = false,
-  ) {
+  async assignedAccess(bookingId: string, context: StaffRequestContext) {
     const actor = await this.guests.identity.resolver.resolve(context.accessToken);
     if (
       actor.accountId !== context.actorId ||
@@ -71,8 +67,23 @@ export class CheckInService {
         where: { bookingId_staffAccountId: { bookingId, staffAccountId: actor.accountId } },
       });
       if (assignment?.status !== 'ACTIVE') throw denied('EVENT_ASSIGNMENT_REQUIRED');
-      if (overrideReason !== undefined) throw denied('MANAGER_OVERRIDE_REQUIRED');
-    } else if (write && overrideReason === undefined) throw denied('MANAGER_OVERRIDE_REQUIRED');
+    }
+    this.operationsScopes.add(scope);
+    return actor;
+  }
+  async access(
+    bookingId: string,
+    context: StaffRequestContext,
+    overrideReason?: string,
+    write = false,
+  ) {
+    const actor = await this.assignedAccess(bookingId, context);
+    const tx = this.staff.repository.boundary.current(bookingId)!;
+    const scope = this.staff.repository.boundary.currentContext(bookingId)!;
+    if (!actor.roles.includes('MANAGER') && overrideReason !== undefined)
+      throw denied('MANAGER_OVERRIDE_REQUIRED');
+    if (actor.roles.includes('MANAGER') && write && overrideReason === undefined)
+      throw denied('MANAGER_OVERRIDE_REQUIRED');
     const head = await tx.staffConfiguration.findUnique({ where: { bookingId } });
     if (head?.checkInMode !== 'BY_GUEST_NAME') throw denied('CHECK_IN_DISABLED');
     if (
@@ -81,6 +92,7 @@ export class CheckInService {
     )
       throw denied('CHECK_IN_WINDOW_CLOSED');
     this.operationsScopes.add(scope);
+    this.checkInScopes.add(scope);
     return actor;
   }
   async requireSeatingScopeAccess(bookingId: string, scope: ContractContext) {
@@ -90,7 +102,7 @@ export class CheckInService {
   }
   requireAssignedOperationsAccess(bookingId: string, context: StaffRequestContext) {
     const scope = this.staff.repository.boundary.currentContext(bookingId);
-    if (scope?.actorAccountId === context.actorId && this.operationsScopes.has(scope))
+    if (scope?.actorAccountId === context.actorId && this.checkInScopes.has(scope))
       return Promise.resolve();
     return this.access(bookingId, context).then(() => undefined);
   }
@@ -348,6 +360,7 @@ export class CheckInService {
             groupColor: group.color,
             checkedIn: latest?.action === 'CHECK_IN',
             ledgerRevision: latest?.ledgerRevision ?? 0,
+            checkInRecordId: latest?.action === 'CHECK_IN' ? latest.id : null,
             warning:
               first &&
               (first.guestGroupId !== r.guestGroupId ||

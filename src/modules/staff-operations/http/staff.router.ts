@@ -1,3 +1,15 @@
+import {
+  eventListQuery,
+  eventListSchema,
+  workspaceSchema,
+  workPageQuery,
+  workPageSchema,
+  workCreateInput,
+  workUpdateInput,
+  workItemSchema,
+  workHistoryQuery,
+  workHistorySchema,
+} from '../domain/workspace-policy.js';
 import { Router, type Request, type Response } from 'express';
 import { z } from 'zod';
 import {
@@ -105,6 +117,47 @@ export function createStaffRouter(s: ReturnType<typeof createStaffServices>) {
           );
       },
     );
+  const itemParams = bookingParams.extend({ itemId: z.uuid() });
+  get('/staff/events', z.strictObject({}), eventListQuery, eventListSchema, (req, res, _p, q) =>
+    s.workspace.list(q, context(req, res)),
+  );
+  get(
+    '/staff/events/:bookingId/workspace',
+    bookingParams,
+    z.strictObject({}),
+    workspaceSchema,
+    (req, res, p) => s.workspace.read(p.bookingId, context(req, res)),
+  );
+  get(
+    '/staff/events/:bookingId/work-items',
+    bookingParams,
+    workPageQuery,
+    workPageSchema,
+    (req, res, p, q) => s.workspace.page(p.bookingId, q, context(req, res)),
+  );
+  write(
+    'post',
+    '/staff/events/:bookingId/work-items',
+    bookingParams,
+    workCreateInput,
+    workItemSchema,
+    (req, res, p, b) => s.workspace.create(p.bookingId, b, key(req), context(req, res)),
+  );
+  write(
+    'patch',
+    '/staff/events/:bookingId/work-items/:itemId',
+    itemParams,
+    workUpdateInput,
+    workItemSchema,
+    (req, res, p, b) => s.workspace.update(p.bookingId, p.itemId, b, key(req), context(req, res)),
+  );
+  get(
+    '/staff/events/:bookingId/work-items/:itemId/history',
+    itemParams,
+    workHistoryQuery,
+    workHistorySchema,
+    (req, res, p, q) => s.workspace.history(p.bookingId, p.itemId, q, context(req, res)),
+  );
   write(
     'post',
     '/management/staff-accounts',

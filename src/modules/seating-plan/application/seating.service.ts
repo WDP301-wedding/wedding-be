@@ -671,6 +671,15 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
     }
     return { nextBookingId: rows.length === limit ? rows.at(-1)!.bookingId : null, failures };
   }
+  async getOperationalPlan(bookingId: string, context: ContractContext) {
+    const tx = this.boundary.requireScope(bookingId, context);
+    if (this.staff === undefined) throw new NotFoundError();
+    await this.staff.requireAssignedOperationsAccess(bookingId, context);
+    const head = await tx.seatingPlan.findUnique({ where: { bookingId } });
+    if (!head) return { status: 'ABSENT' as const, renderSnapshot: [] };
+    const current = await this.revalidate(tx, context, bookingId, undefined, true);
+    return { status: current.status, renderSnapshot: current.renderSnapshot };
+  }
   async getGuidance(bookingId: string, context: ContractContext) {
     const tx = this.boundary.requireScope(bookingId, context);
     if (this.staff === undefined) throw new NotFoundError();

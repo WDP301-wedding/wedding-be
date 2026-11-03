@@ -211,6 +211,26 @@ model StaffAssignment {
   @@index([staffAccountId, status])
 }
 
+model StaffWorkItem {
+  id String @id @default(uuid()) @db.Uuid
+  bookingId String @db.Uuid
+  kind String @db.VarChar(16)
+  title String @db.VarChar(160)
+  description String @db.VarChar(4000)
+  priority String @default("NORMAL") @db.VarChar(16)
+  status String @default("OPEN") @db.VarChar(16)
+  assignedAccountId String? @db.Uuid
+  createdByAccountId String @db.Uuid
+  revision Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  creator Account @relation("StaffWorkCreator", fields: [createdByAccountId], references: [id], onDelete: Restrict)
+  assignee Account? @relation("StaffWorkAssignee", fields: [assignedAccountId], references: [id], onDelete: Restrict)
+  @@index([bookingId, createdAt, id])
+  @@index([assignedAccountId, status])
+}
+
 model StaffHistory {
   id String @id @default(uuid()) @db.Uuid
   bookingId String @db.Uuid
@@ -493,6 +513,8 @@ model Account {
   sessions               Session[]
   passwordResets         PasswordResetCredential[]
   passwordOtpChallenges  PasswordOtpChallenge[]
+  staffCreatedWorkItems StaffWorkItem[] @relation("StaffWorkCreator")
+  staffAssignedWorkItems StaffWorkItem[] @relation("StaffWorkAssignee")
   retentionFacts         AccountRetentionEligibilityFact[]
 
   @@index([status])
@@ -750,6 +772,7 @@ model Booking {
   billingCommands             BillingOperationCommand[]
   billingRefundApprovals      BillingRefundApproval[]
   commercialContract          CommercialContract?
+  staffWorkItems StaffWorkItem[]
   commercialSelections        BookingCommercialSelectionRevision[]
   commercialAppendices        CommercialAppendixHead?
   incidentalExpenses          IncidentalExpenseDraft?

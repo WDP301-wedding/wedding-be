@@ -10,6 +10,7 @@ export const assignmentSchema = z.strictObject({
   assignmentId: z.uuid(),
   bookingId: z.uuid(),
   staffAccountId: z.uuid(),
+  staffLabel: z.string().nullable().optional(),
   status: z.enum(['ACTIVE', 'REVOKED']),
   revision: z.int().positive(),
 });
@@ -53,6 +54,7 @@ export const searchSchema = z.strictObject({
         groupName: z.string().min(1).max(80),
         groupColor: z.string().regex(/^#[A-F0-9]{6}$/u),
         checkedIn: z.boolean(),
+        checkInRecordId: z.uuid().nullable().optional(),
         ledgerRevision: z.int().nonnegative(),
         warning: z.literal('GUEST_GROUP_CHANGED').nullable(),
         tableLabels: z.array(z.string()),

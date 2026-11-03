@@ -216,14 +216,22 @@ export class StaffService {
         await this.manager(context);
         await this.guests.owners.booking.requireConfirmedEventContext(bookingId);
       },
-      async (tx) =>
-        (
-          await tx.staffAssignment.findMany({
-            where: { bookingId },
-            orderBy: { id: 'asc' },
-            take: 100,
-          })
-        ).map(assignmentDto),
+      async (tx) => {
+        const rows = await tx.staffAssignment.findMany({
+          where: { bookingId },
+          orderBy: { id: 'asc' },
+          take: 100,
+        });
+        const accounts = await tx.account.findMany({
+          where: { id: { in: rows.map((r) => r.staffAccountId) } },
+          select: { id: true, displayName: true, displayEmail: true },
+        });
+        const labels = new Map(accounts.map((a) => [a.id, a.displayName ?? a.displayEmail]));
+        return rows.map((row) => ({
+          ...assignmentDto(row),
+          staffLabel: labels.get(row.staffAccountId) ?? null,
+        }));
+      },
       'READ',
     );
   }

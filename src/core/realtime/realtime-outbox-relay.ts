@@ -412,7 +412,9 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
                 type:
                   row.entityType === 'invitation-design'
                     ? 'print_order.updated'
-                    : 'booking.updated',
+                    : row.entityType === 'STAFF_OPERATIONS'
+                      ? 'staff.updated'
+                      : 'booking.updated',
                 scope: {
                   entityType: row.entityType === 'invitation-design' ? 'print_order' : 'booking',
                   ...(bookingId ? { bookingId } : {}),

@@ -31,8 +31,15 @@ export const searchInput = z.strictObject({
   cursor: z.string().max(1024).optional(),
   limit: z.coerce.number().int().min(1).max(50).default(25),
 });
+export function checkInWindow(eventDate: string, start: string, end: string) {
+  return {
+    opensAt: new Date(Date.parse(`${eventDate}T${start}:00+07:00`) - 2 * 3600000).toISOString(),
+    closesAt: new Date(Date.parse(`${eventDate}T${end}:00+07:00`) + 12 * 3600000).toISOString(),
+  };
+}
 export function isWindowOpen(now: Date, eventDate: string, start: string, end: string) {
-  const startAt = Date.parse(`${eventDate}T${start}:00+07:00`);
-  const endAt = Date.parse(`${eventDate}T${end}:00+07:00`);
-  return now.getTime() >= startAt - 2 * 3600000 && now.getTime() <= endAt + 12 * 3600000;
+  const window = checkInWindow(eventDate, start, end);
+  return (
+    now.getTime() >= Date.parse(window.opensAt) && now.getTime() <= Date.parse(window.closesAt)
+  );
 }

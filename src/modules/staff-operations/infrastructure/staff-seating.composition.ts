@@ -9,6 +9,8 @@ export function createStaffSeatingServices(
   now: () => Date = () => new Date(),
 ) {
   const staff = createStaffServices(prisma, now, studio.boundary, {
+    getOperationalPlan: (bookingId, context) =>
+      seating.seating.getOperationalPlan(bookingId, context),
     getGuidance: (bookingId, context) => seating.seating.getGuidance(bookingId, context),
   });
   const seating = createSeatingServices(prisma, studio, now, staff.seatingAccess);

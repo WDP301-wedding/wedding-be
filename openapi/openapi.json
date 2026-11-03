@@ -44196,6 +44196,12 @@
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                             "type": "string"
                           },
+                          "staffLabel": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
                           "status": {
                             "enum": [
                               "ACTIVE",
@@ -44368,6 +44374,12 @@
                           "format": "uuid",
                           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                           "type": "string"
+                        },
+                        "staffLabel": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
                         },
                         "status": {
                           "enum": [
@@ -44549,6 +44561,12 @@
                           "format": "uuid",
                           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                           "type": "string"
+                        },
+                        "staffLabel": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
                         },
                         "status": {
                           "enum": [
@@ -50316,6 +50334,210 @@
         ]
       }
     },
+    "/staff/events": {
+      "get": {
+        "description": "Manager sees settled events; Staff sees only currently active assigned settled events. Keyset pagination by booking UUID; no cross-account event lookup. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
+        "operationId": "listStaffEvents",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "default": "",
+              "maxLength": 120,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "afterId",
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 25,
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "phase",
+            "schema": {
+              "default": "CONFIRMED",
+              "enum": [
+                "CONFIRMED",
+                "COMPLETED"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "items": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "alias": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "bookingCode": {
+                                "type": "string"
+                              },
+                              "bookingId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "eventDate": {
+                                "format": "date",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                "type": "string"
+                              },
+                              "hallName": {
+                                "type": "string"
+                              },
+                              "phase": {
+                                "enum": [
+                                  "CONFIRMED",
+                                  "COMPLETED"
+                                ],
+                                "type": "string"
+                              },
+                              "shiftCode": {
+                                "enum": [
+                                  "LUNCH",
+                                  "DINNER"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "bookingId",
+                              "bookingCode",
+                              "alias",
+                              "eventDate",
+                              "hallName",
+                              "shiftCode",
+                              "phase"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 50,
+                          "type": "array"
+                        },
+                        "nextAfterId": {
+                          "anyOf": [
+                            {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "items",
+                        "nextAfterId"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Authorized result."
+          },
+          "400": {
+            "$ref": "#/components/responses/IdempotencyKeyRequired"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "requestId"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "EVENT_ASSIGNMENT_REQUIRED, CHECK_IN_DISABLED, CHECK_IN_WINDOW_CLOSED, MANAGER_OVERRIDE_REQUIRED or CHECK_IN_CORRECTION_FORBIDDEN."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Staff operations"
+        ]
+      }
+    },
     "/staff/events/{bookingId}/guests/search": {
       "get": {
         "description": "Current Staff role, active event assignment and BY_GUEST_NAME required. Staff writes within event start - 2h through end + 12h; Manager writes require explicit overrideReason and may override the window only. One listed identity, never all-person attendance; companions are not counted by this API. No invitation/QR authority. Normalized name/phone matching; only phoneLast4, no private notes. Duplicate names remain separate IDs. Opaque cursor becomes stale on Guest changes. Seating ABSENT succeeds. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
@@ -50373,6 +50595,18 @@
                           "items": {
                             "additionalProperties": false,
                             "properties": {
+                              "checkInRecordId": {
+                                "anyOf": [
+                                  {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
                               "checkedIn": {
                                 "type": "boolean"
                               },
@@ -51328,6 +51562,1451 @@
           "Staff operations"
         ]
       }
+    },
+    "/staff/events/{bookingId}/work-items": {
+      "get": {
+        "description": "Assigned Staff or Manager. Bounded newest-first keyset pagination by creation time and UUID; afterId must identify an item in this booking/kind. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
+        "operationId": "listStaffWorkItems",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "afterId",
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 25,
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "schema": {
+              "enum": [
+                "TASK",
+                "INCIDENT",
+                "HANDOVER"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "items": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "assignedAccountId": {
+                                "anyOf": [
+                                  {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "bookingId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                                "type": "string"
+                              },
+                              "createdByAccountId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "description": {
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "kind": {
+                                "enum": [
+                                  "TASK",
+                                  "INCIDENT",
+                                  "HANDOVER"
+                                ],
+                                "type": "string"
+                              },
+                              "priority": {
+                                "enum": [
+                                  "NORMAL",
+                                  "URGENT"
+                                ],
+                                "type": "string"
+                              },
+                              "revision": {
+                                "exclusiveMinimum": 0,
+                                "maximum": 9007199254740991,
+                                "type": "integer"
+                              },
+                              "status": {
+                                "enum": [
+                                  "OPEN",
+                                  "IN_PROGRESS",
+                                  "DONE"
+                                ],
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "updatedAt": {
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "bookingId",
+                              "kind",
+                              "title",
+                              "description",
+                              "priority",
+                              "status",
+                              "assignedAccountId",
+                              "createdByAccountId",
+                              "revision",
+                              "createdAt",
+                              "updatedAt"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 50,
+                          "type": "array"
+                        },
+                        "nextAfterId": {
+                          "anyOf": [
+                            {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "items",
+                        "nextAfterId"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Authorized result."
+          },
+          "400": {
+            "$ref": "#/components/responses/IdempotencyKeyRequired"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "requestId"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "EVENT_ASSIGNMENT_REQUIRED, CHECK_IN_DISABLED, CHECK_IN_WINDOW_CLOSED, MANAGER_OVERRIDE_REQUIRED or CHECK_IN_CORRECTION_FORBIDDEN."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Staff operations"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "bookingId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "description": "Manager creates TASK; assigned Staff/Manager may report INCIDENT or HANDOVER. Assignees must be current active staff assigned to the same booking. Immutable audit snapshot. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
+        "operationId": "createStaffWorkItem",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "assignedAccountId": {
+                    "anyOf": [
+                      {
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "description": {
+                    "maxLength": 4000,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "kind": {
+                    "enum": [
+                      "TASK",
+                      "INCIDENT",
+                      "HANDOVER"
+                    ],
+                    "type": "string"
+                  },
+                  "priority": {
+                    "default": "NORMAL",
+                    "enum": [
+                      "NORMAL",
+                      "URGENT"
+                    ],
+                    "type": "string"
+                  },
+                  "title": {
+                    "maxLength": 160,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "title",
+                  "description"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "assignedAccountId": {
+                          "anyOf": [
+                            {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "bookingId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                          "type": "string"
+                        },
+                        "createdByAccountId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "TASK",
+                            "INCIDENT",
+                            "HANDOVER"
+                          ],
+                          "type": "string"
+                        },
+                        "priority": {
+                          "enum": [
+                            "NORMAL",
+                            "URGENT"
+                          ],
+                          "type": "string"
+                        },
+                        "revision": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "OPEN",
+                            "IN_PROGRESS",
+                            "DONE"
+                          ],
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "bookingId",
+                        "kind",
+                        "title",
+                        "description",
+                        "priority",
+                        "status",
+                        "assignedAccountId",
+                        "createdByAccountId",
+                        "revision",
+                        "createdAt",
+                        "updatedAt"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Authorized result."
+          },
+          "400": {
+            "$ref": "#/components/responses/IdempotencyKeyRequired"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "requestId"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "EVENT_ASSIGNMENT_REQUIRED, CHECK_IN_DISABLED, CHECK_IN_WINDOW_CLOSED, MANAGER_OVERRIDE_REQUIRED or CHECK_IN_CORRECTION_FORBIDDEN."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Staff operations"
+        ]
+      }
+    },
+    "/staff/events/{bookingId}/work-items/{itemId}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "bookingId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "itemId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        }
+      ],
+      "patch": {
+        "description": "Exact expectedRevision required. Manager coordinates incidents/tasks. Staff updates own assigned tasks; handover acknowledgement requires a different recipient. No deletion or financial effect. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
+        "operationId": "updateStaffWorkItem",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "assignedAccountId": {
+                    "anyOf": [
+                      {
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "expectedRevision": {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  },
+                  "note": {
+                    "maxLength": 2000,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "status": {
+                    "enum": [
+                      "OPEN",
+                      "IN_PROGRESS",
+                      "DONE"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "expectedRevision",
+                  "status",
+                  "note"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "assignedAccountId": {
+                          "anyOf": [
+                            {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "bookingId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                          "type": "string"
+                        },
+                        "createdByAccountId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "TASK",
+                            "INCIDENT",
+                            "HANDOVER"
+                          ],
+                          "type": "string"
+                        },
+                        "priority": {
+                          "enum": [
+                            "NORMAL",
+                            "URGENT"
+                          ],
+                          "type": "string"
+                        },
+                        "revision": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "OPEN",
+                            "IN_PROGRESS",
+                            "DONE"
+                          ],
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "bookingId",
+                        "kind",
+                        "title",
+                        "description",
+                        "priority",
+                        "status",
+                        "assignedAccountId",
+                        "createdByAccountId",
+                        "revision",
+                        "createdAt",
+                        "updatedAt"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Authorized result."
+          },
+          "400": {
+            "$ref": "#/components/responses/IdempotencyKeyRequired"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "requestId"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "EVENT_ASSIGNMENT_REQUIRED, CHECK_IN_DISABLED, CHECK_IN_WINDOW_CLOSED, MANAGER_OVERRIDE_REQUIRED or CHECK_IN_CORRECTION_FORBIDDEN."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Staff operations"
+        ]
+      }
+    },
+    "/staff/events/{bookingId}/work-items/{itemId}/history": {
+      "get": {
+        "description": "Append-only history in ascending revision, maximum 25 rows. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
+        "operationId": "readStaffWorkHistory",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "afterRevision",
+            "schema": {
+              "default": 0,
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "items": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "actorAccountId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                                "type": "string"
+                              },
+                              "revision": {
+                                "exclusiveMinimum": 0,
+                                "maximum": 9007199254740991,
+                                "type": "integer"
+                              },
+                              "snapshot": {
+                                "additionalProperties": {},
+                                "propertyNames": {
+                                  "type": "string"
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "revision",
+                              "actorAccountId",
+                              "createdAt",
+                              "snapshot"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 25,
+                          "type": "array"
+                        },
+                        "nextAfterRevision": {
+                          "anyOf": [
+                            {
+                              "exclusiveMinimum": 0,
+                              "maximum": 9007199254740991,
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "items",
+                        "nextAfterRevision"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Authorized result."
+          },
+          "400": {
+            "$ref": "#/components/responses/IdempotencyKeyRequired"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "requestId"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "EVENT_ASSIGNMENT_REQUIRED, CHECK_IN_DISABLED, CHECK_IN_WINDOW_CLOSED, MANAGER_OVERRIDE_REQUIRED or CHECK_IN_CORRECTION_FORBIDDEN."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Staff operations"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "bookingId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "itemId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/staff/events/{bookingId}/workspace": {
+      "get": {
+        "description": "Assigned Staff or Manager. Read-only operational context independent of check-in mode/window: approved timeline, seating, safe attendance, settings and assigned team. No financial data or contract mutation. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
+        "operationId": "readStaffWorkspace",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "alias": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "attendance": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "bookingId": {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            "byGuestGroup": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "checkedInGuestCount": {
+                                    "maximum": 9007199254740991,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  "groupColorSnapshot": {
+                                    "pattern": "^#[A-F0-9]{6}$",
+                                    "type": "string"
+                                  },
+                                  "groupNameSnapshot": {
+                                    "maxLength": 80,
+                                    "minLength": 1,
+                                    "type": "string"
+                                  },
+                                  "guestGroupId": {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "guestGroupId",
+                                  "groupNameSnapshot",
+                                  "groupColorSnapshot",
+                                  "checkedInGuestCount"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "checkInMode": {
+                              "enum": [
+                                "NONE",
+                                "BY_GUEST_NAME"
+                              ],
+                              "type": "string"
+                            },
+                            "checkedInGuestCount": {
+                              "anyOf": [
+                                {
+                                  "maximum": 9007199254740991,
+                                  "minimum": 0,
+                                  "type": "integer"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "ledgerRevision": {
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "measurementStatus": {
+                              "enum": [
+                                "NOT_RECORDED",
+                                "LISTED_GUESTS_ONLY"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "bookingId",
+                            "checkInMode",
+                            "measurementStatus",
+                            "checkedInGuestCount",
+                            "ledgerRevision",
+                            "byGuestGroup"
+                          ],
+                          "type": "object"
+                        },
+                        "bookingCode": {
+                          "type": "string"
+                        },
+                        "bookingId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "isManager": {
+                          "type": "boolean"
+                        },
+                        "listedGuestCount": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "members": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "accountId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "accountId",
+                              "label"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 100,
+                          "type": "array"
+                        },
+                        "planningHeadcount": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "seating": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "renderSnapshot": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "color": {
+                                    "anyOf": [
+                                      {
+                                        "pattern": "^#[A-F0-9]{6}$",
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "guestGroupId": {
+                                    "anyOf": [
+                                      {
+                                        "format": "uuid",
+                                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "guestGroupName": {
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 80,
+                                        "minLength": 1,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "height": {
+                                    "maximum": 10000,
+                                    "minimum": 1,
+                                    "type": "integer"
+                                  },
+                                  "layoutTableId": {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  "rotationDegrees": {
+                                    "maximum": 359,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  "shape": {
+                                    "enum": [
+                                      "ROUND",
+                                      "RECTANGLE"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "tableLabel": {
+                                    "maxLength": 50,
+                                    "minLength": 1,
+                                    "type": "string"
+                                  },
+                                  "width": {
+                                    "maximum": 10000,
+                                    "minimum": 1,
+                                    "type": "integer"
+                                  },
+                                  "x": {
+                                    "maximum": 10000,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  "y": {
+                                    "maximum": 10000,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  }
+                                },
+                                "required": [
+                                  "layoutTableId",
+                                  "tableLabel",
+                                  "shape",
+                                  "x",
+                                  "y",
+                                  "width",
+                                  "height",
+                                  "rotationDegrees",
+                                  "guestGroupId",
+                                  "guestGroupName",
+                                  "color"
+                                ],
+                                "type": "object"
+                              },
+                              "maxItems": 500,
+                              "minItems": 1,
+                              "type": "array"
+                            },
+                            "status": {
+                              "enum": [
+                                "ABSENT",
+                                "DRAFT",
+                                "CONFIRMED",
+                                "REQUIRES_REVIEW"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "status",
+                            "renderSnapshot"
+                          ],
+                          "type": "object"
+                        },
+                        "settings": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "bookingId": {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            "checkInMode": {
+                              "enum": [
+                                "NONE",
+                                "BY_GUEST_NAME"
+                              ],
+                              "type": "string"
+                            },
+                            "locked": {
+                              "type": "boolean"
+                            },
+                            "revision": {
+                              "exclusiveMinimum": 0,
+                              "maximum": 9007199254740991,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "bookingId",
+                            "checkInMode",
+                            "revision",
+                            "locked"
+                          ],
+                          "type": "object"
+                        },
+                        "timeline": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "approvedByCoupleAt": {
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                              "type": "string"
+                            },
+                            "approvedByManagerAt": {
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                              "type": "string"
+                            },
+                            "bookingId": {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            "eventDate": {
+                              "format": "date",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                              "type": "string"
+                            },
+                            "hallName": {
+                              "maxLength": 120,
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "isEffective": {
+                              "type": "boolean"
+                            },
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "description": {
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 2000,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "itemId": {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  "order": {
+                                    "maximum": 9007199254740991,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  "startTime": {
+                                    "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$",
+                                    "type": "string"
+                                  },
+                                  "title": {
+                                    "maxLength": 120,
+                                    "minLength": 1,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "itemId",
+                                  "order",
+                                  "startTime",
+                                  "title",
+                                  "description"
+                                ],
+                                "type": "object"
+                              },
+                              "maxItems": 100,
+                              "minItems": 1,
+                              "type": "array"
+                            },
+                            "revisionNumber": {
+                              "exclusiveMinimum": 0,
+                              "maximum": 9007199254740991,
+                              "type": "integer"
+                            },
+                            "shiftCode": {
+                              "enum": [
+                                "LUNCH",
+                                "DINNER"
+                              ],
+                              "type": "string"
+                            },
+                            "shiftEndTime": {
+                              "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$",
+                              "type": "string"
+                            },
+                            "shiftStartTime": {
+                              "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$",
+                              "type": "string"
+                            },
+                            "timelineRevisionId": {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "bookingId",
+                            "timelineRevisionId",
+                            "revisionNumber",
+                            "eventDate",
+                            "hallName",
+                            "shiftCode",
+                            "shiftStartTime",
+                            "shiftEndTime",
+                            "items",
+                            "approvedByManagerAt",
+                            "approvedByCoupleAt",
+                            "isEffective"
+                          ],
+                          "type": "object"
+                        },
+                        "windowClosesAt": {
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                          "type": "string"
+                        },
+                        "windowOpen": {
+                          "type": "boolean"
+                        },
+                        "windowOpensAt": {
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "bookingId",
+                        "bookingCode",
+                        "alias",
+                        "settings",
+                        "attendance",
+                        "listedGuestCount",
+                        "planningHeadcount",
+                        "windowOpen",
+                        "windowOpensAt",
+                        "windowClosesAt",
+                        "isManager",
+                        "timeline",
+                        "seating",
+                        "members"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Authorized result."
+          },
+          "400": {
+            "$ref": "#/components/responses/IdempotencyKeyRequired"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "requestId"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "EVENT_ASSIGNMENT_REQUIRED, CHECK_IN_DISABLED, CHECK_IN_WINDOW_CLOSED, MANAGER_OVERRIDE_REQUIRED or CHECK_IN_CORRECTION_FORBIDDEN."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Staff operations"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "bookingId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        }
+      ]
     },
     "/workspace-invitation-acceptances": {
       "post": {
