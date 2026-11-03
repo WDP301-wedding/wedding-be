@@ -586,6 +586,22 @@ function adminCollection(
       ),
     },
     [`/management/catalog/${resource}/{${singular}Id}`]: {
+      ...(resource === 'dishes' || resource === 'menu-packages'
+        ? {
+            delete: {
+              ...managerMutation(
+                `archive${operationBase}`,
+                `Soft-delete one ${title}; retain immutable versions and commercial history`,
+                lifecycleBodySchema,
+                { idempotent: true, responseSchema: revisionResultSchema },
+              ),
+              parameters: [
+                { $ref: '#/components/parameters/IdempotencyKey' },
+                pathParameter(`${singular}Id`),
+              ],
+            },
+          }
+        : {}),
       get: {
         operationId: `get${operationBase}History`,
         summary: `Get one ${title} aggregate with immutable history`,

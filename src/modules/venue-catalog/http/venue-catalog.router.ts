@@ -306,6 +306,9 @@ function registerDishRoutes(
   options: CreateVenueCatalogRouterOptions,
   manager: RequestHandler,
 ): void {
+  registerFoodDeletion(router, options, manager, 'dishes', (input) =>
+    options.services.menu.archiveDish(input),
+  );
   router.get(
     '/management/catalog/dishes',
     manager,
@@ -429,6 +432,9 @@ function registerMenuRoutes(
   options: CreateVenueCatalogRouterOptions,
   manager: RequestHandler,
 ): void {
+  registerFoodDeletion(router, options, manager, 'menu-packages', (input) =>
+    options.services.menu.archiveMenuPackage(input),
+  );
   router.get(
     '/management/catalog/menu-packages',
     manager,
@@ -913,6 +919,39 @@ function registerMediaRoutes(
         }),
       );
       response.sendStatus(204);
+    }),
+  );
+}
+
+function registerFoodDeletion(
+  router: Router,
+  options: CreateVenueCatalogRouterOptions,
+  manager: RequestHandler,
+  resource: 'dishes' | 'menu-packages',
+  archive: (input: {
+    aggregateId: string;
+    expectedRevision: number;
+    context: CatalogMutationContext;
+  }) => Promise<Readonly<{ revision: number }>>,
+): void {
+  router.delete(
+    `/management/catalog/${resource}/:id`,
+    manager,
+    options.createIdempotencyHandler(`/management/catalog/${resource}/{id}`),
+    validateRequest({ params: idParamsSchema, body: lifecycleBodySchema }),
+    asyncHandler(async (_request, response) => {
+      const { params, body } = validatedRequest(response, {
+        params: idParamsSchema,
+        body: lifecycleBodySchema,
+      });
+      const result = await catalogOperation(() =>
+        archive({
+          aggregateId: params.id,
+          expectedRevision: body.expectedRevision,
+          context: managerContext(response),
+        }),
+      );
+      sendRevision(response, result, result.revision);
     }),
   );
 }

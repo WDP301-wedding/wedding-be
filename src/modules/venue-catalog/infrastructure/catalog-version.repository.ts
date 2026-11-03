@@ -65,6 +65,14 @@ export interface CatalogVersionReference {
 }
 
 export interface CatalogVersionRepository {
+  archiveFood(
+    input: Readonly<{
+      kind: 'DISH' | 'MENU_PACKAGE';
+      aggregateId: string;
+      expectedRevision: number;
+      context: CatalogMutationContext;
+    }>,
+  ): Promise<Readonly<{ revision: number }>>;
   compareAndSwapDraft(input: CompareAndSwapDraftInput): Promise<Readonly<{ revision: number }>>;
   publish(input: PublishCatalogVersionInput): Promise<
     Readonly<{
@@ -171,6 +179,32 @@ export function createPrismaCatalogVersionRepository(
   now: () => Date = () => new Date(),
 ): CatalogVersionRepository {
   return Object.freeze({
+    archiveFood(input: Parameters<CatalogVersionRepository['archiveFood']>[0]) {
+      return withSerializableRetry(prisma, async (transaction) => {
+        const spec = tableSpecs[input.kind];
+        await advisoryLock(transaction, input.kind, input.aggregateId);
+        const occurredAt = now();
+        const rows = await transaction.$queryRaw<Array<{ revision: number }>>(Prisma.sql`
+          UPDATE ${identifier(spec.aggregateTable)}
+             SET "archivedAt" = ${occurredAt}, "lifecycle" = 'RETIRED',
+                 "retiredAt" = COALESCE("retiredAt", ${occurredAt}),
+                 "revision" = "revision" + 1, "updatedAt" = ${occurredAt},
+                 "updatedByAccountId" = ${input.context.actorId}::uuid
+           WHERE "id" = ${input.aggregateId}::uuid
+             AND "revision" = ${input.expectedRevision} AND "archivedAt" IS NULL
+          RETURNING "revision"
+        `);
+        const updated = rows[0];
+        if (!updated) throw new CatalogConflictError('CATALOG_LIFECYCLE_CONFLICT');
+        await appendAudit(transaction, occurredAt, input.context, {
+          action: 'catalog.archived',
+          entityType: spec.entityType,
+          entityId: input.aggregateId,
+          metadata: { kind: input.kind },
+        });
+        return Object.freeze(updated);
+      });
+    },
     compareAndSwapDraft(input: CompareAndSwapDraftInput) {
       const changedFields = normalizeChangedFields(input.changedFields);
       return withSerializableRetry(prisma, async (transaction) => {
@@ -184,6 +218,7 @@ export function createPrismaCatalogVersionRepository(
              AND ${identifier(spec.aggregateIdColumn)} = ${input.aggregateId}::uuid
              AND "state" = 'DRAFT'
              AND "revision" = ${input.expectedRevision}
+             ${foodVisibilityCondition(input.kind, input.aggregateId)}
           RETURNING "revision"
         `);
         const winner = rows[0];
@@ -299,6 +334,7 @@ async function publishWithRetry(
       SELECT "currentPublishedVersionId", "draftVersionId", "lifecycle"
         FROM ${identifier(spec.aggregateTable)}
        WHERE "id" = ${input.aggregateId}::uuid
+         ${foodNotArchived(input.kind)}
        FOR UPDATE
     `);
     const aggregate = aggregateRows[0];
@@ -415,6 +451,7 @@ async function changeLifecycleWithRetry(
         SELECT "lifecycle", "revision"
           FROM ${identifier(spec.aggregateTable)}
          WHERE "id" = ${input.aggregateId}::uuid
+           ${foodNotArchived(input.kind)}
          FOR UPDATE
       `);
       const current = currentRows[0];
@@ -573,6 +610,18 @@ function normalizeChangedFields(changedFields: readonly string[]): readonly stri
 
 function identifier(value: string): Prisma.Sql {
   return Prisma.raw(`"${value}"`);
+}
+
+function foodNotArchived(kind: CatalogVersionKind): Prisma.Sql {
+  return kind === 'DISH' || kind === 'MENU_PACKAGE'
+    ? Prisma.sql`AND "archivedAt" IS NULL`
+    : Prisma.empty;
+}
+
+function foodVisibilityCondition(kind: CatalogVersionKind, aggregateId: string): Prisma.Sql {
+  if (kind !== 'DISH' && kind !== 'MENU_PACKAGE') return Prisma.empty;
+  return Prisma.sql`AND EXISTS (SELECT 1 FROM ${identifier(tableSpecs[kind].aggregateTable)}
+    WHERE "id" = ${aggregateId}::uuid AND "archivedAt" IS NULL)`;
 }
 
 function isKnownRequestError(error: unknown, code: string): boolean {

@@ -15,6 +15,7 @@ function versionRepository(
   overrides: Partial<CatalogVersionRepository> = {},
 ): CatalogVersionRepository {
   return {
+    archiveFood: vi.fn(() => Promise.resolve({ revision: 2 })),
     compareAndSwapDraft: vi.fn(() => Promise.resolve({ revision: 2 })),
     publish: vi.fn(() =>
       Promise.resolve({
