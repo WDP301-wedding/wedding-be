@@ -6,8 +6,11 @@ import { createPaymentsBillingProviders } from './payments-billing.providers.js'
 import { createPaymentsBillingHttpServices } from './http/payments-billing.http-services.js';
 import { createPaymentsBillingRouter } from './http/payments-billing.router.js';
 
-export async function createPaymentsBillingRuntime(config: Config) {
-  const prisma = createPrismaClient(config.database.url);
+export async function createPaymentsBillingRuntime(
+  config: Config,
+  sharedPrisma?: ReturnType<typeof createPrismaClient>,
+) {
+  const prisma = sharedPrisma ?? createPrismaClient(config.database.url);
   try {
     await prisma.$connect();
     await prisma.$queryRaw`SELECT 1`;
@@ -21,11 +24,13 @@ export async function createPaymentsBillingRuntime(config: Config) {
       providers,
       resource: Object.freeze({
         name: 'payments-billing-database',
-        close: () => prisma.$disconnect(),
+        close: async () => {
+          if (!sharedPrisma) await prisma.$disconnect();
+        },
       }),
     });
   } catch (error: unknown) {
-    await prisma.$disconnect();
+    if (!sharedPrisma) await prisma.$disconnect();
     throw error;
   }
 }

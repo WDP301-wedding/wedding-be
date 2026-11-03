@@ -38,8 +38,9 @@ export type InvitationStudioRuntime = Readonly<{
 export async function createInvitationStudioRuntime(
   config: Config,
   now: () => Date = () => new Date(),
+  sharedPrisma?: ReturnType<typeof createPrismaClient>,
 ): Promise<InvitationStudioRuntime> {
-  const prisma = createPrismaClient(config.database.url);
+  const prisma = sharedPrisma ?? createPrismaClient(config.database.url);
   try {
     await prisma.$connect();
     const unavailable = () => Promise.reject(new ProviderError('unavailable'));
@@ -108,12 +109,12 @@ export async function createInvitationStudioRuntime(
         close: async () => {
           await imageWorker.close();
           await reconciler.close();
-          await prisma.$disconnect();
+          if (!sharedPrisma) await prisma.$disconnect();
         },
       }),
     });
   } catch (error: unknown) {
-    await prisma.$disconnect();
+    if (!sharedPrisma) await prisma.$disconnect();
     throw error;
   }
 }

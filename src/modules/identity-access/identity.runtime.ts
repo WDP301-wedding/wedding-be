@@ -45,8 +45,9 @@ export async function createIdentityRuntime(
       ((sessionId: string, accountId?: string) => void | Promise<void>) | undefined;
     onAccountRevoked?: ((accountId: string) => void | Promise<void>) | undefined;
   },
+  sharedPrisma?: ReturnType<typeof createPrismaClient>,
 ): Promise<IdentityRuntime> {
-  const prisma = createPrismaClient(config.database.url);
+  const prisma = sharedPrisma ?? createPrismaClient(config.database.url);
   try {
     await prisma.$connect();
     const schema = config.database.url
@@ -161,11 +162,13 @@ export async function createIdentityRuntime(
       sessionRepository,
       resource: Object.freeze({
         name: 'identity-database',
-        close: () => prisma.$disconnect(),
+        close: async () => {
+          if (!sharedPrisma) await prisma.$disconnect();
+        },
       }),
     });
   } catch (error: unknown) {
-    await prisma.$disconnect();
+    if (!sharedPrisma) await prisma.$disconnect();
     throw error;
   }
 }

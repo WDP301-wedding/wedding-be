@@ -96,6 +96,60 @@ async function signedReadFixture(options?: Parameters<typeof createCatalogMediaS
 }
 
 describe('catalog media service', () => {
+  it('releases expired signed URL entries while preserving reusable entries', async () => {
+    const clock = vi.spyOn(Date, 'now').mockReturnValue(100_000);
+    try {
+      const f = await signedReadFixture({ cacheTtlSeconds: 60 });
+      await f.service.listSigned('HALL', f.input.resourceId);
+      expect(f.service.pruneSignedUrlCache()).toBe(0);
+      await f.service.listSigned('HALL', f.input.resourceId);
+      expect(f.signing).toHaveBeenCalledOnce();
+
+      clock.mockReturnValue(120_000);
+      const stored = await f.provider.put({
+        bytes: Uint8Array.from([...pngBytes, 1]),
+        contentType: 'image/png',
+        purpose: 'VENUE_CATALOG_MEDIA',
+        resourceId: f.input.resourceId,
+      });
+      f.rows.push({ ...mediaRow(f.input, stored.objectKey), id: randomUUID() });
+      const beforePrune = await f.service.listSigned('HALL', f.input.resourceId);
+      expect(f.signing).toHaveBeenCalledTimes(2);
+
+      clock.mockReturnValue(130_000);
+      expect(f.service.pruneSignedUrlCache()).toBe(1);
+      expect(f.service.pruneSignedUrlCache()).toBe(0);
+      const afterPrune = await f.service.listSigned('HALL', f.input.resourceId);
+      expect(afterPrune[1]!.signedUrl).toBe(beforePrune[1]!.signedUrl);
+      expect(f.signing).toHaveBeenCalledTimes(3);
+      f.service.dispose();
+    } finally {
+      clock.mockRestore();
+    }
+  });
+
+  it('does not retain a signed URL that finishes after cache disposal', async () => {
+    const clock = vi.spyOn(Date, 'now').mockReturnValue(100_000);
+    try {
+      const f = await signedReadFixture({ cacheTtlSeconds: 60 });
+      let finishSigning!: (url: string) => void;
+      f.signing.mockReturnValueOnce(
+        new Promise<string>((resolve) => {
+          finishSigning = resolve;
+        }),
+      );
+      const pending = f.service.listSigned('HALL', f.input.resourceId);
+      await vi.waitFor(() => expect(f.signing).toHaveBeenCalledOnce());
+      f.service.dispose();
+      finishSigning('https://storage.example.test/finished-active-read');
+      await expect(pending).resolves.toMatchObject([{ id: f.input.assetId }]);
+      clock.mockReturnValue(130_000);
+      expect(f.service.pruneSignedUrlCache()).toBe(0);
+    } finally {
+      clock.mockRestore();
+    }
+  });
+
   it('reuses cached signed reads with remaining lifetime and refreshes at the safety window', async () => {
     const clock = vi.spyOn(Date, 'now').mockReturnValue(100_000);
     try {
