@@ -143,6 +143,8 @@ function services(): VenueCatalogHttpServices {
       requireActiveShiftSnapshot: vi.fn(),
     } as unknown as VenueCatalogHttpServices['venue'],
     menu: {
+      archiveDish: vi.fn(() => Promise.resolve({ revision: 2 })),
+      archiveMenuPackage: vi.fn(() => Promise.resolve({ revision: 2 })),
       createDish: vi.fn(() => Promise.resolve({ id: randomUUID(), revision: 1 })),
       cloneDishVersion: vi.fn(() => Promise.resolve({ id: randomUUID(), revision: 1 })),
       updateDishDraft: vi.fn(() => Promise.resolve({ id: randomUUID(), revision: 2 })),
@@ -220,6 +222,33 @@ function appWith(catalogServices = services()) {
 }
 
 describe('FT-V3 venue catalog HTTP contract', () => {
+  it.each(['dishes', 'menu-packages'])(
+    'requires manager access and an integer expected revision for deleting %s',
+    async (resource) => {
+      const { app, catalogServices } = appWith();
+      const path = `/api/v1/management/catalog/${resource}/${randomUUID()}`;
+      expect((await request(app).delete(path).send({ expectedRevision: 1 })).status).toBe(401);
+      expect(
+        (
+          await request(app)
+            .delete(path)
+            .set('Authorization', 'Bearer manager-token')
+            .send({ expectedRevision: 1.5 })
+        ).status,
+      ).toBe(422);
+      const result = await request(app)
+        .delete(path)
+        .set('Authorization', 'Bearer manager-token')
+        .send({ expectedRevision: 1 });
+      expect(result.status).toBe(200);
+      expect(result.body).toEqual({ data: { revision: 2 } });
+      const archive =
+        resource === 'dishes'
+          ? mockedService(catalogServices.menu).archiveDish
+          : mockedService(catalogServices.menu).archiveMenuPackage;
+      expect(archive).toHaveBeenCalledOnce();
+    },
+  );
   it('publishes active restaurant and cursor-paged halls without manager metadata', async () => {
     const { app } = appWith();
 

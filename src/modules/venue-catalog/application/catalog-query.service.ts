@@ -215,7 +215,7 @@ export function createCatalogQueryService(
     },
     async getDish(dishId) {
       const row = await prisma.dish.findUnique({
-        where: { id: dishId },
+        where: { id: dishId, archivedAt: null },
         select: dishAggregateSelect,
       });
       if (row === null) throw new NotFoundError();
@@ -226,7 +226,7 @@ export function createCatalogQueryService(
     },
     async getMenuPackage(menuPackageId) {
       const row = await prisma.menuPackage.findUnique({
-        where: { id: menuPackageId },
+        where: { id: menuPackageId, archivedAt: null },
         select: menuAggregateSelect,
       });
       if (row === null) throw new NotFoundError();
@@ -398,6 +398,7 @@ async function listDishAdmin(
   input: PageInput,
 ): Promise<CatalogPage<unknown>> {
   const rows = await prisma.dish.findMany({
+    where: { archivedAt: null },
     orderBy: { id: 'asc' },
     ...(input.cursor === undefined ? {} : { cursor: { id: input.cursor }, skip: 1 }),
     take: input.limit + 1,
@@ -411,6 +412,7 @@ async function listMenuAdmin(
   input: PageInput,
 ): Promise<CatalogPage<unknown>> {
   const rows = await prisma.menuPackage.findMany({
+    where: { archivedAt: null },
     orderBy: { id: 'asc' },
     ...(input.cursor === undefined ? {} : { cursor: { id: input.cursor }, skip: 1 }),
     take: input.limit + 1,
