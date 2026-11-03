@@ -26,6 +26,13 @@ export const checkpointsSchema = z
 export type Checkpoint = z.infer<typeof checkpointSchema>;
 export type ProjectionRow = FeedRow<unknown> & { owner: ReportingOwner };
 export type Projection = { generationId: string; checkpoints: Checkpoint[]; rows: ProjectionRow[] };
+export type ProjectionHead = Pick<Projection, 'generationId' | 'checkpoints'>;
+export interface ProjectionRefresh {
+  stage(owner: ReportingOwner, rows: readonly ProjectionRow[]): Promise<void>;
+  resetOwner(owner: ReportingOwner): Promise<void>;
+  commit(checkpoints: readonly Checkpoint[]): Promise<string>;
+  abort(): Promise<void>;
+}
 export type ProjectionReadFilter = Readonly<{
   dateFrom: string;
   dateTo: string;
@@ -39,6 +46,12 @@ export type ProjectionReadFilter = Readonly<{
   owners: readonly ReportingOwner[];
 }>;
 export interface ProjectionStore {
+  loadHead?(scope: string): Promise<ProjectionHead | null>;
+  openRefresh?(
+    scope: string,
+    expectedGeneration: string | null,
+    rebuild: boolean,
+  ): Promise<ProjectionRefresh>;
   load(scope: string, bounded?: boolean, filter?: ProjectionReadFilter): Promise<Projection | null>;
   publish(
     scope: string,
@@ -103,7 +116,11 @@ export class AnalyticsProjector {
     rebuild: boolean,
     observation?: AnalyticsRefreshObservation,
   ) {
-    const previous = await this.store.load(scope);
+    const streaming =
+      typeof this.store.loadHead === 'function' &&
+      typeof this.store.openRefresh === 'function' &&
+      typeof this.store.touchCheckpoints === 'function';
+    const previous = streaming ? await this.store.loadHead!(scope) : await this.store.load(scope);
     // One owner-head observation forms the common committed cut; sequences remain owner-local.
     const sourceFences = await this.fences?.();
 
@@ -138,102 +155,120 @@ export class AnalyticsProjector {
       }
       return this.store.publish(scope, previous.generationId, {
         checkpoints: updatedCheckpoints,
-        rows: previous.rows,
+        rows: (previous as Projection).rows,
       });
     }
-    const rows = new Map(
-      (rebuild ? [] : (previous?.rows ?? [])).map((r) => [r.owner + '/' + r.recordId, r]),
-    );
-    const readOwner = async (owner: ReportingOwner): Promise<Checkpoint> => {
-      const checkpoint = previous?.checkpoints.find((c) => c.owner === owner);
-      const observed = observation?.owner(owner);
-      const startedAt = observed ? performance.now() : 0;
-      const afterSequence = rebuild ? 0 : (checkpoint?.throughSequence ?? 0);
-      const staged = new Map<string, ProjectionRow>();
-      try {
-        let cursor: string | undefined,
-          fence: number | undefined = sourceFences?.[owner];
-        const seenCursors = new Set<string>();
-        let pages = 0;
-        do {
-          if (++pages > 2000) throw new Error('Source refresh page budget exceeded.');
-          if (observed) observed.pages++;
-          const page = await this.sources[owner].readPage(
-            {
-              afterSequence,
-              limit: 500,
-              ...(fence === undefined ? {} : { throughSequence: fence }),
-              ...(cursor === undefined ? {} : { cursor }),
-            },
-            context,
-          );
-          if (observed) observed.rows += page.rows.length;
-          if (
-            !Number.isSafeInteger(page.throughSequence) ||
-            page.throughSequence < afterSequence ||
-            (fence !== undefined && fence !== page.throughSequence)
-          )
-            throw new Error('Invalid source fence.');
-          fence = page.throughSequence;
-          for (const row of page.rows) {
-            if (
-              !Number.isSafeInteger(row.sequence) ||
-              row.sequence <= afterSequence ||
-              row.sequence > fence
-            )
-              throw new Error('Source row outside fence.');
-            const key = owner + '/' + row.recordId;
-            const current = staged.get(key) ?? rows.get(key);
-            if (current === undefined || row.sequence > current.sequence)
-              staged.set(key, { ...row, owner });
-          }
-          cursor = page.nextCursor ?? undefined;
-          if (cursor !== undefined && seenCursors.has(cursor))
-            throw new Error('Source cursor cycle.');
-          if (cursor !== undefined) seenCursors.add(cursor);
-        } while (cursor !== undefined);
-        for (const [key, row] of staged) rows.set(key, row);
-        if (observed) observed.status = 'READY';
-        return {
-          owner,
-          throughSequence: fence,
-          refreshedAt: this.now().toISOString(),
-          status: 'READY',
-        };
-      } catch (error) {
-        if (observed) observed.status = checkpoint?.refreshedAt ? 'STALE' : 'SOURCE_NOT_READY';
-        if (rebuild)
-          throw new AppError({
-            status: 503,
-            code: 'ANALYTICS_REBUILD_FAILED',
-            message: 'The rebuild preserved the current generation because a source failed.',
-            cause: error,
-          });
-        return {
-          owner,
-          throughSequence: checkpoint?.throughSequence ?? 0,
-          refreshedAt: checkpoint?.refreshedAt ?? null,
-          status: checkpoint?.refreshedAt ? 'STALE' : 'SOURCE_NOT_READY',
-        };
-      } finally {
-        if (observed) observed.durationMs = performance.now() - startedAt;
-      }
-    };
-    const checkpoints: Checkpoint[] = [];
-    // Each owner keeps sequential cursor/fence validation. Three independent
-    // owners may read at once; this stays bounded even for a large source feed.
-    for (let offset = 0; offset < reportingOwners.length; offset += 3) {
-      const batch = await Promise.allSettled(
-        reportingOwners.slice(offset, offset + 3).map(readOwner),
+    const writer = streaming
+      ? await this.store.openRefresh!(scope, previous?.generationId ?? null, rebuild)
+      : undefined;
+    try {
+      const rows = new Map(
+        (rebuild || writer ? [] : ((previous as Projection | null)?.rows ?? [])).map((r) => [
+          r.owner + '/' + r.recordId,
+          r,
+        ]),
       );
-      for (const result of batch) {
-        if (result.status === 'rejected') throw result.reason;
-        checkpoints.push(result.value);
+      const readOwner = async (owner: ReportingOwner): Promise<Checkpoint> => {
+        const checkpoint = previous?.checkpoints.find((c) => c.owner === owner);
+        const observed = observation?.owner(owner);
+        const startedAt = observed ? performance.now() : 0;
+        const afterSequence = rebuild ? 0 : (checkpoint?.throughSequence ?? 0);
+        const staged = new Map<string, ProjectionRow>();
+        try {
+          let cursor: string | undefined,
+            fence: number | undefined = sourceFences?.[owner];
+          const seenCursors = new Set<string>();
+          let pages = 0;
+          do {
+            if (++pages > 2000) throw new Error('Source refresh page budget exceeded.');
+            if (observed) observed.pages++;
+            const page = await this.sources[owner].readPage(
+              {
+                afterSequence,
+                limit: 500,
+                ...(fence === undefined ? {} : { throughSequence: fence }),
+                ...(cursor === undefined ? {} : { cursor }),
+              },
+              context,
+            );
+            if (observed) observed.rows += page.rows.length;
+            if (
+              !Number.isSafeInteger(page.throughSequence) ||
+              page.throughSequence < afterSequence ||
+              (fence !== undefined && fence !== page.throughSequence)
+            )
+              throw new Error('Invalid source fence.');
+            fence = page.throughSequence;
+            const batch: ProjectionRow[] = [];
+            for (const row of page.rows) {
+              if (
+                !Number.isSafeInteger(row.sequence) ||
+                row.sequence <= afterSequence ||
+                row.sequence > fence
+              )
+                throw new Error('Source row outside fence.');
+              if (writer) {
+                batch.push({ ...row, owner });
+                continue;
+              }
+              const key = owner + '/' + row.recordId;
+              const current = staged.get(key) ?? rows.get(key);
+              if (current === undefined || row.sequence > current.sequence)
+                staged.set(key, { ...row, owner });
+            }
+            if (writer) await writer.stage(owner, batch);
+            cursor = page.nextCursor ?? undefined;
+            if (cursor !== undefined && seenCursors.has(cursor))
+              throw new Error('Source cursor cycle.');
+            if (cursor !== undefined) seenCursors.add(cursor);
+          } while (cursor !== undefined);
+          for (const [key, row] of staged) rows.set(key, row);
+          if (observed) observed.status = 'READY';
+          return {
+            owner,
+            throughSequence: fence,
+            refreshedAt: this.now().toISOString(),
+            status: 'READY',
+          };
+        } catch (error) {
+          if (writer) await writer.resetOwner(owner);
+          if (observed) observed.status = checkpoint?.refreshedAt ? 'STALE' : 'SOURCE_NOT_READY';
+          if (rebuild)
+            throw new AppError({
+              status: 503,
+              code: 'ANALYTICS_REBUILD_FAILED',
+              message: 'The rebuild preserved the current generation because a source failed.',
+              cause: error,
+            });
+          return {
+            owner,
+            throughSequence: checkpoint?.throughSequence ?? 0,
+            refreshedAt: checkpoint?.refreshedAt ?? null,
+            status: checkpoint?.refreshedAt ? 'STALE' : 'SOURCE_NOT_READY',
+          };
+        } finally {
+          if (observed) observed.durationMs = performance.now() - startedAt;
+        }
+      };
+      const checkpoints: Checkpoint[] = [];
+      // Each owner keeps sequential cursor/fence validation. Three independent
+      // owners may read at once; this stays bounded even for a large source feed.
+      for (let offset = 0; offset < reportingOwners.length; offset += 3) {
+        const batch = await Promise.allSettled(
+          reportingOwners.slice(offset, offset + 3).map(readOwner),
+        );
+        for (const result of batch) {
+          if (result.status === 'rejected') throw result.reason;
+          checkpoints.push(result.value);
+        }
       }
+      if (writer) return await writer.commit(checkpoints);
+      return await this.store.publish(scope, previous?.generationId ?? null, {
+        checkpoints,
+        rows: [...rows.values()],
+      });
+    } finally {
+      await writer?.abort();
     }
-    return this.store.publish(scope, previous?.generationId ?? null, {
-      checkpoints,
-      rows: [...rows.values()],
-    });
   }
 }

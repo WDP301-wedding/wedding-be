@@ -1,4 +1,5 @@
 import { readPublicationSnapshots } from './invitation-publication-snapshot.js';
+import { measureRuntimeTask } from '../observability/task-memory.js';
 import type { PrismaClient } from '../../generated/prisma/client.js';
 import type { Logger } from 'pino';
 import type { RedisManager } from '../redis/redis-client.js';
@@ -35,40 +36,49 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
     getId: (row: T) => string,
     toEvent: (row: T) => RealtimeEvent | readonly RealtimeEvent[] | null,
   ): Promise<number> {
-    const claims = await queue.claim(stream);
-    if (claims.length === 0) return 0;
-    let dispatched = 0;
-    try {
-      const rows = new Map(
-        (await fetchBatch([...new Set(claims.map((c) => c.eventId))])).map((row) => [
-          getId(row),
-          row,
-        ]),
-      );
-      for (const claim of claims) {
+    return measureRuntimeTask(
+      'realtime.' + stream,
+      async () => {
+        const claims = await queue.claim(stream);
+        if (claims.length === 0) return 0;
+        let dispatched = 0;
         try {
-          if (!(await queue.renew(stream, claim))) continue;
-          const row = rows.get(claim.eventId);
-          const converted = row ? toEvent(row) : null;
-          const events: readonly RealtimeEvent[] =
-            converted === null ? [] : 'eventId' in converted ? [converted] : converted;
-          for (const event of events) {
-            // A notification row can change revision between claim and read. Its
-            // queued revision remains a distinct invalidation, never a cursor fence.
-            await broker.publish({ ...event, eventId: event.eventId + ':' + claim.revision });
-            dispatched++;
+          const rows = new Map(
+            (await fetchBatch([...new Set(claims.map((c) => c.eventId))])).map((row) => [
+              getId(row),
+              row,
+            ]),
+          );
+          for (const claim of claims) {
+            try {
+              if (!(await queue.renew(stream, claim))) continue;
+              const row = rows.get(claim.eventId);
+              const converted = row ? toEvent(row) : null;
+              const events: readonly RealtimeEvent[] =
+                converted === null ? [] : 'eventId' in converted ? [converted] : converted;
+              for (const event of events) {
+                // A notification row can change revision between claim and read. Its
+                // queued revision remains a distinct invalidation, never a cursor fence.
+                await broker.publish({ ...event, eventId: event.eventId + ':' + claim.revision });
+                dispatched++;
+              }
+              await queue.finish(stream, claim, true);
+            } catch (err) {
+              await queue.finish(stream, claim, false);
+              logger?.error(
+                { err, stream, eventId: claim.eventId },
+                'Realtime delivery will retry.',
+              );
+            }
           }
-          await queue.finish(stream, claim, true);
-        } catch (err) {
-          await queue.finish(stream, claim, false);
-          logger?.error({ err, stream, eventId: claim.eventId }, 'Realtime delivery will retry.');
+        } finally {
+          // Token check makes release harmless for delivered/reclaimed claims.
+          await Promise.all(claims.map((claim) => queue.finish(stream, claim, false)));
         }
-      }
-    } finally {
-      // Token check makes release harmless for delivered/reclaimed claims.
-      await Promise.all(claims.map((claim) => queue.finish(stream, claim, false)));
-    }
-    return dispatched;
+        return dispatched;
+      },
+      logger,
+    );
   }
 
   const identityRecipients = new Map<string, readonly string[]>();
@@ -113,6 +123,13 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
         'booking',
         async (ids) => {
           const rows = await prisma.bookingOutboxEvent.findMany({
+            select: {
+              id: true,
+              aggregateId: true,
+              aggregateRevision: true,
+              eventType: true,
+              occurredAt: true,
+            },
             take: 50,
             orderBy: [{ occurredAt: 'asc' }, { id: 'asc' }],
             where: { id: { in: ids } },
@@ -173,6 +190,13 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
         'billing',
         (ids) =>
           prisma.billingOutboxEvent.findMany({
+            select: {
+              id: true,
+              aggregateId: true,
+              aggregateRevision: true,
+              eventType: true,
+              occurredAt: true,
+            },
             take: 50,
             orderBy: [{ occurredAt: 'asc' }, { id: 'asc' }],
             where: { id: { in: ids } },
@@ -202,6 +226,7 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
         'guest',
         (ids) =>
           prisma.guestOutbox.findMany({
+            select: { eventId: true, bookingId: true, eventType: true, createdAt: true },
             take: 50,
             orderBy: [{ createdAt: 'asc' }, { eventId: 'asc' }],
             where: { eventId: { in: ids } },
@@ -226,6 +251,7 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
         'seating',
         (ids) =>
           prisma.seatingOutbox.findMany({
+            select: { id: true, bookingId: true, eventType: true, occurredAt: true },
             take: 50,
             orderBy: [{ occurredAt: 'asc' }, { id: 'asc' }],
             where: { id: { in: ids } },
@@ -253,6 +279,7 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
         'studio',
         async (ids) => {
           const rows = await prisma.invitationStudioOutbox.findMany({
+            select: { eventId: true, bookingId: true, eventType: true, createdAt: true },
             take: 50,
             orderBy: [{ createdAt: 'asc' }, { eventId: 'asc' }],
             where: { eventId: { in: ids } },
@@ -285,6 +312,7 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
           'identity',
           async (ids) => {
             const rows = await prisma.identityOutbox.findMany({
+              select: { eventId: true, consultationId: true, eventType: true, occurredAt: true },
               take: 50,
               orderBy: [{ occurredAt: 'asc' }, { eventId: 'asc' }],
               where: { eventId: { in: ids } },
@@ -324,6 +352,7 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
           'staff',
           (ids) =>
             prisma.staffOutbox.findMany({
+              select: { id: true, bookingId: true, eventType: true, createdAt: true },
               take: 50,
               orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
               where: { id: { in: ids } },
@@ -354,6 +383,14 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
           'notification',
           (ids) =>
             prisma.notificationInbox.findMany({
+              select: {
+                id: true,
+                accountId: true,
+                bookingId: true,
+                revision: true,
+                createdAt: true,
+                intentId: true,
+              },
               take: 50,
               orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
               where: { id: { in: ids } },
@@ -382,6 +419,7 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
           'audit',
           (ids) =>
             prisma.auditLog.findMany({
+              select: { id: true, entityType: true, metadata: true, occurredAt: true },
               take: 50,
               orderBy: [{ occurredAt: 'asc' }, { id: 'asc' }],
               where: { id: { in: ids } },

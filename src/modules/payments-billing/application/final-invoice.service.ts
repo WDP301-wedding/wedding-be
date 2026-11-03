@@ -29,6 +29,7 @@ import {
   type FinalInvoiceDocument,
 } from '../domain/final-invoice.js';
 import { financialContext, readExpenseDraft } from './incidental-expense.service.js';
+import { rethrowInvoiceFailure } from './final-invoice-errors.js';
 
 type Options = {
   scope: ReturnType<typeof createBookingBoundaryUnitOfWork>;
@@ -70,15 +71,15 @@ export function createFinalInvoiceService(options: Options) {
     requestId: string,
     work: (client: PrismaClient, context: ContractContext) => Promise<FinalInvoiceRevision>,
   ) {
-    return options.boundary.run(
-      { bookingId, context: financialContext(actor, requestId) },
-      (scoped) =>
+    return options.boundary
+      .run({ bookingId, context: financialContext(actor, requestId) }, (scoped) =>
         options.scope.withClient(bookingId, scoped, async (client) => {
           await options.operations.requireManager(bookingId, scoped);
           await options.event(client).requireEnded(bookingId);
           return finalInvoiceView(await work(client, scoped));
         }),
-    );
+      )
+      .catch(rethrowInvoiceFailure);
   }
   async function activate(
     client: PrismaClient,
@@ -139,6 +140,8 @@ export function createFinalInvoiceService(options: Options) {
     const after = await options.ledger.getLedger(bookingId, context);
     if (after.totals.acceptedChargesVnd !== document.totalVnd)
       throw commercialConflict('FINANCIAL_SOURCE_CONFLICT');
+    const lastEntry = after.entries.at(-1);
+    if (!lastEntry) throw commercialConflict('FINANCIAL_SOURCE_CONFLICT');
     await client.finalInvoiceHead.update({ where: { bookingId }, data: { currentRevisionId: id } });
     const payload = {
       bookingId,
@@ -163,7 +166,7 @@ export function createFinalInvoiceService(options: Options) {
     await client.billingOutboxEvent.create({
       data: {
         id: randomUUID(),
-        ledgerEntryId: after.entries.at(-1)!.id,
+        ledgerEntryId: lastEntry.id,
         invoiceRevisionId: id,
         eventType: 'billing.final-invoice-issued',
         eventVersion: 1,

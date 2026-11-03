@@ -29,6 +29,19 @@ export function createRequestLogger(logger: Logger): RequestHandler {
     const startedAt = performance.now();
     let requestLogged = false;
     attachLogger(request, response);
+    if (process.env.RUNTIME_TASK_MEMORY_ENABLED === 'true') {
+      const memory = process.memoryUsage();
+      response.locals.requestMemoryBefore = { heapUsed: memory.heapUsed, rss: memory.rss };
+      request.log.info(
+        {
+          event: 'http_request_started',
+          method: request.method,
+          heapUsed: memory.heapUsed,
+          rss: memory.rss,
+        },
+        'HTTP request started',
+      );
+    }
 
     response.once('prefinish', () => {
       response.locals.normalizedRoute = resolveNormalizedRoute(request);
@@ -75,6 +88,9 @@ function requestLogFields(
 ): Record<string, unknown> {
   const errorCode = response.locals.errorCode as unknown;
   const capturedRoute = response.locals.normalizedRoute as unknown;
+  const before = response.locals.requestMemoryBefore as
+    { heapUsed: number; rss: number } | undefined;
+  const after = before ? process.memoryUsage() : undefined;
 
   return {
     durationMs: Number(Math.max(0, performance.now() - startedAt).toFixed(3)),
@@ -83,6 +99,17 @@ function requestLogFields(
     module: 'http',
     route: typeof capturedRoute === 'string' ? capturedRoute : resolveNormalizedRoute(request),
     statusClass: `${Math.floor(response.statusCode / 100)}xx`,
+    ...(before && after
+      ? {
+          memory: {
+            heapBefore: before.heapUsed,
+            heapAfter: after.heapUsed,
+            heapDelta: after.heapUsed - before.heapUsed,
+            rssBefore: before.rss,
+            rssAfter: after.rss,
+          },
+        }
+      : {}),
     ...(response.locals.databaseDiagnostics
       ? { database: response.locals.databaseDiagnostics as unknown }
       : {}),

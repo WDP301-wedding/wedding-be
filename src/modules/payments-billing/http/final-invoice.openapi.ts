@@ -25,6 +25,7 @@ const errors = Object.fromEntries(
     ['404', 'NotFound'],
     ['409', 'Conflict'],
     ['422', 'UnprocessableEntity'],
+    ['503', 'ServiceUnavailable'],
   ].map(([status, name]) => [status!, { $ref: `#/components/responses/${name}` }] as const),
 );
 const result = (schema: z.ZodType) => ({

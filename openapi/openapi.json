@@ -1196,6 +1196,65 @@
                       }
                     ]
                   },
+                  "settlementSummary": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "creditVnd": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "effectiveContractVnd": {
+                        "anyOf": [
+                          {
+                            "maximum": 9007199254740991,
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "netReceivedVnd": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "outstandingVnd": {
+                        "anyOf": [
+                          {
+                            "maximum": 9007199254740991,
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "payableVnd": {
+                        "anyOf": [
+                          {
+                            "maximum": 9007199254740991,
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "effectiveContractVnd",
+                      "payableVnd",
+                      "netReceivedVnd",
+                      "outstandingVnd",
+                      "creditVnd"
+                    ],
+                    "type": "object"
+                  },
                   "source": {
                     "enum": [
                       "CONTRACT",
@@ -9351,7 +9410,7 @@
     },
     "/bookings/{bookingId}/billing": {
       "get": {
-        "description": "Includes current financialOverview (contract or legacy proposal, required deposit, recorded gross deposit receipts, remaining deposit and application status) in the authorized booking snapshot, including pre-deposit Manager reads. Draft amounts are estimates, not receivables or collection authorization. Settled contracts retain the settlement revision. This overview stays current even on historical ledger pages; totals/history retain their billing fence. Includes advisory VNPay balancePaymentEligibility; POST balance still revalidates authority, invoice, attempt and amount facts. Reading never creates charges or payment evidence.",
+        "description": "Includes current financialOverview (contract or legacy proposal, required deposit, recorded gross deposit receipts, remaining deposit and application status) in the authorized booking snapshot, including pre-deposit Manager reads. Optional settlementSummary reports the effective contract including approved appendices, current payable obligation, net receipts after refunds, outstanding and overpayment. An approved pre-deposit agreement is visible without creating a ledger charge; drafts have no payable obligation. Once charged, ledger obligations include finalized expenses and adjustments exactly once. Settled contracts retain the original deposit revision and amount. This overview stays current even on historical ledger pages; totals/history retain their billing fence. Includes advisory VNPay balancePaymentEligibility; POST balance still revalidates authority, invoice, attempt and amount facts. Reading never creates charges or payment evidence.",
         "operationId": "getBookingBilling",
         "parameters": [
           {
@@ -16845,6 +16904,9 @@
           },
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         },
         "security": [
@@ -17717,6 +17779,9 @@
           },
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         },
         "security": [
@@ -19805,6 +19870,9 @@
           },
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         },
         "security": [
@@ -36633,6 +36701,9 @@
           },
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         },
         "security": [
@@ -36781,6 +36852,9 @@
           },
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         },
         "security": [
@@ -37000,6 +37074,9 @@
           },
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         },
         "security": [
@@ -37174,6 +37251,9 @@
           },
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         },
         "security": [
@@ -37398,6 +37478,9 @@
           },
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         },
         "security": [
@@ -38366,6 +38449,9 @@
           },
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         },
         "security": [

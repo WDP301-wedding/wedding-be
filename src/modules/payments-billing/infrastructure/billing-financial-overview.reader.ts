@@ -6,6 +6,8 @@ import {
   documentDigest,
 } from '../../booking-lifecycle/domain/commercial-contract.js';
 import { createContractFinancialReader } from '../../booking-lifecycle/infrastructure/contract-financial.reader.js';
+import { createEffectiveCommercialReader } from '../../booking-lifecycle/infrastructure/effective-commercial.reader.js';
+import { readReceivables } from './billing-persistence.queries.js';
 import {
   billingFinancialOverviewSchema,
   type BillingFinancialOverviewReader,
@@ -102,6 +104,18 @@ export function createBillingFinancialOverviewReader(
         totalVnd = proposal.baseChargeVnd.toNumber();
         requiredDepositVnd = proposal.depositAmountVnd.toNumber();
       }
+      const ledger = await readReceivables(client, bookingId);
+      const effectiveContractVnd = settledRevision
+        ? (await createEffectiveCommercialReader(client).getEffective(bookingId)).totalVnd
+        : totalVnd;
+      // Before a proven deposit the agreement is visible without manufacturing a ledger charge.
+      // Once charged, the ledger includes approved appendices and finalized expenses exactly once.
+      const payableVnd =
+        booking.phase === 'CANCELLED' || ledger.acceptedChargesVnd > 0 || booking.depositSettlement
+          ? ledger.acceptedChargesVnd
+          : state === 'APPROVED'
+            ? effectiveContractVnd
+            : null;
       return billingFinancialOverviewSchema.parse({
         bookingRevision: booking.revision,
         phase: booking.phase,
@@ -115,6 +129,13 @@ export function createBillingFinancialOverviewReader(
         depositRemainingVnd:
           requiredDepositVnd === null ? null : Math.max(0, requiredDepositVnd - depositReceivedVnd),
         depositApplied: booking.depositSettlement?.promotionStatus === 'SUCCEEDED',
+        settlementSummary: {
+          effectiveContractVnd,
+          payableVnd,
+          netReceivedVnd: ledger.netPaidVnd,
+          outstandingVnd: payableVnd === null ? null : Math.max(0, payableVnd - ledger.netPaidVnd),
+          creditVnd: payableVnd === null ? 0 : Math.max(0, ledger.netPaidVnd - payableVnd),
+        },
       });
     });
 }

@@ -4,6 +4,7 @@ import type { Logger } from 'pino';
 import { Counter, Gauge, Histogram, type Registry } from 'prom-client';
 import type { NotificationScheduler } from './notification-scheduler.js';
 import type { NotificationDispatcher } from './notification-dispatcher.js';
+import { measureRuntimeTask } from '../../../core/observability/task-memory.js';
 
 /** One replica, non-overlapping ticks; PostgreSQL remains the delivery/claim authority. */
 export class NotificationWorker {
@@ -70,9 +71,11 @@ export class NotificationWorker {
   tick(): Promise<void> {
     if (this.stopped) return Promise.resolve();
     if (this.active) return this.active;
-    this.active = this.run().finally(() => {
-      this.active = undefined;
-    });
+    this.active = measureRuntimeTask('notifications.tick', () => this.run(), this.logger).finally(
+      () => {
+        this.active = undefined;
+      },
+    );
     return this.active;
   }
   private async run() {

@@ -16,6 +16,15 @@ export const billingFinancialOverviewSchema = z.strictObject({
   depositReceivedVnd: money,
   depositRemainingVnd: money.nullable(),
   depositApplied: z.boolean(),
+  settlementSummary: z
+    .strictObject({
+      effectiveContractVnd: money.nullable(),
+      payableVnd: money.nullable(),
+      netReceivedVnd: money,
+      outstandingVnd: money.nullable(),
+      creditVnd: money,
+    })
+    .optional(),
 });
 
 export type BillingFinancialOverview = z.infer<typeof billingFinancialOverviewSchema>;

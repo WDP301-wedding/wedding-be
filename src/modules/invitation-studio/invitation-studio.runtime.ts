@@ -95,6 +95,7 @@ export async function createInvitationStudioRuntime(
           'Image job worker needs retry',
         ),
       config.invitationStudio.imageJobsEnabled === true && ai !== null && config.storage.enabled,
+      logger,
     );
     return Object.freeze({
       router,

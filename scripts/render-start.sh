@@ -18,9 +18,8 @@ case ",${CORS_ALLOWED_ORIGINS:-}," in
   *) export CORS_ALLOWED_ORIGINS="${CORS_ALLOWED_ORIGINS:+$CORS_ALLOWED_ORIGINS,}http://localhost:3201" ;;
 esac
 
-# Automatically resolve failed migration 20261029010000_booking_business_codes if present
-# so Render deploy does not get blocked by Prisma error P3009.
-npx prisma migrate resolve --rolled-back 20261029010000_booking_business_codes --config prisma.config.ts 2>/dev/null || true
+# A failed migration requires an explicit operator recovery after inspecting its
+# database state. Never mark it rolled back automatically during API restarts.
 
 # Apply additive releases against this service's configured database. Prisma's
 # migration lock serializes retries; set -e prevents starting an incompatible API.

@@ -8,9 +8,24 @@ import {
 } from '../application/projection.js';
 import { reportingOwners } from '../../../core/reporting/reporting-feed.js';
 import { prismaSchema } from '../../../core/database/prisma.js';
+import { openProjectionRefresh } from './projection-refresh.store.js';
 
 export function createProjectionRepository(prisma: PrismaClient): ProjectionStore {
   return {
+    async loadHead(scope) {
+      const schema = Prisma.raw('"' + prismaSchema(prisma).replaceAll('"', '""') + '"');
+      const [head] = await prisma.$queryRaw<
+        { id: string; checkpoints: Prisma.JsonValue }[]
+      >(Prisma.sql`
+        SELECT g.id,g.checkpoints FROM ${schema}."AnalyticsHead" h
+        JOIN ${schema}."AnalyticsGeneration" g ON g.id=h."generationId" AND g.scope=h.scope WHERE h.scope=${scope}
+      `);
+      return head
+        ? { generationId: head.id, checkpoints: checkpointsSchema.parse(head.checkpoints) }
+        : null;
+    },
+    openRefresh: (scope, expected, rebuild) =>
+      openProjectionRefresh(prisma, scope, expected, rebuild),
     async load(scope, bounded = false, filter) {
       return prisma.$transaction(
         async (tx) => {
@@ -83,20 +98,13 @@ export function createProjectionRepository(prisma: PrismaClient): ProjectionStor
             create: { scope, generationId: id },
             update: { generationId: id },
           });
-          // Readers pin a generation only inside a repeatable-read transaction; MVCC preserves their view.
-          await tx.analyticsProjection.deleteMany({
-            where: {
-              generationId: {
-                in: (
-                  await tx.analyticsGeneration.findMany({
-                    where: { scope, id: { not: id } },
-                    select: { id: true },
-                  })
-                ).map((g) => g.id),
-              },
-            },
-          });
-          await tx.analyticsGeneration.deleteMany({ where: { scope, id: { not: id } } });
+          // Retire only our predecessor, never another writer's private stage.
+          if (expectedGeneration) {
+            await tx.analyticsProjection.deleteMany({
+              where: { generationId: expectedGeneration },
+            });
+            await tx.analyticsGeneration.deleteMany({ where: { id: expectedGeneration } });
+          }
           return id;
         },
         { timeout: 60000 },

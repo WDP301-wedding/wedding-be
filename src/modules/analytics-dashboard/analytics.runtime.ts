@@ -4,9 +4,15 @@ import { createPrismaClient } from '../../core/database/prisma.js';
 import { createAnalyticsServices } from './infrastructure/analytics.composition.js';
 import { createAnalyticsRouter } from './http/analytics.router.js';
 import { createAnalyticsObserver } from './infrastructure/analytics-observer.js';
+import { createLogger } from '../../core/logging/logger.js';
+import { measureRuntimeTask } from '../../core/observability/task-memory.js';
 export async function createAnalyticsRuntime(config: Config) {
   const prisma = createPrismaClient(config.database.url, undefined, 'analytics');
   try {
+    const logger = createLogger({
+      runtimeEnvironment: config.runtime.environment,
+      level: config.runtime.logLevel,
+    });
     await prisma.$connect();
     const services = createAnalyticsServices(prisma, undefined, createAnalyticsObserver(config));
     let timer: ReturnType<typeof setInterval> | undefined, pending: Promise<void> | undefined;
@@ -54,7 +60,7 @@ export async function createAnalyticsRuntime(config: Config) {
         if (!timer)
           timer = setInterval(() => {
             if (!pending)
-              pending = tick()
+              pending = measureRuntimeTask('analytics.scheduler', tick, logger)
                 .catch(() => undefined)
                 .finally(() => {
                   pending = undefined;

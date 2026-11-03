@@ -3,6 +3,7 @@ import type { Logger } from 'pino';
 
 import { errorResponseSchema } from '../http/common.schemas.js';
 import { createLogger } from '../logging/logger.js';
+import { Prisma } from '../../generated/prisma/client.js';
 import {
   AppError,
   InternalError,
@@ -92,6 +93,8 @@ function defaultUnexpectedErrorReporter(error: unknown, request: Request): void 
   logger.error(
     {
       errorName: error instanceof Error ? error.name : 'NonErrorThrownValue',
+      // A stable code is sufficient for diagnosis; never log SQL, arguments or DB credentials.
+      ...(error instanceof Prisma.PrismaClientKnownRequestError ? { prismaCode: error.code } : {}),
       event: 'http_request_error',
       module: 'http',
       ...(requestLogger === undefined ? { entryPoint: 'http', requestId: request.requestId } : {}),
