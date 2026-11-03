@@ -1,11 +1,27 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { PrismaClient } from '../../generated/prisma/client.js';
-import { closeApplicationDatabase } from './runtime-database.js';
+import { closeApplicationDatabase, createApplicationDatabaseResource } from './runtime-database.js';
 
 describe('application database ownership', () => {
+  it('preserves readiness force cleanup when the lifecycle deadline expires', () => {
+    const force = vi.fn();
+    const resource = createApplicationDatabaseResource({ $disconnect: vi.fn() }, [
+      {
+        name: 'failed',
+        close: vi.fn(),
+        forceClose: () => {
+          throw new Error('close failed');
+        },
+      },
+      { name: 'no-force', close: vi.fn() },
+      { name: 'readiness', close: vi.fn(), forceClose: force },
+    ]);
+    resource.forceClose?.();
+    expect(force).toHaveBeenCalledOnce();
+    expect(Object.hasOwn(resource, 'close')).toBe(true);
+  });
   it('reports a disconnect failure without retrying or skipping module cleanup', async () => {
     const failure = new Error('disconnect failed');
-    const closeModule = vi.fn(async () => undefined);
+    const closeModule = vi.fn(() => Promise.resolve());
     const prisma = { $disconnect: vi.fn().mockRejectedValue(failure) };
     const close = closeApplicationDatabase(prisma, [{ name: 'module', close: closeModule }]);
     await expect(close()).rejects.toMatchObject({ errors: [failure] });
@@ -20,11 +36,12 @@ describe('application database ownership', () => {
       finish = resolve;
     });
     const prisma = {
-      $disconnect: vi.fn(async () => {
+      $disconnect: vi.fn(() => {
         events.push('disconnect');
+        return Promise.resolve();
       }),
     };
-    const close = closeApplicationDatabase(prisma as unknown as PrismaClient, [
+    const close = closeApplicationDatabase(prisma, [
       {
         name: 'worker',
         close: async () => {
@@ -34,8 +51,9 @@ describe('application database ownership', () => {
       },
       {
         name: 'realtime',
-        close: async () => {
+        close: () => {
           events.push('realtime');
+          return Promise.resolve();
         },
       },
     ]);
@@ -52,9 +70,9 @@ describe('application database ownership', () => {
 
   it('closes the shared client and other modules even when one cleanup fails', async () => {
     const failure = new Error('worker close failed');
-    const prisma = { $disconnect: vi.fn(async () => undefined) };
-    const other = vi.fn(async () => undefined);
-    const close = closeApplicationDatabase(prisma as unknown as PrismaClient, [
+    const prisma = { $disconnect: vi.fn(() => Promise.resolve()) };
+    const other = vi.fn(() => Promise.resolve());
+    const close = closeApplicationDatabase(prisma, [
       {
         name: 'bad',
         close: () => {

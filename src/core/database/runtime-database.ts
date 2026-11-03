@@ -1,6 +1,25 @@
 import type { PrismaClient } from '../../generated/prisma/client.js';
 import type { ShutdownResource } from '../http/lifecycle.js';
 
+export function createApplicationDatabaseResource(
+  prisma: Pick<PrismaClient, '$disconnect'>,
+  resources: readonly ShutdownResource[],
+): ShutdownResource {
+  return {
+    name: 'application-resources',
+    close: closeApplicationDatabase(prisma, resources),
+    forceClose: () => {
+      for (const resource of resources) {
+        try {
+          resource.forceClose?.();
+        } catch {
+          /* Continue best-effort cleanup of every child. */
+        }
+      }
+    },
+  };
+}
+
 /** The composition root owns this client; modules borrow it and drain first. */
 export function closeApplicationDatabase(
   prisma: Pick<PrismaClient, '$disconnect'>,

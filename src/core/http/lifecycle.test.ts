@@ -272,16 +272,16 @@ describe('HTTP lifecycle', () => {
 describe('server startup and process signals', () => {
   it('closes the shared database once when connecting it fails before module startup', async () => {
     sharedDatabase.$connect.mockRejectedValueOnce(new Error('database unreachable'));
-    await expect(bootstrap({ loadConfig: async () => runtimeConfiguration() })).rejects.toThrow(
-      'database unreachable',
-    );
+    await expect(
+      bootstrap({ loadConfig: () => Promise.resolve(runtimeConfiguration()) }),
+    ).rejects.toThrow('database unreachable');
     expect(sharedDatabase.$disconnect).toHaveBeenCalledOnce();
     expect(createIdentityRuntime).not.toHaveBeenCalled();
   });
 
   it('still refuses native startup without a configured database', async () => {
     await expect(
-      bootstrap({ loadConfig: async () => parseEnvironment({ NODE_ENV: 'test' }) }),
+      bootstrap({ loadConfig: () => Promise.resolve(parseEnvironment({ NODE_ENV: 'test' })) }),
     ).rejects.toThrow('DATABASE_URL');
     expect(createPrismaClient).not.toHaveBeenCalled();
   });

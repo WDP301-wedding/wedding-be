@@ -15,7 +15,10 @@ import type { Config } from './config/config.js';
 import { createRuntimeFeatureManifest } from './config/runtime-manifest.js';
 import { EnvironmentConfigurationError } from './config/env.js';
 import { createPrismaClient } from './core/database/prisma.js';
-import { closeApplicationDatabase } from './core/database/runtime-database.js';
+import {
+  closeApplicationDatabase,
+  createApplicationDatabaseResource,
+} from './core/database/runtime-database.js';
 import { startMemoryMonitor } from './core/observability/memory-monitor.js';
 import {
   createDatabaseReadiness,
@@ -344,7 +347,9 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
     try {
       await closeDatabase();
     } catch (cleanupError) {
-      throw new AggregateError([error, cleanupError], 'Startup and database cleanup failed.');
+      throw new AggregateError([error, cleanupError], 'Startup and database cleanup failed.', {
+        cause: cleanupError,
+      });
     }
     throw error;
   }
@@ -572,38 +577,35 @@ async function startApplication(
       );
     },
     resources: [
-      {
-        name: 'application-resources',
-        close: closeApplicationDatabase(
-          { $disconnect: closeDatabase },
-          tracingResource === undefined
-            ? [
-                realtimeResource,
-                analyticsRuntime.resource,
-                notificationsRuntime.resource,
-                databaseReadiness.resource,
-                guestManagementRuntime.resource,
-                identityRuntime.resource,
-                venueCatalogRuntime.resource,
-                bookingLifecycleRuntime.resource,
-                invitationStudioRuntime.resource,
-                paymentsBillingRuntime.resource,
-              ]
-            : [
-                realtimeResource,
-                analyticsRuntime.resource,
-                notificationsRuntime.resource,
-                databaseReadiness.resource,
-                tracingResource,
-                guestManagementRuntime.resource,
-                identityRuntime.resource,
-                venueCatalogRuntime.resource,
-                invitationStudioRuntime.resource,
-                bookingLifecycleRuntime.resource,
-                paymentsBillingRuntime.resource,
-              ],
-        ),
-      },
+      createApplicationDatabaseResource(
+        { $disconnect: closeDatabase },
+        tracingResource === undefined
+          ? [
+              realtimeResource,
+              analyticsRuntime.resource,
+              notificationsRuntime.resource,
+              databaseReadiness.resource,
+              guestManagementRuntime.resource,
+              identityRuntime.resource,
+              venueCatalogRuntime.resource,
+              bookingLifecycleRuntime.resource,
+              invitationStudioRuntime.resource,
+              paymentsBillingRuntime.resource,
+            ]
+          : [
+              realtimeResource,
+              analyticsRuntime.resource,
+              notificationsRuntime.resource,
+              databaseReadiness.resource,
+              tracingResource,
+              guestManagementRuntime.resource,
+              identityRuntime.resource,
+              venueCatalogRuntime.resource,
+              invitationStudioRuntime.resource,
+              bookingLifecycleRuntime.resource,
+              paymentsBillingRuntime.resource,
+            ],
+      ),
     ],
     registerBodyParsers: (app) => {
       app.use(createGuestImportBodyParser());
