@@ -67,7 +67,7 @@ All POSTs require Idempotency-Key; financial writes retain booking serialization
 - [x] Couple many-design creation/selection and server preview/consent UI.
 - [x] Manager appendix approval/print previews and effective-order tracking.
 - [x] OpenAPI/client regeneration, integration and authorization/race/money tests.
-- [x] Typecheck, changed-file lint, focused suites and desktop/mobile inspection.
+- [x] Typecheck, full-repository lint, focused suites and desktop/mobile inspection.
 - [ ] Full repository suites pass: broad runs still have unresolved failures;
       see the verification evidence. No checks or thresholds were weakened.
 

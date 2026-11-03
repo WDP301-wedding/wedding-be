@@ -36,8 +36,8 @@ the native worker termination remains unexplained.
 
 Backend focused unit tests: 27 passed across four files, including new request
 schema/price tests and unpublished invitation PDF rendering. Typecheck, build,
-changed-file ESLint and OpenAPI consistency pass. Logs: `print-targeted-unit.log`,
-`print-typecheck-final.log`, `print-build-final.log`, `print-changed-lint.log`,
+full-repository ESLint and OpenAPI consistency pass. Logs: `print-targeted-unit.log`,
+`print-typecheck-final.log`, `print-build-final.log`, `print-lint-final.log`,
 `print-api-check.log`.
 
 Couple focused tests: 18 passed across five files, including multi-design save,
@@ -48,6 +48,12 @@ clients pass typecheck, full-repository ESLint and production compilation. Manag
 compilation uses a synthetic HTTPS API URL to satisfy its existing production URL
 guard; this is not a deployed API test. Client logs are the ignored
 `test-results-print-*.log` files in their respective repositories.
+
+Local implementation commits: backend `7209869`, Couple `211611e`, Manager
+`185b373`. Both generated clients pin backend commit
+`7209869bebaa0bd048b877173d262840b5f1e2b0` and OpenAPI SHA-256
+`deb0e1de90d36cfd8a83b94b1cc63a5e21303ae07ed92e40a4b3254c144668ea`;
+both API consistency checks pass.
 
 ## Browser and PDF inspection
 
