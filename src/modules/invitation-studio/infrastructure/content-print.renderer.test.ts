@@ -77,6 +77,15 @@ const render = (content: ReturnType<typeof seatingPrintFixture>) =>
     images: new Map(),
   });
 describe('Content-tab print renderer', () => {
+  it('keeps simultaneous multi-design PDF reads isolated while sharing bounded renderer capacity', async () => {
+    const first = seatingPrintFixture(),
+      second = seatingPrintFixture();
+    second.design.title = 'Save Our Date · Khoảnh Khắc Gắn Kết';
+    const [a, b] = await Promise.all([render(first), render(second)]);
+    expect((await PDFDocument.load(a.bytes)).getTitle()).toBe(first.design.title);
+    expect((await PDFDocument.load(b.bytes)).getTitle()).toBe(second.design.title);
+    expect(a.sha256).not.toBe(b.sha256);
+  }, 20000);
   it('bounds the combined decoded image size before launching the browser', async () => {
     const content = seatingPrintFixture();
     const ids = [randomUUID(), randomUUID()];

@@ -156,15 +156,15 @@ export async function renderContentPrintPdf(input: {
   createdAt: Date;
   images: readonly Image[];
 }) {
-  const qr = input.content.genericQrPayload
-    ? await QRCode.toDataURL(input.content.genericQrPayload, {
-        errorCorrectionLevel: 'M',
-        width: 400,
-      })
-    : undefined;
-  const html = contentPrintHtml(input.content, input.images, qr);
   await acquire();
   try {
+    const qr = input.content.genericQrPayload
+      ? await QRCode.toDataURL(input.content.genericQrPayload, {
+          errorCorrectionLevel: 'M',
+          width: 400,
+        })
+      : undefined;
+    const html = contentPrintHtml(input.content, input.images, qr);
     const instance = await browser();
     const context = await instance.newContext({
       javaScriptEnabled: false,
