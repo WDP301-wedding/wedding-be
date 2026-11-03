@@ -28,7 +28,7 @@ describe('Prisma catalog version repository', () => {
   it.each(['DISH', 'MENU_PACKAGE'] as const)(
     'soft-deletes %s with revision protection and audit',
     async (kind) => {
-      const auditCreate = vi.fn(() => Promise.resolve({}));
+      const auditCreate = vi.fn((input: unknown) => Promise.resolve(input));
       const query = vi.fn(() => Promise.resolve([{ revision: 5 }]));
       const repository = createPrismaCatalogVersionRepository(
         prismaWithTransaction({
@@ -45,9 +45,9 @@ describe('Prisma catalog version repository', () => {
           context: context(),
         }),
       ).resolves.toEqual({ revision: 5 });
-      expect(auditCreate).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ action: 'catalog.archived' }) }),
-      );
+      expect(auditCreate.mock.calls[0]?.[0]).toMatchObject({
+        data: { action: 'catalog.archived' },
+      });
     },
   );
 

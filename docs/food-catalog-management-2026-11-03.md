@@ -45,3 +45,30 @@ database and verifies deletion races, stale revisions, hidden lists, blocked
 restoration/edit/publication and unchanged exact menu snapshots. HTTP tests cover
 authorization and request validation. These checks do not claim cloud deployment
 or live external-provider readiness.
+
+Verified results:
+
+- Backend typecheck, lint, build and OpenAPI generation/check passed.
+- 31 HTTP/repository tests passed; 2 PostgreSQL behavior tests passed, including
+  fresh-database migration rehearsal and concurrent deletion.
+- Venue suite: 131 passed, 1 existing PRINT-facts assertion failed. That same
+  failure and all 5 contract-suite failures reproduce at baseline `7ed1a1c`.
+- Full backend test command was attempted and remains non-green: the overall
+  integration harness needs its own valid migration configuration, alongside
+  unrelated pre-existing behavior assertions. This is not full-suite acceptance.
+- Manage-web: typecheck, lint, production build, API check and 28 catalog/typography
+  tests passed. The full suite had 245 passed and 7 failures in consultation,
+  billing-access and account-OTP tests. The identical 7 failures reproduce in a
+  detached baseline worktree at `10f63cd` (29 other tests passed).
+- Browser against real local HTTP/PostgreSQL verified creation, publication,
+  published-version editing, menu dish ordering, read-only details, both lifecycle
+  directions, confirmed DELETE 200 for dish/menu, persistence after reload,
+  current-only media options, search/filter, Escape/focus return and no horizontal
+  overflow at 320/768/1440 pixels. Console had no errors after authenticated reload;
+  one development Socket.IO reconnect warning remains.
+
+The original demo account's saved password did not match its existing verifier.
+A separate synthetic `catalog-manager@demo.example` was created without changing
+that existing account. Local-only credentials are in ignored
+`.local-demo/catalog-login.json`. Screenshots and baseline JSON reports are also
+under ignored `.local-demo/`; do not commit credentials or raw session traffic.

@@ -244,8 +244,8 @@ describe('FT-V3 venue catalog HTTP contract', () => {
       expect(result.body).toEqual({ data: { revision: 2 } });
       const archive =
         resource === 'dishes'
-          ? catalogServices.menu.archiveDish
-          : catalogServices.menu.archiveMenuPackage;
+          ? mockedService(catalogServices.menu).archiveDish
+          : mockedService(catalogServices.menu).archiveMenuPackage;
       expect(archive).toHaveBeenCalledOnce();
     },
   );

@@ -14,9 +14,9 @@ describeWithDatabase('Food catalog soft deletion', () => {
     const prisma = database.prisma;
     const service = createMenuService(prisma);
     const queries = createCatalogQueryService(prisma, {
-      listSigned: async () => [],
-      listSignedBatch: async () => new Map(),
-      listSignedHallPage: async () => ({ items: [], nextCursor: null }),
+      listSigned: () => Promise.resolve([]),
+      listSignedBatch: () => Promise.resolve(new Map()),
+      listSignedHallPage: () => Promise.resolve({ items: [], nextCursor: null }),
     });
     const context = { actorId: randomUUID(), requestId: randomUUID() };
     const dishId = randomUUID(),
