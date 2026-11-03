@@ -1,5 +1,13 @@
 # Backend Revision Tasks: 2026-10-10
 
+## Owner-authorized multi-design print appendix amendment — 2026-11-04
+
+New scoped continuation (includes wedding-web and wedding-manage-web, excludes
+mobile). Detailed checklist and verification are in
+[print appendix flow](../docs/print-appendix-flow-2026-11-04.md). Older completed
+SPEC/RV evidence remains historical; local verification does not close provider
+or deployment readiness gates.
+
 Business scope confirmed by the owner. Implementation below is pending unless
 checked with evidence. This is the active backlog for the commercial/profile
 extensions and SPEC-06 onward; supersedes older mixed backend/frontend outlines.

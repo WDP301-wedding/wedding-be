@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import type { z } from 'zod';
 import type { createBookingBoundaryUnitOfWork } from '../../../core/database/booking-unit-of-work.js';
 import { NotFoundError } from '../../../core/errors/app-error.js';
-import type { PrismaClient, Prisma } from '../../../generated/prisma/client.js';
+import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
 import type { AuthenticatedActor } from '../../identity-access/authorization/authenticated-actor.middleware.js';
 import {
   createConsultationAccessReader,
@@ -21,6 +21,13 @@ import {
 } from '../domain/commercial-appendix.js';
 import { createEffectiveCommercialReader } from '../infrastructure/effective-commercial.reader.js';
 import { retryCommercialWrite } from '../infrastructure/commercial-write.retry.js';
+import {
+  appendixPrintRequests,
+  linkPrintRequestSuccessors,
+  resolveRequestPrintSelections,
+  synchronizeAppendixPrintOrders,
+  requirePrintRequestChangesAllowed,
+} from '../../invitation-studio/infrastructure/appendix-print-orders.js';
 
 const include = { approvals: { orderBy: { party: 'asc' as const } } } as const;
 type Stored = Prisma.CommercialAppendixRevisionGetPayload<{ include: typeof include }>;
@@ -288,13 +295,27 @@ export function createCommercialAppendixService(options: Options) {
               : []),
           ]),
         );
+        const retainedPrintRequests = await client.invitationPrintRequest.findMany({
+          where: { bookingId },
+        });
         return {
           bookingId,
           bookingRevision: booking.revision,
           currentRevisionId: head?.currentRevisionId ?? null,
           effectiveRevisionId,
           effectiveTotalVnd,
-          revisions: rows.slice(0, 50).map((row) => view(row, printOrders.get(row.id))),
+          revisions: await Promise.all(
+            rows.slice(0, 50).map(async (row) => ({
+              ...view(row, printOrders.get(row.id)),
+              printRequests: await appendixPrintRequests(
+                client,
+                bookingId,
+                booking.revision,
+                row,
+                retainedPrintRequests,
+              ),
+            })),
+          ),
           nextCursor: rows.length > 50 ? rows[49]!.id : null,
         };
       });
@@ -328,10 +349,19 @@ export function createCommercialAppendixService(options: Options) {
             (s) =>
               !frozenMap.has(`${s.category}:${s.sourceId}:${s.sourceRevisionId}:${s.quantity}`),
           );
+          const requestPrint = await resolveRequestPrintSelections(
+            client,
+            bookingId,
+            unfrozenSelections,
+          );
+          const catalogueSelections = unfrozenSelections.filter(
+            (s) => !requestPrint.has(s.category + s.sourceId),
+          );
           const resolvedUnfrozen =
-            unfrozenSelections.length > 0
-              ? await catalog.requireSelections(unfrozenSelections, restaurant.id)
+            catalogueSelections.length > 0
+              ? await catalog.requireSelections(catalogueSelections, restaurant.id)
               : new Map<string, (typeof effective.lines)[number]>();
+          for (const [key, value] of requestPrint) resolvedUnfrozen.set(key, value);
           const afterLines = input.lines.map((l) => {
             const frozen = frozenMap.get(
               `${l.category}:${l.sourceId}:${l.sourceRevisionId}:${l.quantity}`,
@@ -385,6 +415,7 @@ export function createCommercialAppendixService(options: Options) {
             where: { bookingId },
             data: { currentRevisionId: row.id },
           });
+          await linkPrintRequestSuccessors(client, bookingId, row.id, document.afterLines);
           return row;
         },
         'created',
@@ -417,10 +448,16 @@ export function createCommercialAppendixService(options: Options) {
             (line) => !beforeSet.has(JSON.stringify(line)),
           );
           if (changedLines.length > 0) {
-            const resolvedMap = await catalog.requireSelections(
+            const requestPrint = await resolveRequestPrintSelections(
+              client,
+              bookingId,
               changedLines,
+            );
+            const resolvedMap = await catalog.requireSelections(
+              changedLines.filter((l) => !requestPrint.has(l.category + l.sourceId)),
               original.restaurantId,
             );
+            for (const [key, value] of requestPrint) resolvedMap.set(key, value);
             for (const line of changedLines) {
               const resolved = resolvedMap.get(line.category + line.sourceId);
               if (!resolved || JSON.stringify(resolved) !== JSON.stringify(line))
@@ -454,22 +491,33 @@ export function createCommercialAppendixService(options: Options) {
           if (row.state !== 'AWAITING_APPROVAL')
             throw commercialConflict('APPENDIX_APPROVAL_REQUIRED');
           if (
+            appendixDigest(appendixDocumentSchema.parse(row.document)) !== row.documentDigest ||
+            row.approvals.some((a) => a.documentDigest !== row.documentDigest)
+          )
+            throw commercialConflict('FINANCIAL_SOURCE_CONFLICT');
+          if (
             row.approvals.some(
               (a) => a.party === access.party || a.actorAccountId === actor.accountId,
             )
           )
             throw commercialConflict('COMMERCIAL_APPROVAL_CONFLICT');
-          await client.commercialAppendixApproval.create({
-            data: {
-              id: randomUUID(),
-              revisionId,
-              party: access.party,
-              actorAccountId: actor.accountId,
-              documentDigest: row.documentDigest,
-              requestId,
-              occurredAt: now(),
-            },
-          });
+          try {
+            await client.commercialAppendixApproval.create({
+              data: {
+                id: randomUUID(),
+                revisionId,
+                party: access.party,
+                actorAccountId: actor.accountId,
+                documentDigest: row.documentDigest,
+                requestId,
+                occurredAt: now(),
+              },
+            });
+          } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002')
+              throw commercialConflict('COMMERCIAL_APPROVAL_CONFLICT');
+            throw error;
+          }
           if (row.approvals.length === 0)
             return client.commercialAppendixRevision.findUniqueOrThrow({
               where: { id: revisionId },
@@ -478,6 +526,11 @@ export function createCommercialAppendixService(options: Options) {
           await options
             .fulfillment(client)
             .requirePreserved(bookingId, appendixDocumentSchema.parse(row.document).afterLines);
+          await requirePrintRequestChangesAllowed(
+            client,
+            bookingId,
+            appendixDocumentSchema.parse(row.document).afterLines,
+          );
           const approved = await client.commercialAppendixRevision.update({
             where: { id: revisionId },
             data: { state: 'APPROVED', approvedAt: now() },
@@ -488,6 +541,13 @@ export function createCommercialAppendixService(options: Options) {
             where: { bookingId },
             data: { effectiveRevisionId: revisionId },
           });
+          await synchronizeAppendixPrintOrders(
+            client,
+            bookingId,
+            revisionId,
+            appendixDocumentSchema.parse(row.document).afterLines,
+            scoped,
+          );
           return approved;
         },
         'approved',

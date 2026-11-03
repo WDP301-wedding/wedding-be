@@ -19,6 +19,7 @@ import { PrintFileService } from './print-file.service.js';
 import { PrintOrderService } from './print-order.service.js';
 import { createContractedPrintFulfillment } from './contracted-print.providers.js';
 import { PrintPurchaseService } from './print-purchase.service.js';
+import { PrintRequestService } from './print-request.service.js';
 import { PrismaInvitationAutomationReader } from './prisma-automation.reader.js';
 import { PrismaInvitationReportingReader } from './prisma-reporting.reader.js';
 import { ImageJobsService } from './image-jobs.service.js';
@@ -106,6 +107,7 @@ export function createInvitationStudioServices(
     printable,
     billing,
     printOrders,
+    printRequests: new PrintRequestService(repository, authorization, printable, now),
     printPurchases: new PrintPurchaseService(
       repository,
       authorization,

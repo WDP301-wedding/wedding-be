@@ -7,6 +7,7 @@ import {
 import { publicSeating, publicSeatingSchema } from '../domain/public-invitation.js';
 import { contractContext } from '../infrastructure/studio.repository.js';
 import { Router, type RequestHandler, type Request, type Response } from 'express';
+import * as printRequests from '../domain/print-request.js';
 import { z } from 'zod';
 import {
   AuthenticationRequiredError,
@@ -58,7 +59,14 @@ export function createPrintOrdersRouter(
       .catch(next);
   };
 
-  router.use(['/bookings/:bookingId/print-orders', '/management/print-orders'], auth);
+  router.use(
+    [
+      '/bookings/:bookingId/print-orders',
+      '/bookings/:bookingId/print-requests',
+      '/management/print-orders',
+    ],
+    auth,
+  );
 
   function route(
     method: 'get' | 'post' | 'patch' | 'delete',
@@ -73,6 +81,53 @@ export function createPrintOrdersRouter(
         .catch(next);
     });
   }
+
+  route(
+    'post',
+    '/bookings/:bookingId/print-requests/price-preview',
+    z.object({ data: printRequests.printRequestQuoteSchema }),
+    (req, res) => {
+      const { bookingId } = parseStudio(bookParams, req.params);
+      return services.printRequests.preview(bookingId, req.body, key(req), context(res));
+    },
+  );
+  route(
+    'post',
+    '/bookings/:bookingId/print-requests/confirm',
+    printRequests.printRequestResponseSchema,
+    (req, res) => {
+      const { bookingId } = parseStudio(bookParams, req.params);
+      return services.printRequests.confirm(bookingId, req.body, key(req), context(res));
+    },
+    201,
+  );
+  route(
+    'get',
+    '/bookings/:bookingId/print-requests',
+    printRequests.printRequestsResponseSchema,
+    (req, res) => {
+      const { bookingId } = parseStudio(bookParams, req.params);
+      return services.printRequests.list(bookingId, context(res));
+    },
+  );
+  route(
+    'post',
+    '/bookings/:bookingId/print-requests/:requestId/withdraw',
+    printRequests.printRequestResponseSchema,
+    (req, res) => {
+      const { bookingId, requestId } = parseStudio(
+        bookParams.extend({ requestId: id }),
+        req.params,
+      );
+      return services.printRequests.withdraw(
+        bookingId,
+        requestId,
+        req.body,
+        key(req),
+        context(res),
+      );
+    },
+  );
 
   route(
     'post',
@@ -284,7 +339,9 @@ export function createPrintOrdersRouter(
     (req, res) => {
       const { orderId } = parseStudio(orderParams, req.params);
       const body = parseStudio(schemas.transitionOrderBodySchema, req.body);
-      return services.printOrders.startProduction(orderId, body, key(req), context(res));
+      return services.printOrders
+        .startProduction(orderId, body, key(req), context(res))
+        .then((order) => services.printOrders.getPrintOrder(null, order.orderId, context(res)));
     },
   );
 
@@ -296,7 +353,9 @@ export function createPrintOrdersRouter(
     (req, res) => {
       const { orderId } = parseStudio(orderParams, req.params);
       const body = parseStudio(schemas.transitionOrderBodySchema, req.body);
-      return services.printOrders.markReadyForHandover(orderId, body, key(req), context(res));
+      return services.printOrders
+        .markReadyForHandover(orderId, body, key(req), context(res))
+        .then((order) => services.printOrders.getPrintOrder(null, order.orderId, context(res)));
     },
   );
 
@@ -308,7 +367,9 @@ export function createPrintOrdersRouter(
     (req, res) => {
       const { orderId } = parseStudio(orderParams, req.params);
       const body = parseStudio(schemas.handoverOrderBodySchema, req.body);
-      return services.printOrders.markHandedOver(orderId, body, key(req), context(res));
+      return services.printOrders
+        .markHandedOver(orderId, body, key(req), context(res))
+        .then((order) => services.printOrders.getPrintOrder(null, order.orderId, context(res)));
     },
   );
 

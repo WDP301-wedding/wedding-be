@@ -53,6 +53,22 @@ const render = (c: ReturnType<typeof content>, images: Map<string, Uint8Array> =
     images,
   });
 describe('accepted A5 immutable print renderer', () => {
+  it('renders a retained private design without publishing an invitation or printing a dead QR', async () => {
+    const snapshot = {
+      ...content(),
+      genericQrPayload: null,
+      publicInvitationId: null,
+      publishedRevisionId: null,
+    };
+    const result = await renderPrintablePdf({
+      content: snapshot,
+      contentDigest: digest(snapshot),
+      createdAt: new Date('2026-11-04T00:00:00Z'),
+      images: new Map(),
+    });
+    expect(result.bytes.toString('latin1').match(/\/Type \/Page\b/gu)).toHaveLength(2);
+    expect(result.bytes.subarray(0, 4).toString()).toBe('%PDF');
+  });
   it('renders exact round/rotated rectangle geometry with shared Vietnamese Group legend', async () => {
     const c = content(),
       groupId = randomUUID();

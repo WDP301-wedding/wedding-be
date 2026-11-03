@@ -35,9 +35,10 @@ export const printableFileContentSchema = z
     genericQrPayload: z
       .url()
       .max(512)
-      .refine((value) => /^https?:\/\//u.test(value)),
-    publicInvitationId: id,
-    publishedRevisionId: id,
+      .refine((value) => /^https?:\/\//u.test(value))
+      .nullable(),
+    publicInvitationId: id.nullable(),
+    publishedRevisionId: id.nullable(),
   })
   .refine((v) => v.design.includesSeating === (v.seating !== null));
 export function printLimit(code: 'PRINT_CONTENT_OVERFLOW' | 'PRINT_ASSET_LIMIT'): never {
@@ -173,18 +174,20 @@ export async function renderPrintablePdf(input: {
   text(content.design.textFields.footer);
   if (content.seating !== null)
     y = renderSeating(pdf, content.seating.renderSnapshot, { left, top: y, width, bottom });
-  const qr = QRCode.create(content.genericQrPayload, { errorCorrectionLevel: 'M' });
-  const qrSize = mm(30),
-    cell = qrSize / (qr.modules.size + 8);
-  const x = (mm(154) - qrSize) / 2,
-    top = mm(172);
-  pdf.rect(x, top, qrSize, qrSize).fill('#ffffff');
-  pdf.fillColor('#000000');
-  for (let row = 0; row < qr.modules.size; row++)
-    for (let col = 0; col < qr.modules.size; col++) {
-      if (qr.modules.get(row, col))
-        pdf.rect(x + (col + 4) * cell, top + (row + 4) * cell, cell, cell).fill();
-    }
+  if (content.genericQrPayload) {
+    const qr = QRCode.create(content.genericQrPayload, { errorCorrectionLevel: 'M' });
+    const qrSize = mm(30),
+      cell = qrSize / (qr.modules.size + 8);
+    const x = (mm(154) - qrSize) / 2,
+      top = mm(172);
+    pdf.rect(x, top, qrSize, qrSize).fill('#ffffff');
+    pdf.fillColor('#000000');
+    for (let row = 0; row < qr.modules.size; row++)
+      for (let col = 0; col < qr.modules.size; col++) {
+        if (qr.modules.get(row, col))
+          pdf.rect(x + (col + 4) * cell, top + (row + 4) * cell, cell, cell).fill();
+      }
+  }
   const chunks: Buffer[] = [];
   let outputSize = 0;
   const complete = new Promise<Buffer>((resolve, reject) => {

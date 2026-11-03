@@ -254,6 +254,15 @@ export function createFinalInvoiceService(options: Options) {
           select: { id: true },
         });
         if (pendingPrint) throw commercialConflict('PRINT_ORDERS_PENDING');
+        const pendingAppendix = await client.commercialAppendixHead.findUnique({
+          where: { bookingId },
+          include: { currentRevision: true },
+        });
+        if (
+          pendingAppendix?.currentRevision &&
+          ['DRAFT', 'AWAITING_APPROVAL'].includes(pendingAppendix.currentRevision.state)
+        )
+          throw commercialConflict('APPENDIX_APPROVAL_REQUIRED');
         const draft = await readExpenseDraft(client, bookingId);
         if (draft.revision !== input.expectedDraftRevision)
           throw commercialConflict('EXPENSE_REVISION_STALE');
