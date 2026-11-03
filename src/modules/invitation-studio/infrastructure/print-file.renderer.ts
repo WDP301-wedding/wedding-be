@@ -15,6 +15,7 @@ import {
   seatingRenderSchema,
 } from '../domain/studio-policy.js';
 import { renderSeating } from './seating-print.renderer.js';
+import { renderContentPrintPdf } from './content-print.renderer.js';
 
 export const PRINT_RENDERER_VERSION = 'invitation-a5-v1';
 export const SEATING_PRINT_RENDERER_VERSION = 'invitation-a5-v2-seating';
@@ -27,6 +28,12 @@ const regular = font('BeVietnamPro-Regular'),
   bold = font('BeVietnamPro-SemiBold');
 export const printableFileContentSchema = z
   .strictObject({
+    renderer: z
+      .strictObject({
+        version: z.literal('invitation-content-v1'),
+        digest: z.string().regex(/^[a-f0-9]{64}$/u),
+      })
+      .optional(),
     design: designContentSchema,
     timeline: approvedTimelineSnapshotSchema,
     seating: z
@@ -77,6 +84,7 @@ export async function renderPrintablePdf(input: {
   if (ids.length > 8 || input.images.size !== ids.length) printLimit('PRINT_ASSET_LIMIT');
   const images: Array<{ bytes: Buffer; width: number; height: number }> = [];
   let size = 0;
+  let decodedPixels = 0;
   for (const assetId of ids) {
     const bytes = input.images.get(assetId);
     if (bytes === undefined) throw new ProviderError('failure');
@@ -95,13 +103,17 @@ export async function renderPrintablePdf(input: {
         (metadata.pages ?? 1) !== 1
       )
         throw new Error('Invalid image');
+      decodedPixels += metadata.width * metadata.height;
+      if (content.renderer && decodedPixels > 40000000) printLimit('PRINT_ASSET_LIMIT');
       // Decode all pixels before PDFKit embeds the retained PNG.
       await image.raw().toBuffer();
       images.push({ bytes: Buffer.from(bytes), width: metadata.width, height: metadata.height });
-    } catch {
+    } catch (error) {
+      if (error instanceof AppError) throw error;
       throw new ProviderError('failure');
     }
   }
+  if (content.renderer) return renderContentPrintPdf({ ...input, content, images });
   const pdf = new PDFDocument({
     autoFirstPage: false,
     bufferPages: true,

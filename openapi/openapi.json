@@ -27998,7 +27998,7 @@
     },
     "/bookings/{bookingId}/printable-revisions/{printableRevisionId}/file": {
       "get": {
-        "description": "Two pages, 148x210 mm trim, 3 mm bleed, embedded Vietnamese fonts, raster placement at least 300 dpi, 30 mm vector generic QR with quiet zone. invitation-a5-v1 for existing invitations without Seating; invitation-a5-v2-seating renders retained fixed geometry, table labels and a textual Group/color legend. No current-design fallback or extra charge. 8 PNG assets/16 MiB images/12 MiB PDF; oversized or illegible content fails 422. Retained checksum failures fail 502/503. Existing confirmed-booking Invitation access policy applies.",
+        "description": "New captures pin the invitation-content-v1 renderer and immutable web-artifact digest. The PDF uses the Content-tab components, theme, photos and exact Seating SVG/Group legend, with A5 reading pages and a separate Seating page (at most 24 pages). Published invitations retain a 30 mm generic QR; unpublished designs have no dead QR. Embedded Vietnamese fonts; 8 PNG assets/16 MiB images/12 MiB PDF. Historical snapshots without a renderer marker retain their original two-sided A5 PDFKit path, trim and bleed. No current-design fallback, new consent or extra charge on reads. Oversized content fails 422; bounded renderer capacity returns PRINT_RENDERER_BUSY/503. Existing confirmed-booking Invitation access policy applies.",
         "operationId": "getPrintableInvitationFile",
         "parameters": [
           {

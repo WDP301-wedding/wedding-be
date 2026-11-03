@@ -29,6 +29,7 @@ import {
   studioConflict,
 } from '../domain/studio-policy.js';
 import { type StudioRepository, asJson } from './studio.repository.js';
+import { CURRENT_CONTENT_PRINT_ENGINE } from './content-print.renderer.js';
 
 const captureSchema = z.strictObject({ bookingId: id, designRevisionId: id });
 export class PrintableService implements PrintableSeatingContentRegistry {
@@ -311,6 +312,7 @@ export class PrintableService implements PrintableSeatingContentRegistry {
     } | null = null;
     if (design.includesSeating) seating = await this.readSeating(input.bookingId, context);
     const content = {
+      renderer: CURRENT_CONTENT_PRINT_ENGINE,
       design,
       timeline,
       seating,

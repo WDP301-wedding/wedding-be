@@ -14,6 +14,8 @@ export default defineConfig(
     '.local-demo/**',
     'output/**',
     'src/generated/prisma/**',
+    // Hash-pinned generated web artifact; its canonical source is linted in wedding-web.
+    'assets/invitation-print/**',
   ]),
   {
     linterOptions: {

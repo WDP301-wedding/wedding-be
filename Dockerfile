@@ -30,6 +30,7 @@ RUN npm run db:generate && npm run build
 FROM base AS runtime
 
 ENV NODE_ENV=production
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 # Prisma CLI and tsx remain available for the pre-deploy migration command.
 COPY --from=build --chown=node:node /app/node_modules ./node_modules
@@ -37,6 +38,9 @@ COPY --from=build --chown=node:node /app/dist ./dist
 COPY --from=build --chown=node:node /app/prisma ./prisma
 COPY --from=build --chown=node:node /app/prisma.config.ts ./prisma.config.ts
 COPY --from=build --chown=node:node /app/package.json /app/package-lock.json ./
+# Exact browser revision follows the locked playwright-core package. No live web
+# navigation is allowed by the renderer; only retained HTML, fonts and PNGs load.
+RUN npx playwright-core install --with-deps --only-shell chromium
 COPY --chown=node:node openapi ./openapi
 COPY --chown=node:node certs/railway-spec11-root-ca.crt ./certs/railway-spec11-root-ca.crt
 COPY --chown=node:node assets ./assets
