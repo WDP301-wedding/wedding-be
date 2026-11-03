@@ -1,3 +1,6 @@
+import type { StorageProvider } from '../../../integrations/storage/storage-provider.js';
+import { withClonedFoodMedia } from './food-media-clone.js';
+
 import { AppError, NotFoundError } from '../../../core/errors/app-error.js';
 import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
 import {
@@ -163,6 +166,7 @@ type Transaction = Prisma.TransactionClient;
 export function createMenuService(
   prisma: PrismaClient,
   versions: CatalogVersionRepository = createPrismaCatalogVersionRepository(prisma),
+  storage?: StorageProvider,
 ): MenuService {
   const service: MenuService = {
     archiveDish(input) {
@@ -211,37 +215,45 @@ export function createMenuService(
 
     async cloneDishVersion(input) {
       try {
-        await prisma.$transaction(async (transaction) => {
-          const source = await transaction.dishVersion.findFirst({
-            where: {
-              id: input.sourceVersionId,
-              dishId: input.dishId,
-              state: { in: ['PUBLISHED', 'SUPERSEDED'] },
-            },
-          });
-          if (source === null) throw new MenuCatalogConflictError('CATALOG_DRAFT_CONFLICT');
-          await transaction.dishVersion.create({
-            data: {
-              id: input.versionId,
-              dishId: input.dishId,
-              name: source.name,
-              description: source.description,
-              categoryLabel: source.categoryLabel,
-              priceVnd: source.priceVnd,
-              createdByAccountId: input.context.actorId,
-            },
-          });
-          const claimed = await transaction.dish.updateMany({
-            where: { id: input.dishId, lifecycle: 'ACTIVE', draftVersionId: null },
-            data: {
-              draftVersionId: input.versionId,
-              revision: { increment: 1 },
-              updatedByAccountId: input.context.actorId,
-            },
-          });
-          if (claimed.count !== 1) throw new MenuCatalogConflictError('CATALOG_DRAFT_CONFLICT');
-          await appendCloneAudit(transaction, input.context, 'dish', input);
+        const source = await prisma.dishVersion.findFirst({
+          where: {
+            id: input.sourceVersionId,
+            dishId: input.dishId,
+            state: { in: ['PUBLISHED', 'SUPERSEDED'] },
+          },
         });
+        if (source === null) throw new MenuCatalogConflictError('CATALOG_DRAFT_CONFLICT');
+        await withClonedFoodMedia(
+          prisma,
+          storage,
+          'DISH_VERSION',
+          input,
+          async (transaction, assets) => {
+            await transaction.dishVersion.create({
+              data: {
+                id: input.versionId,
+                dishId: input.dishId,
+                name: source.name,
+                description: source.description,
+                categoryLabel: source.categoryLabel,
+                priceVnd: source.priceVnd,
+                createdByAccountId: input.context.actorId,
+              },
+            });
+            const claimed = await transaction.dish.updateMany({
+              where: { id: input.dishId, lifecycle: 'ACTIVE', draftVersionId: null },
+              data: {
+                draftVersionId: input.versionId,
+                revision: { increment: 1 },
+                updatedByAccountId: input.context.actorId,
+              },
+            });
+            if (claimed.count !== 1) throw new MenuCatalogConflictError('CATALOG_DRAFT_CONFLICT');
+            if (assets.length > 0)
+              await transaction.catalogMediaAsset.createMany({ data: [...assets] });
+            await appendCloneAudit(transaction, input.context, 'dish', input);
+          },
+        );
       } catch (error: unknown) {
         throw mapDraftConflict(error);
       }
@@ -343,38 +355,46 @@ export function createMenuService(
 
     async cloneMenuPackageVersion(input) {
       try {
-        await prisma.$transaction(async (transaction) => {
-          const source = await transaction.menuPackageVersion.findFirst({
-            where: {
-              id: input.sourceVersionId,
-              menuPackageId: input.menuPackageId,
-              state: { in: ['PUBLISHED', 'SUPERSEDED'] },
-            },
-            include: { items: { orderBy: { displayOrder: 'asc' } } },
-          });
-          if (source === null) throw new MenuCatalogConflictError('CATALOG_DRAFT_CONFLICT');
-          await transaction.menuPackageVersion.create({
-            data: {
-              id: input.versionId,
-              menuPackageId: input.menuPackageId,
-              name: source.name,
-              description: source.description,
-              priceVndPerTable: source.priceVndPerTable,
-              createdByAccountId: input.context.actorId,
-            },
-          });
-          await replaceMenuItems(transaction, input.versionId, source.items);
-          const claimed = await transaction.menuPackage.updateMany({
-            where: { id: input.menuPackageId, lifecycle: 'ACTIVE', draftVersionId: null },
-            data: {
-              draftVersionId: input.versionId,
-              revision: { increment: 1 },
-              updatedByAccountId: input.context.actorId,
-            },
-          });
-          if (claimed.count !== 1) throw new MenuCatalogConflictError('CATALOG_DRAFT_CONFLICT');
-          await appendCloneAudit(transaction, input.context, 'menu-package', input);
+        const source = await prisma.menuPackageVersion.findFirst({
+          where: {
+            id: input.sourceVersionId,
+            menuPackageId: input.menuPackageId,
+            state: { in: ['PUBLISHED', 'SUPERSEDED'] },
+          },
+          include: { items: { orderBy: { displayOrder: 'asc' } } },
         });
+        if (source === null) throw new MenuCatalogConflictError('CATALOG_DRAFT_CONFLICT');
+        await withClonedFoodMedia(
+          prisma,
+          storage,
+          'MENU_PACKAGE_VERSION',
+          input,
+          async (transaction, assets) => {
+            await transaction.menuPackageVersion.create({
+              data: {
+                id: input.versionId,
+                menuPackageId: input.menuPackageId,
+                name: source.name,
+                description: source.description,
+                priceVndPerTable: source.priceVndPerTable,
+                createdByAccountId: input.context.actorId,
+              },
+            });
+            await replaceMenuItems(transaction, input.versionId, source.items);
+            const claimed = await transaction.menuPackage.updateMany({
+              where: { id: input.menuPackageId, lifecycle: 'ACTIVE', draftVersionId: null },
+              data: {
+                draftVersionId: input.versionId,
+                revision: { increment: 1 },
+                updatedByAccountId: input.context.actorId,
+              },
+            });
+            if (claimed.count !== 1) throw new MenuCatalogConflictError('CATALOG_DRAFT_CONFLICT');
+            if (assets.length > 0)
+              await transaction.catalogMediaAsset.createMany({ data: [...assets] });
+            await appendCloneAudit(transaction, input.context, 'menu-package', input);
+          },
+        );
       } catch (error: unknown) {
         throw mapDraftConflict(error);
       }

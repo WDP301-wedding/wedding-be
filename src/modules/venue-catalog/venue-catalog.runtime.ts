@@ -64,7 +64,7 @@ export async function createVenueCatalogRuntime(config: Config): Promise<VenueCa
       services: {
         authorizeManager: (accessToken, requestId) => authorizer.authorize(accessToken, requestId),
         venue: createVenueService(prisma),
-        menu: createMenuService(prisma),
+        menu: createMenuService(prisma, undefined, storage),
         timeline: createTimelineService(prisma),
         layout: createLayoutService(prisma),
         media,

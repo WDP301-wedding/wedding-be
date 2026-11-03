@@ -1,5 +1,9 @@
 # Food catalog management, 2026-11-03
 
+Follow-up: the owner subsequently requested [tables, explicit draft/publication
+display, version history and image inheritance](./catalog-food-versions-2026-11-03.md).
+The original delivery and verification below are retained as historical evidence.
+
 Owner requested a manage-web catalog revision and explicitly approved backend soft
 deletion on 2026-11-03. Both repositories use branch
 `codex/catalog-food-usability-20261103`.
