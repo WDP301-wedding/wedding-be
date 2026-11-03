@@ -29,8 +29,9 @@ export async function createNotificationsRuntime(
   config: Config,
   logger: Logger,
   registry: Registry,
+  sharedPrisma?: ReturnType<typeof createPrismaClient>,
 ) {
-  const prisma = createPrismaClient(config.database.url);
+  const prisma = sharedPrisma ?? createPrismaClient(config.database.url);
   try {
     await prisma.$connect();
     await prisma.$queryRaw`SELECT 1`;
@@ -103,12 +104,12 @@ export async function createNotificationsRuntime(
         name: 'notifications-automation',
         close: async () => {
           await worker.close();
-          await prisma.$disconnect();
+          if (!sharedPrisma) await prisma.$disconnect();
         },
       }),
     });
   } catch (error) {
-    await prisma.$disconnect();
+    if (!sharedPrisma) await prisma.$disconnect();
     throw error;
   }
 }

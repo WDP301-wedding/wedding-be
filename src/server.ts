@@ -14,6 +14,9 @@ import {
 import type { Config } from './config/config.js';
 import { createRuntimeFeatureManifest } from './config/runtime-manifest.js';
 import { EnvironmentConfigurationError } from './config/env.js';
+import { createPrismaClient } from './core/database/prisma.js';
+import { closeApplicationDatabase } from './core/database/runtime-database.js';
+import { startMemoryMonitor } from './core/observability/memory-monitor.js';
 import {
   createDatabaseReadiness,
   DATABASE_READINESS_TIMEOUT_MS,
@@ -332,6 +335,26 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
   // Starting the real API without its database must not silently use in-memory data.
   // Programmatic test servers remain available through startServer/createApp.
   if (!config.database.url) throw new EnvironmentConfigurationError(['DATABASE_URL']);
+  const prisma = createPrismaClient(config.database.url, undefined, 'shared-default');
+  const closeDatabase = closeApplicationDatabase(prisma, []);
+  try {
+    await prisma.$connect();
+    return await startApplication(config, prisma, closeDatabase);
+  } catch (error) {
+    try {
+      await closeDatabase();
+    } catch (cleanupError) {
+      throw new AggregateError([error, cleanupError], 'Startup and database cleanup failed.');
+    }
+    throw error;
+  }
+}
+
+async function startApplication(
+  config: Config,
+  sharedPrisma: ReturnType<typeof createPrismaClient>,
+  closeDatabase: () => Promise<void>,
+): Promise<RunningServer> {
   const logger = createLogger({
     level: config.runtime.logLevel,
     runtimeEnvironment: config.runtime.environment,
@@ -362,17 +385,22 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
 
   let realtimeInstance: RealtimeServerInstance | undefined;
   let outboxRelay: OutboxRelayInstance | undefined;
+  let memoryMonitor: ReturnType<typeof startMemoryMonitor> | undefined;
 
-  const identityRuntime = await createIdentityRuntime(config, {
-    ...(redisThrottle !== undefined ? { throttle: redisThrottle } : {}),
-    redisClient: redisManager.getClient(),
-    onSessionRevoked: (sessionId) => {
-      realtimeInstance?.broker.revokeSession(sessionId);
+  const identityRuntime = await createIdentityRuntime(
+    config,
+    {
+      ...(redisThrottle !== undefined ? { throttle: redisThrottle } : {}),
+      redisClient: redisManager.getClient(),
+      onSessionRevoked: (sessionId) => {
+        realtimeInstance?.broker.revokeSession(sessionId);
+      },
+      onAccountRevoked: (accountId) => {
+        realtimeInstance?.broker.revokeAccount(accountId);
+      },
     },
-    onAccountRevoked: (accountId) => {
-      realtimeInstance?.broker.revokeAccount(accountId);
-    },
-  });
+    sharedPrisma,
+  );
   let venueCatalogRuntime: Awaited<ReturnType<typeof createVenueCatalogRuntime>>;
   try {
     venueCatalogRuntime = await createVenueCatalogRuntime(config);
@@ -382,9 +410,13 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
   }
   let bookingLifecycleRuntime: Awaited<ReturnType<typeof createBookingLifecycleRuntime>>;
   try {
-    bookingLifecycleRuntime = await createBookingLifecycleRuntime(config, {
-      redisClient: redisManager.getClient(),
-    });
+    bookingLifecycleRuntime = await createBookingLifecycleRuntime(
+      config,
+      {
+        redisClient: redisManager.getClient(),
+      },
+      sharedPrisma,
+    );
   } catch (error: unknown) {
     await Promise.allSettled([
       identityRuntime.resource.close(),
@@ -395,7 +427,7 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
 
   let paymentsBillingRuntime: Awaited<ReturnType<typeof createPaymentsBillingRuntime>>;
   try {
-    paymentsBillingRuntime = await createPaymentsBillingRuntime(config);
+    paymentsBillingRuntime = await createPaymentsBillingRuntime(config, sharedPrisma);
   } catch (error: unknown) {
     await Promise.allSettled([
       identityRuntime.resource.close(),
@@ -407,7 +439,7 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
 
   let invitationStudioRuntime: Awaited<ReturnType<typeof createInvitationStudioRuntime>>;
   try {
-    invitationStudioRuntime = await createInvitationStudioRuntime(config);
+    invitationStudioRuntime = await createInvitationStudioRuntime(config, undefined, sharedPrisma);
   } catch (error: unknown) {
     await Promise.allSettled([
       identityRuntime.resource.close(),
@@ -420,7 +452,7 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
 
   let guestManagementRuntime: Awaited<ReturnType<typeof createGuestManagementRuntime>>;
   try {
-    guestManagementRuntime = await createGuestManagementRuntime(config);
+    guestManagementRuntime = await createGuestManagementRuntime(config, sharedPrisma);
   } catch (error: unknown) {
     await Promise.allSettled([
       identityRuntime.resource.close(),
@@ -448,7 +480,12 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
   }
   let notificationsRuntime: Awaited<ReturnType<typeof createNotificationsRuntime>>;
   try {
-    notificationsRuntime = await createNotificationsRuntime(config, logger, metrics.registry);
+    notificationsRuntime = await createNotificationsRuntime(
+      config,
+      logger,
+      metrics.registry,
+      sharedPrisma,
+    );
   } catch (error) {
     await Promise.allSettled([
       databaseReadiness.resource.close(),
@@ -481,6 +518,7 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
   const realtimeResource: ShutdownResource = {
     name: 'realtime-and-redis',
     close: async () => {
+      memoryMonitor?.close();
       if (outboxRelay) await outboxRelay.stop();
       if (realtimeInstance) await realtimeInstance.close();
       await redisManager.close();
@@ -528,34 +566,45 @@ async function startFromConfig(config: Config): Promise<RunningServer> {
         });
         outboxRelay.start();
       }
+      memoryMonitor = startMemoryMonitor(
+        logger,
+        () => realtimeInstance?.io.engine.clientsCount ?? 0,
+      );
     },
-    resources:
-      tracingResource === undefined
-        ? [
-            realtimeResource,
-            analyticsRuntime.resource,
-            notificationsRuntime.resource,
-            databaseReadiness.resource,
-            guestManagementRuntime.resource,
-            identityRuntime.resource,
-            venueCatalogRuntime.resource,
-            bookingLifecycleRuntime.resource,
-            invitationStudioRuntime.resource,
-            paymentsBillingRuntime.resource,
-          ]
-        : [
-            realtimeResource,
-            analyticsRuntime.resource,
-            notificationsRuntime.resource,
-            databaseReadiness.resource,
-            tracingResource,
-            guestManagementRuntime.resource,
-            identityRuntime.resource,
-            venueCatalogRuntime.resource,
-            invitationStudioRuntime.resource,
-            bookingLifecycleRuntime.resource,
-            paymentsBillingRuntime.resource,
-          ],
+    resources: [
+      {
+        name: 'application-resources',
+        close: closeApplicationDatabase(
+          { $disconnect: closeDatabase },
+          tracingResource === undefined
+            ? [
+                realtimeResource,
+                analyticsRuntime.resource,
+                notificationsRuntime.resource,
+                databaseReadiness.resource,
+                guestManagementRuntime.resource,
+                identityRuntime.resource,
+                venueCatalogRuntime.resource,
+                bookingLifecycleRuntime.resource,
+                invitationStudioRuntime.resource,
+                paymentsBillingRuntime.resource,
+              ]
+            : [
+                realtimeResource,
+                analyticsRuntime.resource,
+                notificationsRuntime.resource,
+                databaseReadiness.resource,
+                tracingResource,
+                guestManagementRuntime.resource,
+                identityRuntime.resource,
+                venueCatalogRuntime.resource,
+                invitationStudioRuntime.resource,
+                bookingLifecycleRuntime.resource,
+                paymentsBillingRuntime.resource,
+              ],
+        ),
+      },
+    ],
     registerBodyParsers: (app) => {
       app.use(createGuestImportBodyParser());
     },

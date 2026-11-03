@@ -21,7 +21,7 @@ export class DatabaseConfigurationError extends Error {
 export function createPrismaClient(
   databaseUrl = config.database.url,
   diagnosticsEnabled = process.env.DB_DIAGNOSTICS_ENABLED === 'true',
-  poolOwner: 'default' | 'venue-catalog' | 'analytics' = 'default',
+  poolOwner: 'default' | 'shared-default' | 'venue-catalog' | 'analytics' = 'default',
 ): PrismaClient {
   const connectionString = databaseUrl?.trim();
 
@@ -34,6 +34,7 @@ export function createPrismaClient(
   const { connectionTimeoutMillis, idleTimeoutMillis } = budget;
   const maxima = {
     default: budget.max,
+    'shared-default': 6 * budget.max,
     'venue-catalog': budget.venueCatalogMax,
     analytics: budget.analyticsMax,
   };

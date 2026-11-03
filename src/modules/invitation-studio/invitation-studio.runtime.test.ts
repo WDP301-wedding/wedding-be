@@ -77,6 +77,8 @@ describe('InvitationStudioRuntime', () => {
       null,
       expect.any(Function),
       false,
+      undefined,
+      undefined,
     );
     for (const operation of [
       storage().put({
@@ -106,7 +108,7 @@ describe('InvitationStudioRuntime', () => {
       false,
     );
   });
-  it('constructs the real Supabase adapter when configured', async () => {
+  it('constructs the configured persistent disk adapter', async () => {
     const runtime = await createInvitationStudioRuntime(
       config({
         enabled: true,
@@ -116,7 +118,7 @@ describe('InvitationStudioRuntime', () => {
         signingKey: 'controlled-storage-fixture-key-at-least-32-bytes',
       }),
     );
-    expect(storage().constructor.name).toBe('SupabaseStorageProvider');
+    expect(storage().constructor.name).toBe('DiskStorageProvider');
     await runtime.resource.close();
   });
   it('enables paid job dispatch only with the flag, AI and Storage together', async () => {
@@ -152,7 +154,7 @@ describe('InvitationStudioRuntime', () => {
           provider: 'render-disk' as const,
           root: tmpdir(),
           publicOrigin: 'https://storage.example.test',
-          signingKey: 'controlled-storage-fixture-key-at-least-32-bytes',
+          signingKey: 'short',
         }),
       ),
     ).rejects.toThrow();

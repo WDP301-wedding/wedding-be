@@ -12,6 +12,19 @@ describe('Guest runtime lifecycle', () => {
     prisma.$connect.mockResolvedValue(undefined);
   });
   const config = { database: { url: 'postgresql://unused/test' } } as Config;
+  it('does not disconnect the application-owned client when its runtime closes or fails', async () => {
+    const shared = { $connect: vi.fn().mockResolvedValue(undefined), $disconnect: vi.fn() };
+    const borrowed = shared as unknown as Parameters<typeof createGuestManagementRuntime>[1];
+    const runtime = await createGuestManagementRuntime(config, borrowed);
+    await runtime.resource.close();
+    expect(shared.$disconnect).not.toHaveBeenCalled();
+    shared.$connect.mockRejectedValueOnce(new Error('connection failed'));
+    await expect(createGuestManagementRuntime(config, borrowed)).rejects.toThrow(
+      'connection failed',
+    );
+    expect(shared.$disconnect).not.toHaveBeenCalled();
+    expect(prisma.$connect).not.toHaveBeenCalled();
+  });
   it('creates its router after connection succeeds and closes its database', async () => {
     const runtime = await createGuestManagementRuntime(config);
     expect(runtime.router).toBeTypeOf('function');

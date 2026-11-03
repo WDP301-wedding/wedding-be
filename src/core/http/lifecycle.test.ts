@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { Writable } from 'node:stream';
 import { pathToFileURL } from 'node:url';
 
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createApp } from '../../app.js';
 import { parseEnvironment } from '../../config/env.js';
@@ -22,12 +22,27 @@ import request from 'supertest';
 import { createPaymentsBillingRuntime } from '../../modules/payments-billing/payments-billing.runtime.js';
 import { createLogger } from '../logging/logger.js';
 import { createDatabaseReadiness } from '../database/database-readiness.js';
+import { createPrismaClient } from '../database/prisma.js';
 import {
   createHttpLifecycle,
   createReadinessState,
   ShutdownTimeoutError,
   type ShutdownResource,
 } from './lifecycle.js';
+
+const sharedDatabase = vi.hoisted(() => ({
+  $connect: vi.fn().mockResolvedValue(undefined),
+  $disconnect: vi.fn().mockResolvedValue(undefined),
+}));
+vi.mock('../database/prisma.js', () => ({ createPrismaClient: vi.fn(() => sharedDatabase) }));
+beforeEach(() => vi.clearAllMocks());
+const runtimeConfiguration = (environment: Parameters<typeof parseEnvironment>[0] = {}) =>
+  parseEnvironment({
+    DATABASE_URL: 'postgresql://unused/test',
+    REALTIME_ENABLED: 'false',
+    LOG_LEVEL: 'silent',
+    ...environment,
+  });
 
 vi.mock('../../modules/identity-access/identity.runtime.js', async () => {
   const { Router } = await import('express');
@@ -255,6 +270,21 @@ describe('HTTP lifecycle', () => {
 });
 
 describe('server startup and process signals', () => {
+  it('closes the shared database once when connecting it fails before module startup', async () => {
+    sharedDatabase.$connect.mockRejectedValueOnce(new Error('database unreachable'));
+    await expect(bootstrap({ loadConfig: async () => runtimeConfiguration() })).rejects.toThrow(
+      'database unreachable',
+    );
+    expect(sharedDatabase.$disconnect).toHaveBeenCalledOnce();
+    expect(createIdentityRuntime).not.toHaveBeenCalled();
+  });
+
+  it('still refuses native startup without a configured database', async () => {
+    await expect(
+      bootstrap({ loadConfig: async () => parseEnvironment({ NODE_ENV: 'test' }) }),
+    ).rejects.toThrow('DATABASE_URL');
+    expect(createPrismaClient).not.toHaveBeenCalled();
+  });
   it('closes supplied resources if application construction fails before listening', async () => {
     const close = vi.fn().mockResolvedValue(undefined);
     await expect(
@@ -376,7 +406,7 @@ describe('server startup and process signals', () => {
   });
 
   it('uses the validated port for the default server startup', async () => {
-    const baseConfig = parseEnvironment({});
+    const baseConfig = runtimeConfiguration();
     const config = {
       ...baseConfig,
       runtime: { ...baseConfig.runtime, port: 0 },
@@ -388,9 +418,14 @@ describe('server startup and process signals', () => {
     runningServers.push(running);
 
     expect(createVenueCatalogRuntime).toHaveBeenCalledWith(config);
-    expect(createInvitationStudioRuntime).toHaveBeenCalledWith(config);
-    expect(createGuestManagementRuntime).toHaveBeenCalledWith(config);
-    expect(createPaymentsBillingRuntime).toHaveBeenCalledWith(config);
+    expect(createPrismaClient).toHaveBeenCalledWith(
+      config.database.url,
+      undefined,
+      'shared-default',
+    );
+    expect(createInvitationStudioRuntime).toHaveBeenCalledWith(config, undefined, sharedDatabase);
+    expect(createGuestManagementRuntime).toHaveBeenCalledWith(config, sharedDatabase);
+    expect(createPaymentsBillingRuntime).toHaveBeenCalledWith(config, sharedDatabase);
     expect(running.httpServer.listening).toBe(true);
     expect(running.readiness.isReady()).toBe(true);
     expect((await request(running.app).get('/api/v1/bookings/one/media/two')).status).toBe(401);
@@ -411,10 +446,11 @@ describe('server startup and process signals', () => {
     expect(vi.mocked(runtime.resource).close.mock.calls).toHaveLength(1);
     expect(notifications.resource.close).toHaveBeenCalledOnce();
     expect(vi.spyOn(analytics.resource, 'close')).toHaveBeenCalledOnce();
+    expect(sharedDatabase.$disconnect).toHaveBeenCalledOnce();
   });
 
   it('wires deployed database readiness, keeps liveness independent, and releases the probe', async () => {
-    const config = parseEnvironment({
+    const config = runtimeConfiguration({
       DATABASE_URL: 'postgresql://local:test@localhost/test',
       LOG_LEVEL: 'silent',
     });
@@ -437,7 +473,7 @@ describe('server startup and process signals', () => {
 
   it('mounts signed disk media in the configured server without exposing unsigned originals', async () => {
     const root = await mkdtemp(join(tmpdir(), 'wedding-bootstrap-disk-'));
-    const config = parseEnvironment({
+    const config = runtimeConfiguration({
       NODE_ENV: 'test',
       LOG_LEVEL: 'silent',
       STORAGE_DRIVER: 'render-disk',
@@ -475,7 +511,7 @@ describe('server startup and process signals', () => {
   it('closes all initialized owners and readiness when analytics startup fails', async () => {
     vi.mocked(createAnalyticsRuntime).mockRejectedValueOnce(new Error('analytics startup failed'));
     await expect(
-      bootstrap({ loadConfig: () => Promise.resolve(parseEnvironment({ NODE_ENV: 'test' })) }),
+      bootstrap({ loadConfig: () => Promise.resolve(runtimeConfiguration({ NODE_ENV: 'test' })) }),
     ).rejects.toThrow('analytics startup failed');
     const notifications = await (vi.mocked(createNotificationsRuntime).mock.results.at(-1)!
       .value as ReturnType<typeof createNotificationsRuntime>);
@@ -495,7 +531,7 @@ describe('server startup and process signals', () => {
     await expect(
       bootstrap({
         loadConfig: () =>
-          Promise.resolve(parseEnvironment({ NODE_ENV: 'test', LOG_LEVEL: 'silent' })),
+          Promise.resolve(runtimeConfiguration({ NODE_ENV: 'test', LOG_LEVEL: 'silent' })),
       }),
     ).rejects.toThrow('notification startup failed');
     const database = vi.mocked(createDatabaseReadiness).mock.results.at(-1)!.value as ReturnType<
@@ -511,7 +547,7 @@ describe('server startup and process signals', () => {
       new Error('media startup failed'),
     );
     await expect(
-      bootstrap({ loadConfig: () => Promise.resolve(parseEnvironment({})) }),
+      bootstrap({ loadConfig: () => Promise.resolve(runtimeConfiguration()) }),
     ).rejects.toThrow('media startup failed');
     const identity = await (vi.mocked(createIdentityRuntime).mock.results.at(-1)!
       .value as ReturnType<typeof createIdentityRuntime>);
@@ -526,7 +562,7 @@ describe('server startup and process signals', () => {
       new Error('guest startup failed'),
     );
     await expect(
-      bootstrap({ loadConfig: () => Promise.resolve(parseEnvironment({})) }),
+      bootstrap({ loadConfig: () => Promise.resolve(runtimeConfiguration()) }),
     ).rejects.toThrow('guest startup failed');
     const invitation = await (vi.mocked(createInvitationStudioRuntime).mock.results.at(-1)!
       .value as ReturnType<typeof createInvitationStudioRuntime>);
@@ -537,7 +573,7 @@ describe('server startup and process signals', () => {
     vi.mocked(createPaymentsBillingRuntime).mockRejectedValueOnce(
       new Error('billing startup failed'),
     );
-    const config = parseEnvironment({ NODE_ENV: 'test' });
+    const config = runtimeConfiguration({ NODE_ENV: 'test' });
     await expect(bootstrap({ loadConfig: () => Promise.resolve(config) })).rejects.toThrow(
       'billing startup failed',
     );

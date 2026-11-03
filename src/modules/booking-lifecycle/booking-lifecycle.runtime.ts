@@ -74,8 +74,9 @@ export async function createBookingLifecycleRuntime(
   dependencies?: {
     redisClient?: Redis | null | undefined;
   },
+  sharedPrisma?: ReturnType<typeof createPrismaClient>,
 ): Promise<BookingLifecycleRuntime> {
-  const prisma = createPrismaClient(config.database.url);
+  const prisma = sharedPrisma ?? createPrismaClient(config.database.url);
   try {
     await prisma.$connect();
     const access = createConsultationAccessReader(createPrismaConsultationAccessRepository(prisma));
@@ -289,11 +290,13 @@ export async function createBookingLifecycleRuntime(
       prisma,
       resource: Object.freeze({
         name: 'booking-lifecycle-database',
-        close: () => prisma.$disconnect(),
+        close: async () => {
+          if (!sharedPrisma) await prisma.$disconnect();
+        },
       }),
     });
   } catch (error: unknown) {
-    await prisma.$disconnect();
+    if (!sharedPrisma) await prisma.$disconnect();
     throw error;
   }
 }
