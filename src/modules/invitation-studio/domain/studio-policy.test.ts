@@ -88,8 +88,8 @@ describe('Structured invitation safety and bounds', () => {
     });
     expect(withSections).toContain(`<img alt="" src="${imageUrl}">`);
     expect(withSections).toContain('<p></p>');
-    expect(publicInvitationSchema.safeParse({ ...dto, bookingId: randomUUID() }).success).toBe(
-      false,
+    expect(publicInvitationSchema.parse({ ...dto, bookingId: randomUUID() })).not.toHaveProperty(
+      'bookingId',
     );
     expect(
       publicInvitationSchema.safeParse({

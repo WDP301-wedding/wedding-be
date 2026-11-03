@@ -29,6 +29,7 @@ describe('proposal workspace query', () => {
       revision: 8,
       eventDate: now,
       planningHeadcount: 100,
+      depositIntents: [],
       cancellationRequests: [{ id: 'request', reason: 'Plans changed', requestedAt: now }],
       hallId: 'hall',
       shiftCode: 'DINNER',
@@ -115,7 +116,7 @@ describe('proposal workspace query', () => {
     expect(draft.timeline).toBeNull();
     expect(draft.effectiveTimeline).toBeNull();
     expect(draft.capabilities.canApproveTimeline).toBe(false);
-    expect(draft.capabilities.canWithdrawApproval).toBe(true);
+    expect(draft.capabilities.canWithdrawApproval).toBe(false);
     expect(draft.proposal.depositAmountVnd).toBe(3000000);
     expect(draft.proposal.baseChargeVnd).toBe(10000000);
     expect(draft.proposal.menus).toEqual([

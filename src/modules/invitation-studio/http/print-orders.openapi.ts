@@ -9,6 +9,7 @@ import { publicSeatingSchema } from '../domain/public-invitation.js';
 import type { ZodOpenApiObject } from 'zod-openapi';
 import type { ZodType } from 'zod';
 import * as s from './print-orders.schemas.js';
+import * as printRequests from '../domain/print-request.js';
 
 const errors = Object.fromEntries(
   ['400', '401', '403', '404', '409', '422', '429', '500', '502', '503', '504'].map((status, i) => [
@@ -58,6 +59,42 @@ function operation(
 }
 
 export const invitationPrintOrdersOpenApiPaths = {
+  '/bookings/{bookingId}/print-requests/price-preview': {
+    post: operation(
+      'previewPrintRequest',
+      'Preview retained designs and server fixed copy prices; no production order or approval',
+      z.object({ data: printRequests.printRequestQuoteSchema }),
+      ['bookingId'],
+      printRequests.printRequestInputSchema,
+    ),
+  },
+  '/bookings/{bookingId}/print-requests/confirm': {
+    post: operation(
+      'confirmPrintRequest',
+      'Couple confirms exact multi-design preview and appendix; creates no production order or receivable',
+      printRequests.printRequestResponseSchema,
+      ['bookingId'],
+      printRequests.printRequestConfirmSchema,
+      '201',
+    ),
+  },
+  '/bookings/{bookingId}/print-requests': {
+    get: operation(
+      'listPrintRequests',
+      'Owning FULL Couple or Manager reads retained print requests and current appendix state',
+      printRequests.printRequestsResponseSchema,
+      ['bookingId'],
+    ),
+  },
+  '/bookings/{bookingId}/print-requests/{requestId}/withdraw': {
+    post: operation(
+      'withdrawPrintRequest',
+      'Owning Couple withdraws pending request and appendix before mutual approval',
+      printRequests.printRequestResponseSchema,
+      ['bookingId', 'requestId'],
+      printRequests.withdrawPrintRequestSchema,
+    ),
+  },
   '/bookings/{bookingId}/print-orders/purchase-options': {
     get: operation(
       'getPrintPurchaseAccess',
@@ -69,7 +106,7 @@ export const invitationPrintOrdersOpenApiPaths = {
   '/bookings/{bookingId}/print-orders/price-preview': {
     post: operation(
       'previewPrintPurchase',
-      'Retain exact post-deposit print content and catalogue price, without creating an order or approval',
+      'Retired: returns PRINT_APPENDIX_FLOW_REQUIRED; use print-requests/price-preview for new purchases',
       z.object({ data: printPurchaseQuoteSchema }),
       ['bookingId'],
       printPurchaseInputSchema,
@@ -78,7 +115,7 @@ export const invitationPrintOrdersOpenApiPaths = {
   '/bookings/{bookingId}/print-orders/confirm-purchase': {
     post: operation(
       'confirmPrintPurchase',
-      'Explicit Couple cost consent atomically creates order and appendix with Couple approval; no charge yet',
+      'Replay an existing historical purchase only; new purchases require print-requests/confirm',
       s.printOrderResponseSchema,
       ['bookingId'],
       printPurchaseConfirmSchema,
@@ -88,7 +125,7 @@ export const invitationPrintOrdersOpenApiPaths = {
   '/management/print-orders/{orderId}/purchase-approval': {
     post: operation(
       'approvePrintPurchase',
-      'Owning Manager approves exact purchase appendix and posts its delta once, authorizing production',
+      'Approve a historical purchase only; new print requests use generic appendix approval',
       s.printOrderResponseSchema,
       ['orderId'],
       s.transitionOrderBodySchema,

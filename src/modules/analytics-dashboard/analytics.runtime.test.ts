@@ -12,7 +12,10 @@ vi.mock('./infrastructure/analytics.composition.js', () => ({
 }));
 vi.mock('./http/analytics.router.js', () => ({ createAnalyticsRouter: f.router }));
 import { createAnalyticsRuntime } from './analytics.runtime.js';
-const config = { database: { url: 'postgresql://unused@127.0.0.1:1/unused' } } as Config;
+const config = {
+  database: { url: 'postgresql://unused@127.0.0.1:1/unused' },
+  runtime: { environment: 'test', logLevel: 'silent' },
+} as Config;
 describe('SPEC-10 scheduled projection lifecycle', () => {
   beforeEach(() => {
     vi.useFakeTimers();

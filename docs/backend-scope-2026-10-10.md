@@ -15,6 +15,26 @@ evidence and frontend source. New requirements are extensions to completed work.
 
 ## 1. Team Boundary
 
+Demo settlement clarification confirmed by the owner on **2026-11-04**:
+keep the existing default bypass of the settlement date check for demonstration.
+`STRICT_SETTLEMENT_DATE_CHECK=true` remains an optional strict-mode switch;
+the demo does not enable it. Authorization, contract/appendix approvals,
+server-calculated amounts and immutable financial history remain required.
+
+Print-flow amendment confirmed by the owner on **2026-11-04**: this revision may
+modify wedding-be, wedding-web and wedding-manage-web. Initial contracts and their
+30% deposit exclude printing. After verified deposit, Couple selects multiple
+saved designs with independent quantities at a server-fixed 5,000 VND/copy,
+without material/type selectors. Exact preview confirmation creates a retained
+request and appendix with Couple consent, not a production order. The second
+same-version appendix approval atomically activates costs and creates the order;
+later approved appendix changes synchronize only orders awaiting production.
+The Manager print page tracks and previews all retained designs; it does not
+separately quote or approve new print purchases. Existing contracts, deposits,
+print/invoice history remain unchanged. This amendment supersedes the conflicting
+print/pre-deposit clauses below for new purchases, not historical evidence.
+See [API, migration and verification](./print-appendix-flow-2026-11-04.md).
+
 Pre-deposit mobile amendment confirmed by the owner on **2026-10-23**: Couple may
 use Android before paying the deposit, including existing profile, proposal,
 commercial contract, timeline and deposit workflows. Invitation acceptance grants

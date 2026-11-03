@@ -115,8 +115,7 @@ describe('commercial selection owner facts', () => {
     expect(result.lineTotalVnd).toBe(
       category === 'MENU' ? 7000000 : category === 'SERVICE' ? 2000 : 10000,
     );
-    if (category === 'PRINT')
-      expect(result.description).toBe('Hai mặt · Giấy · Mẫu · template-version');
+    if (category === 'PRINT') expect(result.description).toBe('Hai mặt · Giấy · Mẫu');
   });
   it('rejects a stale menu version', async () => {
     mocks.menu.requireCurrentMenuPackageVersion.mockResolvedValue({ id: 'new-version' });

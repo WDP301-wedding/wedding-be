@@ -57,11 +57,11 @@ describe('createEmailProvider', () => {
       sender: { email: 'sender@gmail.com', name: 'Wedding' },
       to: [{ email: 'couple@example.com' }],
       textContent:
-        'Open this link to reset your password: https://wedding.example.com/reset-password#test-reset-token',
+        'Mở liên kết này để đặt lại mật khẩu: https://wedding.example.com/reset-password#test-reset-token',
     });
     expect(requestBodies[1]).toMatchObject({
       textContent:
-        'Open this link to accept your invitation: https://wedding.example.com/workspace-invitation#test-invitation-token',
+        'Mở liên kết này để nhận lời mời tham gia quản lý tiệc cưới: https://wedding.example.com/workspace-invitation#test-invitation-token',
     });
     expect(requestBodies[0]?.headers).not.toEqual(requestBodies[1]?.headers);
   });

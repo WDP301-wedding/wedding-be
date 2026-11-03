@@ -55,6 +55,13 @@ export const commercialRevisionViewSchema = z.strictObject({
 });
 
 export const printOrderViewSchema = z.strictObject({
+  appendixSource: z
+    .strictObject({
+      requestId: id,
+      appendixRevisionId: id,
+      pendingAppendixRevisionId: id.nullable().optional(),
+    })
+    .optional(),
   purchase: printPurchaseMetadataSchema.optional(),
   orderId: id,
   bookingId: id,

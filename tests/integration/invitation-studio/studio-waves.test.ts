@@ -817,6 +817,7 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
       publicInvitationId: p2.publicInvitationId,
       publicSlug: p2.publicSlug,
       publishedRevisionId: p2.publishedRevisionId,
+      genericQrPayload: p2.genericQrPayload,
     });
     const input = {
       bookingId: f.bookingId,

@@ -66,7 +66,8 @@ export function createPrintAppendixWorkflow(
     requireMutable: (bookingId: string) => financial.requireMutable(bookingId, localContext),
     async create(
       bookingId: string,
-      line: z.infer<typeof contractLineSchema>,
+      lineOrLines:
+        z.infer<typeof contractLineSchema> | readonly z.infer<typeof contractLineSchema>[],
       coupleId: string,
       reason: string,
       remove = false,
@@ -102,28 +103,33 @@ export function createPrintAppendixWorkflow(
       )
         throw commercialConflict('PRINT_APPENDIX_PENDING');
       const after = [...effective.lines];
-      const index = after.findIndex(
-        (item) => item.category === 'PRINT' && item.sourceId === line.sourceId,
-      );
-      const prior = after[index];
-      if (
-        prior &&
-        (prior.sourceRevisionId !== line.sourceRevisionId ||
-          prior.unitPriceVnd !== line.unitPriceVnd)
-      )
-        throw commercialConflict('CONTRACT_PRINT_SOURCE_CONFLICT');
-      const quantity = (prior?.quantity ?? 0) + (remove ? -line.quantity : line.quantity);
-      if (quantity < 0 || quantity > 10000 || (remove && !prior))
-        throw commercialConflict('CONTRACT_PRINT_SOURCE_CONFLICT');
-      if (quantity === 0) after.splice(index, 1);
-      else {
-        const next = contractLineSchema.parse({
-          ...line,
-          quantity,
-          lineTotalVnd: quantity * line.unitPriceVnd,
-        });
-        if (index < 0) after.push(next);
-        else after[index] = next;
+      const requestedLines = contractLineSchema
+        .array()
+        .parse(Array.isArray(lineOrLines) ? lineOrLines : [lineOrLines]);
+      for (const line of requestedLines) {
+        const index = after.findIndex(
+          (item) => item.category === 'PRINT' && item.sourceId === line.sourceId,
+        );
+        const prior = after[index];
+        if (
+          prior &&
+          (prior.sourceRevisionId !== line.sourceRevisionId ||
+            prior.unitPriceVnd !== line.unitPriceVnd)
+        )
+          throw commercialConflict('CONTRACT_PRINT_SOURCE_CONFLICT');
+        const quantity = (prior?.quantity ?? 0) + (remove ? -line.quantity : line.quantity);
+        if (quantity < 0 || quantity > 10000 || (remove && !prior))
+          throw commercialConflict('CONTRACT_PRINT_SOURCE_CONFLICT');
+        if (quantity === 0) after.splice(index, 1);
+        else {
+          const next = contractLineSchema.parse({
+            ...line,
+            quantity,
+            lineTotalVnd: quantity * line.unitPriceVnd,
+          });
+          if (index < 0) after.push(next);
+          else after[index] = next;
+        }
       }
       const document = appendixDocumentSchema.parse({
         bookingId,

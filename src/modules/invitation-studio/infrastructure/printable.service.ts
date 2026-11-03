@@ -276,7 +276,7 @@ export class PrintableService implements PrintableSeatingContentRegistry {
     };
   }
   /** Internal print-capture port, enlisted by W5 approval; no HTTP approval bypass. */
-  async capture(value: unknown, context: ContractContext) {
+  async capture(value: unknown, context: ContractContext, requirePublication = true) {
     const input = parseStudio(captureSchema, value);
     const tx = this.repository.boundary.requireScope(input.bookingId, context);
     await this.authorize(input.bookingId, context);
@@ -298,10 +298,13 @@ export class PrintableService implements PrintableSeatingContentRegistry {
       timeline.shiftCode !== event.shiftCode
     )
       throw studioConflict('PRINTABLE_TIMELINE_NOT_EFFECTIVE');
-    const publicIdentity = await this.publication.requirePublishedPublicInvitation(input.bookingId);
-    const identity = await tx.invitationPublicIdentity.findUniqueOrThrow({
+    const identity = await tx.invitationPublicIdentity.findUnique({
       where: { bookingId: input.bookingId },
     });
+    const publicIdentity =
+      requirePublication || identity?.currentPublicationId
+        ? await this.publication.requirePublishedPublicInvitation(input.bookingId)
+        : null;
     let seating: {
       seatingPlanRevisionId: string;
       renderSnapshot: z.output<typeof seatingRenderSchema>;
@@ -311,9 +314,10 @@ export class PrintableService implements PrintableSeatingContentRegistry {
       design,
       timeline,
       seating,
-      genericQrPayload: publicIdentity.genericQrPayload ?? identity.publicUrl,
-      publicInvitationId: publicIdentity.publicInvitationId,
-      publishedRevisionId: publicIdentity.publishedRevisionId,
+      genericQrPayload:
+        publicIdentity?.genericQrPayload ?? (publicIdentity ? identity?.publicUrl : null),
+      publicInvitationId: publicIdentity?.publicInvitationId ?? null,
+      publishedRevisionId: publicIdentity?.publishedRevisionId ?? null,
     };
     const printableRevisionId = randomUUID(),
       contentDigest = digest(content);
@@ -324,7 +328,7 @@ export class PrintableService implements PrintableSeatingContentRegistry {
         designRevisionId: source.id,
         timelineRevisionId: timeline.timelineRevisionId,
         seatingPlanRevisionId: seating?.seatingPlanRevisionId ?? null,
-        publicInvitationId: identity.id,
+        publicInvitationId: publicIdentity?.publicInvitationId ?? null,
         contentDigest,
         content: asJson(content),
       },

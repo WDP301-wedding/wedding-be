@@ -19,7 +19,7 @@ export interface InvitationPublicationReader {
     designRevisionId: string;
     timelineRevisionId: string;
     seatingPlanRevisionId: string | null;
-    publicInvitationId: string;
+    publicInvitationId: string | null;
     contentDigest: string;
   }>;
 }

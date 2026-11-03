@@ -30,6 +30,11 @@ export interface CommercialRevisionView {
 }
 
 export interface PrintOrderView {
+  appendixSource?: {
+    requestId: string;
+    appendixRevisionId: string;
+    pendingAppendixRevisionId?: string | null;
+  };
   purchase?: {
     cancellationRequested?: boolean;
     appendixRevisionId: string;

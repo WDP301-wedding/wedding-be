@@ -39,6 +39,9 @@ import type { PrintableService } from './printable.service.js';
 import type { ContractedPrintFulfillment } from './contracted-print.fulfillment.js';
 import { commercialPrintSnapshotSchema } from '../domain/contracted-print.js';
 import { studioPhase } from './studio-phase.js';
+import { requireAppendixPrintProduction } from './appendix-print-orders.js';
+import { printRequestDocumentSchema } from '../domain/print-request.js';
+import { appendixDocumentSchema } from '../../booking-lifecycle/domain/commercial-appendix.js';
 
 export class PrintOrderService {
   constructor(
@@ -51,6 +54,21 @@ export class PrintOrderService {
     readonly now: () => Date = () => new Date(),
     readonly fulfillment?: ContractedPrintFulfillment,
   ) {}
+
+  private async requireSeparatePrintWorkflow(tx: Prisma.TransactionClient, orderId: string) {
+    if (await tx.invitationPrintRequest.findUnique({ where: { orderId } }))
+      throw printOrderConflict('PRINT_APPENDIX_CHANGE_REQUIRED');
+  }
+
+  private async authorizeAppendixOrder(
+    tx: Prisma.TransactionClient,
+    bookingId: string,
+    orderId: string,
+    context: MediaRequestContext,
+  ) {
+    if (await tx.invitationPrintRequest.findUnique({ where: { orderId } }))
+      await this.authorization.booking(bookingId, context, 'MANAGER');
+  }
 
   private mapOrderView(
     order: {
@@ -253,6 +271,7 @@ export class PrintOrderService {
         await this.authorization.manager(scoped);
       },
       async (tx, scoped) => {
+        await this.requireSeparatePrintWorkflow(tx, parsedOrderId);
         if (await tx.invitationPrintPurchase.findUnique({ where: { orderId: parsedOrderId } }))
           throw printOrderConflict('PRINT_PURCHASE_USE_APPROVAL');
         const order = await tx.invitationPrintOrder.findUniqueOrThrow({
@@ -396,6 +415,7 @@ export class PrintOrderService {
         await this.authorization.booking(parsedBookingId, scoped, 'COUPLE');
       },
       async (tx, scoped) => {
+        await this.requireSeparatePrintWorkflow(tx, parsedOrderId);
         if (await tx.invitationPrintPurchase.findUnique({ where: { orderId: parsedOrderId } }))
           throw printOrderConflict('PRINT_PURCHASE_USE_APPROVAL');
         const order = await tx.invitationPrintOrder.findFirst({
@@ -547,6 +567,7 @@ export class PrintOrderService {
         await this.authorization.manager(scoped);
       },
       async (tx, scoped) => {
+        await this.authorizeAppendixOrder(tx, bookingId, parsedOrderId, scoped);
         const order = await tx.invitationPrintOrder.findUniqueOrThrow({
           where: { id: parsedOrderId },
         });
@@ -577,7 +598,9 @@ export class PrintOrderService {
           )
             throw printOrderConflict('PRINT_CANCELLATION_PENDING');
         }
-        await this.fulfillment?.validateOrder(tx, bookingId, parsedOrderId, undefined, false);
+        const appendixFunded = await requireAppendixPrintProduction(tx, bookingId, parsedOrderId);
+        if (!appendixFunded)
+          await this.fulfillment?.validateOrder(tx, bookingId, parsedOrderId, undefined, false);
 
         const approvedRevision = await tx.invitationCommercialRevision.findUniqueOrThrow({
           where: { id: order.currentCommercialRevisionId! },
@@ -659,6 +682,7 @@ export class PrintOrderService {
         await this.authorization.manager(scoped);
       },
       async (tx, scoped) => {
+        await this.authorizeAppendixOrder(tx, bookingId, parsedOrderId, scoped);
         const order = await tx.invitationPrintOrder.findUniqueOrThrow({
           where: { id: parsedOrderId },
         });
@@ -740,6 +764,7 @@ export class PrintOrderService {
         await this.authorization.manager(scoped);
       },
       async (tx, scoped) => {
+        await this.authorizeAppendixOrder(tx, bookingId, parsedOrderId, scoped);
         const order = await tx.invitationPrintOrder.findUniqueOrThrow({
           where: { id: parsedOrderId },
         });
@@ -907,6 +932,7 @@ export class PrintOrderService {
         }
       },
       async (tx, scoped) => {
+        await this.requireSeparatePrintWorkflow(tx, parsedOrderId);
         const order = await tx.invitationPrintOrder.findUniqueOrThrow({
           where: { id: parsedOrderId },
         });
@@ -1116,6 +1142,7 @@ export class PrintOrderService {
         await this.authorization.manager(scoped);
       },
       async (tx, scoped) => {
+        await this.requireSeparatePrintWorkflow(tx, parsedOrderId);
         if (await tx.invitationPrintPurchase.findUnique({ where: { orderId: parsedOrderId } }))
           throw printOrderConflict('PRINT_PURCHASE_USE_APPROVAL');
         const order = await tx.invitationPrintOrder.findUniqueOrThrow({
@@ -1259,6 +1286,7 @@ export class PrintOrderService {
         await this.authorization.booking(parsedBookingId, scoped, 'COUPLE');
       },
       async (tx, scoped) => {
+        await this.requireSeparatePrintWorkflow(tx, parsedOrderId);
         if (await tx.invitationPrintPurchase.findUnique({ where: { orderId: parsedOrderId } }))
           throw printOrderConflict('PRINT_PURCHASE_USE_APPROVAL');
         const order = await tx.invitationPrintOrder.findFirst({
@@ -1560,6 +1588,42 @@ export class PrintOrderService {
   }
 
   private async withPurchases(items: PrintOrderView[]): Promise<PrintOrderView[]> {
+    const requests = await this.repository.prisma.invitationPrintRequest.findMany({
+      where: { orderId: { in: items.map((item) => item.orderId) } },
+    });
+    const heads = requests.length
+      ? await this.repository.prisma.commercialAppendixHead.findMany({
+          where: { bookingId: { in: [...new Set(requests.map((r) => r.bookingId))] } },
+          include: { currentRevision: true },
+        })
+      : [];
+    items = items.map((item) => {
+      const request = requests.find((r) => r.orderId === item.orderId);
+      if (!request) return item;
+      const pending = heads.find((head) => head.bookingId === item.bookingId)?.currentRevision;
+      let pendingAppendixRevisionId: string | null = null;
+      if (pending && ['DRAFT', 'AWAITING_APPROVAL'].includes(pending.state)) {
+        const doc = appendixDocumentSchema.parse(pending.document);
+        const affected = printRequestDocumentSchema.parse(request.document).lines.some((source) => {
+          const before = doc.beforeLines.find(
+            (l) => l.category === 'PRINT' && l.sourceId === source.line.sourceId,
+          );
+          const after = doc.afterLines.find(
+            (l) => l.category === 'PRINT' && l.sourceId === source.line.sourceId,
+          );
+          return JSON.stringify(before) !== JSON.stringify(after);
+        });
+        if (affected) pendingAppendixRevisionId = pending.id;
+      }
+      return {
+        ...item,
+        appendixSource: {
+          requestId: request.id,
+          appendixRevisionId: request.appendixRevisionId,
+          pendingAppendixRevisionId,
+        },
+      };
+    });
     const rows = await this.repository.prisma.invitationPrintPurchase.findMany({
       where: { orderId: { in: items.map((item) => item.orderId) } },
     });

@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import { printRequestViewSchema } from '../../invitation-studio/domain/print-request.js';
 import { checkedLineTotal } from '../../venue-catalog/domain/commercial-offering.js';
 import {
   checkedSum,
@@ -44,6 +45,7 @@ export const appendixDocumentSchema = z.strictObject({
   tableCount: z.int().positive().max(500),
 });
 export const appendixViewSchema = z.strictObject({
+  printRequests: z.array(printRequestViewSchema).optional(),
   printOrderId: z.uuid().optional(),
   revisionId: z.uuid(),
   revisionNumber: z.int().positive(),

@@ -2040,7 +2040,7 @@ model InvitationPrintableRevision {
   designRevisionId      String   @db.Uuid
   timelineRevisionId    String   @db.Uuid
   seatingPlanRevisionId String?  @db.Uuid
-  publicInvitationId    String   @db.Uuid
+  publicInvitationId    String?  @db.Uuid
   contentDigest         String   @db.Char(64)
   content               Json     @db.JsonB
   createdAt             DateTime @default(now()) @db.Timestamptz(6)
@@ -2291,6 +2291,21 @@ model InvitationPrintPurchase {
   createdAt                      DateTime @default(now()) @db.Timestamptz(6)
 
   @@index([bookingId])
+}
+
+// Confirmation retains a request, not a production order. Orders are allocated
+// only by the atomic second-party commercial appendix approval.
+model InvitationPrintRequest {
+  id                String   @id @db.Uuid
+  bookingId         String   @db.Uuid
+  quoteId           String   @unique @db.Uuid
+  appendixRevisionId String   @db.Uuid
+  orderId           String?  @unique @db.Uuid
+  document          Json     @db.JsonB
+  createdAt         DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([bookingId, createdAt])
+  @@index([appendixRevisionId])
 }
 
 model InvitationPrintOrder {

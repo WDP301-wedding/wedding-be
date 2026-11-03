@@ -106,6 +106,7 @@ describe('InvitationStudioRuntime', () => {
       expect.any(Object),
       expect.any(Function),
       false,
+      expect.any(Object),
     );
   });
   it('constructs the configured persistent disk adapter', async () => {
@@ -138,6 +139,7 @@ describe('InvitationStudioRuntime', () => {
       expect.any(Object),
       expect.any(Function),
       true,
+      expect.any(Object),
     );
     await runtime.resource.close();
   });

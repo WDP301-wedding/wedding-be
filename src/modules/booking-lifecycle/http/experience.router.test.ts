@@ -41,6 +41,8 @@ function record() {
 
 function fixture(currentActor = actor) {
   const db = {
+    account: { findUnique: vi.fn().mockResolvedValue({ emailNormalized: 'couple@example.com' }) },
+    workspaceInvitation: { findMany: vi.fn().mockResolvedValue([]) },
     $queryRaw: vi.fn().mockResolvedValue([]),
     consultationRequest: {
       createMany: vi.fn().mockResolvedValue({ count: 1 }),
@@ -266,7 +268,11 @@ describe('booking intake and couple overview HTTP contract', () => {
       where: { id },
       data: { status: 'CONVERTED', consultationId },
     });
-    expect(db.auditLog.create).toHaveBeenCalledOnce();
+    expect(db.auditLog.create.mock.calls).toMatchObject([
+      [{ data: { action: 'booking.consultation-created' } }],
+      [{ data: { action: 'booking.intake-converted' } }],
+    ]);
+    expect(db.auditLog.create).toHaveBeenCalledTimes(2);
   });
 
   it.each([0, 1])('audits closure only when one open intake changed (count %s)', async (count) => {
@@ -327,6 +333,7 @@ describe('booking intake and couple overview HTTP contract', () => {
         expect.objectContaining({
           where: {
             consultationId: { in: [consultationId] },
+            ...(client === 'WEB' ? { phase: { not: 'CANCELLED' } } : {}),
           },
           cursor: { id: secondId },
           skip: 1,

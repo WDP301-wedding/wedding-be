@@ -1,4 +1,5 @@
 import { registerAnalyticsCommercialCases } from './analytics-commercial-cases.js';
+import { registerPrintAppendixRequestCases } from './print-appendix-requests-api-cases.js';
 import { registerGuestCompletionCases } from './guest-management-completion-cases.js';
 import { registerReleaseDemoCases } from './release-demo-cases.js';
 import { registerPerformanceBookingCases } from './performance-booking-cases.js';
@@ -482,6 +483,7 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     deposit,
   };
   registerCommercialAcceptanceCases(harness);
+  registerPrintAppendixRequestCases(harness);
   registerAnalyticsCommercialCases(harness);
   registerStepSixApiCases(harness);
   registerReleaseDemoCases(harness, () => ({

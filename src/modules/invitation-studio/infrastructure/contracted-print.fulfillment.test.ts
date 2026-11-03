@@ -44,6 +44,17 @@ function fixture() {
     }),
   };
   const client = {
+    invitationTemplateVersion: {
+      findUnique: vi.fn(({ where }: { where: { id: string } }) =>
+        Promise.resolve(
+          where.id === templateVersionId
+            ? { id: templateVersionId, templateId: 'historical-template' }
+            : null,
+        ),
+      ),
+    },
+    invitationTemplate: { findUnique: vi.fn().mockResolvedValue({ active: false }) },
+    printOfferingRevision: { findMany: vi.fn().mockResolvedValue([{ id: line.sourceRevisionId }]) },
     invitationDesign: { findFirst: vi.fn().mockResolvedValue({ currentRevisionId: randomUUID() }) },
     invitationDesignRevision: {
       findUniqueOrThrow: vi.fn().mockResolvedValue({ sourceTemplateVersionId: templateVersionId }),
