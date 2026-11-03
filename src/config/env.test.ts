@@ -160,7 +160,12 @@ describe('parseEnvironment', () => {
     const parsed = parseEnvironment({});
 
     expect(parsed).toEqual({
-      invitationStudio: { publicOrigin: null, reconcilerEnabled: true, imageJobsEnabled: false },
+      invitationStudio: {
+        publicOrigin: null,
+        webOrigin: null,
+        reconcilerEnabled: true,
+        imageJobsEnabled: false,
+      },
       runtime: {
         environment: 'development',
         port: 3001,

@@ -15,6 +15,12 @@ evidence and frontend source. New requirements are extensions to completed work.
 
 ## 1. Team Boundary
 
+Demo settlement clarification confirmed by the owner on **2026-11-04**:
+keep the existing default bypass of the settlement date check for demonstration.
+`STRICT_SETTLEMENT_DATE_CHECK=true` remains an optional strict-mode switch;
+the demo does not enable it. Authorization, contract/appendix approvals,
+server-calculated amounts and immutable financial history remain required.
+
 Print-flow amendment confirmed by the owner on **2026-11-04**: this revision may
 modify wedding-be, wedding-web and wedding-manage-web. Initial contracts and their
 30% deposit exclude printing. After verified deposit, Couple selects multiple

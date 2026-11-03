@@ -246,6 +246,7 @@ function fixture() {
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
     },
     bookingTimelineRevision: {
+      findUnique: vi.fn().mockResolvedValue({ managerApprovedAt: null, coupleApprovedAt: null }),
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
       create: vi.fn().mockResolvedValue({}),
     },

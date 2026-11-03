@@ -1,7 +1,9 @@
 import { randomUUID } from 'node:crypto';
-import { expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import type { PrismaClient } from '../../../generated/prisma/client.js';
 import { createEventEndReader } from './event-end.reader.js';
+beforeEach(() => vi.stubEnv('STRICT_SETTLEMENT_DATE_CHECK', 'true'));
+afterEach(() => vi.unstubAllEnvs());
 const booking = {
   phase: 'CONFIRMED',
   eventDate: new Date('2026-10-11T00:00:00Z'),
@@ -13,6 +15,15 @@ function reader(row: typeof booking | null, now: string | null) {
     $queryRaw: vi.fn().mockResolvedValue(now ? [{ now: new Date(now) }] : []),
   } as unknown as PrismaClient);
 }
+it('allows demo settlement before the event by default, preserving eligibility checks', async () => {
+  vi.stubEnv('STRICT_SETTLEMENT_DATE_CHECK', undefined);
+  await expect(
+    reader(booking, '2026-10-10T00:00:00Z').requireEnded(randomUUID()),
+  ).resolves.toMatchObject({ phase: 'CONFIRMED' });
+  await expect(
+    reader({ ...booking, phase: 'DRAFT' }, null).requireEnded(randomUUID()),
+  ).rejects.toMatchObject({ code: 'INVOICE_NOT_ELIGIBLE' });
+});
 it('uses Vietnam event time at the exact end boundary without waiting for the completion job', async () => {
   const id = randomUUID();
   await expect(reader(booking, '2026-10-11T14:59:59.999Z').requireEnded(id)).rejects.toMatchObject({

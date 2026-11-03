@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+afterEach(() => vi.unstubAllEnvs());
 
 import {
   BookingLifecyclePolicyError,
@@ -58,6 +59,7 @@ describe('post-deposit lifecycle policy', () => {
   });
 
   it('allows completion twelve hours after the snapshotted shift end', () => {
+    vi.stubEnv('STRICT_SETTLEMENT_DATE_CHECK', 'true');
     expect(() =>
       requireCompletionDue(
         'CONFIRMED',
@@ -74,5 +76,13 @@ describe('post-deposit lifecycle policy', () => {
         new Date('2026-12-21T02:59:59.999Z'),
       ),
     ).toThrow(expect.objectContaining({ code: 'BOOKING_COMPLETION_NOT_DUE' }));
+  });
+  it('allows early demo completion by default and still requires a confirmed booking', () => {
+    vi.stubEnv('STRICT_SETTLEMENT_DATE_CHECK', undefined);
+    const early = new Date('2026-12-19T00:00:00Z');
+    expect(() => requireCompletionDue('CONFIRMED', '2026-12-20', '22:00', early)).not.toThrow();
+    expect(() => requireCompletionDue('DRAFT', '2026-12-20', '22:00', early)).toThrow(
+      expect.objectContaining({ code: 'INVALID_BOOKING_TRANSITION' }),
+    );
   });
 });

@@ -1,4 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+beforeEach(() => vi.stubEnv('STRICT_SETTLEMENT_DATE_CHECK', 'true'));
+afterEach(() => vi.unstubAllEnvs());
 import { createPrismaBookingAutomationRepository } from './automation.repository.js';
 
 const input = {

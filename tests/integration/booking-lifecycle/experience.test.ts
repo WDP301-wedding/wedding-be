@@ -197,7 +197,7 @@ suite('post-booking experience persistence and authority', () => {
       (await db.prisma.account.findUniqueOrThrow({ where: { id: otherId } })).displayName,
     ).toBeNull();
   });
-  it('lists owned pre-deposit and confirmed bookings equally on Web and Android', async () => {
+  it('lists owned bookings, retaining cancelled history on Android and excluding it from active Web bookings', async () => {
     const ids: string[] = [];
     for (const [owner, level, phase] of [
       [managerId, 'RESTRICTED', 'DRAFT'],
@@ -246,14 +246,22 @@ suite('post-booking experience persistence and authority', () => {
       .get('/api/v1/couple/bookings?client=WEB')
       .set('Authorization', 'Bearer test-manager');
     expect(web.status).toBe(200);
-    expect(overviewResponseSchema.parse(web.body).data).toHaveLength(5);
+    const webPage = overviewResponseSchema.parse(web.body);
+    expect(webPage.data).toHaveLength(4);
+    expect(webPage.data.every((booking) => booking.phase !== 'CANCELLED')).toBe(true);
     expect(JSON.stringify(web.body)).not.toContain(ids[2]);
     const native = await request(server)
       .get('/api/v1/couple/bookings?client=ANDROID')
       .set('Authorization', 'Bearer test-manager');
     expect(native.status).toBe(200);
     const nativePage = overviewResponseSchema.parse(native.body);
-    expect(nativePage).toEqual(overviewResponseSchema.parse(web.body));
+    expect(nativePage.data).toHaveLength(5);
+    expect(nativePage.data.filter((booking) => booking.phase !== 'CANCELLED')).toEqual(
+      webPage.data,
+    );
+    expect(nativePage.data).toContainEqual(
+      expect.objectContaining({ bookingId: ids[4], phase: 'CANCELLED' }),
+    );
     expect(nativePage.data).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ bookingId: ids[0], phase: 'DRAFT', accessLevel: 'RESTRICTED' }),
