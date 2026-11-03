@@ -24,9 +24,21 @@ export function registerBookingLookup(router: Router, prisma: PrismaClient) {
               { consultation: { brideName: { contains: q, mode: 'insensitive' } } },
               { consultation: { groomName: { contains: q, mode: 'insensitive' } } },
               { consultation: { intendedEmail: { contains: q, mode: 'insensitive' } } },
-              { consultation: { intakeRequest: { displayName: { contains: q, mode: 'insensitive' } } } },
-              { consultation: { intakeRequest: { brideName: { contains: q, mode: 'insensitive' } } } },
-              { consultation: { intakeRequest: { groomName: { contains: q, mode: 'insensitive' } } } },
+              {
+                consultation: {
+                  intakeRequest: { displayName: { contains: q, mode: 'insensitive' } },
+                },
+              },
+              {
+                consultation: {
+                  intakeRequest: { brideName: { contains: q, mode: 'insensitive' } },
+                },
+              },
+              {
+                consultation: {
+                  intakeRequest: { groomName: { contains: q, mode: 'insensitive' } },
+                },
+              },
               { consultation: { intakeRequest: { phone: { contains: q } } } },
               ...(qDigits.length >= 4
                 ? [{ consultation: { intakeRequest: { phone: { contains: qDigits } } } }]
@@ -36,7 +48,7 @@ export function registerBookingLookup(router: Router, prisma: PrismaClient) {
             ],
           };
       const rows = await prisma.booking.findMany({
-        where: identityFilter,
+        where: { AND: [identityFilter, { phase: { not: 'CANCELLED' } }] },
         take: 20,
         orderBy: [{ eventDate: 'desc' }, { id: 'desc' }],
         select: {
@@ -70,9 +82,12 @@ export function registerBookingLookup(router: Router, prisma: PrismaClient) {
           data: rows.map((row) => ({
             bookingId: row.id,
             bookingCode: row.bookingCode,
-            customerName: row.consultation.displayName || row.consultation.intakeRequest?.displayName || '',
-            brideName: row.consultation.brideName || row.consultation.intakeRequest?.brideName || null,
-            groomName: row.consultation.groomName || row.consultation.intakeRequest?.groomName || null,
+            customerName:
+              row.consultation.displayName || row.consultation.intakeRequest?.displayName || '',
+            brideName:
+              row.consultation.brideName || row.consultation.intakeRequest?.brideName || null,
+            groomName:
+              row.consultation.groomName || row.consultation.intakeRequest?.groomName || null,
             phone: row.consultation.intakeRequest?.phone ?? null,
             email: row.consultation.intendedEmail || row.consultation.intakeRequest?.email || null,
             eventDate: row.eventDate.toISOString().slice(0, 10),

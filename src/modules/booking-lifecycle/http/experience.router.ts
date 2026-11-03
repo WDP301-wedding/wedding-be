@@ -1,3 +1,5 @@
+import { activeIntakeWhere } from './booking-navigation.policy.js';
+import { createBookingNavigationRouter } from './booking-navigation.router.js';
 import { createHash, randomUUID } from 'node:crypto';
 import { Router, type Response } from 'express';
 import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
@@ -32,6 +34,7 @@ export function createBookingExperienceRouter(
   redisClient?: Redis | null,
 ) {
   const router = Router();
+  router.use(createBookingNavigationRouter(prisma, resolver));
   router.use('/management', createConsultationWorkspaceRouter(prisma, resolver));
   const authenticate = createAuthenticatedActorMiddleware(resolver);
   router.post(
@@ -115,6 +118,7 @@ export function createBookingExperienceRouter(
       const { query } = validatedRequest(response, { query: intakeQuerySchema });
       const normalizedSearch = query.q ? query.q.normalize('NFC') : '';
       const baseWhere: Prisma.ConsultationRequestWhereInput = {
+        AND: [activeIntakeWhere],
         createdAt: { gt: new Date(Date.now() - 180 * 86400_000) },
         ...(normalizedSearch
           ? {
@@ -366,6 +370,7 @@ export function createBookingExperienceRouter(
       const rows = await prisma.booking.findMany({
         where: {
           consultationId: { in: grants.map((grant) => grant.consultationId) },
+          ...(query.client === 'WEB' ? { phase: { not: 'CANCELLED' as const } } : {}),
         },
         select: {
           id: true,

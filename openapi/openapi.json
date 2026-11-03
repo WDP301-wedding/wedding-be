@@ -8592,6 +8592,263 @@
         ]
       }
     },
+    "/booking-archive": {
+      "get": {
+        "description": "Manager sees cancelled bookings; Couple sees only owned cancelled bookings. No records are deleted. Numbered pagination with consistent totals.",
+        "operationId": "getBookingArchive",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "default": 1,
+              "maximum": 1000000,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "schema": {
+              "default": 10,
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "default": "",
+              "maxLength": 120,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "items": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "alias": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "bookingCode": {
+                                "anyOf": [
+                                  {
+                                    "pattern": "^HY-\\d{6,}$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "bookingId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "brideName": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "cancelledAt": {
+                                "anyOf": [
+                                  {
+                                    "format": "date-time",
+                                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "createdAt": {
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                                "type": "string"
+                              },
+                              "customerName": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "email": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "eventDate": {
+                                "format": "date",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                "type": "string"
+                              },
+                              "groomName": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "hallId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "hallNameSnapshot": {
+                                "type": "string"
+                              },
+                              "managerAccountId": {
+                                "anyOf": [
+                                  {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "managerEmail": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "phase": {
+                                "enum": [
+                                  "DRAFT",
+                                  "AWAITING_DEPOSIT",
+                                  "CONFIRMED",
+                                  "CANCELLED",
+                                  "COMPLETED"
+                                ],
+                                "type": "string"
+                              },
+                              "phone": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "shiftCode": {
+                                "enum": [
+                                  "LUNCH",
+                                  "DINNER"
+                                ],
+                                "type": "string"
+                              },
+                              "tableCount": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "bookingId",
+                              "eventDate",
+                              "hallId",
+                              "hallNameSnapshot",
+                              "shiftCode",
+                              "phase",
+                              "tableCount",
+                              "createdAt",
+                              "brideName",
+                              "groomName",
+                              "phone",
+                              "email",
+                              "managerAccountId",
+                              "managerEmail",
+                              "cancelledAt"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 100,
+                          "type": "array"
+                        },
+                        "page": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "pageSize": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "total": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "totalPages": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "page",
+                        "pageSize",
+                        "total",
+                        "totalPages",
+                        "items"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Private no-store result."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Booking navigation"
+        ]
+      }
+    },
     "/bookings": {
       "post": {
         "operationId": "createBooking",
@@ -8661,6 +8918,256 @@
           "Booking Lifecycle"
         ]
       }
+    },
+    "/bookings/{bookingId}/archive": {
+      "get": {
+        "description": "Read-only cancelled booking and retained contract snapshot. Manager or owning Couple only. Active bookings do not appear here.",
+        "operationId": "getArchivedBooking",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "booking": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "alias": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "bookingCode": {
+                              "anyOf": [
+                                {
+                                  "pattern": "^HY-\\d{6,}$",
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "bookingId": {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            "brideName": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "cancelledAt": {
+                              "anyOf": [
+                                {
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "createdAt": {
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                              "type": "string"
+                            },
+                            "customerName": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "email": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "eventDate": {
+                              "format": "date",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                              "type": "string"
+                            },
+                            "groomName": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "hallId": {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            "hallNameSnapshot": {
+                              "type": "string"
+                            },
+                            "managerAccountId": {
+                              "anyOf": [
+                                {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "managerEmail": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "phase": {
+                              "enum": [
+                                "DRAFT",
+                                "AWAITING_DEPOSIT",
+                                "CONFIRMED",
+                                "CANCELLED",
+                                "COMPLETED"
+                              ],
+                              "type": "string"
+                            },
+                            "phone": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "shiftCode": {
+                              "enum": [
+                                "LUNCH",
+                                "DINNER"
+                              ],
+                              "type": "string"
+                            },
+                            "tableCount": {
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "bookingId",
+                            "eventDate",
+                            "hallId",
+                            "hallNameSnapshot",
+                            "shiftCode",
+                            "phase",
+                            "tableCount",
+                            "createdAt",
+                            "brideName",
+                            "groomName",
+                            "phone",
+                            "email",
+                            "managerAccountId",
+                            "managerEmail",
+                            "cancelledAt"
+                          ],
+                          "type": "object"
+                        },
+                        "cancellationReason": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "contract": {
+                          "anyOf": [
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "depositVnd": {
+                                  "maximum": 9007199254740991,
+                                  "minimum": 0,
+                                  "type": "integer"
+                                },
+                                "document": {},
+                                "state": {
+                                  "type": "string"
+                                },
+                                "totalVnd": {
+                                  "maximum": 9007199254740991,
+                                  "minimum": 0,
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "state",
+                                "totalVnd",
+                                "depositVnd",
+                                "document"
+                              ],
+                              "type": "object"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "booking",
+                        "cancellationReason",
+                        "contract"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Private no-store result."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Booking navigation"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "bookingId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        }
+      ]
     },
     "/bookings/{bookingId}/attendance-summary": {
       "get": {
@@ -23469,6 +23976,79 @@
         ]
       }
     },
+    "/bookings/{bookingId}/navigation": {
+      "get": {
+        "description": "Manager or owning Couple. Minimal authoritative phase for route admission, including cancelled bookings; no mutation.",
+        "operationId": "getBookingNavigation",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "bookingId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "phase": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "bookingId",
+                        "phase"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Private no-store result."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Booking navigation"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "bookingId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        }
+      ]
+    },
     "/bookings/{bookingId}/payments/active": {
       "get": {
         "description": "Read-only discovery returns at most two CREATED/PENDING/UNKNOWN attempts or verified VNPay successes awaiting ledger/deposit application, newest first. Applied successes and failures are excluded. Expired unresolved attempts remain visible. No checkout, provider query, settlement or release is performed. Read each existing payment attempt by ID to reconcile, retry interrupted application and recover an unexpired checkoutUrl. An empty list does not prove a previous payment failed. Provider evidence and checkout parameters are excluded.",
@@ -34436,6 +35016,339 @@
         ]
       }
     },
+    "/management/booking-page": {
+      "get": {
+        "description": "Manager. Real database numbered pagination, consistent count/page snapshot, stable sorting and search. Excludes cancelled bookings. Mine uses the retained consultation manager, never browser-local claims.",
+        "operationId": "getManagementBookingPage",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "default": 1,
+              "maximum": 1000000,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "schema": {
+              "default": 10,
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "default": "",
+              "maxLength": 120,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "scope",
+            "schema": {
+              "default": "all",
+              "enum": [
+                "mine",
+                "all"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "phase",
+            "schema": {
+              "default": "ALL",
+              "enum": [
+                "ALL",
+                "DRAFT",
+                "AWAITING_DEPOSIT",
+                "CONFIRMED",
+                "COMPLETED"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": "recency",
+              "enum": [
+                "recency",
+                "eventDate",
+                "hallName",
+                "shiftCode",
+                "tableCount",
+                "phase"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "order",
+            "schema": {
+              "default": "desc",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "counts": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "all": {
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "mine": {
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "all",
+                            "mine"
+                          ],
+                          "type": "object"
+                        },
+                        "items": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "alias": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "bookingCode": {
+                                "anyOf": [
+                                  {
+                                    "pattern": "^HY-\\d{6,}$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "bookingId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "brideName": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "cancelledAt": {
+                                "anyOf": [
+                                  {
+                                    "format": "date-time",
+                                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "createdAt": {
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                                "type": "string"
+                              },
+                              "customerName": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "email": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "eventDate": {
+                                "format": "date",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                "type": "string"
+                              },
+                              "groomName": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "hallId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "hallNameSnapshot": {
+                                "type": "string"
+                              },
+                              "managerAccountId": {
+                                "anyOf": [
+                                  {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "managerEmail": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "phase": {
+                                "enum": [
+                                  "DRAFT",
+                                  "AWAITING_DEPOSIT",
+                                  "CONFIRMED",
+                                  "CANCELLED",
+                                  "COMPLETED"
+                                ],
+                                "type": "string"
+                              },
+                              "phone": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "shiftCode": {
+                                "enum": [
+                                  "LUNCH",
+                                  "DINNER"
+                                ],
+                                "type": "string"
+                              },
+                              "tableCount": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "bookingId",
+                              "eventDate",
+                              "hallId",
+                              "hallNameSnapshot",
+                              "shiftCode",
+                              "phase",
+                              "tableCount",
+                              "createdAt",
+                              "brideName",
+                              "groomName",
+                              "phone",
+                              "email",
+                              "managerAccountId",
+                              "managerEmail",
+                              "cancelledAt"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 100,
+                          "type": "array"
+                        },
+                        "page": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "pageSize": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "total": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "totalPages": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "page",
+                        "pageSize",
+                        "total",
+                        "totalPages",
+                        "items",
+                        "counts"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Private no-store result."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Booking navigation"
+        ]
+      }
+    },
     "/management/bookings/{bookingId}/cancellation": {
       "post": {
         "operationId": "cancelBooking",
@@ -43248,6 +44161,366 @@
         ],
         "tags": [
           "Product experience"
+        ]
+      }
+    },
+    "/management/consultation-page": {
+      "get": {
+        "description": "Manager. Real numbered pagination over all matching consultation requests; excludes records linked to cancelled bookings.",
+        "operationId": "getManagementConsultationPage",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "default": 1,
+              "maximum": 1000000,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "schema": {
+              "default": 10,
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "default": "",
+              "maxLength": 120,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "default": "ALL",
+              "enum": [
+                "ALL",
+                "NEW",
+                "CONVERTED",
+                "CLOSED"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": "createdAt",
+              "enum": [
+                "createdAt",
+                "displayName",
+                "preferredDate",
+                "status"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "order",
+            "schema": {
+              "default": "desc",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "counts": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "pending": {
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "total": {
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "total",
+                            "pending"
+                          ],
+                          "type": "object"
+                        },
+                        "items": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "bookingId": {
+                                "anyOf": [
+                                  {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "bookingPhase": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "brideName": {
+                                "anyOf": [
+                                  {
+                                    "maxLength": 120,
+                                    "minLength": 1,
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "consultationId": {
+                                "anyOf": [
+                                  {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "consultationRevision": {
+                                "anyOf": [
+                                  {
+                                    "exclusiveMinimum": 0,
+                                    "maximum": 9007199254740991,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "createdAt": {
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                                "type": "string"
+                              },
+                              "displayName": {
+                                "maxLength": 120,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              "email": {
+                                "format": "email",
+                                "maxLength": 320,
+                                "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+                                "type": "string"
+                              },
+                              "expectedGuests": {
+                                "anyOf": [
+                                  {
+                                    "maximum": 10000,
+                                    "minimum": 1,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "groomName": {
+                                "anyOf": [
+                                  {
+                                    "maxLength": 120,
+                                    "minLength": 1,
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "message": {
+                                "maxLength": 2000,
+                                "type": "string"
+                              },
+                              "phone": {
+                                "maxLength": 30,
+                                "pattern": "^[+\\d\\s().-]*$",
+                                "type": "string"
+                              },
+                              "preferredDate": {
+                                "anyOf": [
+                                  {
+                                    "format": "date",
+                                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "preferredHallId": {
+                                "anyOf": [
+                                  {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "preferredMenuVersionId": {
+                                "anyOf": [
+                                  {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "preferredShift": {
+                                "anyOf": [
+                                  {
+                                    "enum": [
+                                      "LUNCH",
+                                      "DINNER"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "status": {
+                                "enum": [
+                                  "NEW",
+                                  "CONVERTED",
+                                  "CLOSED"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "brideName",
+                              "groomName",
+                              "displayName",
+                              "email",
+                              "phone",
+                              "preferredDate",
+                              "expectedGuests",
+                              "message",
+                              "id",
+                              "status",
+                              "consultationId",
+                              "consultationRevision",
+                              "createdAt"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 100,
+                          "type": "array"
+                        },
+                        "page": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "pageSize": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "total": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "totalPages": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "page",
+                        "pageSize",
+                        "total",
+                        "totalPages",
+                        "items",
+                        "counts"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Private no-store result."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Booking navigation"
         ]
       }
     },

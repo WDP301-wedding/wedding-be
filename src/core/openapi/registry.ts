@@ -1,3 +1,4 @@
+import { bookingNavigationPaths } from '../../modules/booking-lifecycle/http/booking-navigation.openapi.js';
 import type { ZodOpenApiObject, ZodOpenApiResponseObject } from 'zod-openapi';
 import type { z } from 'zod';
 import { commercialCatalogOpenApiPaths } from '../../modules/venue-catalog/http/commercial-catalog.openapi.js';
@@ -618,6 +619,7 @@ export const openApiRegistry: ZodOpenApiObject = {
       },
     },
     ...staffOpenApiPaths,
+    ...bookingNavigationPaths,
   },
   components: {
     schemas: {

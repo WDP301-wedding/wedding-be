@@ -186,22 +186,24 @@ export class AnalyticsService {
       return {
         meta,
         ...this.page(
-          selected.map((b) => ({
-            bookingId: b.bookingId,
-            bookingCode: b.bookingCode ?? null,
-            customerName: b.customerName ?? null,
-            alias: b.alias ?? null,
-            eventDate: b.eventDate,
-            hallId: b.hallId,
-            hallNameSnapshot: b.hallNameSnapshot,
-            shiftCode: b.shiftCode,
-            phase: b.phase,
-            tableCount: b.commercialLines.some((l) => l.category === 'MENU')
-              ? sumVnd(
-                  b.commercialLines.filter((l) => l.category === 'MENU').map((l) => l.quantity),
-                )
-              : b.tableCount,
-          })),
+          selected
+            .filter((b) => b.phase !== 'CANCELLED')
+            .map((b) => ({
+              bookingId: b.bookingId,
+              bookingCode: b.bookingCode ?? null,
+              customerName: b.customerName ?? null,
+              alias: b.alias ?? null,
+              eventDate: b.eventDate,
+              hallId: b.hallId,
+              hallNameSnapshot: b.hallNameSnapshot,
+              shiftCode: b.shiftCode,
+              phase: b.phase,
+              tableCount: b.commercialLines.some((l) => l.category === 'MENU')
+                ? sumVnd(
+                    b.commercialLines.filter((l) => l.category === 'MENU').map((l) => l.quantity),
+                  )
+                : b.tableCount,
+            })),
           (r) => r.bookingId,
           projection,
           q,
