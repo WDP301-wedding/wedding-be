@@ -40,6 +40,7 @@ export interface RealtimeServerInstance {
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MAX_SUBSCRIPTIONS_PER_SOCKET = 20;
+const MAX_PENDING_AUTHENTICATIONS = 32;
 
 export function createRealtimeServer(options: RealtimeServerOptions): RealtimeServerInstance {
   const { httpServer, config, sessionRepository, prisma, redisManager, logger } = options;
@@ -85,6 +86,11 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
   }
 
   const actorResolver = createAuthenticatedActorResolver(sessionRepository);
+  // A namespace socket is not connected until async middleware completes. A
+  // transport can send more CONNECT packets in that gap, bypassing the limits
+  // installed after authentication. Admit before the first database lookup.
+  const authenticatingTransports = new WeakSet<object>();
+  let pendingAuthentications = 0;
 
   type ConnectedSocket = Socket<
     ClientToServerEvents,
@@ -165,25 +171,45 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
 
   // Authentication Handshake Middleware
   io.use((socket, next) => {
+    const transportIsOpen = () => socket.conn.readyState === 'open';
+    if (!transportIsOpen()) return next(new Error('TRANSPORT_CLOSED'));
+    const rejection = authenticatingTransports.has(socket.conn)
+      ? 'AUTHENTICATION_IN_PROGRESS'
+      : pendingAuthentications >= MAX_PENDING_AUTHENTICATIONS
+        ? 'AUTHENTICATION_BUSY'
+        : undefined;
+    if (rejection) {
+      logger?.warn(
+        { event: 'realtime_auth_admission_rejected', reason: rejection, pendingAuthentications },
+        'Realtime authentication admission rejected.',
+      );
+      socket.conn.close(true);
+      return next(new Error(rejection));
+    }
+    authenticatingTransports.add(socket.conn);
+    pendingAuthentications++;
     void (async () => {
-      // 1. Prohibit token passing in query strings (security rule: no tokens in URLs/logs)
-      if (socket.handshake.query.token) {
-        return next(new Error('TOKEN_IN_QUERY_PROHIBITED'));
-      }
-
-      // 2. Extract token from auth payload
-      const auth = socket.handshake.auth as Record<string, unknown> | undefined;
-      const token = auth?.token;
-      if (typeof token !== 'string' || !token) {
-        return next(new Error('AUTHENTICATION_REQUIRED'));
-      }
-
-      // 3. IP connection limit check with trusted proxy policy
-      const clientIp = extractClientIp(socket);
+      let releaseReservation: (() => void) | undefined;
       try {
+        // 1. Prohibit token passing in query strings (security rule: no tokens in URLs/logs)
+        if (socket.handshake.query.token) {
+          return next(new Error('TOKEN_IN_QUERY_PROHIBITED'));
+        }
+
+        // 2. Extract token from auth payload
+        const auth = socket.handshake.auth as Record<string, unknown> | undefined;
+        const token = auth?.token;
+        if (typeof token !== 'string' || !token) {
+          return next(new Error('AUTHENTICATION_REQUIRED'));
+        }
+
+        // 3. IP connection limit check with trusted proxy policy
+        const clientIp = extractClientIp(socket);
         const actor = await actorResolver.resolve(token);
+        if (!transportIsOpen()) return next(new Error('TRANSPORT_CLOSED'));
         const tokenHash = hashOpaqueToken(token, 'access');
         const state = await sessionRepository.findActorByAccessTokenHash(tokenHash);
+        if (!transportIsOpen()) return next(new Error('TRANSPORT_CLOSED'));
         if (!state) {
           return next(new Error('AUTHENTICATION_REQUIRED'));
         }
@@ -210,15 +236,23 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
         if (!(await limits.reserve(clientIp, actor.accountId, socket.id))) {
           return next(new Error('CONNECTION_LIMIT_EXCEEDED'));
         }
+        let released = false;
         const release = () => {
+          if (released) return;
+          released = true;
           void limits
             .release(clientIp, actor.accountId, socket.id)
             .catch((err) =>
               logger?.warn({ err }, 'Socket reservation release failed; TTL will expire it.'),
             );
         };
+        releaseReservation = release;
         socket.once('disconnect', release);
         socket.conn.once('close', release);
+        if (!transportIsOpen()) {
+          release();
+          return next(new Error('TRANSPORT_CLOSED'));
+        }
 
         // Check couple access level if role is COUPLE
         let accessLevel: 'restricted' | 'full' | undefined;
@@ -234,6 +268,10 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
           }
         }
 
+        if (!transportIsOpen()) {
+          release();
+          return next(new Error('TRANSPORT_CLOSED'));
+        }
         socket.data = {
           actor: {
             accountId: actor.accountId,
@@ -252,8 +290,12 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
 
         next();
       } catch (err) {
+        releaseReservation?.();
         logger?.debug({ err }, 'Realtime socket authentication failed.');
         next(new Error('AUTHENTICATION_FAILED'));
+      } finally {
+        authenticatingTransports.delete(socket.conn);
+        pendingAuthentications--;
       }
     })();
   });
