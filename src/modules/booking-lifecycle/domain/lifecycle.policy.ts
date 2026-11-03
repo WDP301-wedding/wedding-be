@@ -55,13 +55,13 @@ export function requireCancellationAllowed(
   if (phase !== 'DRAFT' && phase !== 'AWAITING_DEPOSIT' && phase !== 'CONFIRMED') {
     throw new BookingLifecyclePolicyError(
       'BOOKING_CANCELLATION_NOT_ALLOWED',
-      'The booking phase cannot be cancelled.',
+      'Không thể hủy tiệc ở trạng thái hiện tại.',
     );
   }
   if (databaseNow.getTime() >= localVietnamTime(eventDate, shiftStartTime).getTime()) {
     throw new BookingLifecyclePolicyError(
       'BOOKING_CANCELLATION_NOT_ALLOWED',
-      'Cancellation is closed after the event starts.',
+      'Không thể hủy tiệc vì đã đến hoặc qua giờ bắt đầu tiệc.',
     );
   }
 }
