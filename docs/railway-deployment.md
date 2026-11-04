@@ -75,16 +75,17 @@ Copy the backend variables from `.env.example` into Railway's variables UI or
 a secret-safe import process. Use the existing `.env` values for Supabase and
 Brevo, with these deployment-specific settings:
 
-| Variable                   | Deployment value                                                                                 |
-| -------------------------- | ------------------------------------------------------------------------------------------------ |
-| `NODE_ENV`                 | `production`                                                                                     |
-| `PORT`                     | `3001` (the generated domain targets this port)                                                  |
-| `AUTH_TRUST_PROXY_HOPS`    | `1`                                                                                              |
-| `BACKEND_REPLICA_COUNT`    | `1`                                                                                              |
-| `OPENAPI_ENABLED`          | `true` (Swagger UI and OpenAPI exposed)                                                          |
-| `PUBLIC_INVITATION_ORIGIN` | `https://wedding-be-production-e1dc.up.railway.app`                                              |
-| `AUTH_OTP_HASH_KEY`        | Independent random secret, stable across restarts                                                |
-| `CORS_ALLOWED_ORIGINS`     | Exact browser origins; deployed HTTPS public web first, explicit HTTP loopback origins permitted |
+| Variable                       | Deployment value                                                                                   |
+| ------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`                     | `production`                                                                                       |
+| `PORT`                         | `3001` (the generated domain targets this port)                                                    |
+| `AUTH_TRUST_PROXY_HOPS`        | `1`                                                                                                |
+| `BACKEND_REPLICA_COUNT`        | `1`                                                                                                |
+| `OPENAPI_ENABLED`              | `true` (Swagger UI and OpenAPI exposed)                                                            |
+| `PUBLIC_INVITATION_ORIGIN`     | `https://wedding-be-production-e1dc.up.railway.app`                                                |
+| `AUTH_OTP_HASH_KEY`            | Independent random secret, stable across restarts                                                  |
+| `CORS_ALLOWED_ORIGINS`         | Exact browser origins; explicit HTTP loopback origins permitted; order does not select email links |
+| `PUBLIC_INVITATION_WEB_ORIGIN` | `https://wedding-web-silk.vercel.app` for production invitation emails and interactive invitations |
 
 Do not configure `TEST_MIGRATION_DATABASE_URL` in the deployed service. Keep
 the legacy Resend group blank when using Brevo. When AI is disabled, also keep
@@ -141,7 +142,7 @@ as described in `database-migrations.md`.
 
 The current CORS allowlist is
 `https://wedding-web-silk.vercel.app,https://wedding-manage-web.vercel.app,https://wedding-be-production-e1dc.up.railway.app`.
-The public web origin comes first because it also determines email credential
-links. Both Vercel applications proxy `/api/v1/*` to this backend so refresh
+From 2026-11-04, email credential links use the explicit `PUBLIC_INVITATION_WEB_ORIGIN`,
+independently of CORS ordering. Both Vercel applications proxy `/api/v1/*` to this backend so refresh
 cookies stay on the browser application's origin. Verify actual login and
 email delivery through an authorized account workflow separately.

@@ -305,11 +305,24 @@ export function bookingIdempotencyPayload(request: Request): unknown {
   return { params: request.params, query: request.query, body: request.body as unknown };
 }
 
-function publicWebBaseUrl(config: Config): string {
-  const configured = config.cors.allowedOrigins[0];
-  if (configured !== undefined) return configured;
-  if (config.runtime.environment === 'development' || config.runtime.environment === 'test') {
-    return 'http://localhost:3000';
+export function publicWebBaseUrl(config: Config): string {
+  const local =
+    config.runtime.environment === 'development' || config.runtime.environment === 'test';
+  const configured = config.invitationStudio.webOrigin;
+  if (configured) {
+    const url = new URL(configured);
+    if (
+      !local &&
+      (url.protocol !== 'https:' || ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname))
+    ) {
+      throw new TypeError('PUBLIC_INVITATION_WEB_ORIGIN must be a public HTTPS website.');
+    }
+    return configured;
   }
-  throw new TypeError('Booking invitation links require a configured Public Web origin.');
+  // CORS controls browser access, not the destination of emailed credentials.
+  // Retain the local convenience only outside staging/production.
+  if (local) return config.cors.allowedOrigins[0] ?? 'http://localhost:3000';
+  throw new TypeError(
+    'Booking invitation links require a configured Public Web origin (PUBLIC_INVITATION_WEB_ORIGIN).',
+  );
 }

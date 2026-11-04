@@ -813,3 +813,13 @@ SPEC-01–05 or replace the separate provider/runtime readiness gates.
 - [ ] DFI-03: Verify authenticated Manager finalization and the final-payment UI
   using an approved demo booking. Deployment and local controlled-provider tests
   do not establish a real provider settlement or an authenticated browser journey.
+
+## Production identity email destination — 2026-11-04
+
+- [x] PIM-01: Reproduce localhost selection in a controlled invitation email and
+  use the explicit public website in staging/production, preserving credential
+  fragments and the existing Staff password OTP workflow.
+  [Verification](evidence/production-identity-mail-2026-11-04.md).
+- [ ] PIM-02: Release the matching backend and public website configuration to the
+  existing server after exact-head CI; verify startup and production landing pages.
+  No real email send or account reset is part of this configuration correction.
