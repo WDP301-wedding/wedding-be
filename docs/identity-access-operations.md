@@ -36,6 +36,27 @@ the parser rejects the previous value. The new lifetime applies to access creden
 by login, invitation acceptance, and refresh after the update. Existing credentials retain
 their persisted expiry.
 
+## Production invitation email destinations
+
+Set `PUBLIC_INVITATION_WEB_ORIGIN=https://wedding-web-silk.vercel.app` on the
+deployed backend. Identity workspace invitations use this explicit website origin;
+they never select a destination from `CORS_ALLOWED_ORIGINS` in staging/production.
+Those environments reject a missing origin, plain HTTP and loopback destinations.
+Development/test retain their local CORS/default localhost convenience. Keep the
+website in the CORS allowlist separately for authenticated browser requests.
+
+The email preserves the credential in a URL fragment. The website's existing
+`/workspace-invitation` redirect opens `/loi-moi` while retaining the fragment.
+Changing configuration affects new messages only; a previously delivered email
+cannot be rewritten or have its expired credential extended.
+
+Staff account provisioning grants the operational role but does not send a
+workspace invitation. A new Staff account sets its password through the production
+management site's existing OTP flow at
+`https://wedding-manage-web.vercel.app/reset-password`. This is separate from the
+Couple consultation invitation. This URL correction does not add automatic Staff
+invitations or change account provisioning.
+
 ## Initial Manager bootstrap
 
 Manager creation is an operator-only deployment operation. There is no public registration route

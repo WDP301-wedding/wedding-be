@@ -76,3 +76,46 @@ and real browser/provider verification remain open as DFI-02.
 All money/provider interactions in these tests are synthetic local records and a
 controlled VNPay checkout adapter. No actual provider settlement or deployed UI
 success is established. Deployment requires the new migration and matching backend.
+
+## Owner-authorized deployment — 2026-11-04
+
+The owner explicitly requested deployment of the migration and matching backend.
+PR [#98](https://github.com/WDP301-wedding/wedding-be/pull/98) was reviewed and merged
+after its exact-head CI passed, with no unresolved review comments. The merge commit
+also passed all four current release checks:
+[main CI run](https://github.com/WDP301-wedding/wedding-be/actions/runs/41749852834).
+The generated API structure is unchanged except for the two settlement descriptions.
+
+- Commit: `50b7a37af52a7eb9cd2f02ac900f83d77743c2b8`.
+- Target: existing Render service `wedding-be-render-trial`,
+  `srv-dbct9ao473hc73a5qud0`, workspace `tea-dbcss8ks728c73851hl0`.
+- Deployment: `dep-dbl84ee1egvs73e2gn80`, status **live**, finished at
+  **07:56:29 on 4 November 2026 (Asia/Saigon)**.
+- Explicitly merged `STRICT_SETTLEMENT_DATE_CHECK=false` into the service's
+  environment, preserving all other variables. This save triggered the matching
+  deployment, so no duplicate deploy was triggered. The existing service uses
+  Dashboard/API configuration; its Blueprint is not linked, and omission of this
+  service variable from the Blueprint does not delete it on a future sync.
+- New instance `srv-dbct9ao473hc73a5qud0-xv6b7` logged
+  `Applying migration 20261104110000_demo_settlement_date_policy` at 07:56:19,
+  followed by `All migrations have been successfully applied.`
+- Live `/health/live` and `/health/ready`: **200**. Live canonical OpenAPI SHA-256
+  matches the release: `1f88df2ec5b6ca8ad4a701b003267cc875d473bf32ba632575d6b21e9af8d7c4`.
+- A valid-shaped final-invoice POST without credentials returned **401**
+  `AUTHENTICATION_REQUIRED`. No invoice or payment was created by this check.
+- No error/fatal logs were returned for the new instance during the startup and
+  immediate post-deploy verification window.
+
+The GitHub connector could not create the PR (403); the existing configured Git
+identity completed the normal PR/CI/merge flow without exposing its credential.
+Direct database inspection was unavailable because external connections remain
+blocked, and SSH had no authorized key. Neither access control was relaxed.
+Migration completion is evidenced by the exact new-instance startup logs rather
+than inferred from health alone. No live invoice creation, payment, provider
+transaction or authenticated browser acceptance was performed; DFI-03 remains open.
+
+Rollback target is the prior retained deployment `dep-dbl73pvb9u1s73doa6kg`
+(commit `c1e5856fa697f6be1b9090a0a49c5a5291ca7b99`). Keep the forward migration,
+explicit demo policy and all financial history; do not reverse or delete invoices,
+ledger entries or settlement evidence. Ignored sanitized runtime receipt:
+`test-results/demo-settlement-live-receipt.json`.
