@@ -34,6 +34,9 @@ export const contractDraftSchema = z
   );
 export const contractDecisionSchema = z.strictObject({ expectedRevision: z.int().positive() });
 export const contractWithdrawalSchema = contractDecisionSchema.extend({ reason: text(500).min(1) });
+export const contractPdfQuerySchema = z.strictObject({
+  layout: z.enum(['retained', 'readable']).default('retained'),
+});
 export const contractLineSchema = commercialSelectionSchema.extend({
   name: text(120).min(1),
   description: text(2400),

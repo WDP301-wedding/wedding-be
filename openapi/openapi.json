@@ -1645,10 +1645,103 @@
                 ],
                 "type": "object"
               },
+              "commercialProgress": {
+                "additionalProperties": false,
+                "properties": {
+                  "contractState": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "DRAFT",
+                          "AWAITING_APPROVAL",
+                          "APPROVED",
+                          "SUPERSEDED"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "coupleApproved": {
+                    "type": "boolean"
+                  },
+                  "managerApproved": {
+                    "type": "boolean"
+                  },
+                  "modelVersion": {
+                    "enum": [
+                      "LEGACY_PROPOSAL_V1",
+                      "FULL_CONTRACT_V1"
+                    ],
+                    "type": "string"
+                  },
+                  "selectionStatus": {
+                    "enum": [
+                      "NOT_STARTED",
+                      "DRAFT",
+                      "SUBMITTED"
+                    ],
+                    "type": "string"
+                  },
+                  "timelineMatchesContract": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "modelVersion",
+                  "selectionStatus",
+                  "contractState",
+                  "managerApproved",
+                  "coupleApproved",
+                  "timelineMatchesContract"
+                ],
+                "type": "object"
+              },
               "consultationId": {
                 "format": "uuid",
                 "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                 "type": "string"
+              },
+              "depositTerms": {
+                "additionalProperties": false,
+                "properties": {
+                  "cancellationClosesAt": {
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                    "type": "string"
+                  },
+                  "cancellationNotice": {
+                    "type": "string"
+                  },
+                  "holdExpiresAt": {
+                    "anyOf": [
+                      {
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "paymentPending": {
+                    "type": "boolean"
+                  },
+                  "refundNotice": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "holdExpiresAt",
+                  "paymentPending",
+                  "cancellationClosesAt",
+                  "cancellationNotice",
+                  "refundNotice"
+                ],
+                "type": "object"
               },
               "effectiveTimeline": {
                 "anyOf": [
@@ -15769,8 +15862,22 @@
     },
     "/bookings/{bookingId}/contracts/{revisionId}/pdf": {
       "get": {
-        "description": "Private exact-version Vietnamese PDF. Approved bytes and SHA-256 are retained, including after supersession. Draft previews are identified as drafts. Snapshot digest differs from PDF byte digest. Does not imply digital signature.",
+        "description": "Private exact-version Vietnamese PDF. Approved bytes and SHA-256 are retained, including after supersession. Draft previews are identified as drafts. Snapshot digest differs from PDF byte digest. layout=readable renders the exact immutable snapshot with current typography as a clearly marked presentation copy; it never replaces retained PDF bytes. Does not imply digital signature.",
         "operationId": "downloadCommercialContractPdf",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "layout",
+            "schema": {
+              "default": "retained",
+              "enum": [
+                "retained",
+                "readable"
+              ],
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {

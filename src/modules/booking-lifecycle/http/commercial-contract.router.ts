@@ -8,6 +8,7 @@ import {
 } from '../../identity-access/authorization/authenticated-actor.middleware.js';
 import type { createCommercialContractService } from '../application/commercial-contract.service.js';
 import {
+  contractPdfQuerySchema,
   contractDraftSchema,
   contractDecisionSchema,
   contractWithdrawalSchema,
@@ -100,18 +101,16 @@ export function createCommercialContractRouter(
         : [idempotent('/bookings/{bookingId}/contract-selections/' + action)]),
       async (request, response) => {
         const { params, body } = validatedRequest(response, { params: paramsSchema, body: schema });
-        response
-          .set('Cache-Control', 'no-store')
-          .json(
-            selectionResponseSchema.parse({
-              data: await operation(
-                params.bookingId,
-                body,
-                response.locals.actor as AuthenticatedActor,
-                request.requestId,
-              ),
-            }),
-          );
+        response.set('Cache-Control', 'no-store').json(
+          selectionResponseSchema.parse({
+            data: await operation(
+              params.bookingId,
+              body,
+              response.locals.actor as AuthenticatedActor,
+              request.requestId,
+            ),
+          }),
+        );
       },
     );
   }
@@ -171,13 +170,17 @@ export function createCommercialContractRouter(
   router.get(
     path + '/:revisionId/pdf',
     authenticate,
-    validateRequest({ params: revisionParamsSchema }),
+    validateRequest({ params: revisionParamsSchema, query: contractPdfQuerySchema }),
     async (_request, response) => {
-      const { params } = validatedRequest(response, { params: revisionParamsSchema });
+      const { params, query } = validatedRequest(response, {
+        params: revisionParamsSchema,
+        query: contractPdfQuerySchema,
+      });
       const result = await service.pdf(
         params.bookingId,
         params.revisionId,
         response.locals.actor as AuthenticatedActor,
+        query.layout,
       );
       response
         .set({

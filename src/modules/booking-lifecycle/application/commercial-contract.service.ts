@@ -568,7 +568,12 @@ export function createCommercialContractService(options: Options) {
         return evidence(client, access, row, actor, requestId, 'withdrawn', input.reason);
       });
     },
-    async pdf(bookingId: string, revisionId: string, actor: AuthenticatedActor) {
+    async pdf(
+      bookingId: string,
+      revisionId: string,
+      actor: AuthenticatedActor,
+      layout: 'retained' | 'readable' = 'retained',
+    ) {
       return options.scope.boundary.run(
         { bookingId, context: context(actor, randomUUID()) },
         (scoped) =>
@@ -579,6 +584,8 @@ export function createCommercialContractService(options: Options) {
               include,
             });
             if (row === null) throw new NotFoundError();
+            if (layout === 'readable')
+              return renderContractPdf(contractView(row), { presentation: true });
             const retained = await client.commercialContractPdf.findUnique({
               where: { revisionId },
             });

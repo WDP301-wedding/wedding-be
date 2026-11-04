@@ -32,6 +32,25 @@ export const proposalResponseSchema = z.strictObject({
     revision,
     eventDate: z.iso.date(),
     planningHeadcount: z.int().min(0).max(10000),
+    commercialProgress: z
+      .strictObject({
+        modelVersion: z.enum(['LEGACY_PROPOSAL_V1', 'FULL_CONTRACT_V1']),
+        selectionStatus: z.enum(['NOT_STARTED', 'DRAFT', 'SUBMITTED']),
+        contractState: z.enum(['DRAFT', 'AWAITING_APPROVAL', 'APPROVED', 'SUPERSEDED']).nullable(),
+        managerApproved: z.boolean(),
+        coupleApproved: z.boolean(),
+        timelineMatchesContract: z.boolean(),
+      })
+      .optional(),
+    depositTerms: z
+      .strictObject({
+        holdExpiresAt: timestamp.nullable(),
+        paymentPending: z.boolean(),
+        cancellationClosesAt: timestamp,
+        cancellationNotice: z.string(),
+        refundNotice: z.string(),
+      })
+      .optional(),
     cancellationRequests: z
       .array(z.strictObject({ requestId: uuid, reason: z.string(), requestedAt: timestamp }))
       .optional(),

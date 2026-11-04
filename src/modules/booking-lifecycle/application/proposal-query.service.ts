@@ -2,6 +2,7 @@ import type { PrismaClient } from '../../../generated/prisma/client.js';
 import type { ConsultationAccessReader } from '../../identity-access/authorization/authorization.service.js';
 import { BookingLifecycleNotFoundError } from '../infrastructure/consultation.repository.js';
 import { proposalMenuLinesSchema } from '../domain/booking-policy.js';
+import { localVietnamTime } from '../domain/lifecycle.policy.js';
 
 type ProposalActor = Readonly<{
   accountId: string;
@@ -72,6 +73,44 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
         revision: booking.revision,
         eventDate: booking.eventDate.toISOString().slice(0, 10),
         planningHeadcount: booking.planningHeadcount,
+        commercialProgress: {
+          modelVersion: booking.commercialContract
+            ? ('FULL_CONTRACT_V1' as const)
+            : booking.commercialModelVersion,
+          selectionStatus:
+            booking.commercialSelections[0]?.status === 'SUBMITTED'
+              ? ('SUBMITTED' as const)
+              : booking.commercialSelections[0]
+                ? ('DRAFT' as const)
+                : ('NOT_STARTED' as const),
+          contractState: booking.commercialContract?.currentRevision?.state ?? null,
+          managerApproved:
+            booking.commercialContract?.currentRevision?.approvals.some(
+              (item) => item.party === 'MANAGER',
+            ) ?? false,
+          coupleApproved:
+            booking.commercialContract?.currentRevision?.approvals.some(
+              (item) => item.party === 'COUPLE',
+            ) ?? false,
+          timelineMatchesContract: Boolean(
+            booking.commercialContract?.currentRevision &&
+            booking.currentTimelineRevision &&
+            booking.commercialContract.currentRevision.timelineRevisionId ===
+              booking.currentTimelineRevision.id,
+          ),
+        },
+        depositTerms: {
+          holdExpiresAt: booking.slotHolds[0]?.expiresAt.toISOString() ?? null,
+          paymentPending,
+          cancellationClosesAt: localVietnamTime(
+            booking.eventDate.toISOString().slice(0, 10),
+            timeText(snapshot.shiftStartTime),
+          ).toISOString(),
+          cancellationNotice:
+            'Không thể hủy tiệc từ giờ bắt đầu ca tiệc. Yêu cầu hủy cần được nhà hàng tiếp nhận và xử lý.',
+          refundNotice:
+            'Hủy tiệc không tự động hoàn cọc. Khoản hoàn được nhà hàng xác nhận theo thỏa thuận và ghi nhận vào lịch sử giao dịch; không vượt quá số tiền đã thu chưa hoàn.',
+        },
         cancellationRequests: booking.cancellationRequests.map((request) => ({
           requestId: request.id,
           reason: request.reason,
@@ -162,6 +201,13 @@ async function requireProposal(prisma: PrismaClient, bookingId: string) {
       revision: true,
       eventDate: true,
       planningHeadcount: true,
+      commercialModelVersion: true,
+      commercialSelections: {
+        orderBy: { revisionNumber: 'desc' },
+        take: 1,
+        select: { status: true },
+      },
+      slotHolds: { where: { status: 'ACTIVE' }, take: 1, select: { expiresAt: true } },
       cancellationRequests: {
         where: { status: 'PENDING' },
         orderBy: [{ requestedAt: 'asc' }, { id: 'asc' }],
@@ -178,6 +224,8 @@ async function requireProposal(prisma: PrismaClient, bookingId: string) {
           currentRevision: {
             select: {
               state: true,
+              timelineRevisionId: true,
+              approvals: { select: { party: true } },
               contractTotalVnd: true,
               depositAmountVnd: true,
               document: true,

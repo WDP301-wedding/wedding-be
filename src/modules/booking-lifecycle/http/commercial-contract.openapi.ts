@@ -1,5 +1,6 @@
 import type { ZodOpenApiObject } from 'zod-openapi';
 import {
+  contractPdfQuerySchema,
   contractDraftSchema,
   contractDecisionSchema,
   contractWithdrawalSchema,
@@ -182,10 +183,13 @@ export const commercialContractOpenApiPaths = {
     parameters: [...parameters, revisionParameter],
     get: {
       operationId: 'downloadCommercialContractPdf',
+      parameters: [
+        contractPdfQuerySchema.shape.layout.meta({ param: { name: 'layout', in: 'query' } }),
+      ],
       tags: ['Booking lifecycle'],
       security,
       description:
-        'Private exact-version Vietnamese PDF. Approved bytes and SHA-256 are retained, including after supersession. Draft previews are identified as drafts. Snapshot digest differs from PDF byte digest. Does not imply digital signature.',
+        'Private exact-version Vietnamese PDF. Approved bytes and SHA-256 are retained, including after supersession. Draft previews are identified as drafts. Snapshot digest differs from PDF byte digest. layout=readable renders the exact immutable snapshot with current typography as a clearly marked presentation copy; it never replaces retained PDF bytes. Does not imply digital signature.',
       responses: {
         '200': {
           description: 'PDF attachment; Cache-Control: no-store.',
