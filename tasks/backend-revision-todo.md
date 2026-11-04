@@ -820,6 +820,8 @@ SPEC-01–05 or replace the separate provider/runtime readiness gates.
   use the explicit public website in staging/production, preserving credential
   fragments and the existing Staff password OTP workflow.
   [Verification](evidence/production-identity-mail-2026-11-04.md).
-- [ ] PIM-02: Release the matching backend and public website configuration to the
+- [x] PIM-02: Release the matching backend and public website configuration to the
   existing server after exact-head CI; verify startup and production landing pages.
-  No real email send or account reset is part of this configuration correction.
+  Commit `0a7b266`, Render deployment `dep-dbl8semc6qcc73aoqs30` is live with
+  `PUBLIC_INVITATION_WEB_ORIGIN=https://wedding-web-silk.vercel.app`.
+  No real email send or account reset was part of this configuration correction.
