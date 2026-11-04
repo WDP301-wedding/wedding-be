@@ -58,7 +58,7 @@ export function requireCancellationAllowed(
       'Không thể hủy tiệc ở trạng thái hiện tại.',
     );
   }
-  if (databaseNow.getTime() >= localVietnamTime(eventDate, shiftStartTime).getTime()) {
+  if (phase === 'CONFIRMED' && databaseNow.getTime() >= localVietnamTime(eventDate, shiftStartTime).getTime()) {
     throw new BookingLifecyclePolicyError(
       'BOOKING_CANCELLATION_NOT_ALLOWED',
       'Không thể hủy tiệc vì đã đến hoặc qua giờ bắt đầu tiệc.',

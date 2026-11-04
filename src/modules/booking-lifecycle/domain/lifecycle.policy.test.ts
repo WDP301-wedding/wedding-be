@@ -58,6 +58,25 @@ describe('post-deposit lifecycle policy', () => {
     ).toThrow(BookingLifecyclePolicyError);
   });
 
+  it('allows cancellation for past unconfirmed bookings', () => {
+    expect(() =>
+      requireCancellationAllowed(
+        'DRAFT',
+        '2026-11-01',
+        '17:30',
+        new Date('2026-11-05T10:30:00.000Z'),
+      ),
+    ).not.toThrow();
+    expect(() =>
+      requireCancellationAllowed(
+        'AWAITING_DEPOSIT',
+        '2026-11-01',
+        '17:30',
+        new Date('2026-11-05T10:30:00.000Z'),
+      ),
+    ).not.toThrow();
+  });
+
   it('allows completion twelve hours after the snapshotted shift end', () => {
     vi.stubEnv('STRICT_SETTLEMENT_DATE_CHECK', 'true');
     expect(() =>
