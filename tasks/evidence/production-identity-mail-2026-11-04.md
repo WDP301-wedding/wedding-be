@@ -39,7 +39,43 @@ are unchanged. No database migration or API shape change is needed.
 - Inverting the deployed-origin guard caused the regression tests to fail; the
   original source was restored. A test-only mock's branded idempotency key was
   corrected after typecheck exposed its invalid fixture type.
-- Remaining static/release checks are recorded when complete below.
+- Local typecheck, build, changed-source ESLint and OpenAPI generation/check passed.
+  The generated OpenAPI digest is unchanged.
 
 An already delivered message cannot be rewritten. These checks do not claim a new
 real email delivery, inbox/spam placement or acceptance of a real invitation.
+
+## Production release
+
+[PR #99](https://github.com/WDP301-wedding/wedding-be/pull/99) merged after all
+PR checks passed with no review comments. The exact merge commit
+`0a7b266f0f96ca0b56448aabefd92ef7dd388db3` passed all release checks in
+[main CI](https://github.com/WDP301-wedding/wedding-be/actions/runs/41755499239):
+lint, PostgreSQL native gates, 175 unit-test files / 1,580 passing tests, build,
+API lock and dependency audit with no high/critical advisories.
+
+Merged only `PUBLIC_INVITATION_WEB_ORIGIN=https://wedding-web-silk.vercel.app`
+into existing Render service `srv-dbct9ao473hc73a5qud0`, workspace
+`tea-dbcss8ks728c73851hl0`; all other variables were preserved. This matches the
+existing Blueprint value. Saving the variable triggered deployment
+`dep-dbl8semc6qcc73aoqs30` of the approved merge commit, so no duplicate deploy
+was triggered. It became **live at 08:47:51 on 4 November 2026 (Asia/Saigon)**.
+
+New instance `srv-dbct9ao473hc73a5qud0-7gxtp` logged `No pending migrations to
+apply.` The release changes no schema or financial data. Post-live checks:
+
+- `/health/live` and `/health/ready`: 200.
+- Canonical live OpenAPI SHA-256 matches the release:
+  `1f88df2ec5b6ca8ad4a701b003267cc875d473bf32ba632575d6b21e9af8d7c4`.
+- Unauthenticated Staff provisioning POST: 401 `AUTHENTICATION_REQUIRED`.
+- Production `/workspace-invitation`: 308 to `/loi-moi`; destination: 200.
+- Production management `/reset-password`: 200.
+- No error/fatal logs returned for the new instance during startup and the
+  immediate verification window. The explicit production-origin validation did
+  not prevent startup.
+
+No real email, invitation acceptance, account provisioning or password reset was
+performed. The screenshot's already delivered old message remains unchanged.
+Sanitized local receipt: `test-results/production-mail-live-receipt.json` (ignored).
+Rollback can reuse retained deployment `dep-dbl84ee1egvs73e2gn80` while preserving
+the explicit website setting and all existing migration/account/financial history.
