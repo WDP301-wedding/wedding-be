@@ -16,6 +16,7 @@ export function rethrowInvoiceFailure(error: unknown): never {
     if (error.code === 'P2004' || error.code === 'P2010') {
       const detail = JSON.stringify(error.meta ?? {});
       const known = [
+        ['commercial invoice requires eligible booking', 'INVOICE_NOT_ELIGIBLE'],
         ['commercial invoice requires authoritative event end', 'EVENT_NOT_ENDED'],
         ['unresolved payment pins monetary revisions', 'PAYMENT_ATTEMPT_ACTIVE'],
         ['invoice predecessor is stale', 'INVOICE_REVISION_STALE'],

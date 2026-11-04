@@ -28,6 +28,7 @@ import { printOrderResponseSchema } from '../../src/modules/invitation-studio/ht
 import { ipnFixture } from './payments-billing/vnpay-fixture.js';
 import { registerContractedPrintPriceApiCases } from './contracted-print-price-api-cases.js';
 import { registerCommercialSettlementJourney } from './commercial-settlement-journey.js';
+import { registerDemoSettlementApiCases } from './demo-settlement-api-cases.js';
 export type CommercialApiFixture = {
   id: string;
   consultationId: string;
@@ -71,6 +72,7 @@ export type StepSixApiHarness = {
 export function registerStepSixApiCases(harness: StepSixApiHarness) {
   registerContractedPrintPriceApiCases(harness);
   registerCommercialSettlementJourney(harness);
+  registerDemoSettlementApiCases(harness);
   const {
     database,
     post,
