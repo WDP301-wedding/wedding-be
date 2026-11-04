@@ -37799,7 +37799,7 @@
         }
       ],
       "post": {
-        "description": "Manager after event end. Exact commercial/draft/billing revisions. Freeze original contract, all approved appendices and expenses (including zero). Atomically post only incidental delta, audit/outbox and current invoice.",
+        "description": "Manager, CONFIRMED/COMPLETED non-cancelled. Demo permits settlement before event end by default; STRICT_SETTLEMENT_DATE_CHECK=true requires authoritative event end. Exact commercial/draft/billing revisions. Freeze original contract, all approved appendices and expenses (including zero). Atomically post only incidental delta, audit/outbox and current invoice.",
         "operationId": "finalizeCommercialInvoice",
         "parameters": [
           {
@@ -38861,7 +38861,7 @@
         }
       ],
       "post": {
-        "description": "Manager after authoritative event end, CONFIRMED/COMPLETED non-cancelled. Expected draft revision, integer VND; server total and audit. No ledger charge before finalization.",
+        "description": "Manager, CONFIRMED/COMPLETED non-cancelled. Demo permits settlement before event end by default; STRICT_SETTLEMENT_DATE_CHECK=true requires authoritative event end. Expected draft revision, integer VND; server total and audit. No ledger charge before finalization.",
         "operationId": "createIncidentalExpense",
         "parameters": [
           {

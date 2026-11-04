@@ -87,8 +87,12 @@ write. Missing/cross-booking resources are concealed by owner authorization.
 An expense line has `name`, positive integer `quantity`, `unit`, nonnegative
 integer `unitPriceVnd` and optional `note`. The server calculates `totalVnd` and
 rejects fractional money, overflow and client-provided totals. Mutation requires
-the authoritative event end in Vietnam time, a CONFIRMED/COMPLETED non-cancelled
-booking and an unfinalized draft. It does not wait for the separate +12-hour
+the authoritative event end in Vietnam time when `STRICT_SETTLEMENT_DATE_CHECK=true`,
+a CONFIRMED/COMPLETED non-cancelled booking and an unfinalized draft. The owner-approved
+demo default permits settlement before event end. Application and PostgreSQL guards
+share this policy through a transaction-local setting; unscoped SQL stays strict.
+Deploy migration `20261104110000_demo_settlement_date_policy` with the matching backend.
+It does not wait for the separate +12-hour
 completion job. Draft changes write audit facts and do not post receivables.
 
 Finalization freezes the original contract, all approved appendices, exact

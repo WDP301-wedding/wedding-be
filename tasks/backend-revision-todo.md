@@ -798,3 +798,13 @@ SPEC-01–05 or replace the separate provider/runtime readiness gates.
   matching backend, verify the exact deployed API and backfilled owners, then
   complete app-team adoption/native provider-browser return and sandbox checks.
   Local controlled-provider proof does not establish a live deposit or deployed UI.
+
+## Demo final invoice date policy — 2026-11-04
+
+- [x] DFI-01: Reproduce the Manager final-invoice HTTP 500 and align PostgreSQL
+  event-end guards with the existing default demo bypass using a forward migration
+  and transaction-local policy. Preserve authorization and financial invariants.
+  [Fix and verification](evidence/demo-final-invoice-2026-11-04.md).
+- [ ] DFI-02: Apply the matching migration/backend to the deployed demo target and
+  verify Manager finalization and the final-payment UI. Local controlled-provider
+  tests do not establish live deployment or provider settlement.

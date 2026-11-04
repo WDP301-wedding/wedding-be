@@ -143,5 +143,8 @@ jobs:
       - name: Verify appendix print consent, production synchronization and money races
         run: npx vitest run tests/integration/commercial-contracts-api.test.ts --maxWorkers=1 -t 'appendix print requests:'
 
+      - name: Verify demo final invoice and strict settlement policy
+        run: npx vitest run tests/integration/commercial-contracts-api.test.ts --maxWorkers=1 -t 'demo finalizes|strict mode refuses|demo settlement rejects'
+
       - name: Verify authenticated retained PDF and Seating downloads
         run: npx vitest run tests/integration/invitation-studio/print-file.test.ts tests/integration/seating-print-files.test.ts --maxWorkers=1
