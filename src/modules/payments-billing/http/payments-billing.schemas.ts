@@ -37,6 +37,8 @@ export const manualBodySchema = z.strictObject({
     .optional(),
   amountVnd: vnd.positive(),
   settledAt: instant,
+  expectedBillingRevision: revision.optional(),
+  timelineRevisionId: uuid.optional(),
   reason: evidence.reason.optional(),
   evidenceReference: evidence.evidenceReference.optional(),
 });

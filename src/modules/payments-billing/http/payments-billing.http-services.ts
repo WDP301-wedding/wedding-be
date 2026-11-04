@@ -266,6 +266,15 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
               evidenceReference: submitted.evidenceReference ?? commandId,
             };
             if (manual.purpose === 'DEPOSIT') {
+              if (
+                manual.timelineRevisionId !== undefined &&
+                manual.timelineRevisionId !== booking.currentTimelineRevisionId
+              )
+                throw new AppError({
+                  status: 409,
+                  code: 'CONTRACT_REVISION_STALE',
+                  message: 'Kịch bản đã thay đổi. Kiểm tra lại khoản cọc.',
+                });
               if (booking.currentTimelineRevisionId === null)
                 throw new AppError({
                   status: 409,
@@ -288,7 +297,7 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
                   ...manual,
                   commandId,
                   purpose: 'BALANCE',
-                  expectedBillingRevision: ledger.revision,
+                  expectedBillingRevision: manual.expectedBillingRevision ?? ledger.revision,
                 },
                 ctx,
               );
@@ -368,6 +377,15 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
     ) {
       await authorize(bookingId, actor, 'FULL');
       return providers.views.read({ bookingId, ...query }, context(actor, requestId));
+    },
+    async recording(
+      bookingId: string,
+      query: { afterRevision: number; limit: number },
+      actor: AuthenticatedActor,
+      requestId: string,
+    ) {
+      await authorize(bookingId, actor, 'FULL', true);
+      return providers.recording(bookingId, query, context(actor, requestId));
     },
     async activeAttempts(bookingId: string, actor: AuthenticatedActor) {
       const booking = await authorize(bookingId, actor, 'RESTRICTED');

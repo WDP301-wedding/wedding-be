@@ -1,3 +1,4 @@
+import { recordingQuerySchema, recordingResponseSchema } from './billing-recording.schemas.js';
 import { Router, type RequestHandler, type ErrorRequestHandler } from 'express';
 import {
   AppError,
@@ -191,6 +192,27 @@ export function createPaymentsBillingRouter(
             request.requestId,
           ),
         }),
+      );
+    }),
+  );
+  router.get(
+    '/management/bookings/:bookingId/billing-recording',
+    authenticate,
+    validateRequest({ params: bookingParamsSchema, query: recordingQuerySchema }),
+    handle(async (request, response) => {
+      const { params, query } = validatedRequest(response, {
+        params: bookingParamsSchema,
+        query: recordingQuerySchema,
+      });
+      response.json(
+        recordingResponseSchema.parse(
+          await services.recording(
+            params.bookingId,
+            query,
+            response.locals.actor as AuthenticatedActor,
+            request.requestId,
+          ),
+        ),
       );
     }),
   );

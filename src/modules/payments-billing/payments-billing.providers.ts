@@ -1,3 +1,4 @@
+import { createBillingRecordingReader } from './infrastructure/billing-recording.reader.js';
 import { createManualRefundDecisionResolver } from './infrastructure/manual-refund-decision.js';
 import { createBillingFinancialOverviewReader } from './infrastructure/billing-financial-overview.reader.js';
 import { randomUUID } from 'node:crypto';
@@ -95,6 +96,7 @@ export function createPaymentsBillingProviders(
     recorder: booking.deposits,
   });
   return Object.freeze({
+    recording: createBillingRecordingReader(scope, operationsRepository, invoice),
     expenses: createIncidentalExpenseService({
       scope,
       boundary,

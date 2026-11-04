@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { recordingQuerySchema, recordingResponseSchema } from './billing-recording.schemas.js';
 import type { ZodOpenApiObject } from 'zod-openapi';
 import {
   depositBodySchema,
@@ -87,6 +88,28 @@ function mutation(
   };
 }
 export const paymentsBillingOpenApiPaths: NonNullable<ZodOpenApiObject['paths']> = {
+  '/management/bookings/{bookingId}/billing-recording': {
+    get: {
+      operationId: 'getManagementBillingRecording',
+      summary:
+        'Manager-only read-only manual recording eligibility and independently paginated payment refund capacities. No provider calls or financial writes.',
+      tags: ['Payments and Billing'],
+      security: bearer,
+      parameters: [
+        ...booking,
+        ...Object.entries(recordingQuerySchema.shape).map(([name, schema]) =>
+          schema.meta({ param: { name, in: 'query' } }),
+        ),
+      ],
+      responses: {
+        '200': response(
+          'Current ledger revision, manual eligibility and refund capacities. Rechecked atomically on writes.',
+          recordingResponseSchema,
+        ),
+        ...errors,
+      },
+    },
+  },
   '/bookings/{bookingId}/payments/active': {
     get: {
       operationId: 'getActivePaymentAttempts',
