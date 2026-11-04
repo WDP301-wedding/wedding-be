@@ -40,6 +40,7 @@ export function createMediaAccessGuard(
   resolver: AuthenticatedActorResolver,
   booking: MediaBookingReader | undefined,
   eventStart: MediaEventStartReader | undefined,
+  options: { allowCompleted?: boolean } = {},
 ): MediaAccessGuard {
   return createResolvedMediaAccessGuard(
     async (context) => {
@@ -48,6 +49,7 @@ export function createMediaAccessGuard(
     },
     booking,
     eventStart,
+    options,
   );
 }
 
@@ -59,6 +61,7 @@ export function createResolvedMediaAccessGuard(
   ) => Promise<{ accountId: string; roles: readonly string[] }>,
   booking: MediaBookingReader | undefined,
   eventStart: MediaEventStartReader | undefined,
+  options: { allowCompleted?: boolean } = {},
 ): MediaAccessGuard {
   return {
     async requireAccess(bookingId, context) {
@@ -80,7 +83,12 @@ export function createResolvedMediaAccessGuard(
               minimum: 'FULL',
             })
           : null;
-      if (access !== null && (access.bookingId !== bookingId || access.phase !== 'CONFIRMED'))
+      if (
+        access !== null &&
+        (access.bookingId !== bookingId ||
+          (access.phase !== 'CONFIRMED' &&
+            !(options.allowCompleted === true && access.phase === 'COMPLETED')))
+      )
         throw new NotFoundError();
       const confirmed = await booking.requireConfirmedEventContext(bookingId);
       if (

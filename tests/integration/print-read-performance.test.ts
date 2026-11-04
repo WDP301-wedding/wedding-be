@@ -71,8 +71,18 @@ describeDb('PERF-07 print page detail work', () => {
         );
         expect(page.items).toHaveLength(limit);
         expect(page.items.map((order) => order.orderId)).toEqual(orderedIds.slice(0, limit));
-        for (const item of page.items)
-          expect(item).toEqual(expected.find((e) => e.orderId === item.orderId));
+        for (const item of page.items) {
+          const { bookingSummary, ...order } = item;
+          expect(order).toEqual(expected.find((e) => e.orderId === item.orderId));
+          expect(bookingSummary?.bookingCode).toMatch(/^HY-/u);
+          expect(bookingSummary).toEqual({
+            bookingCode: bookingSummary?.bookingCode,
+            brideName: null,
+            groomName: null,
+            eventDate: new Date(f.now.getTime() + 10 * 86400000).toISOString().slice(0, 10),
+            hallName: 'Approved hall',
+          });
+        }
         expect(page.nextCursor).toBe(page.items.at(-1)!.orderId);
         expect(lines).toHaveBeenCalledTimes(1);
         const next = await f.services.printOrders.listManagementPrintOrders(
@@ -206,7 +216,9 @@ describeDb('PERF-07 print page detail work', () => {
         );
         expect(page.items).toHaveLength(limit);
         for (const item of page.items) {
-          expect(item).toEqual(expected.find((e) => e.orderId === item.orderId));
+          const { bookingSummary, ...order } = item;
+          expect(order).toEqual(expected.find((e) => e.orderId === item.orderId));
+          expect(bookingSummary).toMatchObject({ hallName: 'Approved hall' });
           expect(item.currentCommercialRevision!.orderTotalVnd).toBe(
             item.lines[0]!.quantity * 1000,
           );

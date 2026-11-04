@@ -55,6 +55,9 @@ jobs:
       - name: Verify realtime authentication admission
         run: npx vitest run tests/integration/realtime-auth-admission.test.ts --maxWorkers=1
 
+      - name: Verify health probes remain available under API rate limiting
+        run: npx vitest run tests/integration/health.test.ts tests/integration/security.test.ts --maxWorkers=1
+
       - name: Verify generated OpenAPI artifact
         run: npm run api:check
 
@@ -147,4 +150,4 @@ jobs:
         run: npx vitest run tests/integration/commercial-contracts-api.test.ts --maxWorkers=1 -t 'demo finalizes|strict mode refuses|demo settlement rejects'
 
       - name: Verify authenticated retained PDF and Seating downloads
-        run: npx vitest run tests/integration/invitation-studio/print-file.test.ts tests/integration/seating-print-files.test.ts --maxWorkers=1
+        run: npx vitest run tests/integration/invitation-studio/print-file.test.ts tests/integration/seating-print-files.test.ts tests/integration/print-booking-summary.test.ts --maxWorkers=1

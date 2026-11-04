@@ -9,6 +9,10 @@ import { createScopedLayoutReader } from '../../venue-catalog/infrastructure/sco
 import { createPersistentMediaService } from './media.composition.js';
 import { StudioRepository } from './studio.repository.js';
 import { StudioAuthorization } from './studio-authorization.js';
+import { createPrismaBookingReaders } from '../../booking-lifecycle/infrastructure/prisma-booking.readers.js';
+import { createMediaAccessGuard } from '../application/media-access.guard.js';
+import { createMediaEventStartReader } from '../application/media-event-start.reader.js';
+import { createPrismaPrintBookingSummaryReader } from '../../booking-lifecycle/infrastructure/print-booking-summary.reader.js';
 import { DesignService } from './design.service.js';
 import { DerivedAssetsService } from './derived-assets.service.js';
 import { GenerationService } from './generation.service.js';
@@ -44,6 +48,26 @@ export function createInvitationStudioServices(
     (context) => repository.recordTemplateDeniedAccess(context),
   );
   const fulfillment = createContractedPrintFulfillment();
+  // Existing print fulfilment and retained files outlive event organization.
+  // Design/media mutations keep the original CONFIRMED-only authorization.
+  const printReaders = createPrismaBookingReaders(
+    prisma,
+    media.boundary,
+    media.identity.access,
+    media.billing,
+    { allowCompleted: true },
+  );
+  const printAuthorization = new StudioAuthorization(
+    createMediaAccessGuard(
+      media.identity.resolver,
+      printReaders.booking,
+      createMediaEventStartReader(printReaders.timeline),
+      { allowCompleted: true },
+    ),
+    editor,
+    (bookingId, context) => media.repository.recordDeniedAccess(bookingId, context),
+    (context) => repository.recordTemplateDeniedAccess(context),
+  );
   const designs = new DesignService(repository, authorization, now, fulfillment);
   const derivedAssets = new DerivedAssetsService(repository, authorization, storage);
   const generation = new GenerationService(repository, authorization, media.service, ai);
@@ -80,13 +104,15 @@ export function createInvitationStudioServices(
     media.timeline,
     now,
     fulfillment,
+    printAuthorization,
+    createPrismaPrintBookingSummaryReader(prisma),
   );
   const automation = new PrismaInvitationAutomationReader(prisma);
   const reporting = new PrismaInvitationReportingReader(prisma);
   return {
     ...media,
     studioRepository: repository,
-    printFiles: new PrintFileService(repository, authorization, storage),
+    printFiles: new PrintFileService(repository, printAuthorization, storage),
     designs,
     designSuggestions: new DesignSuggestionService(repository, authorization, aiDesign),
     derivedAssets,

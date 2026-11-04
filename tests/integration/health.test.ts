@@ -13,6 +13,23 @@ import { startServer } from '../../src/server.js';
 const trustedRequestId = '24dcfaac-4408-4d42-8d66-456ed6ee7ea4';
 
 describe('health endpoints', () => {
+  it('keeps readiness and liveness independent of an exhausted application rate limit', async () => {
+    const app = createApp({
+      securityConfig: {
+        bodyLimitBytes: 1024,
+        requestTimeoutMs: 1000,
+        replicaCount: 1,
+        rateLimit: { maxRequests: 1, windowMs: 60000 },
+      },
+    });
+    expect((await request(app).get('/not-a-route')).status).toBe(404);
+    expect((await request(app).get('/not-a-route')).status).toBe(429);
+    for (const path of ['/health/ready', '/health/live', '/health/ready']) {
+      expect((await request(app).get(path)).status).toBe(200);
+    }
+    expect((await request(app).get('/not-a-route')).status).toBe(429);
+  });
+
   it('returns dependency-free liveness with a stable response schema', async () => {
     const readinessProbe = vi.fn<ReadinessProbe>().mockRejectedValue(new Error('database offline'));
     const app = createApp({

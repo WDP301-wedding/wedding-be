@@ -117,6 +117,39 @@ const database = new CatalogTestDatabase('printfile');
       ).toBe(0);
       expect(f.storage.bucket.remove).not.toHaveBeenCalled();
     }, 30000);
+    it('keeps retained PDF access after completion without reopening design editing', async () => {
+      const { f, d, captured } = await fixture();
+      const before = await f.services.printFiles.read(
+        f.bookingId,
+        captured.printableRevisionId,
+        f.manager,
+      );
+      await f.prisma.booking.update({
+        where: { id: f.bookingId },
+        data: { phase: 'COMPLETED', completedAt: f.now },
+      });
+      for (const actor of [f.manager, f.couple]) {
+        const after = await f.services.printFiles.read(
+          f.bookingId,
+          captured.printableRevisionId,
+          actor,
+        );
+        expect(after.bytes.equals(before.bytes)).toBe(true);
+      }
+      await expect(
+        f.services.designs.edit(
+          {
+            bookingId: f.bookingId,
+            designId: d.designId,
+            expectedRevision: 1,
+            textFields: { greeting: 'Changed' },
+            idempotencyKey: randomUUID(),
+          },
+          f.couple,
+        ),
+      ).rejects.toMatchObject({ status: 404 });
+    }, 30000);
+
     it('denies strangers, Staff, revoked sessions and unknown/cross-booking revisions', async () => {
       const { f, captured } = await fixture();
       for (const actor of [await f.actor('COUPLE'), await f.actor('STAFF')])

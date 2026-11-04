@@ -279,6 +279,7 @@ describe('HTTP security baseline', () => {
     const parsed = parseEnvironment({
       CORS_ALLOWED_ORIGINS: allowedOrigin,
       RATE_LIMIT_MAX_REQUESTS: '1',
+      DATABASE_URL: 'postgresql://test:test@127.0.0.1:1/test',
     });
     const config = {
       ...parsed,
@@ -290,7 +291,10 @@ describe('HTTP security baseline', () => {
 
     try {
       expect(createVenueCatalogRuntime).toHaveBeenCalledWith(config);
-      expect(createPaymentsBillingRuntime).toHaveBeenCalledWith(config);
+      expect(vi.mocked(createPaymentsBillingRuntime).mock.calls[0]?.[0]).toEqual(config);
+      expect(vi.mocked(createPaymentsBillingRuntime).mock.calls[0]?.[1]).toHaveProperty(
+        '$queryRaw',
+      );
       const firstResponse = await request(running.httpServer)
         .get('/health/live')
         .set('origin', allowedOrigin);
@@ -300,8 +304,11 @@ describe('HTTP security baseline', () => {
 
       expect(firstResponse.status).toBe(200);
       expect(firstResponse.headers['access-control-allow-origin']).toBe(allowedOrigin);
-      expect(limitedResponse.status).toBe(429);
-      expect(limitedResponse.body as unknown).toMatchObject({
+      expect(limitedResponse.status).toBe(200);
+      expect((await request(running.httpServer).get('/unknown-route')).status).toBe(404);
+      const limitedApi = await request(running.httpServer).get('/unknown-route');
+      expect(limitedApi.status).toBe(429);
+      expect(limitedApi.body as unknown).toMatchObject({
         error: { code: 'RATE_LIMITED' },
       });
     } finally {
@@ -318,6 +325,18 @@ vi.mock('../../src/modules/analytics-dashboard/analytics.runtime.js', async () =
       start: vi.fn(),
       stop: vi.fn(),
       resource: { name: 'analytics', close: vi.fn() },
+    })),
+  };
+});
+
+vi.mock('../../src/modules/notifications-automation/notifications.runtime.js', async () => {
+  const { Router } = await import('express');
+  return {
+    createNotificationsRuntime: vi.fn(() => ({
+      router: Router(),
+      start: vi.fn(),
+      stop: vi.fn(),
+      resource: { name: 'notifications', close: vi.fn() },
     })),
   };
 });

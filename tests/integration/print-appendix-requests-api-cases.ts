@@ -14,7 +14,10 @@ import {
   printRequestQuoteSchema,
   printRequestResponseSchema,
 } from '../../src/modules/invitation-studio/domain/print-request.js';
-import { printOrderListResponseSchema } from '../../src/modules/invitation-studio/http/print-orders.schemas.js';
+import {
+  printOrderListResponseSchema,
+  printOrderResponseSchema,
+} from '../../src/modules/invitation-studio/http/print-orders.schemas.js';
 
 export function registerPrintAppendixRequestCases(h: StepSixApiHarness) {
   const { post, get, database } = h;
@@ -229,6 +232,35 @@ export function registerPrintAppendixRequestCases(h: StepSixApiHarness) {
         where: { bookingId: f.f.id, sourceType: 'PRINT_ORDER' },
       }),
     ).toBe(0);
+  }, 45000);
+
+  it('appendix print requests: completed events retain authorized production and booking context without new charges', async () => {
+    const f = await prepared();
+    await consent(f);
+    await approve(f.f.id);
+    const original = (await orders(f.f.id))[0]!;
+    await database.prisma.booking.update({
+      where: { id: f.f.id },
+      data: { phase: 'COMPLETED', completedAt: new Date() },
+    });
+    const ledger = await database.prisma.billingLedgerEntry.findMany({
+      where: { bookingId: f.f.id },
+      orderBy: { id: 'asc' },
+    });
+    const production = await post(`/management/print-orders/${original.orderId}/production`, {
+      expectedRevision: original.revision,
+    });
+    expect(production.status, JSON.stringify(production.body)).toBe(200);
+    const produced = printOrderResponseSchema.parse(production.body as unknown).data;
+    expect(produced.status).toBe('IN_PRODUCTION');
+    expect(produced.bookingSummary?.eventDate).toMatch(/^\d{4}-\d{2}-\d{2}$/u);
+    expect(produced.bookingSummary?.hallName).toBeTypeOf('string');
+    expect(
+      await database.prisma.billingLedgerEntry.findMany({
+        where: { bookingId: f.f.id },
+        orderBy: { id: 'asc' },
+      }),
+    ).toEqual(ledger);
   }, 45000);
 
   it('appendix print requests: successor quantity/removal changes sync only on mutual approval and block pending production', async () => {

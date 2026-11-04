@@ -76,10 +76,12 @@ export function createApp(options: CreateAppOptions = {}): Express {
   });
   app.use(createCorsMiddleware(options.corsConfig ?? { allowedOrigins: [] }));
   app.use(createRequestDeadline(securityConfig.requestTimeoutMs));
+  // Platform probes must not share an application client's exhausted quota:
+  // returning 429 here can evict and restart an otherwise healthy instance.
+  app.use('/health', createHealthRouter(options));
   app.use(createGeneralRateLimit(securityConfig.rateLimit, options.redisClient));
   options.registerBodyParsers?.(app);
   app.use(express.json({ limit: securityConfig.bodyLimitBytes }));
-  app.use('/health', createHealthRouter(options));
   if (options.metricsConfig?.enabled === true) {
     app.use(createMetricsRouter({ metrics, token: options.metricsConfig.token }));
   }

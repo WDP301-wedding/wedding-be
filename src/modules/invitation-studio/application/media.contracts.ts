@@ -16,8 +16,10 @@ export interface MediaRequestContext {
   readonly deferDeniedAccess?: (persist: () => Promise<void>) => void;
 }
 
-/** The adapter must re-resolve enabled/current identity, own FULL access and CONFIRMED
- * Booking on every call. Staff, restricted, revoked and unowned access are denied.
+/** The default adapter re-resolves enabled/current identity, own FULL access and
+ * CONFIRMED Booking on every call. The separately composed retained-print guard
+ * also accepts COMPLETED; it never authorizes new media/design mutations.
+ * Staff, restricted, revoked and unowned access are denied.
  * eventStartAt is an absolute instant from the authoritative restaurant calendar,
  * never a client date or a guessed LUNCH/DINNER start time. */
 export interface MediaAccessGuard {
