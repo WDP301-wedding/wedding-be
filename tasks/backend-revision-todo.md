@@ -805,6 +805,11 @@ SPEC-01–05 or replace the separate provider/runtime readiness gates.
   event-end guards with the existing default demo bypass using a forward migration
   and transaction-local policy. Preserve authorization and financial invariants.
   [Fix and verification](evidence/demo-final-invoice-2026-11-04.md).
-- [ ] DFI-02: Apply the matching migration/backend to the deployed demo target and
-  verify Manager finalization and the final-payment UI. Local controlled-provider
-  tests do not establish live deployment or provider settlement.
+- [x] DFI-02: Apply the matching migration/backend to the deployed demo target and
+  verify the deployed commit, startup migration result, API digest and authentication
+  guard. Render deployment `dep-dbl84ee1egvs73e2gn80` is live on commit `50b7a37`;
+  `STRICT_SETTLEMENT_DATE_CHECK=false` is explicitly configured. See the deployment
+  receipt in the [verification record](evidence/demo-final-invoice-2026-11-04.md).
+- [ ] DFI-03: Verify authenticated Manager finalization and the final-payment UI
+  using an approved demo booking. Deployment and local controlled-provider tests
+  do not establish a real provider settlement or an authenticated browser journey.
