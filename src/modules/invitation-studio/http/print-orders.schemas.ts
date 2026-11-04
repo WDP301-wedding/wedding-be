@@ -55,6 +55,15 @@ export const commercialRevisionViewSchema = z.strictObject({
 });
 
 export const printOrderViewSchema = z.strictObject({
+  bookingSummary: z
+    .strictObject({
+      bookingCode: z.string(),
+      brideName: z.string().nullable(),
+      groomName: z.string().nullable(),
+      eventDate: z.iso.date(),
+      hallName: z.string().nullable(),
+    })
+    .optional(),
   appendixSource: z
     .strictObject({
       requestId: id,

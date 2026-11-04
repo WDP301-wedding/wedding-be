@@ -9,7 +9,7 @@ describe('SPEC-05 current Identity/Booking guard adapter', () => {
     consultationId = randomUUID(),
     actorId = randomUUID();
   const context = { actorId, requestId: randomUUID(), accessToken: 'server-only-token' };
-  function harness() {
+  function harness(options: { allowCompleted?: boolean } = {}) {
     const resolver: AuthenticatedActorResolver = {
       resolve: vi.fn(() =>
         Promise.resolve({
@@ -41,7 +41,7 @@ describe('SPEC-05 current Identity/Booking guard adapter', () => {
       resolver,
       booking,
       calendar,
-      guard: createMediaAccessGuard(resolver, booking, calendar),
+      guard: createMediaAccessGuard(resolver, booking, calendar, options),
     };
   }
   it('re-resolves current identity and exact own FULL confirmed context on every call', async () => {
@@ -61,6 +61,35 @@ describe('SPEC-05 current Identity/Booking guard adapter', () => {
       expect.objectContaining({ eventDate: '2026-10-15', shiftCode: 'DINNER' }),
       context,
     );
+  });
+  it('allows completed access only for the explicit retained-print guard', async () => {
+    for (const allowCompleted of [false, true]) {
+      const h = harness({ allowCompleted });
+      vi.spyOn(h.booking, 'requireBookingAccess').mockResolvedValue({
+        bookingId,
+        consultationId,
+        phase: 'COMPLETED',
+      });
+      if (allowCompleted)
+        await expect(h.guard.requireAccess(bookingId, context)).resolves.toMatchObject({
+          role: 'COUPLE',
+        });
+      else
+        await expect(h.guard.requireAccess(bookingId, context)).rejects.toMatchObject({
+          status: 404,
+        });
+    }
+    for (const phase of ['DRAFT', 'AWAITING_DEPOSIT', 'CANCELLED'] as const) {
+      const h = harness({ allowCompleted: true });
+      vi.spyOn(h.booking, 'requireBookingAccess').mockResolvedValue({
+        bookingId,
+        consultationId,
+        phase,
+      });
+      await expect(h.guard.requireAccess(bookingId, context)).rejects.toMatchObject({
+        status: 404,
+      });
+    }
   });
   it('authorizes Manager confirmed context without granting Staff private access', async () => {
     const h = harness();

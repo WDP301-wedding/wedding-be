@@ -1,6 +1,7 @@
 import type { PrintOrderStatus } from '../domain/print-policy.js';
 import type { z } from 'zod';
 import type { commercialPrintSnapshotSchema } from '../domain/contracted-print.js';
+import type { PrintBookingSummary } from '../../booking-lifecycle/application/print-booking-summary.reader.js';
 
 export interface PrintLineView {
   lineId: string;
@@ -30,6 +31,7 @@ export interface CommercialRevisionView {
 }
 
 export interface PrintOrderView {
+  bookingSummary?: PrintBookingSummary;
   appendixSource?: {
     requestId: string;
     appendixRevisionId: string;

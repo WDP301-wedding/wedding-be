@@ -42,6 +42,7 @@ import { studioPhase } from './studio-phase.js';
 import { requireAppendixPrintProduction } from './appendix-print-orders.js';
 import { printRequestDocumentSchema } from '../domain/print-request.js';
 import { appendixDocumentSchema } from '../../booking-lifecycle/domain/commercial-appendix.js';
+import type { PrintBookingSummaryReader } from '../../booking-lifecycle/application/print-booking-summary.reader.js';
 
 export class PrintOrderService {
   constructor(
@@ -53,6 +54,8 @@ export class PrintOrderService {
     readonly timeline: BookingTimelineSnapshotReader,
     readonly now: () => Date = () => new Date(),
     readonly fulfillment?: ContractedPrintFulfillment,
+    readonly printAuthorization: StudioAuthorization = authorization,
+    readonly bookingSummaries?: PrintBookingSummaryReader,
   ) {}
 
   private async requireSeparatePrintWorkflow(tx: Prisma.TransactionClient, orderId: string) {
@@ -67,7 +70,7 @@ export class PrintOrderService {
     context: MediaRequestContext,
   ) {
     if (await tx.invitationPrintRequest.findUnique({ where: { orderId } }))
-      await this.authorization.booking(bookingId, context, 'MANAGER');
+      await this.printAuthorization.booking(bookingId, context, 'MANAGER');
   }
 
   private mapOrderView(
@@ -584,7 +587,7 @@ export class PrintOrderService {
           where: { orderId: parsedOrderId },
         });
         if (purchase) {
-          await this.authorization.booking(bookingId, scoped, 'MANAGER');
+          await this.printAuthorization.booking(bookingId, scoped, 'MANAGER');
           const intent = await tx.invitationPrintAudit.findFirst({
             where: {
               orderId: parsedOrderId,
@@ -1449,7 +1452,7 @@ export class PrintOrderService {
       if (order.bookingId !== parsedBookingId) {
         throw new NotFoundError();
       }
-      await this.authorization.booking(parsedBookingId, context, 'COUPLE');
+      await this.printAuthorization.booking(parsedBookingId, context, 'COUPLE');
     } else {
       await this.authorization.manager(context);
     }
@@ -1485,9 +1488,10 @@ export class PrintOrderService {
       });
     }
 
-    return (
-      await this.withPurchases([this.mapOrderView(order, lines, currentRev, pendingProposal)])
-    )[0]!;
+    const views = await this.withPurchases([
+      this.mapOrderView(order, lines, currentRev, pendingProposal),
+    ]);
+    return (bookingId === null ? await this.withBookingSummaries(views) : views)[0]!;
   }
 
   async listPrintOrders(
@@ -1497,7 +1501,7 @@ export class PrintOrderService {
   ): Promise<{ items: PrintOrderView[]; nextCursor: string | null }> {
     const parsedBookingId = parseStudio(id, bookingId);
     await studioPhase(context, 'print.list', 'authorization', () =>
-      this.authorization.booking(parsedBookingId, context, 'COUPLE'),
+      this.printAuthorization.booking(parsedBookingId, context, 'COUPLE'),
     );
 
     const limit = query.limit;
@@ -1535,7 +1539,7 @@ export class PrintOrderService {
       this.pageViews(pageOrders),
     );
     await studioPhase(context, 'print.list', 'authorization', () =>
-      this.authorization.booking(parsedBookingId, context, 'COUPLE'),
+      this.printAuthorization.booking(parsedBookingId, context, 'COUPLE'),
     );
     return { items, nextCursor };
   }
@@ -1582,9 +1586,18 @@ export class PrintOrderService {
     const pageOrders = hasMore ? orders.slice(0, limit) : orders;
     const nextCursor = hasMore ? pageOrders[pageOrders.length - 1]!.id : null;
 
-    const items = await this.pageViews(pageOrders);
+    const items = await this.withBookingSummaries(await this.pageViews(pageOrders));
     await this.authorization.manager(context);
     return { items, nextCursor };
+  }
+
+  private async withBookingSummaries(items: PrintOrderView[]): Promise<PrintOrderView[]> {
+    if (!this.bookingSummaries || !items.length) return items;
+    const summaries = await this.bookingSummaries.readMany(items.map((item) => item.bookingId));
+    return items.map((item) => {
+      const summary = summaries.get(item.bookingId);
+      return summary ? { ...item, bookingSummary: summary } : item;
+    });
   }
 
   private async withPurchases(items: PrintOrderView[]): Promise<PrintOrderView[]> {
