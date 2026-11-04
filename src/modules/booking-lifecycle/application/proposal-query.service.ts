@@ -78,18 +78,18 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
             ? ('FULL_CONTRACT_V1' as const)
             : booking.commercialModelVersion,
           selectionStatus:
-            booking.commercialSelections[0]?.status === 'SUBMITTED'
+            booking.commercialSelections?.[0]?.status === 'SUBMITTED'
               ? ('SUBMITTED' as const)
-              : booking.commercialSelections[0]
+              : booking.commercialSelections?.[0]
                 ? ('DRAFT' as const)
                 : ('NOT_STARTED' as const),
           contractState: booking.commercialContract?.currentRevision?.state ?? null,
           managerApproved:
-            booking.commercialContract?.currentRevision?.approvals.some(
+            booking.commercialContract?.currentRevision?.approvals?.some(
               (item) => item.party === 'MANAGER',
             ) ?? false,
           coupleApproved:
-            booking.commercialContract?.currentRevision?.approvals.some(
+            booking.commercialContract?.currentRevision?.approvals?.some(
               (item) => item.party === 'COUPLE',
             ) ?? false,
           timelineMatchesContract: Boolean(
@@ -100,7 +100,7 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
           ),
         },
         depositTerms: {
-          holdExpiresAt: booking.slotHolds[0]?.expiresAt.toISOString() ?? null,
+          holdExpiresAt: booking.slotHolds?.[0]?.expiresAt.toISOString() ?? null,
           paymentPending,
           cancellationClosesAt: localVietnamTime(
             booking.eventDate.toISOString().slice(0, 10),
