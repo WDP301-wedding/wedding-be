@@ -144,6 +144,9 @@ import {
         .set('Idempotency-Key', randomUUID())
         .send({
           expectedRevision: 1,
+          positions: [
+            { layoutTableId: selectedPlan.renderSnapshot[0]!.layoutTableId, x: 321, y: 456 },
+          ],
           labels: [
             {
               layoutTableId: selectedPlan.renderSnapshot[0]!.layoutTableId,
@@ -166,6 +169,12 @@ import {
         .auth(f.couple.accessToken, { type: 'bearer' })
         .expect(200);
       expect(planViewSchema.parse((read.body as { data: unknown }).data).status).toBe('CONFIRMED');
+      expect(
+        planViewSchema.parse((read.body as { data: unknown }).data).renderSnapshot[0],
+      ).toMatchObject({
+        x: 321,
+        y: 456,
+      });
       expect(read.headers['cache-control']).toBe('no-store');
       const exception = `/api/v1/management/seating-plans/${selectedPlan.seatingPlanId}/exceptions`;
       await request(app)

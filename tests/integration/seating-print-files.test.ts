@@ -40,6 +40,7 @@ import { createErrorHandler } from '../../src/core/errors/error-handler.js';
         plan.seatingPlanId,
         {
           expectedRevision: 1,
+          positions: [{ layoutTableId: plan.renderSnapshot[0]!.layoutTableId, x: 321, y: 456 }],
           labels: [
             {
               layoutTableId: plan.renderSnapshot[0]!.layoutTableId,
@@ -99,6 +100,8 @@ import { createErrorHandler } from '../../src/core/errors/error-handler.js';
       const { f, s, capture, confirmed, plan } = await fixture(),
         printed = await capture();
       expect(printed.content.seating?.seatingPlanRevisionId).toBe(confirmed.revisionId);
+      expect(printed.content.seating?.renderSnapshot).toEqual(confirmed.renderSnapshot);
+      expect(printed.content.seating?.renderSnapshot[0]).toMatchObject({ x: 321, y: 456 });
       const file = await f.services.printFiles.read(
         f.bookingId,
         printed.printableRevisionId,

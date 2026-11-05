@@ -141,6 +141,60 @@ import { SeatingService } from '../../src/modules/seating-plan/application/seati
       const competing = await Promise.allSettled([confirm(x, 4), confirm(x, 4)]);
       expect(competing.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
     });
+    it('confirms moved tables, retains their exact positions and preserves earlier print registrations', async () => {
+      const x = await fixture(),
+        { f, s, plan, groups } = x;
+      const first = await confirm(x);
+      const tableId = first.renderSnapshot[0]!.layoutTableId;
+      const reviseKey = randomUUID();
+      const input = {
+        expectedRevision: first.revisionNumber,
+        labels: [{ layoutTableId: tableId, guestGroupId: groups[0]!.guestGroupId }],
+        positions: [{ layoutTableId: tableId, x: 321, y: 456 }],
+      };
+      const draft = await s.seating.revise(
+        f.bookingId,
+        plan.seatingPlanId,
+        input,
+        reviseKey,
+        f.couple,
+      );
+      expect(draft.status).toBe('DRAFT');
+      expect(draft.renderSnapshot[0]).toMatchObject({ x: 321, y: 456 });
+      expect(
+        await s.seating.revise(f.bookingId, plan.seatingPlanId, input, reviseKey, f.couple),
+      ).toEqual(draft);
+      const key = randomUUID();
+      const confirmation = { expectedRevision: draft.revisionNumber, expectedBookingRevision: 1 };
+      const confirmed = await s.seating.confirm(
+        f.bookingId,
+        plan.seatingPlanId,
+        confirmation,
+        key,
+        f.couple,
+      );
+      expect(confirmed.status).toBe('CONFIRMED');
+      expect(confirmed.renderSnapshot).toEqual(draft.renderSnapshot);
+      expect(
+        await s.seating.confirm(f.bookingId, plan.seatingPlanId, confirmation, key, f.couple),
+      ).toEqual(confirmed);
+      expect(await s.seating.readCurrent(f.bookingId, f.couple)).toEqual(confirmed);
+      expect(
+        await db.prisma.invitationSeatingRevision.findUniqueOrThrow({
+          where: { id: confirmed.revisionId },
+        }),
+      ).toMatchObject({ renderSnapshot: confirmed.renderSnapshot });
+      expect(
+        await db.prisma.invitationSeatingRevision.findUniqueOrThrow({
+          where: { id: first.revisionId },
+        }),
+      ).toMatchObject({ renderSnapshot: first.renderSnapshot });
+      expect(
+        await db.prisma.invitationSeatingState.findUniqueOrThrow({
+          where: { bookingId: f.bookingId },
+        }),
+      ).toMatchObject({ status: 'ELIGIBLE', revisionId: confirmed.revisionId });
+    });
     it('rolls back plan/head/outbox/receipt when real registry rejects confirmation', async () => {
       const x = await fixture(),
         { f, s, plan } = x;
