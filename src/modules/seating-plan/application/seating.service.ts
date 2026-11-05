@@ -170,6 +170,8 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
     bookingId: string,
     labels: readonly { layoutTableId: string; guestGroupId: string }[],
     droppedTableIds: string[] = [],
+    positions?: readonly { layoutTableId: string; x: number; y: number }[],
+    existingRenderSnapshot?: readonly { layoutTableId: string; x: number; y: number }[],
   ): Promise<Snapshot> {
     if (new Set(labels.map((v) => v.layoutTableId)).size !== labels.length)
       throw conflict('TABLE_NOT_IN_LAYOUT');
@@ -191,12 +193,15 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
       managerException: null,
       renderSnapshot: layout.tables.map((t) => {
         const label = resolved.find((l) => l.layoutTableId === t.tableId);
+        const pos =
+          positions?.find((p) => p.layoutTableId === t.tableId) ??
+          existingRenderSnapshot?.find((p) => p.layoutTableId === t.tableId);
         return {
           layoutTableId: t.tableId,
           tableLabel: t.label,
           shape: t.shape,
-          x: t.x,
-          y: t.y,
+          x: pos?.x ?? t.x,
+          y: pos?.y ?? t.y,
           width: t.width,
           height: t.height,
           rotationDegrees: t.rotationDegrees,
@@ -434,11 +439,16 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
           layout.tables.map((t) => t.tableId),
           input.remap ?? [],
         );
+        const templateChanged =
+          input.layoutTemplateVersionId !== undefined &&
+          input.layoutTemplateVersionId !== row.layoutTemplateVersionId;
         const next = await this.snapshot(
           layout,
           bookingId,
           input.labels ?? remapped.labels,
           remapped.droppedTableIds,
+          input.positions,
+          templateChanged ? undefined : snapshot.renderSnapshot,
         );
         // New drafts disable the previous eligibility; already captured files remain history.
         await this.invalidateRegistry(row, scope, 'SEATING_PLAN_REPLACED');
@@ -483,7 +493,14 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
           exception,
         );
         if (problem !== null) throw conflict(problem);
-        const next = await this.snapshot(layout, bookingId, snapshot.labels);
+        const next = await this.snapshot(
+          layout,
+          bookingId,
+          snapshot.labels,
+          [],
+          undefined,
+          snapshot.renderSnapshot,
+        );
         if (exception)
           next.managerException = {
             approvalId: randomUUID(),

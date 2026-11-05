@@ -14,7 +14,12 @@ import type { createGuestServices } from '../../guest-management/infrastructure/
 import type { BookingMediaPrerequisiteReader } from '../../booking-lifecycle/application/booking-readers.js';
 import { digest, id, parse, conflict } from '../../guest-management/domain/guest-policy.js';
 import { json } from '../../guest-management/infrastructure/guest.repository.js';
-import { configurationInput, assignmentInput, revokeInput } from '../domain/staff-policy.js';
+import {
+  configurationInput,
+  assignmentInput,
+  revokeInput,
+  type staffDirectoryQuery,
+} from '../domain/staff-policy.js';
 import type { StaffRequestContext } from './staff.contracts.js';
 
 export const configurationDto = (r: StaffConfiguration) => ({
@@ -46,6 +51,32 @@ export class StaffService {
     if (actor.accountId !== context.actorId || !actor.roles.includes('MANAGER'))
       throw new NotFoundError();
     return actor;
+  }
+  async directory(
+    query: ReturnType<typeof staffDirectoryQuery.parse>,
+    context: StaffRequestContext,
+  ) {
+    await this.manager(context);
+    const rows = await this.repository.prisma.account.findMany({
+      where: {
+        status: 'ACTIVE',
+        roles: { some: { role: 'STAFF' }, none: { role: 'MANAGER' } },
+        emailNormalized: { contains: query.q, mode: 'insensitive' },
+        ...(query.afterId ? { id: { gt: query.afterId } } : {}),
+      },
+      select: { id: true, displayEmail: true, passwordCredential: { select: { accountId: true } } },
+      orderBy: { id: 'asc' },
+      take: query.limit + 1,
+    });
+    const page = rows.slice(0, query.limit);
+    return {
+      items: page.map((row) => ({
+        accountId: row.id,
+        email: row.displayEmail,
+        credentialSetupRequired: row.passwordCredential === null,
+      })),
+      nextAfterId: rows.length > query.limit ? page.at(-1)!.id : null,
+    };
   }
   async ownerAccess(bookingId: string, context: StaffRequestContext) {
     const actor = await this.guests.identity.resolver.resolve(context.accessToken);

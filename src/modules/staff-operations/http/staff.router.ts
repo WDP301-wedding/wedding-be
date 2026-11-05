@@ -28,6 +28,8 @@ import {
   assignmentInput,
   revokeInput,
   provisionInput,
+  staffDirectoryQuery,
+  staffDirectorySchema,
   operationalInput,
   checkInInput,
   undoInput,
@@ -157,6 +159,13 @@ export function createStaffRouter(s: ReturnType<typeof createStaffServices>) {
     workHistoryQuery,
     workHistorySchema,
     (req, res, p, q) => s.workspace.history(p.bookingId, p.itemId, q, context(req, res)),
+  );
+  get(
+    '/management/staff-accounts',
+    z.strictObject({}),
+    staffDirectoryQuery,
+    staffDirectorySchema,
+    (req, res, _p, q) => s.staff.directory(q, context(req, res)),
   );
   write(
     'post',

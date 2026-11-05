@@ -43,3 +43,21 @@ export function isWindowOpen(now: Date, eventDate: string, start: string, end: s
     now.getTime() >= Date.parse(window.opensAt) && now.getTime() <= Date.parse(window.closesAt)
   );
 }
+
+export const staffDirectoryQuery = z.strictObject({
+  q: z.string().trim().max(120).default(''),
+  afterId: z.uuid().optional(),
+  limit: z.coerce.number().int().min(1).max(50).default(25),
+});
+export const staffDirectorySchema = z.strictObject({
+  items: z
+    .array(
+      z.strictObject({
+        accountId: z.uuid(),
+        email: z.string(),
+        credentialSetupRequired: z.boolean(),
+      }),
+    )
+    .max(50),
+  nextAfterId: z.uuid().nullable(),
+});

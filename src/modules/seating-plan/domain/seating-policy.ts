@@ -3,6 +3,11 @@ import { AppError, ValidationError } from '../../../core/errors/app-error.js';
 export const id = z.uuid().overwrite((v) => v.toLowerCase());
 export const revision = z.int().positive();
 export const labelInput = z.strictObject({ layoutTableId: id, guestGroupId: id });
+export const positionInput = z.strictObject({
+  layoutTableId: id,
+  x: z.int().min(0).max(10000),
+  y: z.int().min(0).max(10000),
+});
 export const remapInput = z.strictObject({ fromTableId: id, toTableId: id.nullable() });
 export const selectInput = z.strictObject({
   layoutTemplateVersionId: id,
@@ -12,6 +17,7 @@ export const revisionInput = z
   .strictObject({
     expectedRevision: revision,
     labels: z.array(labelInput).max(500).optional(),
+    positions: z.array(positionInput).max(500).optional(),
     layoutTemplateVersionId: id.optional(),
     remap: z.array(remapInput).max(500).optional(),
   })

@@ -17,6 +17,8 @@ import {
   assignmentInput,
   revokeInput,
   provisionInput,
+  staffDirectoryQuery,
+  staffDirectorySchema,
   operationalInput,
   checkInInput,
   undoInput,
@@ -150,6 +152,16 @@ export const staffOpenApiPaths: NonNullable<ZodOpenApiObject['paths']> = {
   },
 
   '/management/staff-accounts': {
+    get: {
+      ...op(
+        'listStaffAccounts',
+        staffDirectorySchema,
+        'Manager-only directory of active staff accounts.',
+      ),
+      parameters: Object.entries(staffDirectoryQuery.shape).map(([name, schema]) =>
+        schema.meta({ param: { name, in: 'query' } }),
+      ),
+    },
     post: op(
       'provisionStaffAccount',
       provisionSchema,

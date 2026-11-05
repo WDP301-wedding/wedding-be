@@ -48,13 +48,19 @@ export class OperationsWorkspaceService {
         shiftCode: 'LUNCH' | 'DINNER';
         phase: 'CONFIRMED' | 'COMPLETED';
       }[]
-    >(Prisma.sql`SELECT b.id AS "bookingId", b."bookingCode", b.alias, to_char(b."eventDate",'YYYY-MM-DD') AS "eventDate", p."hallName", b."shiftCode", b.phase
+    >(Prisma.sql`WITH events AS (SELECT b.id AS "bookingId", b."bookingCode", b.alias, to_char(b."eventDate",'YYYY-MM-DD') AS "eventDate", p."hallName", b."shiftCode", b.phase,
+        CASE WHEN ${query.phase}='CONFIRMED' AND b."eventDate" < (now() AT TIME ZONE 'Asia/Ho_Chi_Minh')::date THEN 1 ELSE 0 END AS bucket,
+        CASE WHEN ${query.phase}='COMPLETED' THEN -(b."eventDate"::date - DATE '2000-01-01')
+             ELSE b."eventDate"::date - DATE '2000-01-01' END AS day_order
       FROM "Booking" b JOIN "BookingProposalSnapshot" p ON p."bookingId"=b.id
       WHERE b.phase::text=${query.phase} AND EXISTS (SELECT 1 FROM "BookingDepositSettlement" d WHERE d."bookingId"=b.id AND d."promotionStatus"='SUCCEEDED')
       AND (${manager} OR EXISTS (SELECT 1 FROM "StaffAssignment" a WHERE a."bookingId"=b.id AND a."staffAccountId"=${actor.accountId}::uuid AND a.status='ACTIVE'))
-      AND (${query.afterId ?? null}::uuid IS NULL OR b.id > ${query.afterId ?? null}::uuid)
       AND (position(lower(${query.q}) in lower(b."bookingCode"))>0 OR position(lower(${query.q}) in lower(coalesce(b.alias,'')))>0)
-      ORDER BY b.id ASC LIMIT ${query.limit + 1}`);
+      )
+      SELECT "bookingId","bookingCode",alias,"eventDate","hallName","shiftCode",phase FROM events e
+      WHERE ${query.afterId ?? null}::uuid IS NULL OR (e.bucket,e.day_order,e."bookingId") >
+        (SELECT c.bucket,c.day_order,c."bookingId" FROM events c WHERE c."bookingId"=${query.afterId ?? null}::uuid)
+      ORDER BY e.bucket,e.day_order,e."bookingId" LIMIT ${query.limit + 1}`);
     return eventListSchema.parse({
       items: rows.slice(0, query.limit),
       nextAfterId: rows.length > query.limit ? rows[query.limit - 1]!.bookingId : null,
