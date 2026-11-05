@@ -18,9 +18,6 @@ case ",${CORS_ALLOWED_ORIGINS:-}," in
   *) export CORS_ALLOWED_ORIGINS="${CORS_ALLOWED_ORIGINS:+$CORS_ALLOWED_ORIGINS,}http://localhost:3201" ;;
 esac
 
-# Recover from previously failed migration if present in _prisma_migrations
-npx prisma migrate resolve --rolled-back 20261105081000_add_lotus_layout_templates --config prisma.config.ts 2>/dev/null || true
-
 # Apply additive releases against this service's configured database. Prisma's
 # migration lock serializes retries; set -e prevents starting an incompatible API.
 npm run db:migrate:deploy

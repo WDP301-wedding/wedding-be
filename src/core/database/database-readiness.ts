@@ -15,6 +15,22 @@ type ReadinessPool = Pick<Pool, 'connect' | 'end' | 'on'>;
 
 export const DATABASE_READINESS_TIMEOUT_MS = 5_000;
 
+// Lotus was shipped as a data migration before it was guarded for empty databases.
+// Accept the original release only against the exact guarded artifact. Keep all
+// other migrations, including future changes to this file, on exact matching.
+const lotusMigration = '20261105081000_add_lotus_layout_templates';
+const lotusGuardedChecksum = '16f8fb7b33ce8a680344bb485a772e5bcb4dc54ac6168ce2cc96f874f8b5352b';
+const lotusOriginalChecksum = 'b0c4d125fde2df1327ccbd7cb7af9ab3fefe8cee31ee6caca8646a0529639929';
+
+function matchesAppliedChecksum(migration: Migration, appliedChecksum: string): boolean {
+  return (
+    appliedChecksum === migration.checksum ||
+    (migration.name === lotusMigration &&
+      migration.checksum === lotusGuardedChecksum &&
+      appliedChecksum === lotusOriginalChecksum)
+  );
+}
+
 export function readRequiredMigrations(): readonly Migration[] {
   const directory = new URL('../../../prisma/migrations/', import.meta.url);
   return readdirSync(directory, { withFileTypes: true })
@@ -82,7 +98,7 @@ export function createDatabaseReadiness(
             !rows.some(
               (row) =>
                 row.migration_name === migration.name &&
-                row.checksum === migration.checksum &&
+                matchesAppliedChecksum(migration, row.checksum) &&
                 row.finished_at !== null &&
                 row.rolled_back_at === null,
             ),

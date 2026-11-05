@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createDatabaseReadiness } from './database-readiness.js';
 
-function fixture() {
+function fixture(migration = { name: 'one', checksum: 'digest' }) {
   const release = vi.fn();
   const query = vi.fn().mockResolvedValue({
     rows: [
       {
-        migration_name: 'one',
-        checksum: 'digest',
+        migration_name: migration.name,
+        checksum: migration.checksum,
         finished_at: new Date(),
         rolled_back_at: null,
       },
@@ -18,12 +18,38 @@ function fixture() {
   const pool = { connect, end, on: vi.fn() };
   const runtime = createDatabaseReadiness('postgresql://user:secret@localhost/db?schema=tenant', {
     pool,
-    migrations: [{ name: 'one', checksum: 'digest' }],
+    migrations: [migration],
   });
   return { runtime, release, query, connect, end };
 }
 
 describe('database readiness resource', () => {
+  it('accepts only the known original Lotus checksum for the exact guarded artifact', async () => {
+    const name = '20261105081000_add_lotus_layout_templates';
+    const guarded = '16f8fb7b33ce8a680344bb485a772e5bcb4dc54ac6168ce2cc96f874f8b5352b';
+    const original = 'b0c4d125fde2df1327ccbd7cb7af9ab3fefe8cee31ee6caca8646a0529639929';
+    const signal = new AbortController().signal;
+    const current = fixture({ name, checksum: guarded });
+    await current.runtime.probe(signal);
+    const originalRow = {
+      migration_name: name,
+      checksum: original,
+      finished_at: new Date(),
+      rolled_back_at: null,
+    };
+    current.query.mockResolvedValueOnce({ rows: [originalRow] });
+    await current.runtime.probe(signal);
+
+    current.query.mockResolvedValueOnce({
+      rows: [{ ...originalRow, rolled_back_at: new Date() }],
+    });
+    await expect(current.runtime.probe(signal)).rejects.toThrow('Database schema is incompatible');
+
+    const changed = fixture({ name, checksum: 'different-artifact' });
+    changed.query.mockResolvedValueOnce({ rows: [originalRow] });
+    await expect(changed.runtime.probe(signal)).rejects.toThrow('Database schema is incompatible');
+  });
+
   it('requires the exact completed migration checksum and destroys failed connections', async () => {
     const f = fixture();
     await f.runtime.probe(new AbortController().signal);
