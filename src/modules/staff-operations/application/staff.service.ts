@@ -187,7 +187,7 @@ export class StaffService {
         const saved = await tx.staffConfiguration.findUnique({ where: { bookingId } });
         return saved
           ? configurationDto(saved)
-          : { bookingId, checkInMode: 'NONE' as const, revision: 1, locked: true };
+          : { bookingId, checkInMode: 'NONE' as const, revision: 1, locked: false };
       },
       'READ',
     );
