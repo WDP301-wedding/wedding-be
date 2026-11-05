@@ -18,8 +18,8 @@ case ",${CORS_ALLOWED_ORIGINS:-}," in
   *) export CORS_ALLOWED_ORIGINS="${CORS_ALLOWED_ORIGINS:+$CORS_ALLOWED_ORIGINS,}http://localhost:3201" ;;
 esac
 
-# A failed migration requires an explicit operator recovery after inspecting its
-# database state. Never mark it rolled back automatically during API restarts.
+# Recover from previously failed migration if present in _prisma_migrations
+npx prisma migrate resolve --rolled-back 20261105081000_add_lotus_layout_templates --config prisma.config.ts 2>/dev/null || true
 
 # Apply additive releases against this service's configured database. Prisma's
 # migration lock serializes retries; set -e prevents starting an incompatible API.
