@@ -93,6 +93,80 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
     f.services.boundary.run({ bookingId: f.bookingId, context: f.contract }, (ctx) =>
       f.services.printable.capture({ bookingId: f.bookingId, designRevisionId: d.revisionId }, ctx),
     );
+  it('shares multiple designs independently across reload, update, unpublish and replay', async () => {
+    const first = await design(),
+      second = await design(),
+      third = await design();
+    const [a, b, c] = await Promise.all([publish(first), publish(second), publish(third)]);
+    expect(new Set([a.publicSlug, b.publicSlug, c.publicSlug]).size).toBe(3);
+    for (const [source, published] of [
+      [first, a],
+      [second, b],
+      [third, c],
+    ] as const) {
+      expect(
+        await f.services.publication.readDesign(f.bookingId, source.designId, f.couple),
+      ).toMatchObject({
+        publicationRevision: 1,
+        published: true,
+        publicSlug: published.publicSlug,
+        designRevisionId: source.revisionId,
+      });
+      expect(await f.services.publication.readPublic(published.publicSlug)).toMatchObject({
+        publishedRevisionId: published.publishedRevisionId,
+      });
+    }
+    const edit = await f.services.designs.edit(
+      {
+        bookingId: f.bookingId,
+        designId: second.designId,
+        expectedRevision: 1,
+        textFields: { greeting: 'Riêng cho nhà gái' },
+        idempotencyKey: key(),
+      },
+      f.couple,
+    );
+    const updated = await publish(edit, 1);
+    expect(updated.publicSlug).toBe(b.publicSlug);
+    expect((await f.services.publication.readPublic(a.publicSlug)).textFields.greeting).not.toBe(
+      'Riêng cho nhà gái',
+    );
+    expect((await f.services.publication.readPublic(b.publicSlug)).textFields.greeting).toBe(
+      'Riêng cho nhà gái',
+    );
+    const removal = {
+      bookingId: f.bookingId,
+      designId: second.designId,
+      expectedRevision: 2,
+      idempotencyKey: key(),
+    };
+    const removed = await f.services.publication.unpublish(removal, f.couple);
+    expect(await f.services.publication.unpublish(removal, f.couple)).toEqual(removed);
+    await expect(f.services.publication.readPublic(b.publicSlug)).rejects.toMatchObject({
+      status: 404,
+    });
+    await expect(f.services.publication.readPublic(a.publicSlug)).resolves.toBeDefined();
+    await expect(f.services.publication.readPublic(c.publicSlug)).resolves.toBeDefined();
+    expect((await publish(edit, 3)).publicSlug).toBe(b.publicSlug);
+    await expect(publish(edit, 3)).rejects.toMatchObject({ code: 'INVITATION_PUBLICATION_STALE' });
+    expect(
+      await f.services.publication.requirePublishedPublicInvitation(f.bookingId),
+    ).toMatchObject({ publicSlug: a.publicSlug });
+    const printed = await capture(edit);
+    expect(
+      (
+        await f.prisma.invitationPrintableRevision.findUniqueOrThrow({
+          where: { id: printed.printableRevisionId },
+        })
+      ).publicInvitationId,
+    ).toBe(b.publicInvitationId);
+    await expect(
+      f.prisma.invitationPublicIdentity.update({
+        where: { id: b.publicInvitationId },
+        data: { designId: first.designId, revision: 5 },
+      }),
+    ).rejects.toThrow();
+  });
   it('creates immutable design history and durable replay, rejects body reuse and stale CAS', async () => {
     const input = { bookingId: f.bookingId, content: f.content, idempotencyKey: key() };
     const d = await f.services.designs.create(input, f.couple);
@@ -783,6 +857,19 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
     ])
       expect(serialized).not.toContain(privateValue);
     expect(await f.services.derivedAssets.readPublic(asset.publicSlug)).toBeInstanceOf(Uint8Array);
+    const other = await f.services.designs.create(
+      {
+        bookingId: f.bookingId,
+        content: {
+          ...f.content,
+          derivedAssetIds: [asset.id],
+          sections: [{ kind: 'HERO', textKey: 'greeting', derivedAssetId: asset.id }],
+        },
+        idempotencyKey: key(),
+      },
+      f.couple,
+    );
+    await publish(other);
     await f.services.publication.unpublish(
       { bookingId: f.bookingId, designId: d.designId, expectedRevision: 1, idempotencyKey: key() },
       f.manager,
@@ -790,6 +877,16 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
     await expect(f.services.publication.readPublic(p.publicSlug)).rejects.toMatchObject({
       status: 404,
     });
+    expect(await f.services.derivedAssets.readPublic(asset.publicSlug)).toBeInstanceOf(Uint8Array);
+    await f.services.publication.unpublish(
+      {
+        bookingId: f.bookingId,
+        designId: other.designId,
+        expectedRevision: 1,
+        idempotencyKey: key(),
+      },
+      f.couple,
+    );
     await expect(f.services.derivedAssets.readPublic(asset.publicSlug)).rejects.toMatchObject({
       status: 404,
     });
@@ -805,24 +902,24 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
       ),
     ).rejects.toMatchObject({ status: 404 });
   });
-  it('publication stable identity spans variants, CAS/outbox atomicity, removed fact keeps frozen event meaning', async () => {
+  it('publication identities are independent, CAS/outbox atomicity and removed facts retain event meaning', async () => {
     const first = await design(),
       p1 = await publish(first),
       second = await design(),
-      p2 = await publish(second, 1);
-    expect(p2.publicSlug).toBe(p1.publicSlug);
-    expect(p2.genericQrPayload).toBe(p1.genericQrPayload);
-    await expect(publish(first, 1)).rejects.toMatchObject({ status: 409 });
+      p2 = await publish(second);
+    expect(p2.publicSlug).not.toBe(p1.publicSlug);
+    expect(p2.genericQrPayload).not.toBe(p1.genericQrPayload);
+    await expect(publish(first, 0)).rejects.toMatchObject({ status: 409 });
     expect(await f.services.publication.requirePublishedPublicInvitation(f.bookingId)).toEqual({
-      publicInvitationId: p2.publicInvitationId,
-      publicSlug: p2.publicSlug,
-      publishedRevisionId: p2.publishedRevisionId,
-      genericQrPayload: p2.genericQrPayload,
+      publicInvitationId: p1.publicInvitationId,
+      publicSlug: p1.publicSlug,
+      publishedRevisionId: p1.publishedRevisionId,
+      genericQrPayload: p1.genericQrPayload,
     });
     const input = {
       bookingId: f.bookingId,
       designId: second.designId,
-      expectedRevision: 2,
+      expectedRevision: 1,
       idempotencyKey: key(),
     };
     await f.services.publication.unpublish(input, f.couple);
@@ -840,9 +937,10 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
       await f.prisma.invitationPublishedRevision.count({ where: { bookingId: f.bookingId } }),
     ).toBe(2);
     await expect(f.services.publication.readPublic('bad')).rejects.toMatchObject({ status: 404 });
-    await expect(
-      f.services.publication.requirePublishedPublicInvitation(f.bookingId),
-    ).rejects.toMatchObject({ status: 404 });
+    await expect(f.services.publication.readPublic(p2.publicSlug)).rejects.toMatchObject({
+      status: 404,
+    });
+    await expect(f.services.publication.readPublic(p1.publicSlug)).resolves.toBeDefined();
   });
   it.each(['CONFIRM_FIRST', 'INVALIDATE_FIRST'])(
     'registry equal-number invalidation wins in %s order, replay/higher reconfirm/delayed lower are safe',
@@ -1038,6 +1136,17 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
       .send({ content: f.content });
     expect(result.status).toBe(201);
     const d = designResponse.parse(result.body).data;
+    const statePath = base + `/${d.designId}/publication`;
+    expect((await request(app).get(statePath)).status).toBe(401);
+    expect((await auth(request(app).get(statePath + '?extra=true'))).status).toBe(422);
+    expect((await auth(request(app).get(statePath))).body).toMatchObject({
+      data: {
+        publicationRevision: 0,
+        published: false,
+        publicSlug: null,
+        designRevisionId: null,
+      },
+    });
     const response = await auth(request(app).post(base + `/${d.designId}/publication`))
       .set('Idempotency-Key', key())
       .send({
@@ -1047,6 +1156,15 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
       });
     expect(response.status).toBe(200);
     const slug = publicationResponse.parse(response.body).data.publicSlug;
+    const outsider = await f.actor('COUPLE');
+    expect(
+      (await request(app).get(statePath).set('Authorization', `Bearer ${outsider.accessToken}`))
+        .status,
+    ).toBe(404);
+    expect(
+      (await request(app).get(statePath).set('Authorization', `Bearer ${f.android.accessToken}`))
+        .body,
+    ).toMatchObject({ data: { published: true, publicSlug: slug } });
     const pub = await request(app).get('/api/v1/public/invitations/' + slug);
     expect(pub.status).toBe(200);
     expect(pub.headers['cache-control']).toBe('no-store');
@@ -1059,6 +1177,20 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
     expect(
       (await request(app).get(`/api/v1/public/invitations/${slug}?token=private`)).status,
     ).toBe(422);
+    await f.prisma.booking.update({
+      where: { id: f.bookingId },
+      data: { phase: 'COMPLETED', completedAt: f.now },
+    });
+    expect((await auth(request(app).get(statePath))).body).toMatchObject({
+      data: { published: true, publicSlug: slug },
+    });
+    expect(
+      (
+        await auth(request(app).delete(statePath))
+          .set('Idempotency-Key', key())
+          .send({ expectedRevision: 1 })
+      ).status,
+    ).toBe(409);
   });
   it('publication and outbox rollback together under enlisted owner failure', async () => {
     const d = await design();

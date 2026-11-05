@@ -84,6 +84,18 @@ export const publicationResponse = z.strictObject({
     genericQrPayload: z.url(),
   }),
 });
+export const designPublicationResponse = z.strictObject({
+  data: z.strictObject({
+    publicationRevision: z.int().nonnegative(),
+    published: z.boolean(),
+    publicSlug: z
+      .string()
+      .regex(/^[a-f0-9]{64}$/u)
+      .nullable(),
+    publishedRevisionId: id.nullable(),
+    designRevisionId: id.nullable(),
+  }),
+});
 export const unpublicationResponse = z.strictObject({
   data: z.strictObject({
     publicInvitationId: id,

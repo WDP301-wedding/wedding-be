@@ -7,7 +7,7 @@ export async function readPublicationSnapshots(
 ) {
   const ids = [...new Set(bookingIds)];
   const identities = await prisma.invitationPublicIdentity.findMany({
-    where: { bookingId: { in: ids } },
+    where: { bookingId: { in: ids }, isDefault: true },
     select: { bookingId: true, revision: true, slug: true, currentPublicationId: true },
   });
   const revisions = await prisma.invitationPublishedRevision.findMany({

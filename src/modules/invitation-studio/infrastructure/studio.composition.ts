@@ -86,6 +86,7 @@ export function createInvitationStudioServices(
     now,
     (bookingId, context) => printable.readSeating(bookingId, context),
     publicWebOrigin,
+    printAuthorization,
   );
   const planning = createPrismaPlanningSnapshotReader(media.boundary);
   const venue = createPrismaSelectionEligibilityReader(media.boundary);

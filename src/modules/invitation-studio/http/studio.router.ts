@@ -243,6 +243,16 @@ export function createStudioRouter(
     201,
   );
   route(
+    'get',
+    '/bookings/:bookingId/invitations/:designId/publication',
+    schemas.designPublicationResponse,
+    (req, res) => {
+      noQuery(req);
+      const p = parseStudio(designParams, req.params);
+      return services.publication.readDesign(p.bookingId, p.designId, context(res));
+    },
+  );
+  route(
     'post',
     '/bookings/:bookingId/invitations/:designId/publication',
     schemas.publicationResponse,
