@@ -82,9 +82,6 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
   private get prisma() {
     return this.guest.repository.prisma;
   }
-  private async authorize(bookingId: string, context: SeatingRequestContext) {
-    await this.guest.guests.authorize(bookingId, context);
-  }
   private run<T>(
     bookingValue: string,
     context: SeatingRequestContext,
@@ -95,7 +92,7 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
     return this.guest.repository.run(
       bookingId,
       context,
-      () => this.authorize(bookingId, context),
+      () => this.guest.guests.authorize(bookingId, context, mode),
       work,
       mode,
     );
@@ -626,7 +623,11 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
     return this.run(
       bookingId,
       context,
-      (tx, scope) => this.revalidate(tx, scope, bookingId, undefined, false, { planId }),
+      async (tx, scope) => {
+        if (await this.guest.owners.preparationLock.read(bookingId))
+          return this.view((await this.current(tx, bookingId, planId)).row);
+        return this.revalidate(tx, scope, bookingId, undefined, false, { planId });
+      },
       'READ',
     );
   }
@@ -637,6 +638,8 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
       async (tx, scope) => {
         const head = await tx.seatingPlan.findUnique({ where: { bookingId } });
         if (head === null) return null;
+        if (await this.guest.owners.preparationLock.read(bookingId))
+          return this.view((await this.current(tx, bookingId, undefined, head)).row);
         return this.revalidate(tx, scope, bookingId, undefined, false, { head });
       },
       'READ',
@@ -666,8 +669,11 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
       },
       async (scope) => {
         const tx = this.boundary.requireScope(bookingId, scope);
-        if ((await tx.seatingPlan.findUnique({ where: { bookingId } })) === null) return null;
-        return this.revalidate(tx, scope, bookingId, eventRevision);
+        const head = await tx.seatingPlan.findUnique({ where: { bookingId } });
+        if (head === null) return null;
+        if (await this.guest.owners.preparationLock.read(bookingId))
+          return this.view((await this.current(tx, bookingId, undefined, head)).row);
+        return this.revalidate(tx, scope, bookingId, eventRevision, false, { head });
       },
     );
   }

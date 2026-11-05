@@ -3,6 +3,7 @@ import { PrismaBookingBoundary } from '../../../core/database/booking-boundary.j
 import type { StorageProvider } from '../../../integrations/storage/storage-provider.js';
 import { createScopedIdentityReaders } from '../../identity-access/authorization/scoped-identity.reader.js';
 import { createPrismaDepositSettlementReader } from '../../payments-billing/infrastructure/prisma-deposit-settlement.reader.js';
+import { createPreparationLockReader } from '../../payments-billing/infrastructure/preparation-lock.reader.js';
 import { createPrismaBookingReaders } from '../../booking-lifecycle/infrastructure/prisma-booking.readers.js';
 import { createMediaAccessGuard } from '../application/media-access.guard.js';
 import { createMediaEventStartReader } from '../application/media-event-start.reader.js';
@@ -22,12 +23,26 @@ export function createPersistentMediaService(
   const identity = createScopedIdentityReaders(prisma, boundary, now);
   const billing = createPrismaDepositSettlementReader(prisma, boundary);
   const providers = createPrismaBookingReaders(prisma, boundary, identity.access, billing);
-  const guard = createMediaAccessGuard(
-    identity.resolver,
-    providers.booking,
-    createMediaEventStartReader(providers.timeline),
-  );
+  const history = createPrismaBookingReaders(prisma, boundary, identity.access, billing, {
+    allowCompleted: true,
+  });
+  const requireEditable = createPreparationLockReader(prisma, boundary).requireEditable;
+  const eventStart = createMediaEventStartReader(history.timeline);
+  const guard = createMediaAccessGuard(identity.resolver, history.booking, eventStart, {
+    allowCompleted: true,
+    requireEditable,
+  });
+  const readGuard = createMediaAccessGuard(identity.resolver, history.booking, eventStart, {
+    allowCompleted: true,
+  });
   const repository = new PrismaMediaRepository(prisma, boundary);
-  const service = new MediaService(repository, guard, storage, new SharpMediaInspector(), now);
-  return { service, repository, boundary, guard, identity, ...providers, billing };
+  const service = new MediaService(
+    repository,
+    guard,
+    storage,
+    new SharpMediaInspector(),
+    now,
+    readGuard,
+  );
+  return { service, repository, boundary, guard, requireEditable, identity, ...providers, billing };
 }

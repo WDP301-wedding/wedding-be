@@ -36,7 +36,7 @@ import {
   searchInput,
   pageInput,
 } from '../domain/staff-policy.js';
-import { attendanceSchema } from '../application/attendance-readers.js';
+import { attendance, attendanceSchema } from '../application/attendance-readers.js';
 import {
   settingsSchema,
   assignmentSchema,
@@ -232,7 +232,7 @@ export function createStaffRouter(s: ReturnType<typeof createStaffServices>) {
         p.bookingId,
         context(req, res),
         () => s.staff.ownerAccess(p.bookingId, context(req, res)),
-        () => s.readers.getBookingAttendance(p.bookingId),
+        (tx) => attendance(tx, p.bookingId),
         'READ',
       ),
   );

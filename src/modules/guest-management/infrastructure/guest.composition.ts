@@ -2,6 +2,7 @@ import type { PrismaClient } from '../../../generated/prisma/client.js';
 import { PrismaBookingBoundary } from '../../../core/database/booking-boundary.js';
 import { createScopedIdentityReaders } from '../../identity-access/authorization/scoped-identity.reader.js';
 import { createPrismaDepositSettlementReader } from '../../payments-billing/infrastructure/prisma-deposit-settlement.reader.js';
+import { createPreparationLockReader } from '../../payments-billing/infrastructure/preparation-lock.reader.js';
 import { createPrismaBookingReaders } from '../../booking-lifecycle/infrastructure/prisma-booking.readers.js';
 import { createGuestBookingPlanningProviders } from '../../booking-lifecycle/infrastructure/guest-planning.providers.js';
 import { createGuestPlanningCapacityReader } from '../../venue-catalog/infrastructure/guest-planning-capacity.reader.js';
@@ -22,6 +23,10 @@ export function createGuestServices(
   const billing = createPrismaDepositSettlementReader(prisma, boundary);
   const owners = {
     ...createPrismaBookingReaders(prisma, boundary, identity.access, billing),
+    history: createPrismaBookingReaders(prisma, boundary, identity.access, billing, {
+      allowCompleted: true,
+    }).booking,
+    preparationLock: createPreparationLockReader(prisma, boundary),
     planning: createGuestBookingPlanningProviders(prisma, boundary, billing),
     capacity: createGuestPlanningCapacityReader(boundary),
     invitation: createGuestPublicationReader(prisma, boundary),

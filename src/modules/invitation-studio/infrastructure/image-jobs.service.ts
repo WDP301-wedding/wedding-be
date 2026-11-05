@@ -34,6 +34,7 @@ type Dependencies = {
   derivedAssets: DerivedAssetsService;
   booking: Parameters<typeof createResolvedMediaAccessGuard>[1];
   timeline: Parameters<typeof createMediaEventStartReader>[0];
+  requireEditable?: (bookingId: string) => Promise<void>;
 };
 
 export class ImageJobsService {
@@ -356,6 +357,7 @@ export class ImageJobsService {
         },
         this.deps.booking,
         createMediaEventStartReader(this.deps.timeline),
+        this.deps.requireEditable ? { requireEditable: this.deps.requireEditable } : {},
       );
       const access = new StudioAuthorization(
         {

@@ -24,10 +24,10 @@ export const guestSchema = z.strictObject({
 });
 export const planSchema = z.strictObject({
   bookingId: z.uuid(),
-  sourceGuestPlanRevisionId: z.uuid(),
+  sourceGuestPlanRevisionId: z.uuid().nullable(),
   sourceSequence: z.int().nonnegative(),
   planningHeadcount: z.int().min(0).max(10000),
-  revision: z.int().positive(),
+  revision: z.int().nonnegative(),
 });
 export const previewSchema = z.strictObject({
   previewId: z.uuid(),

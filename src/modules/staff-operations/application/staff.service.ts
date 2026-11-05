@@ -79,19 +79,7 @@ export class StaffService {
     };
   }
   async ownerAccess(bookingId: string, context: StaffRequestContext) {
-    const actor = await this.guests.identity.resolver.resolve(context.accessToken);
-    if (
-      actor.accountId !== context.actorId ||
-      !actor.roles.some((r) => r === 'MANAGER' || r === 'COUPLE')
-    )
-      throw new NotFoundError();
-    if (!actor.roles.includes('MANAGER'))
-      await this.events.requireBookingAccess({
-        bookingId,
-        accountId: actor.accountId,
-        minimum: 'FULL',
-      });
-    await this.events.requireConfirmedEventContext(bookingId);
+    await this.guests.guests.authorize(bookingId, context, 'READ');
   }
   run<T>(
     bookingId: string,
@@ -193,7 +181,14 @@ export class StaffService {
       bookingId,
       context,
       () => this.ownerAccess(bookingId, context),
-      async (tx) => configurationDto(await this.configuration(tx, bookingId)),
+      async (tx) => {
+        if (!(await this.guests.owners.preparationLock.read(bookingId)))
+          return configurationDto(await this.configuration(tx, bookingId));
+        const saved = await tx.staffConfiguration.findUnique({ where: { bookingId } });
+        return saved
+          ? configurationDto(saved)
+          : { bookingId, checkInMode: 'NONE' as const, revision: 1, locked: true };
+      },
       'READ',
     );
   }
