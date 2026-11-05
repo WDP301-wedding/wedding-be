@@ -18,7 +18,7 @@ export function createGuestBookingPlanningProviders(
   boundary: PrismaBookingBoundary,
   billing: DepositSettlementReader,
 ) {
-  const planning = createPrismaPlanningSnapshotReader(boundary);
+  const planning = createPrismaPlanningSnapshotReader(boundary, { allowCompleted: true });
   return {
     async requireInvitationViewContext(bookingId: string) {
       const row = await (boundary.current(bookingId) ?? prisma).booking.findUnique({

@@ -45,6 +45,11 @@ export interface GuestBookingPlanningPort {
 }
 export interface GuestOwnerPorts {
   booking: BookingMediaPrerequisiteReader;
+  history?: BookingMediaPrerequisiteReader;
+  preparationLock?: {
+    read(bookingId: string): Promise<string | null>;
+    requireEditable(bookingId: string): Promise<void>;
+  };
   timeline: BookingTimelineSnapshotReader;
   planning: GuestBookingPlanningPort;
   capacity: {

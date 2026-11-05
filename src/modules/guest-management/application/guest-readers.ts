@@ -98,7 +98,8 @@ export class GuestReaders {
     const input = parse(listQuerySchema, value);
     return this.guests.read(bookingId, context, async (tx, _scope, workspace) => {
       const filter = { bookingId, guestGroupId: input.guestGroupId ?? null, status: input.status };
-      const after = cursor(input.cursor, workspace.listSequence, filter);
+      const sequence = workspace?.listSequence ?? 1;
+      const after = cursor(input.cursor, sequence, filter);
       const rows = await tx.guest.findMany({
         where: {
           bookingId,
@@ -111,12 +112,12 @@ export class GuestReaders {
       });
       return {
         items: rows.slice(0, input.limit).map(guestDto),
-        sourceSequence: workspace.listSequence,
+        sourceSequence: sequence,
         nextCursor:
           rows.length > input.limit
             ? encode({
                 id: rows[input.limit - 1]!.id,
-                sequence: workspace.listSequence,
+                sequence,
                 filterDigest: digest(filter),
               })
             : null,

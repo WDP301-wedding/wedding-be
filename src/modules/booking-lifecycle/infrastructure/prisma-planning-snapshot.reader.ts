@@ -5,13 +5,15 @@ import type { BookingPlanningSnapshotReader } from '../application/planning-snap
 import { readLockedBooking } from './locked-booking.reader.js';
 export function createPrismaPlanningSnapshotReader(
   boundary: PrismaBookingBoundary,
+  options: { allowCompleted?: boolean } = {},
 ): BookingPlanningSnapshotReader {
   return {
     async getCurrent(value, context) {
       const bookingId = z.uuid().parse(value).toLowerCase();
       boundary.requireScope(bookingId, context);
       const row = await readLockedBooking(boundary.prisma, boundary, bookingId);
-      if (row.phase !== 'CONFIRMED') throw new NotFoundError();
+      if (row.phase !== 'CONFIRMED' && !(options.allowCompleted && row.phase === 'COMPLETED'))
+        throw new NotFoundError();
       if (
         !Number.isSafeInteger(row.revision) ||
         row.revision < 1 ||

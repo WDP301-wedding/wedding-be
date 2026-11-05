@@ -36,11 +36,16 @@ export type MediaEventStartReader = (
   request: MediaRequestContext,
 ) => Promise<Date>;
 
+type MediaAccessOptions = {
+  allowCompleted?: boolean;
+  requireEditable?: (bookingId: string) => Promise<void>;
+};
+
 export function createMediaAccessGuard(
   resolver: AuthenticatedActorResolver,
   booking: MediaBookingReader | undefined,
   eventStart: MediaEventStartReader | undefined,
-  options: { allowCompleted?: boolean } = {},
+  options: MediaAccessOptions = {},
 ): MediaAccessGuard {
   return createResolvedMediaAccessGuard(
     async (context) => {
@@ -61,7 +66,7 @@ export function createResolvedMediaAccessGuard(
   ) => Promise<{ accountId: string; roles: readonly string[] }>,
   booking: MediaBookingReader | undefined,
   eventStart: MediaEventStartReader | undefined,
-  options: { allowCompleted?: boolean } = {},
+  options: MediaAccessOptions = {},
 ): MediaAccessGuard {
   return {
     async requireAccess(bookingId, context) {
@@ -96,6 +101,7 @@ export function createResolvedMediaAccessGuard(
         (access !== null && access.consultationId !== confirmed.consultationId)
       )
         throw new NotFoundError();
+      await options.requireEditable?.(bookingId);
       const eventStartAt = await eventStart(confirmed, context);
       if (!Number.isFinite(eventStartAt.getTime())) throw new ValidationError();
       return { actorId: actor.accountId, role, eventStartAt };

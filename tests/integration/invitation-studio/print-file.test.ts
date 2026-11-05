@@ -147,7 +147,8 @@ const database = new CatalogTestDatabase('printfile');
           },
           f.couple,
         ),
-      ).rejects.toMatchObject({ status: 404 });
+      ).rejects.toMatchObject({ status: 409, code: 'PREPARATION_READ_ONLY' });
+      expect(await f.services.designs.get(f.bookingId, d.designId, f.couple)).toEqual(d);
     }, 30000);
 
     it('denies strangers, Staff, revoked sessions and unknown/cross-booking revisions', async () => {
