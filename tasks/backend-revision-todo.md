@@ -1,5 +1,10 @@
 # Backend Revision Tasks: 2026-10-10
 
+## Seating drag/confirmation correction — 2026-11-05
+
+- [x] SEAT-DRAG-01: Diagnose logged `PRINTABLE_SEATING_DIGEST_CONFLICT`, accept saved table positions in printable registration while preserving Venue table identity/shape and immutable history; verify native API, print capture and desktop/mobile browser behavior. [Evidence and existing-suite limitations](./evidence/seating-drag-confirm-409-2026-11-05.md).
+- [ ] SEAT-DRAG-02: Release the reviewed correction and verify the deployed drag/save/confirmation flow with an authorized synthetic fixture.
+
 ## Owner-authorized multi-design print appendix amendment — 2026-11-04
 
 New scoped continuation (includes wedding-web and wedding-manage-web, excludes

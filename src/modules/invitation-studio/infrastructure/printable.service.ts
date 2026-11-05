@@ -114,6 +114,8 @@ export class PrintableService implements PrintableSeatingContentRegistry {
         true,
       );
       const layout = await this.layouts.resolveLayoutTemplateVersion(input.layoutTemplateVersionId);
+      // Seating owns the saved x/y placement; Venue still owns table identity and shape.
+      // The schema bounds coordinates and the digest above binds the exact print positions.
       if (
         input.renderSnapshot.length !== layout.tables.length ||
         input.renderSnapshot.some((table) => {
@@ -122,8 +124,6 @@ export class PrintableService implements PrintableSeatingContentRegistry {
             source === undefined ||
             source.label !== table.tableLabel ||
             source.shape !== table.shape ||
-            source.x !== table.x ||
-            source.y !== table.y ||
             source.width !== table.width ||
             source.height !== table.height ||
             source.rotationDegrees !== table.rotationDegrees

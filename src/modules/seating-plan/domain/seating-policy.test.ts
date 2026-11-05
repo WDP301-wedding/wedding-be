@@ -41,4 +41,20 @@ describe('SEA-W1 independent planning and fixed table labels', () => {
       }).success,
     ).toBe(false);
   });
+  it('allows bounded saved table positions while rejecting shape changes and invalid coordinates', () => {
+    const position = { layoutTableId: randomUUID(), x: 0, y: 10000 };
+    const input = (change: object) => ({
+      expectedRevision: 1,
+      positions: [{ ...position, ...change }],
+    });
+    expect(revisionInput.safeParse(input({})).success).toBe(true);
+    for (const change of [
+      { x: -1 },
+      { y: 10001 },
+      { x: 0.5 },
+      { width: 500 },
+      { rotationDegrees: 90 },
+    ])
+      expect(revisionInput.safeParse(input(change)).success).toBe(false);
+  });
 });

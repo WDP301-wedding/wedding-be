@@ -884,7 +884,7 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
       ).rejects.toThrow();
     },
   );
-  it('registry requires live proof, exact immutable geometry/digest; owner work rolls back on rejection', async () => {
+  it('registry requires live proof, exact table identity/shape/digest; owner work rolls back on rejection', async () => {
     const { validityProof: _proof, ...legacy } = f.registry;
     expect(_proof.bookingRevision).toBe(1);
     await expect(
@@ -892,10 +892,19 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
         f.services.printable.registerConfirmed(legacy, ctx),
       ),
     ).rejects.toMatchObject({ status: 409 });
-    const renderSnapshot = f.registry.renderSnapshot.map((t) => ({ ...t, x: 3 }));
-    await expect(
-      registered({ ...f.registry, renderSnapshot, contentDigest: digest(renderSnapshot) }),
-    ).rejects.toMatchObject({ status: 409 });
+    for (const change of [
+      { layoutTableId: randomUUID() },
+      { tableLabel: 'Changed label' },
+      { shape: 'RECTANGLE' as const },
+      { width: 3 },
+      { height: 3 },
+      { rotationDegrees: 3 },
+    ]) {
+      const renderSnapshot = f.registry.renderSnapshot.map((t) => ({ ...t, ...change }));
+      await expect(
+        registered({ ...f.registry, renderSnapshot, contentDigest: digest(renderSnapshot) }),
+      ).rejects.toMatchObject({ status: 409 });
+    }
     await expect(
       f.services.boundary.run({ bookingId: f.bookingId, context: f.contract }, async (ctx) => {
         const tx = f.services.boundary.requireScope(f.bookingId, ctx);

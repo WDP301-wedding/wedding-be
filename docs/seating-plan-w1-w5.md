@@ -8,7 +8,9 @@ Provider: `seating-plan@1.0.0`. Confirmed scope: `WEDDING-CONTRACT-3@3.0.0`,
 Capacity uses Booking's independently entered `planningHeadcount`. Zero named
 Guests, partial lists and disabled check-in do not change this number and do not
 block Group labels or compatible confirmation. No person/seat or companion count
-is stored. No geometry, group display values or client capacity claims are accepted.
+is stored. Table identity, label, shape, size and rotation come from Venue. Saved
+table positions may be changed through `positions`; group display values and client
+capacity claims are never accepted.
 
 `GET /api/v1/bookings/{bookingId}/seating-layout-options` returns current published
 versions for the Booking hall, ranked by compatibility, physical capacity and stable
@@ -29,7 +31,7 @@ Unknown body/query keys are 422. Every POST requires printable ASCII
 | Operation                                                        | Strict body / result                                                                                      |
 | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | POST `/bookings/{bookingId}/seating-plans`                       | `layoutTemplateVersionId`, `expectedBookingRevision`; new DRAFT, 201                                      |
-| POST `/bookings/{bookingId}/seating-plans/{planId}/revisions`    | `expectedRevision`, optional `labels`, optional `layoutTemplateVersionId` / `remap`; successor DRAFT, 201 |
+| POST `/bookings/{bookingId}/seating-plans/{planId}/revisions`    | `expectedRevision`, optional `labels` / `positions`, optional `layoutTemplateVersionId` / `remap`; successor DRAFT, 201 |
 | POST `/bookings/{bookingId}/seating-plans/{planId}/confirmation` | `expectedRevision`, `expectedBookingRevision`; successor CONFIRMED and registered printable snapshot, 201 |
 | POST `/management/seating-plans/{planId}/exceptions`             | Same revision fields plus NFC reason 10–500 characters; Manager confirmation, 201                         |
 | GET `/bookings/{bookingId}/seating-plans/{planId}`               | Retained selected snapshot plus revalidated status/current count/revision, 200                            |
@@ -40,7 +42,12 @@ Paths above are relative to `/api/v1`. Labels are
 `{layoutTableId, guestGroupId}`; one Group can label several tables, each table at
 most one Group. Groups must belong to the Booking and be active when edited or
 confirmed. Server snapshots Group name/color and exact Venue table geometry.
-Unlabelled tables are supported.
+Unlabelled tables are supported. Optional `positions` entries contain
+`{layoutTableId, x, y}` with integer coordinates from 0 to 10000. Confirmation
+preserves the saved positions and registers their exact digest for printing; it
+does not restore the template's initial x/y. Omitted positions retain the saved
+coordinates when the template is unchanged. Table shape, size and rotation remain
+Venue-owned. Existing confirmed revisions and printable captures are immutable.
 
 Example revision with an optional list still empty:
 
