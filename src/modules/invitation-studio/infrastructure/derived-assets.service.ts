@@ -155,21 +155,28 @@ export class DerivedAssetsService {
       where: { publicSlug: slug },
     });
     if (asset === null) throw new NotFoundError();
-    const identity = await this.repository.prisma.invitationPublicIdentity.findUnique({
-      where: { bookingId: asset.bookingId },
+    const identities = await this.repository.prisma.invitationPublicIdentity.findMany({
+      where: { bookingId: asset.bookingId, currentPublicationId: { not: null } },
+      select: { currentPublicationId: true },
     });
-    if (identity?.currentPublicationId === null || identity === null) throw new NotFoundError();
     const current = await this.repository.prisma.invitationPublishedRevision.findFirst({
-      where: { id: identity.currentPublicationId, assetIds: { has: asset.id } },
+      where: {
+        bookingId: asset.bookingId,
+        id: {
+          in: identities.flatMap((identity) =>
+            identity.currentPublicationId ? [identity.currentPublicationId] : [],
+          ),
+        },
+        assetIds: { has: asset.id },
+      },
     });
     if (current === null) throw new NotFoundError();
     const bytes = await this.storage.read(asset.object as unknown as StoredObject);
-    // Recheck unpublication/replacement after the provider read; old references stay
-    // private and do not authorize a public asset response.
-    const latest = await this.repository.prisma.invitationPublicIdentity.findUnique({
-      where: { bookingId: asset.bookingId },
+    // An asset stays public only while at least one live design references it.
+    const latest = await this.repository.prisma.invitationPublicIdentity.findFirst({
+      where: { bookingId: asset.bookingId, currentPublicationId: current.id },
     });
-    if (latest?.currentPublicationId !== current.id) throw new NotFoundError();
+    if (!latest) throw new NotFoundError();
     return bytes;
   }
 }

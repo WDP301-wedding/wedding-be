@@ -52,6 +52,7 @@ export class PublicationService implements InvitationPublicationReader {
       renderSnapshot: z.infer<typeof seatingRenderSchema>;
     }>,
     readonly webOrigin?: string | null,
+    readonly readAccess = access,
   ) {}
   /** Resolve the current delivery address without rewriting immutable published/print content. */
   publicUrlForSlug(slug: string): string {
@@ -86,8 +87,11 @@ export class PublicationService implements InvitationPublicationReader {
           where: { id: design.currentRevisionId },
         });
         const content = parseStudio(designContentSchema, source.content);
-        let identity = await tx.invitationPublicIdentity.findUnique({
-          where: { bookingId: input.bookingId },
+        let identity = await tx.invitationPublicIdentity.findFirst({
+          where: {
+            bookingId: input.bookingId,
+            OR: [{ designId: input.designId }, { designId: null, isDefault: true }],
+          },
         });
         if ((identity?.revision ?? 0) !== input.expectedPublicationRevision)
           throw studioConflict('INVITATION_PUBLICATION_STALE');
@@ -96,6 +100,10 @@ export class PublicationService implements InvitationPublicationReader {
           identity = await tx.invitationPublicIdentity.create({
             data: {
               bookingId: input.bookingId,
+              designId: input.designId,
+              isDefault: !(await tx.invitationPublicIdentity.findFirst({
+                where: { bookingId: input.bookingId, isDefault: true },
+              })),
               id: randomUUID(),
               slug,
               publicUrl: this.publicUrlForSlug(slug),
@@ -172,8 +180,12 @@ export class PublicationService implements InvitationPublicationReader {
         });
         const publicationRevision = identity.revision + 1;
         await tx.invitationPublicIdentity.update({
-          where: { bookingId: input.bookingId },
-          data: { currentPublicationId: publishedRevisionId, revision: publicationRevision },
+          where: { id: identity.id },
+          data: {
+            designId: input.designId,
+            currentPublicationId: publishedRevisionId,
+            revision: publicationRevision,
+          },
         });
         await this.repository.audit(
           tx,
@@ -199,6 +211,32 @@ export class PublicationService implements InvitationPublicationReader {
       { action: 'publication.publish', resourceId: input.designId },
     );
   }
+  /** Authenticated per-design state, also available for retained read-only preparation. */
+  async readDesign(bookingValue: string, designValue: string, context: MediaRequestContext) {
+    const bookingId = parseStudio(id, bookingValue),
+      designId = parseStudio(id, designValue);
+    await this.readAccess.booking(bookingId, context);
+    const design = await this.repository.prisma.invitationDesign.findFirst({
+      where: { id: designId, bookingId },
+    });
+    if (!design) throw new NotFoundError();
+    const identity = await this.repository.prisma.invitationPublicIdentity.findFirst({
+      where: { bookingId, designId },
+    });
+    const publication = identity?.currentPublicationId
+      ? await this.repository.prisma.invitationPublishedRevision.findFirst({
+          where: { id: identity.currentPublicationId, bookingId },
+        })
+      : null;
+    await this.readAccess.booking(bookingId, context);
+    return {
+      publicationRevision: identity?.revision ?? 0,
+      published: publication !== null,
+      publicSlug: publication ? identity!.slug : null,
+      publishedRevisionId: publication?.id ?? null,
+      designRevisionId: publication?.designRevisionId ?? null,
+    };
+  }
   async unpublish(value: unknown, context: MediaRequestContext) {
     const input = parseStudio(unpublishSchema, value);
     return this.repository.command(
@@ -208,8 +246,11 @@ export class PublicationService implements InvitationPublicationReader {
       { action: 'publication.unpublish', ...input },
       (ctx) => this.access.booking(input.bookingId, ctx),
       async (tx, scoped) => {
-        const identity = await tx.invitationPublicIdentity.findUnique({
-          where: { bookingId: input.bookingId },
+        const identity = await tx.invitationPublicIdentity.findFirst({
+          where: {
+            bookingId: input.bookingId,
+            ...(input.designId === undefined ? { isDefault: true } : { designId: input.designId }),
+          },
         });
         if (identity === null) throw new NotFoundError();
         if (identity.revision !== input.expectedRevision)
@@ -225,7 +266,7 @@ export class PublicationService implements InvitationPublicationReader {
           if (source.designId !== input.designId) throw new NotFoundError();
         }
         await tx.invitationPublicIdentity.update({
-          where: { bookingId: input.bookingId },
+          where: { id: identity.id },
           data: { currentPublicationId: null, revision: identity.revision + 1 },
         });
         await this.repository.audit(
@@ -267,7 +308,7 @@ export class PublicationService implements InvitationPublicationReader {
     `);
     if (row === undefined) throw new NotFoundError();
     const latest = await this.repository.prisma.invitationPublicIdentity.findUnique({
-      where: { bookingId: row.bookingId },
+      where: { slug },
       select: { currentPublicationId: true },
     });
     if (latest?.currentPublicationId !== row.id) throw new NotFoundError();
@@ -276,10 +317,17 @@ export class PublicationService implements InvitationPublicationReader {
       genericQrPayload: this.publicUrlForSlug(slug),
     });
   }
-  async requirePublishedPublicInvitation(value: string) {
+  async requirePublishedPublicInvitation(value: string, designValue?: string) {
     const bookingId = parseStudio(id, value);
     const db = this.repository.boundary.current(bookingId) ?? this.repository.prisma;
-    const row = await db.invitationPublicIdentity.findUnique({ where: { bookingId } });
+    const row = await db.invitationPublicIdentity.findFirst({
+      where: {
+        bookingId,
+        ...(designValue === undefined
+          ? { isDefault: true }
+          : { designId: parseStudio(id, designValue) }),
+      },
+    });
     if (row === null || row.currentPublicationId === null) throw new NotFoundError();
     return {
       publicInvitationId: row.id,

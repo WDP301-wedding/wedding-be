@@ -1984,12 +1984,16 @@ model InvitationDerivedAsset {
 }
 
 model InvitationPublicIdentity {
-  bookingId            String  @id @db.Uuid
-  id                   String  @unique @db.Uuid
+  bookingId            String  @db.Uuid
+  id                   String  @id @unique @db.Uuid
+  designId             String? @unique @db.Uuid
+  isDefault            Boolean @default(false)
   slug                 String  @unique
   publicUrl            String
   revision             Int     @default(0)
   currentPublicationId String? @unique @db.Uuid
+
+  @@index([bookingId])
 }
 
 model InvitationPublishedRevision {

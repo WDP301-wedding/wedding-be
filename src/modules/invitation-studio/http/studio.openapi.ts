@@ -240,9 +240,15 @@ export const invitationStudioOpenApiPaths = {
     ),
   },
   '/bookings/{bookingId}/invitations/{designId}/publication': {
+    get: operation(
+      'getWeddingInvitationPublication',
+      'Owner or Manager reads this design’s independent publication state, including archived preparation',
+      s.designPublicationResponse,
+      ['bookingId', 'designId'],
+    ),
     post: operation(
       'publishWeddingInvitation',
-      'Explicit publication of exact current design and publication revisions',
+      'Publish exact design with independent stable slug and per-design publication CAS',
       s.publicationResponse,
       ['bookingId', 'designId'],
       s.publishBody,

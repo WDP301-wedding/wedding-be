@@ -13,7 +13,12 @@ export function createGuestPublicationReader(
   return {
     async getCurrent(bookingId, publicInvitationId) {
       const db = boundary.current(bookingId) ?? prisma;
-      const identity = await db.invitationPublicIdentity.findUnique({ where: { bookingId } });
+      const identity = await db.invitationPublicIdentity.findFirst({
+        where: {
+          bookingId,
+          ...(publicInvitationId === undefined ? { isDefault: true } : { id: publicInvitationId }),
+        },
+      });
       if (
         identity === null ||
         identity.currentPublicationId === null ||

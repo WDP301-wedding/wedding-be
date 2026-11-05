@@ -299,12 +299,12 @@ export class PrintableService implements PrintableSeatingContentRegistry {
       timeline.shiftCode !== event.shiftCode
     )
       throw studioConflict('PRINTABLE_TIMELINE_NOT_EFFECTIVE');
-    const identity = await tx.invitationPublicIdentity.findUnique({
-      where: { bookingId: input.bookingId },
+    const identity = await tx.invitationPublicIdentity.findFirst({
+      where: { bookingId: input.bookingId, designId: source.designId },
     });
     const publicIdentity =
       requirePublication || identity?.currentPublicationId
-        ? await this.publication.requirePublishedPublicInvitation(input.bookingId)
+        ? await this.publication.requirePublishedPublicInvitation(input.bookingId, source.designId)
         : null;
     let seating: {
       seatingPlanRevisionId: string;

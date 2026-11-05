@@ -8,7 +8,10 @@ export {
 } from '../domain/studio-policy.js';
 
 export interface InvitationPublicationReader {
-  requirePublishedPublicInvitation(bookingId: string): Promise<{
+  requirePublishedPublicInvitation(
+    bookingId: string,
+    designId?: string,
+  ): Promise<{
     publicInvitationId: string;
     publicSlug: string;
     genericQrPayload?: string;
