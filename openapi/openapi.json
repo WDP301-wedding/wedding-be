@@ -18839,7 +18839,7 @@
     },
     "/bookings/{bookingId}/guest-groups": {
       "get": {
-        "description": "Confirmed Booking: Manager or owning FULL Couple. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
+        "description": "Manager or owning FULL Couple. Confirmed and completed bookings remain readable. Preparation writes return PREPARATION_READ_ONLY after completion or verified final settlement. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
         "operationId": "listGuestGroups",
         "responses": {
           "200": {
@@ -18949,7 +18949,7 @@
         }
       ],
       "post": {
-        "description": "Confirmed Booking: Manager or owning FULL Couple. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
+        "description": "Manager or owning FULL Couple. Confirmed and completed bookings remain readable. Preparation writes return PREPARATION_READ_ONLY after completion or verified final settlement. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
         "operationId": "createGuestGroup",
         "parameters": [
           {
@@ -19102,7 +19102,7 @@
         }
       ],
       "patch": {
-        "description": "Confirmed Booking: Manager or owning FULL Couple. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
+        "description": "Manager or owning FULL Couple. Confirmed and completed bookings remain readable. Preparation writes return PREPARATION_READ_ONLY after completion or verified final settlement. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
         "operationId": "updateGuestGroup",
         "parameters": [
           {
@@ -19269,14 +19269,21 @@
                           "type": "integer"
                         },
                         "revision": {
-                          "exclusiveMinimum": 0,
                           "maximum": 9007199254740991,
+                          "minimum": 0,
                           "type": "integer"
                         },
                         "sourceGuestPlanRevisionId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
+                          "anyOf": [
+                            {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         },
                         "sourceSequence": {
                           "maximum": 9007199254740991,
@@ -19346,7 +19353,7 @@
         }
       ],
       "patch": {
-        "description": "Confirmed Booking: Manager or owning FULL Couple. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
+        "description": "Manager or owning FULL Couple. Confirmed and completed bookings remain readable. Preparation writes return PREPARATION_READ_ONLY after completion or verified final settlement. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
         "operationId": "reviseExplicitGuestPlan",
         "parameters": [
           {
@@ -19405,14 +19412,21 @@
                           "type": "integer"
                         },
                         "revision": {
-                          "exclusiveMinimum": 0,
                           "maximum": 9007199254740991,
+                          "minimum": 0,
                           "type": "integer"
                         },
                         "sourceGuestPlanRevisionId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
+                          "anyOf": [
+                            {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         },
                         "sourceSequence": {
                           "maximum": 9007199254740991,
@@ -19473,7 +19487,7 @@
     },
     "/bookings/{bookingId}/guests": {
       "get": {
-        "description": "Confirmed Booking: Manager or owning FULL Couple. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
+        "description": "Manager or owning FULL Couple. Confirmed and completed bookings remain readable. Preparation writes return PREPARATION_READ_ONLY after completion or verified final settlement. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
         "operationId": "listNamedGuests",
         "parameters": [
           {
@@ -19667,7 +19681,7 @@
         }
       ],
       "post": {
-        "description": "Confirmed Booking: Manager or owning FULL Couple. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
+        "description": "Manager or owning FULL Couple. Confirmed and completed bookings remain readable. Preparation writes return PREPARATION_READ_ONLY after completion or verified final settlement. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
         "operationId": "createNamedGuest",
         "parameters": [
           {
@@ -19854,7 +19868,7 @@
         }
       ],
       "post": {
-        "description": "Confirmed Booking: Manager or owning FULL Couple. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
+        "description": "Manager or owning FULL Couple. Confirmed and completed bookings remain readable. Preparation writes return PREPARATION_READ_ONLY after completion or verified final settlement. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
         "operationId": "previewNamedGuestImport",
         "parameters": [
           {
@@ -20056,7 +20070,7 @@
         }
       ],
       "post": {
-        "description": "Confirmed Booking: Manager or owning FULL Couple. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
+        "description": "Manager or owning FULL Couple. Confirmed and completed bookings remain readable. Preparation writes return PREPARATION_READ_ONLY after completion or verified final settlement. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
         "operationId": "commitNamedGuestImport",
         "parameters": [
           {
@@ -20186,7 +20200,7 @@
         }
       ],
       "patch": {
-        "description": "Confirmed Booking: Manager or owning FULL Couple. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
+        "description": "Manager or owning FULL Couple. Confirmed and completed bookings remain readable. Preparation writes return PREPARATION_READ_ONLY after completion or verified final settlement. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
         "operationId": "updateNamedGuest",
         "parameters": [
           {

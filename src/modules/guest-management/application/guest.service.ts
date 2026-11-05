@@ -53,7 +53,11 @@ export class GuestService {
     readonly owners: GuestOwnerPorts,
     readonly now: () => Date = () => new Date(),
   ) {}
-  async authorize(bookingId: string, context: GuestRequestContext) {
+  async authorize(
+    bookingId: string,
+    context: GuestRequestContext,
+    mode: 'READ' | 'WRITE' = 'WRITE',
+  ) {
     const actor = await this.resolver.resolve(context.accessToken);
     if (
       actor.accountId !== context.actorId ||
@@ -66,7 +70,8 @@ export class GuestService {
         accountId: actor.accountId,
         minimum: 'FULL',
       });
-    await this.owners.booking.requireConfirmedEventContext(bookingId);
+    await (this.owners.history ?? this.owners.booking).requireConfirmedEventContext(bookingId);
+    if (mode === 'WRITE') await this.owners.preparationLock?.requireEditable(bookingId);
   }
   read<T>(
     bookingValue: string,
@@ -74,15 +79,20 @@ export class GuestService {
     work: (
       tx: Prisma.TransactionClient,
       scope: ContractContext,
-      workspace: GuestWorkspace,
+      workspace: GuestWorkspace | null,
     ) => Promise<T>,
   ) {
     const bookingId = parse(id, bookingValue);
     return this.repository.run(
       bookingId,
       context,
-      () => this.authorize(bookingId, context),
-      async (tx, scope) => work(tx, scope, await this.initialize(tx, bookingId, scope)),
+      () => this.authorize(bookingId, context, 'READ'),
+      async (tx, scope) => {
+        const workspace = (await this.owners.preparationLock?.read(bookingId))
+          ? await tx.guestWorkspace.findUnique({ where: { bookingId } })
+          : await this.initialize(tx, bookingId, scope);
+        return work(tx, scope, workspace);
+      },
       'READ',
     );
   }
@@ -365,7 +375,17 @@ export class GuestService {
     return row;
   }
   plan(bookingId: string, context: GuestRequestContext) {
-    return this.read(bookingId, context, (tx, _scope, workspace) => this.planDto(tx, workspace));
+    return this.read(bookingId, context, async (tx, scope, workspace) => {
+      if (workspace) return this.planDto(tx, workspace);
+      const source = await this.owners.planning.getSource(bookingId, scope);
+      return {
+        bookingId,
+        sourceGuestPlanRevisionId: source.sourceGuestPlanRevisionId,
+        sourceSequence: source.sourceSequence,
+        planningHeadcount: source.planningHeadcount,
+        revision: 0,
+      };
+    });
   }
   async planDto(tx: Prisma.TransactionClient, workspace: GuestWorkspace) {
     const row = await tx.guestPlanRevision.findUniqueOrThrow({

@@ -44,7 +44,7 @@ const operation = (
   tags: ['Guest management'],
   security: [{ bearerAuth: [] }],
   description:
-    'Confirmed Booking: Manager or owning FULL Couple. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.',
+    'Manager or owning FULL Couple. Confirmed and completed bookings remain readable. Preparation writes return PREPARATION_READ_ONLY after completion or verified final settlement. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.',
   ...(body === undefined
     ? {}
     : {

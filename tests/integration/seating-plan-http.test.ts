@@ -65,6 +65,20 @@ import {
       );
       const latest = await read().expect(200);
       expect(planViewSchema.parse((latest.body as { data: unknown }).data).revisionNumber).toBe(2);
+      await db.prisma.booking.update({
+        where: { id: f.bookingId },
+        data: { phase: 'COMPLETED' },
+      });
+      expect((await read().expect(200)).body).toEqual(latest.body);
+      await expect(
+        s.seating.revise(
+          f.bookingId,
+          created.seatingPlanId,
+          { expectedRevision: 2, labels: [] },
+          randomUUID(),
+          f.couple,
+        ),
+      ).rejects.toMatchObject({ status: 409, code: 'PREPARATION_READ_ONLY' });
       const byId = await request(app)
         .get(path.replace('current', created.seatingPlanId))
         .auth(f.couple.accessToken, { type: 'bearer' })

@@ -68,7 +68,13 @@ export function createInvitationStudioServices(
     (bookingId, context) => media.repository.recordDeniedAccess(bookingId, context),
     (context) => repository.recordTemplateDeniedAccess(context),
   );
-  const designs = new DesignService(repository, authorization, now, fulfillment);
+  const designs = new DesignService(
+    repository,
+    authorization,
+    now,
+    fulfillment,
+    printAuthorization,
+  );
   const derivedAssets = new DerivedAssetsService(repository, authorization, storage);
   const generation = new GenerationService(repository, authorization, media.service, ai);
   const publication: PublicationService = new PublicationService(
@@ -124,6 +130,7 @@ export function createInvitationStudioServices(
         generation,
         derivedAssets,
         booking: media.booking,
+        requireEditable: media.requireEditable,
         timeline: media.timeline,
       },
       now,
@@ -133,7 +140,13 @@ export function createInvitationStudioServices(
     printable,
     billing,
     printOrders,
-    printRequests: new PrintRequestService(repository, authorization, printable, now),
+    printRequests: new PrintRequestService(
+      repository,
+      authorization,
+      printable,
+      now,
+      printAuthorization,
+    ),
     printPurchases: new PrintPurchaseService(
       repository,
       authorization,

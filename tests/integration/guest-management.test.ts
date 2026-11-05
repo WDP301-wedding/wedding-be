@@ -18,6 +18,77 @@ describeDb('GM-W1 real Booking + Guest persistence', () => {
     s = createGuestServices(database.prisma);
   }, 60000);
   afterAll(() => database.disconnect());
+  it('reads an untouched completed booking without initializing any planning records', async () => {
+    const closed = await studioFixture(database.prisma);
+    await database.prisma.booking.update({
+      where: { id: closed.bookingId },
+      data: { phase: 'COMPLETED' },
+    });
+    expect(await s.guests.groups(closed.bookingId, closed.couple)).toEqual([]);
+    expect(await s.readers.list(closed.bookingId, {}, closed.couple)).toMatchObject({ items: [] });
+    expect(await s.guests.plan(closed.bookingId, closed.couple)).toMatchObject({
+      planningHeadcount: 20,
+      revision: 0,
+      sourceGuestPlanRevisionId: null,
+    });
+    expect(
+      await database.prisma.guestWorkspace.findUnique({
+        where: { bookingId: closed.bookingId },
+      }),
+    ).toBeNull();
+    expect(await closed.services.designs.list(closed.bookingId, {}, closed.couple)).toMatchObject({
+      items: [],
+    });
+    expect(await closed.services.printRequests.list(closed.bookingId, closed.couple)).toMatchObject(
+      { items: [] },
+    );
+    await expect(
+      s.guests.createGroup(
+        closed.bookingId,
+        { name: 'Closed group', color: '#112233' },
+        randomUUID(),
+        closed.couple,
+      ),
+    ).rejects.toMatchObject({ status: 409, code: 'PREPARATION_READ_ONLY' });
+  });
+  it('keeps saved preparation visible after completion and rejects mutations', async () => {
+    const closed = await studioFixture(database.prisma);
+    const design = await closed.services.designs.create(
+      {
+        bookingId: closed.bookingId,
+        content: {
+          title: 'Saved invitation',
+          textFields: {},
+          sections: [],
+          derivedAssetIds: [],
+          includesSeating: false,
+        },
+        idempotencyKey: randomUUID(),
+      },
+      closed.couple,
+    );
+    const groups = await s.guests.groups(closed.bookingId, closed.couple);
+    await database.prisma.booking.update({
+      where: { id: closed.bookingId },
+      data: { phase: 'COMPLETED' },
+    });
+    expect(await s.guests.groups(closed.bookingId, closed.couple)).toEqual(groups);
+    expect(
+      await closed.services.designs.get(closed.bookingId, design.designId, closed.couple),
+    ).toEqual(design);
+    await expect(
+      closed.services.designs.edit(
+        {
+          bookingId: closed.bookingId,
+          designId: design.designId,
+          expectedRevision: 1,
+          textFields: { greeting: 'Locked' },
+          idempotencyKey: randomUUID(),
+        },
+        closed.couple,
+      ),
+    ).rejects.toMatchObject({ status: 409, code: 'PREPARATION_READ_ONLY' });
+  });
   it('initializes groups without names, retains Booking planning count and initializes once', async () => {
     const groups = await s.guests.groups(f.bookingId, f.couple);
     expect(groups).toHaveLength(4);
@@ -103,7 +174,9 @@ describeDb('GM-W1 real Booking + Guest persistence', () => {
     expect(await database.prisma.booking.findUniqueOrThrow({ where: { id: f.bookingId } })).toEqual(
       before,
     );
-    expect(await database.prisma.guestPlanRevision.count()).toBe(1);
+    expect(
+      await database.prisma.guestPlanRevision.count({ where: { bookingId: f.bookingId } }),
+    ).toBe(1);
     const key = randomUUID(),
       input = { expectedRevision: 1, planningHeadcount: 25 };
     const next = await s.guests.updatePlan(f.bookingId, input, key, f.couple);

@@ -66,6 +66,7 @@ export class DesignService {
         templateVersionId: string,
       ): Promise<void>;
     },
+    readonly readAccess = access,
   ) {}
   async saveTemplate(value: unknown, context: MediaRequestContext) {
     const input = parseStudio(templateSchema, value);
@@ -162,7 +163,7 @@ export class DesignService {
     const bookingId = parseStudio(id, bookingValue),
       query = parseStudio(pageSchema.omit({ bookingId: true, includeArchived: true }), page);
     await studioPhase(context, 'design.list', 'authorization', () =>
-      this.access.booking(bookingId, context),
+      this.readAccess.booking(bookingId, context),
     );
     const rows = await studioPhase(context, 'design.list', 'page', () =>
       this.repository.prisma.invitationDesign.findMany({
@@ -191,7 +192,7 @@ export class DesignService {
     });
     // Recheck current authority once for the complete response, including empty pages.
     await studioPhase(context, 'design.list', 'authorization', () =>
-      this.access.booking(bookingId, context),
+      this.readAccess.booking(bookingId, context),
     );
     return { items, nextCursor: rows.length > query.limit ? rows[query.limit - 1]!.id : null };
   }
@@ -344,7 +345,7 @@ export class DesignService {
   async get(bookingValue: string, designValue: string, context: MediaRequestContext) {
     const bookingId = parseStudio(id, bookingValue),
       designId = parseStudio(id, designValue);
-    await this.access.booking(bookingId, context);
+    await this.readAccess.booking(bookingId, context);
     const head = await this.repository.prisma.invitationDesign.findFirst({
       where: { id: designId, bookingId },
     });
@@ -352,7 +353,7 @@ export class DesignService {
     const row = await this.repository.prisma.invitationDesignRevision.findUniqueOrThrow({
       where: { id: head.currentRevisionId },
     });
-    await this.access.booking(bookingId, context);
+    await this.readAccess.booking(bookingId, context);
     return designViewSchema.parse({
       ...parseStudio(designContentSchema, row.content),
       designId,

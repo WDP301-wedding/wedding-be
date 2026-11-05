@@ -47,6 +47,7 @@ export class MediaService {
     readonly storage: StorageProvider,
     readonly inspector: MediaImageInspector,
     readonly now: () => Date = () => new Date(),
+    readonly readAccess = access,
   ) {}
 
   async upload(value: unknown, context: MediaRequestContext): Promise<MediaAsset> {
@@ -274,7 +275,7 @@ export class MediaService {
     const input = parseMediaInput(readSchema, value);
 
     const authorize = async (scopedContext: MediaRequestContext) => {
-      await this.requireActor(input.bookingId, scopedContext);
+      await this.requireActor(input.bookingId, scopedContext, undefined, this.readAccess);
     };
 
     // 1. Short read boundary: fresh authorization + exact-asset projection under scoped lock
@@ -318,10 +319,11 @@ export class MediaService {
     bookingId: string,
     context: MediaRequestContext,
     role?: 'COUPLE' | 'MANAGER',
+    guard = this.access,
   ) {
     let actor;
     try {
-      actor = await this.access.requireAccess(bookingId, context);
+      actor = await guard.requireAccess(bookingId, context);
       if (
         actor.actorId !== context.actorId ||
         (actor.role !== 'MANAGER' && actor.role !== 'COUPLE') ||

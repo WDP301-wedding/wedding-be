@@ -24,6 +24,7 @@ export class PrintRequestService {
     readonly access: StudioAuthorization,
     readonly printable: PrintableService,
     readonly now = () => new Date(),
+    readonly readAccess = access,
   ) {}
 
   private async eligible(
@@ -161,10 +162,10 @@ export class PrintRequestService {
   }
 
   async list(bookingId: string, context: MediaRequestContext) {
-    return this.repository.boundary.run(
+    return this.repository.boundary.runRead(
       { bookingId, context: contractContext(context) },
       async (scope) => {
-        await this.access.booking(bookingId, {
+        await this.readAccess.booking(bookingId, {
           ...context,
           transactionScopeId: scope.transactionScopeId!,
         });
