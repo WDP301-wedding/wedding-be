@@ -86,7 +86,7 @@ export function buildDemoLayoutPlans(
     ) {
       throw Error('DEMO_HALL_CONFLICT');
     }
-    const sizes = lotus ? [10, 20, 30] : [5, 10, 12];
+    const sizes = lotus ? [10, 15, 18, 20, 25, 30] : [5, 10, 12];
     const label = lotus ? 'Lotus' : orchid ? 'Orchid' : 'Tiệc thân mật';
     let minimum = 1;
     return sizes.map((count, index) => {
