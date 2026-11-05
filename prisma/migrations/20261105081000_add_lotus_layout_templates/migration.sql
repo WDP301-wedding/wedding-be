@@ -1,10 +1,15 @@
 -- Add 3 layout templates for Lotus Hall: 15 tables (150 seats), 18 tables (180 seats), 25 tables (250 seats)
 
--- Disable user triggers during catalog insertion to prevent deferred constraint trigger aborts
-ALTER TABLE "LayoutTemplate" DISABLE TRIGGER USER;
-ALTER TABLE "LayoutTemplateVersion" DISABLE TRIGGER USER;
-ALTER TABLE "LayoutTableIdentity" DISABLE TRIGGER USER;
-ALTER TABLE "LayoutTableGeometry" DISABLE TRIGGER USER;
+-- Only apply if the referenced Hall and Account exist (e.g. seeded demo/prod database, not empty test CI database)
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM "Hall" WHERE "id" = '10000000-0000-4000-8000-000000000010')
+     AND EXISTS (SELECT 1 FROM "Account" WHERE "id" = '10000000-0000-4000-8000-000000000001') THEN
+
+    EXECUTE 'ALTER TABLE "LayoutTemplate" DISABLE TRIGGER USER';
+    EXECUTE 'ALTER TABLE "LayoutTemplateVersion" DISABLE TRIGGER USER';
+    EXECUTE 'ALTER TABLE "LayoutTableIdentity" DISABLE TRIGGER USER';
+    EXECUTE 'ALTER TABLE "LayoutTableGeometry" DISABLE TRIGGER USER';
 
 -- =============================================================================
 -- Lotus — 15 bàn, 150 chỗ
@@ -451,10 +456,13 @@ INSERT INTO "LayoutTableGeometry" ("id", "layoutTemplateVersionId", "layoutTempl
 VALUES ('17e85004-2bf4-5ed1-aec5-84c1341bcac4', 'ff3502c4-03e1-584f-a988-70ba82ecdb50', '7e8e64bc-4278-53c3-a445-04a4c0161045', '14d5b068-534c-5daa-ad0d-d75e3d32372b', 'Bàn 25', 'ROUND', 10, 600, 6800, 650, 650, 0, 25)
 ON CONFLICT ("id") DO NOTHING;
 
--- Re-enable user triggers
-ALTER TABLE "LayoutTableGeometry" ENABLE TRIGGER USER;
-ALTER TABLE "LayoutTableIdentity" ENABLE TRIGGER USER;
-ALTER TABLE "LayoutTemplateVersion" ENABLE TRIGGER USER;
-ALTER TABLE "LayoutTemplate" ENABLE TRIGGER USER;
+    -- Re-enable user triggers
+    EXECUTE 'ALTER TABLE "LayoutTableGeometry" ENABLE TRIGGER USER';
+    EXECUTE 'ALTER TABLE "LayoutTableIdentity" ENABLE TRIGGER USER';
+    EXECUTE 'ALTER TABLE "LayoutTemplateVersion" ENABLE TRIGGER USER';
+    EXECUTE 'ALTER TABLE "LayoutTemplate" ENABLE TRIGGER USER';
+
+  END IF;
+END $$;
 
 
