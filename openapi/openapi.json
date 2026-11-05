@@ -4969,6 +4969,90 @@
               "presentation": {
                 "additionalProperties": false,
                 "properties": {
+                  "decoration": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "coverComposition": {
+                        "enum": [
+                          "diagonal",
+                          "crown",
+                          "border"
+                        ],
+                        "type": "string"
+                      },
+                      "coverDensity": {
+                        "enum": [
+                          "subtle",
+                          "ornate"
+                        ],
+                        "type": "string"
+                      },
+                      "coverMotif": {
+                        "enum": [
+                          "peony",
+                          "lotus",
+                          "botanical",
+                          "art-deco",
+                          "celestial",
+                          "orchid",
+                          "cloud",
+                          "ginkgo"
+                        ],
+                        "type": "string"
+                      },
+                      "finish": {
+                        "enum": [
+                          "letterpress",
+                          "gold-foil",
+                          "silk"
+                        ],
+                        "type": "string"
+                      },
+                      "frame": {
+                        "enum": [
+                          "double-line",
+                          "arch",
+                          "corners"
+                        ],
+                        "type": "string"
+                      },
+                      "insideComposition": {
+                        "enum": [
+                          "diagonal",
+                          "crown",
+                          "border"
+                        ],
+                        "type": "string"
+                      },
+                      "insideDensity": {
+                        "enum": [
+                          "subtle",
+                          "ornate"
+                        ],
+                        "type": "string"
+                      },
+                      "insideMotif": {
+                        "enum": [
+                          "peony",
+                          "lotus",
+                          "botanical",
+                          "art-deco",
+                          "celestial",
+                          "orchid",
+                          "cloud",
+                          "ginkgo"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "coverMotif",
+                      "insideMotif",
+                      "frame",
+                      "finish"
+                    ],
+                    "type": "object"
+                  },
                   "layout": {
                     "enum": [
                       "envelope",
@@ -6686,6 +6770,90 @@
               "presentation": {
                 "additionalProperties": false,
                 "properties": {
+                  "decoration": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "coverComposition": {
+                        "enum": [
+                          "diagonal",
+                          "crown",
+                          "border"
+                        ],
+                        "type": "string"
+                      },
+                      "coverDensity": {
+                        "enum": [
+                          "subtle",
+                          "ornate"
+                        ],
+                        "type": "string"
+                      },
+                      "coverMotif": {
+                        "enum": [
+                          "peony",
+                          "lotus",
+                          "botanical",
+                          "art-deco",
+                          "celestial",
+                          "orchid",
+                          "cloud",
+                          "ginkgo"
+                        ],
+                        "type": "string"
+                      },
+                      "finish": {
+                        "enum": [
+                          "letterpress",
+                          "gold-foil",
+                          "silk"
+                        ],
+                        "type": "string"
+                      },
+                      "frame": {
+                        "enum": [
+                          "double-line",
+                          "arch",
+                          "corners"
+                        ],
+                        "type": "string"
+                      },
+                      "insideComposition": {
+                        "enum": [
+                          "diagonal",
+                          "crown",
+                          "border"
+                        ],
+                        "type": "string"
+                      },
+                      "insideDensity": {
+                        "enum": [
+                          "subtle",
+                          "ornate"
+                        ],
+                        "type": "string"
+                      },
+                      "insideMotif": {
+                        "enum": [
+                          "peony",
+                          "lotus",
+                          "botanical",
+                          "art-deco",
+                          "celestial",
+                          "orchid",
+                          "cloud",
+                          "ginkgo"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "coverMotif",
+                      "insideMotif",
+                      "frame",
+                      "finish"
+                    ],
+                    "type": "object"
+                  },
                   "layout": {
                     "enum": [
                       "envelope",
@@ -7321,6 +7489,90 @@
               "presentation": {
                 "additionalProperties": false,
                 "properties": {
+                  "decoration": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "coverComposition": {
+                        "enum": [
+                          "diagonal",
+                          "crown",
+                          "border"
+                        ],
+                        "type": "string"
+                      },
+                      "coverDensity": {
+                        "enum": [
+                          "subtle",
+                          "ornate"
+                        ],
+                        "type": "string"
+                      },
+                      "coverMotif": {
+                        "enum": [
+                          "peony",
+                          "lotus",
+                          "botanical",
+                          "art-deco",
+                          "celestial",
+                          "orchid",
+                          "cloud",
+                          "ginkgo"
+                        ],
+                        "type": "string"
+                      },
+                      "finish": {
+                        "enum": [
+                          "letterpress",
+                          "gold-foil",
+                          "silk"
+                        ],
+                        "type": "string"
+                      },
+                      "frame": {
+                        "enum": [
+                          "double-line",
+                          "arch",
+                          "corners"
+                        ],
+                        "type": "string"
+                      },
+                      "insideComposition": {
+                        "enum": [
+                          "diagonal",
+                          "crown",
+                          "border"
+                        ],
+                        "type": "string"
+                      },
+                      "insideDensity": {
+                        "enum": [
+                          "subtle",
+                          "ornate"
+                        ],
+                        "type": "string"
+                      },
+                      "insideMotif": {
+                        "enum": [
+                          "peony",
+                          "lotus",
+                          "botanical",
+                          "art-deco",
+                          "celestial",
+                          "orchid",
+                          "cloud",
+                          "ginkgo"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "coverMotif",
+                      "insideMotif",
+                      "frame",
+                      "finish"
+                    ],
+                    "type": "object"
+                  },
                   "layout": {
                     "enum": [
                       "envelope",
@@ -21084,6 +21336,90 @@
                         "presentation": {
                           "additionalProperties": false,
                           "properties": {
+                            "decoration": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "coverComposition": {
+                                  "enum": [
+                                    "diagonal",
+                                    "crown",
+                                    "border"
+                                  ],
+                                  "type": "string"
+                                },
+                                "coverDensity": {
+                                  "enum": [
+                                    "subtle",
+                                    "ornate"
+                                  ],
+                                  "type": "string"
+                                },
+                                "coverMotif": {
+                                  "enum": [
+                                    "peony",
+                                    "lotus",
+                                    "botanical",
+                                    "art-deco",
+                                    "celestial",
+                                    "orchid",
+                                    "cloud",
+                                    "ginkgo"
+                                  ],
+                                  "type": "string"
+                                },
+                                "finish": {
+                                  "enum": [
+                                    "letterpress",
+                                    "gold-foil",
+                                    "silk"
+                                  ],
+                                  "type": "string"
+                                },
+                                "frame": {
+                                  "enum": [
+                                    "double-line",
+                                    "arch",
+                                    "corners"
+                                  ],
+                                  "type": "string"
+                                },
+                                "insideComposition": {
+                                  "enum": [
+                                    "diagonal",
+                                    "crown",
+                                    "border"
+                                  ],
+                                  "type": "string"
+                                },
+                                "insideDensity": {
+                                  "enum": [
+                                    "subtle",
+                                    "ornate"
+                                  ],
+                                  "type": "string"
+                                },
+                                "insideMotif": {
+                                  "enum": [
+                                    "peony",
+                                    "lotus",
+                                    "botanical",
+                                    "art-deco",
+                                    "celestial",
+                                    "orchid",
+                                    "cloud",
+                                    "ginkgo"
+                                  ],
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "coverMotif",
+                                "insideMotif",
+                                "frame",
+                                "finish"
+                              ],
+                              "type": "object"
+                            },
                             "layout": {
                               "enum": [
                                 "envelope",
@@ -23176,6 +23512,90 @@
                               "presentation": {
                                 "additionalProperties": false,
                                 "properties": {
+                                  "decoration": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "coverComposition": {
+                                        "enum": [
+                                          "diagonal",
+                                          "crown",
+                                          "border"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "coverDensity": {
+                                        "enum": [
+                                          "subtle",
+                                          "ornate"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "coverMotif": {
+                                        "enum": [
+                                          "peony",
+                                          "lotus",
+                                          "botanical",
+                                          "art-deco",
+                                          "celestial",
+                                          "orchid",
+                                          "cloud",
+                                          "ginkgo"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "finish": {
+                                        "enum": [
+                                          "letterpress",
+                                          "gold-foil",
+                                          "silk"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "frame": {
+                                        "enum": [
+                                          "double-line",
+                                          "arch",
+                                          "corners"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "insideComposition": {
+                                        "enum": [
+                                          "diagonal",
+                                          "crown",
+                                          "border"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "insideDensity": {
+                                        "enum": [
+                                          "subtle",
+                                          "ornate"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "insideMotif": {
+                                        "enum": [
+                                          "peony",
+                                          "lotus",
+                                          "botanical",
+                                          "art-deco",
+                                          "celestial",
+                                          "orchid",
+                                          "cloud",
+                                          "ginkgo"
+                                        ],
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "coverMotif",
+                                      "insideMotif",
+                                      "frame",
+                                      "finish"
+                                    ],
+                                    "type": "object"
+                                  },
                                   "layout": {
                                     "enum": [
                                       "envelope",
@@ -23478,6 +23898,90 @@
                       "presentation": {
                         "additionalProperties": false,
                         "properties": {
+                          "decoration": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "coverComposition": {
+                                "enum": [
+                                  "diagonal",
+                                  "crown",
+                                  "border"
+                                ],
+                                "type": "string"
+                              },
+                              "coverDensity": {
+                                "enum": [
+                                  "subtle",
+                                  "ornate"
+                                ],
+                                "type": "string"
+                              },
+                              "coverMotif": {
+                                "enum": [
+                                  "peony",
+                                  "lotus",
+                                  "botanical",
+                                  "art-deco",
+                                  "celestial",
+                                  "orchid",
+                                  "cloud",
+                                  "ginkgo"
+                                ],
+                                "type": "string"
+                              },
+                              "finish": {
+                                "enum": [
+                                  "letterpress",
+                                  "gold-foil",
+                                  "silk"
+                                ],
+                                "type": "string"
+                              },
+                              "frame": {
+                                "enum": [
+                                  "double-line",
+                                  "arch",
+                                  "corners"
+                                ],
+                                "type": "string"
+                              },
+                              "insideComposition": {
+                                "enum": [
+                                  "diagonal",
+                                  "crown",
+                                  "border"
+                                ],
+                                "type": "string"
+                              },
+                              "insideDensity": {
+                                "enum": [
+                                  "subtle",
+                                  "ornate"
+                                ],
+                                "type": "string"
+                              },
+                              "insideMotif": {
+                                "enum": [
+                                  "peony",
+                                  "lotus",
+                                  "botanical",
+                                  "art-deco",
+                                  "celestial",
+                                  "orchid",
+                                  "cloud",
+                                  "ginkgo"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "coverMotif",
+                              "insideMotif",
+                              "frame",
+                              "finish"
+                            ],
+                            "type": "object"
+                          },
                           "layout": {
                             "enum": [
                               "envelope",
@@ -24093,6 +24597,90 @@
                       "presentation": {
                         "additionalProperties": false,
                         "properties": {
+                          "decoration": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "coverComposition": {
+                                "enum": [
+                                  "diagonal",
+                                  "crown",
+                                  "border"
+                                ],
+                                "type": "string"
+                              },
+                              "coverDensity": {
+                                "enum": [
+                                  "subtle",
+                                  "ornate"
+                                ],
+                                "type": "string"
+                              },
+                              "coverMotif": {
+                                "enum": [
+                                  "peony",
+                                  "lotus",
+                                  "botanical",
+                                  "art-deco",
+                                  "celestial",
+                                  "orchid",
+                                  "cloud",
+                                  "ginkgo"
+                                ],
+                                "type": "string"
+                              },
+                              "finish": {
+                                "enum": [
+                                  "letterpress",
+                                  "gold-foil",
+                                  "silk"
+                                ],
+                                "type": "string"
+                              },
+                              "frame": {
+                                "enum": [
+                                  "double-line",
+                                  "arch",
+                                  "corners"
+                                ],
+                                "type": "string"
+                              },
+                              "insideComposition": {
+                                "enum": [
+                                  "diagonal",
+                                  "crown",
+                                  "border"
+                                ],
+                                "type": "string"
+                              },
+                              "insideDensity": {
+                                "enum": [
+                                  "subtle",
+                                  "ornate"
+                                ],
+                                "type": "string"
+                              },
+                              "insideMotif": {
+                                "enum": [
+                                  "peony",
+                                  "lotus",
+                                  "botanical",
+                                  "art-deco",
+                                  "celestial",
+                                  "orchid",
+                                  "cloud",
+                                  "ginkgo"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "coverMotif",
+                              "insideMotif",
+                              "frame",
+                              "finish"
+                            ],
+                            "type": "object"
+                          },
                           "layout": {
                             "enum": [
                               "envelope",
@@ -32770,6 +33358,90 @@
                             "presentation": {
                               "additionalProperties": false,
                               "properties": {
+                                "decoration": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "coverComposition": {
+                                      "enum": [
+                                        "diagonal",
+                                        "crown",
+                                        "border"
+                                      ],
+                                      "type": "string"
+                                    },
+                                    "coverDensity": {
+                                      "enum": [
+                                        "subtle",
+                                        "ornate"
+                                      ],
+                                      "type": "string"
+                                    },
+                                    "coverMotif": {
+                                      "enum": [
+                                        "peony",
+                                        "lotus",
+                                        "botanical",
+                                        "art-deco",
+                                        "celestial",
+                                        "orchid",
+                                        "cloud",
+                                        "ginkgo"
+                                      ],
+                                      "type": "string"
+                                    },
+                                    "finish": {
+                                      "enum": [
+                                        "letterpress",
+                                        "gold-foil",
+                                        "silk"
+                                      ],
+                                      "type": "string"
+                                    },
+                                    "frame": {
+                                      "enum": [
+                                        "double-line",
+                                        "arch",
+                                        "corners"
+                                      ],
+                                      "type": "string"
+                                    },
+                                    "insideComposition": {
+                                      "enum": [
+                                        "diagonal",
+                                        "crown",
+                                        "border"
+                                      ],
+                                      "type": "string"
+                                    },
+                                    "insideDensity": {
+                                      "enum": [
+                                        "subtle",
+                                        "ornate"
+                                      ],
+                                      "type": "string"
+                                    },
+                                    "insideMotif": {
+                                      "enum": [
+                                        "peony",
+                                        "lotus",
+                                        "botanical",
+                                        "art-deco",
+                                        "celestial",
+                                        "orchid",
+                                        "cloud",
+                                        "ginkgo"
+                                      ],
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "coverMotif",
+                                    "insideMotif",
+                                    "frame",
+                                    "finish"
+                                  ],
+                                  "type": "object"
+                                },
                                 "layout": {
                                   "enum": [
                                     "envelope",
@@ -33391,6 +34063,90 @@
                               "presentation": {
                                 "additionalProperties": false,
                                 "properties": {
+                                  "decoration": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "coverComposition": {
+                                        "enum": [
+                                          "diagonal",
+                                          "crown",
+                                          "border"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "coverDensity": {
+                                        "enum": [
+                                          "subtle",
+                                          "ornate"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "coverMotif": {
+                                        "enum": [
+                                          "peony",
+                                          "lotus",
+                                          "botanical",
+                                          "art-deco",
+                                          "celestial",
+                                          "orchid",
+                                          "cloud",
+                                          "ginkgo"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "finish": {
+                                        "enum": [
+                                          "letterpress",
+                                          "gold-foil",
+                                          "silk"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "frame": {
+                                        "enum": [
+                                          "double-line",
+                                          "arch",
+                                          "corners"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "insideComposition": {
+                                        "enum": [
+                                          "diagonal",
+                                          "crown",
+                                          "border"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "insideDensity": {
+                                        "enum": [
+                                          "subtle",
+                                          "ornate"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "insideMotif": {
+                                        "enum": [
+                                          "peony",
+                                          "lotus",
+                                          "botanical",
+                                          "art-deco",
+                                          "celestial",
+                                          "orchid",
+                                          "cloud",
+                                          "ginkgo"
+                                        ],
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "coverMotif",
+                                      "insideMotif",
+                                      "frame",
+                                      "finish"
+                                    ],
+                                    "type": "object"
+                                  },
                                   "layout": {
                                     "enum": [
                                       "envelope",
@@ -48826,6 +49582,90 @@
                               "presentation": {
                                 "additionalProperties": false,
                                 "properties": {
+                                  "decoration": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "coverComposition": {
+                                        "enum": [
+                                          "diagonal",
+                                          "crown",
+                                          "border"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "coverDensity": {
+                                        "enum": [
+                                          "subtle",
+                                          "ornate"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "coverMotif": {
+                                        "enum": [
+                                          "peony",
+                                          "lotus",
+                                          "botanical",
+                                          "art-deco",
+                                          "celestial",
+                                          "orchid",
+                                          "cloud",
+                                          "ginkgo"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "finish": {
+                                        "enum": [
+                                          "letterpress",
+                                          "gold-foil",
+                                          "silk"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "frame": {
+                                        "enum": [
+                                          "double-line",
+                                          "arch",
+                                          "corners"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "insideComposition": {
+                                        "enum": [
+                                          "diagonal",
+                                          "crown",
+                                          "border"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "insideDensity": {
+                                        "enum": [
+                                          "subtle",
+                                          "ornate"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "insideMotif": {
+                                        "enum": [
+                                          "peony",
+                                          "lotus",
+                                          "botanical",
+                                          "art-deco",
+                                          "celestial",
+                                          "orchid",
+                                          "cloud",
+                                          "ginkgo"
+                                        ],
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "coverMotif",
+                                      "insideMotif",
+                                      "frame",
+                                      "finish"
+                                    ],
+                                    "type": "object"
+                                  },
                                   "layout": {
                                     "enum": [
                                       "envelope",
@@ -49121,6 +49961,90 @@
                       "presentation": {
                         "additionalProperties": false,
                         "properties": {
+                          "decoration": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "coverComposition": {
+                                "enum": [
+                                  "diagonal",
+                                  "crown",
+                                  "border"
+                                ],
+                                "type": "string"
+                              },
+                              "coverDensity": {
+                                "enum": [
+                                  "subtle",
+                                  "ornate"
+                                ],
+                                "type": "string"
+                              },
+                              "coverMotif": {
+                                "enum": [
+                                  "peony",
+                                  "lotus",
+                                  "botanical",
+                                  "art-deco",
+                                  "celestial",
+                                  "orchid",
+                                  "cloud",
+                                  "ginkgo"
+                                ],
+                                "type": "string"
+                              },
+                              "finish": {
+                                "enum": [
+                                  "letterpress",
+                                  "gold-foil",
+                                  "silk"
+                                ],
+                                "type": "string"
+                              },
+                              "frame": {
+                                "enum": [
+                                  "double-line",
+                                  "arch",
+                                  "corners"
+                                ],
+                                "type": "string"
+                              },
+                              "insideComposition": {
+                                "enum": [
+                                  "diagonal",
+                                  "crown",
+                                  "border"
+                                ],
+                                "type": "string"
+                              },
+                              "insideDensity": {
+                                "enum": [
+                                  "subtle",
+                                  "ornate"
+                                ],
+                                "type": "string"
+                              },
+                              "insideMotif": {
+                                "enum": [
+                                  "peony",
+                                  "lotus",
+                                  "botanical",
+                                  "art-deco",
+                                  "celestial",
+                                  "orchid",
+                                  "cloud",
+                                  "ginkgo"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "coverMotif",
+                              "insideMotif",
+                              "frame",
+                              "finish"
+                            ],
+                            "type": "object"
+                          },
                           "layout": {
                             "enum": [
                               "envelope",
@@ -49481,6 +50405,90 @@
                       "presentation": {
                         "additionalProperties": false,
                         "properties": {
+                          "decoration": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "coverComposition": {
+                                "enum": [
+                                  "diagonal",
+                                  "crown",
+                                  "border"
+                                ],
+                                "type": "string"
+                              },
+                              "coverDensity": {
+                                "enum": [
+                                  "subtle",
+                                  "ornate"
+                                ],
+                                "type": "string"
+                              },
+                              "coverMotif": {
+                                "enum": [
+                                  "peony",
+                                  "lotus",
+                                  "botanical",
+                                  "art-deco",
+                                  "celestial",
+                                  "orchid",
+                                  "cloud",
+                                  "ginkgo"
+                                ],
+                                "type": "string"
+                              },
+                              "finish": {
+                                "enum": [
+                                  "letterpress",
+                                  "gold-foil",
+                                  "silk"
+                                ],
+                                "type": "string"
+                              },
+                              "frame": {
+                                "enum": [
+                                  "double-line",
+                                  "arch",
+                                  "corners"
+                                ],
+                                "type": "string"
+                              },
+                              "insideComposition": {
+                                "enum": [
+                                  "diagonal",
+                                  "crown",
+                                  "border"
+                                ],
+                                "type": "string"
+                              },
+                              "insideDensity": {
+                                "enum": [
+                                  "subtle",
+                                  "ornate"
+                                ],
+                                "type": "string"
+                              },
+                              "insideMotif": {
+                                "enum": [
+                                  "peony",
+                                  "lotus",
+                                  "botanical",
+                                  "art-deco",
+                                  "celestial",
+                                  "orchid",
+                                  "cloud",
+                                  "ginkgo"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "coverMotif",
+                              "insideMotif",
+                              "frame",
+                              "finish"
+                            ],
+                            "type": "object"
+                          },
                           "layout": {
                             "enum": [
                               "envelope",
