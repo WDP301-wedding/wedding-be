@@ -9,14 +9,20 @@ const motifSchema = z.enum([
   'orchid',
   'cloud',
   'ginkgo',
+  'phoenix',
+  'magnolia',
+  'bamboo',
+  'song-hy',
+  'lace',
+  'wildflower',
 ]);
-const compositionSchema = z.enum(['diagonal', 'crown', 'border']);
+const compositionSchema = z.enum(['diagonal', 'crown', 'border', 'botanical-corners', 'medallion']);
 const densitySchema = z.enum(['subtle', 'ornate']);
 const decorationSchema = z.strictObject({
   coverMotif: motifSchema,
   insideMotif: motifSchema,
-  frame: z.enum(['double-line', 'arch', 'corners']),
-  finish: z.enum(['letterpress', 'gold-foil', 'silk']),
+  frame: z.enum(['double-line', 'arch', 'corners', 'scalloped', 'inset']),
+  finish: z.enum(['letterpress', 'gold-foil', 'silk', 'embossed-cotton', 'pearl', 'linen']),
   coverComposition: compositionSchema.optional(),
   insideComposition: compositionSchema.optional(),
   coverDensity: densitySchema.optional(),

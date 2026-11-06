@@ -2,10 +2,10 @@
   "version": 1,
   "source": {
     "repository": "https://github.com/WDP301-wedding/wedding-web",
-    "commit": "eecc4925b2c0b7482809bbfb30e9c99b1049678f",
+    "commit": "fcf0f84dc7f62fe26485d5a319b83a12dc647713",
     "path": "artifacts/invitation-print/current.json"
   },
-  "manifestSha256": "7bcc546136493f8b1cec32c95906f438d71153e2274882f3422e3ae132f8409f",
+  "manifestSha256": "daf84c662bacb07fffd028b021b2d28f4f333bc0359136c8b044d3f2939781d0",
   "runtime": {
     "playwrightCore": "1.64.1",
     "chromiumRevision": "1248",

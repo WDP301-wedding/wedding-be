@@ -4976,7 +4976,9 @@
                         "enum": [
                           "diagonal",
                           "crown",
-                          "border"
+                          "border",
+                          "botanical-corners",
+                          "medallion"
                         ],
                         "type": "string"
                       },
@@ -4996,7 +4998,13 @@
                           "celestial",
                           "orchid",
                           "cloud",
-                          "ginkgo"
+                          "ginkgo",
+                          "phoenix",
+                          "magnolia",
+                          "bamboo",
+                          "song-hy",
+                          "lace",
+                          "wildflower"
                         ],
                         "type": "string"
                       },
@@ -5004,7 +5012,10 @@
                         "enum": [
                           "letterpress",
                           "gold-foil",
-                          "silk"
+                          "silk",
+                          "embossed-cotton",
+                          "pearl",
+                          "linen"
                         ],
                         "type": "string"
                       },
@@ -5012,7 +5023,9 @@
                         "enum": [
                           "double-line",
                           "arch",
-                          "corners"
+                          "corners",
+                          "scalloped",
+                          "inset"
                         ],
                         "type": "string"
                       },
@@ -5020,7 +5033,9 @@
                         "enum": [
                           "diagonal",
                           "crown",
-                          "border"
+                          "border",
+                          "botanical-corners",
+                          "medallion"
                         ],
                         "type": "string"
                       },
@@ -5040,7 +5055,13 @@
                           "celestial",
                           "orchid",
                           "cloud",
-                          "ginkgo"
+                          "ginkgo",
+                          "phoenix",
+                          "magnolia",
+                          "bamboo",
+                          "song-hy",
+                          "lace",
+                          "wildflower"
                         ],
                         "type": "string"
                       }
@@ -5152,6 +5173,30 @@
               "textFields": {
                 "additionalProperties": false,
                 "properties": {
+                  "brideFatherName": {
+                    "anyOf": [
+                      {
+                        "maxLength": 120,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "brideMotherName": {
+                    "anyOf": [
+                      {
+                        "maxLength": 120,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
                   "brideName": {
                     "anyOf": [
                       {
@@ -5180,6 +5225,30 @@
                     "anyOf": [
                       {
                         "maxLength": 2000,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "groomFatherName": {
+                    "anyOf": [
+                      {
+                        "maxLength": 120,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "groomMotherName": {
+                    "anyOf": [
+                      {
+                        "maxLength": 120,
                         "minLength": 0,
                         "type": "string"
                       },
@@ -6777,7 +6846,9 @@
                         "enum": [
                           "diagonal",
                           "crown",
-                          "border"
+                          "border",
+                          "botanical-corners",
+                          "medallion"
                         ],
                         "type": "string"
                       },
@@ -6797,7 +6868,13 @@
                           "celestial",
                           "orchid",
                           "cloud",
-                          "ginkgo"
+                          "ginkgo",
+                          "phoenix",
+                          "magnolia",
+                          "bamboo",
+                          "song-hy",
+                          "lace",
+                          "wildflower"
                         ],
                         "type": "string"
                       },
@@ -6805,7 +6882,10 @@
                         "enum": [
                           "letterpress",
                           "gold-foil",
-                          "silk"
+                          "silk",
+                          "embossed-cotton",
+                          "pearl",
+                          "linen"
                         ],
                         "type": "string"
                       },
@@ -6813,7 +6893,9 @@
                         "enum": [
                           "double-line",
                           "arch",
-                          "corners"
+                          "corners",
+                          "scalloped",
+                          "inset"
                         ],
                         "type": "string"
                       },
@@ -6821,7 +6903,9 @@
                         "enum": [
                           "diagonal",
                           "crown",
-                          "border"
+                          "border",
+                          "botanical-corners",
+                          "medallion"
                         ],
                         "type": "string"
                       },
@@ -6841,7 +6925,13 @@
                           "celestial",
                           "orchid",
                           "cloud",
-                          "ginkgo"
+                          "ginkgo",
+                          "phoenix",
+                          "magnolia",
+                          "bamboo",
+                          "song-hy",
+                          "lace",
+                          "wildflower"
                         ],
                         "type": "string"
                       }
@@ -7038,6 +7128,30 @@
               "textFields": {
                 "additionalProperties": false,
                 "properties": {
+                  "brideFatherName": {
+                    "anyOf": [
+                      {
+                        "maxLength": 120,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "brideMotherName": {
+                    "anyOf": [
+                      {
+                        "maxLength": 120,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
                   "brideName": {
                     "anyOf": [
                       {
@@ -7066,6 +7180,30 @@
                     "anyOf": [
                       {
                         "maxLength": 2000,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "groomFatherName": {
+                    "anyOf": [
+                      {
+                        "maxLength": 120,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "groomMotherName": {
+                    "anyOf": [
+                      {
+                        "maxLength": 120,
                         "minLength": 0,
                         "type": "string"
                       },
@@ -7496,7 +7634,9 @@
                         "enum": [
                           "diagonal",
                           "crown",
-                          "border"
+                          "border",
+                          "botanical-corners",
+                          "medallion"
                         ],
                         "type": "string"
                       },
@@ -7516,7 +7656,13 @@
                           "celestial",
                           "orchid",
                           "cloud",
-                          "ginkgo"
+                          "ginkgo",
+                          "phoenix",
+                          "magnolia",
+                          "bamboo",
+                          "song-hy",
+                          "lace",
+                          "wildflower"
                         ],
                         "type": "string"
                       },
@@ -7524,7 +7670,10 @@
                         "enum": [
                           "letterpress",
                           "gold-foil",
-                          "silk"
+                          "silk",
+                          "embossed-cotton",
+                          "pearl",
+                          "linen"
                         ],
                         "type": "string"
                       },
@@ -7532,7 +7681,9 @@
                         "enum": [
                           "double-line",
                           "arch",
-                          "corners"
+                          "corners",
+                          "scalloped",
+                          "inset"
                         ],
                         "type": "string"
                       },
@@ -7540,7 +7691,9 @@
                         "enum": [
                           "diagonal",
                           "crown",
-                          "border"
+                          "border",
+                          "botanical-corners",
+                          "medallion"
                         ],
                         "type": "string"
                       },
@@ -7560,7 +7713,13 @@
                           "celestial",
                           "orchid",
                           "cloud",
-                          "ginkgo"
+                          "ginkgo",
+                          "phoenix",
+                          "magnolia",
+                          "bamboo",
+                          "song-hy",
+                          "lace",
+                          "wildflower"
                         ],
                         "type": "string"
                       }
@@ -7672,6 +7831,30 @@
               "textFields": {
                 "additionalProperties": false,
                 "properties": {
+                  "brideFatherName": {
+                    "anyOf": [
+                      {
+                        "maxLength": 120,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "brideMotherName": {
+                    "anyOf": [
+                      {
+                        "maxLength": 120,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
                   "brideName": {
                     "anyOf": [
                       {
@@ -7700,6 +7883,30 @@
                     "anyOf": [
                       {
                         "maxLength": 2000,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "groomFatherName": {
+                    "anyOf": [
+                      {
+                        "maxLength": 120,
+                        "minLength": 0,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "groomMotherName": {
+                    "anyOf": [
+                      {
+                        "maxLength": 120,
                         "minLength": 0,
                         "type": "string"
                       },
@@ -21357,7 +21564,9 @@
                                   "enum": [
                                     "diagonal",
                                     "crown",
-                                    "border"
+                                    "border",
+                                    "botanical-corners",
+                                    "medallion"
                                   ],
                                   "type": "string"
                                 },
@@ -21377,7 +21586,13 @@
                                     "celestial",
                                     "orchid",
                                     "cloud",
-                                    "ginkgo"
+                                    "ginkgo",
+                                    "phoenix",
+                                    "magnolia",
+                                    "bamboo",
+                                    "song-hy",
+                                    "lace",
+                                    "wildflower"
                                   ],
                                   "type": "string"
                                 },
@@ -21385,7 +21600,10 @@
                                   "enum": [
                                     "letterpress",
                                     "gold-foil",
-                                    "silk"
+                                    "silk",
+                                    "embossed-cotton",
+                                    "pearl",
+                                    "linen"
                                   ],
                                   "type": "string"
                                 },
@@ -21393,7 +21611,9 @@
                                   "enum": [
                                     "double-line",
                                     "arch",
-                                    "corners"
+                                    "corners",
+                                    "scalloped",
+                                    "inset"
                                   ],
                                   "type": "string"
                                 },
@@ -21401,7 +21621,9 @@
                                   "enum": [
                                     "diagonal",
                                     "crown",
-                                    "border"
+                                    "border",
+                                    "botanical-corners",
+                                    "medallion"
                                   ],
                                   "type": "string"
                                 },
@@ -21421,7 +21643,13 @@
                                     "celestial",
                                     "orchid",
                                     "cloud",
-                                    "ginkgo"
+                                    "ginkgo",
+                                    "phoenix",
+                                    "magnolia",
+                                    "bamboo",
+                                    "song-hy",
+                                    "lace",
+                                    "wildflower"
                                   ],
                                   "type": "string"
                                 }
@@ -23533,7 +23761,9 @@
                                         "enum": [
                                           "diagonal",
                                           "crown",
-                                          "border"
+                                          "border",
+                                          "botanical-corners",
+                                          "medallion"
                                         ],
                                         "type": "string"
                                       },
@@ -23553,7 +23783,13 @@
                                           "celestial",
                                           "orchid",
                                           "cloud",
-                                          "ginkgo"
+                                          "ginkgo",
+                                          "phoenix",
+                                          "magnolia",
+                                          "bamboo",
+                                          "song-hy",
+                                          "lace",
+                                          "wildflower"
                                         ],
                                         "type": "string"
                                       },
@@ -23561,7 +23797,10 @@
                                         "enum": [
                                           "letterpress",
                                           "gold-foil",
-                                          "silk"
+                                          "silk",
+                                          "embossed-cotton",
+                                          "pearl",
+                                          "linen"
                                         ],
                                         "type": "string"
                                       },
@@ -23569,7 +23808,9 @@
                                         "enum": [
                                           "double-line",
                                           "arch",
-                                          "corners"
+                                          "corners",
+                                          "scalloped",
+                                          "inset"
                                         ],
                                         "type": "string"
                                       },
@@ -23577,7 +23818,9 @@
                                         "enum": [
                                           "diagonal",
                                           "crown",
-                                          "border"
+                                          "border",
+                                          "botanical-corners",
+                                          "medallion"
                                         ],
                                         "type": "string"
                                       },
@@ -23597,7 +23840,13 @@
                                           "celestial",
                                           "orchid",
                                           "cloud",
-                                          "ginkgo"
+                                          "ginkgo",
+                                          "phoenix",
+                                          "magnolia",
+                                          "bamboo",
+                                          "song-hy",
+                                          "lace",
+                                          "wildflower"
                                         ],
                                         "type": "string"
                                       }
@@ -23709,6 +23958,30 @@
                               "textFields": {
                                 "additionalProperties": false,
                                 "properties": {
+                                  "brideFatherName": {
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 120,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "brideMotherName": {
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 120,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
                                   "brideName": {
                                     "anyOf": [
                                       {
@@ -23737,6 +24010,30 @@
                                     "anyOf": [
                                       {
                                         "maxLength": 2000,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "groomFatherName": {
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 120,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "groomMotherName": {
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 120,
                                         "minLength": 0,
                                         "type": "string"
                                       },
@@ -23919,7 +24216,9 @@
                                 "enum": [
                                   "diagonal",
                                   "crown",
-                                  "border"
+                                  "border",
+                                  "botanical-corners",
+                                  "medallion"
                                 ],
                                 "type": "string"
                               },
@@ -23939,7 +24238,13 @@
                                   "celestial",
                                   "orchid",
                                   "cloud",
-                                  "ginkgo"
+                                  "ginkgo",
+                                  "phoenix",
+                                  "magnolia",
+                                  "bamboo",
+                                  "song-hy",
+                                  "lace",
+                                  "wildflower"
                                 ],
                                 "type": "string"
                               },
@@ -23947,7 +24252,10 @@
                                 "enum": [
                                   "letterpress",
                                   "gold-foil",
-                                  "silk"
+                                  "silk",
+                                  "embossed-cotton",
+                                  "pearl",
+                                  "linen"
                                 ],
                                 "type": "string"
                               },
@@ -23955,7 +24263,9 @@
                                 "enum": [
                                   "double-line",
                                   "arch",
-                                  "corners"
+                                  "corners",
+                                  "scalloped",
+                                  "inset"
                                 ],
                                 "type": "string"
                               },
@@ -23963,7 +24273,9 @@
                                 "enum": [
                                   "diagonal",
                                   "crown",
-                                  "border"
+                                  "border",
+                                  "botanical-corners",
+                                  "medallion"
                                 ],
                                 "type": "string"
                               },
@@ -23983,7 +24295,13 @@
                                   "celestial",
                                   "orchid",
                                   "cloud",
-                                  "ginkgo"
+                                  "ginkgo",
+                                  "phoenix",
+                                  "magnolia",
+                                  "bamboo",
+                                  "song-hy",
+                                  "lace",
+                                  "wildflower"
                                 ],
                                 "type": "string"
                               }
@@ -24084,6 +24402,30 @@
                       },
                       "textFields": {
                         "properties": {
+                          "brideFatherName": {
+                            "anyOf": [
+                              {
+                                "maxLength": 120,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "brideMotherName": {
+                            "anyOf": [
+                              {
+                                "maxLength": 120,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
                           "brideName": {
                             "anyOf": [
                               {
@@ -24112,6 +24454,30 @@
                             "anyOf": [
                               {
                                 "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "groomFatherName": {
+                            "anyOf": [
+                              {
+                                "maxLength": 120,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "groomMotherName": {
+                            "anyOf": [
+                              {
+                                "maxLength": 120,
                                 "minLength": 0,
                                 "type": "string"
                               },
@@ -24757,7 +25123,9 @@
                                 "enum": [
                                   "diagonal",
                                   "crown",
-                                  "border"
+                                  "border",
+                                  "botanical-corners",
+                                  "medallion"
                                 ],
                                 "type": "string"
                               },
@@ -24777,7 +25145,13 @@
                                   "celestial",
                                   "orchid",
                                   "cloud",
-                                  "ginkgo"
+                                  "ginkgo",
+                                  "phoenix",
+                                  "magnolia",
+                                  "bamboo",
+                                  "song-hy",
+                                  "lace",
+                                  "wildflower"
                                 ],
                                 "type": "string"
                               },
@@ -24785,7 +25159,10 @@
                                 "enum": [
                                   "letterpress",
                                   "gold-foil",
-                                  "silk"
+                                  "silk",
+                                  "embossed-cotton",
+                                  "pearl",
+                                  "linen"
                                 ],
                                 "type": "string"
                               },
@@ -24793,7 +25170,9 @@
                                 "enum": [
                                   "double-line",
                                   "arch",
-                                  "corners"
+                                  "corners",
+                                  "scalloped",
+                                  "inset"
                                 ],
                                 "type": "string"
                               },
@@ -24801,7 +25180,9 @@
                                 "enum": [
                                   "diagonal",
                                   "crown",
-                                  "border"
+                                  "border",
+                                  "botanical-corners",
+                                  "medallion"
                                 ],
                                 "type": "string"
                               },
@@ -24821,7 +25202,13 @@
                                   "celestial",
                                   "orchid",
                                   "cloud",
-                                  "ginkgo"
+                                  "ginkgo",
+                                  "phoenix",
+                                  "magnolia",
+                                  "bamboo",
+                                  "song-hy",
+                                  "lace",
+                                  "wildflower"
                                 ],
                                 "type": "string"
                               }
@@ -24922,6 +25309,30 @@
                       },
                       "textFields": {
                         "properties": {
+                          "brideFatherName": {
+                            "anyOf": [
+                              {
+                                "maxLength": 120,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "brideMotherName": {
+                            "anyOf": [
+                              {
+                                "maxLength": 120,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
                           "brideName": {
                             "anyOf": [
                               {
@@ -24950,6 +25361,30 @@
                             "anyOf": [
                               {
                                 "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "groomFatherName": {
+                            "anyOf": [
+                              {
+                                "maxLength": 120,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "groomMotherName": {
+                            "anyOf": [
+                              {
+                                "maxLength": 120,
                                 "minLength": 0,
                                 "type": "string"
                               },
@@ -25007,6 +25442,30 @@
                   },
                   "textFields": {
                     "properties": {
+                      "brideFatherName": {
+                        "anyOf": [
+                          {
+                            "maxLength": 120,
+                            "minLength": 0,
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "brideMotherName": {
+                        "anyOf": [
+                          {
+                            "maxLength": 120,
+                            "minLength": 0,
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
                       "brideName": {
                         "anyOf": [
                           {
@@ -25035,6 +25494,30 @@
                         "anyOf": [
                           {
                             "maxLength": 2000,
+                            "minLength": 0,
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "groomFatherName": {
+                        "anyOf": [
+                          {
+                            "maxLength": 120,
+                            "minLength": 0,
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "groomMotherName": {
+                        "anyOf": [
+                          {
+                            "maxLength": 120,
                             "minLength": 0,
                             "type": "string"
                           },
@@ -33518,7 +34001,9 @@
                                       "enum": [
                                         "diagonal",
                                         "crown",
-                                        "border"
+                                        "border",
+                                        "botanical-corners",
+                                        "medallion"
                                       ],
                                       "type": "string"
                                     },
@@ -33538,7 +34023,13 @@
                                         "celestial",
                                         "orchid",
                                         "cloud",
-                                        "ginkgo"
+                                        "ginkgo",
+                                        "phoenix",
+                                        "magnolia",
+                                        "bamboo",
+                                        "song-hy",
+                                        "lace",
+                                        "wildflower"
                                       ],
                                       "type": "string"
                                     },
@@ -33546,7 +34037,10 @@
                                       "enum": [
                                         "letterpress",
                                         "gold-foil",
-                                        "silk"
+                                        "silk",
+                                        "embossed-cotton",
+                                        "pearl",
+                                        "linen"
                                       ],
                                       "type": "string"
                                     },
@@ -33554,7 +34048,9 @@
                                       "enum": [
                                         "double-line",
                                         "arch",
-                                        "corners"
+                                        "corners",
+                                        "scalloped",
+                                        "inset"
                                       ],
                                       "type": "string"
                                     },
@@ -33562,7 +34058,9 @@
                                       "enum": [
                                         "diagonal",
                                         "crown",
-                                        "border"
+                                        "border",
+                                        "botanical-corners",
+                                        "medallion"
                                       ],
                                       "type": "string"
                                     },
@@ -33582,7 +34080,13 @@
                                         "celestial",
                                         "orchid",
                                         "cloud",
-                                        "ginkgo"
+                                        "ginkgo",
+                                        "phoenix",
+                                        "magnolia",
+                                        "bamboo",
+                                        "song-hy",
+                                        "lace",
+                                        "wildflower"
                                       ],
                                       "type": "string"
                                     }
@@ -33779,6 +34283,30 @@
                             "textFields": {
                               "additionalProperties": false,
                               "properties": {
+                                "brideFatherName": {
+                                  "anyOf": [
+                                    {
+                                      "maxLength": 120,
+                                      "minLength": 0,
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "brideMotherName": {
+                                  "anyOf": [
+                                    {
+                                      "maxLength": 120,
+                                      "minLength": 0,
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
                                 "brideName": {
                                   "anyOf": [
                                     {
@@ -33807,6 +34335,30 @@
                                   "anyOf": [
                                     {
                                       "maxLength": 2000,
+                                      "minLength": 0,
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "groomFatherName": {
+                                  "anyOf": [
+                                    {
+                                      "maxLength": 120,
+                                      "minLength": 0,
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "groomMotherName": {
+                                  "anyOf": [
+                                    {
+                                      "maxLength": 120,
                                       "minLength": 0,
                                       "type": "string"
                                     },
@@ -34223,7 +34775,9 @@
                                         "enum": [
                                           "diagonal",
                                           "crown",
-                                          "border"
+                                          "border",
+                                          "botanical-corners",
+                                          "medallion"
                                         ],
                                         "type": "string"
                                       },
@@ -34243,7 +34797,13 @@
                                           "celestial",
                                           "orchid",
                                           "cloud",
-                                          "ginkgo"
+                                          "ginkgo",
+                                          "phoenix",
+                                          "magnolia",
+                                          "bamboo",
+                                          "song-hy",
+                                          "lace",
+                                          "wildflower"
                                         ],
                                         "type": "string"
                                       },
@@ -34251,7 +34811,10 @@
                                         "enum": [
                                           "letterpress",
                                           "gold-foil",
-                                          "silk"
+                                          "silk",
+                                          "embossed-cotton",
+                                          "pearl",
+                                          "linen"
                                         ],
                                         "type": "string"
                                       },
@@ -34259,7 +34822,9 @@
                                         "enum": [
                                           "double-line",
                                           "arch",
-                                          "corners"
+                                          "corners",
+                                          "scalloped",
+                                          "inset"
                                         ],
                                         "type": "string"
                                       },
@@ -34267,7 +34832,9 @@
                                         "enum": [
                                           "diagonal",
                                           "crown",
-                                          "border"
+                                          "border",
+                                          "botanical-corners",
+                                          "medallion"
                                         ],
                                         "type": "string"
                                       },
@@ -34287,7 +34854,13 @@
                                           "celestial",
                                           "orchid",
                                           "cloud",
-                                          "ginkgo"
+                                          "ginkgo",
+                                          "phoenix",
+                                          "magnolia",
+                                          "bamboo",
+                                          "song-hy",
+                                          "lace",
+                                          "wildflower"
                                         ],
                                         "type": "string"
                                       }
@@ -34399,6 +34972,30 @@
                               "textFields": {
                                 "additionalProperties": false,
                                 "properties": {
+                                  "brideFatherName": {
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 120,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "brideMotherName": {
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 120,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
                                   "brideName": {
                                     "anyOf": [
                                       {
@@ -34427,6 +35024,30 @@
                                     "anyOf": [
                                       {
                                         "maxLength": 2000,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "groomFatherName": {
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 120,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "groomMotherName": {
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 120,
                                         "minLength": 0,
                                         "type": "string"
                                       },
@@ -49742,7 +50363,9 @@
                                         "enum": [
                                           "diagonal",
                                           "crown",
-                                          "border"
+                                          "border",
+                                          "botanical-corners",
+                                          "medallion"
                                         ],
                                         "type": "string"
                                       },
@@ -49762,7 +50385,13 @@
                                           "celestial",
                                           "orchid",
                                           "cloud",
-                                          "ginkgo"
+                                          "ginkgo",
+                                          "phoenix",
+                                          "magnolia",
+                                          "bamboo",
+                                          "song-hy",
+                                          "lace",
+                                          "wildflower"
                                         ],
                                         "type": "string"
                                       },
@@ -49770,7 +50399,10 @@
                                         "enum": [
                                           "letterpress",
                                           "gold-foil",
-                                          "silk"
+                                          "silk",
+                                          "embossed-cotton",
+                                          "pearl",
+                                          "linen"
                                         ],
                                         "type": "string"
                                       },
@@ -49778,7 +50410,9 @@
                                         "enum": [
                                           "double-line",
                                           "arch",
-                                          "corners"
+                                          "corners",
+                                          "scalloped",
+                                          "inset"
                                         ],
                                         "type": "string"
                                       },
@@ -49786,7 +50420,9 @@
                                         "enum": [
                                           "diagonal",
                                           "crown",
-                                          "border"
+                                          "border",
+                                          "botanical-corners",
+                                          "medallion"
                                         ],
                                         "type": "string"
                                       },
@@ -49806,7 +50442,13 @@
                                           "celestial",
                                           "orchid",
                                           "cloud",
-                                          "ginkgo"
+                                          "ginkgo",
+                                          "phoenix",
+                                          "magnolia",
+                                          "bamboo",
+                                          "song-hy",
+                                          "lace",
+                                          "wildflower"
                                         ],
                                         "type": "string"
                                       }
@@ -49918,6 +50560,30 @@
                               "textFields": {
                                 "additionalProperties": false,
                                 "properties": {
+                                  "brideFatherName": {
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 120,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "brideMotherName": {
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 120,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
                                   "brideName": {
                                     "anyOf": [
                                       {
@@ -49946,6 +50612,30 @@
                                     "anyOf": [
                                       {
                                         "maxLength": 2000,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "groomFatherName": {
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 120,
+                                        "minLength": 0,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "groomMotherName": {
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 120,
                                         "minLength": 0,
                                         "type": "string"
                                       },
@@ -50121,7 +50811,9 @@
                                 "enum": [
                                   "diagonal",
                                   "crown",
-                                  "border"
+                                  "border",
+                                  "botanical-corners",
+                                  "medallion"
                                 ],
                                 "type": "string"
                               },
@@ -50141,7 +50833,13 @@
                                   "celestial",
                                   "orchid",
                                   "cloud",
-                                  "ginkgo"
+                                  "ginkgo",
+                                  "phoenix",
+                                  "magnolia",
+                                  "bamboo",
+                                  "song-hy",
+                                  "lace",
+                                  "wildflower"
                                 ],
                                 "type": "string"
                               },
@@ -50149,7 +50847,10 @@
                                 "enum": [
                                   "letterpress",
                                   "gold-foil",
-                                  "silk"
+                                  "silk",
+                                  "embossed-cotton",
+                                  "pearl",
+                                  "linen"
                                 ],
                                 "type": "string"
                               },
@@ -50157,7 +50858,9 @@
                                 "enum": [
                                   "double-line",
                                   "arch",
-                                  "corners"
+                                  "corners",
+                                  "scalloped",
+                                  "inset"
                                 ],
                                 "type": "string"
                               },
@@ -50165,7 +50868,9 @@
                                 "enum": [
                                   "diagonal",
                                   "crown",
-                                  "border"
+                                  "border",
+                                  "botanical-corners",
+                                  "medallion"
                                 ],
                                 "type": "string"
                               },
@@ -50185,7 +50890,13 @@
                                   "celestial",
                                   "orchid",
                                   "cloud",
-                                  "ginkgo"
+                                  "ginkgo",
+                                  "phoenix",
+                                  "magnolia",
+                                  "bamboo",
+                                  "song-hy",
+                                  "lace",
+                                  "wildflower"
                                 ],
                                 "type": "string"
                               }
@@ -50286,6 +50997,30 @@
                       },
                       "textFields": {
                         "properties": {
+                          "brideFatherName": {
+                            "anyOf": [
+                              {
+                                "maxLength": 120,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "brideMotherName": {
+                            "anyOf": [
+                              {
+                                "maxLength": 120,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
                           "brideName": {
                             "anyOf": [
                               {
@@ -50314,6 +51049,30 @@
                             "anyOf": [
                               {
                                 "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "groomFatherName": {
+                            "anyOf": [
+                              {
+                                "maxLength": 120,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "groomMotherName": {
+                            "anyOf": [
+                              {
+                                "maxLength": 120,
                                 "minLength": 0,
                                 "type": "string"
                               },
@@ -50565,7 +51324,9 @@
                                 "enum": [
                                   "diagonal",
                                   "crown",
-                                  "border"
+                                  "border",
+                                  "botanical-corners",
+                                  "medallion"
                                 ],
                                 "type": "string"
                               },
@@ -50585,7 +51346,13 @@
                                   "celestial",
                                   "orchid",
                                   "cloud",
-                                  "ginkgo"
+                                  "ginkgo",
+                                  "phoenix",
+                                  "magnolia",
+                                  "bamboo",
+                                  "song-hy",
+                                  "lace",
+                                  "wildflower"
                                 ],
                                 "type": "string"
                               },
@@ -50593,7 +51360,10 @@
                                 "enum": [
                                   "letterpress",
                                   "gold-foil",
-                                  "silk"
+                                  "silk",
+                                  "embossed-cotton",
+                                  "pearl",
+                                  "linen"
                                 ],
                                 "type": "string"
                               },
@@ -50601,7 +51371,9 @@
                                 "enum": [
                                   "double-line",
                                   "arch",
-                                  "corners"
+                                  "corners",
+                                  "scalloped",
+                                  "inset"
                                 ],
                                 "type": "string"
                               },
@@ -50609,7 +51381,9 @@
                                 "enum": [
                                   "diagonal",
                                   "crown",
-                                  "border"
+                                  "border",
+                                  "botanical-corners",
+                                  "medallion"
                                 ],
                                 "type": "string"
                               },
@@ -50629,7 +51403,13 @@
                                   "celestial",
                                   "orchid",
                                   "cloud",
-                                  "ginkgo"
+                                  "ginkgo",
+                                  "phoenix",
+                                  "magnolia",
+                                  "bamboo",
+                                  "song-hy",
+                                  "lace",
+                                  "wildflower"
                                 ],
                                 "type": "string"
                               }
@@ -50730,6 +51510,30 @@
                       },
                       "textFields": {
                         "properties": {
+                          "brideFatherName": {
+                            "anyOf": [
+                              {
+                                "maxLength": 120,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "brideMotherName": {
+                            "anyOf": [
+                              {
+                                "maxLength": 120,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
                           "brideName": {
                             "anyOf": [
                               {
@@ -50758,6 +51562,30 @@
                             "anyOf": [
                               {
                                 "maxLength": 2000,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "groomFatherName": {
+                            "anyOf": [
+                              {
+                                "maxLength": 120,
+                                "minLength": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "groomMotherName": {
+                            "anyOf": [
+                              {
+                                "maxLength": 120,
                                 "minLength": 0,
                                 "type": "string"
                               },

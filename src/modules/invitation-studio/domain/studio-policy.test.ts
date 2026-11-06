@@ -66,7 +66,7 @@ describe('Structured invitation safety and bounds', () => {
       publicInvitationId: randomUUID(),
       publishedRevisionId: randomUUID(),
       title: content.title,
-      textFields: content.textFields,
+      textFields: { ...content.textFields, groomFatherName: '  Hùng & An  ', brideMotherName: '' },
       sections: content.sections,
       event: { eventDate: '2026-10-15', hallName: '<script>Hall</script>', shiftCode: 'LUNCH' },
       timeline: [
@@ -78,6 +78,8 @@ describe('Structured invitation safety and bounds', () => {
     const html = renderPublicInvitation(dto);
     expect(html).not.toContain('<script>');
     expect(html).toContain('&lt;img onerror=x&gt;');
+    expect(html).toContain('<h2>Nhà trai</h2><p>Hùng &amp; An</p>');
+    expect(html).not.toContain('<h2>Nhà gái</h2>');
     const imageUrl = '/api/v1/public/invitation-assets/' + 'a'.repeat(64);
     const withSections = renderPublicInvitation({
       ...dto,

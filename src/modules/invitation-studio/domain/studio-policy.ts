@@ -19,6 +19,10 @@ const safeText = (max: number, min = 0) =>
 export const textFieldsSchema = z.object({
   brideName: safeText(2000).nullish(),
   groomName: safeText(2000).nullish(),
+  brideFatherName: safeText(120).nullish(),
+  brideMotherName: safeText(120).nullish(),
+  groomFatherName: safeText(120).nullish(),
+  groomMotherName: safeText(120).nullish(),
   greeting: safeText(2000).nullish(),
   message: safeText(2000).nullish(),
   footer: safeText(2000).nullish(),

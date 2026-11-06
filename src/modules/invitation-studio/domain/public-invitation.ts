@@ -123,6 +123,18 @@ function renderPublicSeating(tables: z.infer<typeof publicSeatingSchema>) {
 
 /** Text-only approved structure; no user HTML/CSS/SVG, external assets or scripts. */
 export function renderPublicInvitation(dto: PublicInvitation): string {
+  const text = dto.textFields;
+  const families = [
+    { label: 'Nhà trai', names: [text.groomFatherName, text.groomMotherName] },
+    { label: 'Nhà gái', names: [text.brideFatherName, text.brideMotherName] },
+  ]
+    .map(({ label, names }) => {
+      const paragraphs = names.flatMap((name) =>
+        name?.trim() ? [`<p>${escapeText(name.trim())}</p>`] : [],
+      );
+      return paragraphs.length ? `<section><h2>${label}</h2>${paragraphs.join('')}</section>` : '';
+    })
+    .join('');
   const sections = dto.sections
     .filter((section) => section.kind !== 'SEATING' || !dto.seating)
     .map(
@@ -136,5 +148,5 @@ export function renderPublicInvitation(dto: PublicInvitation): string {
         `<li><time>${escapeText(item.startTime)}</time> ${escapeText(item.title)}${!item.description ? '' : `<p>${escapeText(item.description)}</p>`}</li>`,
     )
     .join('');
-  return `<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeText(dto.title)}</title></head><body><main><h1>${escapeText(dto.title)}</h1><p>${escapeText(dto.event.eventDate)} — ${escapeText(dto.event.hallName)}</p>${sections}<ol>${timeline}</ol>${dto.seating ? renderPublicSeating(dto.seating) : ''}</main></body></html>`;
+  return `<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeText(dto.title)}</title></head><body><main><h1>${escapeText(dto.title)}</h1><p>${escapeText(dto.event.eventDate)} — ${escapeText(dto.event.hallName)}</p>${families}${sections}<ol>${timeline}</ol>${dto.seating ? renderPublicSeating(dto.seating) : ''}</main></body></html>`;
 }
