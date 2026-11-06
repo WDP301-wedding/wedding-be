@@ -14309,6 +14309,9 @@
                             "canManageDraft": {
                               "type": "boolean"
                             },
+                            "canRequestChanges": {
+                              "type": "boolean"
+                            },
                             "canWithdrawApproval": {
                               "type": "boolean"
                             }
@@ -14320,6 +14323,11 @@
                             "canEditSelections"
                           ],
                           "type": "object"
+                        },
+                        "changeRequestReason": {
+                          "maxLength": 500,
+                          "minLength": 1,
+                          "type": "string"
                         },
                         "currentRevisionId": {
                           "anyOf": [
@@ -16493,9 +16501,511 @@
         ]
       }
     },
+    "/bookings/{bookingId}/contracts/{revisionId}/change-requests": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "bookingId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "revisionId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "description": "Owning Couple only. Replaces a submitted revision with a successor draft and a reason before mutual approval. Prior approvals stay in history and the successor starts without approvals.",
+        "operationId": "requestCommercialContractChanges",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "expectedRevision": {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  },
+                  "reason": {
+                    "maxLength": 500,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "expectedRevision",
+                  "reason"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "bookingRevision": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "contract": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "approvals": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "actorAccountId": {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  "documentDigest": {
+                                    "pattern": "^[a-f0-9]{64}$",
+                                    "type": "string"
+                                  },
+                                  "occurredAt": {
+                                    "format": "date-time",
+                                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                                    "type": "string"
+                                  },
+                                  "party": {
+                                    "enum": [
+                                      "MANAGER",
+                                      "COUPLE"
+                                    ],
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "party",
+                                  "actorAccountId",
+                                  "documentDigest",
+                                  "occurredAt"
+                                ],
+                                "type": "object"
+                              },
+                              "maxItems": 2,
+                              "type": "array"
+                            },
+                            "approvedAt": {
+                              "anyOf": [
+                                {
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "createdAt": {
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                              "type": "string"
+                            },
+                            "document": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "bookingId": {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                },
+                                "brideName": {
+                                  "anyOf": [
+                                    {
+                                      "maxLength": 120,
+                                      "minLength": 1,
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "contractTotalVnd": {
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "type": "integer"
+                                },
+                                "depositAmountVnd": {
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "type": "integer"
+                                },
+                                "eventDate": {
+                                  "format": "date",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                  "type": "string"
+                                },
+                                "groomName": {
+                                  "anyOf": [
+                                    {
+                                      "maxLength": 120,
+                                      "minLength": 1,
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "hallId": {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                },
+                                "hallName": {
+                                  "maxLength": 120,
+                                  "minLength": 1,
+                                  "type": "string"
+                                },
+                                "incidentalClause": {
+                                  "const": "Các chi phí phát sinh sẽ được tính sau",
+                                  "type": "string"
+                                },
+                                "lines": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "category": {
+                                        "enum": [
+                                          "MENU",
+                                          "PRINT",
+                                          "SERVICE"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "description": {
+                                        "maxLength": 2400,
+                                        "type": "string"
+                                      },
+                                      "lineTotalVnd": {
+                                        "maximum": 9007199254740991,
+                                        "minimum": 0,
+                                        "type": "integer"
+                                      },
+                                      "name": {
+                                        "maxLength": 120,
+                                        "minLength": 1,
+                                        "type": "string"
+                                      },
+                                      "quantity": {
+                                        "exclusiveMinimum": 0,
+                                        "maximum": 10000,
+                                        "type": "integer"
+                                      },
+                                      "sourceId": {
+                                        "format": "uuid",
+                                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                        "type": "string"
+                                      },
+                                      "sourceRevisionId": {
+                                        "format": "uuid",
+                                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                        "type": "string"
+                                      },
+                                      "unit": {
+                                        "maxLength": 80,
+                                        "minLength": 1,
+                                        "type": "string"
+                                      },
+                                      "unitPriceVnd": {
+                                        "maximum": 9007199254740991,
+                                        "minimum": 0,
+                                        "type": "integer"
+                                      }
+                                    },
+                                    "required": [
+                                      "category",
+                                      "sourceId",
+                                      "sourceRevisionId",
+                                      "quantity",
+                                      "name",
+                                      "description",
+                                      "unit",
+                                      "unitPriceVnd",
+                                      "lineTotalVnd"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "maxItems": 50,
+                                  "minItems": 1,
+                                  "type": "array"
+                                },
+                                "maxGuests": {
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "type": "integer"
+                                },
+                                "modelVersion": {
+                                  "const": "FULL_CONTRACT_V1",
+                                  "type": "string"
+                                },
+                                "planningHeadcount": {
+                                  "maximum": 9007199254740991,
+                                  "minimum": 0,
+                                  "type": "integer"
+                                },
+                                "restaurantAddress": {
+                                  "maxLength": 500,
+                                  "type": "string"
+                                },
+                                "restaurantId": {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                },
+                                "restaurantName": {
+                                  "maxLength": 120,
+                                  "minLength": 1,
+                                  "type": "string"
+                                },
+                                "shiftCode": {
+                                  "enum": [
+                                    "LUNCH",
+                                    "DINNER"
+                                  ],
+                                  "type": "string"
+                                },
+                                "shiftEndTime": {
+                                  "type": "string"
+                                },
+                                "shiftStartTime": {
+                                  "type": "string"
+                                },
+                                "standardTerms": {
+                                  "$ref": "#/components/schemas/WeddingStandardContractTerms"
+                                },
+                                "tableCount": {
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 500,
+                                  "type": "integer"
+                                },
+                                "timeline": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "description": {
+                                        "anyOf": [
+                                          {
+                                            "maxLength": 2000,
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ]
+                                      },
+                                      "order": {
+                                        "maximum": 9007199254740991,
+                                        "minimum": 0,
+                                        "type": "integer"
+                                      },
+                                      "startTime": {
+                                        "pattern": "^\\d{2}:\\d{2}$",
+                                        "type": "string"
+                                      },
+                                      "title": {
+                                        "maxLength": 120,
+                                        "minLength": 1,
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "order",
+                                      "startTime",
+                                      "title",
+                                      "description"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "maxItems": 100,
+                                  "type": "array"
+                                },
+                                "timelineDigest": {
+                                  "pattern": "^[a-f0-9]{64}$",
+                                  "type": "string"
+                                },
+                                "timelineRevisionId": {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "modelVersion",
+                                "bookingId",
+                                "timelineRevisionId",
+                                "timelineDigest",
+                                "timeline",
+                                "brideName",
+                                "groomName",
+                                "restaurantId",
+                                "restaurantName",
+                                "restaurantAddress",
+                                "hallId",
+                                "hallName",
+                                "maxGuests",
+                                "eventDate",
+                                "shiftCode",
+                                "shiftStartTime",
+                                "shiftEndTime",
+                                "planningHeadcount",
+                                "tableCount",
+                                "lines",
+                                "contractTotalVnd",
+                                "depositAmountVnd",
+                                "incidentalClause"
+                              ],
+                              "type": "object"
+                            },
+                            "documentDigest": {
+                              "pattern": "^[a-f0-9]{64}$",
+                              "type": "string"
+                            },
+                            "pdfSha256": {
+                              "anyOf": [
+                                {
+                                  "pattern": "^[a-f0-9]{64}$",
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "predecessorRevisionId": {
+                              "anyOf": [
+                                {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "revisionId": {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            "revisionNumber": {
+                              "exclusiveMinimum": 0,
+                              "maximum": 9007199254740991,
+                              "type": "integer"
+                            },
+                            "state": {
+                              "enum": [
+                                "DRAFT",
+                                "AWAITING_APPROVAL",
+                                "APPROVED",
+                                "SUPERSEDED"
+                              ],
+                              "type": "string"
+                            },
+                            "submittedAt": {
+                              "anyOf": [
+                                {
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "revisionId",
+                            "revisionNumber",
+                            "predecessorRevisionId",
+                            "state",
+                            "documentDigest",
+                            "document",
+                            "createdAt",
+                            "submittedAt",
+                            "approvedAt",
+                            "approvals",
+                            "pdfSha256"
+                          ],
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "bookingRevision",
+                        "contract"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Exact immutable commercial revision and current Booking revision."
+          },
+          "400": {
+            "$ref": "#/components/responses/IdempotencyKeyRequired"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Booking lifecycle"
+        ]
+      }
+    },
     "/bookings/{bookingId}/contracts/{revisionId}/pdf": {
       "get": {
-        "description": "Private exact-version Vietnamese PDF. Submitted standard contracts are available as labeled previews. Final PDF bytes and SHA-256 are retained, including after legacy supersession. Standard PDFs include blank spaces for both parties to sign by hand. Snapshot digest differs from PDF byte digest. layout=readable renders the exact immutable snapshot as a clearly marked presentation copy; it never replaces retained PDF bytes. Does not imply digital signature.",
+        "description": "Private exact-version Vietnamese PDF. Only the owning Manager can open unsent standard drafts. Submitted standard contracts are available as labeled previews. Final PDF bytes and SHA-256 are retained, including after legacy supersession. Standard PDFs include blank spaces for both parties to sign by hand. Snapshot digest differs from PDF byte digest. layout=readable renders the exact immutable snapshot as a clearly marked presentation copy; it never replaces retained PDF bytes. Does not imply digital signature.",
         "operationId": "downloadCommercialContractPdf",
         "parameters": [
           {

@@ -162,6 +162,12 @@ export const commercialContractOpenApiPaths = {
           contractWithdrawalSchema,
           'Withdraw own approval before deposit by creating a successor DRAFT with no approvals; reason retained in atomic audit/outbox. Mutually approved standard contracts reject withdrawal with CONTRACT_NOT_EDITABLE. Old approvals and approved PDF remain immutable. Active/unknown/settled deposit blocks changes.',
         ],
+        [
+          'change-requests',
+          'requestCommercialContractChanges',
+          contractWithdrawalSchema,
+          'Owning Couple only. Replaces a submitted revision with a successor draft and a reason before mutual approval. Prior approvals stay in history and the successor starts without approvals.',
+        ],
       ] as const
     ).map(([action, operationId, schema, description]) => [
       '/bookings/{bookingId}/contracts/{revisionId}/' + action,
@@ -189,7 +195,7 @@ export const commercialContractOpenApiPaths = {
       tags: ['Booking lifecycle'],
       security,
       description:
-        'Private exact-version Vietnamese PDF. Submitted standard contracts are available as labeled previews. Final PDF bytes and SHA-256 are retained, including after legacy supersession. Standard PDFs include blank spaces for both parties to sign by hand. Snapshot digest differs from PDF byte digest. layout=readable renders the exact immutable snapshot as a clearly marked presentation copy; it never replaces retained PDF bytes. Does not imply digital signature.',
+        'Private exact-version Vietnamese PDF. Only the owning Manager can open unsent standard drafts. Submitted standard contracts are available as labeled previews. Final PDF bytes and SHA-256 are retained, including after legacy supersession. Standard PDFs include blank spaces for both parties to sign by hand. Snapshot digest differs from PDF byte digest. layout=readable renders the exact immutable snapshot as a clearly marked presentation copy; it never replaces retained PDF bytes. Does not imply digital signature.',
       responses: {
         '200': {
           description: 'PDF attachment; Cache-Control: no-store.',

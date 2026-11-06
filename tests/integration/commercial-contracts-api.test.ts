@@ -672,6 +672,8 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     });
     const initial = await draft(f);
     const path = `${f.path}/${initial.contract.revisionId}`;
+    expect((await get(path + '/pdf', 'own')).status).toBe(404);
+    expect((await get(path + '/pdf', 'manager')).status).toBe(200);
     const submitted = await post(path + '/submissions', {
       expectedRevision: initial.bookingRevision,
     });
@@ -831,7 +833,7 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     }
     const d = await createDraft(f),
       path = `${f.path}/${d.contract.revisionId}`;
-    const preview = await get(path + '/pdf', 'own');
+    const preview = await get(path + '/pdf', 'manager');
     expect(preview.status).toBe(200);
     expect((preview.body as Buffer).subarray(0, 5).toString()).toBe('%PDF-');
     expect(
@@ -891,6 +893,41 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     expect(completed.status).toBe(200);
     const list = await get(f.path, 'own');
     expect(contractsResponseSchema.parse(list.body as unknown).data.eligibleForDeposit).toBe(true);
+  }, 30_000);
+  it('returns a submitted contract for changes without carrying over the Manager approval', async () => {
+    const f = await fixture();
+    const initial = await draft(f);
+    const path = `${f.path}/${initial.contract.revisionId}`;
+    const submitted = await post(path + '/submissions', {
+      expectedRevision: initial.bookingRevision,
+    });
+    const pending = contractResponseSchema.parse(submitted.body as unknown).data;
+    const approvedOnce = await post(path + '/approvals', {
+      expectedRevision: pending.bookingRevision,
+    });
+    const partial = contractResponseSchema.parse(approvedOnce.body as unknown).data;
+    const reason = 'Cần điều chỉnh số bàn';
+    const requestBody = { expectedRevision: partial.bookingRevision, reason };
+    expect((await post(path + '/change-requests', requestBody, 'manager')).status).toBe(404);
+    const response = await post(path + '/change-requests', requestBody, 'own');
+    expect(response.status).toBe(200);
+    const returned = contractResponseSchema.parse(response.body as unknown).data;
+    expect(returned.contract).toMatchObject({
+      state: 'DRAFT',
+      predecessorRevisionId: initial.contract.revisionId,
+      approvals: [],
+    });
+    const history = contractsResponseSchema.parse((await get(f.path)).body as unknown).data;
+    expect(history.changeRequestReason).toBe(reason);
+    expect(history.revisions[1]).toMatchObject({
+      state: 'SUPERSEDED',
+      approvals: [{ party: 'MANAGER' }],
+    });
+    expect((await get(`${f.path}/${returned.contract.revisionId}/pdf`, 'own')).status).toBe(404);
+    expect(
+      (await post(path + '/approvals', { expectedRevision: returned.bookingRevision }, 'own'))
+        .status,
+    ).toBe(404);
   }, 30_000);
   it('enforces authentication, Staff/outsider concealment and authorized idempotent replay on every contract route', async () => {
     const f = await submitSelections(await fixture()),

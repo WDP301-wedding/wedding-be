@@ -40,7 +40,9 @@ describe('backend CI contract', () => {
       'TEST_MIGRATION_DATABASE_URL: postgresql://wedding_ci:wedding_ci_only@127.0.0.1:5432/wedding_ci',
     );
     expect(workflow).toContain('run: npm run db:migrate:deploy');
-    expect(workflow).toContain("-t 'previews the submitted terms'");
+    expect(workflow).toContain(
+      "-t 'previews the submitted terms|returns a submitted contract for changes'",
+    );
     expect(workflow).not.toContain('continue-on-error');
     expect(workflow).not.toContain('secrets.');
     expect(workflow).not.toContain('pull_request_target');
