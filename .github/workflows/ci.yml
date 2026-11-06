@@ -100,8 +100,10 @@ jobs:
 
   postgresql-integration:
     name: PostgreSQL migration and integration gates
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # Keep Chromium's system dependencies stable as ubuntu-latest advances.
+    # Fresh font downloads can outlast the original ten-minute job budget.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
     services:
       postgres:
         image: mirror.gcr.io/library/postgres:17@sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3
