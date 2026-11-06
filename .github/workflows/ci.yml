@@ -61,6 +61,9 @@ jobs:
       - name: Verify generated OpenAPI artifact
         run: npm run api:check
 
+      - name: Verify backend API and CI contracts
+        run: npm run test:contract
+
       - name: Verify pinned canonical Content renderer
         run: npm run print:check
 
@@ -148,6 +151,9 @@ jobs:
 
       - name: Verify demo final invoice and strict settlement policy
         run: npx vitest run tests/integration/commercial-contracts-api.test.ts --maxWorkers=1 -t 'demo finalizes|strict mode refuses|demo settlement rejects'
+
+      - name: Verify contract PDF preview and mutual approval lock
+        run: npx vitest run tests/integration/commercial-contracts-api.test.ts --maxWorkers=1 -t 'previews the submitted terms|returns a submitted contract for changes'
 
       - name: Verify authenticated retained PDF and Seating downloads
         run: npx vitest run tests/integration/invitation-studio/print-file.test.ts tests/integration/seating-print-files.test.ts tests/integration/print-booking-summary.test.ts --maxWorkers=1

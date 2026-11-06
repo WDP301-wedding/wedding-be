@@ -33,11 +33,20 @@ describe('PB-C3 billing HTTP contract', () => {
   it('publishes strict request/response schemas without monetary authority overrides', () => {
     const schemas = createOpenApiDocument().components?.schemas ?? {};
     const manual = schemas.BillingManualPaymentBody;
-    expect(manual).toMatchObject({ additionalProperties: false });
-    const text = JSON.stringify(manual);
-    expect(text).not.toMatch(
-      /timelineRevisionId|expectedBillingRevision|commandId|approvedRefundableVnd|roles/,
+    expect(manual).toMatchObject({
+      additionalProperties: false,
+      properties: {
+        timelineRevisionId: { format: 'uuid' },
+        expectedBillingRevision: { type: 'integer', exclusiveMinimum: 0 },
+      },
+    });
+    expect(manual).not.toHaveProperty('required', expect.arrayContaining(['timelineRevisionId']));
+    expect(manual).not.toHaveProperty(
+      'required',
+      expect.arrayContaining(['expectedBillingRevision']),
     );
+    const text = JSON.stringify(manual);
+    expect(text).not.toMatch(/commandId|approvedRefundableVnd|roles/);
     const refund = JSON.stringify(schemas.BillingRefundBody);
     expect(refund).not.toMatch(/decisionId|approvedRefundableVnd|recordedAt|bookingId/);
     expect(JSON.stringify(schemas.BillingAttemptResponse)).not.toMatch(

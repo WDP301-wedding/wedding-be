@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { z } from 'zod';
+import { z } from 'zod';
 import type { createBookingBoundaryUnitOfWork } from '../../../core/database/booking-unit-of-work.js';
 import { NotFoundError } from '../../../core/errors/app-error.js';
 import type { Prisma, PrismaClient } from '../../../generated/prisma/client.js';
@@ -19,6 +19,7 @@ import {
   contractDeposit,
   documentDigest,
   commercialConflict,
+  isLockedStandardContract,
   deepFreeze,
   INCIDENTAL_CLAUSE,
   type ContractDocument,
@@ -185,6 +186,7 @@ export function createCommercialContractService(options: Options) {
     client: PrismaClient,
     access: Authorized,
     input: z.infer<typeof contractDraftSchema>,
+    includeStandardTerms = true,
   ): Promise<ContractDocument> {
     const booking = access.booking;
     const timeline = booking.currentTimelineRevision;
@@ -205,6 +207,11 @@ export function createCommercialContractService(options: Options) {
     if (tableCount > 500 || booking.planningHeadcount > hall.maxGuests)
       throw commercialConflict('CONTRACT_CAPACITY_EXCEEDED');
     const total = checkedSum(lines.map((line) => line.lineTotalVnd));
+    const menus = includeStandardTerms
+      ? await catalog.requireContractMenus(
+          lines.filter((line) => line.category === 'MENU').map((line) => line.sourceRevisionId),
+        )
+      : undefined;
     return deepFreeze(
       contractDocumentSchema.parse({
         modelVersion: 'FULL_CONTRACT_V1',
@@ -236,6 +243,9 @@ export function createCommercialContractService(options: Options) {
         contractTotalVnd: total,
         depositAmountVnd: contractDeposit(total),
         incidentalClause: INCIDENTAL_CLAUSE,
+        ...(menus === undefined
+          ? {}
+          : { standardTerms: { version: 'WEDDING_STANDARD_V1', ...menus } }),
       }),
     );
   }
@@ -366,6 +376,20 @@ export function createCommercialContractService(options: Options) {
               include,
             });
             const current = booking.commercialContract?.currentRevision;
+            const changeRequest =
+              current?.state === 'DRAFT' && current.predecessorRevisionId !== null
+                ? await client.auditLog.findFirst({
+                    where: {
+                      entityType: 'commercial-contract',
+                      entityId: current.id,
+                      action: 'booking.contract-changes-requested',
+                    },
+                    select: { metadata: true },
+                  })
+                : null;
+            const changeRequestReason = z
+              .object({ reason: z.string() })
+              .safeParse(changeRequest?.metadata);
             const timeline = booking.currentTimelineRevision;
             const customerSelection = await readCustomerSelection(client, { booking, party });
             const selectionAccess = await customerSelections.selectionAccess(
@@ -408,6 +432,9 @@ export function createCommercialContractService(options: Options) {
                   ? ('FULL_CONTRACT_V1' as const)
                   : booking.commercialModelVersion,
               currentRevisionId: booking.commercialContract?.currentRevisionId ?? null,
+              ...(changeRequestReason.success
+                ? { changeRequestReason: changeRequestReason.data.reason }
+                : {}),
               eligibleForDeposit: eligible,
               customerSelection,
               selectionAccess,
@@ -427,7 +454,10 @@ export function createCommercialContractService(options: Options) {
                   current?.state === 'AWAITING_APPROVAL' &&
                   !ownApproval &&
                   current.timelineRevisionId === timeline?.id,
-                canWithdrawApproval: editable && ownApproval,
+                canWithdrawApproval:
+                  editable && ownApproval && current != null && !isLockedStandardContract(current),
+                canRequestChanges:
+                  editable && party === 'COUPLE' && current?.state === 'AWAITING_APPROVAL',
                 canEditSelections: selectionAccess.canEdit,
               },
               revisions: rows.slice(0, 50).map(contractView),
@@ -470,17 +500,22 @@ export function createCommercialContractService(options: Options) {
         const document = contractDocumentSchema.parse(prior.document);
         if (document.brideName === null || document.groomName === null)
           throw commercialConflict('COUPLE_NAMES_INCOMPLETE');
-        const refreshed = await buildDocument(client, access, {
-          expectedRevision: input.expectedRevision,
-          predecessorRevisionId: prior.predecessorRevisionId,
-          timelineRevisionId: prior.timelineRevisionId,
-          lines: document.lines.map(({ category, sourceId, sourceRevisionId, quantity }) => ({
-            category,
-            sourceId,
-            sourceRevisionId,
-            quantity,
-          })),
-        });
+        const refreshed = await buildDocument(
+          client,
+          access,
+          {
+            expectedRevision: input.expectedRevision,
+            predecessorRevisionId: prior.predecessorRevisionId,
+            timelineRevisionId: prior.timelineRevisionId,
+            lines: document.lines.map(({ category, sourceId, sourceRevisionId, quantity }) => ({
+              category,
+              sourceId,
+              sourceRevisionId,
+              quantity,
+            })),
+          },
+          document.standardTerms !== undefined,
+        );
         if (documentDigest(refreshed) !== prior.documentDigest)
           throw commercialConflict('COMMERCIAL_PRICE_REVISION_STALE');
         const row = await client.commercialContractRevision.update({
@@ -557,6 +592,7 @@ export function createCommercialContractService(options: Options) {
       const input = contractWithdrawalSchema.parse(value);
       return write(bookingId, actor, requestId, input.expectedRevision, async (client, access) => {
         const prior = requireCurrent(access, revisionId);
+        if (isLockedStandardContract(prior)) throw commercialConflict('CONTRACT_NOT_EDITABLE');
         if (!prior.approvals.some((item) => item.party === access.party))
           throw commercialConflict('CONTRACT_APPROVAL_REQUIRED');
         const row = await createRevision(
@@ -566,6 +602,27 @@ export function createCommercialContractService(options: Options) {
           actor,
         );
         return evidence(client, access, row, actor, requestId, 'withdrawn', input.reason);
+      });
+    },
+    async requestChanges(
+      bookingId: string,
+      revisionId: string,
+      value: unknown,
+      actor: AuthenticatedActor,
+      requestId: string,
+    ) {
+      const input = contractWithdrawalSchema.parse(value);
+      return write(bookingId, actor, requestId, input.expectedRevision, async (client, access) => {
+        if (access.party !== 'COUPLE') throw new NotFoundError();
+        const prior = requireCurrent(access, revisionId);
+        if (prior.state !== 'AWAITING_APPROVAL') throw commercialConflict('CONTRACT_NOT_EDITABLE');
+        const row = await createRevision(
+          client,
+          access,
+          contractDocumentSchema.parse(prior.document),
+          actor,
+        );
+        return evidence(client, access, row, actor, requestId, 'changes-requested', input.reason);
       });
     },
     async pdf(
@@ -578,20 +635,22 @@ export function createCommercialContractService(options: Options) {
         { bookingId, context: context(actor, randomUUID()) },
         (scoped) =>
           options.scope.withClient(bookingId, scoped, async (client) => {
-            await authorized(client, bookingId, actor);
+            const { party } = await authorized(client, bookingId, actor);
             const row = await client.commercialContractRevision.findFirst({
               where: { id: revisionId, bookingId },
               include,
             });
             if (row === null) throw new NotFoundError();
-            if (layout === 'readable')
-              return renderContractPdf(contractView(row), { presentation: true });
+            const view = contractView(row);
+            if (party === 'COUPLE' && view.document.standardTerms && view.submittedAt === null)
+              throw new NotFoundError();
+            if (layout === 'readable') return renderContractPdf(view, { presentation: true });
             const retained = await client.commercialContractPdf.findUnique({
               where: { revisionId },
             });
             if (retained !== null)
               return { bytes: Buffer.from(retained.bytes), sha256: retained.sha256 };
-            return renderContractPdf(contractView(row));
+            return renderContractPdf(view);
           }),
       );
     },

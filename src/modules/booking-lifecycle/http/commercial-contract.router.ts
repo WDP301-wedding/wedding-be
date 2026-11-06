@@ -141,6 +141,7 @@ export function createCommercialContractRouter(
     ['submissions', contractDecisionSchema, service.submit],
     ['approvals', contractDecisionSchema, service.approve],
     ['withdrawals', contractWithdrawalSchema, service.withdraw],
+    ['change-requests', contractWithdrawalSchema, service.requestChanges],
   ] as const) {
     router.post(
       path + '/:revisionId/' + action,

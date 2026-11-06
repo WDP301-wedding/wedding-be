@@ -1,14 +1,13 @@
 import { randomUUID } from 'node:crypto';
 import { expect, it } from 'vitest';
 import type { StepSixApiHarness } from './commercial-step6-api-cases.js';
-import { contractResponseSchema } from '../../src/modules/booking-lifecycle/domain/commercial-contract.js';
 import { printOfferingViewSchema } from '../../src/modules/venue-catalog/domain/commercial-offering.js';
 import { designResponse } from '../../src/modules/invitation-studio/http/studio.schemas.js';
 import { printOrderResponseSchema } from '../../src/modules/invitation-studio/http/print-orders.schemas.js';
 import { billingResponseSchema } from '../../src/modules/payments-billing/http/payments-billing.schemas.js';
 
 export function registerContractedPrintPriceApiCases(harness: StepSixApiHarness) {
-  const { database, fixture, getLines, post, get, approved } = harness;
+  const { database, fixture, getLines, post, get, historicalPrintContract } = harness;
   it.each([0, 20_000_000_000])(
     'fulfills the frozen contract print price %i without a second charge',
     async (unitPriceVnd) => {
@@ -35,18 +34,7 @@ export function registerContractedPrintPriceApiCases(harness: StepSixApiHarness)
           ? { ...l, sourceId: offering.offeringId, sourceRevisionId: offering.sourceRevisionId }
           : l,
       );
-      const draft = await post(
-        f.path,
-        {
-          expectedRevision: f.revision,
-          predecessorRevisionId: null,
-          timelineRevisionId: f.timelineId,
-          lines,
-        },
-        'own',
-      );
-      expect(draft.status).toBe(201);
-      const d = await approved(f, contractResponseSchema.parse(draft.body as unknown).data);
+      const d = await historicalPrintContract(f, lines);
       const deposited = await post('/management/billing/payments/manual', {
         bookingId: f.id,
         purpose: 'DEPOSIT',

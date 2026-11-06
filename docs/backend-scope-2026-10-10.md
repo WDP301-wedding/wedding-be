@@ -188,6 +188,20 @@ remain post-deposit.
 
 ## 5. Commercial Contract and Deposit
 
+Standard contract PDF confirmed by the owner on **2026-11-06**. New drafts
+carry `WEDDING_STANDARD_V1` terms with the current published, lowest-priced
+active menu and its dishes for up to two complimentary overflow tables. The
+catalog is restaurant-wide. Revalidate the draft when Manager submits it and
+freeze the exact terms for both approvals. Menu and service prices already
+include VAT. The PDF shows the 30% deposit and post-event settlement, the
+agreed date-change and cancellation terms, and blank spaces for both parties
+to sign the printed copy. Mutual approval locks the new standard revision and
+retains its PDF. Before deposit it also prevents withdrawal or replacement of
+the bound timeline. Existing revisions and retained bytes keep their original
+version and behavior. The PDF states the cancellation and date-change terms;
+operational handling and any refund evidence still follow the existing
+authorized Booking and Billing workflows.
+
 Initial-proposal extension requested by the owner on **2026-10-18**: Manager may
 select multiple menu versions with a separate table quantity for each when creating
 the first Booking proposal. Preserve legacy one-menu input and historical snapshots;

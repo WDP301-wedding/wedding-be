@@ -27,9 +27,15 @@ import { createPrismaSessionRepository } from '../../src/modules/identity-access
 import { hashOpaqueToken } from '../../src/modules/identity-access/crypto/token.js';
 import { createAuthenticatedActorResolver } from '../../src/modules/identity-access/authorization/authenticated-actor.middleware.js';
 import {
+  checkedSum,
+  contractDeposit,
+  contractPreviewResponseSchema,
   contractResponseSchema,
   contractsResponseSchema,
+  documentDigest,
 } from '../../src/modules/booking-lifecycle/domain/commercial-contract.js';
+import { createCommercialSelectionReader } from '../../src/modules/venue-catalog/application/commercial-selection.reader.js';
+import { selectionResponseSchema } from '../../src/modules/booking-lifecycle/domain/commercial-selections.js';
 import {
   consultationResponseSchema,
   bookingResponseSchema,
@@ -80,8 +86,8 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     quantity: number;
   }[];
   let day = 1;
-  const total = 47_000_000,
-    deposit = 14_100_000;
+  const total = 46_500_000,
+    deposit = 13_950_000;
 
   function capture(label: string, method: string, path: string, response: Response, body?: object) {
     const pdf = response.headers['content-type']?.includes('application/pdf') === true;
@@ -397,26 +403,56 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     expect(waiters).toBe(2);
     return resolved;
   }
+  const paidLines = () => lines.filter(({ category }) => category !== 'PRINT');
   const draftBody = (f: Fixture) => ({
     expectedRevision: f.revision,
     predecessorRevisionId: null,
     timelineRevisionId: f.timelineId,
-    lines,
+    lines: paidLines(),
   });
-  async function draft(f: Fixture, couple = 'own') {
-    const r = await post(f.path, draftBody(f), couple);
-    expect(r.status).toBe(201);
+  async function submitSelections(f: Fixture, selections = paidLines(), couple = 'own') {
+    const path = `/bookings/${f.id}/contract-selections`;
+    const saved = await post(
+      path + '/drafts',
+      { expectedRevision: f.revision, lines: selections },
+      couple,
+    );
+    expect(saved.status, JSON.stringify(saved.body)).toBe(200);
+    const draft = selectionResponseSchema.parse(saved.body as unknown).data;
+    const submitted = await post(
+      path + '/submissions',
+      {
+        expectedRevision: draft.bookingRevision,
+        selectionRevisionId: draft.selection.revisionId,
+      },
+      couple,
+    );
+    expect(submitted.status, JSON.stringify(submitted.body)).toBe(200);
+    return {
+      ...f,
+      revision: selectionResponseSchema.parse(submitted.body as unknown).data.bookingRevision,
+    };
+  }
+  async function createDraft(f: Fixture) {
+    const r = await post(f.path, draftBody(f));
+    expect(r.status, JSON.stringify(r.body)).toBe(201);
     return contractResponseSchema.parse(r.body as unknown).data;
+  }
+  async function draft(f: Fixture, couple = 'own') {
+    return createDraft(await submitSelections(f, paidLines(), couple));
   }
   async function approved(f: Fixture, initial?: Awaited<ReturnType<typeof draft>>, couple = 'own') {
     let d = initial ?? (await draft(f, couple));
-    for (const [action, who] of [
-      ['submissions', couple],
-      ['approvals', 'manager'],
-      ['approvals', couple],
-    ] as const) {
+    if (d.contract.state === 'DRAFT') {
+      const submitted = await post(`${f.path}/${d.contract.revisionId}/submissions`, {
+        expectedRevision: d.bookingRevision,
+      });
+      expect(submitted.status, JSON.stringify(submitted.body)).toBe(200);
+      d = contractResponseSchema.parse(submitted.body as unknown).data;
+    }
+    for (const who of ['manager', couple]) {
       const r = await post(
-        `${f.path}/${d.contract.revisionId}/${action}`,
+        `${f.path}/${d.contract.revisionId}/approvals`,
         { expectedRevision: d.bookingRevision },
         who,
       );
@@ -426,7 +462,61 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     expect(d.contract.state).toBe('APPROVED');
     return d;
   }
-  async function paidFixture(past = false) {
+  async function historicalPrintContract(f: Fixture, selections: typeof lines) {
+    // Historical contracts included print before deposit. Seed that retained input in
+    // the disposable database, then exercise approvals and fulfillment through HTTP.
+    const withoutPrint = selections.filter(({ category }) => category !== 'PRINT');
+    const selected = await submitSelections(f, withoutPrint);
+    const response = await post(f.path + '/preview', {
+      ...draftBody(selected),
+      lines: withoutPrint,
+    });
+    expect(response.status, JSON.stringify(response.body)).toBe(200);
+    const document = contractPreviewResponseSchema.parse(response.body as unknown).data.document;
+    delete document.standardTerms;
+    const catalog = createCommercialSelectionReader(database.prisma);
+    const resolved = await catalog.requireSelections(selections, document.restaurantId);
+    document.lines = selections.map((line) => resolved.get(line.category + line.sourceId)!);
+    document.contractTotalVnd = checkedSum(document.lines.map((line) => line.lineTotalVnd));
+    document.depositAmountVnd = contractDeposit(document.contractTotalVnd);
+    const revisionId = randomUUID();
+    await database.prisma.$transaction(async (tx) => {
+      await tx.commercialContract.create({ data: { bookingId: f.id } });
+      await tx.commercialContractRevision.create({
+        data: {
+          id: revisionId,
+          bookingId: f.id,
+          revisionNumber: 1,
+          timelineRevisionId: f.timelineId,
+          document,
+          documentDigest: documentDigest(document),
+          contractTotalVnd: document.contractTotalVnd,
+          depositAmountVnd: document.depositAmountVnd,
+          createdByAccountId: accounts.manager,
+          createdAt: new Date(),
+          lines: {
+            create: document.lines.map((line, displayOrder) => ({
+              ...line,
+              id: randomUUID(),
+              displayOrder,
+            })),
+          },
+        },
+      });
+      await tx.commercialContract.update({
+        where: { bookingId: f.id },
+        data: { currentRevisionId: revisionId },
+      });
+      await tx.commercialContractRevision.update({
+        where: { id: revisionId },
+        data: { state: 'AWAITING_APPROVAL', submittedAt: new Date() },
+      });
+      await tx.booking.update({ where: { id: f.id }, data: { revision: { increment: 1 } } });
+    });
+    const state = contractsResponseSchema.parse((await get(f.path, 'own')).body as unknown).data;
+    return approved(f, { contract: state.revisions[0]!, bookingRevision: state.bookingRevision });
+  }
+  async function paidFixture(past = false, historicalSelections?: typeof lines) {
     const f = await fixture();
     if (past) {
       // Synthetic historical fixture, seeded BEFORE any commercial document or payment.
@@ -440,13 +530,15 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
         });
       });
     }
-    const d = await approved(f);
+    const d = historicalSelections
+      ? await historicalPrintContract(f, historicalSelections)
+      : await approved(f);
     const payment = await post('/management/billing/payments/manual', {
       bookingId: f.id,
       purpose: 'DEPOSIT',
       contractRevisionId: d.contract.revisionId,
       documentDigest: d.contract.documentDigest,
-      amountVnd: deposit,
+      amountVnd: d.contract.document.depositAmountVnd,
       settledAt: new Date().toISOString(),
       reason: 'Cọc kiểm thử quyết toán',
       evidenceReference: 'LOCAL-INVOICE',
@@ -474,6 +566,8 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     get,
     expenseMutation,
     fixture,
+    submitSelections,
+    historicalPrintContract,
     approved,
     paidFixture,
     race,
@@ -566,21 +660,53 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
       (await get(`/bookings/${f.id}/payments/${attempt.paymentAttemptId}`, 'outsider')).status,
     ).toBe(404);
     expect((await get(`/bookings/${f.id}/billing`, 'android')).status).toBe(403);
-  });
+  }, 30_000);
 
-  it('lists, creates, submits, approves, downloads and withdraws the exact contract with retained PDF history', async () => {
+  it('previews the submitted terms and locks the mutually approved contract and its retained PDF', async () => {
     const f = await fixture();
-    const empty = await get(f.path, 'own', 'List before conversion');
+    const empty = await get(f.path, 'own', 'List before the first contract');
     expect(empty.status).toBe(200);
     expect(contractsResponseSchema.parse(empty.body as unknown).data).toMatchObject({
-      modelVersion: 'LEGACY_PROPOSAL_V1',
+      modelVersion: 'FULL_CONTRACT_V1',
       revisions: [],
     });
-    const d = await approved(f);
+    const initial = await draft(f);
+    const path = `${f.path}/${initial.contract.revisionId}`;
+    expect((await get(path + '/pdf', 'own')).status).toBe(404);
+    expect((await get(path + '/pdf', 'manager')).status).toBe(200);
+    const submitted = await post(path + '/submissions', {
+      expectedRevision: initial.bookingRevision,
+    });
+    expect(submitted.status).toBe(200);
+    const pending = contractResponseSchema.parse(submitted.body as unknown).data;
+    expect(pending.contract.document).toMatchObject({
+      standardTerms: {
+        version: 'WEDDING_STANDARD_V1',
+        reserveMenu: {
+          versionId: CATALOG_SEED_IDS.classicMenuVersion,
+          name: 'Classic Celebration',
+          dishes: ['Lotus Salad', 'Roasted Chicken'],
+        },
+      },
+    });
+    const preview = await get(path + '/pdf', 'own', 'Submitted PDF preview');
+    expect(preview.status).toBe(200);
+    let d = pending;
+    for (const who of ['manager', 'own']) {
+      const approval = await post(
+        path + '/approvals',
+        { expectedRevision: d.bookingRevision },
+        who,
+      );
+      expect(approval.status).toBe(200);
+      d = contractResponseSchema.parse(approval.body as unknown).data;
+    }
+    expect(d.contract.state).toBe('APPROVED');
+    expect(d.contract.documentDigest).toBe(pending.contract.documentDigest);
     expect(d.contract.document).toMatchObject({
       tableCount: 12,
-      contractTotalVnd: total,
-      depositAmountVnd: deposit,
+      contractTotalVnd: 46_500_000,
+      depositAmountVnd: 13_950_000,
       incidentalClause: 'Các chi phí phát sinh sẽ được tính sau',
     });
     const pdfPath = `${f.path}/${d.contract.revisionId}/pdf`;
@@ -596,17 +722,19 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
       { expectedRevision: d.bookingRevision, reason: 'Cần xem lại dịch vụ' },
       'own',
     );
-    expect(withdrawn.status).toBe(200);
-    const next = contractResponseSchema.parse(withdrawn.body as unknown).data;
-    expect(next.contract).toMatchObject({
-      state: 'DRAFT',
-      predecessorRevisionId: d.contract.revisionId,
-      approvals: [],
-    });
-    expect(next.contract.revisionId).not.toBe(d.contract.revisionId);
+    expect(withdrawn.status).toBe(409);
+    expect(withdrawn.body).toMatchObject({ error: { code: 'CONTRACT_NOT_EDITABLE' } });
+    const timelineWithdrawal = await post(
+      `/bookings/${f.id}/timeline-revisions/${f.timelineId}/withdrawals`,
+      { expectedRevision: d.bookingRevision, reason: 'Cần đổi lịch trình' },
+    );
+    expect(timelineWithdrawal.status).toBe(409);
+    expect(timelineWithdrawal.body).toMatchObject({ error: { code: 'CONTRACT_NOT_EDITABLE' } });
     const history = await get(f.path, 'own', 'History after withdrawal');
     expect(history.status).toBe(200);
-    expect(contractsResponseSchema.parse(history.body as unknown).data.revisions).toHaveLength(2);
+    const snapshot = contractsResponseSchema.parse(history.body as unknown).data;
+    expect(snapshot.capabilities.canWithdrawApproval).toBe(false);
+    expect(snapshot.revisions).toHaveLength(1);
     const retained = await get(pdfPath, 'manager', 'Retained old PDF');
     expect(retained.status).toBe(200);
     expect(retained.body).toEqual(bytes);
@@ -625,13 +753,13 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     }
     expect((await post(f.path, body, 'own', null, 'Missing idempotency key')).status).toBe(400);
     const d = await draft(f);
-    const stale = await post(f.path, body, 'own', randomUUID(), 'Stale booking revision');
+    const stale = await post(f.path, body, 'manager', randomUUID(), 'Stale booking revision');
     expect(stale.status).toBe(409);
     expect(stale.body).toMatchObject({ error: { code: 'CONTRACT_REVISION_STALE' } });
     const missing = await post(
       `${f.path}/${d.contract.revisionId}/submissions`,
       { expectedRevision: d.bookingRevision },
-      'own',
+      'manager',
       randomUUID(),
       'Missing bride/groom names',
     );
@@ -639,11 +767,11 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     expect(missing.body).toMatchObject({ error: { code: 'COUPLE_NAMES_INCOMPLETE' } });
   }, 30_000);
   it('serializes concurrent draft conversion and approvals into one write and a replayable stale conflict', async () => {
-    const f = await fixture();
+    const f = await submitSelections(await fixture());
     const keys = [randomUUID(), randomUUID()];
     const converted = await race(
       f,
-      keys.map((key) => () => post(f.path, draftBody(f), 'own', key)),
+      keys.map((key) => () => post(f.path, draftBody(f), 'manager', key)),
     );
     expect(converted.map((r) => r.status).sort()).toEqual([201, 409]);
     const winner = converted.find((r) => r.status === 201)!;
@@ -651,7 +779,7 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     const submitted = await post(
       `${f.path}/${d.contract.revisionId}/submissions`,
       { expectedRevision: d.bookingRevision },
-      'own',
+      'manager',
     );
     expect(submitted.status).toBe(200);
     const pending = contractResponseSchema.parse(submitted.body as unknown).data;
@@ -678,12 +806,12 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     ).toBe(1);
   }, 30_000);
   it('rejects invalid capacity, catalog/timeline/predecessor and lifecycle transitions while retaining draft previews', async () => {
-    const f = await fixture();
+    const f = await submitSelections(await fixture());
     for (const [body, code] of [
       [
         {
           ...draftBody(f),
-          lines: lines.map((line, i) => (i === 0 ? { ...line, quantity: 501 } : line)),
+          lines: paidLines().map((line, i) => (i === 0 ? { ...line, quantity: 501 } : line)),
         },
         'CONTRACT_CAPACITY_EXCEEDED',
       ],
@@ -692,20 +820,20 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
       [
         {
           ...draftBody(f),
-          lines: lines.map((line, i) =>
+          lines: paidLines().map((line, i) =>
             i === 0 ? { ...line, sourceRevisionId: randomUUID() } : line,
           ),
         },
         'COMMERCIAL_PRICE_REVISION_STALE',
       ],
     ] as const) {
-      const r = await post(f.path, body, 'own');
+      const r = await post(f.path, body);
       expect(r.status).toBe(409);
       expect(r.body).toMatchObject({ error: { code } });
     }
-    const d = await draft(f),
+    const d = await createDraft(f),
       path = `${f.path}/${d.contract.revisionId}`;
-    const preview = await get(path + '/pdf', 'own');
+    const preview = await get(path + '/pdf', 'manager');
     expect(preview.status).toBe(200);
     expect((preview.body as Buffer).subarray(0, 5).toString()).toBe('%PDF-');
     expect(
@@ -730,11 +858,7 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
       data: { groomName: 'Tên mới' },
     });
     try {
-      const changed = await post(
-        path + '/submissions',
-        { expectedRevision: d.bookingRevision },
-        'own',
-      );
+      const changed = await post(path + '/submissions', { expectedRevision: d.bookingRevision });
       expect(changed.status).toBe(409);
       expect(changed.body).toMatchObject({ error: { code: 'COMMERCIAL_PRICE_REVISION_STALE' } });
     } finally {
@@ -743,15 +867,10 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
         data: { groomName: 'Trần Minh' },
       });
     }
-    const submitted = await post(
-      path + '/submissions',
-      { expectedRevision: d.bookingRevision },
-      'own',
-    );
+    const submitted = await post(path + '/submissions', { expectedRevision: d.bookingRevision });
     const pending = contractResponseSchema.parse(submitted.body as unknown).data;
     expect(
-      (await post(path + '/submissions', { expectedRevision: pending.bookingRevision }, 'own'))
-        .status,
+      (await post(path + '/submissions', { expectedRevision: pending.bookingRevision })).status,
     ).toBe(409);
     const first = await post(
       path + '/approvals',
@@ -775,14 +894,50 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     const list = await get(f.path, 'own');
     expect(contractsResponseSchema.parse(list.body as unknown).data.eligibleForDeposit).toBe(true);
   }, 30_000);
+  it('returns a submitted contract for changes without carrying over the Manager approval', async () => {
+    const f = await fixture();
+    const initial = await draft(f);
+    const path = `${f.path}/${initial.contract.revisionId}`;
+    const submitted = await post(path + '/submissions', {
+      expectedRevision: initial.bookingRevision,
+    });
+    const pending = contractResponseSchema.parse(submitted.body as unknown).data;
+    const approvedOnce = await post(path + '/approvals', {
+      expectedRevision: pending.bookingRevision,
+    });
+    const partial = contractResponseSchema.parse(approvedOnce.body as unknown).data;
+    const reason = 'Cần điều chỉnh số bàn';
+    const requestBody = { expectedRevision: partial.bookingRevision, reason };
+    expect((await post(path + '/change-requests', requestBody, 'manager')).status).toBe(404);
+    const response = await post(path + '/change-requests', requestBody, 'own');
+    expect(response.status).toBe(200);
+    const returned = contractResponseSchema.parse(response.body as unknown).data;
+    expect(returned.contract).toMatchObject({
+      state: 'DRAFT',
+      predecessorRevisionId: initial.contract.revisionId,
+      approvals: [],
+    });
+    const history = contractsResponseSchema.parse((await get(f.path)).body as unknown).data;
+    expect(history.changeRequestReason).toBe(reason);
+    expect(history.revisions[1]).toMatchObject({
+      state: 'SUPERSEDED',
+      approvals: [{ party: 'MANAGER' }],
+    });
+    expect((await get(`${f.path}/${returned.contract.revisionId}/pdf`, 'own')).status).toBe(404);
+    expect(
+      (await post(path + '/approvals', { expectedRevision: returned.bookingRevision }, 'own'))
+        .status,
+    ).toBe(404);
+  }, 30_000);
   it('enforces authentication, Staff/outsider concealment and authorized idempotent replay on every contract route', async () => {
-    const f = await fixture(),
+    const f = await submitSelections(await fixture()),
       key = randomUUID(),
       body = draftBody(f);
-    const first = await post(f.path, body, 'own', key, 'Create with replay key');
+    expect((await post(f.path, body, 'own')).status).toBe(404);
+    const first = await post(f.path, body, 'manager', key, 'Create with replay key');
     expect(first.status).toBe(201);
     const d = contractResponseSchema.parse(first.body as unknown).data;
-    const again = await post(f.path, body, 'own', key, 'Identical authorized replay');
+    const again = await post(f.path, body, 'manager', key, 'Identical authorized replay');
     expect(again.status).toBe(201);
     expect(again.body).toEqual(first.body);
     const operations = [
@@ -884,7 +1039,7 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
             expectedRevision: current.bookingRevision,
             predecessorRevisionId: d.contract.revisionId,
           },
-          'own',
+          'manager',
           randomUUID(),
           'Edit during active deposit',
         )

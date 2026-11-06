@@ -4,27 +4,31 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const workflowPath = join(process.cwd(), '.github', 'workflows', 'ci.yml');
+const setupPath = join(process.cwd(), '.github', 'actions', 'backend-setup', 'action.yml');
 const dependabotPath = join(process.cwd(), '.github', 'dependabot.yml');
 
 describe('backend CI contract', () => {
   it('gates pull requests and main pushes on every required backend check', async () => {
-    const workflow = await readFile(workflowPath, 'utf8');
+    const [workflow, setup] = await Promise.all([
+      readFile(workflowPath, 'utf8'),
+      readFile(setupPath, 'utf8'),
+    ]);
 
     expect(workflow).toContain('pull_request:');
     expect(workflow).toContain('push:');
     expect(workflow).toMatch(/branches:\s*\[main\]/u);
-    expect(workflow).toContain("node-version-file: '.node-version'");
-    expect(workflow.match(/run: npm ci/gu)).toHaveLength(2);
-    expect(workflow).toContain('run: npm run format:check');
+    expect(workflow.match(/uses: \.\/\.github\/actions\/backend-setup/gu)).toHaveLength(3);
+    expect(setup).toContain("node-version-file: '.node-version'");
+    expect(setup).toContain('run: npm ci');
+    expect(setup).toContain('run: npm run db:generate');
     expect(workflow).toContain('run: npm run lint');
     expect(workflow).toContain('run: npm run typecheck');
-    expect(workflow).toContain('run: npm run test:unit');
+    expect(workflow).toContain('npm run test:unit');
     expect(workflow).toContain('run: npm run test:contract');
-    expect(workflow).toContain('run: npm run test:coverage -- --maxWorkers=2');
-    expect(workflow.match(/run: npm run test:coverage -- --maxWorkers=2/gu)).toHaveLength(1);
     expect(workflow).toMatch(
-      /postgresql-integration:[\s\S]*run: npm run test:coverage -- --maxWorkers=2/u,
+      /postgresql-integration:[\s\S]*npm run db:migrate:deploy[\s\S]*npm run db:generate[\s\S]*npx vitest run tests\/integration\//u,
     );
+    expect(workflow).toContain('needs: [lint, production, postgresql-integration]');
     expect(workflow).toContain('run: npm run api:check');
     expect(workflow).toContain('run: npm run build');
     expect(workflow).toContain('run: npm run audit:ci');
@@ -36,7 +40,9 @@ describe('backend CI contract', () => {
       'TEST_MIGRATION_DATABASE_URL: postgresql://wedding_ci:wedding_ci_only@127.0.0.1:5432/wedding_ci',
     );
     expect(workflow).toContain('run: npm run db:migrate:deploy');
-    expect(workflow).toContain('run: npm run test:integration');
+    expect(workflow).toContain(
+      "-t 'previews the submitted terms|returns a submitted contract for changes'",
+    );
     expect(workflow).not.toContain('continue-on-error');
     expect(workflow).not.toContain('secrets.');
     expect(workflow).not.toContain('pull_request_target');

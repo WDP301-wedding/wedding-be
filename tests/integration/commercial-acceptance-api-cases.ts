@@ -32,24 +32,28 @@ export function registerCommercialAcceptanceCases(h: StepSixApiHarness) {
     const created = await post('/management/services', fields);
     expect(created.status).toBe(201);
     const service = serviceViewSchema.parse((created.body as { data: unknown }).data);
-    const selections = h.getLines().map((line) =>
-      line.category === 'SERVICE'
-        ? {
-            ...line,
-            sourceId: service.serviceId,
-            sourceRevisionId: service.sourceRevisionId,
-          }
-        : line,
-    );
+    const selections = h
+      .getLines()
+      .filter(({ category }) => category !== 'PRINT')
+      .map((line) =>
+        line.category === 'SERVICE'
+          ? {
+              ...line,
+              sourceId: service.serviceId,
+              sourceRevisionId: service.sourceRevisionId,
+            }
+          : line,
+      );
+    const selected = await h.submitSelections(f, selections);
     const draft = await post(
       f.path,
       {
-        expectedRevision: f.revision,
+        expectedRevision: selected.revision,
         predecessorRevisionId: null,
         timelineRevisionId: f.timelineId,
         lines: selections,
       },
-      'own',
+      'manager',
     );
     expect(draft.status).toBe(201);
     const old = contractResponseSchema.parse(draft.body as unknown).data;
@@ -63,7 +67,7 @@ export function registerCommercialAcceptanceCases(h: StepSixApiHarness) {
     const submit = await post(
       `${f.path}/${old.contract.revisionId}/submissions`,
       { expectedRevision: old.bookingRevision },
-      'own',
+      'manager',
     );
     expect(submit.status).toBe(409);
     expect(submit.body).toMatchObject({ error: { code: 'COMMERCIAL_PRICE_REVISION_STALE' } });
@@ -77,7 +81,7 @@ export function registerCommercialAcceptanceCases(h: StepSixApiHarness) {
           line.category === 'SERVICE' ? { ...line, sourceRevisionId: next.sourceRevisionId } : line,
         ),
       },
-      'own',
+      'manager',
     );
     expect(replacement.status).toBe(201);
     const d = await approved(f, contractResponseSchema.parse(replacement.body as unknown).data);
@@ -169,45 +173,36 @@ export function registerCommercialAcceptanceCases(h: StepSixApiHarness) {
     expect(await database.prisma.billingLedgerEntry.count({ where: { bookingId: f.id } })).toBe(0);
   }, 30_000);
 
-  it('serializes full-contract checkout against an invalidating timeline successor', async () => {
+  it('allows checkout and rejects a concurrent timeline successor for a locked contract', async () => {
     const f = await fixture(),
       d = await approved(f);
-    const results = await race(f, [
-      () =>
-        post(
-          `/bookings/${f.id}/payments/deposit`,
-          {
-            timelineRevisionId: f.timelineId,
-            contractRevisionId: d.contract.revisionId,
-            documentDigest: d.contract.documentDigest,
-          },
-          'own',
-        ),
-      () =>
-        post(
-          `/bookings/${f.id}/timeline-revisions`,
-          {
-            expectedRevision: d.bookingRevision,
-            predecessorRevisionId: f.timelineId,
-            items: [{ order: 0, startTime: '18:30', title: 'Giờ mới' }],
-          },
-          'own',
-        ),
+    const results = await Promise.all([
+      post(
+        `/bookings/${f.id}/payments/deposit`,
+        {
+          timelineRevisionId: f.timelineId,
+          contractRevisionId: d.contract.revisionId,
+          documentDigest: d.contract.documentDigest,
+        },
+        'own',
+      ),
+      post(
+        `/bookings/${f.id}/timeline-revisions`,
+        {
+          expectedRevision: d.bookingRevision,
+          predecessorRevisionId: f.timelineId,
+          items: [{ order: 0, startTime: '18:30', title: 'Giờ mới' }],
+        },
+        'own',
+      ),
     ]);
-    expect(results.filter((r) => r.status < 300)).toHaveLength(1);
-    expect(results.filter((r) => r.status === 409)).toHaveLength(1);
+    expect(results.map((result) => result.status)).toEqual([201, 409]);
     const current = await database.prisma.booking.findUniqueOrThrow({ where: { id: f.id } });
-    expect(current.currentTimelineRevisionId === f.timelineId).toBe(results[0]!.status === 201);
-    if (results[1]!.status === 201) {
-      expect(
-        contractsResponseSchema.parse((await get(f.path, 'own')).body as unknown).data
-          .eligibleForDeposit,
-      ).toBe(false);
-    }
+    expect(current.currentTimelineRevisionId).toBe(f.timelineId);
     expect(await database.prisma.billingLedgerEntry.count({ where: { bookingId: f.id } })).toBe(0);
   }, 30_000);
 
-  it('pins an expired hall hold for UNKNOWN full-contract money, then releases edits only after verified failure', async () => {
+  it('pins an expired hall hold for UNKNOWN money and releases the slot while preserving the signed contract', async () => {
     const f = await fixture(),
       d = await approved(f);
     const checkout = await post(
@@ -277,18 +272,13 @@ export function registerCommercialAcceptanceCases(h: StepSixApiHarness) {
         .status,
     ).toBe('RELEASED');
     const after = contractsResponseSchema.parse((await get(f.path, 'own')).body as unknown).data;
-    expect(
-      (
-        await post(
-          `${f.path}/${d.contract.revisionId}/withdrawals`,
-          {
-            expectedRevision: after.bookingRevision,
-            reason: 'Đã đối soát thất bại',
-          },
-          'own',
-        )
-      ).status,
-    ).toBe(200);
+    const locked = await post(
+      `${f.path}/${d.contract.revisionId}/withdrawals`,
+      { expectedRevision: after.bookingRevision, reason: 'Đã đối soát thất bại' },
+      'own',
+    );
+    expect(locked.status).toBe(409);
+    expect(locked.body).toMatchObject({ error: { code: 'CONTRACT_NOT_EDITABLE' } });
     const proposal = await database.prisma.booking.findUniqueOrThrow({
       where: { id: other.bookingId },
     });

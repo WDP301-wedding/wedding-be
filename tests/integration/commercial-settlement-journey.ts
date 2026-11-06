@@ -22,9 +22,10 @@ import { createNotificationBookingReader } from '../../src/modules/booking-lifec
 import { createNotificationIdentityReader } from '../../src/modules/identity-access/authorization/notification-recipient.reader.js';
 
 export function registerCommercialSettlementJourney(harness: StepSixApiHarness) {
-  const { database, paidFixture, getLines, post, get, total, deposit } = harness;
+  const { database, paidFixture, getLines, post, get } = harness;
   it('settles the complete appendix, print, expense, invoice, balance and refund journey without rewriting history', async () => {
-    const { f, d } = await paidFixture(true);
+    const { f, d } = await paidFixture(true, getLines());
+    const { contractTotalVnd: total, depositAmountVnd: deposit } = d.contract.document;
     const servicePrice = d.contract.document.lines.find(
       (l) => l.category === 'SERVICE',
     )!.unitPriceVnd;
