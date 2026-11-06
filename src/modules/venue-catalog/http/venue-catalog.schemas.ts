@@ -60,6 +60,7 @@ export const updateRestaurantBodySchema = strictWriteSchema({
   address: trimmedText(1, 2_000),
   publicPhone: trimmedText(1, 250).nullable(),
   publicEmail: z.email().max(320).nullable(),
+  depositPercentage: z.number().int().min(10).max(100).optional(),
   expectedRevision: revisionSchema,
 });
 

@@ -3632,6 +3632,11 @@
           "address": {
             "type": "string"
           },
+          "depositPercentage": {
+            "maximum": 100,
+            "minimum": 10,
+            "type": "integer"
+          },
           "description": {
             "type": "string"
           },
@@ -9572,6 +9577,46 @@
                                   "null"
                                 ]
                               },
+                              "outstandingVnd": {
+                                "anyOf": [
+                                  {
+                                    "maximum": 9007199254740991,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "paidVnd": {
+                                "anyOf": [
+                                  {
+                                    "maximum": 9007199254740991,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "paymentStatus": {
+                                "anyOf": [
+                                  {
+                                    "enum": [
+                                      "PAID",
+                                      "DEBT",
+                                      "AWAITING_DEPOSIT",
+                                      "DRAFT"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
                               "phase": {
                                 "enum": [
                                   "DRAFT",
@@ -9865,6 +9910,46 @@
                               "type": [
                                 "string",
                                 "null"
+                              ]
+                            },
+                            "outstandingVnd": {
+                              "anyOf": [
+                                {
+                                  "maximum": 9007199254740991,
+                                  "minimum": 0,
+                                  "type": "integer"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "paidVnd": {
+                              "anyOf": [
+                                {
+                                  "maximum": 9007199254740991,
+                                  "minimum": 0,
+                                  "type": "integer"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "paymentStatus": {
+                              "anyOf": [
+                                {
+                                  "enum": [
+                                    "PAID",
+                                    "DEBT",
+                                    "AWAITING_DEPOSIT",
+                                    "DRAFT"
+                                  ],
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
                               ]
                             },
                             "phase": {
@@ -11137,6 +11222,9 @@
                                           "minLength": 1,
                                           "type": "string"
                                         },
+                                        "priceGuarantee": {
+                                          "type": "boolean"
+                                        },
                                         "quantity": {
                                           "exclusiveMinimum": 0,
                                           "maximum": 10000,
@@ -11210,6 +11298,9 @@
                                           "maxLength": 120,
                                           "minLength": 1,
                                           "type": "string"
+                                        },
+                                        "priceGuarantee": {
+                                          "type": "boolean"
                                         },
                                         "quantity": {
                                           "exclusiveMinimum": 0,
@@ -11389,6 +11480,9 @@
                                                     "maxLength": 120,
                                                     "minLength": 1,
                                                     "type": "string"
+                                                  },
+                                                  "priceGuarantee": {
+                                                    "type": "boolean"
                                                   },
                                                   "quantity": {
                                                     "exclusiveMinimum": 0,
@@ -11800,6 +11894,9 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
+                                      "priceGuarantee": {
+                                        "type": "boolean"
+                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -11873,6 +11970,9 @@
                                         "maxLength": 120,
                                         "minLength": 1,
                                         "type": "string"
+                                      },
+                                      "priceGuarantee": {
+                                        "type": "boolean"
                                       },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
@@ -12052,6 +12152,9 @@
                                                   "maxLength": 120,
                                                   "minLength": 1,
                                                   "type": "string"
+                                                },
+                                                "priceGuarantee": {
+                                                  "type": "boolean"
                                                 },
                                                 "quantity": {
                                                   "exclusiveMinimum": 0,
@@ -12418,6 +12521,9 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
+                                      "priceGuarantee": {
+                                        "type": "boolean"
+                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -12491,6 +12597,9 @@
                                         "maxLength": 120,
                                         "minLength": 1,
                                         "type": "string"
+                                      },
+                                      "priceGuarantee": {
+                                        "type": "boolean"
                                       },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
@@ -12670,6 +12779,9 @@
                                                   "maxLength": 120,
                                                   "minLength": 1,
                                                   "type": "string"
+                                                },
+                                                "priceGuarantee": {
+                                                  "type": "boolean"
                                                 },
                                                 "quantity": {
                                                   "exclusiveMinimum": 0,
@@ -13036,6 +13148,9 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
+                                      "priceGuarantee": {
+                                        "type": "boolean"
+                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -13109,6 +13224,9 @@
                                         "maxLength": 120,
                                         "minLength": 1,
                                         "type": "string"
+                                      },
+                                      "priceGuarantee": {
+                                        "type": "boolean"
                                       },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
@@ -13288,6 +13406,9 @@
                                                   "maxLength": 120,
                                                   "minLength": 1,
                                                   "type": "string"
+                                                },
+                                                "priceGuarantee": {
+                                                  "type": "boolean"
                                                 },
                                                 "quantity": {
                                                   "exclusiveMinimum": 0,
@@ -13634,6 +13755,9 @@
                                     "minLength": 1,
                                     "type": "string"
                                   },
+                                  "priceGuarantee": {
+                                    "type": "boolean"
+                                  },
                                   "quantity": {
                                     "exclusiveMinimum": 0,
                                     "maximum": 10000,
@@ -13894,6 +14018,9 @@
                                     "minLength": 1,
                                     "type": "string"
                                   },
+                                  "priceGuarantee": {
+                                    "type": "boolean"
+                                  },
                                   "quantity": {
                                     "exclusiveMinimum": 0,
                                     "maximum": 10000,
@@ -14123,6 +14250,9 @@
                                     "maxLength": 120,
                                     "minLength": 1,
                                     "type": "string"
+                                  },
+                                  "priceGuarantee": {
+                                    "type": "boolean"
                                   },
                                   "quantity": {
                                     "exclusiveMinimum": 0,
@@ -14370,6 +14500,9 @@
                                     "minLength": 1,
                                     "type": "string"
                                   },
+                                  "priceGuarantee": {
+                                    "type": "boolean"
+                                  },
                                   "quantity": {
                                     "exclusiveMinimum": 0,
                                     "maximum": 10000,
@@ -14491,6 +14624,9 @@
                                 "maxLength": 120,
                                 "minLength": 1,
                                 "type": "string"
+                              },
+                              "priceGuarantee": {
+                                "type": "boolean"
                               },
                               "quantity": {
                                 "exclusiveMinimum": 0,
@@ -14645,6 +14781,11 @@
                                     "maximum": 9007199254740991,
                                     "type": "integer"
                                   },
+                                  "depositRate": {
+                                    "maximum": 100,
+                                    "minimum": 10,
+                                    "type": "integer"
+                                  },
                                   "eventDate": {
                                     "format": "date",
                                     "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -14702,6 +14843,9 @@
                                           "minLength": 1,
                                           "type": "string"
                                         },
+                                        "priceGuarantee": {
+                                          "type": "boolean"
+                                        },
                                         "quantity": {
                                           "exclusiveMinimum": 0,
                                           "maximum": 10000,
@@ -14758,6 +14902,9 @@
                                     "maximum": 9007199254740991,
                                     "minimum": 0,
                                     "type": "integer"
+                                  },
+                                  "priceGuaranteed": {
+                                    "type": "boolean"
                                   },
                                   "restaurantAddress": {
                                     "maxLength": 500,
@@ -15250,6 +15397,11 @@
                                   "maximum": 9007199254740991,
                                   "type": "integer"
                                 },
+                                "depositRate": {
+                                  "maximum": 100,
+                                  "minimum": 10,
+                                  "type": "integer"
+                                },
                                 "eventDate": {
                                   "format": "date",
                                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -15307,6 +15459,9 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
+                                      "priceGuarantee": {
+                                        "type": "boolean"
+                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -15363,6 +15518,9 @@
                                   "maximum": 9007199254740991,
                                   "minimum": 0,
                                   "type": "integer"
+                                },
+                                "priceGuaranteed": {
+                                  "type": "boolean"
                                 },
                                 "restaurantAddress": {
                                   "maxLength": 500,
@@ -15735,6 +15893,11 @@
                               "maximum": 9007199254740991,
                               "type": "integer"
                             },
+                            "depositRate": {
+                              "maximum": 100,
+                              "minimum": 10,
+                              "type": "integer"
+                            },
                             "eventDate": {
                               "format": "date",
                               "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -15792,6 +15955,9 @@
                                     "minLength": 1,
                                     "type": "string"
                                   },
+                                  "priceGuarantee": {
+                                    "type": "boolean"
+                                  },
                                   "quantity": {
                                     "exclusiveMinimum": 0,
                                     "maximum": 10000,
@@ -15848,6 +16014,9 @@
                               "maximum": 9007199254740991,
                               "minimum": 0,
                               "type": "integer"
+                            },
+                            "priceGuaranteed": {
+                              "type": "boolean"
                             },
                             "restaurantAddress": {
                               "maxLength": 500,
@@ -16157,6 +16326,11 @@
                                   "maximum": 9007199254740991,
                                   "type": "integer"
                                 },
+                                "depositRate": {
+                                  "maximum": 100,
+                                  "minimum": 10,
+                                  "type": "integer"
+                                },
                                 "eventDate": {
                                   "format": "date",
                                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -16214,6 +16388,9 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
+                                      "priceGuarantee": {
+                                        "type": "boolean"
+                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -16270,6 +16447,9 @@
                                   "maximum": 9007199254740991,
                                   "minimum": 0,
                                   "type": "integer"
+                                },
+                                "priceGuaranteed": {
+                                  "type": "boolean"
                                 },
                                 "restaurantAddress": {
                                   "maxLength": 500,
@@ -16659,6 +16839,11 @@
                                   "maximum": 9007199254740991,
                                   "type": "integer"
                                 },
+                                "depositRate": {
+                                  "maximum": 100,
+                                  "minimum": 10,
+                                  "type": "integer"
+                                },
                                 "eventDate": {
                                   "format": "date",
                                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -16716,6 +16901,9 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
+                                      "priceGuarantee": {
+                                        "type": "boolean"
+                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -16772,6 +16960,9 @@
                                   "maximum": 9007199254740991,
                                   "minimum": 0,
                                   "type": "integer"
+                                },
+                                "priceGuaranteed": {
+                                  "type": "boolean"
                                 },
                                 "restaurantAddress": {
                                   "maxLength": 500,
@@ -17238,6 +17429,11 @@
                                   "maximum": 9007199254740991,
                                   "type": "integer"
                                 },
+                                "depositRate": {
+                                  "maximum": 100,
+                                  "minimum": 10,
+                                  "type": "integer"
+                                },
                                 "eventDate": {
                                   "format": "date",
                                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -17295,6 +17491,9 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
+                                      "priceGuarantee": {
+                                        "type": "boolean"
+                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -17351,6 +17550,9 @@
                                   "maximum": 9007199254740991,
                                   "minimum": 0,
                                   "type": "integer"
+                                },
+                                "priceGuaranteed": {
+                                  "type": "boolean"
                                 },
                                 "restaurantAddress": {
                                   "maxLength": 500,
@@ -17740,6 +17942,11 @@
                                   "maximum": 9007199254740991,
                                   "type": "integer"
                                 },
+                                "depositRate": {
+                                  "maximum": 100,
+                                  "minimum": 10,
+                                  "type": "integer"
+                                },
                                 "eventDate": {
                                   "format": "date",
                                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -17797,6 +18004,9 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
+                                      "priceGuarantee": {
+                                        "type": "boolean"
+                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -17853,6 +18063,9 @@
                                   "maximum": 9007199254740991,
                                   "minimum": 0,
                                   "type": "integer"
+                                },
+                                "priceGuaranteed": {
+                                  "type": "boolean"
                                 },
                                 "restaurantAddress": {
                                   "maxLength": 500,
@@ -18299,6 +18512,9 @@
                                                     "minLength": 1,
                                                     "type": "string"
                                                   },
+                                                  "priceGuarantee": {
+                                                    "type": "boolean"
+                                                  },
                                                   "quantity": {
                                                     "exclusiveMinimum": 0,
                                                     "maximum": 10000,
@@ -18372,6 +18588,9 @@
                                                     "maxLength": 120,
                                                     "minLength": 1,
                                                     "type": "string"
+                                                  },
+                                                  "priceGuarantee": {
+                                                    "type": "boolean"
                                                   },
                                                   "quantity": {
                                                     "exclusiveMinimum": 0,
@@ -18540,6 +18759,11 @@
                                             "maximum": 9007199254740991,
                                             "type": "integer"
                                           },
+                                          "depositRate": {
+                                            "maximum": 100,
+                                            "minimum": 10,
+                                            "type": "integer"
+                                          },
                                           "eventDate": {
                                             "format": "date",
                                             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -18597,6 +18821,9 @@
                                                   "minLength": 1,
                                                   "type": "string"
                                                 },
+                                                "priceGuarantee": {
+                                                  "type": "boolean"
+                                                },
                                                 "quantity": {
                                                   "exclusiveMinimum": 0,
                                                   "maximum": 10000,
@@ -18653,6 +18880,9 @@
                                             "maximum": 9007199254740991,
                                             "minimum": 0,
                                             "type": "integer"
+                                          },
+                                          "priceGuaranteed": {
+                                            "type": "boolean"
                                           },
                                           "restaurantAddress": {
                                             "maxLength": 500,
@@ -19189,6 +19419,9 @@
                                               "minLength": 1,
                                               "type": "string"
                                             },
+                                            "priceGuarantee": {
+                                              "type": "boolean"
+                                            },
                                             "quantity": {
                                               "exclusiveMinimum": 0,
                                               "maximum": 10000,
@@ -19262,6 +19495,9 @@
                                               "maxLength": 120,
                                               "minLength": 1,
                                               "type": "string"
+                                            },
+                                            "priceGuarantee": {
+                                              "type": "boolean"
                                             },
                                             "quantity": {
                                               "exclusiveMinimum": 0,
@@ -19430,6 +19666,11 @@
                                       "maximum": 9007199254740991,
                                       "type": "integer"
                                     },
+                                    "depositRate": {
+                                      "maximum": 100,
+                                      "minimum": 10,
+                                      "type": "integer"
+                                    },
                                     "eventDate": {
                                       "format": "date",
                                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -19487,6 +19728,9 @@
                                             "minLength": 1,
                                             "type": "string"
                                           },
+                                          "priceGuarantee": {
+                                            "type": "boolean"
+                                          },
                                           "quantity": {
                                             "exclusiveMinimum": 0,
                                             "maximum": 10000,
@@ -19543,6 +19787,9 @@
                                       "maximum": 9007199254740991,
                                       "minimum": 0,
                                       "type": "integer"
+                                    },
+                                    "priceGuaranteed": {
+                                      "type": "boolean"
                                     },
                                     "restaurantAddress": {
                                       "maxLength": 500,
@@ -27932,6 +28179,9 @@
                                   "minLength": 1,
                                   "type": "string"
                                 },
+                                "priceGuarantee": {
+                                  "type": "boolean"
+                                },
                                 "quantity": {
                                   "exclusiveMinimum": 0,
                                   "maximum": 10000,
@@ -28957,6 +29207,9 @@
                                               "minLength": 1,
                                               "type": "string"
                                             },
+                                            "priceGuarantee": {
+                                              "type": "boolean"
+                                            },
                                             "quantity": {
                                               "exclusiveMinimum": 0,
                                               "maximum": 10000,
@@ -29263,6 +29516,9 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
+                                      "priceGuarantee": {
+                                        "type": "boolean"
+                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -29566,6 +29822,9 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
+                                      "priceGuarantee": {
+                                        "type": "boolean"
+                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -29843,6 +30102,9 @@
                                         "maxLength": 120,
                                         "minLength": 1,
                                         "type": "string"
+                                      },
+                                      "priceGuarantee": {
+                                        "type": "boolean"
                                       },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
@@ -36292,6 +36554,39 @@
                           },
                           "type": "array"
                         },
+                        "hallRevenues": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "bookingCount": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "hallId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "hallName": {
+                                "type": "string"
+                              },
+                              "revenueVnd": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "hallId",
+                              "hallName",
+                              "revenueVnd",
+                              "bookingCount"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "hallUtilization": {
                           "additionalProperties": false,
                           "properties": {
@@ -36939,6 +37234,39 @@
                             }
                           ]
                         },
+                        "hallRevenues": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "bookingCount": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "hallId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "hallName": {
+                                "type": "string"
+                              },
+                              "revenueVnd": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "hallId",
+                              "hallName",
+                              "revenueVnd",
+                              "bookingCount"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "hallUtilization": {
                           "additionalProperties": false,
                           "properties": {
@@ -37585,6 +37913,39 @@
                               "type": "null"
                             }
                           ]
+                        },
+                        "hallRevenues": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "bookingCount": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "hallId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "hallName": {
+                                "type": "string"
+                              },
+                              "revenueVnd": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "hallId",
+                              "hallName",
+                              "revenueVnd",
+                              "bookingCount"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
                         },
                         "hallUtilization": {
                           "additionalProperties": false,
@@ -39493,6 +39854,19 @@
           },
           {
             "in": "query",
+            "name": "paymentStatus",
+            "schema": {
+              "default": "ALL",
+              "enum": [
+                "ALL",
+                "PAID",
+                "DEBT"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
             "name": "sort",
             "schema": {
               "default": "recency",
@@ -39646,6 +40020,46 @@
                                 "type": [
                                   "string",
                                   "null"
+                                ]
+                              },
+                              "outstandingVnd": {
+                                "anyOf": [
+                                  {
+                                    "maximum": 9007199254740991,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "paidVnd": {
+                                "anyOf": [
+                                  {
+                                    "maximum": 9007199254740991,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "paymentStatus": {
+                                "anyOf": [
+                                  {
+                                    "enum": [
+                                      "PAID",
+                                      "DEBT",
+                                      "AWAITING_DEPOSIT",
+                                      "DRAFT"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
                                 ]
                               },
                               "phase": {
@@ -40670,6 +41084,9 @@
                                               "minLength": 1,
                                               "type": "string"
                                             },
+                                            "priceGuarantee": {
+                                              "type": "boolean"
+                                            },
                                             "quantity": {
                                               "exclusiveMinimum": 0,
                                               "maximum": 10000,
@@ -40743,6 +41160,9 @@
                                               "maxLength": 120,
                                               "minLength": 1,
                                               "type": "string"
+                                            },
+                                            "priceGuarantee": {
+                                              "type": "boolean"
                                             },
                                             "quantity": {
                                               "exclusiveMinimum": 0,
@@ -40911,6 +41331,11 @@
                                       "maximum": 9007199254740991,
                                       "type": "integer"
                                     },
+                                    "depositRate": {
+                                      "maximum": 100,
+                                      "minimum": 10,
+                                      "type": "integer"
+                                    },
                                     "eventDate": {
                                       "format": "date",
                                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -40968,6 +41393,9 @@
                                             "minLength": 1,
                                             "type": "string"
                                           },
+                                          "priceGuarantee": {
+                                            "type": "boolean"
+                                          },
                                           "quantity": {
                                             "exclusiveMinimum": 0,
                                             "maximum": 10000,
@@ -41024,6 +41452,9 @@
                                       "maximum": 9007199254740991,
                                       "minimum": 0,
                                       "type": "integer"
+                                    },
+                                    "priceGuaranteed": {
+                                      "type": "boolean"
                                     },
                                     "restaurantAddress": {
                                       "maxLength": 500,
@@ -42421,6 +42852,9 @@
                                               "minLength": 1,
                                               "type": "string"
                                             },
+                                            "priceGuarantee": {
+                                              "type": "boolean"
+                                            },
                                             "quantity": {
                                               "exclusiveMinimum": 0,
                                               "maximum": 10000,
@@ -42494,6 +42928,9 @@
                                               "maxLength": 120,
                                               "minLength": 1,
                                               "type": "string"
+                                            },
+                                            "priceGuarantee": {
+                                              "type": "boolean"
                                             },
                                             "quantity": {
                                               "exclusiveMinimum": 0,
@@ -42662,6 +43099,11 @@
                                       "maximum": 9007199254740991,
                                       "type": "integer"
                                     },
+                                    "depositRate": {
+                                      "maximum": 100,
+                                      "minimum": 10,
+                                      "type": "integer"
+                                    },
                                     "eventDate": {
                                       "format": "date",
                                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -42719,6 +43161,9 @@
                                             "minLength": 1,
                                             "type": "string"
                                           },
+                                          "priceGuarantee": {
+                                            "type": "boolean"
+                                          },
                                           "quantity": {
                                             "exclusiveMinimum": 0,
                                             "maximum": 10000,
@@ -42775,6 +43220,9 @@
                                       "maximum": 9007199254740991,
                                       "minimum": 0,
                                       "type": "integer"
+                                    },
+                                    "priceGuaranteed": {
+                                      "type": "boolean"
                                     },
                                     "restaurantAddress": {
                                       "maxLength": 500,
@@ -47358,6 +47806,11 @@
                         "address": {
                           "type": "string"
                         },
+                        "depositPercentage": {
+                          "maximum": 100,
+                          "minimum": 10,
+                          "type": "integer"
+                        },
                         "description": {
                           "type": "string"
                         },
@@ -47468,6 +47921,11 @@
                     "minLength": 1,
                     "type": "string"
                   },
+                  "depositPercentage": {
+                    "maximum": 100,
+                    "minimum": 10,
+                    "type": "integer"
+                  },
                   "description": {
                     "maxLength": 2000,
                     "minLength": 0,
@@ -47535,6 +47993,11 @@
                       "properties": {
                         "address": {
                           "type": "string"
+                        },
+                        "depositPercentage": {
+                          "maximum": 100,
+                          "minimum": 10,
+                          "type": "integer"
                         },
                         "description": {
                           "type": "string"

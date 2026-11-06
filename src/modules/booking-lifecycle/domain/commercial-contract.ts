@@ -43,6 +43,7 @@ export const contractLineSchema = commercialSelectionSchema.extend({
   unit: text(80).min(1),
   unitPriceVnd: vnd,
   lineTotalVnd: vnd,
+  priceGuarantee: z.boolean().optional(),
 });
 export const customerSelectionViewSchema = z.strictObject({
   revisionId: z.uuid().nullable(),
@@ -84,6 +85,8 @@ export const contractDocumentSchema = z.strictObject({
   lines: z.array(contractLineSchema).min(1).max(50),
   contractTotalVnd: vnd.positive(),
   depositAmountVnd: vnd.positive(),
+  depositRate: z.int().min(10).max(100).optional(),
+  priceGuaranteed: z.boolean().optional(),
   incidentalClause: z.literal(INCIDENTAL_CLAUSE),
   standardTerms: z
     .strictObject({
@@ -183,8 +186,9 @@ export function checkedSum(values: readonly number[]): number {
   if (sum > BigInt(Number.MAX_SAFE_INTEGER)) throw commercialConflict('COMMERCIAL_AMOUNT_OVERFLOW');
   return Number(sum);
 }
-export function contractDeposit(total: number): number {
-  const amount = (BigInt(vnd.positive().parse(total)) * 30n + 99n) / 100n;
+export function contractDeposit(total: number, depositRate: number = 30): number {
+  const rate = BigInt(Math.max(1, Math.min(100, Math.round(depositRate))));
+  const amount = (BigInt(vnd.positive().parse(total)) * rate + 99n) / 100n;
   return Number(amount);
 }
 export function documentDigest(document: ContractDocument): string {

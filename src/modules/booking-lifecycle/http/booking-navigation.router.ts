@@ -31,6 +31,11 @@ const selection = {
   hallId: true,
   consultationId: true,
   proposalSnapshot: { select: { hallName: true, tableCount: true } },
+  commercialContract: {
+    select: {
+      currentRevision: { select: { contractTotalVnd: true } },
+    },
+  },
   consultation: {
     select: {
       displayName: true,
@@ -72,26 +77,82 @@ async function rowsDto(tx: Prisma.TransactionClient, rows: Row[], includeManager
       })
     : [];
   const emails = new Map(managers.map((a) => [a.id, a.displayEmail]));
-  return rows.map((r) => ({
-    bookingId: r.id,
-    bookingCode: r.bookingCode,
-    alias: r.alias,
-    eventDate: r.eventDate.toISOString().slice(0, 10),
-    hallId: r.hallId,
-    hallNameSnapshot: r.proposalSnapshot?.hallName ?? '',
-    shiftCode: r.shiftCode,
-    phase: r.phase,
-    tableCount: r.proposalSnapshot?.tableCount ?? 0,
-    createdAt: r.createdAt.toISOString(),
-    cancelledAt: r.cancelledAt?.toISOString() ?? null,
-    customerName: r.consultation.displayName,
-    brideName: r.consultation.brideName,
-    groomName: r.consultation.groomName,
-    phone: r.consultation.intakeRequest?.phone ?? null,
-    email: r.consultation.intendedEmail,
-    managerAccountId: includeManagerIdentity ? r.consultation.managerAccountId : null,
-    managerEmail: emails.get(r.consultation.managerAccountId) ?? null,
-  }));
+
+  const bookingIds = rows.map((r) => r.id);
+  const ledgerEntries = await tx.billingLedgerEntry.findMany({
+    where: { bookingId: { in: bookingIds } },
+    select: { bookingId: true, kind: true, amountVnd: true },
+  });
+
+  const billingMap = new Map<string, { paid: number; charges: number }>();
+  for (const entry of ledgerEntries) {
+    const cur = billingMap.get(entry.bookingId) ?? { paid: 0, charges: 0 };
+    const amount = Number(entry.amountVnd);
+    if (entry.kind === 'PAYMENT') cur.paid += amount;
+    else if (entry.kind === 'REFUND') cur.paid -= amount;
+    else if (entry.kind === 'CHARGE') cur.charges += amount;
+    billingMap.set(entry.bookingId, cur);
+  }
+
+  return rows.map((r) => {
+    const bill = billingMap.get(r.id);
+    let paymentStatus: 'PAID' | 'DEBT' | 'AWAITING_DEPOSIT' | 'DRAFT' | null = null;
+    let paidVnd: number | null = bill ? bill.paid : null;
+    let outstandingVnd: number | null = null;
+
+    const contractTotal = r.commercialContract?.currentRevision?.contractTotalVnd
+      ? Number(r.commercialContract.currentRevision.contractTotalVnd)
+      : null;
+
+    if (bill && bill.charges > 0) {
+      outstandingVnd = Math.max(0, bill.charges - bill.paid);
+      paymentStatus = outstandingVnd === 0 ? 'PAID' : 'DEBT';
+    } else if (contractTotal !== null && contractTotal > 0) {
+      const paid = bill ? bill.paid : 0;
+      outstandingVnd = Math.max(0, contractTotal - paid);
+      paymentStatus =
+        outstandingVnd === 0
+          ? 'PAID'
+          : r.phase === 'DRAFT'
+            ? 'DRAFT'
+            : r.phase === 'AWAITING_DEPOSIT'
+              ? 'AWAITING_DEPOSIT'
+              : 'DEBT';
+    } else if (r.phase === 'COMPLETED') {
+      paymentStatus = 'PAID';
+      outstandingVnd = 0;
+    } else if (r.phase === 'CONFIRMED') {
+      paymentStatus = 'DEBT';
+    } else if (r.phase === 'AWAITING_DEPOSIT') {
+      paymentStatus = 'AWAITING_DEPOSIT';
+    } else if (r.phase === 'DRAFT') {
+      paymentStatus = 'DRAFT';
+    }
+
+    return {
+      bookingId: r.id,
+      bookingCode: r.bookingCode,
+      alias: r.alias,
+      eventDate: r.eventDate.toISOString().slice(0, 10),
+      hallId: r.hallId,
+      hallNameSnapshot: r.proposalSnapshot?.hallName ?? '',
+      shiftCode: r.shiftCode,
+      phase: r.phase,
+      tableCount: r.proposalSnapshot?.tableCount ?? 0,
+      createdAt: r.createdAt.toISOString(),
+      cancelledAt: r.cancelledAt?.toISOString() ?? null,
+      customerName: r.consultation.displayName,
+      brideName: r.consultation.brideName,
+      groomName: r.consultation.groomName,
+      phone: r.consultation.intakeRequest?.phone ?? null,
+      email: r.consultation.intendedEmail,
+      managerAccountId: includeManagerIdentity ? r.consultation.managerAccountId : null,
+      managerEmail: emails.get(r.consultation.managerAccountId) ?? null,
+      paidVnd,
+      outstandingVnd,
+      paymentStatus,
+    };
+  });
 }
 const bounds = (requested: number, total: number, size: number) => ({
   page: Math.min(requested, Math.max(1, Math.ceil(total / size))),
@@ -149,13 +210,27 @@ export function createBookingNavigationRouter(
               : { [q.sort]: q.order };
       const data = await prisma.$transaction(
         async (tx) => {
-          const [total, all, mine] = await Promise.all([
-            tx.booking.count({ where }),
+          const [all, mine] = await Promise.all([
             tx.booking.count({ where: base }),
             tx.booking.count({
               where: { ...base, consultation: { managerAccountId: actor(res).accountId } },
             }),
           ]);
+
+          if (q.paymentStatus && q.paymentStatus !== 'ALL') {
+            const allMatchingRows = await tx.booking.findMany({
+              where,
+              select: selection,
+              orderBy: [sort, { id: q.order }],
+            });
+            const allDtos = await rowsDto(tx, allMatchingRows);
+            const filtered = allDtos.filter((item) => item.paymentStatus === q.paymentStatus);
+            const paging = bounds(q.page, filtered.length, q.pageSize);
+            const items = filtered.slice((paging.page - 1) * q.pageSize, paging.page * q.pageSize);
+            return { ...paging, counts: { all, mine }, items };
+          }
+
+          const total = await tx.booking.count({ where });
           const paging = bounds(q.page, total, q.pageSize);
           const rows = await tx.booking.findMany({
             where,

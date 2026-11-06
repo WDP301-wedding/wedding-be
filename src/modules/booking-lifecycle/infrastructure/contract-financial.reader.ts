@@ -44,7 +44,7 @@ export function createContractFinancialReader(
         new Set(row.approvals.map((approval) => approval.actorAccountId)).size !== 2 ||
         document.contractTotalVnd !== row.contractTotalVnd.toNumber() ||
         checkedSum(document.lines.map((line) => line.lineTotalVnd)) !== document.contractTotalVnd ||
-        contractDeposit(document.contractTotalVnd) !== row.depositAmountVnd.toNumber()
+        contractDeposit(document.contractTotalVnd, document.depositRate ?? 30) !== row.depositAmountVnd.toNumber()
       )
         throw commercialConflict('CONTRACT_APPROVAL_REQUIRED');
       return deepFreeze({

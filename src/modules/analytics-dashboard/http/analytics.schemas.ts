@@ -111,6 +111,12 @@ const utilization = z.strictObject({
   rate: z.number().min(0).max(1).nullable(),
   status: z.enum(['READY', 'SOURCE_NOT_READY', 'NO_AVAILABLE_SLOTS']),
 });
+export const hallRevenueSchema = z.strictObject({
+  hallId: z.uuid(),
+  hallName: z.string(),
+  revenueVnd: vnd,
+  bookingCount: count,
+});
 export const analyticsResultSchemas = {
   overview: z.strictObject({
     meta: analyticsMetaSchema,
@@ -119,6 +125,7 @@ export const analyticsResultSchemas = {
     hallUtilization: utilization,
     menuPopularity: z.array(popularity),
     servicePopularity: z.array(popularity),
+    hallRevenues: z.array(hallRevenueSchema).optional(),
   }),
   revenue: z.strictObject({ meta: analyticsMetaSchema, ...cashSchema.shape }),
   bookings: z.strictObject({
@@ -129,6 +136,7 @@ export const analyticsResultSchemas = {
     hallUtilization: utilization,
     menuPopularity: z.array(popularity),
     servicePopularity: z.array(popularity),
+    hallRevenues: z.array(hallRevenueSchema).optional(),
   }),
   attendance: z.strictObject({
     meta: analyticsMetaSchema,

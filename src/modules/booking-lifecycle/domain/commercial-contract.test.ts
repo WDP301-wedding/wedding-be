@@ -26,6 +26,11 @@ describe('commercial contract arithmetic and canonical identity', () => {
   ])('rounds 30 percent upward for %i', (total, expected) => {
     expect(contractDeposit(total)).toBe(expected);
   });
+  it('calculates custom deposit rate correctly', () => {
+    expect(contractDeposit(10000000, 50)).toBe(5000000);
+    expect(contractDeposit(10000000, 20)).toBe(2000000);
+    expect(contractDeposit(10000000, 100)).toBe(10000000);
+  });
   it('rejects nonpositive or fractional deposit bases', () => {
     for (const invalid of [0, -1, 0.5]) expect(() => contractDeposit(invalid)).toThrow();
   });

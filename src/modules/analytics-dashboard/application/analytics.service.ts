@@ -446,10 +446,31 @@ export class AnalyticsService {
         }))
         .sort(
           (a, b) =>
+            b.bookingCount - a.bookingCount ||
+            b.quantity - a.quantity ||
             a.sourceId.localeCompare(b.sourceId) ||
             String(a.sourceRevisionId).localeCompare(String(b.sourceRevisionId)),
         );
     };
+    const hallRevenueMap = new Map<
+      string,
+      { hallId: string; hallName: string; revenueVnd: number; bookingCount: number }
+    >();
+    for (const b of committed) {
+      const cur = hallRevenueMap.get(b.hallId) ?? {
+        hallId: b.hallId,
+        hallName: b.hallNameSnapshot || 'Sảnh tiệc',
+        revenueVnd: 0,
+        bookingCount: 0,
+      };
+      cur.bookingCount += 1;
+      cur.revenueVnd = sumVnd([
+        cur.revenueVnd,
+        b.effectiveAgreedTotalVnd ?? b.originalContractTotalVnd ?? 0,
+      ]);
+      hallRevenueMap.set(b.hallId, cur);
+    }
+    const hallRevenues = [...hallRevenueMap.values()].sort((a, b) => b.revenueVnd - a.revenueVnd);
     const occupied = new Set(
       all
         .filter(
@@ -487,6 +508,7 @@ export class AnalyticsService {
       bookingStatusCounts: this.counts(selected.map((b) => b.phase)),
       menuPopularity: popularity('MENU'),
       servicePopularity: popularity('SERVICE'),
+      hallRevenues,
       hallUtilization: {
         occupiedSlots: occupied,
         availableSlots: ready ? available : null,

@@ -20,6 +20,7 @@ export interface RestaurantProfileView {
   readonly address: string;
   readonly publicPhone: string | null;
   readonly publicEmail: string | null;
+  readonly depositPercentage?: number | undefined;
   readonly revision: number;
 }
 
@@ -70,6 +71,7 @@ export interface UpdateRestaurantProfileInput {
   readonly address: string;
   readonly publicPhone: string | null;
   readonly publicEmail: string | null;
+  readonly depositPercentage?: number | undefined;
   readonly expectedRevision: number;
   readonly context: CatalogMutationContext;
 }
@@ -136,14 +138,29 @@ export function createVenueService(prisma: PrismaClient): VenueService {
     },
 
     async updateRestaurantProfile(input) {
-      const values = {
-        displayName: validateCatalogName(input.displayName),
-        description: validateCatalogDescription(input.description),
-        address: requireBoundedText('address', input.address, 1, 2_000),
-        publicPhone: optionalText(input.publicPhone, 250),
-        publicEmail: optionalText(input.publicEmail, 320),
-      };
       return prisma.$transaction(async (transaction) => {
+        let depositRate = input.depositPercentage;
+        if (depositRate === undefined && typeof (transaction.restaurantProfile as any)?.findUnique === 'function') {
+          const current = await transaction.restaurantProfile.findUnique({
+            where: { singletonKey: 'RESTAURANT' },
+            select: { description: true },
+          });
+          const match = current?.description?.match(/<!--DEPOSIT_RATE:(\d+)-->/);
+          if (match && match[1]) {
+            depositRate = Math.min(100, Math.max(10, parseInt(match[1], 10)));
+          }
+        }
+        let rawDescription = input.description.replace(/\s*<!--DEPOSIT_RATE:\d+-->/g, '').trim();
+        if (depositRate !== undefined) {
+          rawDescription = `${rawDescription}\n<!--DEPOSIT_RATE:${depositRate}-->`;
+        }
+        const values = {
+          displayName: validateCatalogName(input.displayName),
+          description: validateCatalogDescription(rawDescription),
+          address: requireBoundedText('address', input.address, 1, 2_000),
+          publicPhone: optionalText(input.publicPhone, 250),
+          publicEmail: optionalText(input.publicEmail, 320),
+        };
         const result = await transaction.restaurantProfile.updateMany({
           where: { singletonKey: 'RESTAURANT', revision: input.expectedRevision },
           data: {
@@ -427,13 +444,18 @@ function toRestaurantView(profile: {
   publicEmail: string | null;
   revision: number;
 }): RestaurantProfileView {
+  const match = profile.description.match(/<!--DEPOSIT_RATE:(\d+)-->/);
+  const depositPercentage =
+    match && match[1] ? Math.min(100, Math.max(10, parseInt(match[1], 10))) : undefined;
+  const cleanDescription = profile.description.replace(/\s*<!--DEPOSIT_RATE:\d+-->/g, '').trim();
   return Object.freeze({
     id: profile.id,
     displayName: profile.displayName,
-    description: profile.description,
+    description: cleanDescription,
     address: profile.address,
     publicPhone: profile.publicPhone,
     publicEmail: profile.publicEmail,
+    ...(depositPercentage !== undefined ? { depositPercentage } : {}),
     revision: profile.revision,
   });
 }

@@ -81,6 +81,7 @@ const publicRestaurantSchema = z.strictObject({
   address: z.string(),
   publicPhone: z.string().nullable(),
   publicEmail: z.email().nullable(),
+  depositPercentage: z.number().int().min(10).max(100).optional(),
   shifts: z.array(
     z.strictObject({
       code: z.enum(['LUNCH', 'DINNER']),

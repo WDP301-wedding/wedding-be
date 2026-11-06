@@ -9,6 +9,7 @@ export const numberPageQuery = z.strictObject({
 export const bookingPageQuery = numberPageQuery.extend({
   scope: z.enum(['mine', 'all']).default('all'),
   phase: z.enum(['ALL', 'DRAFT', 'AWAITING_DEPOSIT', 'CONFIRMED', 'COMPLETED']).default('ALL'),
+  paymentStatus: z.enum(['ALL', 'PAID', 'DEBT']).default('ALL').optional(),
   sort: z
     .enum(['recency', 'eventDate', 'hallName', 'shiftCode', 'tableCount', 'phase'])
     .default('recency'),
@@ -28,6 +29,9 @@ export const navigationRowSchema = bookingRowSchema.extend({
   managerAccountId: z.uuid().nullable(),
   managerEmail: z.string().nullable(),
   cancelledAt: z.iso.datetime().nullable(),
+  paidVnd: z.number().int().nonnegative().nullable().optional(),
+  outstandingVnd: z.number().int().nonnegative().nullable().optional(),
+  paymentStatus: z.enum(['PAID', 'DEBT', 'AWAITING_DEPOSIT', 'DRAFT']).nullable().optional(),
 });
 const pageFields = {
   page: z.int().positive(),
