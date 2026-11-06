@@ -85,6 +85,29 @@ export const contractDocumentSchema = z.strictObject({
   contractTotalVnd: vnd.positive(),
   depositAmountVnd: vnd.positive(),
   incidentalClause: z.literal(INCIDENTAL_CLAUSE),
+  standardTerms: z
+    .strictObject({
+      version: z.literal('WEDDING_STANDARD_V1'),
+      reserveMenu: z.strictObject({
+        versionId: z.uuid(),
+        name: text(120).min(1),
+        dishes: z.array(text(120).min(1)).min(1),
+      }),
+      orderedMenus: z
+        .array(
+          z.strictObject({
+            versionId: z.uuid(),
+            dishes: z.array(text(120).min(1)).min(1),
+          }),
+        )
+        .max(50),
+    })
+    .meta({
+      id: 'WeddingStandardContractTerms',
+      description:
+        'Versioned contract terms and immutable catalog menu facts. Absent on earlier contract revisions.',
+    })
+    .optional(),
 });
 export const contractPreviewResponseSchema = z.strictObject({
   data: z.strictObject({ bookingRevision: z.int().positive(), document: contractDocumentSchema }),
@@ -140,6 +163,12 @@ export const contractResponseSchema = z.strictObject({
 export type ContractDocument = Readonly<z.infer<typeof contractDocumentSchema>>;
 export type ContractView = z.infer<typeof contractViewSchema>;
 export type CommercialSelection = z.infer<typeof commercialSelectionSchema>;
+export function isLockedStandardContract(revision: { state: string; document: unknown }) {
+  return (
+    revision.state === 'APPROVED' &&
+    contractDocumentSchema.parse(revision.document).standardTerms !== undefined
+  );
+}
 export function commercialConflict(code: string) {
   return new AppError({
     status: 409,

@@ -50,6 +50,33 @@ describe('private Vietnamese contract PDF output', () => {
     const result = await renderContractPdf(v);
     expect(result.bytes.toString('latin1').match(/\/Type \/Page\b/g)?.length).toBeGreaterThan(2);
   });
+  it('prints the frozen standard terms and two handwritten signature areas', async () => {
+    const view = fixture('AWAITING_APPROVAL');
+    Object.assign(view.document, {
+      standardTerms: {
+        version: 'WEDDING_STANDARD_V1',
+        reserveMenu: { versionId: randomUUID(), name: 'Gói Sen', dishes: ['Súp bắp'] },
+        orderedMenus: [],
+      },
+    });
+    const rendered = vi.spyOn(PDFDocument.prototype, 'text');
+    await renderContractPdf(view);
+    const output = rendered.mock.calls.map(([value]) => value).join('\n');
+    for (const text of [
+      'Bản xem trước',
+      'đã bao gồm thuế GTGT',
+      '02 bàn dự phòng',
+      'Gói Sen',
+      'Súp bắp',
+      'Tất toán sau tiệc',
+      '24.500.000',
+      'Điều 10.',
+      'ĐẠI DIỆN BÊN A',
+      'ĐẠI DIỆN BÊN B',
+      'Ký, ghi rõ họ tên',
+    ])
+      expect(output).toContain(text);
+  });
   it('rejects an oversized emitted document instead of returning it', async () => {
     const prototype = PDFDocument.prototype as InstanceType<typeof PDFDocument>;
     const original = Reflect.get(prototype, 'end');

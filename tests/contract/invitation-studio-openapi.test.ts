@@ -30,10 +30,28 @@ describe('SPEC-05 W2/W3 implemented external schemas', () => {
       '/public/invitation-assets/{slug}',
     ])
       expect(paths[path]!.get!.security).toEqual([]);
-    const publicDto = JSON.stringify(document.components!.schemas!['PublicWeddingInvitation']);
+    const schema = document.components!.schemas!['PublicWeddingInvitation'];
+    const publicDto = JSON.stringify(schema);
     expect(publicDto).toContain('genericQrPayload');
+    expect(schema).toHaveProperty(
+      'properties.data.properties.seating.anyOf.0.items',
+      expect.objectContaining({
+        additionalProperties: false,
+        required: [
+          'tableLabel',
+          'shape',
+          'x',
+          'y',
+          'width',
+          'height',
+          'rotationDegrees',
+          'guestGroupName',
+          'color',
+        ],
+      }),
+    );
     expect(publicDto).not.toMatch(
-      /bookingId|derivedAssetIds|objectKey|signedUrl|guestGroup|billing|accessToken/u,
+      /bookingId|derivedAssetIds|objectKey|signedUrl|guestGroupId|guestId|guestName|email|phone|billing|accessToken/u,
     );
     expect(paths['/public/invitations/{slug}/qr']!.get!.responses!['200']).toHaveProperty(
       'content.image/png',

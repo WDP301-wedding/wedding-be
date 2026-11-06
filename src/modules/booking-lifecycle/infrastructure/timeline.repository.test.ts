@@ -235,6 +235,7 @@ describe('PrismaTimelineRepository', () => {
 
 function fixture() {
   return {
+    commercialContract: { findUnique: vi.fn().mockResolvedValue(null) },
     booking: {
       findUnique: vi.fn().mockResolvedValue({
         id: revision.bookingId,

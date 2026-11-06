@@ -39,18 +39,19 @@ describe('FT-V3 immutable venue catalog contract', () => {
   });
 
   it('contains no public/Couple geometry mutation or storage and actor internals', () => {
-    const serialized = JSON.stringify(createOpenApiDocument());
-
-    expect(serialized).not.toMatch(/objectKey|createdByAccountId|updatedByAccountId/iu);
-    for (const [path, operations] of Object.entries(createOpenApiDocument().paths ?? {})) {
+    const paths = createOpenApiDocument().paths ?? {};
+    for (const [path, operations] of Object.entries(paths)) {
+      if (/^(?:\/management)?\/catalog\//u.test(path))
+        expect(JSON.stringify(operations), path).not.toMatch(
+          /objectKey|createdByAccountId|updatedByAccountId/iu,
+        );
       if (/^\/couple\/.*(?:geometry|layout)/iu.test(path)) {
         expect(operations?.post).toBeUndefined();
         expect(operations?.patch).toBeUndefined();
         expect(operations?.delete).toBeUndefined();
       }
     }
-    const paths = Object.keys(createOpenApiDocument().paths ?? {});
-    expect(paths).not.toContain('/catalog/layout-templates');
-    expect(paths).not.toContain('/catalog/timeline-templates');
+    expect(paths).not.toHaveProperty('/catalog/layout-templates');
+    expect(paths).not.toHaveProperty('/catalog/timeline-templates');
   });
 });

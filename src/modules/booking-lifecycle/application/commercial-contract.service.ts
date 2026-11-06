@@ -19,6 +19,7 @@ import {
   contractDeposit,
   documentDigest,
   commercialConflict,
+  isLockedStandardContract,
   deepFreeze,
   INCIDENTAL_CLAUSE,
   type ContractDocument,
@@ -185,6 +186,7 @@ export function createCommercialContractService(options: Options) {
     client: PrismaClient,
     access: Authorized,
     input: z.infer<typeof contractDraftSchema>,
+    includeStandardTerms = true,
   ): Promise<ContractDocument> {
     const booking = access.booking;
     const timeline = booking.currentTimelineRevision;
@@ -205,6 +207,11 @@ export function createCommercialContractService(options: Options) {
     if (tableCount > 500 || booking.planningHeadcount > hall.maxGuests)
       throw commercialConflict('CONTRACT_CAPACITY_EXCEEDED');
     const total = checkedSum(lines.map((line) => line.lineTotalVnd));
+    const menus = includeStandardTerms
+      ? await catalog.requireContractMenus(
+          lines.filter((line) => line.category === 'MENU').map((line) => line.sourceRevisionId),
+        )
+      : undefined;
     return deepFreeze(
       contractDocumentSchema.parse({
         modelVersion: 'FULL_CONTRACT_V1',
@@ -236,6 +243,9 @@ export function createCommercialContractService(options: Options) {
         contractTotalVnd: total,
         depositAmountVnd: contractDeposit(total),
         incidentalClause: INCIDENTAL_CLAUSE,
+        ...(menus === undefined
+          ? {}
+          : { standardTerms: { version: 'WEDDING_STANDARD_V1', ...menus } }),
       }),
     );
   }
@@ -427,7 +437,8 @@ export function createCommercialContractService(options: Options) {
                   current?.state === 'AWAITING_APPROVAL' &&
                   !ownApproval &&
                   current.timelineRevisionId === timeline?.id,
-                canWithdrawApproval: editable && ownApproval,
+                canWithdrawApproval:
+                  editable && ownApproval && current != null && !isLockedStandardContract(current),
                 canEditSelections: selectionAccess.canEdit,
               },
               revisions: rows.slice(0, 50).map(contractView),
@@ -470,17 +481,22 @@ export function createCommercialContractService(options: Options) {
         const document = contractDocumentSchema.parse(prior.document);
         if (document.brideName === null || document.groomName === null)
           throw commercialConflict('COUPLE_NAMES_INCOMPLETE');
-        const refreshed = await buildDocument(client, access, {
-          expectedRevision: input.expectedRevision,
-          predecessorRevisionId: prior.predecessorRevisionId,
-          timelineRevisionId: prior.timelineRevisionId,
-          lines: document.lines.map(({ category, sourceId, sourceRevisionId, quantity }) => ({
-            category,
-            sourceId,
-            sourceRevisionId,
-            quantity,
-          })),
-        });
+        const refreshed = await buildDocument(
+          client,
+          access,
+          {
+            expectedRevision: input.expectedRevision,
+            predecessorRevisionId: prior.predecessorRevisionId,
+            timelineRevisionId: prior.timelineRevisionId,
+            lines: document.lines.map(({ category, sourceId, sourceRevisionId, quantity }) => ({
+              category,
+              sourceId,
+              sourceRevisionId,
+              quantity,
+            })),
+          },
+          document.standardTerms !== undefined,
+        );
         if (documentDigest(refreshed) !== prior.documentDigest)
           throw commercialConflict('COMMERCIAL_PRICE_REVISION_STALE');
         const row = await client.commercialContractRevision.update({
@@ -557,6 +573,7 @@ export function createCommercialContractService(options: Options) {
       const input = contractWithdrawalSchema.parse(value);
       return write(bookingId, actor, requestId, input.expectedRevision, async (client, access) => {
         const prior = requireCurrent(access, revisionId);
+        if (isLockedStandardContract(prior)) throw commercialConflict('CONTRACT_NOT_EDITABLE');
         if (!prior.approvals.some((item) => item.party === access.party))
           throw commercialConflict('CONTRACT_APPROVAL_REQUIRED');
         const row = await createRevision(

@@ -169,7 +169,16 @@ export function registerGuestCompletionCases(
       where: { bookingId: f.id },
       orderBy: { id: 'asc' },
     });
-    for (let page = 0; page < 10; page++) {
+    // Other cases share this disposable queue. Drain the due backlog present at dispatch start.
+    const dueAt = foundation.now();
+    const due = await prisma.notificationIntent.count({
+      where: {
+        state: { in: ['QUEUED', 'RETRYABLE_FAILED'] },
+        scheduledAt: { lte: dueAt },
+        nextAttemptAt: { lte: dueAt },
+      },
+    });
+    for (let page = 0; page < Math.ceil(due / 100); page++) {
       const rows = await foundation.claimDue(100);
       for (const row of rows) {
         const result = await dispatcher.send(row);
@@ -181,11 +190,24 @@ export function registerGuestCompletionCases(
       if (rows.length < 100) break;
     }
     // A controlled acceptance is UNKNOWN; only provider delivery evidence can close email.
-    expect(
-      await prisma.notificationIntent.count({
-        where: { bookingId: f.id, channel: 'EMAIL', state: 'UNKNOWN' },
-      }),
-    ).toBeGreaterThan(0);
+    const emailIntents = await prisma.notificationIntent.findMany({
+      where: { bookingId: f.id, channel: 'EMAIL' },
+      select: {
+        purpose: true,
+        state: true,
+        attempts: { select: { outcome: true, errorCode: true, providerMessageId: true } },
+      },
+    });
+    const accepted = emailIntents.find(
+      ({ purpose, state, attempts }) =>
+        purpose === 'FINAL_INVOICE' &&
+        state === 'UNKNOWN' &&
+        attempts.some(
+          ({ outcome, providerMessageId }) =>
+            outcome === 'ACCEPTED' && providerMessageId === 'controlled-gmw5-accepted',
+        ),
+    );
+    expect(accepted, JSON.stringify(emailIntents)).toBeDefined();
     expect(await prisma.notificationInbox.count({ where: { bookingId: f.id } })).toBeGreaterThan(0);
     expect(await consumer.poll(100)).toBe(0);
     expect(

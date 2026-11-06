@@ -7,6 +7,7 @@ import { TimelineConflictError } from '../application/timeline.service.js';
 import type { TimelineParty, TimelineRevision } from '../domain/timeline.policy.js';
 import { BookingLifecycleNotFoundError } from './consultation.repository.js';
 import { BookingPolicyError } from '../domain/booking-policy.js';
+import { commercialConflict, isLockedStandardContract } from '../domain/commercial-contract.js';
 import { AppError } from '../../../core/errors/app-error.js';
 
 export function createPrismaTimelineRepository(
@@ -56,6 +57,7 @@ export function createPrismaTimelineRepository(
             input.expectedBookingRevision,
           );
           await requireNoDepositIntent(transaction, input.revision.bookingId);
+          await requireContractTimelineEditable(transaction, booking);
           if (booking.phase !== 'CONFIRMED' && input.revision.predecessorRevisionId !== null) {
             const predecessor = await transaction.bookingTimelineRevision.findUnique({
               where: { id: input.revision.predecessorRevisionId },
@@ -188,6 +190,7 @@ async function persistDecision(
       );
       if (decision === 'WITHDRAWN') {
         await requireNoDepositIntent(transaction, input.bookingId);
+        await requireContractTimelineEditable(transaction, booking);
       }
       if (booking.currentTimelineRevisionId !== input.timelineRevisionId) {
         throw new TimelineConflictError('TIMELINE_REVISION_SUPERSEDED');
@@ -330,6 +333,19 @@ async function requireNoDepositIntent(
     select: { id: true },
   });
   if (unresolved !== null) throw new TimelineConflictError('DEPOSIT_INTENT_ACTIVE');
+}
+
+async function requireContractTimelineEditable(
+  transaction: Prisma.TransactionClient,
+  booking: { id: string; phase: string },
+) {
+  if (booking.phase === 'CONFIRMED') return;
+  const contract = await transaction.commercialContract.findUnique({
+    where: { bookingId: booking.id },
+    select: { currentRevision: { select: { state: true, document: true } } },
+  });
+  if (contract?.currentRevision && isLockedStandardContract(contract.currentRevision))
+    throw commercialConflict('CONTRACT_NOT_EDITABLE');
 }
 
 async function advanceBooking(

@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { expect, it } from 'vitest';
+import { expect, it, vi } from 'vitest';
 import type { z } from 'zod';
 import type { Response } from 'supertest';
 import type { CatalogTestDatabase } from './venue-catalog/catalog-test-database.js';
@@ -7,7 +7,6 @@ import type {
   contractResponseSchema,
   CommercialSelection,
 } from '../../src/modules/booking-lifecycle/domain/commercial-contract.js';
-import { contractResponseSchema as parseContractResponse } from '../../src/modules/booking-lifecycle/domain/commercial-contract.js';
 import { printOfferingViewSchema } from '../../src/modules/venue-catalog/domain/commercial-offering.js';
 import {
   appendixResponseSchema,
@@ -57,8 +56,22 @@ export type StepSixApiHarness = {
     key?: string,
   ): Promise<Response>;
   fixture(this: void, names?: boolean): Promise<CommercialApiFixture>;
+  submitSelections(
+    this: void,
+    f: CommercialApiFixture,
+    selections?: CommercialSelection[],
+  ): Promise<CommercialApiFixture>;
   approved(this: void, f: CommercialApiFixture, initial?: Approved): Promise<Approved>;
-  paidFixture(this: void, past?: boolean): Promise<{ f: CommercialApiFixture; d: Approved }>;
+  historicalPrintContract(
+    this: void,
+    f: CommercialApiFixture,
+    selections: CommercialSelection[],
+  ): Promise<Approved>;
+  paidFixture(
+    this: void,
+    past?: boolean,
+    historicalSelections?: CommercialSelection[],
+  ): Promise<{ f: CommercialApiFixture; d: Approved }>;
   race(
     this: void,
     f: CommercialApiFixture,
@@ -81,16 +94,18 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
     fixture,
     approved,
     paidFixture,
+    historicalPrintContract,
     race,
     getLines,
     accounts,
     total,
     deposit,
   } = harness;
+  const paidLines = () => getLines().filter(({ category }) => category !== 'PRINT');
   async function appendixDraft(
     f: CommercialApiFixture,
     predecessorRevisionId: string,
-    selections = getLines(),
+    selections = paidLines(),
   ) {
     const path = `/bookings/${f.id}/contract-appendices`;
     const state = appendicesResponseSchema.parse((await get(path, 'own')).body as unknown).data;
@@ -375,7 +390,7 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
   }, 45_000);
   it('rolls back second appendix approval and finalization if ledger/outbox posting fails', async () => {
     const { f, d } = await paidFixture(true),
-      selections = getLines().map((l, i) => (i === 0 ? { ...l, quantity: l.quantity + 1 } : l));
+      selections = paidLines().map((l, i) => (i === 0 ? { ...l, quantity: l.quantity + 1 } : l));
     const { path, data: initial } = await appendixDraft(f, d.contract.revisionId, selections);
     let data = initial;
     const first = await post(`${path}/${data.appendix.revisionId}/approvals`, {
@@ -477,9 +492,14 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
     expect((await post(path, body, 'own')).status).toBe(403);
     expect((await post(path, body, 'staff')).status).toBe(403);
     expect((await post(path, { ...body, totalVnd: 1 })).status).toBe(422);
-    const result = await post(path, body);
-    expect(result.status, JSON.stringify(result.body)).toBe(409);
-    expect(result.body).toMatchObject({ error: { code: 'EVENT_NOT_ENDED' } });
+    vi.stubEnv('STRICT_SETTLEMENT_DATE_CHECK', 'true');
+    try {
+      const result = await post(path, body);
+      expect(result.status, JSON.stringify(result.body)).toBe(409);
+      expect(result.body).toMatchObject({ error: { code: 'EVENT_NOT_ENDED' } });
+    } finally {
+      vi.unstubAllEnvs();
+    }
     expect((await get(`/bookings/${f.id}/incidental-expenses`, 'own')).status).toBe(200);
     expect(await database.prisma.incidentalExpenseLine.count({ where: { bookingId: f.id } })).toBe(
       0,
@@ -817,18 +837,7 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
           }
         : l,
     );
-    const drafted = await post(
-      f.path,
-      {
-        expectedRevision: f.revision,
-        predecessorRevisionId: null,
-        timelineRevisionId: f.timelineId,
-        lines,
-      },
-      'own',
-    );
-    expect(drafted.status, JSON.stringify(drafted.body)).toBe(201);
-    const d = await approved(f, parseContractResponse.parse(drafted.body as unknown).data);
+    const d = await historicalPrintContract(f, lines);
     expect(
       (
         await post('/management/billing/payments/manual', {
@@ -836,7 +845,7 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
           purpose: 'DEPOSIT',
           contractRevisionId: d.contract.revisionId,
           documentDigest: d.contract.documentDigest,
-          amountVnd: deposit,
+          amountVnd: d.contract.document.depositAmountVnd,
           settledAt: new Date().toISOString(),
           reason: 'Cọc kiểm thử in',
           evidenceReference: 'LOCAL-PRINT',
@@ -1106,7 +1115,7 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
     const bill = await get(`/bookings/${f.id}/billing`, 'own');
     expect(bill.status).toBe(200);
     expect(billingResponseSchema.parse(bill.body as unknown).data.totals.acceptedChargesVnd).toBe(
-      total,
+      d.contract.document.contractTotalVnd,
     );
   }, 45_000);
   it('applies an appendix only on the second distinct approval and retains the original deposit and history', async () => {
@@ -1129,7 +1138,7 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
       expectedRevision: state.bookingRevision,
       predecessorRevisionId: d.contract.revisionId,
       reason: 'Giảm một bàn menu',
-      lines: getLines().map((l, i) => (i === 0 ? { ...l, quantity: l.quantity - 1 } : l)),
+      lines: paidLines().map((l, i) => (i === 0 ? { ...l, quantity: l.quantity - 1 } : l)),
     };
     expect((await post(path, body, 'staff')).status).toBe(404);
     expect((await post(path, { ...body, deltaVnd: -1 }, 'own')).status).toBe(422);

@@ -15,10 +15,15 @@ const halls = [
 describe('reusable demo seating catalog', () => {
   it('covers each hall continuously with realistic non-overlapping tables and stable IDs', () => {
     const plans = buildDemoLayoutPlans(halls);
-    expect(plans).toHaveLength(9);
+    const expectedTableCounts = [
+      [10, 15, 18, 20, 25, 30],
+      [5, 10, 12],
+      [5, 10, 12],
+    ];
     expect(buildDemoLayoutPlans(halls)).toEqual(plans);
-    for (const hall of halls) {
+    for (const [index, hall] of halls.entries()) {
       const layouts = plans.filter((p) => p.hallId === hall.id);
+      expect(layouts.map((layout) => layout.tables.length)).toEqual(expectedTableCounts[index]);
       let next = 1;
       for (const layout of layouts) {
         expect(layout.minGuests).toBe(next);

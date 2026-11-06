@@ -26,6 +26,35 @@ export function createCommercialSelectionReader(prisma: PrismaClient) {
       const shift = await venue.requireActiveShiftSnapshot(shiftCode);
       return Object.freeze({ restaurant, hall, shift });
     },
+    async requireContractMenus(orderedVersionIds: readonly string[]) {
+      const menuDishes = {
+        orderBy: { displayOrder: 'asc' as const },
+        select: { dishVersion: { select: { name: true } } },
+      };
+      // The single restaurant's menu catalog has no per-shift eligibility.
+      const reserve = await prisma.menuPackageVersion.findFirst({
+        where: { state: 'PUBLISHED', currentFor: { is: { lifecycle: 'ACTIVE' } } },
+        orderBy: [{ priceVndPerTable: 'asc' }, { id: 'asc' }],
+        select: { id: true, name: true, items: menuDishes },
+      });
+      if (reserve === null) throw new NotFoundError();
+      const ordered = await prisma.menuPackageVersion.findMany({
+        where: { id: { in: [...orderedVersionIds] } },
+        orderBy: { id: 'asc' },
+        select: { id: true, items: menuDishes },
+      });
+      return {
+        reserveMenu: {
+          versionId: reserve.id,
+          name: reserve.name,
+          dishes: reserve.items.map(({ dishVersion }) => dishVersion.name),
+        },
+        orderedMenus: ordered.map(({ id, items }) => ({
+          versionId: id,
+          dishes: items.map(({ dishVersion }) => dishVersion.name),
+        })),
+      };
+    },
     async requireSelection(input: Selection, restaurantId: string) {
       try {
         return await resolveSelection(input, restaurantId);
@@ -106,11 +135,9 @@ export function createCommercialSelectionReader(prisma: PrismaClient) {
           Object.freeze({
             ...input,
             name: facts.name,
-            description: [
-              facts.printType,
-              facts.material,
-              facts.templateTitle,
-            ].filter(Boolean).join(' · '),
+            description: [facts.printType, facts.material, facts.templateTitle]
+              .filter(Boolean)
+              .join(' · '),
             unit: facts.unit,
             unitPriceVnd: facts.unitPriceVnd,
             lineTotalVnd: checkedLineTotal(facts.unitPriceVnd, input.quantity),
@@ -188,11 +215,9 @@ export function createCommercialSelectionReader(prisma: PrismaClient) {
     return Object.freeze({
       ...input,
       name: facts.name,
-      description: [
-        facts.printType,
-        facts.material,
-        facts.templateTitle,
-      ].filter(Boolean).join(' · '),
+      description: [facts.printType, facts.material, facts.templateTitle]
+        .filter(Boolean)
+        .join(' · '),
       unit: facts.unit,
       unitPriceVnd: facts.unitPriceVnd,
       lineTotalVnd: facts.lineTotalVnd,

@@ -132,7 +132,7 @@ export const commercialContractOpenApiPaths = {
       tags: ['Booking lifecycle'],
       security,
       description:
-        'Owning Manager only. New bookings start as FULL_CONTRACT_V1 even without a draft. Explicit conversion for uncharged/unsettled legacy drafts, or successor replacing an unapproved current revision; withdraw own approval before editing any approved document. expectedRevision is the Booking revision. Null predecessor only for the first draft. Server freezes current catalog/profile/venue/timeline facts and checked totals; MENU quantities are tables, PRINT copies. No inherited approvals. Reject monetary history or active/unknown pins.',
+        'Owning Manager only. New bookings start as FULL_CONTRACT_V1 even without a draft. Explicit conversion for uncharged/unsettled legacy drafts, or successor replacing an unapproved current revision. expectedRevision is the Booking revision. Null predecessor only for the first draft. Server freezes current catalog/profile/venue/timeline facts, the lowest-priced active published reserve menu, and checked VAT-inclusive totals. MENU quantities are paid tables; reserve tables are excluded from charges. No inherited approvals. Reject locked contracts, monetary history or active/unknown pins.',
       parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }],
       requestBody: {
         required: true,
@@ -154,13 +154,13 @@ export const commercialContractOpenApiPaths = {
           'approvals',
           'approveCommercialContract',
           contractDecisionSchema,
-          'Approve current submitted revision as trusted own Manager or Couple party. Two distinct actors on the same digest. Final approval retains a private PDF. Never read catalog prices again after submission. Current timeline required.',
+          'Approve current submitted revision as trusted own Manager or Couple party. Two distinct actors on the same digest. Final approval retains a private PDF and locks standard contracts. Never read catalog prices again after submission. Current timeline required.',
         ],
         [
           'withdrawals',
           'withdrawCommercialContractApproval',
           contractWithdrawalSchema,
-          'Withdraw own approval before deposit by creating a successor DRAFT with no approvals; reason retained in atomic audit/outbox. Old approvals and approved PDF remain immutable. Active/unknown/settled deposit blocks changes.',
+          'Withdraw own approval before deposit by creating a successor DRAFT with no approvals; reason retained in atomic audit/outbox. Mutually approved standard contracts reject withdrawal with CONTRACT_NOT_EDITABLE. Old approvals and approved PDF remain immutable. Active/unknown/settled deposit blocks changes.',
         ],
       ] as const
     ).map(([action, operationId, schema, description]) => [
@@ -189,7 +189,7 @@ export const commercialContractOpenApiPaths = {
       tags: ['Booking lifecycle'],
       security,
       description:
-        'Private exact-version Vietnamese PDF. Approved bytes and SHA-256 are retained, including after supersession. Draft previews are identified as drafts. Snapshot digest differs from PDF byte digest. layout=readable renders the exact immutable snapshot with current typography as a clearly marked presentation copy; it never replaces retained PDF bytes. Does not imply digital signature.',
+        'Private exact-version Vietnamese PDF. Submitted standard contracts are available as labeled previews. Final PDF bytes and SHA-256 are retained, including after legacy supersession. Standard PDFs include blank spaces for both parties to sign by hand. Snapshot digest differs from PDF byte digest. layout=readable renders the exact immutable snapshot as a clearly marked presentation copy; it never replaces retained PDF bytes. Does not imply digital signature.',
       responses: {
         '200': {
           description: 'PDF attachment; Cache-Control: no-store.',
