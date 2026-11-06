@@ -110,14 +110,16 @@ export function createRedisManager(options: RedisManagerOptions): RedisManager {
       return { pub: pubClient, sub: subClient };
     },
     async healthCheck() {
+      // Let ioredis own reconnects already in progress. Restart a connection
+      // whose automatic retry budget was exhausted without blocking the probe.
+      if (client.status === 'end') {
+        void client.connect().catch(() => undefined);
+      }
+      if (client.status !== 'ready') return false;
       try {
-        if (client.status !== 'ready') {
-          await client.connect();
-        }
         const pong = await client.ping();
         return pong === 'PONG';
-      } catch (err) {
-        logger?.warn({ err }, 'Redis health check failed.');
+      } catch {
         return false;
       }
     },

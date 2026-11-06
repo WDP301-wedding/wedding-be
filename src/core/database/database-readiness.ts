@@ -13,7 +13,10 @@ type MigrationRow = {
 };
 type ReadinessPool = Pick<Pool, 'connect' | 'end' | 'on'>;
 
-export const DATABASE_READINESS_TIMEOUT_MS = 5_000;
+// Leave headroom for HTTP delivery before the platform's five-second deadline.
+export const DATABASE_READINESS_TIMEOUT_MS = 4_000;
+
+export class DatabaseSchemaNotReadyError extends Error {}
 
 // Lotus was shipped as a data migration before it was guarded for empty databases.
 // Accept the original release only against the exact guarded artifact. Keep all
@@ -59,7 +62,7 @@ export function createDatabaseReadiness(
     new Pool({
       connectionString: url.toString(),
       max: 1,
-      connectionTimeoutMillis: 4_000,
+      connectionTimeoutMillis: 2_500,
       query_timeout: 700,
       statement_timeout: 700,
       idleTimeoutMillis: 10_000,
@@ -89,9 +92,8 @@ export function createDatabaseReadiness(
       const { rows } = await client.query<MigrationRow>(
         `SELECT migration_name, checksum, finished_at, rolled_back_at FROM ${quotedSchema}."_prisma_migrations"`,
       );
+      if (signal.aborted || closed) throw new Error('Database readiness cancelled.');
       if (
-        signal.aborted ||
-        closed ||
         rows.some((row) => row.finished_at === null && row.rolled_back_at === null) ||
         migrations.some(
           (migration) =>
@@ -104,7 +106,7 @@ export function createDatabaseReadiness(
             ),
         )
       ) {
-        throw new Error('Database schema is incompatible with this build.');
+        throw new DatabaseSchemaNotReadyError('Database schema is incompatible with this build.');
       }
       release(false);
     } catch (error: unknown) {

@@ -100,19 +100,22 @@ describe('health endpoints', () => {
     expect(JSON.stringify(response.body)).not.toContain('super-secret');
   });
 
-  it('bounds a stalled readiness probe and keeps liveness healthy', async () => {
+  it('bounds a stalled readiness probe, keeps liveness healthy and recovers on the next check', async () => {
     let receivedSignal: AbortSignal | undefined;
-    const readinessProbe = vi.fn<ReadinessProbe>().mockImplementation(
-      (signal) =>
-        new Promise<void>((_resolve, reject) => {
-          receivedSignal = signal;
-          signal.addEventListener(
-            'abort',
-            () => reject(new Error('Readiness probe aborted.', { cause: signal.reason })),
-            { once: true },
-          );
-        }),
-    );
+    const readinessProbe = vi
+      .fn<ReadinessProbe>()
+      .mockResolvedValue(undefined)
+      .mockImplementationOnce(
+        (signal) =>
+          new Promise<void>((_resolve, reject) => {
+            receivedSignal = signal;
+            signal.addEventListener(
+              'abort',
+              () => reject(new Error('Readiness probe aborted.', { cause: signal.reason })),
+              { once: true },
+            );
+          }),
+      );
     const app = createApp({
       isTrustedRequestId: () => true,
       readinessProbe,
@@ -131,6 +134,9 @@ describe('health endpoints', () => {
     expect(liveResponse.status).toBe(200);
     expect(healthLiveResponseSchema.safeParse(liveResponse.body).success).toBe(true);
     expect(readinessProbe).toHaveBeenCalledOnce();
+    const recovered = await request(app).get('/health/ready');
+    expect(recovered.status).toBe(200);
+    expect(readinessProbe).toHaveBeenCalledTimes(2);
   });
 
   it('combines server lifecycle readiness with the injected dependency probe', async () => {

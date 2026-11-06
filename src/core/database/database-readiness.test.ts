@@ -24,6 +24,18 @@ function fixture(migration = { name: 'one', checksum: 'digest' }) {
 }
 
 describe('database readiness resource', () => {
+  it('recovers after a failed connection attempt without accepting a stale result', async () => {
+    const f = fixture();
+    const signal = new AbortController().signal;
+    await f.runtime.probe(signal);
+    f.connect.mockRejectedValueOnce(new Error('database unavailable'));
+    await expect(f.runtime.probe(signal)).rejects.toThrow('database unavailable');
+    await expect(f.runtime.probe(signal)).resolves.toBeUndefined();
+    expect(f.connect).toHaveBeenCalledTimes(3);
+    expect(f.release).toHaveBeenCalledTimes(2);
+    await f.runtime.resource.close();
+  });
+
   it('accepts only the known original Lotus checksum for the exact guarded artifact', async () => {
     const name = '20261105081000_add_lotus_layout_templates';
     const guarded = '16f8fb7b33ce8a680344bb485a772e5bcb4dc54ac6168ce2cc96f874f8b5352b';

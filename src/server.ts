@@ -23,6 +23,7 @@ import { startMemoryMonitor } from './core/observability/memory-monitor.js';
 import {
   createDatabaseReadiness,
   DATABASE_READINESS_TIMEOUT_MS,
+  DatabaseSchemaNotReadyError,
 } from './core/database/database-readiness.js';
 import {
   createHttpLifecycle,
@@ -531,13 +532,29 @@ async function startApplication(
   };
 
   const combinedReadinessProbe: ReadinessProbe = async (signal) => {
-    await databaseReadiness.probe(signal);
-    if (redisManager.isConfigured) {
-      const redisHealthy = await redisManager.healthCheck();
-      if (!redisHealthy) {
-        throw new Error('Redis readiness check failed.');
-      }
+    const [database, redis] = await Promise.allSettled([
+      databaseReadiness.probe(signal),
+      redisManager.isConfigured ? redisManager.healthCheck() : Promise.resolve(true),
+    ]);
+    if (database.status === 'rejected') {
+      logger.warn({
+        event: 'readiness_dependency_failed',
+        dependency: 'postgresql',
+        reason:
+          database.reason instanceof DatabaseSchemaNotReadyError
+            ? 'migration_mismatch'
+            : 'probe_failed',
+      });
     }
+    if (redis.status === 'rejected' || !redis.value) {
+      logger.warn({
+        event: 'readiness_dependency_failed',
+        dependency: 'redis',
+        reason: 'probe_failed',
+      });
+      throw new Error('Redis readiness check failed.');
+    }
+    if (database.status === 'rejected') throw database.reason;
   };
 
   const running = await startServer({

@@ -11,7 +11,9 @@ export function createReadinessCheck(
     throw new RangeError('The readiness timeout must be a positive finite number.');
   }
 
-  return async () => {
+  let inFlight: Promise<boolean> | undefined;
+
+  async function run(): Promise<boolean> {
     const controller = new AbortController();
     let timeout: NodeJS.Timeout | undefined;
     const probeOutcome = Promise.resolve()
@@ -34,5 +36,12 @@ export function createReadinessCheck(
         clearTimeout(timeout);
       }
     }
+  }
+
+  return () => {
+    inFlight ??= run().finally(() => {
+      inFlight = undefined;
+    });
+    return inFlight;
   };
 }
