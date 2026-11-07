@@ -97,7 +97,7 @@ async function rowsDto(tx: Prisma.TransactionClient, rows: Row[], includeManager
   return rows.map((r) => {
     const bill = billingMap.get(r.id);
     let paymentStatus: 'PAID' | 'DEBT' | 'AWAITING_DEPOSIT' | 'DRAFT' | null = null;
-    let paidVnd: number | null = bill ? bill.paid : null;
+    let paidVnd: number | null = bill ? Math.max(0, bill.paid) : null;
     let outstandingVnd: number | null = null;
 
     const contractTotal = r.commercialContract?.currentRevision?.contractTotalVnd
