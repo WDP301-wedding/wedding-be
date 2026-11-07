@@ -128,7 +128,10 @@ async function rowsDto(tx: Prisma.TransactionClient, rows: Row[], includeManager
           ? charges
           : null;
 
-    if (totalObligation !== null && totalObligation > 0) {
+    if (r.phase === 'CANCELLED') {
+      paymentStatus = null;
+      outstandingVnd = 0;
+    } else if (totalObligation !== null && totalObligation > 0) {
       if (paidVnd === null) paidVnd = 0;
       outstandingVnd = Math.max(0, totalObligation - paid);
       paymentStatus =

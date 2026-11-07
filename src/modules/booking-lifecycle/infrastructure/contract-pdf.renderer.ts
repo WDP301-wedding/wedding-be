@@ -366,14 +366,18 @@ function renderStandardTerms(
   );
 
   section('Điều 5. Hai mốc thanh toán');
-  const depositPct = document.depositRate ?? 30;
+  const depositPct =
+    document.depositRate ??
+    (document.contractTotalVnd > 0
+      ? Math.round((document.depositAmountVnd / document.contractTotalVnd) * 100)
+      : 30);
   text(`5.1. Đặt cọc ${depositPct}%: ` + money(document.depositAmountVnd), true, 11);
   text(
     'Bên B đặt cọc trong thời hạn giữ chỗ sau khi hai bên duyệt hợp đồng và lịch trình tương ứng. Sảnh và ca tiệc được xác nhận khi hệ thống ghi nhận cọc thành công theo điều kiện giữ chỗ.',
   );
   text(
     '5.2. Tất toán sau tiệc, tạm tính: ' +
-      money(document.contractTotalVnd - document.depositAmountVnd),
+      money(Math.max(0, document.contractTotalVnd - document.depositAmountVnd)),
     true,
     11,
   );

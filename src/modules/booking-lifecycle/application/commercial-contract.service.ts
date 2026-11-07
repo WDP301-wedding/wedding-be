@@ -214,7 +214,7 @@ export function createCommercialContractService(options: Options) {
       : undefined;
     const depositRate =
       'depositPercentage' in restaurant && typeof restaurant.depositPercentage === 'number'
-        ? restaurant.depositPercentage
+        ? Math.min(100, Math.max(10, Math.round(restaurant.depositPercentage)))
         : 30;
     return deepFreeze(
       contractDocumentSchema.parse({
