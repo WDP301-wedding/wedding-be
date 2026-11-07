@@ -75,12 +75,20 @@ const queryFilter = (q: string): Prisma.BookingWhereInput =>
         ],
       };
 async function rowsDto(tx: Prisma.TransactionClient, rows: Row[], includeManagerIdentity = true) {
-  const managers = includeManagerIdentity
-    ? await tx.account.findMany({
-        where: { id: { in: [...new Set(rows.map((r) => r.consultation.managerAccountId))] } },
-        select: { id: true, displayEmail: true },
-      })
-    : [];
+  const managerIds = [
+    ...new Set(
+      rows
+        .map((r) => r.consultation.managerAccountId)
+        .filter((id): id is string => typeof id === 'string' && id.length > 0),
+    ),
+  ];
+  const managers =
+    includeManagerIdentity && managerIds.length > 0
+      ? await tx.account.findMany({
+          where: { id: { in: managerIds } },
+          select: { id: true, displayEmail: true },
+        })
+      : [];
   const emails = new Map(managers.map((a) => [a.id, a.displayEmail]));
 
   const bookingIds = rows.map((r) => r.id);
