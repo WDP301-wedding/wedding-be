@@ -12,6 +12,9 @@ import {
   type HeadcountOutcome,
 } from '../domain/lifecycle.policy.js';
 import { BookingLifecycleNotFoundError } from './consultation.repository.js';
+import { readCompletionAppendix } from './completion-appendix.reader.js';
+import { commercialConflict } from '../domain/commercial-contract.js';
+import { retryCommercialWrite } from './commercial-write.retry.js';
 
 export type BookingLifecycleMutationContext = Readonly<{
   requestId: string;
@@ -393,48 +396,53 @@ export function createPrismaBookingLifecycleRepository(
     },
 
     complete(input: Parameters<BookingLifecycleRepository['complete']>[0]) {
-      return prisma.$transaction(
-        async (transaction) => {
-          const booking = await requireLifecycleBooking(transaction, input.bookingId);
-          if (booking.revision !== input.expectedBookingRevision) {
-            throw new BookingLifecycleStateError('STALE_BOOKING_REVISION');
-          }
-          const completedAt = now();
-          requireCompletionDue(
-            booking.phase,
-            isoDate(booking.eventDate),
-            timeText(booking.proposalSnapshot!.shiftEndTime),
-            completedAt,
-          );
-          const bookingRevision = await incrementBooking(
-            transaction,
-            input.bookingId,
-            input.expectedBookingRevision,
-            { phase: 'COMPLETED', completedAt },
-            'CONFIRMED',
-          );
-          await appendLifecycleEvidence(transaction, createId, {
-            action: 'booking.completed',
-            eventType: 'booking.completed',
-            bookingId: input.bookingId,
-            bookingRevision,
-            requestId: input.context.requestId,
-            actorAccountId: input.context.actorAccountId,
-            occurredAt: completedAt,
-            metadata: {},
-          });
-          await recordRetention(
-            transaction,
-            {
+      return retryCommercialWrite(() =>
+        prisma.$transaction(
+          async (transaction) => {
+            await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${input.bookingId}))`;
+            const booking = await requireLifecycleBooking(transaction, input.bookingId);
+            if (booking.revision !== input.expectedBookingRevision) {
+              throw new BookingLifecycleStateError('STALE_BOOKING_REVISION');
+            }
+            const completedAt = now();
+            requireCompletionDue(
+              booking.phase,
+              isoDate(booking.eventDate),
+              timeText(booking.proposalSnapshot!.shiftEndTime),
+              completedAt,
+            );
+            if ((await readCompletionAppendix(transaction, input.bookingId)).pending)
+              throw commercialConflict('APPENDIX_APPROVAL_REQUIRED');
+            const bookingRevision = await incrementBooking(
+              transaction,
+              input.bookingId,
+              input.expectedBookingRevision,
+              { phase: 'COMPLETED', completedAt },
+              'CONFIRMED',
+            );
+            await appendLifecycleEvidence(transaction, createId, {
+              action: 'booking.completed',
+              eventType: 'booking.completed',
               bookingId: input.bookingId,
-              consultationId: booking.consultationId,
-              eligibleAfter: completedAt,
-            },
-            input.context,
-          );
-          return Object.freeze({ phase: 'COMPLETED' as const, bookingRevision });
-        },
-        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+              bookingRevision,
+              requestId: input.context.requestId,
+              actorAccountId: input.context.actorAccountId,
+              occurredAt: completedAt,
+              metadata: {},
+            });
+            await recordRetention(
+              transaction,
+              {
+                bookingId: input.bookingId,
+                consultationId: booking.consultationId,
+                eligibleAfter: completedAt,
+              },
+              input.context,
+            );
+            return Object.freeze({ phase: 'COMPLETED' as const, bookingRevision });
+          },
+          { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+        ),
       );
     },
   });

@@ -27,7 +27,7 @@ function fixture() {
       creditVnd: 0,
     },
   } satisfies LedgerSnapshot;
-  const input = { bookingId, phase: 'CONFIRMED', ledger, throughBillingRevision: 2 };
+  const input = { bookingId, phase: 'COMPLETED', ledger, throughBillingRevision: 2 };
   const dependencies = {
     invoice: { getApplicable: vi.fn().mockResolvedValue(null) },
     operations: { requireBalanceAvailable: vi.fn().mockResolvedValue(undefined) },
@@ -86,7 +86,7 @@ describe('balance payment eligibility', () => {
     });
   });
 
-  it.each(['DRAFT', 'AWAITING_DEPOSIT', 'CANCELLED'])(
+  it.each(['DRAFT', 'AWAITING_DEPOSIT', 'CONFIRMED', 'CANCELLED'])(
     'blocks phase %s before invoice/attempt reads',
     async (phase) => {
       const f = fixture();

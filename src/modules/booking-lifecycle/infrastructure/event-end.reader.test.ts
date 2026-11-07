@@ -5,7 +5,7 @@ import { createEventEndReader } from './event-end.reader.js';
 beforeEach(() => vi.stubEnv('STRICT_SETTLEMENT_DATE_CHECK', 'true'));
 afterEach(() => vi.unstubAllEnvs());
 const booking = {
-  phase: 'CONFIRMED',
+  phase: 'COMPLETED',
   eventDate: new Date('2026-10-11T00:00:00Z'),
   proposalSnapshot: { shiftEndTime: new Date('1970-01-01T22:00:00Z') },
 };
@@ -19,7 +19,7 @@ it('allows demo settlement before the event by default, preserving eligibility c
   vi.stubEnv('STRICT_SETTLEMENT_DATE_CHECK', undefined);
   await expect(
     reader(booking, '2026-10-10T00:00:00Z').requireEnded(randomUUID()),
-  ).resolves.toMatchObject({ phase: 'CONFIRMED' });
+  ).resolves.toMatchObject({ phase: 'COMPLETED' });
   await expect(
     reader({ ...booking, phase: 'DRAFT' }, null).requireEnded(randomUUID()),
   ).rejects.toMatchObject({ code: 'INVOICE_NOT_ELIGIBLE' });
@@ -32,14 +32,14 @@ it('uses Vietnam event time at the exact end boundary without waiting for the co
   for (const now of ['2026-10-11T15:00:00.000Z', '2026-10-11T15:00:00.001Z'])
     expect(await reader(booking, now).requireEnded(id)).toEqual({
       bookingId: id,
-      phase: 'CONFIRMED',
+      phase: 'COMPLETED',
       eventEndAt: '2026-10-11T15:00:00.000Z',
     });
 });
 it('denies cancelled, unconfirmed, absent and unverifiable event sources', async () => {
   const id = randomUUID();
   await expect(reader(null, null).requireEnded(id)).rejects.toMatchObject({ status: 404 });
-  for (const phase of ['CANCELLED', 'DRAFT', 'AWAITING_DEPOSIT'])
+  for (const phase of ['CANCELLED', 'DRAFT', 'AWAITING_DEPOSIT', 'CONFIRMED'])
     await expect(reader({ ...booking, phase }, null).requireEnded(id)).rejects.toMatchObject({
       code: 'INVOICE_NOT_ELIGIBLE',
     });

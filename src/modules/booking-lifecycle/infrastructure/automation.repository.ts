@@ -7,6 +7,7 @@ import type { BookingAutomationPort } from '../application/automation.js';
 import { BookingLifecyclePolicyError, requireCompletionDue } from '../domain/lifecycle.policy.js';
 import { BookingLifecycleNotFoundError } from './consultation.repository.js';
 import type { BookingTerminalRetentionRecorder } from './lifecycle.repository.js';
+import { readCompletionAppendix } from './completion-appendix.reader.js';
 
 const cursorSchema = z.strictObject({
   kind: z.enum(['D3_REMINDER', 'COMPLETION']),
@@ -123,6 +124,8 @@ export function createPrismaBookingAutomationRepository(
                   return { outcome: 'NOT_DUE' as const };
                 throw error;
               }
+              if ((await readCompletionAppendix(tx, input.bookingId)).pending)
+                return { outcome: 'NOT_DUE' as const };
               const updated = await tx.booking.updateMany({
                 where: {
                   id: booking.id,

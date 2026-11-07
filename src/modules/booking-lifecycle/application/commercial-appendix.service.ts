@@ -14,6 +14,7 @@ import { commercialConflict, deepFreeze } from '../domain/commercial-contract.js
 import {
   appendixDraftSchema,
   appendixDecisionSchema,
+  appendixCancellationSchema,
   appendixDocumentSchema,
   appendixViewSchema,
   appendixDigest,
@@ -103,6 +104,7 @@ export function createCommercialAppendixService(options: Options) {
       context: ContractContext,
     ) => Promise<Stored>,
     action: string,
+    reason?: string,
   ) {
     return retryCommercialWrite(() =>
       options.scope.boundary.run(
@@ -120,7 +122,10 @@ export function createCommercialAppendixService(options: Options) {
             const access = await authorized(client, bookingId, actor);
             if (access.booking.revision !== expectedRevision)
               throw commercialConflict('CONTRACT_REVISION_STALE');
-            if (!['CONFIRMED', 'COMPLETED'].includes(access.booking.phase))
+            if (
+              access.booking.phase !== 'CONFIRMED' &&
+              !(action === 'cancelled' && access.booking.phase === 'COMPLETED')
+            )
               throw commercialConflict('APPENDIX_NOT_EDITABLE');
             await options.financial.requireMutable(bookingId, scoped);
             const purchase = await client.invitationPrintPurchase.findFirst({
@@ -149,6 +154,7 @@ export function createCommercialAppendixService(options: Options) {
               documentDigest: row.documentDigest,
               party: access.party,
               state: row.state,
+              ...(reason ? { reason } : {}),
             };
             await client.auditLog.create({
               data: {
@@ -191,6 +197,33 @@ export function createCommercialAppendixService(options: Options) {
     return row;
   }
   return Object.freeze({
+    async cancel(
+      bookingId: string,
+      revisionId: string,
+      raw: z.infer<typeof appendixCancellationSchema>,
+      actor: AuthenticatedActor,
+      requestId: string,
+    ) {
+      const input = appendixCancellationSchema.parse(raw);
+      return write(
+        bookingId,
+        actor,
+        requestId,
+        input.expectedRevision,
+        async (client) => {
+          const row = await current(client, bookingId, revisionId);
+          if (!['DRAFT', 'AWAITING_APPROVAL'].includes(row.state))
+            throw commercialConflict('APPENDIX_NOT_EDITABLE');
+          return client.commercialAppendixRevision.update({
+            where: { id: revisionId },
+            data: { state: 'SUPERSEDED' },
+            include,
+          });
+        },
+        'cancelled',
+        input.reason,
+      );
+    },
     async authorize(bookingId: string, actor: AuthenticatedActor, revisionId?: string) {
       return options.scope.withClient(bookingId, undefined, async (client) => {
         await authorized(client, bookingId, actor);

@@ -3,6 +3,7 @@ import type { ConsultationAccessReader } from '../../identity-access/authorizati
 import { BookingLifecycleNotFoundError } from '../infrastructure/consultation.repository.js';
 import { proposalMenuLinesSchema } from '../domain/booking-policy.js';
 import { localVietnamTime } from '../domain/lifecycle.policy.js';
+import { completionAppendix } from '../domain/completion-appendix.js';
 
 type ProposalActor = Readonly<{
   accountId: string;
@@ -66,6 +67,7 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
       const ownApproval = manager
         ? booking.currentTimelineRevision?.managerApprovedAt
         : booking.currentTimelineRevision?.coupleApprovedAt;
+      const appendix = completionAppendix(booking.commercialAppendices?.currentRevision);
       return immutable({
         bookingId: booking.id,
         consultationId: booking.consultationId,
@@ -73,6 +75,10 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
         revision: booking.revision,
         eventDate: booking.eventDate.toISOString().slice(0, 10),
         planningHeadcount: booking.planningHeadcount,
+        completion: {
+          ...appendix,
+          canComplete: manager && booking.phase === 'CONFIRMED' && !appendix.pending,
+        },
         commercialProgress: {
           modelVersion: booking.commercialContract
             ? ('FULL_CONTRACT_V1' as const)
@@ -229,6 +235,18 @@ async function requireProposal(prisma: PrismaClient, bookingId: string) {
               contractTotalVnd: true,
               depositAmountVnd: true,
               document: true,
+            },
+          },
+        },
+      },
+      commercialAppendices: {
+        select: {
+          currentRevision: {
+            select: {
+              state: true,
+              revisionNumber: true,
+              documentDigest: true,
+              approvals: { select: { party: true, documentDigest: true } },
             },
           },
         },

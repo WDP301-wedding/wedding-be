@@ -67,6 +67,10 @@ export function createBillingOperationsService(
     return options.boundary.run({ bookingId: command.bookingId, context }, async (scoped) => {
       if (manager) await options.operations.requireManager(command.bookingId, scoped);
       else await options.operations.requireReadAccess(command.bookingId, scoped);
+      if (kind === 'BALANCE_INTENT') {
+        const access = await options.operations.requireReadAccess(command.bookingId, scoped);
+        if (access.phase !== 'COMPLETED') throw error('BALANCE_NOT_ELIGIBLE');
+      }
       const bodyHash = createHash('sha256').update(JSON.stringify(command)).digest('hex');
       const old = await options.operations.findCommand(
         command.bookingId,
@@ -102,7 +106,7 @@ export function createBillingOperationsService(
     context: ContractContext,
   ) {
     const access = await options.operations.requireReadAccess(command.bookingId, context);
-    if (!['CONFIRMED', 'COMPLETED'].includes(access.phase)) throw error('BALANCE_NOT_ELIGIBLE');
+    if (access.phase !== 'COMPLETED') throw error('BALANCE_NOT_ELIGIBLE');
     const ledger = await options.ledger.getLedger(command.bookingId, context);
     if (ledger.revision !== command.expectedBillingRevision) throw error('STALE_BILLING_REVISION');
     return requireBalancePayment(
@@ -505,6 +509,8 @@ export function createBillingOperationsService(
     async issueInvoice(input: z.input<typeof invoiceCommandSchema>, context: ContractContext) {
       const command = invoiceCommandSchema.parse(input);
       return execute(command, 'INVOICE', context, async (scoped) => {
+        const access = await options.operations.requireReadAccess(command.bookingId, scoped);
+        if (access.phase !== 'COMPLETED') throw error('INVOICE_NOT_ELIGIBLE');
         const invoice = await options.ledger.issueInvoice(
           {
             id: command.commandId,

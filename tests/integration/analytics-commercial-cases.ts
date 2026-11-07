@@ -6,6 +6,7 @@ import { analyticsResultSchemas } from '../../src/modules/analytics-dashboard/ht
 import { appendixResponseSchema } from '../../src/modules/booking-lifecycle/domain/commercial-appendix.js';
 import { billingResponseSchema } from '../../src/modules/payments-billing/http/payments-billing.schemas.js';
 import { finalInvoiceResponseSchema } from '../../src/modules/payments-billing/domain/final-invoice.js';
+import { completeSettlementFixture } from './completion-settlement-api-cases.js';
 export function registerAnalyticsCommercialCases(h: StepSixApiHarness) {
   it('ANL-W1/W4 projects mutually approved services/appendices and finalized expenses exactly once from real owners', async () => {
     const { f, d } = await h.paidFixture(true),
@@ -58,6 +59,7 @@ export function registerAnalyticsCommercialCases(h: StepSixApiHarness) {
       expect(approval.status, JSON.stringify(approval.body)).toBe(200);
       a = appendixResponseSchema.parse(approval.body as unknown).data;
     }
+    await completeSettlementFixture(h, f.id);
     const expense = await h.post(`/management/bookings/${f.id}/incidental-expenses`, {
       expectedRevision: 0,
       name: 'Nước phát sinh',

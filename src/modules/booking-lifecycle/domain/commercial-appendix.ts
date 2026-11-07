@@ -30,6 +30,9 @@ export const appendixDraftSchema = z
     { message: 'At least one menu and distinct source selections are required.' },
   );
 export const appendixDecisionSchema = contractDecisionSchema;
+export const appendixCancellationSchema = appendixDecisionSchema.extend({
+  reason: appendixDraftSchema.shape.reason,
+});
 export const appendixDocumentSchema = z.strictObject({
   bookingId: z.uuid(),
   contractRevisionId: z.uuid(),

@@ -1,3 +1,4 @@
+import { completeSettlementFixture } from './completion-settlement-api-cases.js';
 import { randomUUID } from 'node:crypto';
 import { expect, it } from 'vitest';
 import type { StepSixApiHarness } from './commercial-step6-api-cases.js';
@@ -133,6 +134,7 @@ export function registerCommercialSettlementJourney(harness: StepSixApiHarness) 
       expect(result.status, JSON.stringify(result.body)).toBe(200);
       order = printOrderResponseSchema.parse(result.body as unknown).data;
     }
+    await completeSettlementFixture(harness, f.id);
     const expenses = await post(`/management/bookings/${f.id}/incidental-expenses`, {
       expectedRevision: 0,
       name: 'Chi phí cuối tiệc',

@@ -8,6 +8,9 @@ export const recordingResponseSchema = z.strictObject({
   data: z.strictObject({
     bookingId: z.uuid(),
     bookingRevision: z.int().positive(),
+    bookingPhase: z
+      .enum(['DRAFT', 'AWAITING_DEPOSIT', 'CONFIRMED', 'COMPLETED', 'CANCELLED'])
+      .optional(),
     billingRevision: z.int().nonnegative(),
     deposit: z.strictObject({
       canRecord: z.boolean(),

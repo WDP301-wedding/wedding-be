@@ -69,7 +69,7 @@ export const finalInvoiceOpenApiPaths = {
     get: read('getManagementIncidentalExpenses', expenseDraftResponseSchema),
     post: write(
       'createIncidentalExpense',
-      'Manager, CONFIRMED/COMPLETED non-cancelled. Demo permits settlement before event end by default; STRICT_SETTLEMENT_DATE_CHECK=true requires authoritative event end. Expected draft revision, integer VND; server total and audit. No ledger charge before finalization.',
+      'Manager, COMPLETED only. Manager must mark the event completed before settlement, even in demo mode. Demo date bypass remains; STRICT_SETTLEMENT_DATE_CHECK=true additionally requires authoritative event end. Expected draft revision, integer VND; server total and audit. No ledger charge before finalization.',
       createExpenseSchema,
       expenseDraftResponseSchema,
     ),
@@ -95,7 +95,7 @@ export const finalInvoiceOpenApiPaths = {
     parameters: [booking],
     post: write(
       'finalizeCommercialInvoice',
-      'Manager, CONFIRMED/COMPLETED non-cancelled. Demo permits settlement before event end by default; STRICT_SETTLEMENT_DATE_CHECK=true requires authoritative event end. Exact commercial/draft/billing revisions. Freeze original contract, all approved appendices and expenses (including zero). Atomically post only incidental delta, audit/outbox and current invoice.',
+      'Manager, COMPLETED only. Manager must mark the event completed before settlement, even in demo mode. Demo date bypass remains; STRICT_SETTLEMENT_DATE_CHECK=true additionally requires authoritative event end. Exact commercial/draft/billing revisions. Freeze original contract, all approved appendices and expenses (including zero). Atomically post only incidental delta, audit/outbox and current invoice.',
       finalizeInvoiceSchema,
       finalInvoiceResponseSchema,
     ),

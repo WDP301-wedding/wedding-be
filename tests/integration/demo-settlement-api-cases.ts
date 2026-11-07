@@ -1,3 +1,4 @@
+import { completeSettlementFixture } from './completion-settlement-api-cases.js';
 import { expect, it, vi } from 'vitest';
 import type { StepSixApiHarness } from './commercial-step6-api-cases.js';
 import { selectionResponseSchema } from '../../src/modules/booking-lifecycle/domain/commercial-selections.js';
@@ -76,6 +77,7 @@ export function registerDemoSettlementApiCases(h: StepSixApiHarness) {
       vi.stubEnv('STRICT_SETTLEMENT_DATE_CHECK', undefined);
       try {
         const { f, d, total, deposit } = await prepared();
+        await completeSettlementFixture(h, f.id);
         // Direct SQL remains strict outside the authorized settlement transaction.
         await expect(
           h.database.prisma.$queryRaw`SELECT require_event_ended(${f.id}::uuid)`,
@@ -138,6 +140,9 @@ export function registerDemoSettlementApiCases(h: StepSixApiHarness) {
     vi.stubEnv('STRICT_SETTLEMENT_DATE_CHECK', 'true');
     try {
       const { f, d } = await prepared();
+      vi.stubEnv('STRICT_SETTLEMENT_DATE_CHECK', undefined);
+      await completeSettlementFixture(h, f.id);
+      vi.stubEnv('STRICT_SETTLEMENT_DATE_CHECK', 'true');
       const result = await h.post(`/management/bookings/${f.id}/final-invoices`, {
         expectedDraftRevision: 0,
         expectedCommercialRevisionId: d.contract.revisionId,
