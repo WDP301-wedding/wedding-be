@@ -151,12 +151,18 @@ export function createVenueService(prisma: PrismaClient): VenueService {
           }
         }
         let rawDescription = input.description.replace(/\s*<!--DEPOSIT_RATE:\d+-->/g, '').trim();
+        validateCatalogDescription(rawDescription);
         if (depositRate !== undefined) {
-          rawDescription = `${rawDescription}\n<!--DEPOSIT_RATE:${depositRate}-->`;
+          const tag = `\n<!--DEPOSIT_RATE:${depositRate}-->`;
+          if (rawDescription.length + tag.length > 2_000) {
+            rawDescription = rawDescription.slice(0, 2_000 - tag.length).trimEnd() + tag;
+          } else {
+            rawDescription = `${rawDescription}${tag}`;
+          }
         }
         const values = {
           displayName: validateCatalogName(input.displayName),
-          description: validateCatalogDescription(rawDescription),
+          description: rawDescription,
           address: requireBoundedText('address', input.address, 1, 2_000),
           publicPhone: optionalText(input.publicPhone, 250),
           publicEmail: optionalText(input.publicEmail, 320),
