@@ -15,6 +15,17 @@ evidence and frontend source. New requirements are extensions to completed work.
 
 ## 1. Team Boundary
 
+Cancellation/refund amendment confirmed by the owner on **2026-11-08**: this work
+may change backend, Manager web, Couple web and PRM-app. Keep the signed contract
+unchanged. Restaurant cancellation refunds only 100% of received deposit in-system;
+any additional compensation remains external. Couple personal cancellation uses
+the signed standard 100/50/0% timing from request receipt to agreed shift start.
+Freeze accepted cancellation evidence; never substitute Manager decision time for
+the received request time. No provider money transfer is introduced. Before
+cancellation, show disabled percentage previews; after cancellation prefill the
+server-calculated remainder. Couple may request stopping an unpaid draft with
+RESTRICTED access. See [scope and evidence](./cancellation-refund-policy-2026-11-08.md).
+
 Completion-before-settlement amendment confirmed by the owner on **2026-11-07**:
 this revision may change wedding-manage-web and wedding-be. Place event completion
 before post-event settlement. Manual and automatic completion require no unresolved

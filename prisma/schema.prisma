@@ -750,6 +750,7 @@ model Booking {
   eventType                   BookingEventType             @default(WEDDING)
   alias                       String?                      @db.VarChar(120)
   cancelledAt                 DateTime?                    @db.Timestamptz(6)
+  cancellationRefundPolicy    Json?
   completedAt                 DateTime?                    @db.Timestamptz(6)
   currentTimelineRevisionId   String?                      @unique @db.Uuid
   effectiveTimelineRevisionId String?                      @unique @db.Uuid

@@ -34,6 +34,12 @@ export function createBillingOperationsService(
     ledger: BillingLedgerRepository;
     operations: BillingOperationsRepository;
     boundary: BookingBoundaryUnitOfWork;
+    requireCancellationRefund?: (
+      bookingId: string,
+      amountVnd: number,
+      sourcePaymentId: string | undefined,
+      context: ContractContext,
+    ) => Promise<void>;
     booking: BookingLifecycleReader;
     commercial: BookingCommercialSnapshotReader;
     reporting: BookingReportingReader;
@@ -394,6 +400,12 @@ export function createBillingOperationsService(
     async approveRefund(input: z.input<typeof refundApprovalSchema>, context: ContractContext) {
       const command = refundApprovalSchema.parse(input);
       return execute(command, 'REFUND_APPROVAL', context, async (scoped) => {
+        await options.requireCancellationRefund?.(
+          command.bookingId,
+          command.approvedRefundableVnd,
+          undefined,
+          scoped,
+        );
         const ledger = await options.ledger.getLedger(command.bookingId, scoped);
         if (
           command.expectedBillingRevision !== undefined &&
@@ -456,6 +468,12 @@ export function createBillingOperationsService(
     async recordRefund(input: z.input<typeof refundCommandSchema>, context: ContractContext) {
       const command = refundCommandSchema.parse(input);
       return execute(command, 'REFUND', context, async (scoped) => {
+        await options.requireCancellationRefund?.(
+          command.bookingId,
+          command.amountVnd,
+          command.sourcePaymentId,
+          scoped,
+        );
         const ledger = await options.ledger.getLedger(command.bookingId, scoped);
         if (ledger.revision !== command.expectedBillingRevision)
           throw error('STALE_BILLING_REVISION');

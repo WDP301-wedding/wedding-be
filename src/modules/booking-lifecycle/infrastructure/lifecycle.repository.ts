@@ -15,6 +15,7 @@ import { BookingLifecycleNotFoundError } from './consultation.repository.js';
 import { readCompletionAppendix } from './completion-appendix.reader.js';
 import { commercialConflict } from '../domain/commercial-contract.js';
 import { retryCommercialWrite } from './commercial-write.retry.js';
+import { readCancellationRefundPolicy } from './cancellation-refund.reader.js';
 
 export type BookingLifecycleMutationContext = Readonly<{
   requestId: string;
@@ -58,6 +59,7 @@ export interface BookingLifecycleRepository extends BookingPlanningHeadcountSync
       bookingId: string;
       expectedBookingRevision: number;
       reason: string;
+      initiator?: 'COUPLE' | 'RESTAURANT';
       context: BookingLifecycleMutationContext;
     }>,
   ): Promise<Readonly<{ phase: 'CANCELLED'; bookingRevision: number }>>;
@@ -127,6 +129,7 @@ export function createPrismaBookingLifecycleRepository(
     cancel(input: Parameters<BookingLifecycleRepository['cancel']>[0]) {
       return prisma.$transaction(
         async (transaction) => {
+          await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${input.bookingId}))`;
           const booking = await requireLifecycleBooking(transaction, input.bookingId);
           if (booking.revision !== input.expectedBookingRevision) {
             throw new BookingLifecycleStateError('STALE_BOOKING_REVISION');
@@ -139,11 +142,16 @@ export function createPrismaBookingLifecycleRepository(
             cancelledAt,
           );
           await requireNoDepositIntent(transaction, input.bookingId);
+          const refundPolicy = await readCancellationRefundPolicy(transaction, input.bookingId, {
+            initiator: input.initiator ?? null,
+            requestedAt: input.initiator === 'RESTAURANT' ? cancelledAt : null,
+            fallbackRequestedAt: cancelledAt,
+          });
           const bookingRevision = await incrementBooking(
             transaction,
             input.bookingId,
             input.expectedBookingRevision,
-            { phase: 'CANCELLED', cancelledAt },
+            { phase: 'CANCELLED', cancelledAt, cancellationRefundPolicy: refundPolicy },
             booking.phase,
           );
           await releaseCancellationHolds(
@@ -258,6 +266,7 @@ export function createPrismaBookingLifecycleRepository(
 
     requestCancellation(input: Parameters<BookingLifecycleRepository['requestCancellation']>[0]) {
       return prisma.$transaction(async (transaction) => {
+        await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${input.bookingId}))`;
         const booking = await requireLifecycleBooking(transaction, input.bookingId);
         if (booking.revision !== input.expectedBookingRevision) {
           throw new BookingLifecycleStateError('STALE_BOOKING_REVISION');
@@ -307,6 +316,7 @@ export function createPrismaBookingLifecycleRepository(
     decideCancellation(input: Parameters<BookingLifecycleRepository['decideCancellation']>[0]) {
       return prisma.$transaction(
         async (transaction) => {
+          await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${input.bookingId}))`;
           const booking = await requireLifecycleBooking(transaction, input.bookingId);
           if (booking.revision !== input.expectedBookingRevision) {
             throw new BookingLifecycleStateError('STALE_BOOKING_REVISION');
@@ -343,11 +353,24 @@ export function createPrismaBookingLifecycleRepository(
           if (decided.count !== 1)
             throw new BookingLifecycleStateError('CANCELLATION_REQUEST_CONFLICT');
           const phase = input.decision === 'APPROVE' ? ('CANCELLED' as const) : booking.phase;
+          const refundPolicy =
+            input.decision === 'APPROVE'
+              ? await readCancellationRefundPolicy(transaction, input.bookingId, {
+                  initiator: 'COUPLE',
+                  requestedAt: request.requestedAt,
+                })
+              : null;
           const bookingRevision = await incrementBooking(
             transaction,
             input.bookingId,
             input.expectedBookingRevision,
-            input.decision === 'APPROVE' ? { phase: 'CANCELLED', cancelledAt: decidedAt } : {},
+            input.decision === 'APPROVE'
+              ? {
+                  phase: 'CANCELLED',
+                  cancelledAt: decidedAt,
+                  cancellationRefundPolicy: refundPolicy!,
+                }
+              : {},
             input.decision === 'APPROVE' ? booking.phase : undefined,
           );
           if (input.decision === 'APPROVE') {
@@ -528,6 +551,7 @@ async function incrementBooking(
     phase?: 'CANCELLED' | 'COMPLETED';
     cancelledAt?: Date;
     completedAt?: Date;
+    cancellationRefundPolicy?: Prisma.InputJsonValue;
   }>,
   phase?: BookingPhase,
 ): Promise<number> {

@@ -23,6 +23,7 @@ export function createBookingLifecycleService(
         bookingId: string;
         expectedBookingRevision: number;
         reason: string;
+        initiator?: 'COUPLE' | 'RESTAURANT';
         actor: LifecycleActor;
         requestId: string;
       }>,
@@ -32,6 +33,7 @@ export function createBookingLifecycleService(
         bookingId: input.bookingId,
         expectedBookingRevision: input.expectedBookingRevision,
         reason: input.reason,
+        ...(input.initiator ? { initiator: input.initiator } : {}),
         context: { requestId: input.requestId, actorAccountId: input.actor.accountId },
       });
     },
@@ -49,7 +51,7 @@ export function createBookingLifecycleService(
       await options.access.requireAccess({
         accountId: input.actor.accountId,
         consultationId: authorization.consultationId,
-        minimum: 'FULL',
+        minimum: 'RESTRICTED',
       });
       return options.repository.requestCancellation({
         bookingId: input.bookingId,
