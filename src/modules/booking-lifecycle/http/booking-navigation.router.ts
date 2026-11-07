@@ -36,6 +36,11 @@ const selection = {
       currentRevision: { select: { contractTotalVnd: true } },
     },
   },
+  commercialAppendices: {
+    select: {
+      effectiveRevision: { select: { effectiveTotalVnd: true } },
+    },
+  },
   consultation: {
     select: {
       displayName: true,
@@ -100,16 +105,23 @@ async function rowsDto(tx: Prisma.TransactionClient, rows: Row[], includeManager
     let paidVnd: number | null = bill ? Math.max(0, bill.paid) : null;
     let outstandingVnd: number | null = null;
 
-    const contractTotal = r.commercialContract?.currentRevision?.contractTotalVnd
-      ? Number(r.commercialContract.currentRevision.contractTotalVnd)
-      : null;
+    const effectiveTotal = r.commercialAppendices?.effectiveRevision?.effectiveTotalVnd
+      ? Number(r.commercialAppendices.effectiveRevision.effectiveTotalVnd)
+      : r.commercialContract?.currentRevision?.contractTotalVnd
+        ? Number(r.commercialContract.currentRevision.contractTotalVnd)
+        : null;
 
-    if (bill && bill.charges > 0) {
-      outstandingVnd = Math.max(0, bill.charges - bill.paid);
-      paymentStatus = outstandingVnd === 0 ? 'PAID' : 'DEBT';
-    } else if (contractTotal !== null && contractTotal > 0) {
-      const paid = bill ? bill.paid : 0;
-      outstandingVnd = Math.max(0, contractTotal - paid);
+    const charges = bill?.charges ?? 0;
+    const paid = bill ? Math.max(0, bill.paid) : 0;
+    const totalObligation =
+      effectiveTotal !== null && effectiveTotal > 0
+        ? Math.max(effectiveTotal, charges)
+        : charges > 0
+          ? charges
+          : null;
+
+    if (totalObligation !== null && totalObligation > 0) {
+      outstandingVnd = Math.max(0, totalObligation - paid);
       paymentStatus =
         outstandingVnd === 0
           ? 'PAID'
