@@ -97,7 +97,10 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
     const first = await design(),
       second = await design(),
       third = await design();
-    const [a, b, c] = await Promise.all([publish(first), publish(second), publish(third)]);
+    // The first committed publication owns the retained default. Establish it
+    // before racing other designs; Promise.all does not guarantee commit order.
+    const a = await publish(first);
+    const [b, c] = await Promise.all([publish(second), publish(third)]);
     expect(new Set([a.publicSlug, b.publicSlug, c.publicSlug]).size).toBe(3);
     for (const [source, published] of [
       [first, a],
