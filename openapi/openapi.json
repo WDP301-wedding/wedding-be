@@ -1709,6 +1709,43 @@
                 ],
                 "type": "object"
               },
+              "completion": {
+                "additionalProperties": false,
+                "properties": {
+                  "appendixRevisionNumber": {
+                    "anyOf": [
+                      {
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "canComplete": {
+                    "type": "boolean"
+                  },
+                  "coupleApproved": {
+                    "type": "boolean"
+                  },
+                  "managerApproved": {
+                    "type": "boolean"
+                  },
+                  "pending": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "canComplete",
+                  "pending",
+                  "appendixRevisionNumber",
+                  "managerApproved",
+                  "coupleApproved"
+                ],
+                "type": "object"
+              },
               "consultationId": {
                 "format": "uuid",
                 "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
@@ -11623,7 +11660,7 @@
         }
       ],
       "post": {
-        "description": "Confirmed/completed paid full contract. Exact effective predecessor, reason and selections. Server computes signed delta; original contract/deposit remain frozen. Unresolved payments and finalized invoices block changes.",
+        "description": "CONFIRMED paid full contract only, before event completion. Exact effective predecessor, reason and selections. Server computes signed delta; original contract/deposit remain frozen. Unresolved payments and finalized invoices block changes.",
         "operationId": "createCommercialAppendix",
         "parameters": [
           {
@@ -12315,6 +12352,630 @@
                 },
                 "required": [
                   "expectedRevision"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "appendix": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "approvals": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "actorAccountId": {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  "documentDigest": {
+                                    "pattern": "^[a-f0-9]{64}$",
+                                    "type": "string"
+                                  },
+                                  "occurredAt": {
+                                    "format": "date-time",
+                                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                                    "type": "string"
+                                  },
+                                  "party": {
+                                    "enum": [
+                                      "MANAGER",
+                                      "COUPLE"
+                                    ],
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "party",
+                                  "actorAccountId",
+                                  "documentDigest",
+                                  "occurredAt"
+                                ],
+                                "type": "object"
+                              },
+                              "maxItems": 2,
+                              "type": "array"
+                            },
+                            "approvedAt": {
+                              "anyOf": [
+                                {
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "createdAt": {
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                              "type": "string"
+                            },
+                            "document": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "afterLines": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "category": {
+                                        "enum": [
+                                          "MENU",
+                                          "PRINT",
+                                          "SERVICE"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "description": {
+                                        "maxLength": 2400,
+                                        "type": "string"
+                                      },
+                                      "lineTotalVnd": {
+                                        "maximum": 9007199254740991,
+                                        "minimum": 0,
+                                        "type": "integer"
+                                      },
+                                      "name": {
+                                        "maxLength": 120,
+                                        "minLength": 1,
+                                        "type": "string"
+                                      },
+                                      "quantity": {
+                                        "exclusiveMinimum": 0,
+                                        "maximum": 10000,
+                                        "type": "integer"
+                                      },
+                                      "sourceId": {
+                                        "format": "uuid",
+                                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                        "type": "string"
+                                      },
+                                      "sourceRevisionId": {
+                                        "format": "uuid",
+                                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                        "type": "string"
+                                      },
+                                      "unit": {
+                                        "maxLength": 80,
+                                        "minLength": 1,
+                                        "type": "string"
+                                      },
+                                      "unitPriceVnd": {
+                                        "maximum": 9007199254740991,
+                                        "minimum": 0,
+                                        "type": "integer"
+                                      }
+                                    },
+                                    "required": [
+                                      "category",
+                                      "sourceId",
+                                      "sourceRevisionId",
+                                      "quantity",
+                                      "name",
+                                      "description",
+                                      "unit",
+                                      "unitPriceVnd",
+                                      "lineTotalVnd"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "maxItems": 50,
+                                  "minItems": 1,
+                                  "type": "array"
+                                },
+                                "afterTotalVnd": {
+                                  "maximum": 9007199254740991,
+                                  "minimum": 0,
+                                  "type": "integer"
+                                },
+                                "beforeLines": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "category": {
+                                        "enum": [
+                                          "MENU",
+                                          "PRINT",
+                                          "SERVICE"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "description": {
+                                        "maxLength": 2400,
+                                        "type": "string"
+                                      },
+                                      "lineTotalVnd": {
+                                        "maximum": 9007199254740991,
+                                        "minimum": 0,
+                                        "type": "integer"
+                                      },
+                                      "name": {
+                                        "maxLength": 120,
+                                        "minLength": 1,
+                                        "type": "string"
+                                      },
+                                      "quantity": {
+                                        "exclusiveMinimum": 0,
+                                        "maximum": 10000,
+                                        "type": "integer"
+                                      },
+                                      "sourceId": {
+                                        "format": "uuid",
+                                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                        "type": "string"
+                                      },
+                                      "sourceRevisionId": {
+                                        "format": "uuid",
+                                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                        "type": "string"
+                                      },
+                                      "unit": {
+                                        "maxLength": 80,
+                                        "minLength": 1,
+                                        "type": "string"
+                                      },
+                                      "unitPriceVnd": {
+                                        "maximum": 9007199254740991,
+                                        "minimum": 0,
+                                        "type": "integer"
+                                      }
+                                    },
+                                    "required": [
+                                      "category",
+                                      "sourceId",
+                                      "sourceRevisionId",
+                                      "quantity",
+                                      "name",
+                                      "description",
+                                      "unit",
+                                      "unitPriceVnd",
+                                      "lineTotalVnd"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "maxItems": 50,
+                                  "minItems": 1,
+                                  "type": "array"
+                                },
+                                "beforeTotalVnd": {
+                                  "maximum": 9007199254740991,
+                                  "minimum": 0,
+                                  "type": "integer"
+                                },
+                                "bookingId": {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                },
+                                "brideName": {
+                                  "maxLength": 120,
+                                  "minLength": 1,
+                                  "type": "string"
+                                },
+                                "contractRevisionId": {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                },
+                                "deltaVnd": {
+                                  "maximum": 9007199254740991,
+                                  "minimum": -9007199254740991,
+                                  "type": "integer"
+                                },
+                                "groomName": {
+                                  "maxLength": 120,
+                                  "minLength": 1,
+                                  "type": "string"
+                                },
+                                "predecessorRevisionId": {
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                  "type": "string"
+                                },
+                                "reason": {
+                                  "maxLength": 500,
+                                  "minLength": 1,
+                                  "type": "string"
+                                },
+                                "tableCount": {
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 500,
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "bookingId",
+                                "contractRevisionId",
+                                "predecessorRevisionId",
+                                "brideName",
+                                "groomName",
+                                "reason",
+                                "beforeLines",
+                                "afterLines",
+                                "beforeTotalVnd",
+                                "afterTotalVnd",
+                                "deltaVnd",
+                                "tableCount"
+                              ],
+                              "type": "object"
+                            },
+                            "documentDigest": {
+                              "pattern": "^[a-f0-9]{64}$",
+                              "type": "string"
+                            },
+                            "printOrderId": {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            "printRequests": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "appendixRevisionId": {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  "bookingId": {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  "bookingRevision": {
+                                    "exclusiveMinimum": 0,
+                                    "maximum": 9007199254740991,
+                                    "type": "integer"
+                                  },
+                                  "document": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "lines": {
+                                        "items": {
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "contentDigest": {
+                                              "pattern": "^[a-f0-9]{64}$",
+                                              "type": "string"
+                                            },
+                                            "designId": {
+                                              "format": "uuid",
+                                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                              "type": "string"
+                                            },
+                                            "designRevisionId": {
+                                              "format": "uuid",
+                                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                              "type": "string"
+                                            },
+                                            "line": {
+                                              "additionalProperties": false,
+                                              "properties": {
+                                                "category": {
+                                                  "enum": [
+                                                    "MENU",
+                                                    "PRINT",
+                                                    "SERVICE"
+                                                  ],
+                                                  "type": "string"
+                                                },
+                                                "description": {
+                                                  "maxLength": 2400,
+                                                  "type": "string"
+                                                },
+                                                "lineTotalVnd": {
+                                                  "maximum": 9007199254740991,
+                                                  "minimum": 0,
+                                                  "type": "integer"
+                                                },
+                                                "name": {
+                                                  "maxLength": 120,
+                                                  "minLength": 1,
+                                                  "type": "string"
+                                                },
+                                                "quantity": {
+                                                  "exclusiveMinimum": 0,
+                                                  "maximum": 10000,
+                                                  "type": "integer"
+                                                },
+                                                "sourceId": {
+                                                  "format": "uuid",
+                                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                                  "type": "string"
+                                                },
+                                                "sourceRevisionId": {
+                                                  "format": "uuid",
+                                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                                  "type": "string"
+                                                },
+                                                "unit": {
+                                                  "maxLength": 80,
+                                                  "minLength": 1,
+                                                  "type": "string"
+                                                },
+                                                "unitPriceVnd": {
+                                                  "maximum": 9007199254740991,
+                                                  "minimum": 0,
+                                                  "type": "integer"
+                                                }
+                                              },
+                                              "required": [
+                                                "category",
+                                                "sourceId",
+                                                "sourceRevisionId",
+                                                "quantity",
+                                                "name",
+                                                "description",
+                                                "unit",
+                                                "unitPriceVnd",
+                                                "lineTotalVnd"
+                                              ],
+                                              "type": "object"
+                                            },
+                                            "printableRevisionId": {
+                                              "format": "uuid",
+                                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                              "type": "string"
+                                            },
+                                            "quantity": {
+                                              "maximum": 10000,
+                                              "minimum": 1,
+                                              "type": "integer"
+                                            },
+                                            "title": {
+                                              "type": "string"
+                                            }
+                                          },
+                                          "required": [
+                                            "designId",
+                                            "designRevisionId",
+                                            "title",
+                                            "quantity",
+                                            "printableRevisionId",
+                                            "contentDigest",
+                                            "line"
+                                          ],
+                                          "type": "object"
+                                        },
+                                        "maxItems": 20,
+                                        "minItems": 1,
+                                        "type": "array"
+                                      },
+                                      "predecessorRevisionId": {
+                                        "format": "uuid",
+                                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                        "type": "string"
+                                      },
+                                      "totalVnd": {
+                                        "maximum": 9007199254740991,
+                                        "minimum": 0,
+                                        "type": "integer"
+                                      }
+                                    },
+                                    "required": [
+                                      "predecessorRevisionId",
+                                      "lines",
+                                      "totalVnd"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "orderId": {
+                                    "anyOf": [
+                                      {
+                                        "format": "uuid",
+                                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "requestId": {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  "state": {
+                                    "enum": [
+                                      "DRAFT",
+                                      "AWAITING_APPROVAL",
+                                      "APPROVED",
+                                      "SUPERSEDED"
+                                    ],
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "requestId",
+                                  "bookingId",
+                                  "bookingRevision",
+                                  "appendixRevisionId",
+                                  "state",
+                                  "orderId",
+                                  "document"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "revisionId": {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            "revisionNumber": {
+                              "exclusiveMinimum": 0,
+                              "maximum": 9007199254740991,
+                              "type": "integer"
+                            },
+                            "state": {
+                              "enum": [
+                                "DRAFT",
+                                "AWAITING_APPROVAL",
+                                "APPROVED",
+                                "SUPERSEDED"
+                              ],
+                              "type": "string"
+                            },
+                            "submittedAt": {
+                              "anyOf": [
+                                {
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "revisionId",
+                            "revisionNumber",
+                            "state",
+                            "document",
+                            "documentDigest",
+                            "createdAt",
+                            "submittedAt",
+                            "approvedAt",
+                            "approvals"
+                          ],
+                          "type": "object"
+                        },
+                        "bookingRevision": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "bookingRevision",
+                        "appendix"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Immutable appendix and current Booking revision."
+          },
+          "400": {
+            "$ref": "#/components/responses/IdempotencyKeyRequired"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Booking lifecycle"
+        ]
+      }
+    },
+    "/bookings/{bookingId}/contract-appendices/{revisionId}/cancellations": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "bookingId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "revisionId",
+          "required": true,
+          "schema": {
+            "format": "uuid",
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "description": "Own Manager or FULL Couple. CONFIRMED, or COMPLETED solely to discard an unapplied legacy proposal. Cancel the current DRAFT/AWAITING_APPROVAL proposal with expected Booking revision and reason. Retain approvals, content, audit and effective agreement; no ledger changes. Legacy pending print purchases use their existing withdrawal flow.",
+        "operationId": "cancelCommercialAppendix",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "expectedRevision": {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  },
+                  "reason": {
+                    "maxLength": 500,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "expectedRevision",
+                  "reason"
                 ],
                 "type": "object"
               }
@@ -27124,7 +27785,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Start VNPay full outstanding balance for own FULL access or Manager at the expected billing revision.",
+        "summary": "COMPLETED booking only. Start VNPay full outstanding balance for own FULL access or Manager at the expected billing revision. Deposit remains available before the event under its existing guards.",
         "tags": [
           "Payments and Billing"
         ]
@@ -27302,7 +27963,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Read owned deposit status with RESTRICTED/FULL access or balance status with FULL access; Managers can read either. Reopens an unexpired VNPay checkout. After expiry plus 15 minutes, authenticated missing-order or unpaid evidence resolves FAILED; unverified outcomes remain UNKNOWN.",
+        "summary": "Read owned deposit status with RESTRICTED/FULL access or balance status with FULL access; Managers can read either. Reopens an unexpired VNPay checkout; BALANCE URLs are exposed only for COMPLETED bookings. After expiry plus 15 minutes, authenticated missing-order or unpaid evidence resolves FAILED; unverified outcomes remain UNKNOWN.",
         "tags": [
           "Payments and Billing"
         ]
@@ -39842,6 +40503,16 @@
                           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                           "type": "string"
                         },
+                        "bookingPhase": {
+                          "enum": [
+                            "DRAFT",
+                            "AWAITING_DEPOSIT",
+                            "CONFIRMED",
+                            "COMPLETED",
+                            "CANCELLED"
+                          ],
+                          "type": "string"
+                        },
                         "bookingRevision": {
                           "exclusiveMinimum": 0,
                           "maximum": 9007199254740991,
@@ -40443,7 +41114,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Complete a due confirmed booking",
+        "summary": "Own Manager completes a due CONFIRMED booking only after the current appendix is approved by both parties on the same digest, or superseded/cancelled. No appendix is required. Completion opens post-event settlement; it is not payment closure. Demo date bypass remains unchanged.",
         "tags": [
           "Booking Lifecycle"
         ]
@@ -40462,7 +41133,7 @@
         }
       ],
       "post": {
-        "description": "Manager, CONFIRMED/COMPLETED non-cancelled. Demo permits settlement before event end by default; STRICT_SETTLEMENT_DATE_CHECK=true requires authoritative event end. Exact commercial/draft/billing revisions. Freeze original contract, all approved appendices and expenses (including zero). Atomically post only incidental delta, audit/outbox and current invoice.",
+        "description": "Manager, COMPLETED only. Manager must mark the event completed before settlement, even in demo mode. Demo date bypass remains; STRICT_SETTLEMENT_DATE_CHECK=true additionally requires authoritative event end. Exact commercial/draft/billing revisions. Freeze original contract, all approved appendices and expenses (including zero). Atomically post only incidental delta, audit/outbox and current invoice.",
         "operationId": "finalizeCommercialInvoice",
         "parameters": [
           {
@@ -41527,7 +42198,7 @@
         }
       ],
       "post": {
-        "description": "Manager, CONFIRMED/COMPLETED non-cancelled. Demo permits settlement before event end by default; STRICT_SETTLEMENT_DATE_CHECK=true requires authoritative event end. Expected draft revision, integer VND; server total and audit. No ledger charge before finalization.",
+        "description": "Manager, COMPLETED only. Manager must mark the event completed before settlement, even in demo mode. Demo date bypass remains; STRICT_SETTLEMENT_DATE_CHECK=true additionally requires authoritative event end. Expected draft revision, integer VND; server total and audit. No ledger charge before finalization.",
         "operationId": "createIncidentalExpense",
         "parameters": [
           {

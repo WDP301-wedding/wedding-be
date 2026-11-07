@@ -138,7 +138,7 @@ export const paymentsBillingOpenApiPaths: NonNullable<ZodOpenApiObject['paths']>
   '/bookings/{bookingId}/payments/balance': {
     post: mutation(
       'createBalancePayment',
-      'Start VNPay full outstanding balance for own FULL access or Manager at the expected billing revision.',
+      'COMPLETED booking only. Start VNPay full outstanding balance for own FULL access or Manager at the expected billing revision. Deposit remains available before the event under its existing guards.',
       balanceBodySchema,
       checkoutResponseSchema,
       booking,
@@ -211,7 +211,7 @@ export const paymentsBillingOpenApiPaths: NonNullable<ZodOpenApiObject['paths']>
     get: {
       operationId: 'getPaymentAttempt',
       summary:
-        'Read owned deposit status with RESTRICTED/FULL access or balance status with FULL access; Managers can read either. Reopens an unexpired VNPay checkout. After expiry plus 15 minutes, authenticated missing-order or unpaid evidence resolves FAILED; unverified outcomes remain UNKNOWN.',
+        'Read owned deposit status with RESTRICTED/FULL access or balance status with FULL access; Managers can read either. Reopens an unexpired VNPay checkout; BALANCE URLs are exposed only for COMPLETED bookings. After expiry plus 15 minutes, authenticated missing-order or unpaid evidence resolves FAILED; unverified outcomes remain UNKNOWN.',
       tags: ['Payments and Billing'],
       security: bearer,
       parameters: [

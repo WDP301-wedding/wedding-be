@@ -3,6 +3,7 @@ import type { z } from 'zod';
 import {
   appendixDraftSchema,
   appendixDecisionSchema,
+  appendixCancellationSchema,
   appendixResponseSchema,
   appendicesResponseSchema,
 } from '../domain/commercial-appendix.js';
@@ -58,7 +59,7 @@ export const commercialAppendixOpenApiPaths = {
     },
     post: write(
       'createCommercialAppendix',
-      'Confirmed/completed paid full contract. Exact effective predecessor, reason and selections. Server computes signed delta; original contract/deposit remain frozen. Unresolved payments and finalized invoices block changes.',
+      'CONFIRMED paid full contract only, before event completion. Exact effective predecessor, reason and selections. Server computes signed delta; original contract/deposit remain frozen. Unresolved payments and finalized invoices block changes.',
       appendixDraftSchema,
       '201',
     ),
@@ -78,6 +79,15 @@ export const commercialAppendixOpenApiPaths = {
       'approveCommercialAppendix',
       'Two distinct own Manager/Couple actors approve one digest. Second approval atomically activates revision, posts signed delta once and creates or synchronizes production orders for retained print requests. Quantity/removal changes affect only APPROVED orders; production history is immutable. Historical catalogue allocations retain their original safeguards.',
       appendixDecisionSchema,
+      '200',
+    ),
+  },
+  '/bookings/{bookingId}/contract-appendices/{revisionId}/cancellations': {
+    parameters: [booking, revision],
+    post: write(
+      'cancelCommercialAppendix',
+      'Own Manager or FULL Couple. CONFIRMED, or COMPLETED solely to discard an unapplied legacy proposal. Cancel the current DRAFT/AWAITING_APPROVAL proposal with expected Booking revision and reason. Retain approvals, content, audit and effective agreement; no ledger changes. Legacy pending print purchases use their existing withdrawal flow.',
+      appendixCancellationSchema,
       '200',
     ),
   },

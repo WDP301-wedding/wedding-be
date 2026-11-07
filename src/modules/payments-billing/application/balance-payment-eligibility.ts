@@ -46,7 +46,7 @@ export async function requireBalancePayment(
       code,
       message: 'The billing command conflicts with its authority or evidence.',
     });
-  if (!['CONFIRMED', 'COMPLETED'].includes(input.phase)) throw reject('BALANCE_NOT_ELIGIBLE');
+  if (input.phase !== 'COMPLETED') throw reject('BALANCE_NOT_ELIGIBLE');
   const invoicePin = (await dependencies.invoice?.getApplicable(input.bookingId, context)) ?? null;
   if (invoicePin && invoicePin.totalVnd !== input.ledger.totals.acceptedChargesVnd)
     throw reject('FINANCIAL_SOURCE_CONFLICT');

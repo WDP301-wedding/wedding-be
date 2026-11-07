@@ -272,7 +272,7 @@ export const bookingLifecycleOpenApiPaths: Paths = {
   '/management/bookings/{bookingId}/completion': {
     post: mutation(
       'completeBooking',
-      'Complete a due confirmed booking',
+      'Own Manager completes a due CONFIRMED booking only after the current appendix is approved by both parties on the same digest, or superseded/cancelled. No appendix is required. Completion opens post-event settlement; it is not payment closure. Demo date bypass remains unchanged.',
       expectedRevisionBodySchema,
       phaseResponse,
       {

@@ -1,3 +1,7 @@
+import {
+  registerCompletionSettlementCases,
+  completeSettlementFixture,
+} from './completion-settlement-api-cases.js';
 import { randomUUID } from 'node:crypto';
 import { expect, it, vi } from 'vitest';
 import type { z } from 'zod';
@@ -83,6 +87,7 @@ export type StepSixApiHarness = {
   deposit: number;
 };
 export function registerStepSixApiCases(harness: StepSixApiHarness) {
+  registerCompletionSettlementCases(harness);
   registerContractedPrintPriceApiCases(harness);
   registerCommercialSettlementJourney(harness);
   registerDemoSettlementApiCases(harness);
@@ -178,6 +183,7 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
       path = `/management/bookings/${f.id}/incidental-expenses`,
       body = { expectedRevision: 0, name: 'Nước', quantity: 1, unit: 'chai', unitPriceVnd: 10000 },
       key = randomUUID();
+    await completeSettlementFixture(harness, f.id);
     expect((await post(path, body, 'anonymous')).status).toBe(401);
     expect((await post(path, body, 'manager', null)).status).toBe(400);
     const saved = await post(path, body, 'manager', key);
@@ -223,12 +229,13 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
     });
   }, 45_000);
   it('posts debit and zero-net successors and rejects over-credit or forged invoice payment pins', async () => {
-    const { f, d } = await paidFixture(true),
-      result = await post(`/management/bookings/${f.id}/final-invoices`, {
-        expectedDraftRevision: 0,
-        expectedCommercialRevisionId: d.contract.revisionId,
-        expectedBillingRevision: 2,
-      });
+    const { f, d } = await paidFixture(true);
+    await completeSettlementFixture(harness, f.id);
+    const result = await post(`/management/bookings/${f.id}/final-invoices`, {
+      expectedDraftRevision: 0,
+      expectedCommercialRevisionId: d.contract.revisionId,
+      expectedBillingRevision: 2,
+    });
     expect(result.status).toBe(201);
     const root = finalInvoiceResponseSchema.parse(result.body as unknown).data,
       path = `/management/bookings/${f.id}/invoice-adjustments`,
@@ -324,6 +331,7 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
   it('serializes expense edits, same-source finalization and adjustment-versus-payment races', async () => {
     const { f, d } = await paidFixture(true),
       expensePath = `/management/bookings/${f.id}/incidental-expenses`;
+    await completeSettlementFixture(harness, f.id);
     const created = await post(expensePath, {
       expectedRevision: 0,
       name: 'Nước thêm',
@@ -424,6 +432,7 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
     const approved = await post(approvalPath, approval, 'own');
     expect(approved.status, JSON.stringify(approved.body)).toBe(200);
     data = appendixResponseSchema.parse(approved.body as unknown).data;
+    await completeSettlementFixture(harness, f.id);
     const expense = await post(`/management/bookings/${f.id}/incidental-expenses`, {
       expectedRevision: 0,
       name: 'Nước',
@@ -482,6 +491,7 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
   it('enforces authoritative event end and Manager expense authority without accepting client totals', async () => {
     const { f } = await paidFixture(),
       path = `/management/bookings/${f.id}/incidental-expenses`;
+    await completeSettlementFixture(harness, f.id);
     const body = {
       expectedRevision: 0,
       name: 'Bia thêm',
@@ -508,6 +518,7 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
   it('manages draft expenses, finalizes itemized sources once, freezes them and appends signed invoice successors', async () => {
     const { f, d } = await paidFixture(true),
       path = `/management/bookings/${f.id}/incidental-expenses`;
+    await completeSettlementFixture(harness, f.id);
     const body = {
         expectedRevision: 0,
         name: 'Bia thêm',
@@ -591,7 +602,7 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
       (await get(`/bookings/${f.id}/final-invoices/${initial.invoiceRevisionId}`, 'own')).body,
     ).toEqual(invoice.body);
     expect((await database.prisma.booking.findUniqueOrThrow({ where: { id: f.id } })).phase).toBe(
-      'CONFIRMED',
+      'COMPLETED',
     );
     await expect(
       database.prisma.finalInvoiceRevision.update({
@@ -647,6 +658,7 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
   }, 30_000);
   it('pins zero-expense final invoices, reconciles UNKNOWN balances and keeps credits separate from manual refunds', async () => {
     const { f, d } = await paidFixture(true);
+    await completeSettlementFixture(harness, f.id);
     const finalized = await post(`/management/bookings/${f.id}/final-invoices`, {
       expectedDraftRevision: 0,
       expectedCommercialRevisionId: d.contract.revisionId,

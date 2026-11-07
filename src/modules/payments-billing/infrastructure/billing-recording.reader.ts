@@ -139,6 +139,7 @@ export function createBillingRecordingReader(
           data: {
             bookingId,
             bookingRevision: booking.revision,
+            bookingPhase: booking.phase,
             billingRevision: revision,
             deposit: {
               canRecord: reason === null,

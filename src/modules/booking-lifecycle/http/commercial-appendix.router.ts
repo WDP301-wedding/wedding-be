@@ -10,6 +10,7 @@ import type { createCommercialAppendixService } from '../application/commercial-
 import {
   appendixDraftSchema,
   appendixDecisionSchema,
+  appendixCancellationSchema,
   appendixResponseSchema,
   appendicesResponseSchema,
 } from '../domain/commercial-appendix.js';
@@ -108,5 +109,29 @@ export function createCommercialAppendixRouter(
         );
       },
     );
+  router.post(
+    path + '/:revisionId/cancellations',
+    authenticate,
+    validateRequest({ params: revisionParams, body: appendixCancellationSchema }),
+    scope,
+    idempotent('/bookings/{bookingId}/contract-appendices/{revisionId}/cancellations'),
+    async (request, response) => {
+      const { params, body } = validatedRequest(response, {
+        params: revisionParams,
+        body: appendixCancellationSchema,
+      });
+      response.json(
+        appendixResponseSchema.parse({
+          data: await service.cancel(
+            params.bookingId,
+            params.revisionId,
+            body,
+            response.locals.actor as AuthenticatedActor,
+            request.requestId,
+          ),
+        }),
+      );
+    },
+  );
   return router;
 }

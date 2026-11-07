@@ -31,6 +31,14 @@ export function createPrintAppendixWorkflow(
     actorAccountId: context.actorAccountId,
     authority: context.authority,
   };
+  async function requireMutable(bookingId: string) {
+    const booking = await tx.booking.findUniqueOrThrow({
+      where: { id: bookingId },
+      select: { phase: true },
+    });
+    if (booking.phase !== 'CONFIRMED') throw commercialConflict('APPENDIX_NOT_EDITABLE');
+    await financial.requireMutable(bookingId, localContext);
+  }
   async function changed(bookingId: string, revisionId: string, action: string) {
     const booking = await tx.booking.update({
       where: { id: bookingId },
@@ -63,7 +71,7 @@ export function createPrintAppendixWorkflow(
     });
   }
   return {
-    requireMutable: (bookingId: string) => financial.requireMutable(bookingId, localContext),
+    requireMutable,
     async create(
       bookingId: string,
       lineOrLines:
@@ -72,7 +80,7 @@ export function createPrintAppendixWorkflow(
       reason: string,
       remove = false,
     ) {
-      await financial.requireMutable(bookingId, localContext);
+      await requireMutable(bookingId);
       if (remove) {
         const booking = await tx.booking.findUniqueOrThrow({
           where: { id: bookingId },
@@ -184,7 +192,7 @@ export function createPrintAppendixWorkflow(
       return { id, documentDigest, document };
     },
     async approve(bookingId: string, revisionId: string, managerId: string) {
-      await financial.requireMutable(bookingId, localContext);
+      await requireMutable(bookingId);
       const row = await tx.commercialAppendixRevision.findFirstOrThrow({
         where: { id: revisionId, bookingId },
         include: { approvals: true },
@@ -231,6 +239,7 @@ export function createPrintAppendixWorkflow(
       await changed(bookingId, revisionId, 'approved');
     },
     async withdraw(bookingId: string, revisionId: string) {
+      // Withdrawal only discards an unapplied legacy proposal, including completed bookings.
       await financial.requireMutable(bookingId, localContext);
       const row = await tx.commercialAppendixRevision.findFirstOrThrow({
         where: { id: revisionId, bookingId },

@@ -15,6 +15,20 @@ evidence and frontend source. New requirements are extensions to completed work.
 
 ## 1. Team Boundary
 
+Completion-before-settlement amendment confirmed by the owner on **2026-11-07**:
+this revision may change wedding-manage-web and wedding-be. Place event completion
+before post-event settlement. Manual and automatic completion require no unresolved
+current commercial appendix: DRAFT/AWAITING_APPROVAL blocks; APPROVED requires both
+parties on the same revision/digest; superseded history does not block. Only
+COMPLETED bookings may record incidental expenses, finalize/adjust invoices, issue
+legacy billing invoices or collect BALANCE through manual/VNPay commands. Deposits,
+refund evidence, existing payment reconciliation and read-only history retain their
+existing guards. New/edited commercial appendices (including print purchases) stop
+at completion; discard of an unapplied legacy proposal remains possible with reason
+and audit. The demo date bypass remains, and strict date mode adds its existing time
+checks. This supersedes the CONFIRMED settlement allowance below. See
+[implementation and verification](./completion-before-settlement-2026-11-07.md).
+
 Demo settlement clarification confirmed by the owner on **2026-11-04**:
 keep the existing default bypass of the settlement date check for demonstration.
 `STRICT_SETTLEMENT_DATE_CHECK=true` remains an optional strict-mode switch;

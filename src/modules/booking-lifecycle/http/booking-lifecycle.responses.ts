@@ -32,6 +32,15 @@ export const proposalResponseSchema = z.strictObject({
     revision,
     eventDate: z.iso.date(),
     planningHeadcount: z.int().min(0).max(10000),
+    completion: z
+      .strictObject({
+        canComplete: z.boolean(),
+        pending: z.boolean(),
+        appendixRevisionNumber: z.int().positive().nullable(),
+        managerApproved: z.boolean(),
+        coupleApproved: z.boolean(),
+      })
+      .optional(),
     commercialProgress: z
       .strictObject({
         modelVersion: z.enum(['LEGACY_PROPOSAL_V1', 'FULL_CONTRACT_V1']),

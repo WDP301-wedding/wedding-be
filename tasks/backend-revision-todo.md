@@ -1,5 +1,13 @@
 # Backend Revision Tasks: 2026-10-10
 
+## Completion before post-event settlement — 2026-11-07
+
+- [x] COMPLETE-01: Guard manual/automatic completion with current same-digest appendix approvals; serialize completion with commercial changes.
+- [x] COMPLETE-02: Gate post-event financial writers and BALANCE payments on COMPLETED; retain deposits/refunds/history and demo date policy.
+- [x] COMPLETE-03: Update Manager actions, blocked reasons, pending-proposal cancellation, schemas and OpenAPI. [Scope and verification](../docs/completion-before-settlement-2026-11-07.md).
+- [x] COMPLETE-04: Verify scoped local API/UI behavior, forward migration and desktop/mobile browser states; retain broader-suite limitations in the evidence document.
+- [ ] COMPLETE-05: Release and apply the forward migration to the authorized target, then verify deployed behavior.
+
 ## Seating drag/confirmation correction — 2026-11-05
 
 - [x] SEAT-DRAG-01: Diagnose logged `PRINTABLE_SEATING_DIGEST_CONFLICT`, accept saved table positions in printable registration while preserving Venue table identity/shape and immutable history; verify native API, print capture and desktop/mobile browser behavior. [Evidence and existing-suite limitations](./evidence/seating-drag-confirm-409-2026-11-05.md).

@@ -200,6 +200,12 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
         ['MANUAL', 'REFUND', 'APPROVAL'].includes(input.operation),
         input.operation === 'DEPOSIT',
       );
+      if (input.operation === 'BALANCE' && booking.phase !== 'COMPLETED')
+        throw new AppError({
+          status: 409,
+          code: 'BALANCE_NOT_ELIGIBLE',
+          message: 'Complete the event before collecting its remaining balance.',
+        });
       if (['DEPOSIT', 'BALANCE'].includes(input.operation) && providers.vnpay === null)
         throw unavailable();
       const ctx = context(input.actor, input.requestId);
@@ -614,7 +620,13 @@ export function createPaymentsBillingHttpServices(prisma: PrismaClient, provider
       if (status === 'SUCCEEDED' || status === 'FAILED' || isExpired) {
         checkoutUrl = undefined;
       }
-      await authorize(bookingId, actor, attempt.purpose === 'DEPOSIT' ? 'RESTRICTED' : 'FULL');
+      const currentBooking = await authorize(
+        bookingId,
+        actor,
+        attempt.purpose === 'DEPOSIT' ? 'RESTRICTED' : 'FULL',
+      );
+      if (attempt.purpose === 'BALANCE' && currentBooking.phase !== 'COMPLETED')
+        checkoutUrl = undefined;
       return attemptResponseSchema.parse({
         data: {
           paymentAttemptId: attempt.id,

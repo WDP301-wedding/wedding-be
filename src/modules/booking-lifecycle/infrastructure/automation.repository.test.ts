@@ -17,6 +17,7 @@ const context = {
 };
 function fixture() {
   const tx = {
+    commercialAppendixHead: { findUnique: vi.fn().mockResolvedValue(null) },
     $executeRaw: vi.fn(),
     bookingAutomationCommand: { findUnique: vi.fn().mockResolvedValue(null), create: vi.fn() },
     booking: {
@@ -43,6 +44,15 @@ function fixture() {
   };
 }
 describe('booking automation persistence', () => {
+  it('leaves completion pending while an appendix awaits either party', async () => {
+    const { tx, repository } = fixture();
+    tx.commercialAppendixHead.findUnique.mockResolvedValue({
+      currentRevision: { state: 'AWAITING_APPROVAL', revisionNumber: 3, approvals: [] },
+    });
+    await expect(repository.completeDue(input, context)).resolves.toEqual({ outcome: 'NOT_DUE' });
+    expect(tx.booking.updateMany).not.toHaveBeenCalled();
+    expect(tx.bookingAutomationCommand.create).not.toHaveBeenCalled();
+  });
   it('completes once with an atomic command journal, audit and outbox', async () => {
     const { tx, repository } = fixture();
     await expect(repository.completeDue(input, context)).resolves.toEqual({ outcome: 'COMPLETED' });

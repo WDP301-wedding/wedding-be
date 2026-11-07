@@ -10,7 +10,7 @@ export function createEventEndReader(client: PrismaClient) {
         include: { proposalSnapshot: true },
       });
       if (!booking) throw new NotFoundError();
-      if (!['CONFIRMED', 'COMPLETED'].includes(booking.phase) || !booking.proposalSnapshot)
+      if (booking.phase !== 'COMPLETED' || !booking.proposalSnapshot)
         throw commercialConflict('INVOICE_NOT_ELIGIBLE');
       const eventEndAt = localVietnamTime(
         booking.eventDate.toISOString().slice(0, 10),

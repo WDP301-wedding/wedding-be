@@ -13,6 +13,21 @@ const context: BookingLifecycleMutationContext = Object.freeze({
 const now = new Date('2026-12-21T03:00:00.000Z');
 
 describe('PrismaBookingLifecycleRepository', () => {
+  it.each(['DRAFT', 'AWAITING_APPROVAL'])(
+    'does not complete an event with a current %s appendix',
+    async (state) => {
+      const transaction = fixture();
+      transaction.commercialAppendixHead.findUnique.mockResolvedValue({
+        currentRevision: { state, revisionNumber: 2, documentDigest: 'digest', approvals: [] },
+      });
+      const repository = createPrismaBookingLifecycleRepository(client(transaction), () => now);
+      await expect(
+        repository.complete({ bookingId: 'booking', expectedBookingRevision: 4, context }),
+      ).rejects.toMatchObject({ code: 'APPENDIX_APPROVAL_REQUIRED' });
+      expect(transaction.booking.updateMany).not.toHaveBeenCalled();
+      expect(transaction.bookingOutboxEvent.create).not.toHaveBeenCalled();
+    },
+  );
   it.each(['direct', 'approved request'] as const)(
     'releases the unpinned Draft hold when cancellation is %s',
     async (mode) => {
@@ -413,6 +428,8 @@ describe('PrismaBookingLifecycleRepository', () => {
 
 function fixture() {
   return {
+    $executeRaw: vi.fn(),
+    commercialAppendixHead: { findUnique: vi.fn().mockResolvedValue(null) },
     booking: {
       findUnique: vi.fn().mockResolvedValue({
         id: 'booking',
