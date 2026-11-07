@@ -121,6 +121,7 @@ async function rowsDto(tx: Prisma.TransactionClient, rows: Row[], includeManager
           : null;
 
     if (totalObligation !== null && totalObligation > 0) {
+      if (paidVnd === null) paidVnd = 0;
       outstandingVnd = Math.max(0, totalObligation - paid);
       paymentStatus =
         outstandingVnd === 0
@@ -133,6 +134,7 @@ async function rowsDto(tx: Prisma.TransactionClient, rows: Row[], includeManager
     } else if (r.phase === 'COMPLETED') {
       paymentStatus = 'PAID';
       outstandingVnd = 0;
+      if (paidVnd === null) paidVnd = 0;
     } else if (r.phase === 'CONFIRMED') {
       paymentStatus = 'DEBT';
     } else if (r.phase === 'AWAITING_DEPOSIT') {

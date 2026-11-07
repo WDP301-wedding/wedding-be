@@ -423,7 +423,7 @@ export class AnalyticsService {
             quantity: b.tableCount,
           });
         for (const line of lines) {
-          const key = line.sourceId + '/' + line.sourceRevisionId;
+          const key = line.sourceId;
           const row = map.get(key) ?? {
             sourceId: line.sourceId,
             sourceRevisionId: b.commercialLines.length ? line.sourceRevisionId : null,
@@ -433,6 +433,12 @@ export class AnalyticsService {
           };
           row.ids.add(b.bookingId);
           row.quantity = sumVnd([row.quantity, line.quantity]);
+          if (line.name && (!row.nameSnapshot || line.name.length > row.nameSnapshot.length)) {
+            row.nameSnapshot = line.name;
+          }
+          if (b.commercialLines.length === 0) {
+            row.sourceRevisionId = null;
+          }
           map.set(key, row);
         }
       }
@@ -456,6 +462,21 @@ export class AnalyticsService {
       string,
       { hallId: string; hallName: string; revenueVnd: number; bookingCount: number }
     >();
+    const hallNames = new Map(all.map((b) => [b.hallId, b.hallNameSnapshot]));
+    for (const v of venue) {
+      for (const h of v.halls) {
+        if (h.active && (!q.hallId || h.id === q.hallId)) {
+          if (!hallRevenueMap.has(h.id)) {
+            hallRevenueMap.set(h.id, {
+              hallId: h.id,
+              hallName: hallNames.get(h.id) || 'Sảnh tiệc',
+              revenueVnd: 0,
+              bookingCount: 0,
+            });
+          }
+        }
+      }
+    }
     for (const b of committed) {
       const cur = hallRevenueMap.get(b.hallId) ?? {
         hallId: b.hallId,
@@ -470,7 +491,9 @@ export class AnalyticsService {
       ]);
       hallRevenueMap.set(b.hallId, cur);
     }
-    const hallRevenues = [...hallRevenueMap.values()].sort((a, b) => b.revenueVnd - a.revenueVnd);
+    const hallRevenues = [...hallRevenueMap.values()].sort(
+      (a, b) => b.revenueVnd - a.revenueVnd || b.bookingCount - a.bookingCount || a.hallName.localeCompare(b.hallName),
+    );
     const occupied = new Set(
       all
         .filter(
