@@ -198,8 +198,7 @@ export async function renderContractPdf(
   tableHeader();
   for (const [index, line] of content.lines.entries()) {
     pdf.font('Body').fontSize(8.5);
-    const guaranteeBadge = line.priceGuarantee ? ' [Đã bảo đảm giá]' : '';
-    const name = (line.name + guaranteeBadge).normalize('NFC');
+    const name = line.name.normalize('NFC');
     const unit = line.unit === 'table' ? 'bàn' : line.unit === 'copy' ? 'thiệp' : line.unit;
     const values = [
       String(index + 1),

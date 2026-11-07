@@ -11222,9 +11222,6 @@
                                           "minLength": 1,
                                           "type": "string"
                                         },
-                                        "priceGuarantee": {
-                                          "type": "boolean"
-                                        },
                                         "quantity": {
                                           "exclusiveMinimum": 0,
                                           "maximum": 10000,
@@ -11298,9 +11295,6 @@
                                           "maxLength": 120,
                                           "minLength": 1,
                                           "type": "string"
-                                        },
-                                        "priceGuarantee": {
-                                          "type": "boolean"
                                         },
                                         "quantity": {
                                           "exclusiveMinimum": 0,
@@ -11480,9 +11474,6 @@
                                                     "maxLength": 120,
                                                     "minLength": 1,
                                                     "type": "string"
-                                                  },
-                                                  "priceGuarantee": {
-                                                    "type": "boolean"
                                                   },
                                                   "quantity": {
                                                     "exclusiveMinimum": 0,
@@ -11894,9 +11885,6 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
-                                      "priceGuarantee": {
-                                        "type": "boolean"
-                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -11970,9 +11958,6 @@
                                         "maxLength": 120,
                                         "minLength": 1,
                                         "type": "string"
-                                      },
-                                      "priceGuarantee": {
-                                        "type": "boolean"
                                       },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
@@ -12152,9 +12137,6 @@
                                                   "maxLength": 120,
                                                   "minLength": 1,
                                                   "type": "string"
-                                                },
-                                                "priceGuarantee": {
-                                                  "type": "boolean"
                                                 },
                                                 "quantity": {
                                                   "exclusiveMinimum": 0,
@@ -12521,9 +12503,6 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
-                                      "priceGuarantee": {
-                                        "type": "boolean"
-                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -12597,9 +12576,6 @@
                                         "maxLength": 120,
                                         "minLength": 1,
                                         "type": "string"
-                                      },
-                                      "priceGuarantee": {
-                                        "type": "boolean"
                                       },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
@@ -12779,9 +12755,6 @@
                                                   "maxLength": 120,
                                                   "minLength": 1,
                                                   "type": "string"
-                                                },
-                                                "priceGuarantee": {
-                                                  "type": "boolean"
                                                 },
                                                 "quantity": {
                                                   "exclusiveMinimum": 0,
@@ -13148,9 +13121,6 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
-                                      "priceGuarantee": {
-                                        "type": "boolean"
-                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -13224,9 +13194,6 @@
                                         "maxLength": 120,
                                         "minLength": 1,
                                         "type": "string"
-                                      },
-                                      "priceGuarantee": {
-                                        "type": "boolean"
                                       },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
@@ -13406,9 +13373,6 @@
                                                   "maxLength": 120,
                                                   "minLength": 1,
                                                   "type": "string"
-                                                },
-                                                "priceGuarantee": {
-                                                  "type": "boolean"
                                                 },
                                                 "quantity": {
                                                   "exclusiveMinimum": 0,
@@ -13755,9 +13719,6 @@
                                     "minLength": 1,
                                     "type": "string"
                                   },
-                                  "priceGuarantee": {
-                                    "type": "boolean"
-                                  },
                                   "quantity": {
                                     "exclusiveMinimum": 0,
                                     "maximum": 10000,
@@ -14018,9 +13979,6 @@
                                     "minLength": 1,
                                     "type": "string"
                                   },
-                                  "priceGuarantee": {
-                                    "type": "boolean"
-                                  },
                                   "quantity": {
                                     "exclusiveMinimum": 0,
                                     "maximum": 10000,
@@ -14250,9 +14208,6 @@
                                     "maxLength": 120,
                                     "minLength": 1,
                                     "type": "string"
-                                  },
-                                  "priceGuarantee": {
-                                    "type": "boolean"
                                   },
                                   "quantity": {
                                     "exclusiveMinimum": 0,
@@ -14500,9 +14455,6 @@
                                     "minLength": 1,
                                     "type": "string"
                                   },
-                                  "priceGuarantee": {
-                                    "type": "boolean"
-                                  },
                                   "quantity": {
                                     "exclusiveMinimum": 0,
                                     "maximum": 10000,
@@ -14624,9 +14576,6 @@
                                 "maxLength": 120,
                                 "minLength": 1,
                                 "type": "string"
-                              },
-                              "priceGuarantee": {
-                                "type": "boolean"
                               },
                               "quantity": {
                                 "exclusiveMinimum": 0,
@@ -14843,9 +14792,6 @@
                                           "minLength": 1,
                                           "type": "string"
                                         },
-                                        "priceGuarantee": {
-                                          "type": "boolean"
-                                        },
                                         "quantity": {
                                           "exclusiveMinimum": 0,
                                           "maximum": 10000,
@@ -14902,9 +14848,6 @@
                                     "maximum": 9007199254740991,
                                     "minimum": 0,
                                     "type": "integer"
-                                  },
-                                  "priceGuaranteed": {
-                                    "type": "boolean"
                                   },
                                   "restaurantAddress": {
                                     "maxLength": 500,
@@ -15459,9 +15402,6 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
-                                      "priceGuarantee": {
-                                        "type": "boolean"
-                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -15518,9 +15458,6 @@
                                   "maximum": 9007199254740991,
                                   "minimum": 0,
                                   "type": "integer"
-                                },
-                                "priceGuaranteed": {
-                                  "type": "boolean"
                                 },
                                 "restaurantAddress": {
                                   "maxLength": 500,
@@ -15955,9 +15892,6 @@
                                     "minLength": 1,
                                     "type": "string"
                                   },
-                                  "priceGuarantee": {
-                                    "type": "boolean"
-                                  },
                                   "quantity": {
                                     "exclusiveMinimum": 0,
                                     "maximum": 10000,
@@ -16014,9 +15948,6 @@
                               "maximum": 9007199254740991,
                               "minimum": 0,
                               "type": "integer"
-                            },
-                            "priceGuaranteed": {
-                              "type": "boolean"
                             },
                             "restaurantAddress": {
                               "maxLength": 500,
@@ -16388,9 +16319,6 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
-                                      "priceGuarantee": {
-                                        "type": "boolean"
-                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -16447,9 +16375,6 @@
                                   "maximum": 9007199254740991,
                                   "minimum": 0,
                                   "type": "integer"
-                                },
-                                "priceGuaranteed": {
-                                  "type": "boolean"
                                 },
                                 "restaurantAddress": {
                                   "maxLength": 500,
@@ -16901,9 +16826,6 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
-                                      "priceGuarantee": {
-                                        "type": "boolean"
-                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -16960,9 +16882,6 @@
                                   "maximum": 9007199254740991,
                                   "minimum": 0,
                                   "type": "integer"
-                                },
-                                "priceGuaranteed": {
-                                  "type": "boolean"
                                 },
                                 "restaurantAddress": {
                                   "maxLength": 500,
@@ -17491,9 +17410,6 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
-                                      "priceGuarantee": {
-                                        "type": "boolean"
-                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -17550,9 +17466,6 @@
                                   "maximum": 9007199254740991,
                                   "minimum": 0,
                                   "type": "integer"
-                                },
-                                "priceGuaranteed": {
-                                  "type": "boolean"
                                 },
                                 "restaurantAddress": {
                                   "maxLength": 500,
@@ -18004,9 +17917,6 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
-                                      "priceGuarantee": {
-                                        "type": "boolean"
-                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -18063,9 +17973,6 @@
                                   "maximum": 9007199254740991,
                                   "minimum": 0,
                                   "type": "integer"
-                                },
-                                "priceGuaranteed": {
-                                  "type": "boolean"
                                 },
                                 "restaurantAddress": {
                                   "maxLength": 500,
@@ -18512,9 +18419,6 @@
                                                     "minLength": 1,
                                                     "type": "string"
                                                   },
-                                                  "priceGuarantee": {
-                                                    "type": "boolean"
-                                                  },
                                                   "quantity": {
                                                     "exclusiveMinimum": 0,
                                                     "maximum": 10000,
@@ -18588,9 +18492,6 @@
                                                     "maxLength": 120,
                                                     "minLength": 1,
                                                     "type": "string"
-                                                  },
-                                                  "priceGuarantee": {
-                                                    "type": "boolean"
                                                   },
                                                   "quantity": {
                                                     "exclusiveMinimum": 0,
@@ -18821,9 +18722,6 @@
                                                   "minLength": 1,
                                                   "type": "string"
                                                 },
-                                                "priceGuarantee": {
-                                                  "type": "boolean"
-                                                },
                                                 "quantity": {
                                                   "exclusiveMinimum": 0,
                                                   "maximum": 10000,
@@ -18880,9 +18778,6 @@
                                             "maximum": 9007199254740991,
                                             "minimum": 0,
                                             "type": "integer"
-                                          },
-                                          "priceGuaranteed": {
-                                            "type": "boolean"
                                           },
                                           "restaurantAddress": {
                                             "maxLength": 500,
@@ -19419,9 +19314,6 @@
                                               "minLength": 1,
                                               "type": "string"
                                             },
-                                            "priceGuarantee": {
-                                              "type": "boolean"
-                                            },
                                             "quantity": {
                                               "exclusiveMinimum": 0,
                                               "maximum": 10000,
@@ -19495,9 +19387,6 @@
                                               "maxLength": 120,
                                               "minLength": 1,
                                               "type": "string"
-                                            },
-                                            "priceGuarantee": {
-                                              "type": "boolean"
                                             },
                                             "quantity": {
                                               "exclusiveMinimum": 0,
@@ -19728,9 +19617,6 @@
                                             "minLength": 1,
                                             "type": "string"
                                           },
-                                          "priceGuarantee": {
-                                            "type": "boolean"
-                                          },
                                           "quantity": {
                                             "exclusiveMinimum": 0,
                                             "maximum": 10000,
@@ -19787,9 +19673,6 @@
                                       "maximum": 9007199254740991,
                                       "minimum": 0,
                                       "type": "integer"
-                                    },
-                                    "priceGuaranteed": {
-                                      "type": "boolean"
                                     },
                                     "restaurantAddress": {
                                       "maxLength": 500,
@@ -28179,9 +28062,6 @@
                                   "minLength": 1,
                                   "type": "string"
                                 },
-                                "priceGuarantee": {
-                                  "type": "boolean"
-                                },
                                 "quantity": {
                                   "exclusiveMinimum": 0,
                                   "maximum": 10000,
@@ -29207,9 +29087,6 @@
                                               "minLength": 1,
                                               "type": "string"
                                             },
-                                            "priceGuarantee": {
-                                              "type": "boolean"
-                                            },
                                             "quantity": {
                                               "exclusiveMinimum": 0,
                                               "maximum": 10000,
@@ -29516,9 +29393,6 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
-                                      "priceGuarantee": {
-                                        "type": "boolean"
-                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -29822,9 +29696,6 @@
                                         "minLength": 1,
                                         "type": "string"
                                       },
-                                      "priceGuarantee": {
-                                        "type": "boolean"
-                                      },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
                                         "maximum": 10000,
@@ -30102,9 +29973,6 @@
                                         "maxLength": 120,
                                         "minLength": 1,
                                         "type": "string"
-                                      },
-                                      "priceGuarantee": {
-                                        "type": "boolean"
                                       },
                                       "quantity": {
                                         "exclusiveMinimum": 0,
@@ -41084,9 +40952,6 @@
                                               "minLength": 1,
                                               "type": "string"
                                             },
-                                            "priceGuarantee": {
-                                              "type": "boolean"
-                                            },
                                             "quantity": {
                                               "exclusiveMinimum": 0,
                                               "maximum": 10000,
@@ -41160,9 +41025,6 @@
                                               "maxLength": 120,
                                               "minLength": 1,
                                               "type": "string"
-                                            },
-                                            "priceGuarantee": {
-                                              "type": "boolean"
                                             },
                                             "quantity": {
                                               "exclusiveMinimum": 0,
@@ -41393,9 +41255,6 @@
                                             "minLength": 1,
                                             "type": "string"
                                           },
-                                          "priceGuarantee": {
-                                            "type": "boolean"
-                                          },
                                           "quantity": {
                                             "exclusiveMinimum": 0,
                                             "maximum": 10000,
@@ -41452,9 +41311,6 @@
                                       "maximum": 9007199254740991,
                                       "minimum": 0,
                                       "type": "integer"
-                                    },
-                                    "priceGuaranteed": {
-                                      "type": "boolean"
                                     },
                                     "restaurantAddress": {
                                       "maxLength": 500,
@@ -42852,9 +42708,6 @@
                                               "minLength": 1,
                                               "type": "string"
                                             },
-                                            "priceGuarantee": {
-                                              "type": "boolean"
-                                            },
                                             "quantity": {
                                               "exclusiveMinimum": 0,
                                               "maximum": 10000,
@@ -42928,9 +42781,6 @@
                                               "maxLength": 120,
                                               "minLength": 1,
                                               "type": "string"
-                                            },
-                                            "priceGuarantee": {
-                                              "type": "boolean"
                                             },
                                             "quantity": {
                                               "exclusiveMinimum": 0,
@@ -43161,9 +43011,6 @@
                                             "minLength": 1,
                                             "type": "string"
                                           },
-                                          "priceGuarantee": {
-                                            "type": "boolean"
-                                          },
                                           "quantity": {
                                             "exclusiveMinimum": 0,
                                             "maximum": 10000,
@@ -43220,9 +43067,6 @@
                                       "maximum": 9007199254740991,
                                       "minimum": 0,
                                       "type": "integer"
-                                    },
-                                    "priceGuaranteed": {
-                                      "type": "boolean"
                                     },
                                     "restaurantAddress": {
                                       "maxLength": 500,

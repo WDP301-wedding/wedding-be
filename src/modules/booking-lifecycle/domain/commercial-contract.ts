@@ -43,7 +43,6 @@ export const contractLineSchema = commercialSelectionSchema.extend({
   unit: text(80).min(1),
   unitPriceVnd: vnd,
   lineTotalVnd: vnd,
-  priceGuarantee: z.boolean().optional(),
 });
 export const customerSelectionViewSchema = z.strictObject({
   revisionId: z.uuid().nullable(),
@@ -86,7 +85,6 @@ export const contractDocumentSchema = z.strictObject({
   contractTotalVnd: vnd.positive(),
   depositAmountVnd: vnd.positive(),
   depositRate: z.int().min(10).max(100).optional(),
-  priceGuaranteed: z.boolean().optional(),
   incidentalClause: z.literal(INCIDENTAL_CLAUSE),
   standardTerms: z
     .strictObject({

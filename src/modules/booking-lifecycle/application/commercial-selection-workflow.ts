@@ -173,21 +173,12 @@ export function createCustomerSelectionWorkflow(options: {
     const priced = lines.map((line) =>
       contractLineSchema.parse(resolved.get(line.category + line.sourceId)),
     );
-    const hasPriceGuarantee = priced.some((l) =>
-      /bảo đảm giá|bao dam gia|bảo hiểm giá|giữ giá|price guarantee/i.test(`${l.name} ${l.description}`),
-    );
-    const mappedLines = priced.map((line) =>
-      contractLineSchema.parse({
-        ...line,
-        ...(line.category === 'MENU' ? { priceGuarantee: hasPriceGuarantee } : {}),
-      }),
-    );
     if (
-      checkedSum(mappedLines.filter((l) => l.category === 'MENU').map((l) => l.quantity)) > 500 ||
+      checkedSum(priced.filter((l) => l.category === 'MENU').map((l) => l.quantity)) > 500 ||
       access.booking.planningHeadcount > hall.maxGuests
     )
       throw commercialConflict('CONTRACT_CAPACITY_EXCEEDED');
-    return { lines: mappedLines, totalVnd: checkedSum(mappedLines.map((l) => l.lineTotalVnd)) };
+    return { lines: priced, totalVnd: checkedSum(priced.map((l) => l.lineTotalVnd)) };
   }
   async function persist(
     client: PrismaClient,

@@ -216,13 +216,6 @@ export function createCommercialContractService(options: Options) {
       'depositPercentage' in restaurant && typeof restaurant.depositPercentage === 'number'
         ? restaurant.depositPercentage
         : 30;
-    const hasPriceGuarantee = lines.some((l) =>
-      /bảo đảm giá|bao dam gia|bảo hiểm giá|giữ giá|price guarantee/i.test(`${l.name} ${l.description}`),
-    );
-    const mappedLines = lines.map((line) => ({
-      ...line,
-      ...(line.category === 'MENU' ? { priceGuarantee: hasPriceGuarantee } : {}),
-    }));
     return deepFreeze(
       contractDocumentSchema.parse({
         modelVersion: 'FULL_CONTRACT_V1',
@@ -250,11 +243,10 @@ export function createCommercialContractService(options: Options) {
         shiftEndTime: proposal.shiftEndTime.toISOString().slice(11, 16),
         planningHeadcount: booking.planningHeadcount,
         tableCount,
-        lines: mappedLines,
+        lines,
         contractTotalVnd: total,
         depositAmountVnd: contractDeposit(total, depositRate),
         depositRate,
-        priceGuaranteed: hasPriceGuarantee,
         incidentalClause: INCIDENTAL_CLAUSE,
         ...(menus === undefined
           ? {}
