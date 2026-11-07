@@ -2,6 +2,7 @@ import {
   registerCompletionSettlementCases,
   completeSettlementFixture,
 } from './completion-settlement-api-cases.js';
+import { registerCancellationRefundPolicyCases } from './cancellation-refund-policy-api-cases.js';
 import { randomUUID } from 'node:crypto';
 import { expect, it, vi } from 'vitest';
 import type { z } from 'zod';
@@ -87,6 +88,7 @@ export type StepSixApiHarness = {
   deposit: number;
 };
 export function registerStepSixApiCases(harness: StepSixApiHarness) {
+  registerCancellationRefundPolicyCases(harness);
   registerCompletionSettlementCases(harness);
   registerContractedPrintPriceApiCases(harness);
   registerCommercialSettlementJourney(harness);

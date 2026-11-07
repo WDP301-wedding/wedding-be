@@ -32,6 +32,7 @@ import {
   bookingParamsSchema,
   bookingResponseSchema,
   cancellationBodySchema,
+  managerCancellationBodySchema,
   cancellationDecisionParamsSchema,
   cancellationDecisionBodySchema,
   changeRequestBodySchema,
@@ -171,6 +172,7 @@ export interface BookingLifecycleHttpServices {
       bookingId: string;
       expectedBookingRevision: number;
       reason: string;
+      initiator?: 'COUPLE' | 'RESTAURANT';
       actor: Actor;
       requestId: string;
     }>,
@@ -506,17 +508,18 @@ export function createBookingLifecycleRouter(options: CreateBookingLifecycleRout
     '/management/bookings/:bookingId/cancellation',
     ...manager,
     idempotent('/management/bookings/{bookingId}/cancellation'),
-    validateRequest({ params: bookingParamsSchema, body: cancellationBodySchema }),
+    validateRequest({ params: bookingParamsSchema, body: managerCancellationBodySchema }),
     asyncHandler(async (request, response) => {
       const { params, body } = validatedRequest(response, {
         params: bookingParamsSchema,
-        body: cancellationBodySchema,
+        body: managerCancellationBodySchema,
       });
       response.json({
         data: await options.services.cancel({
           bookingId: params.bookingId,
           expectedBookingRevision: body.expectedRevision,
           reason: body.reason,
+          ...(body.initiator ? { initiator: body.initiator } : {}),
           actor: actor(request),
           requestId: request.requestId,
         }),

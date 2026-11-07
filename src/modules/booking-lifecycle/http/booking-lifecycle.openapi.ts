@@ -16,6 +16,7 @@ import {
   approvalBodySchema,
   bookingResponseSchema,
   cancellationBodySchema,
+  managerCancellationBodySchema,
   cancellationDecisionBodySchema,
   changeRequestBodySchema,
   consultationResponseSchema,
@@ -248,7 +249,7 @@ export const bookingLifecycleOpenApiPaths: Paths = {
     post: mutation(
       'cancelBooking',
       'Cancel a booking as its Manager',
-      cancellationBodySchema,
+      managerCancellationBodySchema,
       phaseResponse,
       {
         parameters: [path('bookingId')],

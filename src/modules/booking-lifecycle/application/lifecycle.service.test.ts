@@ -31,7 +31,7 @@ describe('BookingLifecycleService', () => {
     ).rejects.toMatchObject({ code: 'BOOKING_NOT_FOUND' });
     expect(repository.cancel).toHaveBeenCalledOnce();
   });
-  it('requires FULL access for a Couple cancellation request', async () => {
+  it('requires owned RESTRICTED access for a Couple cancellation request, including unpaid drafts', async () => {
     const repository = repositoryFixture();
     const access = accessReader();
     const service = createBookingLifecycleService({
@@ -51,7 +51,7 @@ describe('BookingLifecycleService', () => {
     expect(access.requireAccess).toHaveBeenCalledWith({
       accountId: 'couple',
       consultationId: 'consultation',
-      minimum: 'FULL',
+      minimum: 'RESTRICTED',
     });
     expect(repository.requestCancellation).toHaveBeenCalledWith(
       expect.objectContaining({

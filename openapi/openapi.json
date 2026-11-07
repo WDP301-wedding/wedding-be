@@ -40518,6 +40518,168 @@
                           "maximum": 9007199254740991,
                           "type": "integer"
                         },
+                        "cancellationRefund": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "alreadyRefundedVnd": {
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "canRecord": {
+                              "type": "boolean"
+                            },
+                            "contractRevisionId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "contractTermsVersion": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "depositPaymentId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "depositReceivedVnd": {
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "entitledVnd": {
+                              "anyOf": [
+                                {
+                                  "maximum": 9007199254740991,
+                                  "minimum": 0,
+                                  "type": "integer"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "eventStartsAt": {
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                              "type": "string"
+                            },
+                            "initiator": {
+                              "anyOf": [
+                                {
+                                  "enum": [
+                                    "COUPLE",
+                                    "RESTAURANT"
+                                  ],
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "options": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "amountVnd": {
+                                    "maximum": 9007199254740991,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  "percent": {
+                                    "anyOf": [
+                                      {
+                                        "const": 0,
+                                        "type": "number"
+                                      },
+                                      {
+                                        "const": 50,
+                                        "type": "number"
+                                      },
+                                      {
+                                        "const": 100,
+                                        "type": "number"
+                                      }
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "percent",
+                                  "amountVnd"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "ratePercent": {
+                              "anyOf": [
+                                {
+                                  "anyOf": [
+                                    {
+                                      "const": 0,
+                                      "type": "number"
+                                    },
+                                    {
+                                      "const": 50,
+                                      "type": "number"
+                                    },
+                                    {
+                                      "const": 100,
+                                      "type": "number"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "remainingVnd": {
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "requestedAt": {
+                              "anyOf": [
+                                {
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "version": {
+                              "const": "CANCELLATION_REFUND_V1",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "version",
+                            "initiator",
+                            "requestedAt",
+                            "eventStartsAt",
+                            "contractRevisionId",
+                            "contractTermsVersion",
+                            "depositPaymentId",
+                            "depositReceivedVnd",
+                            "ratePercent",
+                            "entitledVnd",
+                            "canRecord",
+                            "alreadyRefundedVnd",
+                            "remainingVnd",
+                            "options"
+                          ],
+                          "type": "object"
+                        },
                         "deposit": {
                           "additionalProperties": false,
                           "properties": {
@@ -40547,10 +40709,30 @@
                                 "null"
                               ]
                             },
+                            "isSettled": {
+                              "type": "boolean"
+                            },
                             "reasonCode": {
                               "type": [
                                 "string",
                                 "null"
+                              ]
+                            },
+                            "settledAmountVnd": {
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "settledAt": {
+                              "anyOf": [
+                                {
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
                               ]
                             },
                             "timelineRevisionId": {
@@ -40761,6 +40943,13 @@
                     "exclusiveMinimum": 0,
                     "maximum": 9007199254740991,
                     "type": "integer"
+                  },
+                  "initiator": {
+                    "enum": [
+                      "COUPLE",
+                      "RESTAURANT"
+                    ],
+                    "type": "string"
                   },
                   "reason": {
                     "maxLength": 500,

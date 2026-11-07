@@ -158,7 +158,7 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
             Boolean(ownApproval) &&
             ['DRAFT', 'AWAITING_DEPOSIT'].includes(booking.phase),
           canRequestCancellation:
-            !manager && grant.level === 'FULL' && booking.phase === 'CONFIRMED',
+            !manager && ['DRAFT', 'AWAITING_DEPOSIT', 'CONFIRMED'].includes(booking.phase),
         },
       });
     },

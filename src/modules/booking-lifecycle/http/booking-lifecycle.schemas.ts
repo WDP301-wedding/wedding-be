@@ -22,12 +22,10 @@ export const cancellationDecisionBodySchema = z.strictObject({
 });
 
 export const createConsultationBodySchema = z.strictObject({
-  sourceConsultationId: uuid
-    .optional()
-    .meta({
-      description:
-        'Explicit existing-customer selection from an owned consultation. The server verifies the matching email and existing active customer grant before linking RESTRICTED access atomically; typing an email alone never links an account.',
-    }),
+  sourceConsultationId: uuid.optional().meta({
+    description:
+      'Explicit existing-customer selection from an owned consultation. The server verifies the matching email and existing active customer grant before linking RESTRICTED access atomically; typing an email alone never links an account.',
+  }),
   ...coupleProfileFields,
   intendedEmail: z.email(),
   displayName: z.string().trim().min(1).max(120),
@@ -141,6 +139,9 @@ export const changeRequestBodySchema = z.strictObject({
 export const cancellationBodySchema = z.strictObject({
   expectedRevision: revision,
   reason,
+});
+export const managerCancellationBodySchema = cancellationBodySchema.extend({
+  initiator: z.enum(['COUPLE', 'RESTAURANT']).optional(),
 });
 
 export const consultationResponseSchema = z.strictObject({

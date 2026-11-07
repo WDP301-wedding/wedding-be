@@ -157,6 +157,9 @@ jobs:
       - name: Verify completion approval gates, cancellation and settlement admission
         run: npx vitest run tests/integration/commercial-contracts-api.test.ts --maxWorkers=1 -t 'denies final settlement and both payment methods before completion|requires current dual approval|retains a cancelled proposal and reason|keeps automatic completion pending|serializes a new appendix against completion'
 
+      - name: Verify cancellation refund percentages, retained evidence and deposit limits
+        run: npx vitest run tests/integration/commercial-contracts-api.test.ts --maxWorkers=1 -t 'refund policy:'
+
       - name: Verify contract PDF preview and mutual approval lock
         run: npx vitest run tests/integration/commercial-contracts-api.test.ts --maxWorkers=1 -t 'previews the submitted terms|returns a submitted contract for changes'
 

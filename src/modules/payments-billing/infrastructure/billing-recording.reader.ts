@@ -9,6 +9,7 @@ import {
 } from '../application/balance-payment-eligibility.js';
 import { readReceivables } from './billing-persistence.queries.js';
 import { recordingResponseSchema } from '../http/billing-recording.schemas.js';
+import { readCancellationRefundPolicy } from '../../booking-lifecycle/infrastructure/cancellation-refund.reader.js';
 
 /** Read-only advisory snapshot. Every command still rechecks its financial authority atomically. */
 export function createBillingRecordingReader(
@@ -48,7 +49,7 @@ export function createBillingRecordingReader(
               },
             },
             proposalSnapshot: { select: { depositAmountVnd: true } },
-            depositSettlement: { select: { bookingId: true } },
+            depositSettlement: { select: { bookingId: true, amountVnd: true, settledAt: true } },
             depositIntents: {
               where: { status: { in: ['ACTIVE', 'UNKNOWN'] } },
               take: 1,
@@ -114,21 +115,33 @@ export function createBillingRecordingReader(
           CASE WHEN ${booking.phase}='CANCELLED' AND EXISTS(SELECT 1 FROM "BookingReportingSnapshot" WHERE "bookingId"=${bookingId}::uuid AND value->>'phase'='CANCELLED')
           THEN ${totals.paidVnd}::numeric-COALESCE((SELECT SUM("approvedRefundableVnd") FROM decisions WHERE "basisKind"='CANCELLATION' AND "basisId"=${bookingId}::uuid),0) ELSE 0 END
         ) AS available`;
-        const maxRefund = Math.min(totals.netPaidVnd, Number(capacity?.available ?? 0));
-        const rows =
-          maxRefund <= 0
-            ? []
-            : await tx.$queryRaw<
-                Array<{
-                  id: string;
-                  revision: number;
-                  occurredAt: Date;
-                  amountVnd: unknown;
-                  refundedVnd: unknown;
-                  purpose: 'DEPOSIT' | 'BALANCE' | null;
-                  provider: 'MANUAL' | 'VNPAY' | null;
-                }>
-              >`
+        const policy = await readCancellationRefundPolicy(tx, bookingId);
+        const refundedDeposit = policy.depositPaymentId
+          ? await tx.billingLedgerEntry.aggregate({
+              where: { bookingId, kind: 'REFUND', sourceEntryId: policy.depositPaymentId },
+              _sum: { amountVnd: true },
+            })
+          : null;
+        const alreadyRefundedVnd = Number(refundedDeposit?._sum.amountVnd ?? 0);
+        const remainingVnd = Math.max(0, (policy.entitledVnd ?? 0) - alreadyRefundedVnd);
+        const canRefund =
+          booking.phase === 'CANCELLED' && policy.ratePercent !== null && remainingVnd > 0;
+        const maxRefund = Math.min(
+          totals.netPaidVnd,
+          remainingVnd,
+          Number(capacity?.available ?? 0),
+        );
+        const rows = await tx.$queryRaw<
+          Array<{
+            id: string;
+            revision: number;
+            occurredAt: Date;
+            amountVnd: unknown;
+            refundedVnd: unknown;
+            purpose: 'DEPOSIT' | 'BALANCE' | null;
+            provider: 'MANUAL' | 'VNPAY' | null;
+          }>
+        >`
         WITH returned AS (SELECT "sourceEntryId", SUM("amountVnd") AS amount FROM "BillingLedgerEntry" WHERE "bookingId"=${bookingId}::uuid AND "kind"='REFUND' GROUP BY "sourceEntryId")
         SELECT p.id,p.revision,p."occurredAt",p."amountVnd",COALESCE(r.amount,0) AS "refundedVnd",a.purpose,a.provider
         FROM "BillingLedgerEntry" p LEFT JOIN returned r ON r."sourceEntryId"=p.id LEFT JOIN "BillingPaymentAttempt" a ON a.id=p."paymentAttemptId" AND a."bookingId"=p."bookingId"
@@ -141,7 +154,25 @@ export function createBillingRecordingReader(
             bookingRevision: booking.revision,
             bookingPhase: booking.phase,
             billingRevision: revision,
+            cancellationRefund: {
+              ...policy,
+              canRecord: canRefund,
+              alreadyRefundedVnd,
+              remainingVnd,
+              options: ([100, 50, 0] as const).map((percent) => ({
+                percent,
+                amountVnd:
+                  percent === 100
+                    ? policy.depositReceivedVnd
+                    : percent === 50
+                      ? Math.floor(policy.depositReceivedVnd / 2)
+                      : 0,
+              })),
+            },
             deposit: {
+              isSettled: booking.depositSettlement !== null,
+              settledAmountVnd: Number(booking.depositSettlement?.amountVnd ?? 0),
+              settledAt: booking.depositSettlement?.settledAt.toISOString() ?? null,
               canRecord: reason === null,
               amountVnd: Number(
                 approved
@@ -169,7 +200,10 @@ export function createBillingRecordingReader(
                 provider: row.provider,
                 amountVnd: amount,
                 refundedVnd: returned,
-                maxRefundVnd: Math.max(0, Math.min(amount - returned, maxRefund)),
+                maxRefundVnd:
+                  canRefund && row.id === policy.depositPaymentId
+                    ? Math.max(0, Math.min(amount - returned, maxRefund))
+                    : 0,
               };
             }),
             nextAfterRevision: rows.length > query.limit ? page.at(-1)!.revision : null,

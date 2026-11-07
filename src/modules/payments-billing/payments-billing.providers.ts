@@ -26,6 +26,7 @@ import { createVnpayProtocol } from './infrastructure/vnpay.protocol.js';
 import { createVnpayStatusGateway } from './infrastructure/vnpay.gateway.js';
 import { createBillingOperationsRepository } from './infrastructure/billing-operations.repository.js';
 import { createBillingOperationsService } from './application/billing-operations.service.js';
+import { createCancellationRefundGuard } from './infrastructure/cancellation-refund.guard.js';
 import type { ContractContext } from './application/payments-billing.providers.js';
 import { createBillingViewsService } from './application/billing-views.service.js';
 import { createBillingReportingReader } from './infrastructure/billing-reporting.repository.js';
@@ -84,6 +85,7 @@ export function createPaymentsBillingProviders(
   const operationsRepository = createBillingOperationsRepository(prisma, scope);
   const invoice = createInvoiceBalanceReader(prisma, scope);
   const operations = createBillingOperationsService({
+    requireCancellationRefund: createCancellationRefundGuard(scope),
     resolveManualRefundDecision: createManualRefundDecisionResolver(scope),
     ledger: billing.repository,
     operations: operationsRepository,

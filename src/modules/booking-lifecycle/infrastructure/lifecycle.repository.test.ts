@@ -405,7 +405,15 @@ describe('PrismaBookingLifecycleRepository', () => {
 
     expect(transaction.booking.updateMany).toHaveBeenCalledWith({
       where: { id: 'booking', revision: 4, phase: 'CONFIRMED' },
-      data: { phase: 'CANCELLED', cancelledAt: now, revision: { increment: 1 } },
+      data: {
+        phase: 'CANCELLED',
+        cancelledAt: now,
+        cancellationRefundPolicy: expect.objectContaining({
+          version: 'CANCELLATION_REFUND_V1',
+          depositReceivedVnd: 0,
+        }),
+        revision: { increment: 1 },
+      },
     });
     expect('updateMany' in transaction.bookingDepositSettlement).toBe(false);
   });
@@ -431,6 +439,14 @@ function fixture() {
     $executeRaw: vi.fn(),
     commercialAppendixHead: { findUnique: vi.fn().mockResolvedValue(null) },
     booking: {
+      findUniqueOrThrow: vi.fn().mockResolvedValue({
+        phase: 'CONFIRMED',
+        eventDate: new Date('2026-12-20T00:00:00Z'),
+        cancellationRefundPolicy: null,
+        proposalSnapshot: { shiftStartTime: new Date('1970-01-01T17:30:00Z') },
+        depositSettlement: null,
+        cancellationRequests: [],
+      }),
       findUnique: vi.fn().mockResolvedValue({
         id: 'booking',
         revision: 4,
