@@ -6,6 +6,7 @@ import {
 } from './venue-catalog/catalog-test-database.js';
 import { studioFixture } from './invitation-studio/studio-fixture.js';
 import { createStaffServices } from '../../src/modules/staff-operations/infrastructure/staff.composition.js';
+import { createStaffSeatingServices } from '../../src/modules/staff-operations/infrastructure/staff-seating.composition.js';
 
 (catalogMigrationDatabaseUrl ? describe : describe.skip)(
   'assigned events without named guests',
@@ -59,6 +60,58 @@ import { createStaffServices } from '../../src/modules/staff-operations/infrastr
         code: 'EVENT_ASSIGNMENT_REQUIRED',
       });
       await expect(f.s.workspace.read(f.bookingId, f.couple)).rejects.toMatchObject({
+        status: 404,
+      });
+    });
+    it('reads retained seating and work after completion without changing the seating history', async () => {
+      const f = await fixture();
+      const s = createStaffSeatingServices(db.prisma, f.services);
+      const plan = await s.seating.seating.select(
+        f.bookingId,
+        { layoutTemplateVersionId: f.layoutId, expectedBookingRevision: 1 },
+        randomUUID(),
+        f.couple,
+      );
+      await db.prisma.booking.update({ where: { id: f.bookingId }, data: { phase: 'COMPLETED' } });
+      const before = await db.prisma.seatingPlan.findUniqueOrThrow({
+        where: { bookingId: f.bookingId },
+      });
+      for (const actor of [f.manager, f.staff]) {
+        const view = await s.staff.workspace.read(f.bookingId, actor);
+        expect(view.operations.phase).toBe('COMPLETED');
+        expect(view.seating.renderSnapshot).toEqual(plan.renderSnapshot);
+        expect(
+          (await s.staff.workspace.page(f.bookingId, { kind: 'INCIDENT' }, actor)).items,
+        ).toEqual([]);
+      }
+      expect(
+        await db.prisma.seatingPlan.findUniqueOrThrow({ where: { bookingId: f.bookingId } }),
+      ).toEqual(before);
+      await expect(
+        s.seating.seating.select(
+          f.bookingId,
+          { layoutTemplateVersionId: f.layoutId, expectedBookingRevision: 1 },
+          randomUUID(),
+          f.manager,
+        ),
+      ).rejects.toMatchObject({ code: 'PREPARATION_READ_ONLY' });
+    });
+    it('lets Manager read and assign personnel for completed events', async () => {
+      const f = await fixture();
+      await db.prisma.booking.update({ where: { id: f.bookingId }, data: { phase: 'COMPLETED' } });
+      expect(await f.s.staff.assignments(f.bookingId, f.manager)).toHaveLength(2);
+      const staff = await f.actor('STAFF');
+      const assignment = await f.s.staff.assign(
+        f.bookingId,
+        { staffAccountId: staff.actorId, expectedRevision: 0 },
+        randomUUID(),
+        f.manager,
+      );
+      expect(assignment.status).toBe('ACTIVE');
+      expect((await f.s.workspace.list({ phase: 'COMPLETED' }, staff)).items[0]?.bookingId).toBe(
+        f.bookingId,
+      );
+      await expect(f.s.staff.assignments(f.bookingId, f.staff)).rejects.toMatchObject({
         status: 404,
       });
     });

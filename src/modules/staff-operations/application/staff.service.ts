@@ -240,7 +240,7 @@ export class StaffService {
       context,
       async () => {
         await this.manager(context);
-        await this.guests.owners.booking.requireConfirmedEventContext(bookingId);
+        await this.events.requireConfirmedEventContext(bookingId);
       },
       async (tx) => {
         const rows = await tx.staffAssignment.findMany({
@@ -272,7 +272,7 @@ export class StaffService {
       input,
       async () => {
         await this.manager(context);
-        await this.guests.owners.booking.requireConfirmedEventContext(bookingId);
+        await this.events.requireConfirmedEventContext(bookingId);
       },
       async (tx, scope) => {
         await tx.$queryRaw`SELECT id FROM "Account" WHERE id=${input.staffAccountId}::uuid FOR SHARE`;

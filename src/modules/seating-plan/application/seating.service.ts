@@ -154,8 +154,14 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
       snapshotDigest: row.snapshotDigest,
     });
   }
-  private async facts(bookingId: string, layoutId: string, scope: ContractContext) {
-    const event = await this.guest.owners.booking.requireConfirmedEventContext(bookingId);
+  private async facts(
+    bookingId: string,
+    layoutId: string,
+    scope: ContractContext,
+    readOnly = false,
+  ) {
+    const booking = readOnly ? this.guest.owners.history : this.guest.owners.booking;
+    const event = await booking.requireConfirmedEventContext(bookingId);
     const planning = await this.guest.owners.planning.getSource(bookingId, scope);
     const eligibility = await this.venue.getLayoutEligibility(layoutId, scope);
     if (eligibility.hallId !== event.hallId) throw new NotFoundError();
@@ -568,6 +574,7 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
       bookingId,
       row.layoutTemplateVersionId,
       scope,
+      readOnly,
     );
     if (eventRevision !== undefined && eventRevision > planning.bookingRevision)
       throw conflict('SEATING_REVISION_STALE');

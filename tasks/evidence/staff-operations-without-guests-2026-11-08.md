@@ -91,3 +91,27 @@ were performed. Local browser/dev/realtime fixture servers were closed afterward
 
 Deployment, generated-client repinning to an actual released backend commit and
 live acceptance remain a separate coordinated release.
+
+## Release verification follow-up
+
+The owner authorized merge/deploy and confirmed Render workspace `my space`
+(`tea-dbcss8ks728c73851hl0`). PRM-app #10 was merged only; Manager Web #50 and
+Couple Web #44 passed main CI and their Vercel production deployment jobs.
+Backend #111 passed main CI and deployment `dep-dbo1bnbl550s738fktc0` became live
+on the existing service at 06:27:36 UTC on 8 November. The live OpenAPI matched
+the merged artifact. No paid provider or business-data writes were used.
+
+Read-only live verification then exposed a completed-event regression: the event
+list included a completed booking with retained seating, but opening its workspace
+or personnel returned 404. Two real-database tests reproduced this independently:
+Seating's read-only revalidation and Manager assignment authorization each used
+the confirmed-only reader. The correction uses the existing completed-capable
+history/Staff readers while preserving the preparation write lock and assignment
+authorization. Both new tests first failed, then all **29 tests** across Staff
+workspace, Staff operations and Seating persistence passed against disposable
+loopback databases. The completed seating head remains unchanged by reads, and
+an attempt to change completed preparation still fails `PREPARATION_READ_ONLY`.
+
+The correction requires its own exact-head CI and deployment before this live
+workspace check is accepted. Final sanitized runtime receipts are kept locally
+in `output/staff-release-20261108/`; generated-client repinning remains separate.
