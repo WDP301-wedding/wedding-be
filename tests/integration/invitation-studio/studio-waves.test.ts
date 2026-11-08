@@ -1090,7 +1090,7 @@ suite('SPEC-05 W2/W3/W4 native PostgreSQL owner boundaries', () => {
       transition: 'RETIRE',
       context: f.ownerContext,
     });
-    expect((await f.layout.resolveVersion(f.layoutId)).tables).toHaveLength(1);
+    expect((await f.layout.resolveVersion(f.layoutId)).tables).toHaveLength(4);
     await expect(capture(d)).rejects.toMatchObject({ status: 409 });
   });
   it('trusted scope validation blocks HTTP-style SYSTEM forgery and cross-book enlistment', async () => {

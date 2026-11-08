@@ -124,6 +124,9 @@ describe('PrismaConsultationWorkspaceRepository', () => {
 
 function fixture() {
   return {
+    $executeRaw: vi.fn().mockResolvedValue(1),
+    hall: { findUnique: vi.fn().mockResolvedValue({ lifecycle: 'ACTIVE', maxGuests: 500 }) },
+    layoutTemplateVersion: { findMany: vi.fn().mockResolvedValue([{ _count: { geometry: 50 } }]) },
     consultation: {
       create: vi.fn().mockResolvedValue({}),
       findUnique: vi.fn().mockResolvedValue({

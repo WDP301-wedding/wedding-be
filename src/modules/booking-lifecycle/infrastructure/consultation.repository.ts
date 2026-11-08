@@ -1,3 +1,4 @@
+import { requireHallTableCapacity } from '../../venue-catalog/infrastructure/table-capacity.reader.js';
 import { AppError } from '../../../core/errors/app-error.js';
 import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
 import { normalizeEmail } from '../../identity-access/account/account.service.js';
@@ -56,6 +57,12 @@ export function createPrismaConsultationRepository(
       const email = normalizeEmail(record.intendedEmail);
       try {
         await prisma.$transaction(async (transaction) => {
+          await requireHallTableCapacity(
+            transaction,
+            record.proposal.hall.id,
+            record.proposal.planningHeadcount,
+            record.proposal.tableCount,
+          );
           await transaction.consultation.create({
             data: {
               id: record.consultationId,
@@ -302,6 +309,12 @@ export function createPrismaConsultationWorkspaceRepository(
             if (consultation.revision !== record.expectedConsultationRevision) {
               throw new BookingLifecycleConflictError('STALE_BOOKING_REVISION');
             }
+            await requireHallTableCapacity(
+              transaction,
+              record.proposal.hall.id,
+              record.proposal.planningHeadcount,
+              record.proposal.tableCount,
+            );
             await transaction.booking.create({
               data: {
                 id: record.bookingId,

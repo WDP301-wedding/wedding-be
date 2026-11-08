@@ -1,3 +1,9 @@
+import { prismaSchema } from '../../../core/database/prisma.js';
+import {
+  commercialSummary,
+  commercialSummarySelect,
+} from '../infrastructure/commercial-summary.reader.js';
+import { readEffectiveTablePage } from '../infrastructure/effective-table-page.reader.js';
 import { activeIntakeWhere } from './booking-navigation.policy.js';
 import { Router, type Response } from 'express';
 import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
@@ -20,6 +26,7 @@ import {
   navigationResponse,
 } from './booking-navigation.schemas.js';
 const selection = {
+  ...commercialSummarySelect,
   id: true,
   bookingCode: true,
   alias: true,
@@ -81,7 +88,7 @@ async function rowsDto(tx: Prisma.TransactionClient, rows: Row[], includeManager
     hallNameSnapshot: r.proposalSnapshot?.hallName ?? '',
     shiftCode: r.shiftCode,
     phase: r.phase,
-    tableCount: r.proposalSnapshot?.tableCount ?? 0,
+    tableCount: commercialSummary(r).tableCount,
     createdAt: r.createdAt.toISOString(),
     cancelledAt: r.cancelledAt?.toISOString() ?? null,
     customerName: r.consultation.displayName,
@@ -157,13 +164,26 @@ export function createBookingNavigationRouter(
             }),
           ]);
           const paging = bounds(q.page, total, q.pageSize);
+          const pageIds =
+            q.sort === 'tableCount'
+              ? await readEffectiveTablePage(
+                  tx,
+                  q,
+                  actor(res).accountId,
+                  (paging.page - 1) * q.pageSize,
+                  prismaSchema(prisma),
+                )
+              : null;
           const rows = await tx.booking.findMany({
-            where,
+            where: pageIds === null ? where : { id: { in: pageIds } },
             select: selection,
             orderBy: [sort, { id: q.order }],
-            skip: (paging.page - 1) * q.pageSize,
-            take: q.pageSize,
+            ...(pageIds === null ? { skip: (paging.page - 1) * q.pageSize, take: q.pageSize } : {}),
           });
+          if (pageIds !== null) {
+            const positions = new Map(pageIds.map((id, index) => [id, index]));
+            rows.sort((a, b) => positions.get(a.id)! - positions.get(b.id)!);
+          }
           return { ...paging, counts: { all, mine }, items: await rowsDto(tx, rows) };
         },
         { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },

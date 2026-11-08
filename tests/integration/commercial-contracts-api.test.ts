@@ -1,3 +1,4 @@
+import { ensurePublishedTableLayout } from '../fixtures/table-layout.js';
 import { registerAnalyticsCommercialCases } from './analytics-commercial-cases.js';
 import { registerDepositPolicyCases } from './deposit-policy-api-cases.js';
 import { registerIncidentalApprovalCases } from './incidental-approval-api-cases.js';
@@ -135,6 +136,18 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     await mkdir(directory, { recursive: true });
     await database.connect();
     await seedVenueCatalog(database.prisma);
+    await ensurePublishedTableLayout(
+      database.prisma,
+      CATALOG_SEED_IDS.lotusHall,
+      CATALOG_SEED_IDS.actor,
+      30,
+    );
+    await ensurePublishedTableLayout(
+      database.prisma,
+      CATALOG_SEED_IDS.orchidHall,
+      CATALOG_SEED_IDS.actor,
+      12,
+    );
     const sessions = createPrismaSessionRepository(database.prisma);
     for (const [who, id] of Object.entries(accounts)) {
       await database.prisma.account.create({

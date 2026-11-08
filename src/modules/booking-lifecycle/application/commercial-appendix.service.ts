@@ -1,3 +1,4 @@
+import { requireHallTableCapacity } from '../../venue-catalog/infrastructure/table-capacity.reader.js';
 import { randomUUID } from 'node:crypto';
 import type { z } from 'zod';
 import type { createBookingBoundaryUnitOfWork } from '../../../core/database/booking-unit-of-work.js';
@@ -401,8 +402,12 @@ export function createCommercialAppendixService(options: Options) {
             );
             return frozen ?? resolvedUnfrozen.get(l.category + l.sourceId)!;
           });
-          if (access.booking.planningHeadcount > hall.maxGuests)
-            throw commercialConflict('CONTRACT_CAPACITY_EXCEEDED');
+          await requireHallTableCapacity(
+            client,
+            hall.id,
+            access.booking.planningHeadcount,
+            calculateAppendixChange(effective.lines, afterLines).tableCount,
+          );
           const document = appendixDocumentSchema.parse({
             bookingId,
             contractRevisionId: effective.contract.contractRevisionId,
@@ -467,10 +472,16 @@ export function createCommercialAppendixService(options: Options) {
         actor,
         requestId,
         input.expectedRevision,
-        async (client) => {
+        async (client, access) => {
           const row = await current(client, bookingId, revisionId);
           if (row.state !== 'DRAFT') throw commercialConflict('APPENDIX_NOT_EDITABLE');
           const document = appendixDocumentSchema.parse(row.document);
+          await requireHallTableCapacity(
+            client,
+            access.booking.hallId,
+            access.booking.planningHeadcount,
+            document.tableCount,
+          );
           const effective = await createEffectiveCommercialReader(client).getEffective(bookingId);
           if (effective.revisionId !== document.predecessorRevisionId)
             throw commercialConflict('COMMERCIAL_PREDECESSOR_STALE');
@@ -523,6 +534,12 @@ export function createCommercialAppendixService(options: Options) {
           const row = await current(client, bookingId, revisionId);
           if (row.state !== 'AWAITING_APPROVAL')
             throw commercialConflict('APPENDIX_APPROVAL_REQUIRED');
+          await requireHallTableCapacity(
+            client,
+            access.booking.hallId,
+            access.booking.planningHeadcount,
+            appendixDocumentSchema.parse(row.document).tableCount,
+          );
           if (
             appendixDigest(appendixDocumentSchema.parse(row.document)) !== row.documentDigest ||
             row.approvals.some((a) => a.documentDigest !== row.documentDigest)

@@ -1,3 +1,7 @@
+import {
+  commercialSummary,
+  commercialSummarySelect,
+} from '../infrastructure/commercial-summary.reader.js';
 import { activeIntakeWhere } from './booking-navigation.policy.js';
 import { createBookingNavigationRouter } from './booking-navigation.router.js';
 import { createHash, randomUUID } from 'node:crypto';
@@ -373,6 +377,7 @@ export function createBookingExperienceRouter(
           ...(query.client === 'WEB' ? { phase: { not: 'CANCELLED' as const } } : {}),
         },
         select: {
+          ...commercialSummarySelect,
           id: true,
           consultationId: true,
           eventDate: true,
@@ -383,7 +388,7 @@ export function createBookingExperienceRouter(
           eventType: true,
           alias: true,
           consultation: { select: { brideName: true, groomName: true } },
-          proposalSnapshot: { select: { hallName: true, baseChargeVnd: true } },
+          proposalSnapshot: { select: { hallName: true, baseChargeVnd: true, tableCount: true } },
           depositSettlement: { select: { amountVnd: true } },
           currentTimelineRevision: { select: { managerApprovedAt: true, coupleApprovedAt: true } },
         },
@@ -418,9 +423,11 @@ export function createBookingExperienceRouter(
             alias: booking.alias,
             brideName: booking.consultation?.brideName ?? null,
             groomName: booking.consultation?.groomName ?? null,
-            totalVnd: booking.proposalSnapshot?.baseChargeVnd
-              ? Number(booking.proposalSnapshot.baseChargeVnd)
-              : undefined,
+            totalVnd:
+              commercialSummary(booking).totalVnd ??
+              (booking.proposalSnapshot?.baseChargeVnd
+                ? Number(booking.proposalSnapshot.baseChargeVnd)
+                : undefined),
             depositPaidVnd: booking.depositSettlement?.amountVnd
               ? Number(booking.depositSettlement.amountVnd)
               : 0,

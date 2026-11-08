@@ -57,6 +57,14 @@ const intent: InvitationIntent = Object.freeze({
   invitationId: null,
 });
 
+function hallCapacity() {
+  return {
+    $executeRaw: vi.fn().mockResolvedValue(1),
+    hall: { findUnique: vi.fn().mockResolvedValue({ lifecycle: 'ACTIVE', maxGuests: 500 }) },
+    layoutTemplateVersion: { findMany: vi.fn().mockResolvedValue([{ _count: { geometry: 50 } }]) },
+  };
+}
+
 describe('PrismaConsultationRepository', () => {
   it('conceals missing recipients and workspace ownership, and guards revisions and existing bookings', async () => {
     const consultation = {
@@ -68,6 +76,7 @@ describe('PrismaConsultationRepository', () => {
       booking: null,
     };
     const transaction = {
+      ...hallCapacity(),
       consultation: {
         findUnique: vi.fn().mockResolvedValue(consultation),
         findFirst: vi.fn().mockResolvedValue(consultation),
@@ -431,7 +440,7 @@ function storedIntent(value: InvitationIntent) {
 function transactionClient(transaction: object) {
   return {
     $transaction: vi.fn(async (operation: (client: object) => Promise<unknown>) =>
-      operation(transaction),
+      operation({ ...hallCapacity(), ...transaction }),
     ),
   } as never;
 }

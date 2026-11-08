@@ -437,6 +437,8 @@ describe('PrismaBookingLifecycleRepository', () => {
 function fixture() {
   return {
     $executeRaw: vi.fn(),
+    hall: { findUnique: vi.fn().mockResolvedValue({ lifecycle: 'ACTIVE', maxGuests: 500 }) },
+    layoutTemplateVersion: { findMany: vi.fn().mockResolvedValue([{ _count: { geometry: 50 } }]) },
     commercialAppendixHead: { findUnique: vi.fn().mockResolvedValue(null) },
     booking: {
       findUniqueOrThrow: vi.fn().mockResolvedValue({
@@ -449,10 +451,12 @@ function fixture() {
       }),
       findUnique: vi.fn().mockResolvedValue({
         id: 'booking',
+        hallId: 'hall',
         revision: 4,
         phase: 'CONFIRMED',
         eventDate: new Date('2026-12-20T00:00:00.000Z'),
         proposalSnapshot: {
+          tableCount: 12,
           shiftStartTime: new Date('1970-01-01T17:30:00.000Z'),
           shiftEndTime: new Date('1970-01-01T22:00:00.000Z'),
         },

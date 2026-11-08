@@ -1,3 +1,10 @@
+import {
+  commercialSummary,
+  commercialSummarySelect,
+  mutuallyApproved as isMutuallyApproved,
+} from '../infrastructure/commercial-summary.reader.js';
+import { readHallTableCapacity } from '../../venue-catalog/infrastructure/table-capacity.reader.js';
+import { tableCapacityIssue, GUESTS_PER_TABLE } from '../domain/table-capacity.js';
 import type { PrismaClient } from '../../../generated/prisma/client.js';
 import type { ConsultationAccessReader } from '../../identity-access/authorization/authorization.service.js';
 import { BookingLifecycleNotFoundError } from '../infrastructure/consultation.repository.js';
@@ -26,7 +33,7 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
           });
       const snapshot = booking.proposalSnapshot;
       if (snapshot === null) throw new BookingLifecycleNotFoundError();
-      const menu = {
+      let menu = {
         versionId: snapshot.menuPackageVersionId,
         packageId: snapshot.menuPackageId,
         versionNumber: snapshot.menuVersionNumber,
@@ -34,7 +41,7 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
         description: snapshot.menuDescription,
         priceVndPerTable: decimalNumber(snapshot.menuPriceVndPerTable),
       };
-      const menus =
+      let menus =
         snapshot.menus == null
           ? [
               {
@@ -44,21 +51,42 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
               },
             ]
           : proposalMenuLinesSchema.parse(snapshot.menus);
-      const approvedContract =
-        booking.commercialContract?.currentRevision?.state === 'APPROVED'
-          ? booking.commercialContract.currentRevision
-          : null;
-      const baseChargeVnd =
-        approvedContract !== null
-          ? decimalNumber(approvedContract.contractTotalVnd)
-          : decimalNumber(snapshot.baseChargeVnd);
-      const depositAmountVnd =
-        approvedContract !== null
-          ? decimalNumber(approvedContract.depositAmountVnd)
-          : decimalNumber(snapshot.depositAmountVnd);
-      const contractDocument = approvedContract?.document as
-        Readonly<{ tableCount?: number }> | undefined;
-      const tableCount = contractDocument?.tableCount ?? snapshot.tableCount;
+      const summary = commercialSummary(booking);
+      const candidate = booking.commercialContract?.currentRevision;
+      const approvedContract = isMutuallyApproved(candidate) ? candidate : null;
+      const baseChargeVnd = summary.totalVnd ?? decimalNumber(snapshot.baseChargeVnd);
+      const depositAmountVnd = decimalNumber(
+        approvedContract?.depositAmountVnd ?? snapshot.depositAmountVnd,
+      );
+      const tableCount = summary.tableCount;
+      if (summary.lines !== null) {
+        const menuLines = summary.lines.filter((line) => line.category === 'MENU');
+        const versions = await prisma.menuPackageVersion.findMany({
+          where: { id: { in: menuLines.map((line) => line.sourceRevisionId) } },
+          select: { id: true, versionNumber: true },
+        });
+        const versionNumbers = new Map(versions.map((v) => [v.id, v.versionNumber]));
+        menus = menuLines.map((line) => ({
+          versionId: line.sourceRevisionId,
+          packageId: line.sourceId,
+          versionNumber: versionNumbers.get(line.sourceRevisionId)!,
+          name: line.name,
+          description: line.description,
+          priceVndPerTable: line.unitPriceVnd,
+          tableCount: line.quantity,
+          lineTotalVnd: line.lineTotalVnd,
+        }));
+        const first = menus[0]!;
+        menu = {
+          versionId: first.versionId,
+          packageId: first.packageId,
+          versionNumber: first.versionNumber,
+          name: first.name,
+          description: first.description,
+          priceVndPerTable: first.priceVndPerTable,
+        };
+      }
+      const capacity = await readHallTableCapacity(prisma, snapshot.hallId);
       const paymentPending = booking.depositIntents.length > 0;
       const mutuallyApproved = Boolean(
         booking.currentTimelineRevision?.managerApprovedAt &&
@@ -75,6 +103,18 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
         revision: booking.revision,
         eventDate: booking.eventDate.toISOString().slice(0, 10),
         planningHeadcount: booking.planningHeadcount,
+        commercialSource: summary.source,
+        capacity: {
+          guestsPerTable: GUESTS_PER_TABLE,
+          minimumTables: Math.ceil(booking.planningHeadcount / GUESTS_PER_TABLE),
+          maximumTables: capacity.maximumTables,
+          issue: tableCapacityIssue(
+            booking.planningHeadcount,
+            tableCount,
+            capacity.maximumTables,
+            capacity.hallMaxGuests,
+          ),
+        },
         completion: {
           ...appendix,
           canComplete: manager && booking.phase === 'CONFIRMED' && !appendix.pending,
@@ -231,9 +271,10 @@ async function requireProposal(prisma: PrismaClient, bookingId: string) {
         select: {
           currentRevision: {
             select: {
+              ...commercialSummarySelect.commercialContract.select.currentRevision.select,
               state: true,
               timelineRevisionId: true,
-              approvals: { select: { party: true } },
+              approvals: { select: { party: true, actorAccountId: true, documentDigest: true } },
               contractTotalVnd: true,
               depositAmountVnd: true,
               document: true,
@@ -243,6 +284,7 @@ async function requireProposal(prisma: PrismaClient, bookingId: string) {
       },
       commercialAppendices: {
         select: {
+          ...commercialSummarySelect.commercialAppendices.select,
           currentRevision: {
             select: {
               state: true,

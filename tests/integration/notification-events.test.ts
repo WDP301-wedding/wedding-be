@@ -18,7 +18,7 @@ import { createNotificationIdentityReader } from '../../src/modules/identity-acc
     beforeAll(() => db.connect(), 60000);
     afterAll(() => db.disconnect());
     it.each([false, true])('native events with Android=%s', async (androidEnabled) => {
-      const f = await studioFixture(db.prisma);
+      const f = await studioFixture(db.prisma, null, { commercialTableCount: 4 });
       const reader = createNotificationBookingReader(db.prisma);
       const c = new NotificationEventConsumer(
         new NotificationFoundation(db.prisma, () => f.now),

@@ -1,3 +1,4 @@
+import { requireHallTableCapacity } from '../../venue-catalog/infrastructure/table-capacity.reader.js';
 import { randomUUID } from 'node:crypto';
 import type { z } from 'zod';
 import type { PrismaClient, BookingProposalSnapshot } from '../../../generated/prisma/client.js';
@@ -163,7 +164,7 @@ export function createCustomerSelectionWorkflow(options: {
     lines: z.infer<typeof selectionDraftSchema>['lines'],
   ) {
     const catalog = options.catalog(client);
-    const { restaurant, hall } = await catalog.requireVenue(
+    const { restaurant } = await catalog.requireVenue(
       access.booking.hallId,
       access.booking.shiftCode,
     );
@@ -173,11 +174,12 @@ export function createCustomerSelectionWorkflow(options: {
     const priced = lines.map((line) =>
       contractLineSchema.parse(resolved.get(line.category + line.sourceId)),
     );
-    if (
-      checkedSum(priced.filter((l) => l.category === 'MENU').map((l) => l.quantity)) > 500 ||
-      access.booking.planningHeadcount > hall.maxGuests
-    )
-      throw commercialConflict('CONTRACT_CAPACITY_EXCEEDED');
+    await requireHallTableCapacity(
+      client,
+      access.booking.hallId,
+      access.booking.planningHeadcount,
+      checkedSum(priced.filter((l) => l.category === 'MENU').map((l) => l.quantity)),
+    );
     return { lines: priced, totalVnd: checkedSum(priced.map((l) => l.lineTotalVnd)) };
   }
   async function persist(

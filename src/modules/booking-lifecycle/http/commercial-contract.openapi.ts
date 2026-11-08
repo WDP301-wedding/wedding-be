@@ -148,7 +148,7 @@ export const commercialContractOpenApiPaths = {
           'submissions',
           'submitCommercialContract',
           contractDecisionSchema,
-          'Owning Manager only. Revalidate current selections and exact draft digest. Catalog/profile changes require explicit successor/reselection. Both names required. Submits for two approvals; never silently reprices.',
+          'Owning Manager only. Revalidate current selections and exact draft digest. MENU quantities remain table quantities: maximum 10 guests per table and total tables must fit a published active hall layout; capacity is rechecked at both approvals. Catalog/profile changes require explicit successor/reselection. Both names required. Submits for two approvals; never silently reprices.',
         ],
         [
           'approvals',

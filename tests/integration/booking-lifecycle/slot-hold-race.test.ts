@@ -1,3 +1,4 @@
+import { ensurePublishedTableLayout } from '../../fixtures/table-layout.js';
 import 'dotenv/config';
 
 import { execFile } from 'node:child_process';
@@ -271,6 +272,7 @@ describeWithDatabase('booking slot hold PostgreSQL serialization', () => {
       },
     });
 
+    await ensurePublishedTableLayout(database, hallId, managerId, 50);
     const deposits = createPrismaBookingDepositRepository(database, () => now);
     const timelines = createPrismaTimelineRepository(database);
     const successorId = randomUUID();

@@ -20,7 +20,7 @@ import { createErrorHandler } from '../../src/core/errors/error-handler.js';
     beforeAll(() => db.connect(), 60000);
     afterAll(() => db.disconnect());
     async function fixture() {
-      const f = await studioFixture(db.prisma),
+      const f = await studioFixture(db.prisma, null, { commercialTableCount: 4 }),
         s = createSeatingServices(db.prisma, f.services);
       await s.guests.guests.groups(f.bookingId, f.couple);
       const group = await s.guests.guests.createGroup(

@@ -222,6 +222,7 @@ export const publicHallSchema = z.strictObject({
   name: catalogNameSchema,
   description: catalogDescriptionSchema,
   maxGuests: z.int(),
+  maxTables: z.int().nonnegative().optional(),
   media: z.array(z.unknown()).optional(),
 });
 

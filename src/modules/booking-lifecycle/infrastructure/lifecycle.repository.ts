@@ -1,3 +1,6 @@
+import { commercialSummary, commercialSummarySelect } from './commercial-summary.reader.js';
+import { readLockedHallTableCapacity } from '../../venue-catalog/infrastructure/table-capacity.reader.js';
+import { requireTableCapacity } from '../domain/table-capacity.js';
 import { randomUUID } from 'node:crypto';
 
 import { AppError } from '../../../core/errors/app-error.js';
@@ -203,7 +206,13 @@ export function createPrismaBookingLifecycleRepository(
         async (transaction) => {
           const booking = await transaction.booking.findUnique({
             where: { id: input.bookingId },
-            select: { id: true, revision: true },
+            select: {
+              id: true,
+              revision: true,
+              hallId: true,
+              proposalSnapshot: { select: { tableCount: true } },
+              ...commercialSummarySelect,
+            },
           });
           if (booking === null) throw new BookingLifecycleNotFoundError();
           const stored = await transaction.bookingHeadcountEvidence.findUnique({
@@ -222,6 +231,15 @@ export function createPrismaBookingLifecycleRepository(
               outcome: result.outcome,
             });
           }
+          const capacity = await readLockedHallTableCapacity(transaction, booking.hallId);
+          // Planning changes do not rewrite an over-capacity historical agreement.
+          // Permit a safe headcount correction before a corrective appendix reduces tables.
+          requireTableCapacity(
+            input.expectedAttendees,
+            Math.min(commercialSummary(booking).tableCount, capacity.maximumTables),
+            capacity.maximumTables,
+            capacity.hallMaxGuests,
+          );
           const appliedAt = now();
           await transaction.bookingHeadcountEvidence.upsert({
             where: { bookingId: input.bookingId },

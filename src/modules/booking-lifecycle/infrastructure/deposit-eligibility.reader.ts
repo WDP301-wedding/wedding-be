@@ -1,3 +1,5 @@
+import { readHallTableCapacity } from '../../venue-catalog/infrastructure/table-capacity.reader.js';
+import { requireTableCapacity } from '../domain/table-capacity.js';
 import { bookingEventMetadata } from '../../../core/integration-events/booking-event.js';
 import type { Prisma, PrismaClient } from '../../../generated/prisma/client.js';
 import type { DepositEligibility } from '../application/deposit.service.js';
@@ -7,7 +9,7 @@ import { BookingLifecycleNotFoundError } from './consultation.repository.js';
 
 export type EligibilityClient = Pick<
   PrismaClient | Prisma.TransactionClient,
-  'booking' | 'consultationAccess'
+  'booking' | 'consultationAccess' | 'hall' | 'layoutTemplateVersion'
 > & {
   bookingSlotHold?: Pick<PrismaClient['bookingSlotHold'], 'findFirst' | 'updateMany'>;
 };
@@ -17,11 +19,13 @@ export async function readEligibility(
   input: Readonly<{ bookingId: string; timelineRevisionId: string }>,
   databaseNow: Date,
   actorAccountId: string | null = null,
+  checkTableCapacity = true,
 ): Promise<DepositEligibility> {
   const booking = await client.booking.findUnique({
     where: { id: input.bookingId },
     select: {
       hallId: true,
+      planningHeadcount: true,
       eventDate: true,
       shiftCode: true,
       consultationId: true,
@@ -33,7 +37,7 @@ export async function readEligibility(
       currentTimelineRevision: {
         select: { id: true, managerApprovedAt: true, coupleApprovedAt: true },
       },
-      proposalSnapshot: { select: { depositAmountVnd: true } },
+      proposalSnapshot: { select: { depositAmountVnd: true, tableCount: true } },
       commercialContract: { include: { currentRevision: { include: { approvals: true } } } },
       slotHolds: {
         where: { status: 'ACTIVE' },
@@ -126,6 +130,19 @@ export async function readEligibility(
     ) {
       if (reasonCode === 'ELIGIBLE') reasonCode = 'CONTRACT_APPROVAL_REQUIRED';
     }
+  }
+  if (checkTableCapacity && reasonCode === 'ELIGIBLE') {
+    const capacity = await readHallTableCapacity(client, booking.hallId);
+    const tables =
+      contract?.state === 'APPROVED'
+        ? contractDocumentSchema.parse(contract.document).tableCount
+        : booking.proposalSnapshot.tableCount;
+    requireTableCapacity(
+      booking.planningHeadcount,
+      tables,
+      capacity.maximumTables,
+      capacity.hallMaxGuests,
+    );
   }
   return Object.freeze({
     eligible: reasonCode === 'ELIGIBLE',

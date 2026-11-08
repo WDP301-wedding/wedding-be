@@ -1,3 +1,4 @@
+import { requireHallTableCapacity } from '../../venue-catalog/infrastructure/table-capacity.reader.js';
 import { randomUUID } from 'node:crypto';
 import type { Prisma } from '../../../generated/prisma/client.js';
 import { enlistedPrismaClient } from '../../../core/database/enlisted-prisma-client.js';
@@ -38,6 +39,13 @@ export function createPrintAppendixWorkflow(
     });
     if (booking.phase !== 'CONFIRMED') throw commercialConflict('APPENDIX_NOT_EDITABLE');
     await financial.requireMutable(bookingId, localContext);
+  }
+  async function requireCapacity(bookingId: string, tables: number) {
+    const booking = await tx.booking.findUniqueOrThrow({
+      where: { id: bookingId },
+      select: { hallId: true, planningHeadcount: true },
+    });
+    await requireHallTableCapacity(tx, booking.hallId, booking.planningHeadcount, tables);
   }
   async function changed(bookingId: string, revisionId: string, action: string) {
     const booking = await tx.booking.update({
@@ -150,6 +158,7 @@ export function createPrintAppendixWorkflow(
         afterLines: after,
         ...calculateAppendixChange(effective.lines, after),
       });
+      await requireCapacity(bookingId, document.tableCount);
       const id = randomUUID(),
         documentDigest = appendixDigest(document),
         occurredAt = new Date();
@@ -200,6 +209,7 @@ export function createPrintAppendixWorkflow(
       const head = await tx.commercialAppendixHead.findUniqueOrThrow({ where: { bookingId } });
       const effective = await createEffectiveCommercialReader(tx).getEffective(bookingId);
       const document = appendixDocumentSchema.parse(row.document);
+      await requireCapacity(bookingId, document.tableCount);
       if (
         row.state !== 'AWAITING_APPROVAL' ||
         head.currentRevisionId !== row.id ||

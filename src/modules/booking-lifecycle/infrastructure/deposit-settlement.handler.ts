@@ -1,11 +1,7 @@
 import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
 import type { BookingDepositRepository } from '../application/deposit.service.js';
 import { BookingLifecycleNotFoundError } from './consultation.repository.js';
-import {
-  appendEvidence,
-  decimalNumber,
-  readEligibility,
-} from './deposit-eligibility.reader.js';
+import { appendEvidence, decimalNumber, readEligibility } from './deposit-eligibility.reader.js';
 import { BookingDepositConflictError } from './deposit-repository.errors.js';
 
 export async function recordUnknownDeposit(
@@ -145,6 +141,8 @@ export function settleDeposit(
         input,
         now(),
         intent.coupleAccountId,
+        // Reconcile the already reserved payment against frozen facts, even if layouts changed.
+        false,
       );
       if (
         !eligibility.eligible ||
