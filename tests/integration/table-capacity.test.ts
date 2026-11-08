@@ -7,6 +7,7 @@ import { parseEnvironment } from '../../src/config/env.js';
 import { CATALOG_SEED_IDS as ids, seedVenueCatalog } from '../../scripts/catalog-seed.js';
 import { createLayoutService } from '../../src/modules/venue-catalog/application/layout.service.js';
 import { createBookingLifecycleRuntime } from '../../src/modules/booking-lifecycle/booking-lifecycle.runtime.js';
+import { readEffectiveTablePage } from '../../src/modules/booking-lifecycle/infrastructure/effective-table-page.reader.js';
 import { createPrismaSessionRepository } from '../../src/modules/identity-access/session/session.repository.js';
 import { hashOpaqueToken } from '../../src/modules/identity-access/crypto/token.js';
 import { createAuthenticatedActorResolver } from '../../src/modules/identity-access/authorization/authenticated-actor.middleware.js';
@@ -466,6 +467,32 @@ describeDb('fixed ten-person table capacity with real owner APIs and PostgreSQL'
       }),
     ).toBe(0);
     expect((await proposal(f.id)).revision).toBe(t.revision);
+  }, 60000);
+
+  it('keeps compilation disabled only within the effective table sorting transaction', async () => {
+    const tag = `Capacity compilation ${randomUUID()}`;
+    const f = await initial(10, 100, tag);
+    const before = await database.prisma.$queryRaw<{ value: string }[]>`
+      SELECT current_setting('jit') AS value
+    `;
+    await database.prisma.$transaction(
+      async (tx) => {
+        await tx.$executeRaw`SET LOCAL jit=on`;
+        await tx.$executeRaw`SET LOCAL jit_above_cost=0`;
+        const page = await readEffectiveTablePage(
+          tx,
+          { q: tag, scope: 'mine', phase: 'ALL', order: 'asc', pageSize: 1 },
+          accounts.manager,
+          0,
+        );
+        expect(page).toEqual([f.id]);
+        expect(await tx.$queryRaw`SELECT current_setting('jit') AS value`).toEqual([
+          { value: 'off' },
+        ]);
+      },
+      { timeout: 30000 },
+    );
+    expect(await database.prisma.$queryRaw`SELECT current_setting('jit') AS value`).toEqual(before);
   }, 60000);
 
   it('uses effective appendix tables and menus consistently in proposal and paginated navigation sorting', async () => {
