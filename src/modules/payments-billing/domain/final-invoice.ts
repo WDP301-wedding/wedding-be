@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import { incidentalPricingSchema } from '../../venue-catalog/domain/incidental-offering.js';
 import {
   commercialConflict,
   checkedSum,
@@ -21,6 +22,10 @@ export const expenseLineSchema = z.strictObject({
   unit: text(80),
   unitPriceVnd: vnd,
   note: text(2000).nullable().optional(),
+  sourceType: z.enum(['CATALOG', 'OTHER']).optional(),
+  offeringId: z.uuid().optional(),
+  offeringRevision: z.int().positive().optional(),
+  reason: text(1000).optional(),
 });
 export const expenseSnapshotSchema = expenseLineSchema.extend({ id: z.uuid(), totalVnd: vnd });
 export const createExpenseSchema = expenseLineSchema.extend({
@@ -31,6 +36,51 @@ export const updateExpenseSchema = expenseLineSchema
   .extend({ expectedRevision: z.int().nonnegative() })
   .refine((v) => Object.keys(v).some((k) => k !== 'expectedRevision'));
 export const deleteExpenseSchema = z.strictObject({ expectedRevision: z.int().nonnegative() });
+export const expenseReviewViewSchema = z.strictObject({
+  id: z.uuid(),
+  revisionNumber: z.int().positive(),
+  draftRevision: z.int().nonnegative(),
+  type: z.enum(['EXPENSES', 'NONE', 'ADJUSTMENT']),
+  state: z.enum(['AWAITING_APPROVAL', 'APPROVED', 'CHANGES_REQUESTED', 'WITHDRAWN']),
+  documentDigest: digest,
+  document: z.strictObject({
+    lines: z.array(expenseSnapshotSchema),
+    totalVnd: vnd,
+    adjustment: z
+      .strictObject({
+        expectedInvoiceRevisionId: z.uuid(),
+        expectedBillingRevision: z.int().positive(),
+        reason: text(500),
+        lines: z
+          .array(expenseLineSchema.extend({ kind: z.enum(['DEBIT', 'CREDIT']) }))
+          .min(1)
+          .max(50),
+      })
+      .optional(),
+  }),
+  managerAccountId: z.uuid(),
+  managerApprovedAt: instant,
+  coupleAccountId: z.uuid().nullable(),
+  coupleApprovedAt: instant.nullable(),
+  decisionReason: text(1000).nullable(),
+  createdAt: instant,
+});
+export const expenseReviewCommandSchema = z.strictObject({
+  expectedRevision: z.int().nonnegative(),
+});
+export const expenseReviewDecisionSchema = expenseReviewCommandSchema
+  .extend({
+    reviewId: z.uuid(),
+    documentDigest: digest,
+    decision: z.enum(['APPROVE', 'REQUEST_CHANGES']),
+    reason: text(1000).optional(),
+  })
+  .refine((v) => v.decision !== 'REQUEST_CHANGES' || v.reason !== undefined);
+export const expenseReviewReopenSchema = expenseReviewCommandSchema.extend({
+  reviewId: z.uuid(),
+  documentDigest: digest,
+  reason: text(1000),
+});
 export const expenseDraftResponseSchema = z.strictObject({
   data: z.strictObject({
     bookingId: z.uuid(),
@@ -38,6 +88,11 @@ export const expenseDraftResponseSchema = z.strictObject({
     finalized: z.boolean(),
     lines: z.array(expenseSnapshotSchema),
     totalVnd: vnd,
+    approvalRequired: z.boolean(),
+    pricing: incidentalPricingSchema,
+    currentReview: expenseReviewViewSchema.nullable(),
+    reviewHistory: z.array(expenseReviewViewSchema),
+    canFinalize: z.boolean(),
   }),
 });
 export const finalizeInvoiceSchema = z.strictObject({
@@ -51,8 +106,10 @@ export const invoiceAdjustmentSchema = z.strictObject({
   expectedBillingRevision: z.int().positive(),
   reason: text(500),
   lines: z.array(adjustmentLineSchema).min(1).max(50),
+  reviewId: z.uuid().optional(),
 });
 export const adjustmentSnapshotSchema = z.strictObject({
+  reviewId: z.uuid().optional(),
   id: z.uuid(),
   predecessorRevisionId: z.uuid(),
   reason: text(500),
@@ -65,6 +122,7 @@ export const adjustmentSnapshotSchema = z.strictObject({
   deltaVnd: z.int(),
 });
 export const finalInvoiceDocumentSchema = z.strictObject({
+  incidentalReviewId: z.uuid().optional(),
   modelVersion: z.literal('FINAL_INVOICE_V1'),
   bookingId: z.uuid(),
   contract: z.strictObject({

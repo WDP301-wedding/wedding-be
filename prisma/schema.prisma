@@ -737,6 +737,9 @@ model ConsultationRequest {
 }
 
 model Booking {
+  incidentalPolicyVersion     Int?
+  incidentalPricing           Json?                                @db.JsonB
+  incidentalReviews           IncidentalExpenseReview[]
   id                          String                       @id @db.Uuid
   depositPercentage           Int                          @default(30)
   depositPolicyRevision       Int?
@@ -1273,6 +1276,8 @@ model BillingInvoice {
 }
 
 model IncidentalExpenseDraft {
+  currentReviewId String?                  @unique @db.Uuid
+  currentReview   IncidentalExpenseReview? @relation("CurrentIncidentalReview", fields: [currentReviewId], references: [id], onDelete: Restrict, onUpdate: NoAction)
   bookingId String                  @id @db.Uuid
   revision  Int                     @default(0)
   booking   Booking                 @relation(fields: [bookingId], references: [id], onDelete: Restrict)
@@ -1280,6 +1285,10 @@ model IncidentalExpenseDraft {
 }
 
 model IncidentalExpenseLine {
+  sourceType       String                 @default("LEGACY")
+  offeringId       String?                @db.Uuid
+  offeringRevision Int?
+  reason           String?
   id           String                 @id @db.Uuid
   bookingId    String                 @db.Uuid
   name         String
@@ -1293,6 +1302,39 @@ model IncidentalExpenseLine {
   draft        IncidentalExpenseDraft @relation(fields: [bookingId], references: [bookingId], onDelete: Restrict)
 
   @@index([bookingId, id])
+}
+
+model IncidentalOffering {
+  id           String  @id @db.Uuid
+  restaurantId String  @db.Uuid
+  revision     Int     @default(1)
+  name         String
+  description  String
+  unit         String
+  unitPriceVnd Decimal @db.Decimal(18, 0)
+  chargingRule String
+  active       Boolean @default(true)
+}
+
+model IncidentalExpenseReview {
+  id                String                  @id @db.Uuid
+  bookingId         String                  @db.Uuid
+  revisionNumber    Int
+  draftRevision     Int
+  type              String
+  state             String
+  document          Json                    @db.JsonB
+  documentDigest    String
+  managerAccountId  String                  @db.Uuid
+  managerApprovedAt DateTime                @db.Timestamptz(6)
+  coupleAccountId   String?                 @db.Uuid
+  coupleApprovedAt  DateTime?               @db.Timestamptz(6)
+  decisionReason    String?
+  createdAt         DateTime                @default(now()) @db.Timestamptz(6)
+  booking           Booking                 @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  currentFor        IncidentalExpenseDraft? @relation("CurrentIncidentalReview")
+
+  @@unique([bookingId, revisionNumber])
 }
 
 model FinalInvoiceHead {

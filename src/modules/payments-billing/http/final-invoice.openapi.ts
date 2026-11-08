@@ -8,6 +8,9 @@ import {
   finalizeInvoiceSchema,
   invoiceAdjustmentSchema,
   finalInvoiceResponseSchema,
+  expenseReviewCommandSchema,
+  expenseReviewDecisionSchema,
+  expenseReviewReopenSchema,
 } from '../domain/final-invoice.js';
 import { finalInvoicesResponseSchema } from './final-invoice.router.js';
 const security = [{ bearerAuth: [] }];
@@ -60,6 +63,39 @@ function write(
   };
 }
 export const finalInvoiceOpenApiPaths = {
+  ...Object.fromEntries(
+    ['submit', 'no-expenses', 'reopen', 'adjustment-proposals'].map((action) => [
+      '/management/bookings/{bookingId}/incidental-expenses/' + action,
+      {
+        parameters: [booking],
+        post: write(
+          'incidental' +
+            action
+              .split('-')
+              .map((s) => s[0]!.toUpperCase() + s.slice(1))
+              .join(''),
+          'Assigned Manager, COMPLETED; frozen booking prices and exact expense revision. Submission records Manager approval; no-expenses requires explicit empty declaration; reopen retains evidence with reason. Adjustment proposals bind invoice and billing versions. Legacy bookings retain their prior workflow.',
+          action === 'reopen'
+            ? expenseReviewReopenSchema
+            : action === 'adjustment-proposals'
+              ? invoiceAdjustmentSchema
+              : expenseReviewCommandSchema,
+          expenseDraftResponseSchema,
+          '200',
+        ),
+      },
+    ]),
+  ),
+  '/bookings/{bookingId}/incidental-expenses/decisions': {
+    parameters: [booking],
+    post: write(
+      'decideIncidentalExpenses',
+      'Owning FULL Couple approves the exact current digest or requests changes with reason; any content change requires a successor. Staff and Manager cannot decide for Couple.',
+      expenseReviewDecisionSchema,
+      expenseDraftResponseSchema,
+      '200',
+    ),
+  },
   '/bookings/{bookingId}/incidental-expenses': {
     parameters: [booking],
     get: read('getIncidentalExpenses', expenseDraftResponseSchema),

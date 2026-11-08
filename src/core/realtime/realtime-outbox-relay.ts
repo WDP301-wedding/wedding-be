@@ -427,9 +427,12 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
           (row) => row.id,
           (row) => {
             if (
-              ['consultation-request', 'STAFF_OPERATIONS', 'invitation-design'].includes(
-                row.entityType,
-              )
+              [
+                'consultation-request',
+                'STAFF_OPERATIONS',
+                'invitation-design',
+                'incidental-review',
+              ].includes(row.entityType)
             ) {
               const metadata =
                 row.metadata !== null &&
@@ -448,23 +451,31 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
                 eventId: row.id,
                 schemaVersion: 1,
                 type:
-                  row.entityType === 'invitation-design'
-                    ? 'print_order.updated'
-                    : row.entityType === 'STAFF_OPERATIONS'
-                      ? 'staff.updated'
-                      : 'booking.updated',
+                  row.entityType === 'incidental-review'
+                    ? 'billing.updated'
+                    : row.entityType === 'invitation-design'
+                      ? 'print_order.updated'
+                      : row.entityType === 'STAFF_OPERATIONS'
+                        ? 'staff.updated'
+                        : 'booking.updated',
                 scope: {
                   entityType: row.entityType === 'invitation-design' ? 'print_order' : 'booking',
                   ...(bookingId ? { bookingId } : {}),
                 },
                 resources: !bookingId
                   ? ['/management/consultation-requests']
-                  : row.entityType === 'invitation-design'
-                    ? [`/bookings/${bookingId}/invitations`]
-                    : [
-                        `/bookings/${bookingId}/staff-assignments`,
-                        `/bookings/${bookingId}/check-in-configuration`,
-                      ],
+                  : row.entityType === 'incidental-review'
+                    ? [
+                        `/bookings/${bookingId}/incidental-expenses`,
+                        `/bookings/${bookingId}/final-invoices`,
+                        `/bookings/${bookingId}/billing`,
+                      ]
+                    : row.entityType === 'invitation-design'
+                      ? [`/bookings/${bookingId}/invitations`]
+                      : [
+                          `/bookings/${bookingId}/staff-assignments`,
+                          `/bookings/${bookingId}/check-in-configuration`,
+                        ],
                 occurredAt: row.occurredAt.toISOString(),
               };
             }

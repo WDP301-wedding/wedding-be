@@ -1,5 +1,16 @@
 # Backend Revision Tasks: 2026-10-10
 
+## Incidental catalog and mutual expense approval — 2026-11-08
+
+- [x] Implement prospectively frozen Manager incidental prices in contracts/PDFs.
+- [x] Implement Manager authoring/submission, whole-table Couple decisions,
+      reasoned reopening, explicit no-expense confirmation and invoice/adjustment gates.
+- [x] Deliver Manager/Couple Web and PRM-app controls and strict generated OpenAPI.
+- [x] Rehearse forward migration and verify current-policy financial guards locally.
+- [ ] Resolve broad backend-suite fixture failures / complete release acceptance.
+      Baseline HTTP failures have been reproduced independently; no deployment or
+      shared migration is claimed. See [scope and evidence](../docs/incidental-catalog-approval-2026-11-08.md).
+
 ## Completion before post-event settlement — 2026-11-07
 
 - [x] COMPLETE-01: Guard manual/automatic completion with current same-digest appendix approvals; serialize completion with commercial changes.

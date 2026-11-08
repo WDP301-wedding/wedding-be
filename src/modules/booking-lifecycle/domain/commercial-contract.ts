@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import { incidentalPricingSchema } from '../../venue-catalog/domain/incidental-offering.js';
 import { selectionAccessSchema } from './selection-access.js';
 import { AppError } from '../../../core/errors/app-error.js';
 import { coupleNameSchema } from './couple-profile.js';
@@ -86,6 +87,8 @@ export const contractDocumentSchema = z.strictObject({
   depositAmountVnd: vnd.positive(),
   depositRate: z.int().min(10).max(100).optional(),
   incidentalClause: z.literal(INCIDENTAL_CLAUSE),
+  incidentalPricing: incidentalPricingSchema.optional(),
+  incidentalApprovalRequired: z.literal(true).optional(),
   standardTerms: z
     .strictObject({
       version: z.literal('WEDDING_STANDARD_V1'),

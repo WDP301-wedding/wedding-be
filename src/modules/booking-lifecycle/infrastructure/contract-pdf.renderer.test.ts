@@ -22,6 +22,34 @@ function fixture(state: ContractView['state'] = 'DRAFT'): ContractView {
 }
 afterEach(() => vi.restoreAllMocks());
 describe('private Vietnamese contract PDF output', () => {
+  it('prints the frozen incidental price and counting rule without adding it to the contract or deposit', async () => {
+    const view = fixture();
+    const before = {
+      total: view.document.contractTotalVnd,
+      deposit: view.document.depositAmountVnd,
+    };
+    view.document.incidentalPricing = [
+      {
+        offeringId: randomUUID(),
+        revision: 1,
+        name: 'Bia A',
+        description: 'Thùng 24 lon × 330 ml',
+        unit: 'thùng',
+        unitPriceVnd: 300000,
+        chargingRule: 'Chỉ tính thùng đã mở',
+      },
+    ];
+    view.document.incidentalApprovalRequired = true;
+    const rendered = vi.spyOn(PDFDocument.prototype, 'text');
+    await renderContractPdf(view);
+    const output = rendered.mock.calls.map(([value]) => value).join('\n');
+    expect(output).toContain('Bảng đơn giá áp dụng khi phát sinh');
+    expect(output).toContain('Bia A — 300.000 đ/thùng');
+    expect(output).toContain('Chỉ tính thùng đã mở');
+    expect(output).toContain('hai bên duyệt cùng bảng chi phí');
+    expect(view.document.contractTotalVnd).toBe(before.total);
+    expect(view.document.depositAmountVnd).toBe(before.deposit);
+  });
   it.each([10, 50, 100])(
     'prints the frozen %i%% policy in the contract and settlement clause',
     async (rate) => {

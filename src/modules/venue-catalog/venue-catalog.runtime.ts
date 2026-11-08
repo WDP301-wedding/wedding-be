@@ -1,4 +1,10 @@
 import { createHash } from 'node:crypto';
+import { createIncidentalOfferingService } from './application/incidental-offering.service.js';
+import {
+  createIncidentalOfferingSchema,
+  reviseIncidentalOfferingSchema,
+} from './domain/incidental-offering.js';
+import { createOfferingRouter } from './http/commercial-catalog.router.js';
 
 import type { Request, Router } from 'express';
 
@@ -101,6 +107,25 @@ export async function createVenueCatalogRuntime(config: Config): Promise<VenueCa
     router.use(
       createPrintCommercialCatalogRouter(
         createPrintOfferingService(prisma, createInvitationTemplateSelectionReader),
+        actorResolver,
+        (normalizedRoute) =>
+          createIdempotencyMiddleware({
+            service: idempotency,
+            policy: defineIdempotencyPolicy({
+              actorScope: commercialActorScope,
+              normalizedRoute,
+              operationVersion: 'v1',
+              payload: catalogIdempotencyPayload,
+            }),
+          }),
+      ),
+    );
+    router.use(
+      createOfferingRouter(
+        'incidental-offerings',
+        createIncidentalOfferingService(prisma),
+        createIncidentalOfferingSchema,
+        reviseIncidentalOfferingSchema,
         actorResolver,
         (normalizedRoute) =>
           createIdempotencyMiddleware({
