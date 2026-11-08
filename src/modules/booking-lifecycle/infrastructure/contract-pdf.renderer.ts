@@ -262,7 +262,11 @@ export async function renderContractPdf(
       'Hợp đồng có hiệu lực khi hai bên xác nhận cùng phiên bản trên hệ thống. Hệ thống khóa bản gốc và lưu PDF để hai bên tải lại. Việc xác nhận giữ sảnh thực hiện theo Điều 5.1.',
     );
   } else {
-    text('Tiền đặt cọc cam kết (30%): ' + money(content.depositAmountVnd), true, 11);
+    text(
+      `Tiền đặt cọc cam kết (${content.depositRate ?? 30}%): ` + money(content.depositAmountVnd),
+      true,
+      11,
+    );
     text(content.incidentalClause);
     section('03. Lịch trình đã thỏa thuận');
     timeline();
@@ -365,7 +369,11 @@ function renderStandardTerms(
   );
 
   section('Điều 5. Hai mốc thanh toán');
-  text('5.1. Đặt cọc 30%: ' + money(document.depositAmountVnd), true, 11);
+  text(
+    `5.1. Đặt cọc ${document.depositRate ?? 30}%: ` + money(document.depositAmountVnd),
+    true,
+    11,
+  );
   text(
     'Bên B đặt cọc trong thời hạn giữ chỗ sau khi hai bên duyệt hợp đồng và lịch trình tương ứng. Sảnh và ca tiệc được xác nhận khi hệ thống ghi nhận cọc thành công theo điều kiện giữ chỗ.',
   );

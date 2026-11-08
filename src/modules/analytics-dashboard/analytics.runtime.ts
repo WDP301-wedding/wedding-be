@@ -53,7 +53,12 @@ export async function createAnalyticsRuntime(config: Config) {
       await pending;
     };
     return {
-      router: createAnalyticsRouter(services.service, services.resolver, services.audit),
+      router: createAnalyticsRouter(
+        services.service,
+        services.resolver,
+        services.audit,
+        services.completedEvents,
+      ),
       providers: services,
       start() {
         stopping = false;

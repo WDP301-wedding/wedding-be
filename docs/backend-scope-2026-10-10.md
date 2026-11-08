@@ -15,6 +15,14 @@ evidence and frontend source. New requirements are extensions to completed work.
 
 ## 1. Team Boundary
 
+Completed-event dashboard/deposit amendment confirmed on **2026-11-08**: Tasks 8
+and 10 may change backend, Manager/Couple Web and PRM-app. Report revenue from
+current finalized invoices for COMPLETED events; keep provisional amounts, cash
+and debts distinct. Manager-configured 10–100% deposit rates are frozen when a
+new booking is created; existing bookings, contracts, retained PDFs and payments
+remain unchanged. This supersedes the fixed 30% rule below for new bookings only.
+See [accepted scope](./tasks-8-10-dashboard-deposit-2026-11-08.md).
+
 Assigned-event operations amendment confirmed by the owner on **2026-11-08**:
 retire active named-Guest lists and check-in for all roles. Manager assigns Staff
 to events; Staff retains own task updates, incident reporting and handovers.

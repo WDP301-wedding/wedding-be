@@ -116,6 +116,7 @@ export function createVenueCatalogRouter(options: CreateVenueCatalogRouterOption
           address: profile.address,
           publicPhone: profile.publicPhone,
           publicEmail: profile.publicEmail,
+          depositPercentage: profile.depositPercentage ?? 30,
           shifts: shifts.map(({ code, startTime, endTime }) => ({ code, startTime, endTime })),
           media,
         },

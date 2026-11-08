@@ -21,6 +21,7 @@ export interface RestaurantProfileView {
   readonly publicPhone: string | null;
   readonly publicEmail: string | null;
   readonly revision: number;
+  readonly depositPercentage?: number;
 }
 
 export interface ShiftSnapshot {
@@ -65,6 +66,7 @@ export interface VenueService {
 }
 
 export interface UpdateRestaurantProfileInput {
+  readonly depositPercentage?: number | undefined;
   readonly displayName: string;
   readonly description: string;
   readonly address: string;
@@ -137,6 +139,11 @@ export function createVenueService(prisma: PrismaClient): VenueService {
 
     async updateRestaurantProfile(input) {
       const values = {
+        ...(input.depositPercentage === undefined
+          ? {}
+          : {
+              depositPercentage: requireDepositPercentage(input.depositPercentage),
+            }),
         displayName: validateCatalogName(input.displayName),
         description: validateCatalogDescription(input.description),
         address: requireBoundedText('address', input.address, 1, 2_000),
@@ -161,7 +168,17 @@ export function createVenueService(prisma: PrismaClient): VenueService {
           entityType: 'restaurant-profile',
           entityId: profile.id,
           metadata: {
-            changedFields: ['address', 'description', 'displayName', 'publicEmail', 'publicPhone'],
+            changedFields: [
+              'address',
+              'description',
+              'displayName',
+              'publicEmail',
+              'publicPhone',
+              ...(input.depositPercentage === undefined ? [] : ['depositPercentage']),
+            ],
+            ...(input.depositPercentage === undefined
+              ? {}
+              : { depositPercentage: input.depositPercentage }),
           },
         });
         return toRestaurantView(profile);
@@ -419,6 +436,7 @@ function normalizeHallInput(input: {
 }
 
 function toRestaurantView(profile: {
+  depositPercentage?: number;
   id: string;
   displayName: string;
   description: string;
@@ -435,7 +453,19 @@ function toRestaurantView(profile: {
     publicPhone: profile.publicPhone,
     publicEmail: profile.publicEmail,
     revision: profile.revision,
+    ...(profile.depositPercentage === undefined
+      ? {}
+      : { depositPercentage: profile.depositPercentage }),
   });
+}
+
+function requireDepositPercentage(value: number): number {
+  if (!Number.isInteger(value) || value < 10 || value > 100)
+    throw new CatalogPolicyError(
+      'CATALOG_INVALID_DEPOSIT_PERCENTAGE',
+      'Deposit must be an integer from 10 to 100.',
+    );
+  return value;
 }
 
 function toShiftSnapshot(shift: {

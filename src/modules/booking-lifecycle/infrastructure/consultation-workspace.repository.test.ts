@@ -6,6 +6,7 @@ import type {
   ConsultationWorkspaceRecord,
 } from '../application/consultation-workspace.service.js';
 import { createPrismaConsultationWorkspaceRepository } from './consultation.repository.js';
+import { Prisma } from '../../../generated/prisma/client.js';
 
 const consultation: ConsultationWorkspaceRecord = Object.freeze({
   consultationId: '00000000-0000-4000-8000-000000000001',
@@ -48,6 +49,42 @@ const booking: BookingProposalRecord = Object.freeze({
 });
 
 describe('PrismaConsultationWorkspaceRepository', () => {
+  it('retries a rolled-back policy serialization conflict but retains the same booking command', async () => {
+    const transaction = fixture();
+    const operation = vi
+      .fn<(work: (tx: object) => Promise<unknown>) => Promise<unknown>>()
+      .mockRejectedValueOnce(
+        new Prisma.PrismaClientKnownRequestError('serialization', {
+          code: 'P2034',
+          clientVersion: 'test',
+        }),
+      )
+      .mockImplementation(async (work) => work(transaction));
+    await createPrismaConsultationWorkspaceRepository(
+      { $transaction: operation } as never,
+      fixedNow,
+    ).createBooking(booking);
+    expect(operation).toHaveBeenCalledTimes(2);
+    expect(transaction.booking.create).toHaveBeenCalledTimes(1);
+    expect(transaction.booking.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({ id: booking.bookingId }),
+    });
+  });
+  it('returns a stale command conflict after three serialization failures', async () => {
+    const operation = vi.fn().mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError('serialization', {
+        code: 'P2034',
+        clientVersion: 'test',
+      }),
+    );
+    await expect(
+      createPrismaConsultationWorkspaceRepository(
+        { $transaction: operation } as never,
+        fixedNow,
+      ).createBooking(booking),
+    ).rejects.toHaveProperty('code', 'STALE_BOOKING_REVISION');
+    expect(operation).toHaveBeenCalledTimes(3);
+  });
   it('persists an independent consultation with normalized contact', async () => {
     const transaction = fixture();
     await createPrismaConsultationWorkspaceRepository(

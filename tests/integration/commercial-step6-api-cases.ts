@@ -615,6 +615,7 @@ export function registerStepSixApiCases(harness: StepSixApiHarness) {
   }, 30_000);
   it('requires finalization before a full-contract balance payment', async () => {
     const { f } = await paidFixture(true);
+    await completeSettlementFixture(harness, f.id);
     const billingPath = `/bookings/${f.id}/billing`;
     for (const who of ['own', 'manager']) {
       const read = await get(billingPath, who);

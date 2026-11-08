@@ -183,11 +183,19 @@ export function registerPerformanceBookingCases(
           path: `/api/v1/bookings/${f.id}/${suffix}`,
           route: suffix,
           token: couple.accessToken,
+          expectedStatus: suffix.startsWith('guests?') ? 410 : 200,
         })),
         {
           path: `/api/v1/staff/events/${f.id}/guests/search?query=${encodeURIComponent('Khách')}&limit=20`,
           route: 'assigned-guest-search',
           token: context('staff').accessToken,
+          expectedStatus: 410,
+        },
+        {
+          path: `/api/v1/staff/events/${f.id}/workspace`,
+          route: 'assigned-event-workspace',
+          token: context('staff').accessToken,
+          expectedStatus: 200,
         },
       ];
       const counts = async () => ({
@@ -222,7 +230,9 @@ export function registerPerformanceBookingCases(
         for (const item of cases) {
           const started = performance.now();
           const response = await request(app).get(item.path).auth(item.token, { type: 'bearer' });
-          expect(response.status, `${item.route}: ${JSON.stringify(response.body)}`).toBe(200);
+          expect(response.status, `${item.route}: ${JSON.stringify(response.body)}`).toBe(item.expectedStatus);
+          if (item.expectedStatus === 410)
+            expect(response.body).toMatchObject({ error: { code: 'FEATURE_RETIRED' } });
           const log = logs.get(response.headers['x-request-id'] as string);
           expect(log?.database.queries).toBeGreaterThan(0);
           expect(log?.database.errors).toBe(0);

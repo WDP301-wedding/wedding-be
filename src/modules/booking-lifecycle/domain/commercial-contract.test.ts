@@ -29,6 +29,13 @@ describe('commercial contract arithmetic and canonical identity', () => {
   it('rejects nonpositive or fractional deposit bases', () => {
     for (const invalid of [0, -1, 0.5]) expect(() => contractDeposit(invalid)).toThrow();
   });
+  it('uses exact configurable percentages and rejects invalid policy values', () => {
+    expect(contractDeposit(101, 10)).toBe(11);
+    expect(contractDeposit(101, 50)).toBe(51);
+    expect(contractDeposit(Number.MAX_SAFE_INTEGER, 100)).toBe(Number.MAX_SAFE_INTEGER);
+    for (const rate of [0, 9, 101, 30.5, NaN, Infinity])
+      expect(() => contractDeposit(100, rate)).toThrow();
+  });
   it('hashes schema-canonical fields independently of input object order', () => {
     const d = commercialDocumentFixture();
     const { lines, ...otherFields } = d;

@@ -1,4 +1,5 @@
 import { registerAnalyticsCommercialCases } from './analytics-commercial-cases.js';
+import { registerDepositPolicyCases } from './deposit-policy-api-cases.js';
 import { registerPrintAppendixRequestCases } from './print-appendix-requests-api-cases.js';
 import { registerGuestCompletionCases } from './guest-management-completion-cases.js';
 import { registerReleaseDemoCases } from './release-demo-cases.js';
@@ -199,11 +200,11 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     });
     app = createApp({
       runtimeEnvironment: 'test',
-      // This API matrix sends >100 requests/minute. Production defaults and
+      // The full API matrix sends >1,000 requests/minute. Production defaults and
       // dedicated rate-limit tests remain unchanged.
       securityConfig: {
         ...config.security,
-        rateLimit: { ...config.security.rateLimit, maxRequests: 1000 },
+        rateLimit: { ...config.security.rateLimit, maxRequests: 10000 },
       },
       registerRoutes(express) {
         studio = createInvitationStudioServices(
@@ -577,6 +578,7 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     deposit,
   };
   registerCommercialAcceptanceCases(harness);
+  registerDepositPolicyCases(harness);
   registerPrintAppendixRequestCases(harness);
   registerAnalyticsCommercialCases(harness);
   registerStepSixApiCases(harness);

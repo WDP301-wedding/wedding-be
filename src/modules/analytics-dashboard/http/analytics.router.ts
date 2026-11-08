@@ -9,6 +9,12 @@ import { requireAnyRole } from '../../identity-access/authorization/authorizatio
 import { validateRequest, validatedRequest } from '../../../core/http/validate.js';
 import type { AnalyticsService } from '../application/analytics.service.js';
 import type { ContractContext } from '../../../core/database/booking-boundary.js';
+import { AppError } from '../../../core/errors/app-error.js';
+import {
+  completedEventsQuerySchema,
+  completedEventsResponseSchema,
+} from './completed-events.schemas.js';
+import type { createCompletedEventsReader } from '../infrastructure/completed-events.reader.js';
 import {
   analyticsQuerySchema,
   analyticsResultSchemas,
@@ -34,6 +40,7 @@ export function createAnalyticsRouter(
       resultSize?: number;
     },
   ) => Promise<void>,
+  completedEvents?: ReturnType<typeof createCompletedEventsReader>,
 ) {
   const router = Router();
   router.use(
@@ -62,6 +69,22 @@ export function createAnalyticsRouter(
     const actor = await resolver.resolve(req.get('authorization')!.slice(7));
     requireAnyRole(actor, ['MANAGER']);
   };
+  router.get(
+    '/management/analytics/completed-events',
+    validateRequest({ query: completedEventsQuerySchema }),
+    async (req, res) => {
+      if (!completedEvents)
+        throw new AppError({
+          status: 503,
+          code: 'ANALYTICS_NOT_READY',
+          message: 'Completed-event reporting is unavailable.',
+        });
+      const query = validatedRequest(res, { query: completedEventsQuerySchema }).query;
+      const data = await completedEvents(query);
+      await recheck(req);
+      res.json(completedEventsResponseSchema.parse({ data }));
+    },
+  );
   for (const report of Object.keys(
     analyticsResultSchemas,
   ) as (keyof typeof analyticsResultSchemas)[]) {

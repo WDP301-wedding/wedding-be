@@ -738,6 +738,8 @@ model ConsultationRequest {
 
 model Booking {
   id                          String                       @id @db.Uuid
+  depositPercentage           Int                          @default(30)
+  depositPolicyRevision       Int?
   bookingCode                 String                       @unique @default(dbgenerated("new_booking_code()")) @db.VarChar(32)
   commercialModelVersion      BookingCommercialModelVersion @default(FULL_CONTRACT_V1)
   consultationId              String                       @unique @db.Uuid
@@ -1408,6 +1410,7 @@ model BookingReportingSnapshot {
 }
 
 model BookingProposalSnapshot {
+  depositPercentage Int @default(30)
   id                   String              @id @default(uuid()) @db.Uuid
   bookingId            String              @unique @db.Uuid
   hallId               String              @db.Uuid
@@ -1458,6 +1461,7 @@ model BookingInvitationIntent {
 }
 
 model RestaurantProfile {
+  depositPercentage Int @default(30)
   printOfferings     PrintOffering[]
   services           RestaurantService[]
   id                 String              @id @default(uuid()) @db.Uuid

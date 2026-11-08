@@ -846,3 +846,20 @@ SPEC-01–05 or replace the separate provider/runtime readiness gates.
 - [x] STF-NG3 Couple Web/PRM preparation contains only headcount/groups and seating.
 - [x] STF-NG4 Verify regressions, API, typography and local desktop/mobile behavior. [Evidence and broader-suite limitations](evidence/staff-operations-without-guests-2026-11-08.md).
 - [ ] STF-NG5 Separate coordinated release of the reviewed backend and updated clients; repin generated clients to the real released backend commit and verify deployed behavior.
+
+## Completed-event dashboard and prospective deposit — 2026-11-08
+
+- [x] T810-01 Freeze new-booking deposit policy with forward schema/constraints,
+  strict configuration, server arithmetic, historical compatibility and PDF text.
+- [x] T810-02 Add completed-event invoice revenue, hall/item rankings and SQL
+  payment filtering/pagination through owner-published facts.
+- [x] T810-03 Archive the duplicate MC offering with append-only revision/audit;
+  retain historical references and the active MC tiệc cưới offering.
+- [x] T810-04 Connect Manager dashboard/configuration and dynamic percentage
+  display across Manager/Couple Web and Android.
+- [x] T810-05 Complete focused local verification, browser/PDF checks and record
+  [exact results and broader-suite limitations](evidence/tasks-8-10-dashboard-deposit-2026-11-08.md).
+- [ ] T810-CI Run full commercial integration and full web regression on a stable
+  runner before merge; local Windows native exits are not a green full-suite result.
+- [ ] T810-REL Coordinated deployment/migrations and released OpenAPI client pins;
+  verify actual deployed behavior separately from local test evidence.

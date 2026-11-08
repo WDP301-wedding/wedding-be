@@ -7,6 +7,7 @@ import type { GuestRequestContext } from '../../src/modules/guest-management/app
 import { billingResponseSchema } from '../../src/modules/payments-billing/http/payments-billing.schemas.js';
 import { finalInvoiceResponseSchema } from '../../src/modules/payments-billing/domain/final-invoice.js';
 import type { StepSixApiHarness } from './commercial-step6-api-cases.js';
+import { completeSettlementFixture } from './completion-settlement-api-cases.js';
 type Dependencies = {
   studio: ReturnType<typeof createInvitationStudioServices>;
   context: (who: 'own' | 'manager' | 'staff') => GuestRequestContext;
@@ -78,7 +79,7 @@ export function registerReleaseDemoCases(h: StepSixApiHarness, dependencies: () 
     }
   }, 30000);
 
-  it('REL-W2 partial names preserve planning/money through explicit assigned Staff check-in, undo and final invoice', async () => {
+  it('REL-W2 partial names preserve planning/money and retained check-in history through completion and final invoice', async () => {
     const { f, d } = await h.paidFixture(true),
       prisma = h.database.prisma;
     const { studio, context } = dependencies(),
@@ -159,6 +160,7 @@ export function registerReleaseDemoCases(h: StepSixApiHarness, dependencies: () 
       billingResponseSchema.parse((await h.get(`/bookings/${f.id}/billing`, 'own')).body as unknown)
         .data.totals,
     ).toEqual(before.totals);
+    await completeSettlementFixture(h, f.id);
     const response = await h.post(`/management/bookings/${f.id}/final-invoices`, {
       expectedDraftRevision: 0,
       expectedCommercialRevisionId: d.contract.revisionId,

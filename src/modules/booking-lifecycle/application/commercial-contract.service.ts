@@ -241,7 +241,11 @@ export function createCommercialContractService(options: Options) {
         tableCount,
         lines,
         contractTotalVnd: total,
-        depositAmountVnd: contractDeposit(total),
+        depositAmountVnd: contractDeposit(total, booking.depositPercentage ?? 30),
+        // Omit the new field for pre-policy bookings, preserving legacy draft digests.
+        ...(booking.depositPolicyRevision == null
+          ? {}
+          : { depositRate: booking.depositPercentage }),
         incidentalClause: INCIDENTAL_CLAUSE,
         ...(menus === undefined
           ? {}

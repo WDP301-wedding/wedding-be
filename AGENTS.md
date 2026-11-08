@@ -1,5 +1,10 @@
 # Backend Ownership
 
+Owner-approved amendment, 2026-11-08: implement Tasks 8 and 10 as confirmed in
+docs/tasks-8-10-dashboard-deposit-2026-11-08.md across backend, Manager/Couple Web
+and PRM-app. Completed-event revenue uses finalized invoices. New bookings freeze
+the Manager-configured deposit rate; preserve existing agreements and payments.
+
 Owner-approved amendment, 2026-11-08: assigned-event operations replaces active
 named-Guest lists and all new check-in/configuration/undo operations. This revision
 may change wedding-be, wedding-manage-web, wedding-web and PRM-app. Keep explicit

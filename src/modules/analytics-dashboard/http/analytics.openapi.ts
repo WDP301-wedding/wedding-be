@@ -1,6 +1,10 @@
 import { z } from 'zod';
 import type { ZodOpenApiObject } from 'zod-openapi';
 import {
+  completedEventsQuerySchema,
+  completedEventsResponseSchema,
+} from './completed-events.schemas.js';
+import {
   analyticsQuerySchema,
   analyticsResultSchemas,
   rebuildBodySchema,
@@ -47,6 +51,14 @@ analyticsOpenApiPaths['/management/analytics/rebuild'] = {
   post: {
     ...operation('rebuildAnalytics', projectionResultSchema),
     requestBody: { required: true, content: { 'application/json': { schema: rebuildBodySchema } } },
+  },
+};
+analyticsOpenApiPaths['/management/analytics/completed-events'] = {
+  get: {
+    ...operation('getCompletedEventDashboard', completedEventsResponseSchema.shape.data),
+    description:
+      'Manager only. COMPLETED events by inclusive local event date. Revenue is the current finalized invoice, not cash. Unfinalized events are provisional and never PAID. Owner-published financial facts retain credit adjustments and refunds. SQL filters/paginates rows; aggregate budget is 10,000 events/offerings. PAID/DEBT filters apply to the event table; summary and rankings retain the date/hall/search cohort. No-store; authorization is rechecked before returning.',
+    requestParams: { query: completedEventsQuerySchema },
   },
 };
 analyticsOpenApiPaths['/management/analytics/exports/overview'] = {

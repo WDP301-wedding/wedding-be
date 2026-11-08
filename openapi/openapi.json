@@ -1929,6 +1929,11 @@
                     "minimum": 0,
                     "type": "integer"
                   },
+                  "depositPercentage": {
+                    "maximum": 100,
+                    "minimum": 10,
+                    "type": "integer"
+                  },
                   "hall": {
                     "additionalProperties": false,
                     "properties": {
@@ -3668,6 +3673,11 @@
         "properties": {
           "address": {
             "type": "string"
+          },
+          "depositPercentage": {
+            "maximum": 100,
+            "minimum": 10,
+            "type": "integer"
           },
           "description": {
             "type": "string"
@@ -15150,6 +15160,11 @@
                                     "maximum": 9007199254740991,
                                     "type": "integer"
                                   },
+                                  "depositRate": {
+                                    "maximum": 100,
+                                    "minimum": 10,
+                                    "type": "integer"
+                                  },
                                   "eventDate": {
                                     "format": "date",
                                     "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -15755,6 +15770,11 @@
                                   "maximum": 9007199254740991,
                                   "type": "integer"
                                 },
+                                "depositRate": {
+                                  "maximum": 100,
+                                  "minimum": 10,
+                                  "type": "integer"
+                                },
                                 "eventDate": {
                                   "format": "date",
                                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -16240,6 +16260,11 @@
                               "maximum": 9007199254740991,
                               "type": "integer"
                             },
+                            "depositRate": {
+                              "maximum": 100,
+                              "minimum": 10,
+                              "type": "integer"
+                            },
                             "eventDate": {
                               "format": "date",
                               "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -16660,6 +16685,11 @@
                                 "depositAmountVnd": {
                                   "exclusiveMinimum": 0,
                                   "maximum": 9007199254740991,
+                                  "type": "integer"
+                                },
+                                "depositRate": {
+                                  "maximum": 100,
+                                  "minimum": 10,
                                   "type": "integer"
                                 },
                                 "eventDate": {
@@ -17162,6 +17192,11 @@
                                 "depositAmountVnd": {
                                   "exclusiveMinimum": 0,
                                   "maximum": 9007199254740991,
+                                  "type": "integer"
+                                },
+                                "depositRate": {
+                                  "maximum": 100,
+                                  "minimum": 10,
                                   "type": "integer"
                                 },
                                 "eventDate": {
@@ -17743,6 +17778,11 @@
                                   "maximum": 9007199254740991,
                                   "type": "integer"
                                 },
+                                "depositRate": {
+                                  "maximum": 100,
+                                  "minimum": 10,
+                                  "type": "integer"
+                                },
                                 "eventDate": {
                                   "format": "date",
                                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -18243,6 +18283,11 @@
                                 "depositAmountVnd": {
                                   "exclusiveMinimum": 0,
                                   "maximum": 9007199254740991,
+                                  "type": "integer"
+                                },
+                                "depositRate": {
+                                  "maximum": 100,
+                                  "minimum": 10,
                                   "type": "integer"
                                 },
                                 "eventDate": {
@@ -19043,6 +19088,11 @@
                                           "depositAmountVnd": {
                                             "exclusiveMinimum": 0,
                                             "maximum": 9007199254740991,
+                                            "type": "integer"
+                                          },
+                                          "depositRate": {
+                                            "maximum": 100,
+                                            "minimum": 10,
                                             "type": "integer"
                                           },
                                           "eventDate": {
@@ -19933,6 +19983,11 @@
                                     "depositAmountVnd": {
                                       "exclusiveMinimum": 0,
                                       "maximum": 9007199254740991,
+                                      "type": "integer"
+                                    },
+                                    "depositRate": {
+                                      "maximum": 100,
+                                      "minimum": 10,
                                       "type": "integer"
                                     },
                                     "eventDate": {
@@ -26981,7 +27036,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Start VNPay deposit for an owned eligible RESTRICTED or FULL booking. FULL_CONTRACT_V1 requires exact contractRevisionId and documentDigest, dual commercial/timeline approvals and ceil(30% full total). Legacy bodies and settlements retain original semantics. Amount is server-owned.",
+        "summary": "Start VNPay deposit for an owned eligible RESTRICTED or FULL booking. FULL_CONTRACT_V1 requires exact contractRevisionId and documentDigest, dual commercial/timeline approvals and the exact rounded-up frozen booking deposit percentage. Legacy documents without a rate retain 30% and their original settlement semantics. Amount is server-owned.",
         "tags": [
           "Payments and Billing"
         ]
@@ -36474,6 +36529,573 @@
         ]
       }
     },
+    "/management/analytics/completed-events": {
+      "get": {
+        "description": "Manager only. COMPLETED events by inclusive local event date. Revenue is the current finalized invoice, not cash. Unfinalized events are provisional and never PAID. Owner-published financial facts retain credit adjustments and refunds. SQL filters/paginates rows; aggregate budget is 10,000 events/offerings. PAID/DEBT filters apply to the event table; summary and rankings retain the date/hall/search cohort. No-store; authorization is rechecked before returning.",
+        "operationId": "getCompletedEventDashboard",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "dateFrom",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "dateTo",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "hallId",
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "paymentStatus",
+            "schema": {
+              "default": "ALL",
+              "enum": [
+                "ALL",
+                "PAID",
+                "DEBT"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "default": "",
+              "maxLength": 120,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "default": 1,
+              "maximum": 1000000,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "schema": {
+              "default": 10,
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "halls": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "bookingCount": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "finalizedCount": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "hallId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "hallName": {
+                                "type": "string"
+                              },
+                              "netPaidVnd": {
+                                "anyOf": [
+                                  {
+                                    "maximum": 9007199254740991,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "outstandingVnd": {
+                                "anyOf": [
+                                  {
+                                    "maximum": 9007199254740991,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "revenueVnd": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "hallId",
+                              "hallName",
+                              "bookingCount",
+                              "finalizedCount",
+                              "revenueVnd",
+                              "netPaidVnd",
+                              "outstandingVnd"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 10000,
+                          "type": "array"
+                        },
+                        "items": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "bookingCode": {
+                                "type": "string"
+                              },
+                              "bookingId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "creditVnd": {
+                                "anyOf": [
+                                  {
+                                    "maximum": 9007199254740991,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "customerName": {
+                                "type": "string"
+                              },
+                              "eventDate": {
+                                "format": "date",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                "type": "string"
+                              },
+                              "hallId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "hallName": {
+                                "type": "string"
+                              },
+                              "invoiceRevisionId": {
+                                "anyOf": [
+                                  {
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "invoiceState": {
+                                "enum": [
+                                  "FINALIZED",
+                                  "PROVISIONAL",
+                                  "SOURCE_NOT_READY"
+                                ],
+                                "type": "string"
+                              },
+                              "netPaidVnd": {
+                                "anyOf": [
+                                  {
+                                    "maximum": 9007199254740991,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "outstandingVnd": {
+                                "anyOf": [
+                                  {
+                                    "maximum": 9007199254740991,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "paymentStatus": {
+                                "enum": [
+                                  "PAID",
+                                  "DEBT",
+                                  "PENDING_INVOICE",
+                                  "UNKNOWN"
+                                ],
+                                "type": "string"
+                              },
+                              "totalVnd": {
+                                "anyOf": [
+                                  {
+                                    "maximum": 9007199254740991,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": [
+                              "bookingId",
+                              "bookingCode",
+                              "customerName",
+                              "eventDate",
+                              "hallId",
+                              "hallName",
+                              "invoiceRevisionId",
+                              "invoiceState",
+                              "totalVnd",
+                              "netPaidVnd",
+                              "outstandingVnd",
+                              "creditVnd",
+                              "paymentStatus"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 100,
+                          "type": "array"
+                        },
+                        "meta": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "dateFrom": {
+                              "format": "date",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                              "type": "string"
+                            },
+                            "dateTo": {
+                              "format": "date",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                              "type": "string"
+                            },
+                            "definitionVersion": {
+                              "const": "COMPLETED_INVOICE_V1",
+                              "type": "string"
+                            },
+                            "generatedAt": {
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                              "type": "string"
+                            },
+                            "sourceSequences": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "billing": {
+                                  "maximum": 9007199254740991,
+                                  "minimum": 0,
+                                  "type": "integer"
+                                },
+                                "booking": {
+                                  "maximum": 9007199254740991,
+                                  "minimum": 0,
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "booking",
+                                "billing"
+                              ],
+                              "type": "object"
+                            },
+                            "status": {
+                              "enum": [
+                                "READY",
+                                "SOURCE_NOT_READY"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "definitionVersion",
+                            "dateFrom",
+                            "dateTo",
+                            "generatedAt",
+                            "status",
+                            "sourceSequences"
+                          ],
+                          "type": "object"
+                        },
+                        "offerings": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "bookingCount": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "category": {
+                                "enum": [
+                                  "MENU",
+                                  "SERVICE"
+                                ],
+                                "type": "string"
+                              },
+                              "finalizedBookingCount": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "quantity": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "revenueVnd": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "sourceId": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "unit": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "category",
+                              "sourceId",
+                              "name",
+                              "unit",
+                              "bookingCount",
+                              "finalizedBookingCount",
+                              "quantity",
+                              "revenueVnd"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 10000,
+                          "type": "array"
+                        },
+                        "page": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "pageSize": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "summary": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "completedCount": {
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "creditVnd": {
+                              "anyOf": [
+                                {
+                                  "maximum": 9007199254740991,
+                                  "minimum": 0,
+                                  "type": "integer"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "finalizedCount": {
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "netPaidVnd": {
+                              "anyOf": [
+                                {
+                                  "maximum": 9007199254740991,
+                                  "minimum": 0,
+                                  "type": "integer"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "outstandingVnd": {
+                              "anyOf": [
+                                {
+                                  "maximum": 9007199254740991,
+                                  "minimum": 0,
+                                  "type": "integer"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "provisionalCount": {
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "provisionalTotalVnd": {
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "revenueVnd": {
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "unallocatedRevenueVnd": {
+                              "maximum": 9007199254740991,
+                              "minimum": -9007199254740991,
+                              "type": "integer"
+                            },
+                            "unknownCount": {
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "completedCount",
+                            "finalizedCount",
+                            "provisionalCount",
+                            "unknownCount",
+                            "revenueVnd",
+                            "provisionalTotalVnd",
+                            "netPaidVnd",
+                            "outstandingVnd",
+                            "creditVnd",
+                            "unallocatedRevenueVnd"
+                          ],
+                          "type": "object"
+                        },
+                        "total": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "totalPages": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "meta",
+                        "summary",
+                        "halls",
+                        "offerings",
+                        "page",
+                        "pageSize",
+                        "total",
+                        "totalPages",
+                        "items"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Authoritative bounded analytics result.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
     "/management/analytics/exports/overview": {
       "get": {
         "description": "Manager-only bounded JSON aggregate export. Same source definitions and filters as overview; audits filters and aggregate row count without copying row content. No spreadsheet or named-Guest export.",
@@ -40882,6 +41504,11 @@
                                       "maximum": 9007199254740991,
                                       "type": "integer"
                                     },
+                                    "depositRate": {
+                                      "maximum": 100,
+                                      "minimum": 10,
+                                      "type": "integer"
+                                    },
                                     "eventDate": {
                                       "format": "date",
                                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -42631,6 +43258,11 @@
                                     "depositAmountVnd": {
                                       "exclusiveMinimum": 0,
                                       "maximum": 9007199254740991,
+                                      "type": "integer"
+                                    },
+                                    "depositRate": {
+                                      "maximum": 100,
+                                      "minimum": 10,
                                       "type": "integer"
                                     },
                                     "eventDate": {
@@ -47329,6 +47961,11 @@
                         "address": {
                           "type": "string"
                         },
+                        "depositPercentage": {
+                          "maximum": 100,
+                          "minimum": 10,
+                          "type": "integer"
+                        },
                         "description": {
                           "type": "string"
                         },
@@ -47439,6 +48076,11 @@
                     "minLength": 1,
                     "type": "string"
                   },
+                  "depositPercentage": {
+                    "maximum": 100,
+                    "minimum": 10,
+                    "type": "integer"
+                  },
                   "description": {
                     "maxLength": 2000,
                     "minLength": 0,
@@ -47506,6 +48148,11 @@
                       "properties": {
                         "address": {
                           "type": "string"
+                        },
+                        "depositPercentage": {
+                          "maximum": 100,
+                          "minimum": 10,
+                          "type": "integer"
                         },
                         "description": {
                           "type": "string"

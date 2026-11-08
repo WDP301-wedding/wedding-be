@@ -15,6 +15,7 @@ import { AnalyticsProjector } from '../application/projection.js';
 import { AnalyticsService } from '../application/analytics.service.js';
 import { reportingFencesSchema } from '../../../core/reporting/reporting-feed.js';
 import type { AnalyticsObserver } from '../application/analytics-observation.js';
+import { createCompletedEventsReader } from './completed-events.reader.js';
 export function createAnalyticsServices(
   prisma: PrismaClient,
   now: () => Date = () => new Date(),
@@ -87,5 +88,13 @@ export function createAnalyticsServices(
         },
       })
       .then(() => undefined);
-  return { sources, store, projector, service, resolver, audit };
+  return {
+    sources,
+    store,
+    projector,
+    service,
+    resolver,
+    audit,
+    completedEvents: createCompletedEventsReader(prisma),
+  };
 }
