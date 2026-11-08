@@ -10,7 +10,11 @@ import { digest } from '../../../src/modules/invitation-studio/domain/studio-pol
 import { controlledStorage } from './controlled-storage.js';
 import { nativeBookingFixture } from './native-booking-fixture.js';
 
-export async function studioFixture(prisma: PrismaClient, ai: AiImageProvider | null = null) {
+export async function studioFixture(
+  prisma: PrismaClient,
+  ai: AiImageProvider | null = null,
+  options: { commercialTableCount?: number } = {},
+) {
   const now = new Date();
   const eventDate = new Date(Date.now() + 10 * 86400000);
   eventDate.setUTCHours(0, 0, 0, 0);
@@ -71,20 +75,18 @@ export async function studioFixture(prisma: PrismaClient, ai: AiImageProvider | 
   const layout = createLayoutService(prisma),
     templateId = randomUUID(),
     layoutId = randomUUID();
-  const tables = [
-    {
-      tableId: randomUUID(),
-      label: 'T1',
-      shape: 'ROUND' as const,
-      seatCapacity: 40,
-      x: 0,
-      y: 0,
-      width: 500,
-      height: 500,
-      rotationDegrees: 0,
-      displayOrder: 1,
-    },
-  ];
+  const tables = Array.from({ length: 4 }, (_, index) => ({
+    tableId: randomUUID(),
+    label: `T${index + 1}`,
+    shape: 'ROUND' as const,
+    seatCapacity: 10,
+    x: index * 1000,
+    y: 0,
+    width: 500,
+    height: 500,
+    rotationDegrees: 0,
+    displayOrder: index + 1,
+  }));
   const ownerContext = { actorId: manager.actorId, requestId: manager.requestId };
   await layout.createTemplate({
     templateId,
@@ -112,6 +114,9 @@ export async function studioFixture(prisma: PrismaClient, ai: AiImageProvider | 
     actorId: couple.actorId,
     managerId: manager.actorId,
     hallId,
+    ...(options.commercialTableCount === undefined
+      ? {}
+      : { tableCount: options.commercialTableCount }),
     eventDate,
     now,
   });

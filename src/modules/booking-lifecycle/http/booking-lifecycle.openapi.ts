@@ -185,7 +185,10 @@ export const bookingLifecycleOpenApiPaths: Paths = {
       security: bearer,
       parameters: [path('bookingId')],
       responses: {
-        '200': success('The authorized proposal workspace.', proposalResponseSchema),
+        '200': success(
+          'The authorized workspace with effective mutually approved appendix > approved contract > initial proposal menus/tables. Original deposit remains frozen. capacity reports the fixed ten-person rule and current published hall-layout maximum without rewriting historical agreements.',
+          proposalResponseSchema,
+        ),
         ...errors,
       },
     },

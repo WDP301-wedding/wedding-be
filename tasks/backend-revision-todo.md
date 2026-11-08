@@ -1,5 +1,13 @@
 # Backend Revision Tasks: 2026-10-10
 
+## Fixed table capacity and effective commercial summaries — 2026-11-09
+
+- [x] Guard commercial writes and Couple planning changes with ten people per table and published active hall-layout table maximum; preserve reserved payment reconciliation.
+- [x] Read current menus/tables/totals from mutually approved effective appendix, then approved contract, then proposal; sort/page by the same current table count.
+- [x] Add Manager/Couple Web and mobile feedback without removing Couple headcount editing or introducing capacity configuration.
+- [x] Finish local regression, type/lint/build/OpenAPI and browser verification. [Scope](../docs/table-capacity-2026-11-09.md), [evidence](./evidence/table-capacity-2026-11-09.md).
+- [ ] Release the reviewed backend and clients together, then verify deployed behavior; local results do not imply deployment.
+
 ## Incidental catalog and mutual expense approval — 2026-11-08
 
 - [x] Implement prospectively frozen Manager incidental prices in contracts/PDFs.

@@ -1,3 +1,4 @@
+import { ensurePublishedTableLayout } from '../../fixtures/table-layout.js';
 import { randomUUID } from 'node:crypto';
 
 import request from 'supertest';
@@ -92,6 +93,22 @@ describeWithDatabase('booking runtime with real identity, venue, and PostgreSQL'
       });
     }
     await seedVenueCatalog(database.prisma);
+    await database.prisma.hall.update({
+      where: { id: CATALOG_SEED_IDS.lotusHall },
+      data: { maxGuests: 600 },
+    });
+    await ensurePublishedTableLayout(
+      database.prisma,
+      CATALOG_SEED_IDS.lotusHall,
+      CATALOG_SEED_IDS.actor,
+      60,
+    );
+    await ensurePublishedTableLayout(
+      database.prisma,
+      CATALOG_SEED_IDS.orchidHall,
+      CATALOG_SEED_IDS.actor,
+      12,
+    );
     const url = new URL(catalogMigrationDatabaseUrl!);
     url.pathname = `/${database.databaseName}`;
     url.searchParams.delete('schema');
@@ -507,6 +524,12 @@ describeWithDatabase('booking runtime with real identity, venue, and PostgreSQL'
     });
     expect(response.status).toBe(201);
     const result = bookingResponseSchema.parse(response.body as unknown).data;
+    // This case verifies the retained timeline-only compatibility lifecycle;
+    // full-contract deposit readiness is covered by commercial-contracts-api.
+    await database.prisma.booking.update({
+      where: { id: result.bookingId },
+      data: { commercialModelVersion: 'LEGACY_PROPOSAL_V1' },
+    });
     expect(result.consultationRevision).toBe(2);
     const invitation = await post(
       `/management/consultations/${created.consultationId}/workspace-invitations`,
@@ -593,7 +616,7 @@ describeWithDatabase('booking runtime with real identity, venue, and PostgreSQL'
       bookingId: result.bookingId,
       timelineRevisionId: effectiveId,
     });
-    expect(eligibility.eligible).toBe(true);
+    expect(eligibility.eligible, JSON.stringify(eligibility)).toBe(true);
     await expect(
       booking!.providers.boundary.run({ bookingId: result.bookingId, context }, async (scoped) => {
         const paymentAttemptId = randomUUID();
@@ -684,13 +707,13 @@ describeWithDatabase('booking runtime with real identity, venue, and PostgreSQL'
             bookingId: result.bookingId,
             sourceGuestPlanRevisionId: randomUUID(),
             sourceSequence: 1,
-            expectedAttendees: 120,
+            expectedAttendees: 95,
           },
           scoped,
         );
         expect(
           await booking!.providers.planning.getCurrent(result.bookingId, scoped),
-        ).toMatchObject({ planningHeadcount: 120 });
+        ).toMatchObject({ planningHeadcount: 95 });
         throw new Error('Guest owner failed');
       }),
     ).rejects.toThrow('Guest owner failed');
@@ -764,10 +787,16 @@ describeWithDatabase('booking runtime with real identity, venue, and PostgreSQL'
       .get(`/api/v1/bookings/${result.bookingId}/proposal`)
       .set('Authorization', `Bearer ${outsiderToken}`);
     expect(denied.status).toBe(404);
-    const notDue = await post(`/management/bookings/${result.bookingId}/completion`, {
-      expectedRevision: proposal.revision,
-    });
-    expect(notDue.status).toBe(409);
+    // The demo permits early completion; this assertion exercises explicit strict mode.
+    vi.stubEnv('STRICT_SETTLEMENT_DATE_CHECK', 'true');
+    try {
+      const notDue = await post(`/management/bookings/${result.bookingId}/completion`, {
+        expectedRevision: proposal.revision,
+      });
+      expect(notDue.status).toBe(409);
+    } finally {
+      vi.unstubAllEnvs();
+    }
     const cancellation = await post(
       `/bookings/${result.bookingId}/cancellation-requests`,
       { expectedRevision: proposal.revision, reason: 'Plans changed' },

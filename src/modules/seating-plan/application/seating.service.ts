@@ -1,3 +1,7 @@
+import {
+  commercialSummary,
+  commercialSummarySelect,
+} from '../../booking-lifecycle/infrastructure/commercial-summary.reader.js';
 import type { SeatingLayoutOptions } from '../domain/layout-options.js';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
@@ -165,8 +169,21 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
     const planning = await this.guest.owners.planning.getSource(bookingId, scope);
     const eligibility = await this.venue.getLayoutEligibility(layoutId, scope);
     if (eligibility.hallId !== event.hallId) throw new NotFoundError();
-    const layout = eligibility.layoutSnapshot ?? (await this.layouts.resolveVersion(layoutId));
-    return { planning, eligibility, layout };
+    const originalLayout =
+      eligibility.layoutSnapshot ?? (await this.layouts.resolveVersion(layoutId));
+    const layout = { ...originalLayout, totalSeatCapacity: originalLayout.tables.length * 10 };
+    const bookingFacts = await this.boundary
+      .requireScope(bookingId, scope)
+      .booking.findUniqueOrThrow({
+        where: { id: bookingId },
+        select: { proposalSnapshot: { select: { tableCount: true } }, ...commercialSummarySelect },
+      });
+    return {
+      planning,
+      eligibility: { ...eligibility, totalSeatCapacity: layout.totalSeatCapacity },
+      layout,
+      bookedTables: commercialSummary(bookingFacts).tableCount,
+    };
   }
   private async snapshot(
     layout: LayoutVersionSnapshot,
@@ -313,7 +330,15 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
     return this.run(
       bookingId,
       context,
-      async (_tx, scope) => {
+      async (tx, scope) => {
+        const bookingFacts = await tx.booking.findUniqueOrThrow({
+          where: { id: bookingId },
+          select: {
+            proposalSnapshot: { select: { tableCount: true } },
+            ...commercialSummarySelect,
+          },
+        });
+        const bookedTables = commercialSummary(bookingFacts).tableCount;
         const event = await this.guest.owners.booking.requireConfirmedEventContext(bookingId),
           planning = await this.guest.owners.planning.getSource(bookingId, scope);
         const layouts = await this.layouts.listCurrentVersionsForHall(event.hallId);
@@ -328,7 +353,11 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
             )
           : undefined;
         const items: SeatingLayoutOptions['items'] = [];
-        for (const layout of layouts) {
+        for (const originalLayout of layouts) {
+          const layout = {
+            ...originalLayout,
+            totalSeatCapacity: originalLayout.tables.length * 10,
+          };
           const eligibility =
             batch?.get(layout.id) ?? (await this.venue.getLayoutEligibility(layout.id, scope));
           if (
@@ -337,16 +366,20 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
             !eligibility.hallActive
           )
             continue;
-          const warning = capacityProblem(planning.planningHeadcount, {
-            ...layout,
-            ...eligibility,
-          });
+          const warning =
+            layout.tables.length < bookedTables
+              ? ('EXCEPTION_EXCEEDS_PHYSICAL_CAPACITY' as const)
+              : capacityProblem(planning.planningHeadcount, {
+                  ...layout,
+                  ...eligibility,
+                  totalSeatCapacity: layout.tables.length * 10,
+                });
           items.push({
             layoutTemplateVersionId: layout.id,
             name: layout.name,
             minGuests: layout.minGuests,
             maxGuests: layout.maxGuests,
-            totalSeatCapacity: layout.totalSeatCapacity,
+            totalSeatCapacity: layout.tables.length * 10,
             compatible: warning === null,
             description: layout.description,
             tables: layout.tables.map((table) => ({
@@ -358,7 +391,7 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
               width: table.width,
               height: table.height,
               rotationDegrees: table.rotationDegrees,
-              seatCapacity: table.seatCapacity,
+              seatCapacity: 10,
             })),
             warning,
           });
@@ -482,7 +515,7 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
         }
         const { head, row, snapshot } = await this.current(tx, bookingId, planId);
         this.bookingRevision(input.expectedRevision, row.revisionNumber);
-        const { planning, eligibility, layout } = await this.facts(
+        const { planning, eligibility, layout, bookedTables } = await this.facts(
           bookingId,
           row.layoutTemplateVersionId,
           scope,
@@ -490,6 +523,7 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
         this.bookingRevision(input.expectedBookingRevision, planning.bookingRevision);
         if (!eligibility.hallActive || !eligibility.templateActive)
           throw conflict('LAYOUT_RETIRED');
+        if (layout.tables.length < bookedTables) throw conflict('BOOKING_LAYOUT_TABLE_LIMIT');
         const problem = capacityProblem(
           planning.planningHeadcount,
           { ...layout, ...eligibility },
@@ -570,7 +604,7 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
     );
     if (eventRevision !== undefined && eventRevision <= head.observedBookingRevision)
       return this.view(row);
-    const { planning, eligibility, layout } = await this.facts(
+    const { planning, eligibility, layout, bookedTables } = await this.facts(
       bookingId,
       row.layoutTemplateVersionId,
       scope,
@@ -585,11 +619,14 @@ export class SeatingService implements SeatingGuidanceReader, SeatingPlanReader 
       e !== null &&
       (e.approvedBookingRevision !== planning.bookingRevision ||
         e.approvedHeadcount !== planning.planningHeadcount);
-    const problem = capacityProblem(
-      planning.planningHeadcount,
-      { ...layout, ...eligibility },
-      e !== null && !invalidException,
-    );
+    const problem =
+      layout.tables.length < bookedTables
+        ? 'EXCEPTION_EXCEEDS_PHYSICAL_CAPACITY'
+        : capacityProblem(
+            planning.planningHeadcount,
+            { ...layout, ...eligibility },
+            e !== null && !invalidException,
+          );
     if (
       row.status === 'CONFIRMED' &&
       (retired || headcountChanged || invalidException || problem !== null)

@@ -10,6 +10,84 @@ import { BookingLifecycleNotFoundError } from './consultation.repository.js';
 const now = new Date('2026-10-07T10:00:00.000Z');
 
 describe('PrismaBookingDepositRepository', () => {
+  it('rejects new eligibility and reservation when the agreement exceeds available layout tables', async () => {
+    const transaction = fixture();
+    transaction.layoutTemplateVersion.findMany.mockResolvedValue([{ _count: { geometry: 8 } }]);
+    const repository = createPrismaBookingDepositRepository(client(transaction), () => now);
+    const input = { bookingId: 'booking', timelineRevisionId: 'timeline' };
+    await expect(repository.requireDepositEligibility(input)).rejects.toMatchObject({
+      status: 409,
+      code: 'BOOKING_LAYOUT_TABLE_LIMIT',
+    });
+    await expect(
+      repository.reserve({
+        ...input,
+        paymentAttemptId: 'attempt',
+        expectedBookingRevision: 4,
+        amountVnd: 3_000_001,
+        expiresAt: '2026-10-07T10:15:00.000Z',
+        requestId: 'request',
+        actorAccountId: 'couple',
+      }),
+    ).rejects.toMatchObject({ status: 409, code: 'BOOKING_LAYOUT_TABLE_LIMIT' });
+    expect(transaction.bookingDepositIntent.create).not.toHaveBeenCalled();
+    expect(transaction.booking.updateMany).not.toHaveBeenCalled();
+  });
+
+  it('settles an already reserved matching deposit after layout retirement while blocking new eligibility', async () => {
+    const transaction = fixture();
+    const repository = createPrismaBookingDepositRepository(client(transaction), () => now);
+    const input = { bookingId: 'booking', timelineRevisionId: 'timeline' };
+    await repository.reserve({
+      ...input,
+      paymentAttemptId: 'attempt',
+      expectedBookingRevision: 4,
+      amountVnd: 3_000_001,
+      expiresAt: '2026-10-07T10:15:00.000Z',
+      requestId: 'request',
+      actorAccountId: 'couple',
+    });
+    transaction.booking.findUnique.mockResolvedValue({
+      ...(await transaction.booking.findUnique()),
+      phase: 'AWAITING_DEPOSIT',
+      revision: 5,
+    });
+    transaction.bookingDepositIntent.findFirst.mockResolvedValue({
+      id: 'attempt',
+      ...input,
+      contractRevisionId: null,
+      documentDigest: null,
+      amountVnd: 3_000_001,
+      status: 'ACTIVE',
+      coupleAccountId: 'couple',
+      requestId: 'request',
+    });
+    transaction.layoutTemplateVersion.findMany.mockResolvedValue([]);
+    await expect(repository.requireDepositEligibility(input)).rejects.toMatchObject({
+      status: 409,
+      code: 'BOOKING_LAYOUT_UNAVAILABLE',
+    });
+    await expect(
+      repository.settle({
+        ...input,
+        paymentId: 'verified-payment',
+        amountVnd: 3_000_001,
+        settledAt: now,
+      }),
+    ).resolves.toMatchObject({ phase: 'CONFIRMED', replayed: false, promotionPending: true });
+    expect(transaction.bookingDepositSettlement.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({ paymentId: 'verified-payment', amountVnd: 3_000_001 }),
+    });
+    expect(transaction.booking.updateMany).toHaveBeenLastCalledWith({
+      where: { id: 'booking', revision: 5, phase: 'AWAITING_DEPOSIT' },
+      data: {
+        phase: 'CONFIRMED',
+        effectiveTimelineRevisionId: 'timeline',
+        revision: { increment: 1 },
+      },
+    });
+  });
+
   it('binds a requesting Couple with a Manager role to their own grant rather than the oldest grant', async () => {
     const transaction = fixture();
     transaction.account.findFirst.mockResolvedValue({ id: 'payer' });
@@ -157,7 +235,7 @@ describe('PrismaBookingDepositRepository', () => {
     for (const pin of ['ACTIVE', 'UNKNOWN']) {
       transaction.booking.findUnique.mockResolvedValue({
         ...booking,
-        proposalSnapshot: { depositAmountVnd: { toNumber: () => 3_000_001 } },
+        proposalSnapshot: { tableCount: 10, depositAmountVnd: { toNumber: () => 3_000_001 } },
         slotHolds: [{ expiresAt: now, depositIntentPin: pin }],
       });
       expect(await repository.requireDepositEligibility(input)).toMatchObject({
@@ -501,6 +579,8 @@ describe('PrismaBookingDepositRepository', () => {
 function fixture() {
   const booking = {
     id: 'booking',
+    hallId: 'hall',
+    planningHeadcount: 100,
     consultationId: 'consultation',
     consultation: { intendedEmailNormalized: 'couple@example.com' },
     phase: 'DRAFT',
@@ -511,7 +591,7 @@ function fixture() {
       managerApprovedAt: new Date('2026-10-07T09:00:00.000Z'),
       coupleApprovedAt: new Date('2026-10-07T09:05:00.000Z'),
     },
-    proposalSnapshot: { depositAmountVnd: 3_000_001 },
+    proposalSnapshot: { tableCount: 10, depositAmountVnd: 3_000_001 },
     commercialContract: null,
     slotHolds: [
       {
@@ -523,9 +603,13 @@ function fixture() {
     ],
   };
   return {
+    $executeRaw: vi.fn().mockResolvedValue(1),
+    hall: { findUnique: vi.fn().mockResolvedValue({ lifecycle: 'ACTIVE', maxGuests: 200 }) },
+    layoutTemplateVersion: { findMany: vi.fn().mockResolvedValue([{ _count: { geometry: 20 } }]) },
     account: { findFirst: vi.fn().mockResolvedValue(null) },
     booking: {
       findUnique: vi.fn().mockResolvedValue(booking),
+      findUniqueOrThrow: vi.fn().mockResolvedValue(booking),
       findFirst: vi.fn().mockResolvedValue(null),
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
     },
@@ -560,6 +644,8 @@ function client(transaction: object) {
   const value = transaction as ReturnType<typeof fixture>;
   return {
     booking: value.booking,
+    hall: value.hall,
+    layoutTemplateVersion: value.layoutTemplateVersion,
     consultationAccess: value.consultationAccess,
     bookingDepositSettlement: value.bookingDepositSettlement,
     bookingSlotHold: value.bookingSlotHold,

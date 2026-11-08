@@ -32,6 +32,22 @@ export const proposalResponseSchema = z.strictObject({
     revision,
     eventDate: z.iso.date(),
     planningHeadcount: z.int().min(0).max(10000),
+    commercialSource: z.enum(['APPENDIX', 'CONTRACT', 'PROPOSAL']).optional(),
+    capacity: z
+      .strictObject({
+        guestsPerTable: z.literal(10),
+        minimumTables: z.int().nonnegative(),
+        maximumTables: z.int().nonnegative(),
+        issue: z
+          .enum([
+            'BOOKING_TABLES_INSUFFICIENT',
+            'BOOKING_LAYOUT_TABLE_LIMIT',
+            'BOOKING_LAYOUT_UNAVAILABLE',
+            'BOOKING_HALL_CAPACITY_EXCEEDED',
+          ])
+          .nullable(),
+      })
+      .optional(),
     completion: z
       .strictObject({
         canComplete: z.boolean(),

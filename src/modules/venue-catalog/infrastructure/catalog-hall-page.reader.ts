@@ -12,6 +12,7 @@ interface HallPageRow {
   name: string;
   description: string;
   maxGuests: number;
+  maxTables: number;
   assets: {
     id: string;
     resourceType: 'HALL';
@@ -51,7 +52,14 @@ export async function readCatalogHallPage(prisma: PrismaClient, input: HallPageI
     SELECT (${cursor} IS NULL OR EXISTS(SELECT 1 FROM anchor)) AS "cursorValid",
       COALESCE((SELECT jsonb_agg(
         jsonb_build_object('id',p.id,'name',p.name,'description',p.description,
-          'maxGuests',p."maxGuests",'assets',COALESCE((
+          'maxGuests',p."maxGuests",'maxTables',COALESCE((
+            SELECT MAX(layout_tables.n) FROM (
+              SELECT COUNT(g.id)::int AS n FROM ${schema}."LayoutTemplate" lt
+              JOIN ${schema}."LayoutTemplateVersion" lv ON lv.id=lt."currentPublishedVersionId" AND lv.state='PUBLISHED'
+              LEFT JOIN ${schema}."LayoutTableGeometry" g ON g."layoutTemplateVersionId"=lv.id
+              WHERE lt."hallId"=p.id AND lt.lifecycle='ACTIVE' GROUP BY lv.id
+            ) layout_tables
+          ),0),'assets',COALESCE((
             SELECT jsonb_agg(jsonb_build_object('id',m.id,'resourceType',m."resourceType",
               'resourceId',m."resourceId",'objectKey',m."objectKey",
               'checksumSha256',m."checksumSha256",'contentType',m."contentType",

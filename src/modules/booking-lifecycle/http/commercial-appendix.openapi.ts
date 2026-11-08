@@ -31,7 +31,9 @@ const success = {
 function write(operationId: string, description: string, schema: z.ZodType, status: string) {
   return {
     operationId,
-    description,
+    description:
+      description +
+      ' MENU quantities are table counts. Maximum 10 guests per table; minimum tables and maximum published active hall-layout tables are rechecked at creation, submission and both approvals. Capacity conflicts return 409 BOOKING_TABLES_INSUFFICIENT, BOOKING_LAYOUT_TABLE_LIMIT, BOOKING_LAYOUT_UNAVAILABLE or BOOKING_HALL_CAPACITY_EXCEEDED.',
     tags: ['Booking lifecycle'],
     security,
     parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }],

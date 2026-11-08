@@ -1,3 +1,4 @@
+import { ensurePublishedTableLayout } from '../../fixtures/table-layout.js';
 import { randomUUID } from 'node:crypto';
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -471,6 +472,7 @@ describeWithDatabase('booking lifecycle review regressions', () => {
         createdAt: now,
       },
     });
+    await ensurePublishedTableLayout(prisma, hallId, managerId, 50);
     return {
       now,
       eventDate,

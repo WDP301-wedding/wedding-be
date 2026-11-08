@@ -54,7 +54,7 @@ export function createPrismaSelectionEligibilityReader(
       SELECT v.id AS "layoutTemplateVersionId", t."hallId",
         (t.lifecycle='ACTIVE') AS "templateActive", (h.lifecycle='ACTIVE') AS "hallActive",
         COALESCE(t."currentPublishedVersionId"=v.id, false) AS "currentForNewSelection",
-        h."maxGuests" AS "hallMaxGuests", COALESCE(SUM(g."seatCapacity"),0)::int AS "totalSeatCapacity"
+        h."maxGuests" AS "hallMaxGuests", (COUNT(g.id)*10)::int AS "totalSeatCapacity"
         ${
           snapshot
             ? Prisma.sql`, jsonb_build_object(

@@ -14,7 +14,7 @@ describeDb('GM explicit 300 total, quotas and reauthorization', () => {
   beforeAll(() => db.connect(), 60000);
   afterAll(() => db.disconnect());
   it('retains 300 with zero/20 names, only an explicit 250 revision changes Booking', async () => {
-    const f = await studioFixture(db.prisma),
+    const f = await studioFixture(db.prisma, null, { commercialTableCount: 30 }),
       s = createGuestServices(db.prisma);
     await db.prisma.hall.update({
       where: { id: f.hallId },
@@ -117,7 +117,7 @@ describeDb('GM explicit 300 total, quotas and reauthorization', () => {
     ).rejects.toMatchObject({ status: 404 });
   }, 30000);
   it('enforces quotas on create, import and restoration without changing the independent plan', async () => {
-    const f = await studioFixture(db.prisma),
+    const f = await studioFixture(db.prisma, null, { commercialTableCount: 4 }),
       s = createGuestServices(db.prisma);
     const groups = await s.guests.groups(f.bookingId, f.couple),
       group = groups[0]!;
@@ -222,7 +222,7 @@ describeDb('GM explicit 300 total, quotas and reauthorization', () => {
     expect((await s.guests.plan(f.bookingId, f.couple)).planningHeadcount).toBe(20);
   }, 60000);
   it('rejects missing/retired capacity and stale Booking planning evidence', async () => {
-    const f = await studioFixture(db.prisma),
+    const f = await studioFixture(db.prisma, null, { commercialTableCount: 4 }),
       s = createGuestServices(db.prisma);
     const context = {
       authority: 'AUTHENTICATED' as const,

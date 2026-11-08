@@ -14,8 +14,8 @@ import { SeatingService } from '../../src/modules/seating-plan/application/seati
     const db = new CatalogTestDatabase('seating');
     beforeAll(() => db.connect(), 60000);
     afterAll(() => db.disconnect());
-    async function fixture() {
-      const f = await studioFixture(db.prisma),
+    async function fixture(commercialTableCount = 2) {
+      const f = await studioFixture(db.prisma, null, { commercialTableCount }),
         s = createSeatingServices(db.prisma, f.services, () => f.now);
       const groups = await s.guests.guests.groups(f.bookingId, f.couple);
       const plan = await s.seating.select(
@@ -214,7 +214,7 @@ import { SeatingService } from '../../src/modules/seating-plan/application/seati
       await confirm(x);
     });
     it('invalidates out-of-range headcount, preserves history and rejects older/future events', async () => {
-      const x = await fixture(),
+      const x = await fixture(4),
         { f, s, plan } = x;
       const c = await confirm(x);
       await s.guests.guests.updatePlan(
@@ -263,7 +263,7 @@ import { SeatingService } from '../../src/modules/seating-plan/application/seati
       ).toMatchObject({ status: 'CONFIRMED', planningHeadcount: 20 });
     });
     it('audits exact Manager exceptions, rejects Couple/physical overflow/zero, and invalidates changed exception', async () => {
-      const { f, s, plan } = await fixture();
+      const { f, s, plan } = await fixture(4);
       await s.guests.guests.updatePlan(
         f.bookingId,
         { expectedRevision: 1, planningHeadcount: 35 },
@@ -300,9 +300,18 @@ import { SeatingService } from '../../src/modules/seating-plan/application/seati
       expect(await s.seating.read(f.bookingId, plan.seatingPlanId, f.couple)).toMatchObject({
         status: 'REQUIRES_REVIEW',
       });
+      await expect(
+        s.guests.guests.updatePlan(
+          f.bookingId,
+          { expectedRevision: 3, planningHeadcount: 41 },
+          randomUUID(),
+          f.couple,
+        ),
+      ).rejects.toMatchObject({ code: 'BOOKING_TABLES_INSUFFICIENT' });
+      expect((await s.guests.guests.plan(f.bookingId, f.couple)).planningHeadcount).toBe(36);
       await s.guests.guests.updatePlan(
         f.bookingId,
-        { expectedRevision: 3, planningHeadcount: 41 },
+        { expectedRevision: 3, planningHeadcount: 0 },
         randomUUID(),
         f.couple,
       );
@@ -311,22 +320,6 @@ import { SeatingService } from '../../src/modules/seating-plan/application/seati
           f.bookingId,
           plan.seatingPlanId,
           { ...input, expectedRevision: 3, expectedBookingRevision: 4 },
-          randomUUID(),
-          f.manager,
-          true,
-        ),
-      ).rejects.toMatchObject({ code: 'EXCEPTION_EXCEEDS_PHYSICAL_CAPACITY' });
-      await s.guests.guests.updatePlan(
-        f.bookingId,
-        { expectedRevision: 4, planningHeadcount: 0 },
-        randomUUID(),
-        f.couple,
-      );
-      await expect(
-        s.seating.confirm(
-          f.bookingId,
-          plan.seatingPlanId,
-          { ...input, expectedRevision: 3, expectedBookingRevision: 5 },
           randomUUID(),
           f.manager,
           true,

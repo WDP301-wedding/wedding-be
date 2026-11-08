@@ -1,5 +1,13 @@
 # Backend Ownership
 
+Owner-approved amendment, 2026-11-09: enforce fixed maximum 10 guests per table;
+menu quantities remain table quantities. Couple retains explicit headcount edits.
+Validate minimum tables and maximum published active hall-layout table count at
+commercial writes, approvals, deposits and planning updates. Unify current summaries
+as mutually approved effective appendix > mutually approved contract > proposal.
+This revision may change wedding-be, wedding-manage-web, wedding-web and PRM-app.
+Preserve immutable history and payments. See docs/table-capacity-2026-11-09.md.
+
 Owner-approved amendment, 2026-11-08: implement booking-frozen incidental catalogs
 and whole-table Manager/Couple approval as confirmed in
 docs/incidental-catalog-approval-2026-11-08.md across backend, Manager/Couple Web

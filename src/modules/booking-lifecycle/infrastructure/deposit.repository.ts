@@ -1,12 +1,10 @@
+import { requireHallTableCapacity } from '../../venue-catalog/infrastructure/table-capacity.reader.js';
+import { commercialSummary, commercialSummarySelect } from './commercial-summary.reader.js';
 import { randomUUID } from 'node:crypto';
 import { Prisma, type PrismaClient } from '../../../generated/prisma/client.js';
 import type { BookingDepositRepository } from '../application/deposit.service.js';
 import { BookingLifecycleNotFoundError } from './consultation.repository.js';
-import {
-  appendEvidence,
-  decimalNumber,
-  readEligibility,
-} from './deposit-eligibility.reader.js';
+import { appendEvidence, decimalNumber, readEligibility } from './deposit-eligibility.reader.js';
 import {
   BookingDepositConflictError,
   type DepositConflictCode,
@@ -81,7 +79,10 @@ export function createPrismaBookingDepositRepository(
             select: { id: true, status: true, expiresAt: true },
           });
           if (unresolved !== null) {
-            if (unresolved.status === 'ACTIVE' && unresolved.expiresAt.getTime() <= now().getTime()) {
+            if (
+              unresolved.status === 'ACTIVE' &&
+              unresolved.expiresAt.getTime() <= now().getTime()
+            ) {
               await transaction.bookingDepositIntent.update({
                 where: { id: unresolved.id },
                 data: { status: 'RELEASED', releasedAt: now() },
@@ -109,6 +110,21 @@ export function createPrismaBookingDepositRepository(
               >,
             );
           }
+          const bookingCapacity = await transaction.booking.findUniqueOrThrow({
+            where: { id: input.bookingId },
+            select: {
+              hallId: true,
+              planningHeadcount: true,
+              proposalSnapshot: { select: { tableCount: true } },
+              ...commercialSummarySelect,
+            },
+          });
+          await requireHallTableCapacity(
+            transaction,
+            bookingCapacity.hallId,
+            bookingCapacity.planningHeadcount,
+            commercialSummary(bookingCapacity).tableCount,
+          );
           if (eligibility.bookingRevision !== input.expectedBookingRevision) {
             throw new BookingDepositConflictError('STALE_BOOKING_REVISION');
           }

@@ -14,7 +14,7 @@ describeDb('GM-W3 minimum-data ordered provider conformance', () => {
   let groupId: string, guestId: string;
   beforeAll(async () => {
     await db.connect();
-    f = await studioFixture(db.prisma);
+    f = await studioFixture(db.prisma, null, { commercialTableCount: 4 });
     s = createGuestServices(db.prisma);
     groupId = (await s.guests.groups(f.bookingId, f.couple))[0]!.guestGroupId;
   }, 60000);
@@ -153,7 +153,7 @@ describeDb('GM-W3 minimum-data ordered provider conformance', () => {
     ).rejects.toMatchObject({ status: 404 });
   });
   it('orders Booking sequence 11 then 10 and rejects changed same-sequence source', async () => {
-    const other = await studioFixture(db.prisma),
+    const other = await studioFixture(db.prisma, null, { commercialTableCount: 4 }),
       composition = createGuestServices(db.prisma);
     const context = {
       authority: 'AUTHENTICATED' as const,

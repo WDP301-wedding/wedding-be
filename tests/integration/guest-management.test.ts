@@ -14,12 +14,12 @@ describeDb('GM-W1 real Booking + Guest persistence', () => {
   let s: ReturnType<typeof createGuestServices>;
   beforeAll(async () => {
     await database.connect();
-    f = await studioFixture(database.prisma);
+    f = await studioFixture(database.prisma, null, { commercialTableCount: 4 });
     s = createGuestServices(database.prisma);
   }, 60000);
   afterAll(() => database.disconnect());
   it('reads an untouched completed booking without initializing any planning records', async () => {
-    const closed = await studioFixture(database.prisma);
+    const closed = await studioFixture(database.prisma, null, { commercialTableCount: 4 });
     await database.prisma.booking.update({
       where: { id: closed.bookingId },
       data: { phase: 'COMPLETED' },
@@ -52,7 +52,7 @@ describeDb('GM-W1 real Booking + Guest persistence', () => {
     ).rejects.toMatchObject({ status: 409, code: 'PREPARATION_READ_ONLY' });
   });
   it('keeps saved preparation visible after completion and rejects mutations', async () => {
-    const closed = await studioFixture(database.prisma);
+    const closed = await studioFixture(database.prisma, null, { commercialTableCount: 4 });
     const design = await closed.services.designs.create(
       {
         bookingId: closed.bookingId,

@@ -25,7 +25,7 @@ import { createGuestServices } from '../../src/modules/guest-management/infrastr
   it.each([false, true])(
     'native due jobs with Android=%s',
     async (androidEnabled) => {
-      const f = await studioFixture(db.prisma);
+      const f = await studioFixture(db.prisma, null, { commercialTableCount: 4 });
       const b = await db.prisma.booking.findUniqueOrThrow({
         where: { id: f.bookingId },
         include: { proposalSnapshot: true },
@@ -122,8 +122,8 @@ import { createGuestServices } from '../../src/modules/guest-management/infrastr
     30000,
   );
   it('persists page fences, honors rehearsal scopes and ignores invalid cutoff revisions', async () => {
-    const a = await studioFixture(db.prisma),
-      b = await studioFixture(db.prisma);
+    const a = await studioFixture(db.prisma, null, { commercialTableCount: 4 }),
+      b = await studioFixture(db.prisma, null, { commercialTableCount: 4 });
     const head = await db.prisma.booking.findUniqueOrThrow({
       where: { id: a.bookingId },
       include: { proposalSnapshot: true },
@@ -215,7 +215,7 @@ import { createGuestServices } from '../../src/modules/guest-management/infrastr
     expect(await db.prisma.notificationIntent.count()).toBe(priorCount);
   }, 30000);
   it('keeps frozen completion inputs on NOT_DUE/restart and marks stale owner revisions as conflicts', async () => {
-    const f = await studioFixture(db.prisma);
+    const f = await studioFixture(db.prisma, null, { commercialTableCount: 4 });
     let clock = f.now;
     const foundation = new NotificationFoundation(db.prisma, () => clock);
     const consumer = new NotificationEventConsumer(

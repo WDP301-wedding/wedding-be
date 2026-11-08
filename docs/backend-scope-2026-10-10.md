@@ -15,6 +15,13 @@ evidence and frontend source. New requirements are extensions to completed work.
 
 ## 1. Team Boundary
 
+Table-capacity amendment confirmed on **2026-11-09**: fixed maximum 10 people per
+table, no per-table capacity setting in this rule. Menu quantities remain tables;
+Couple may edit planning headcount within effective table and hall-layout limits.
+Current table/menu summaries use the mutually approved effective appendix, then
+approved contract, then proposal. Four repositories are authorized. See
+[accepted scope](./table-capacity-2026-11-09.md).
+
 Incidental-pricing/approval amendment confirmed on **2026-11-08**: new bookings
 freeze the Manager incidental catalog and include the schedule in their contracts.
 After completion, Manager submits the full expense table and owning FULL Couple

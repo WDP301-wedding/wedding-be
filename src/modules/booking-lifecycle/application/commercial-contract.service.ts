@@ -1,3 +1,4 @@
+import { requireHallTableCapacity } from '../../venue-catalog/infrastructure/table-capacity.reader.js';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import type { createBookingBoundaryUnitOfWork } from '../../../core/database/booking-unit-of-work.js';
@@ -203,9 +204,8 @@ export function createCommercialContractService(options: Options) {
     const tableCount = checkedSum(
       lines.filter((line) => line.category === 'MENU').map((line) => line.quantity),
     );
-    // No invented seats-per-table ratio; hall capacity constrains independently entered headcount.
-    if (tableCount > 500 || booking.planningHeadcount > hall.maxGuests)
-      throw commercialConflict('CONTRACT_CAPACITY_EXCEEDED');
+    if (tableCount > 500) throw commercialConflict('CONTRACT_CAPACITY_EXCEEDED');
+    await requireHallTableCapacity(client, booking.hallId, booking.planningHeadcount, tableCount);
     const total = checkedSum(lines.map((line) => line.lineTotalVnd));
     const menus = includeStandardTerms
       ? await catalog.requireContractMenus(
@@ -553,6 +553,12 @@ export function createCommercialContractService(options: Options) {
         const own = prior.approvals.find((item) => item.party === access.party);
         if (own !== undefined)
           return { bookingRevision: access.booking.revision, contract: contractView(prior) };
+        await requireHallTableCapacity(
+          client,
+          access.booking.hallId,
+          access.booking.planningHeadcount,
+          document.tableCount,
+        );
         if (prior.approvals.some((item) => item.actorAccountId === actor.accountId))
           throw commercialConflict('CONTRACT_DISTINCT_APPROVERS_REQUIRED');
         await client.commercialContractApproval.create({

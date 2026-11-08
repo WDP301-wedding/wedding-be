@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 import type { PrismaClient } from '../../../src/generated/prisma/client.js';
 import { CATALOG_SEED_IDS } from '../../../scripts/catalog-seed.js';
+import { ensurePublishedTableLayout } from '../../fixtures/table-layout.js';
 
 let eventDay = 1;
 
@@ -14,6 +15,7 @@ export async function createPayableBooking(prisma: PrismaClient) {
   const requestId = randomUUID();
   const managerId = CATALOG_SEED_IDS.actor;
   const hallId = CATALOG_SEED_IDS.lotusHall;
+  await ensurePublishedTableLayout(prisma, hallId, managerId, 10);
   const eventDate = new Date(Date.UTC(2027, 0, eventDay++));
   const now = new Date();
   await prisma.account.create({

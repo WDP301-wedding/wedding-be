@@ -30,7 +30,7 @@ describeDb('GM-W4 mounted strict HTTP + real Identity/Booking/Invitation', () =>
   let app: ReturnType<typeof createApp>;
   beforeAll(async () => {
     await db.connect();
-    f = await studioFixture(db.prisma);
+    f = await studioFixture(db.prisma, null, { commercialTableCount: 4 });
     s = createGuestServices(db.prisma);
     app = createApp({
       runtimeEnvironment: 'test',

@@ -30,7 +30,7 @@ async function competingLocks(prisma: PrismaClient, bookingId: string) {
     afterAll(() => db.disconnect());
 
     it('allows other readers while retaining the booking fence against writers', async () => {
-      const f = await studioFixture(db.prisma);
+      const f = await studioFixture(db.prisma, null, { commercialTableCount: 4 });
       const guest = createGuestServices(db.prisma);
       await guest.guests.groups(f.bookingId, f.couple);
       await guest.guests.read(f.bookingId, f.couple, async () => {
@@ -46,7 +46,7 @@ async function competingLocks(prisma: PrismaClient, bookingId: string) {
     });
 
     it('initializes once under simultaneous first reads without replacing planned attendance', async () => {
-      const f = await studioFixture(db.prisma);
+      const f = await studioFixture(db.prisma, null, { commercialTableCount: 4 });
       const guest = createGuestServices(db.prisma);
       const results = await Promise.all(
         Array.from({ length: 6 }, () => guest.guests.groups(f.bookingId, f.couple)),
@@ -69,7 +69,7 @@ async function competingLocks(prisma: PrismaClient, bookingId: string) {
     });
 
     it('reuses locked booking facts within a read without reusing them across requests', async () => {
-      const f = await studioFixture(db.prisma);
+      const f = await studioFixture(db.prisma, null, { commercialTableCount: 4 });
       const setup = createSeatingServices(db.prisma, f.services);
       await setup.guests.guests.groups(f.bookingId, f.couple);
       await setup.seating.select(
@@ -113,7 +113,7 @@ async function competingLocks(prisma: PrismaClient, bookingId: string) {
     });
 
     it('serializes a stale seating repair once while preserving immutable plan and print history', async () => {
-      const f = await studioFixture(db.prisma);
+      const f = await studioFixture(db.prisma, null, { commercialTableCount: 4 });
       const s = createSeatingServices(db.prisma, f.services);
       await s.guests.guests.groups(f.bookingId, f.couple);
       const plan = await s.seating.select(

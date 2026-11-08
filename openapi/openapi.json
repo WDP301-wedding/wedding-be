@@ -1656,6 +1656,48 @@
                 ],
                 "type": "object"
               },
+              "capacity": {
+                "additionalProperties": false,
+                "properties": {
+                  "guestsPerTable": {
+                    "const": 10,
+                    "type": "number"
+                  },
+                  "issue": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "BOOKING_TABLES_INSUFFICIENT",
+                          "BOOKING_LAYOUT_TABLE_LIMIT",
+                          "BOOKING_LAYOUT_UNAVAILABLE",
+                          "BOOKING_HALL_CAPACITY_EXCEEDED"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "maximumTables": {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "minimumTables": {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "guestsPerTable",
+                  "minimumTables",
+                  "maximumTables",
+                  "issue"
+                ],
+                "type": "object"
+              },
               "commercialProgress": {
                 "additionalProperties": false,
                 "properties": {
@@ -1709,6 +1751,14 @@
                   "timelineMatchesContract"
                 ],
                 "type": "object"
+              },
+              "commercialSource": {
+                "enum": [
+                  "APPENDIX",
+                  "CONTRACT",
+                  "PROPOSAL"
+                ],
+                "type": "string"
               },
               "completion": {
                 "additionalProperties": false,
@@ -11515,7 +11565,7 @@
         }
       ],
       "post": {
-        "description": "CONFIRMED paid full contract only, before event completion. Exact effective predecessor, reason and selections. Server computes signed delta; original contract/deposit remain frozen. Unresolved payments and finalized invoices block changes.",
+        "description": "CONFIRMED paid full contract only, before event completion. Exact effective predecessor, reason and selections. Server computes signed delta; original contract/deposit remain frozen. Unresolved payments and finalized invoices block changes. MENU quantities are table counts. Maximum 10 guests per table; minimum tables and maximum published active hall-layout tables are rechecked at creation, submission and both approvals. Capacity conflicts return 409 BOOKING_TABLES_INSUFFICIENT, BOOKING_LAYOUT_TABLE_LIMIT, BOOKING_LAYOUT_UNAVAILABLE or BOOKING_HALL_CAPACITY_EXCEEDED.",
         "operationId": "createCommercialAppendix",
         "parameters": [
           {
@@ -12186,7 +12236,7 @@
         }
       ],
       "post": {
-        "description": "Two distinct own Manager/Couple actors approve one digest. Second approval atomically activates revision, posts signed delta once and creates or synchronizes production orders for retained print requests. Quantity/removal changes affect only APPROVED orders; production history is immutable. Historical catalogue allocations retain their original safeguards.",
+        "description": "Two distinct own Manager/Couple actors approve one digest. Second approval atomically activates revision, posts signed delta once and creates or synchronizes production orders for retained print requests. Quantity/removal changes affect only APPROVED orders; production history is immutable. Historical catalogue allocations retain their original safeguards. MENU quantities are table counts. Maximum 10 guests per table; minimum tables and maximum published active hall-layout tables are rechecked at creation, submission and both approvals. Capacity conflicts return 409 BOOKING_TABLES_INSUFFICIENT, BOOKING_LAYOUT_TABLE_LIMIT, BOOKING_LAYOUT_UNAVAILABLE or BOOKING_HALL_CAPACITY_EXCEEDED.",
         "operationId": "approveCommercialAppendix",
         "parameters": [
           {
@@ -12804,7 +12854,7 @@
         }
       ],
       "post": {
-        "description": "Own Manager or FULL Couple. CONFIRMED, or COMPLETED solely to discard an unapplied legacy proposal. Cancel the current DRAFT/AWAITING_APPROVAL proposal with expected Booking revision and reason. Retain approvals, content, audit and effective agreement; no ledger changes. Legacy pending print purchases use their existing withdrawal flow.",
+        "description": "Own Manager or FULL Couple. CONFIRMED, or COMPLETED solely to discard an unapplied legacy proposal. Cancel the current DRAFT/AWAITING_APPROVAL proposal with expected Booking revision and reason. Retain approvals, content, audit and effective agreement; no ledger changes. Legacy pending print purchases use their existing withdrawal flow. MENU quantities are table counts. Maximum 10 guests per table; minimum tables and maximum published active hall-layout tables are rechecked at creation, submission and both approvals. Capacity conflicts return 409 BOOKING_TABLES_INSUFFICIENT, BOOKING_LAYOUT_TABLE_LIMIT, BOOKING_LAYOUT_UNAVAILABLE or BOOKING_HALL_CAPACITY_EXCEEDED.",
         "operationId": "cancelCommercialAppendix",
         "parameters": [
           {
@@ -13428,7 +13478,7 @@
         }
       ],
       "post": {
-        "description": "Revalidate changed catalog selections before submission. Unchanged frozen facts remain usable.",
+        "description": "Revalidate changed catalog selections before submission. Unchanged frozen facts remain usable. MENU quantities are table counts. Maximum 10 guests per table; minimum tables and maximum published active hall-layout tables are rechecked at creation, submission and both approvals. Capacity conflicts return 409 BOOKING_TABLES_INSUFFICIENT, BOOKING_LAYOUT_TABLE_LIMIT, BOOKING_LAYOUT_UNAVAILABLE or BOOKING_HALL_CAPACITY_EXCEEDED.",
         "operationId": "submitCommercialAppendix",
         "parameters": [
           {
@@ -17939,7 +17989,7 @@
         }
       ],
       "post": {
-        "description": "Owning Manager only. Revalidate current selections and exact draft digest. Catalog/profile changes require explicit successor/reselection. Both names required. Submits for two approvals; never silently reprices.",
+        "description": "Owning Manager only. Revalidate current selections and exact draft digest. MENU quantities remain table quantities: maximum 10 guests per table and total tables must fit a published active hall layout; capacity is rechecked at both approvals. Catalog/profile changes require explicit successor/reselection. Both names required. Submits for two approvals; never silently reprices.",
         "operationId": "submitCommercialContract",
         "parameters": [
           {
@@ -32283,7 +32333,7 @@
                 }
               }
             },
-            "description": "The authorized proposal workspace.",
+            "description": "The authorized workspace with effective mutually approved appendix > approved contract > initial proposal menus/tables. Original deposit remains frozen. capacity reports the fixed ten-person rule and current published hall-layout maximum without rewriting historical agreements.",
             "headers": {
               "x-request-id": {
                 "$ref": "#/components/headers/RequestId"

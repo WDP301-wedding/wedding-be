@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import type { PrismaClient } from '../../../src/generated/prisma/client.js';
+import { ensurePublishedTableLayout } from '../../fixtures/table-layout.js';
 
 export async function nativeTimelineFixture(
   prisma: PrismaClient,
@@ -51,10 +52,14 @@ export async function nativeBookingFixture(
     actorId: string;
     managerId?: string;
     hallId?: string;
+    tableCount?: number;
     eventDate: Date;
     now: Date;
   },
 ) {
+  const tableCount = input.tableCount ?? 2;
+  const menuTotalVnd = tableCount * 1_000_000;
+  const depositAmountVnd = Math.ceil(menuTotalVnd * 0.3);
   const hallId = input.hallId ?? randomUUID();
   const managerId = input.managerId ?? input.actorId;
   if (input.hallId === undefined) {
@@ -98,6 +103,7 @@ export async function nativeBookingFixture(
       data: { currentPublishedVersionId: menuVersionId },
     });
   });
+  await ensurePublishedTableLayout(prisma, hallId, managerId, tableCount);
   await prisma.consultation.create({
     data: {
       id: input.consultationId,
@@ -129,10 +135,10 @@ export async function nativeBookingFixture(
               menuName: 'Approved menu',
               menuDescription: '',
               menuPriceVndPerTable: 1_000_000,
-              tableCount: 2,
+              tableCount,
               planningHeadcount: 20,
-              baseChargeVnd: 2_000_000,
-              depositAmountVnd: 600_000,
+              baseChargeVnd: menuTotalVnd,
+              depositAmountVnd,
             },
           },
         },
@@ -161,7 +167,7 @@ export async function nativeBookingFixture(
       paymentId: input.paymentId,
       bookingId: input.bookingId,
       timelineRevisionId: input.timelineId,
-      amountVnd: 600_000,
+      amountVnd: depositAmountVnd,
       settledAt: input.now,
       promotionStatus: 'SUCCEEDED',
       promotedAt: input.now,
