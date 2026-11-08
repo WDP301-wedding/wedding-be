@@ -8,6 +8,9 @@ export async function readEffectiveTablePage(
   offset: number,
   schemaName = 'public',
 ) {
+  // This short paginated read can otherwise spend seconds compiling correlated
+  // approval aggregates on PostgreSQL hosts with LLVM. Keep the setting local.
+  await tx.$executeRaw`SET LOCAL jit = off`;
   const schema = Prisma.raw('"' + schemaName.replaceAll('"', '""') + '"');
   const direction = query.order === 'asc' ? Prisma.sql`ASC` : Prisma.sql`DESC`;
   // Match the existing Prisma contains filters used for the page's total count.
