@@ -163,6 +163,9 @@ jobs:
       - name: Verify contract PDF preview and mutual approval lock
         run: npx vitest run tests/integration/commercial-contracts-api.test.ts --maxWorkers=1 -t 'previews the submitted terms|returns a submitted contract for changes'
 
+      - name: Verify full commercial lifecycle, completed revenue and prospective deposits
+        run: npx vitest run tests/integration/commercial-contracts-api.test.ts tests/integration/completed-events-report.test.ts tests/integration/deposit-mc-upgrade.test.ts --maxWorkers=1 --hookTimeout=60000
+
       - name: Verify authenticated retained PDF and Seating downloads
         run: npx vitest run tests/integration/invitation-studio/print-file.test.ts tests/integration/seating-print-files.test.ts tests/integration/print-booking-summary.test.ts --maxWorkers=1
 
