@@ -22,6 +22,31 @@ function fixture(state: ContractView['state'] = 'DRAFT'): ContractView {
 }
 afterEach(() => vi.restoreAllMocks());
 describe('private Vietnamese contract PDF output', () => {
+  it.each([10, 50, 100])(
+    'prints the frozen %i%% policy in the contract and settlement clause',
+    async (rate) => {
+      const view = fixture();
+      view.document.depositRate = rate;
+      view.document.depositAmountVnd = Math.ceil((view.document.contractTotalVnd * rate) / 100);
+      const rendered = vi.spyOn(PDFDocument.prototype, 'text');
+      await renderContractPdf(view);
+      expect(rendered.mock.calls.map(([value]) => value).join('\n')).toContain(
+        `Tiền đặt cọc cam kết (${rate}%):`,
+      );
+      view.document.standardTerms = {
+        version: 'WEDDING_STANDARD_V1',
+        reserveMenu: { versionId: randomUUID(), name: 'Menu', dishes: ['Món'] },
+        orderedMenus: [],
+      };
+      rendered.mockClear();
+      await renderContractPdf(view);
+      const output = rendered.mock.calls.map(([value]) => value).join('\n');
+      expect(output).toContain(`5.1. Đặt cọc ${rate}%:`);
+      expect(output).toContain(
+        (view.document.contractTotalVnd - view.document.depositAmountVnd).toLocaleString('vi-VN'),
+      );
+    },
+  );
   it.each(['DRAFT', 'AWAITING_APPROVAL', 'APPROVED', 'SUPERSEDED'] as const)(
     'renders %s identity with exact byte digest',
     async (state) => {

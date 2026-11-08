@@ -75,6 +75,7 @@ const publicMenuSchema = z.strictObject({
   media: z.array(mediaViewSchema),
 });
 const publicRestaurantSchema = z.strictObject({
+  depositPercentage: z.int().min(10).max(100).optional(),
   id: idSchema,
   displayName: z.string(),
   description: z.string(),

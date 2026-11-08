@@ -139,6 +139,7 @@ export function createProposalQueryService(prisma: PrismaClient, access: Consult
           tableCount,
           baseChargeVnd,
           depositAmountVnd,
+          depositPercentage: booking.depositPercentage ?? 30,
         },
         timeline: timelineView(booking.currentTimelineRevision),
         effectiveTimeline: timelineView(booking.effectiveTimelineRevision),
@@ -208,6 +209,7 @@ async function requireProposal(prisma: PrismaClient, bookingId: string) {
       eventDate: true,
       planningHeadcount: true,
       commercialModelVersion: true,
+      depositPercentage: true,
       commercialSelections: {
         orderBy: { revisionNumber: 'desc' },
         take: 1,

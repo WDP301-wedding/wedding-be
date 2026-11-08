@@ -279,75 +279,95 @@ export function createPrismaConsultationWorkspaceRepository(
     },
 
     async createBooking(record: Parameters<ConsultationWorkspaceRepository['createBooking']>[0]) {
-      return prisma.$transaction(
-        async (transaction) => {
-          const consultation = await transaction.consultation.findUnique({
-            where: { id: record.consultationId },
-            select: {
-              id: true,
-              revision: true,
-              managerAccountId: true,
-              booking: { select: { id: true } },
-            },
-          });
-          if (consultation === null || consultation.managerAccountId !== record.managerAccountId) {
-            throw new BookingLifecycleNotFoundError();
-          }
-          if (consultation.booking !== null)
-            throw new BookingLifecycleConflictError('BOOKING_ALREADY_EXISTS');
-          if (consultation.revision !== record.expectedConsultationRevision) {
-            throw new BookingLifecycleConflictError('STALE_BOOKING_REVISION');
-          }
-          await transaction.booking.create({
-            data: {
-              id: record.bookingId,
-              consultationId: record.consultationId,
-              hallId: record.proposal.hall.id,
-              eventDate: localDate(record.proposal.eventDate),
-              shiftCode: record.proposal.shift.code,
-              phase: 'DRAFT',
-              revision: 1,
-              planningHeadcount: record.proposal.planningHeadcount,
-              proposalSnapshot: { create: proposalSnapshotData(record.proposal) },
-              commercialModelVersion: 'FULL_CONTRACT_V1',
-            },
-          });
-          const updated = await transaction.consultation.updateMany({
-            where: { id: record.consultationId, revision: record.expectedConsultationRevision },
-            data: { revision: { increment: 1 } },
-          });
-          if (updated.count !== 1) {
-            throw new BookingLifecycleConflictError('STALE_BOOKING_REVISION');
-          }
-          await transaction.auditLog.create({
-            data: {
-              occurredAt: now(),
-              requestId: record.requestId,
-              actorType: 'USER',
-              actorId: record.managerAccountId,
-              action: 'booking.proposal-created',
-              entityType: 'booking',
-              entityId: record.bookingId,
-              metadata: {
+      return retryBookingCreation(() =>
+        prisma.$transaction(
+          async (transaction) => {
+            const consultation = await transaction.consultation.findUnique({
+              where: { id: record.consultationId },
+              select: {
+                id: true,
+                revision: true,
+                managerAccountId: true,
+                booking: { select: { id: true } },
+              },
+            });
+            if (
+              consultation === null ||
+              consultation.managerAccountId !== record.managerAccountId
+            ) {
+              throw new BookingLifecycleNotFoundError();
+            }
+            if (consultation.booking !== null)
+              throw new BookingLifecycleConflictError('BOOKING_ALREADY_EXISTS');
+            if (consultation.revision !== record.expectedConsultationRevision) {
+              throw new BookingLifecycleConflictError('STALE_BOOKING_REVISION');
+            }
+            await transaction.booking.create({
+              data: {
+                id: record.bookingId,
                 consultationId: record.consultationId,
                 hallId: record.proposal.hall.id,
-                menuPackageVersionId: record.proposal.menu.versionId,
-                menuPackageVersionIds: record.proposal.menus?.map((line) => line.versionId) ?? [
-                  record.proposal.menu.versionId,
-                ],
+                eventDate: localDate(record.proposal.eventDate),
+                shiftCode: record.proposal.shift.code,
+                phase: 'DRAFT',
+                revision: 1,
+                planningHeadcount: record.proposal.planningHeadcount,
+                proposalSnapshot: { create: proposalSnapshotData(record.proposal) },
+                commercialModelVersion: 'FULL_CONTRACT_V1',
               },
-            },
-          });
-          return immutable({
-            ...record,
-            bookingRevision: 1,
-            consultationRevision: record.expectedConsultationRevision + 1,
-          });
-        },
-        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+            });
+            const updated = await transaction.consultation.updateMany({
+              where: { id: record.consultationId, revision: record.expectedConsultationRevision },
+              data: { revision: { increment: 1 } },
+            });
+            if (updated.count !== 1) {
+              throw new BookingLifecycleConflictError('STALE_BOOKING_REVISION');
+            }
+            await transaction.auditLog.create({
+              data: {
+                occurredAt: now(),
+                requestId: record.requestId,
+                actorType: 'USER',
+                actorId: record.managerAccountId,
+                action: 'booking.proposal-created',
+                entityType: 'booking',
+                entityId: record.bookingId,
+                metadata: {
+                  consultationId: record.consultationId,
+                  hallId: record.proposal.hall.id,
+                  menuPackageVersionId: record.proposal.menu.versionId,
+                  menuPackageVersionIds: record.proposal.menus?.map((line) => line.versionId) ?? [
+                    record.proposal.menu.versionId,
+                  ],
+                },
+              },
+            });
+            return immutable({
+              ...record,
+              bookingRevision: 1,
+              consultationRevision: record.expectedConsultationRevision + 1,
+            });
+          },
+          { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+        ),
       );
     },
   });
+}
+
+// A concurrent policy update may invalidate the Serializable snapshot before the
+// INSERT trigger can acquire its share lock. Retry the entire rolled-back owner
+// transaction, retaining the command's booking ID and rechecking consultation CAS.
+async function retryBookingCreation<T>(work: () => Promise<T>): Promise<T> {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      return await work();
+    } catch (error) {
+      if (!(error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2034'))
+        throw error;
+    }
+  }
+  throw new BookingLifecycleConflictError('STALE_BOOKING_REVISION');
 }
 
 function proposalData(record: ConsultationRecord) {

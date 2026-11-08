@@ -79,6 +79,7 @@ export const proposalResponseSchema = z.strictObject({
       tableCount: z.int().min(1).max(500),
       baseChargeVnd: z.int().nonnegative(),
       depositAmountVnd: z.int().nonnegative(),
+      depositPercentage: z.int().min(10).max(100).optional(),
     }),
     timeline: proposalTimeline.nullable(),
     effectiveTimeline: proposalTimeline.nullable(),

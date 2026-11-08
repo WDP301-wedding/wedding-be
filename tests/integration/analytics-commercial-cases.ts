@@ -7,6 +7,7 @@ import { appendixResponseSchema } from '../../src/modules/booking-lifecycle/doma
 import { billingResponseSchema } from '../../src/modules/payments-billing/http/payments-billing.schemas.js';
 import { finalInvoiceResponseSchema } from '../../src/modules/payments-billing/domain/final-invoice.js';
 import { completeSettlementFixture } from './completion-settlement-api-cases.js';
+import { createCompletedEventsReader } from '../../src/modules/analytics-dashboard/infrastructure/completed-events.reader.js';
 export function registerAnalyticsCommercialCases(h: StepSixApiHarness) {
   it('ANL-W1/W4 projects mutually approved services/appendices and finalized expenses exactly once from real owners', async () => {
     const { f, d } = await h.paidFixture(true),
@@ -95,6 +96,18 @@ export function registerAnalyticsCommercialCases(h: StepSixApiHarness) {
       (await h.get(`/bookings/${f.id}/billing`, 'own')).body as unknown,
     ).data;
     expect(currentBill.totals.acceptedChargesVnd).toBe(invoice.document.totalVnd);
+    const completed = await createCompletedEventsReader(prisma)(query);
+    expect(completed.items.find((item) => item.bookingId === f.id)).toMatchObject({
+      invoiceState: 'FINALIZED',
+      totalVnd: invoice.document.totalVnd,
+      netPaidVnd: currentBill.totals.netPaidVnd,
+      outstandingVnd: currentBill.totals.outstandingVnd,
+    });
+    expect(
+      completed.offerings.find(
+        (item) => item.sourceId === selections.find((l) => l.category === 'SERVICE')!.sourceId,
+      ),
+    ).toMatchObject({ category: 'SERVICE', quantity: 2, revenueVnd: 5000000 });
     expect(currentBill.history.filter((e) => e.sourceType === 'PRINT_ORDER')).toHaveLength(0);
     await s.projector.refresh(c.actorAccountId, c, true);
     expect(await report()).toMatchObject({

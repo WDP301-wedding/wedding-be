@@ -47,7 +47,8 @@ import { createAnalyticsServices } from '../../src/modules/analytics-dashboard/i
       });
       expect(await db.prisma.bookingReportingSnapshot.count()).toBe(oldCount);
       const v = await s.sources.venue.readPage({ afterSequence: 0, limit: 500 }, context);
-      expect(v.rows).toHaveLength(1);
+      // The completed-event revision adds a forward observation with hall names.
+      expect(v.rows).toHaveLength(2);
       expect(Date.parse(v.rows[0]!.value.observedAt)).toBeGreaterThan(Date.now() - 120000);
       const client = new Client({ connectionString: catalogMigrationDatabaseUrl });
       await client.connect();

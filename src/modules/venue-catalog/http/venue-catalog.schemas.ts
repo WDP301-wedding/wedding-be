@@ -55,6 +55,7 @@ export const mediaOrderParamsSchema = z.strictObject({
 });
 
 export const updateRestaurantBodySchema = strictWriteSchema({
+  depositPercentage: z.int().min(10).max(100).optional(),
   displayName: catalogNameSchema,
   description: catalogDescriptionSchema,
   address: trimmedText(1, 2_000),

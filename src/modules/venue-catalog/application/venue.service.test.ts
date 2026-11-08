@@ -18,6 +18,49 @@ function prismaWithTransaction(transaction: object): PrismaClient {
 }
 
 describe('venue service', () => {
+  it('stores deposit policy separately without truncating a valid description', async () => {
+    const profile = {
+      id: randomUUID(),
+      displayName: 'Estate',
+      description: 'x'.repeat(2000),
+      address: 'Road',
+      publicPhone: null,
+      publicEmail: null,
+      revision: 2,
+      depositPercentage: 50,
+    };
+    const updateMany = vi.fn().mockResolvedValue({ count: 1 });
+    const service = createVenueService(
+      prismaWithTransaction({
+        restaurantProfile: { updateMany, findUniqueOrThrow: vi.fn().mockResolvedValue(profile) },
+        auditLog: { create: vi.fn().mockResolvedValue({}) },
+      }),
+    );
+    const fields = {
+      displayName: profile.displayName,
+      description: profile.description,
+      address: profile.address,
+      publicPhone: null,
+      publicEmail: null,
+      depositPercentage: 50,
+    };
+    const saved = await service.updateRestaurantProfile({
+      ...fields,
+      expectedRevision: 1,
+      context,
+    });
+    expect(saved.description).toHaveLength(2000);
+    expect(saved.depositPercentage).toBe(50);
+    expect(updateMany.mock.calls[0]?.[0]).toHaveProperty('data.depositPercentage', 50);
+    await expect(
+      service.updateRestaurantProfile({
+        ...fields,
+        depositPercentage: 30.5,
+        expectedRevision: 1,
+        context,
+      }),
+    ).rejects.toHaveProperty('code', 'CATALOG_INVALID_DEPOSIT_PERCENTAGE');
+  });
   it('updates a fixed shift only when its local window is valid', async () => {
     const updateMany = vi.fn(() => Promise.resolve({ count: 1 }));
     const auditCreate = vi.fn<
