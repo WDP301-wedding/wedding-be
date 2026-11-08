@@ -1,5 +1,10 @@
 # Staff workspace and check-in — 2026-11-03
 
+Active behavior is superseded by the owner-approved
+[assigned-event revision of 2026-11-08](./staff-operations-without-guests-2026-11-08.md).
+Named lists, check-in and new personalized issuance are retired. The text below
+records the earlier implementation and its historical acceptance guide.
+
 ## Scope and permissions
 
 Changes cover wedding-be and wedding-manage-web only. No Couple app or customer

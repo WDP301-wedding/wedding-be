@@ -14,13 +14,7 @@ import { errorResponseSchema } from '../../src/core/http/common.schemas.js';
 import { createGuestImportBodyParser } from '../../src/modules/guest-management/http/guest-import.parser.js';
 import {
   groupSchema,
-  guestSchema,
   planSchema,
-  previewSchema,
-  importResultSchema,
-  privateListSchema,
-  issuedLinkSchema,
-  invitationMetadataSchema,
   sessionSchema,
   invitationViewSchema,
 } from '../../src/modules/guest-management/http/guest.schemas.js';
@@ -34,7 +28,6 @@ describeDb('GM-W4 mounted strict HTTP + real Identity/Booking/Invitation', () =>
   let f: Awaited<ReturnType<typeof studioFixture>>;
   let s: ReturnType<typeof createGuestServices>;
   let app: ReturnType<typeof createApp>;
-  let groupId: string, guestId: string;
   beforeAll(async () => {
     await db.connect();
     f = await studioFixture(db.prisma);
@@ -67,209 +60,53 @@ describeDb('GM-W4 mounted strict HTTP + real Identity/Booking/Invitation', () =>
       .set('Authorization', `Bearer ${f.couple.accessToken}`)
       .set('Idempotency-Key', key)
       .send(body);
-  it('supports an empty named list with Group-only planning and scoped denials', async () => {
+  it('retains independent planning and group access with owner-scoped denials', async () => {
     expect((await request(app).get(url('guest-groups'))).status).toBe(401);
     const groups = await get('guest-groups');
     expect(groups.status).toBe(200);
     expect(groups.headers['cache-control']).toBe('no-store');
-    expect((await request(app).get('/api/v1/unrelated')).status).toBe(404);
-    groupId = data(groups, z.array(groupSchema))[0]!.guestGroupId;
-    expect(data(await get('guests'), privateListSchema).items).toEqual([]);
+    expect(data(groups, z.array(groupSchema))).toHaveLength(4);
     expect(data(await get('guest-plan'), planSchema).planningHeadcount).toBe(20);
-    const outsider = await f.actor('COUPLE'),
-      staff = await f.actor('STAFF');
-    expect((await get('guest-groups', outsider.accessToken)).status).toBe(404);
-    expect((await get('guest-groups', staff.accessToken)).status).toBe(404);
-    await db.prisma.consultationAccess.create({
-      data: { consultationId: f.consultationId, accountId: outsider.actorId, level: 'RESTRICTED' },
-    });
-    expect((await get('guest-groups', outsider.accessToken)).status).toBe(403);
+    for (const role of ['COUPLE', 'STAFF'] as const) {
+      const outsider = await f.actor(role);
+      expect((await get('guest-groups', outsider.accessToken)).status).toBe(404);
+    }
     expect((await get('guest-groups', f.manager.accessToken)).status).toBe(200);
   });
-  it('validates strict groups/named-person payloads, idempotency, revision and retained references', async () => {
-    expect(
-      (
-        await request(app)
-          .post(url('guests'))
-          .set('Authorization', `Bearer ${f.couple.accessToken}`)
-          .send({ name: 'An', guestGroupId: groupId })
-      ).status,
-    ).toBe(400);
-    expect(
-      (await post('guests', { name: 'An', guestGroupId: groupId, expectedAttendees: 5 })).status,
-    ).toBe(422);
-    expect(
-      (await post('guests', { name: 'An', guestGroupId: groupId }, 'x'.repeat(129))).status,
-    ).toBe(422);
-    expect((await post('guests', { name: 'An', guestGroupId: randomUUID() })).status).toBe(404);
+  it('keeps strict group commands, idempotency, stale revisions and archive/restore', async () => {
     const key = randomUUID(),
-      input = {
-        name: 'Nguyễn An',
-        guestGroupId: groupId,
-        phone: '+84901234567',
-        operationalNote: 'Only owners',
-      };
-    const created = await post('guests', input, key);
+      input = { name: 'Đồng nghiệp', color: '#ABCDEF' };
+    const created = await post('guest-groups', input, key);
     expect(created.status).toBe(201);
-    guestId = data(created, guestSchema).guestId;
-    expect((await post('guests', input, key)).body).toEqual(created.body);
-    expect((await post('guests', { ...input, name: 'Other' }, key)).status).toBe(422);
-    expect(
-      (await patch(`guests/${guestId}`, { expectedRevision: 2, name: 'Another' })).status,
-    ).toBe(409);
-    expect(
-      (await patch(`guests/${randomUUID()}`, { expectedRevision: 1, status: 'ARCHIVED' })).status,
-    ).toBe(404);
-    expect(
-      code(await patch(`guest-groups/${groupId}`, { expectedRevision: 1, status: 'ARCHIVED' })),
-    ).toBe('GUEST_GROUP_IN_USE');
+    expect((await post('guest-groups', input, key)).body).toEqual(created.body);
+    const groupId = data(created, groupSchema).guestGroupId;
+    expect(code(await post('guest-groups', input))).toBe('GUEST_GROUP_NAME_CONFLICT');
     expect(
       (await patch(`guest-groups/${groupId}`, { expectedRevision: 99, name: 'Other' })).status,
     ).toBe(409);
     expect(
-      (await patch(`guest-groups/${randomUUID()}`, { expectedRevision: 1, color: '#FFFFFF' }))
-        .status,
-    ).toBe(404);
-    const custom = await post('guest-groups', { name: '  Đồng nghiệp  ', color: '#abcdef' });
-    expect(custom.status).toBe(201);
-    const customId = data(custom, groupSchema).guestGroupId;
-    expect(code(await post('guest-groups', { name: 'ĐỒNG NGHIỆP', color: '#ABCDEF' }))).toBe(
-      'GUEST_GROUP_NAME_CONFLICT',
-    );
-    expect(
-      (await patch(`guest-groups/${customId}`, { expectedRevision: 1, status: 'ARCHIVED' })).status,
-    ).toBe(200);
-    expect((await post('guests', { name: 'An', guestGroupId: customId })).status).toBe(404);
-    expect(
-      (
-        await patch(`guest-groups/${customId}`, {
-          expectedRevision: 2,
-          name: 'Team',
-          status: 'ACTIVE',
-        })
-      ).status,
+      (await patch(`guest-groups/${groupId}`, { expectedRevision: 1, status: 'ARCHIVED' })).status,
     ).toBe(200);
     expect(
-      (
-        await patch(`guests/${guestId}`, {
-          expectedRevision: 1,
-          guestGroupId: customId,
-          phone: null,
-          operationalNote: null,
-          name: 'An',
-        })
-      ).status,
+      (await patch(`guest-groups/${groupId}`, { expectedRevision: 2, status: 'ACTIVE' })).status,
     ).toBe(200);
-    expect(
-      (await patch(`guests/${guestId}`, { expectedRevision: 2, status: 'ARCHIVED' })).status,
-    ).toBe(200);
-    expect(data(await get('guests?status=ARCHIVED'), privateListSchema).items).toHaveLength(1);
-    expect(
-      (await patch(`guests/${guestId}`, { expectedRevision: 3, status: 'ACTIVE' })).status,
-    ).toBe(200);
-    expect(data(await get('guest-plan'), planSchema).planningHeadcount).toBe(20);
-    await expect(db.prisma.guest.delete({ where: { id: guestId } })).rejects.toThrow();
+    expect((await post('guest-groups', { ...input, unexpected: true })).status).toBe(422);
   });
-  it('commits exact preview/imports and rejects stale/digest/row reuse without partial writes', async () => {
-    const rows = [{ externalRowKey: 'key-1', name: 'Bình', guestGroupId: groupId }];
-    expect(
-      (await post('guests/import-previews', { rows: [{ ...rows[0], unexpectedColumn: true }] }))
-        .status,
-    ).toBe(422);
-    const preview = data(await post('guests/import-previews', { rows }), previewSchema);
-    expect(
-      (await post('guests/imports', { previewId: randomUUID(), digest: preview.digest })).status,
-    ).toBe(404);
-    expect(
-      (await post('guests/imports', { previewId: preview.previewId, digest: '0'.repeat(64) }))
-        .status,
-    ).toBe(409);
-    const commit = { previewId: preview.previewId, digest: preview.digest },
-      key = randomUUID();
-    expect(data(await post('guests/imports', commit, key), importResultSchema).createdCount).toBe(
-      1,
-    );
-    expect(data(await post('guests/imports', commit, key), importResultSchema).createdCount).toBe(
-      1,
-    );
-    expect((await post('guests/imports', commit)).status).toBe(409);
-    const changedRows = [{ ...rows[0], name: 'Bình mới' }];
-    expect(code(await post('guests/import-previews', { rows: changedRows }))).toBe(
-      'GUEST_IMPORT_ROW_CONFLICT',
-    );
-    const update = data(
-      await post('guests/import-previews', { rows: changedRows, allowUpdates: true }),
-      previewSchema,
-    );
-    expect(update.updatedCount).toBe(1);
-    expect(
-      data(
-        await post('guests/imports', { previewId: update.previewId, digest: update.digest }),
-        importResultSchema,
-      ).updatedCount,
-    ).toBe(1);
-    const unchanged = data(
-      await post('guests/import-previews', { rows: changedRows }),
-      previewSchema,
-    );
-    expect(
-      data(
-        await post('guests/imports', { previewId: unchanged.previewId, digest: unchanged.digest }),
-        importResultSchema,
-      ).unchangedCount,
-    ).toBe(1);
-    const stale = data(
-      await post('guests/import-previews', { rows: [{ ...rows[0], externalRowKey: 'key-2' }] }),
-      previewSchema,
-    );
-    await post('guests', { name: 'Separate edit', guestGroupId: groupId });
-    expect(
-      code(await post('guests/imports', { previewId: stale.previewId, digest: stale.digest })),
-    ).toBe('GUEST_IMPORT_PREVIEW_STALE');
+  it('rejects named list reads, writes, imports and personalized issuance without altering stored history', async () => {
+    for (const response of [
+      await get('guests'),
+      await post('guests', {}),
+      await patch(`guests/${randomUUID()}`, {}),
+      await post('guests/import-previews', {}),
+      await post('guests/imports', {}),
+      await post(`guests/${randomUUID()}/personalized-invitations`, {}),
+    ]) {
+      expect(response.status).toBe(410);
+      expect(code(response)).toBe('FEATURE_RETIRED');
+    }
+    expect(await db.prisma.guest.count({ where: { bookingId: f.bookingId } })).toBe(0);
     expect(data(await get('guest-plan'), planSchema).planningHeadcount).toBe(20);
   });
-  it('paginates list with bound cursors and isolates booking/group IDs', async () => {
-    const first = data(await get('guests?limit=1'), privateListSchema);
-    expect(first.nextCursor).toBeTypeOf('string');
-    const second = data(await get(`guests?limit=1&cursor=${first.nextCursor!}`), privateListSchema);
-    expect(second.items[0]!.guestId).not.toBe(first.items[0]!.guestId);
-    expect((await get('guests?cursor=invalid-json')).status).toBe(422);
-    expect((await get('guests?limit=51')).status).toBe(422);
-    expect((await get('guests?responseStatus=YES')).status).toBe(422);
-    expect((await get(`guests?guestGroupId=${groupId}`)).status).toBe(200);
-    await post('guests', { name: 'Newest', guestGroupId: groupId });
-    expect(code(await get(`guests?limit=1&cursor=${first.nextCursor!}`))).toBe(
-      'GUEST_LIST_CURSOR_STALE',
-    );
-    const other = await studioFixture(db.prisma);
-    expect(
-      (
-        await request(app)
-          .patch(`/api/v1/bookings/${other.bookingId}/guests/${guestId}`)
-          .set('Authorization', `Bearer ${other.couple.accessToken}`)
-          .set('Idempotency-Key', randomUUID())
-          .send({ expectedRevision: 1, name: 'Leak' })
-      ).status,
-    ).toBe(404);
-  });
-  it('accepts a valid import above the general 1 MiB limit and keeps the 5 MiB import ceiling', async () => {
-    const body = {
-      rows: Array.from({ length: 1000 }, (_, i) => ({
-        externalRowKey: `large-${i}`,
-        name: 'Khách',
-        guestGroupId: groupId,
-        operationalNote: 'ệ'.repeat(500),
-      })),
-    };
-    expect(Buffer.byteLength(JSON.stringify(body))).toBeGreaterThan(1024 * 1024);
-    const preview = await post('guests/import-previews', body);
-    expect(preview.status).toBe(200);
-    expect(data(preview, previewSchema).createdCount).toBe(1000);
-    expect((await post('guests', body)).status).toBe(413);
-    expect(
-      (await post('guests/import-previews', { padding: 'x'.repeat(5 * 1024 * 1024) })).status,
-    ).toBe(413);
-  }, 60000);
   it('explicit total updates accept zero, replay safely, and serialize conflicting edits', async () => {
     const key = randomUUID(),
       body = { expectedRevision: 1, planningHeadcount: 0 };
@@ -299,7 +136,14 @@ describeDb('GM-W4 mounted strict HTTP + real Identity/Booking/Invitation', () =>
         .status,
     ).toBe(422);
   });
-  it('exposes only guest invitation view; no attendance/response writes or generic QR authority', async () => {
+  it('continues to render previously issued read-only invitations without allowing new issuance', async () => {
+    const group = (await s.guests.groups(f.bookingId, f.couple))[0]!;
+    const legacy = await s.guests.createGuest(
+      f.bookingId,
+      { name: 'Legacy invitation recipient', guestGroupId: group.guestGroupId },
+      randomUUID(),
+      f.couple,
+    );
     const design = await f.services.designs.create(
       { bookingId: f.bookingId, content: f.content, idempotencyKey: randomUUID() },
       f.couple,
@@ -315,198 +159,32 @@ describeDb('GM-W4 mounted strict HTTP + real Identity/Booking/Invitation', () =>
       },
       f.couple,
     );
-    const link = await post(`guests/${guestId}/personalized-invitations`, { expectedRevision: 0 });
-    expect(link.status).toBe(201);
-    const credential = data(link, issuedLinkSchema).credential;
+    // Historical fixture issued through the retained internal owner, not the retired HTTP route.
+    const link = await s.links.issue(
+      f.bookingId,
+      legacy.guestId,
+      { expectedRevision: 0 },
+      randomUUID(),
+      f.couple,
+    );
     const session = await request(app)
       .post('/api/v1/guest/invitation-sessions')
-      .send({ credential });
+      .send({ credential: link.credential });
     expect(session.status).toBe(200);
     const token = data(session, sessionSchema).capability;
-    const view = await request(app)
-      .get('/api/v1/guest/invitation')
-      .set('Authorization', `Bearer ${token}`);
+    const view = await request(app).get('/api/v1/guest/invitation').auth(token, { type: 'bearer' });
     expect(view.status).toBe(200);
     expect(Object.keys(data(view, invitationViewSchema))).toEqual([
       'recipientGreeting',
       'invitation',
     ]);
-    expect(view.headers['cache-control']).toBe('no-store');
-    expect((await get('guests', token)).status).toBe(401);
     expect(
-      (
-        await request(app)
-          .post('/api/v1/guest/invitation-sessions')
-          .send({ credential, response: 'YES' })
-      ).status,
-    ).toBe(422);
-    expect(code(await request(app).get('/api/v1/guest/invitation'))).toBe(
-      'INVITATION_LINK_UNAVAILABLE',
-    );
-    expect(
-      (await request(app).get('/api/v1/guest/invitation').set('Authorization', 'Basic invalid'))
+      (await post(`guests/${legacy.guestId}/personalized-invitations`, { expectedRevision: 1 }))
         .status,
-    ).toBe(404);
-    expect(
-      (await request(app).get('/api/v1/guest/invitation').set('Authorization', 'Bearer generic-qr'))
-        .status,
-    ).toBe(404);
+    ).toBe(410);
     for (const path of ['/api/v1/guest/check-in', '/api/v1/guest/responses'])
-      expect(
-        (await request(app).post(path).set('Authorization', `Bearer ${token}`).send({})).status,
-      ).toBe(404);
-    expect(
-      (await post(`guests/${guestId}/personalized-invitations`, { expectedRevision: 0 })).status,
-    ).toBe(409);
-    expect(
-      (await patch(`guests/${guestId}`, { expectedRevision: 4, status: 'ARCHIVED' })).status,
-    ).toBe(200);
-    expect(
-      (await request(app).get('/api/v1/guest/invitation').set('Authorization', `Bearer ${token}`))
-        .status,
-    ).toBe(404);
+      expect((await request(app).post(path).auth(token, { type: 'bearer' }).send({})).status).toBe(
+        404,
+      );
   });
-  it('reads latest invitation metadata across clients without issuing or disclosing credentials', async () => {
-    const fixture = await studioFixture(db.prisma);
-    const [group] = await s.guests.groups(fixture.bookingId, fixture.couple);
-    const guest = await s.guests.createGuest(
-      fixture.bookingId,
-      { name: 'Metadata only', guestGroupId: group!.guestGroupId },
-      randomUUID(),
-      fixture.couple,
-    );
-    const path = `/api/v1/bookings/${fixture.bookingId}/guests/${guest.guestId}/personalized-invitations`;
-    const read = (token = fixture.couple.accessToken) =>
-      request(app).get(path).auth(token, { type: 'bearer' });
-    await request(app).get(path).expect(401);
-    const initial = await read().expect(200);
-    expect(initial.body).toEqual({
-      data: {
-        guestId: guest.guestId,
-        revision: 0,
-        credentialId: null,
-        expiresAt: null,
-        revokedAt: null,
-      },
-    });
-    expect(initial.headers['cache-control']).toBe('no-store');
-    await read(fixture.manager.accessToken).expect(200);
-    for (const role of ['COUPLE', 'STAFF'] as const) {
-      const actor = await fixture.actor(role);
-      await read(actor.accessToken).expect(404);
-    }
-    const restricted = await fixture.actor('COUPLE');
-    await db.prisma.consultationAccess.create({
-      data: {
-        consultationId: fixture.consultationId,
-        accountId: restricted.actorId,
-        level: 'RESTRICTED',
-      },
-    });
-    await read(restricted.accessToken).expect(403);
-    await request(app)
-      .get(`${path}?extra=1`)
-      .auth(fixture.couple.accessToken, { type: 'bearer' })
-      .expect(422);
-    await request(app)
-      .get(path.replace(guest.guestId, randomUUID()))
-      .auth(fixture.couple.accessToken, { type: 'bearer' })
-      .expect(404);
-    await request(app)
-      .get(path.replace(fixture.bookingId, f.bookingId))
-      .auth(f.couple.accessToken, { type: 'bearer' })
-      .expect(404);
-    const design = await fixture.services.designs.create(
-      { bookingId: fixture.bookingId, content: fixture.content, idempotencyKey: randomUUID() },
-      fixture.couple,
-    );
-    await fixture.services.publication.publish(
-      {
-        bookingId: fixture.bookingId,
-        designId: design.designId,
-        designRevisionId: design.revisionId,
-        expectedRevision: 1,
-        expectedPublicationRevision: 0,
-        idempotencyKey: randomUUID(),
-      },
-      fixture.couple,
-    );
-    const issued = await s.links.issue(
-      fixture.bookingId,
-      guest.guestId,
-      { expectedRevision: 0 },
-      randomUUID(),
-      fixture.couple,
-    );
-    const second = await s.links.issue(
-      fixture.bookingId,
-      guest.guestId,
-      { expectedRevision: 1 },
-      randomUUID(),
-      fixture.couple,
-    );
-    const latest = await read().expect(200);
-    expect(latest.body).toEqual({
-      data: {
-        guestId: guest.guestId,
-        revision: 2,
-        credentialId: second.credentialId,
-        expiresAt: second.expiresAt,
-        revokedAt: null,
-      },
-    });
-    expect(JSON.stringify(latest.body)).not.toMatch(/wgc_|tokenHash|fragment|publicInvitationId/u);
-    expect(
-      await db.prisma.guestInvitationCredential.count({ where: { guestId: guest.guestId } }),
-    ).toBe(2);
-    expect(
-      (
-        await db.prisma.guestInvitationCredential.findUniqueOrThrow({
-          where: { id: issued.credentialId },
-        })
-      ).revokedAt,
-    ).not.toBeNull();
-    const expiredAt = new Date(Date.now() - 60000);
-    const expiredGuest = await s.guests.createGuest(
-      fixture.bookingId,
-      { name: 'Expired link', guestGroupId: group!.guestGroupId },
-      randomUUID(),
-      fixture.couple,
-    );
-    const retained = await db.prisma.guestInvitationCredential.findUniqueOrThrow({
-      where: { id: second.credentialId },
-    });
-    await db.prisma.guestInvitationCredential.create({
-      data: {
-        id: randomUUID(),
-        bookingId: fixture.bookingId,
-        guestId: expiredGuest.guestId,
-        publicInvitationId: retained.publicInvitationId,
-        revision: 1,
-        tokenHash: 'e'.repeat(64),
-        expiresAt: expiredAt,
-      },
-    });
-    const expiredMetadata = await request(app)
-      .get(path.replace(guest.guestId, expiredGuest.guestId))
-      .auth(fixture.couple.accessToken, { type: 'bearer' })
-      .expect(200);
-    expect(data(expiredMetadata, invitationMetadataSchema)).toMatchObject({
-      revision: 1,
-      expiresAt: expiredAt.toISOString(),
-    });
-    await s.guests.updateGuest(
-      fixture.bookingId,
-      guest.guestId,
-      { expectedRevision: 1, status: 'ARCHIVED' },
-      randomUUID(),
-      fixture.couple,
-    );
-    expect(data(await read().expect(200), invitationMetadataSchema).revokedAt).not.toBeNull();
-    await db.prisma.session.update({
-      where: { id: fixture.couple.sessionId },
-      data: { status: 'REVOKED', revokedAt: new Date() },
-    });
-    await read().expect(401);
-  }, 30000);
 });

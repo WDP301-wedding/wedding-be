@@ -165,3 +165,6 @@ jobs:
 
       - name: Verify authenticated retained PDF and Seating downloads
         run: npx vitest run tests/integration/invitation-studio/print-file.test.ts tests/integration/seating-print-files.test.ts tests/integration/print-booking-summary.test.ts --maxWorkers=1
+
+      - name: Verify assigned Staff operations and retired named-guest routes
+        run: npx vitest run tests/integration/staff-workspace.test.ts tests/integration/staff-operations.test.ts tests/integration/guest-management-http.test.ts tests/integration/notification-guest-delivery.test.ts --maxWorkers=1

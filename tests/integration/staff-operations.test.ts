@@ -5,14 +5,7 @@ import { createApp } from '../../src/app.js';
 import { createStaffRouter } from '../../src/modules/staff-operations/http/staff.router.js';
 import request from 'supertest';
 import { z } from 'zod';
-import {
-  settingsSchema,
-  recordSchema,
-  historySchema,
-  searchSchema,
-} from '../../src/modules/staff-operations/http/staff.schemas.js';
 import { errorResponseSchema } from '../../src/core/http/common.schemas.js';
-import { createLogger } from '../../src/core/logging/logger.js';
 import { createInvitationStudioRuntime } from '../../src/modules/invitation-studio/invitation-studio.runtime.js';
 import { parseEnvironment } from '../../src/config/env.js';
 import {
@@ -493,90 +486,35 @@ import { createStaffServices } from '../../src/modules/staff-operations/infrastr
       }),
     ).rejects.toThrow('cannot be hidden');
   });
-  it('mounts strict private HTTP, denies guest/QR/foreign scopes, and preserves response schemas/retries', async () => {
-    const { f, staff, s, guest } = await enabledFixture();
-    const logLines: string[] = [];
+  it('retires HTTP check-in/search/undo for all authenticated roles and retains journal evidence', async () => {
+    const { f, s, staff, guest } = await enabledFixture();
+    const record = await s.journal.checkIn(f.bookingId, guest.guestId, {}, randomUUID(), staff);
     const app = createApp({
       runtimeEnvironment: 'test',
-      logger: createLogger({
-        level: 'info',
-        runtimeEnvironment: 'test',
-        destination: {
-          write: (line: string) => {
-            logLines.push(line);
-          },
-        },
-      }),
       registerRoutes: (e) => e.use('/api/v1', createStaffRouter(s)),
     });
-    const url = `/api/v1/staff/events/${f.bookingId}/guests/${guest.guestId}`;
-    const call = (token: string, body: object, key?: string) => {
-      const req = request(app)
-        .post(url + '/check-ins')
-        .set('Authorization', `Bearer ${token}`);
-      if (key) req.set('Idempotency-Key', key);
-      return req.send(body);
-    };
-    expect((await call('generic-qr', {}, randomUUID())).status).toBe(401);
-    expect((await call(staff.accessToken, {})).status).toBe(400);
-    expect((await call(staff.accessToken, {}, 'x'.repeat(300))).status).toBe(422);
-    expect((await call(f.couple.accessToken, {}, randomUUID())).status).toBe(404);
-    expect((await call(staff.accessToken, { role: 'MANAGER' }, randomUUID())).status).toBe(422);
-    const key = randomUUID(),
-      response = await call(staff.accessToken, {}, key);
-    expect(response.status).toBe(201);
-    const record = z.strictObject({ data: recordSchema }).parse(response.body).data;
-    expect(response.headers['cache-control']).toBe('no-store');
-    expect(
-      z.strictObject({ data: recordSchema }).parse((await call(staff.accessToken, {}, key)).body)
-        .data,
-    ).toEqual(record);
-    expect(
-      errorResponseSchema.parse(
-        (await call(staff.accessToken, { eventTime: record.eventTime }, key)).body,
-      ).error.code,
-    ).toBe('IDEMPOTENCY_KEY_REUSED');
-    const settings = await request(app)
-      .get(`/api/v1/bookings/${f.bookingId}/check-in-settings`)
-      .set('Authorization', `Bearer ${f.couple.accessToken}`);
-    expect(z.strictObject({ data: settingsSchema }).parse(settings.body).data.locked).toBe(true);
-    const search = await request(app)
-      .get(`/api/v1/staff/events/${f.bookingId}/guests/search?query=nguyễn`)
-      .set('Authorization', `Bearer ${staff.accessToken}`);
-    expect(
-      z.strictObject({ data: searchSchema }).parse(search.body).data.items[0]!.phoneLast4,
-    ).toBe('5678');
-    expect(logLines.join('')).not.toMatch(/nguyễn|Private note|84912345678/u);
-    const history = await request(app)
-      .get(url + '/check-ins?limit=1')
-      .set('Authorization', `Bearer ${staff.accessToken}`);
-    expect(z.strictObject({ data: historySchema }).parse(history.body).data.items).toHaveLength(1);
-    expect(
-      (
+    const path = `/api/v1/staff/events/${f.bookingId}/guests/${guest.guestId}`;
+    for (const actor of [f.manager, f.couple, staff]) {
+      for (const response of [
         await request(app)
-          .get(url + '/check-ins?unknown=1')
-          .set('Authorization', `Bearer ${staff.accessToken}`)
-      ).status,
-    ).toBe(422);
-    expect(
-      (
+          .post(path + '/check-ins')
+          .auth(actor.accessToken, { type: 'bearer' })
+          .send({}),
         await request(app)
-          .post(`/api/v1/staff/events/${f.bookingId}/guests/${randomUUID()}/check-ins`)
-          .set('Authorization', `Bearer ${staff.accessToken}`)
-          .set('Idempotency-Key', randomUUID())
-          .send({})
-      ).status,
-    ).toBe(404);
-    await request(app)
-      .post(url + '/check-in-undos')
-      .set('Authorization', `Bearer ${staff.accessToken}`)
-      .set('Idempotency-Key', randomUUID())
-      .send({
-        checkInRecordId: record.checkInRecordId,
-        expectedLedgerRevision: record.ledgerRevision,
-        reason: 'Sửa check-in trùng tên nhầm',
-      })
-      .expect(201);
+          .post(path + '/check-in-undos')
+          .auth(actor.accessToken, { type: 'bearer' })
+          .send({}),
+        await request(app)
+          .get(`/api/v1/staff/events/${f.bookingId}/guests/search?query=nguyễn`)
+          .auth(actor.accessToken, { type: 'bearer' }),
+      ]) {
+        expect(response.status).toBe(410);
+        expect(errorResponseSchema.parse(response.body).error.code).toBe('FEATURE_RETIRED');
+      }
+    }
+    expect(
+      await db.prisma.staffCheckInRecord.findUnique({ where: { id: record.checkInRecordId } }),
+    ).not.toBeNull();
   });
   it('serves the complete Manager/settings/summary HTTP workflow and disabled-mode denials', async () => {
     const f = await studioFixture(db.prisma),
@@ -637,7 +575,7 @@ import { createStaffServices } from '../../src/modules/staff-operations/infrastr
       .set('Authorization', `Bearer ${f.couple.accessToken}`)
       .set('Idempotency-Key', randomUUID())
       .send({ checkInMode: 'NONE', expectedRevision: 1 })
-      .expect(200);
+      .expect(410);
     const newStaff = await f.actor('STAFF');
     await s.staff.assign(
       f.bookingId,
@@ -648,7 +586,7 @@ import { createStaffServices } from '../../src/modules/staff-operations/infrastr
     const disabled = await request(app)
       .get(`/api/v1/staff/events/${f.bookingId}/guests/search?query=nguyễn`)
       .set('Authorization', `Bearer ${newStaff.accessToken}`);
-    expect(errorResponseSchema.parse(disabled.body).error.code).toBe('CHECK_IN_DISABLED');
+    expect(errorResponseSchema.parse(disabled.body).error.code).toBe('FEATURE_RETIRED');
   });
   it('serializes undo and operational disable against check-in, with current role/session rechecked', async () => {
     const x = await enabledFixture();
@@ -701,10 +639,8 @@ import { createStaffServices } from '../../src/modules/staff-operations/infrastr
       const response = await request(app)
         .get(`/api/v1/bookings/${f.bookingId}/check-in-settings`)
         .set('Authorization', `Bearer ${f.couple.accessToken}`)
-        .expect(200);
-      expect(z.strictObject({ data: settingsSchema }).parse(response.body).data.checkInMode).toBe(
-        'BY_GUEST_NAME',
-      );
+        .expect(410);
+      expect(errorResponseSchema.parse(response.body).error.code).toBe('FEATURE_RETIRED');
       expect(
         (await runtime.providers.attendance.getBookingAttendance(f.bookingId)).checkedInGuestCount,
       ).toBe(0);

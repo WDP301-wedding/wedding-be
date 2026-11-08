@@ -1,3 +1,4 @@
+import { retiredGuestOperation } from '../../../core/http/retired-guest-operations.js';
 import { Router, type Request } from 'express';
 import { z } from 'zod';
 import {
@@ -126,29 +127,34 @@ export function createNotificationRouter(
       ).parse({ data: await scope(req).readAll(token(req), req.body, key(req)) }),
     ),
   );
-  router.post('/bookings/:bookingId/guests/:guestId/delivery', authenticate, async (req, res) => {
-    if (!delivery)
-      throw new AppError({
-        status: 503,
-        code: 'GUEST_DELIVERY_UNAVAILABLE',
-        message: 'Guest email delivery is not configured.',
-      });
-    const bookingId = parse(id, req.params['bookingId']),
-      guestId = parse(id, req.params['guestId']);
-    const actor = res.locals.actor as AuthenticatedActor;
-    const rawKey = key(req);
-    if (rawKey === undefined) throw new IdempotencyKeyRequiredError();
-    const parsedKey = idempotencyKeySchema.safeParse(rawKey);
-    if (!parsedKey.success) throw new InvalidIdempotencyKeyError();
-    const data = await guests.links.issueDelivery(
-      bookingId,
-      guestId,
-      parse(guestDeliveryBody, req.body),
-      parsedKey.data,
-      { actorId: actor.accountId, accessToken: token(req), requestId: req.requestId },
-      delivery,
-    );
-    res.status(201).json(result(guestDeliveryDto).parse({ data }));
-  });
+  router.post(
+    '/bookings/:bookingId/guests/:guestId/delivery',
+    authenticate,
+    retiredGuestOperation,
+    async (req, res) => {
+      if (!delivery)
+        throw new AppError({
+          status: 503,
+          code: 'GUEST_DELIVERY_UNAVAILABLE',
+          message: 'Guest email delivery is not configured.',
+        });
+      const bookingId = parse(id, req.params['bookingId']),
+        guestId = parse(id, req.params['guestId']);
+      const actor = res.locals.actor as AuthenticatedActor;
+      const rawKey = key(req);
+      if (rawKey === undefined) throw new IdempotencyKeyRequiredError();
+      const parsedKey = idempotencyKeySchema.safeParse(rawKey);
+      if (!parsedKey.success) throw new InvalidIdempotencyKeyError();
+      const data = await guests.links.issueDelivery(
+        bookingId,
+        guestId,
+        parse(guestDeliveryBody, req.body),
+        parsedKey.data,
+        { actorId: actor.accountId, accessToken: token(req), requestId: req.requestId },
+        delivery,
+      );
+      res.status(201).json(result(guestDeliveryDto).parse({ data }));
+    },
+  );
   return router;
 }

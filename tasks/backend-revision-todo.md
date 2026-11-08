@@ -838,3 +838,11 @@ SPEC-01–05 or replace the separate provider/runtime readiness gates.
   Commit `0a7b266`, Render deployment `dep-dbl8semc6qcc73aoqs30` is live with
   `PUBLIC_INVITATION_WEB_ORIGIN=https://wedding-web-silk.vercel.app`.
   No real email send or account reset was part of this configuration correction.
+
+## Assigned event operations amendment — 2026-11-08
+
+- [x] STF-NG1 Retire named-list/check-in HTTP operations; preserve history and generic sharing.
+- [x] STF-NG2 Complete Manager personnel and Staff operational workspace/access rules.
+- [x] STF-NG3 Couple Web/PRM preparation contains only headcount/groups and seating.
+- [x] STF-NG4 Verify regressions, API, typography and local desktop/mobile behavior. [Evidence and broader-suite limitations](evidence/staff-operations-without-guests-2026-11-08.md).
+- [ ] STF-NG5 Separate coordinated release of the reviewed backend and updated clients; repin generated clients to the real released backend commit and verify deployed behavior.

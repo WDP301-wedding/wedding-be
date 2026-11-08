@@ -23,7 +23,11 @@ describe('SPEC-09 published notification boundaries', () => {
         operations++;
         expect(actual?.[method]?.security).toEqual([{ bearerAuth: [] }]);
         expect(actual?.[method]?.responses?.['401']).toBeDefined();
-        if (method !== 'get')
+        if (actual?.[method]?.deprecated) {
+          expect(actual[method]?.responses).toHaveProperty('410');
+          expect(actual[method]?.requestBody).toBeUndefined();
+          expect(path).toBe('/bookings/{bookingId}/guests/{guestId}/delivery');
+        } else if (method !== 'get')
           expect(JSON.stringify(actual?.[method]?.parameters)).toContain('IdempotencyKey');
       }
     }

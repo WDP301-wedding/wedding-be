@@ -1,4 +1,5 @@
 import { Router, type Request, type Response } from 'express';
+import { retiredGuestOperation } from '../../../core/http/retired-guest-operations.js';
 import { z } from 'zod';
 import {
   createAuthenticatedActorMiddleware,
@@ -52,6 +53,8 @@ export function createGuestRouter(services: ReturnType<typeof createGuestService
       response.set({ 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' });
     next();
   });
+  router.use('/bookings/:bookingId/guests', authenticate, retiredGuestOperation);
+
   const context = (request: Request, response: Response) => ({
     actorId: (response.locals.actor as AuthenticatedActor).accountId,
     requestId: request.requestId,
