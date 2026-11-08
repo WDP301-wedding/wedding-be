@@ -1,4 +1,5 @@
 import { Router, type RequestHandler } from 'express';
+import { NotFoundError } from '../../../core/errors/app-error.js';
 import { z } from 'zod';
 import type { PrismaClient } from '../../../generated/prisma/client.js';
 import { validateRequest, validatedRequest } from '../../../core/http/validate.js';
@@ -22,6 +23,9 @@ import {
   invoiceAdjustmentSchema,
   finalInvoiceResponseSchema,
   finalInvoiceViewSchema,
+  expenseReviewCommandSchema,
+  expenseReviewDecisionSchema,
+  expenseReviewReopenSchema,
 } from '../domain/final-invoice.js';
 
 const params = z.strictObject({ bookingId: z.uuid() });
@@ -76,7 +80,78 @@ export function createFinalInvoiceRouter(
         }),
       }),
     });
+  const couple: RequestHandler = async (request, response, next) => {
+    const currentActor = actor(response);
+    if (!currentActor.roles.includes('COUPLE') || currentActor.roles.includes('MANAGER'))
+      throw new NotFoundError();
+    const input = validatedRequest(response, { params });
+    await services.expenses.authorize(input.params.bookingId, currentActor, request.requestId);
+    response.set('Cache-Control', 'no-store');
+    next();
+  };
   const expensePath = '/management/bookings/:bookingId/incidental-expenses';
+  for (const action of ['submit', 'no-expenses', 'reopen', 'adjustment-proposals'] as const) {
+    const body =
+      action === 'reopen'
+        ? expenseReviewReopenSchema
+        : action === 'adjustment-proposals'
+          ? invoiceAdjustmentSchema
+          : expenseReviewCommandSchema;
+    router.post(
+      expensePath + '/' + action,
+      authenticate,
+      validateRequest({ params, body }),
+      manager,
+      idempotent('/management/bookings/{bookingId}/incidental-expenses/' + action),
+      async (request, response) => {
+        const input = validatedRequest(response, { params, body });
+        const args = [input.params.bookingId, actor(response), request.requestId] as const;
+        const data =
+          action === 'reopen'
+            ? await services.expenses.reopen(
+                args[0],
+                expenseReviewReopenSchema.parse(input.body),
+                args[1],
+                args[2],
+              )
+            : action === 'adjustment-proposals'
+              ? await services.expenses.proposeAdjustment(
+                  args[0],
+                  invoiceAdjustmentSchema.parse(input.body),
+                  args[1],
+                  args[2],
+                )
+              : await services.expenses.submit(
+                  args[0],
+                  expenseReviewCommandSchema.parse(input.body),
+                  args[1],
+                  args[2],
+                  action === 'no-expenses',
+                );
+        response.set('Cache-Control', 'no-store').json(expenseDraftResponseSchema.parse({ data }));
+      },
+    );
+  }
+  router.post(
+    '/bookings/:bookingId/incidental-expenses/decisions',
+    authenticate,
+    validateRequest({ params, body: expenseReviewDecisionSchema }),
+    couple,
+    idempotent('/bookings/{bookingId}/incidental-expenses/decisions'),
+    async (request, response) => {
+      const input = validatedRequest(response, { params, body: expenseReviewDecisionSchema });
+      response.set('Cache-Control', 'no-store').json(
+        expenseDraftResponseSchema.parse({
+          data: await services.expenses.decide(
+            input.params.bookingId,
+            input.body,
+            actor(response),
+            request.requestId,
+          ),
+        }),
+      );
+    },
+  );
   for (const path of [expensePath, '/bookings/:bookingId/incidental-expenses'])
     router.get(path, authenticate, validateRequest({ params }), async (request, response) => {
       const input = validatedRequest(response, { params });

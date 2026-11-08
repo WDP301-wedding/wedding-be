@@ -314,6 +314,7 @@ export function createPrismaConsultationWorkspaceRepository(
                 planningHeadcount: record.proposal.planningHeadcount,
                 proposalSnapshot: { create: proposalSnapshotData(record.proposal) },
                 commercialModelVersion: 'FULL_CONTRACT_V1',
+                incidentalPolicyVersion: 1,
               },
             });
             const updated = await transaction.consultation.updateMany({

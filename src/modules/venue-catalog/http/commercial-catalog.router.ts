@@ -61,7 +61,7 @@ interface OfferingHttpService {
   create(value: unknown, context: CatalogMutationContext): Promise<unknown>;
   revise(id: string, value: unknown, context: CatalogMutationContext): Promise<unknown>;
 }
-function createOfferingRouter(
+export function createOfferingRouter(
   kind: string,
   service: OfferingHttpService,
   createSchema: z.ZodType,

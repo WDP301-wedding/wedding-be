@@ -76,6 +76,7 @@ export type StepSixApiHarness = {
     this: void,
     past?: boolean,
     historicalSelections?: CommercialSelection[],
+    incidentalPolicy?: 'legacy' | 'current',
   ): Promise<{ f: CommercialApiFixture; d: Approved }>;
   race(
     this: void,

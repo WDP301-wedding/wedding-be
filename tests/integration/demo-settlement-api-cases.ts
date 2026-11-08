@@ -3,7 +3,10 @@ import { expect, it, vi } from 'vitest';
 import type { StepSixApiHarness } from './commercial-step6-api-cases.js';
 import { selectionResponseSchema } from '../../src/modules/booking-lifecycle/domain/commercial-selections.js';
 import { contractResponseSchema } from '../../src/modules/booking-lifecycle/domain/commercial-contract.js';
-import { finalInvoiceResponseSchema } from '../../src/modules/payments-billing/domain/final-invoice.js';
+import {
+  finalInvoiceResponseSchema,
+  expenseDraftResponseSchema,
+} from '../../src/modules/payments-billing/domain/final-invoice.js';
 import {
   billingResponseSchema,
   checkoutResponseSchema,
@@ -89,8 +92,37 @@ export function registerDemoSettlementApiCases(h: StepSixApiHarness) {
             quantity: 1,
             unit: 'lần',
             unitPriceVnd: expenseVnd,
+            sourceType: 'OTHER',
+            reason: 'Khoản phát sinh kiểm thử đối soát sau tiệc',
           });
           expect(expense.status, JSON.stringify(expense.body)).toBe(201);
+        }
+        const expensePath = `/management/bookings/${f.id}/incidental-expenses`;
+        const expenses = expenseDraftResponseSchema.parse(
+          (await h.get(expensePath)).body as unknown,
+        ).data;
+        const submittedExpenses = await h.post(
+          expensePath + (expenseVnd ? '/submit' : '/no-expenses'),
+          { expectedRevision: expenses.revision },
+        );
+        expect(submittedExpenses.status, JSON.stringify(submittedExpenses.body)).toBe(200);
+        if (expenseVnd) {
+          const current = expenseDraftResponseSchema.parse(submittedExpenses.body as unknown).data
+            .currentReview!;
+          expect(
+            (
+              await h.post(
+                `/bookings/${f.id}/incidental-expenses/decisions`,
+                {
+                  expectedRevision: expenses.revision,
+                  reviewId: current.id,
+                  documentDigest: current.documentDigest,
+                  decision: 'APPROVE',
+                },
+                'own',
+              )
+            ).status,
+          ).toBe(200);
         }
         const path = `/management/bookings/${f.id}/final-invoices`;
         const body = {

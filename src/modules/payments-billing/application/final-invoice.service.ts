@@ -1,4 +1,10 @@
 import { randomUUID } from 'node:crypto';
+import { requireExpenseApproval } from '../domain/incidental-approval.js';
+import {
+  expenseReviewView,
+  expenseReviewDigest,
+  resolveExpenseLine,
+} from './incidental-review.persistence.js';
 import type { z } from 'zod';
 import type { PrismaClient, FinalInvoiceRevision } from '../../../generated/prisma/client.js';
 import type {
@@ -266,6 +272,20 @@ export function createFinalInvoiceService(options: Options) {
         const draft = await readExpenseDraft(client, bookingId);
         if (draft.revision !== input.expectedDraftRevision)
           throw commercialConflict('EXPENSE_REVISION_STALE');
+        const expenseHead = await client.incidentalExpenseDraft.findUnique({
+          where: { bookingId },
+          include: { currentReview: true },
+        });
+        const policy = await client.booking.findUniqueOrThrow({
+          where: { id: bookingId },
+          select: { incidentalPolicyVersion: true },
+        });
+        requireExpenseApproval(
+          policy.incidentalPolicyVersion,
+          draft.revision,
+          draft.totalVnd,
+          expenseHead?.currentReview ?? null,
+        );
         const effective = await options.commercial(client).getEffective(bookingId);
         if (effective.revisionId !== input.expectedCommercialRevisionId)
           throw commercialConflict('COMMERCIAL_PREDECESSOR_STALE');
@@ -273,6 +293,9 @@ export function createFinalInvoiceService(options: Options) {
         if (!Number.isSafeInteger(totalVnd)) throw commercialConflict('COMMERCIAL_AMOUNT_OVERFLOW');
         const document = finalInvoiceDocumentSchema.parse({
           modelVersion: 'FINAL_INVOICE_V1',
+          ...(expenseHead?.currentReview
+            ? { incidentalReviewId: expenseHead.currentReview.id }
+            : {}),
           bookingId,
           contract: {
             revisionId: effective.contract.contractRevisionId,
@@ -315,6 +338,49 @@ export function createFinalInvoiceService(options: Options) {
         if (!head?.currentRevisionId) throw commercialConflict('INVOICE_FINALIZATION_REQUIRED');
         if (head.currentRevisionId !== input.expectedInvoiceRevisionId)
           throw commercialConflict('INVOICE_REVISION_STALE');
+        const policy = await client.booking.findUniqueOrThrow({
+          where: { id: bookingId },
+          select: { incidentalPolicyVersion: true },
+        });
+        if (policy.incidentalPolicyVersion === null && input.reviewId !== undefined)
+          throw commercialConflict('EXPENSE_APPROVAL_NOT_APPLICABLE');
+        const normalizedLines = [];
+        for (const { kind, ...line } of input.lines) {
+          const { totalVnd: ignoredTotal, ...resolved } = await resolveExpenseLine(
+            client,
+            bookingId,
+            line,
+          );
+          void ignoredTotal;
+          normalizedLines.push({ kind, ...resolved });
+        }
+        if (policy.incidentalPolicyVersion !== null) {
+          const draft = await client.incidentalExpenseDraft.findUnique({
+            where: { bookingId },
+            include: { currentReview: true },
+          });
+          const row = draft?.currentReview;
+          if (
+            !row ||
+            row.id !== input.reviewId ||
+            row.type !== 'ADJUSTMENT' ||
+            row.state !== 'APPROVED' ||
+            !row.coupleApprovedAt ||
+            row.coupleAccountId === row.managerAccountId
+          )
+            throw commercialConflict('EXPENSE_APPROVAL_REQUIRED');
+          const review = expenseReviewView(row);
+          const { reviewId: ignored, ...request } = input;
+          void ignored;
+          if (
+            expenseReviewDigest({
+              ...review.document,
+              adjustment: { ...request, lines: normalizedLines },
+            }) !== row.documentDigest
+          )
+            throw commercialConflict('EXPENSE_REVIEW_STALE');
+        }
+        input.lines = normalizedLines;
         const prior = await client.finalInvoiceRevision.findUniqueOrThrow({
           where: { id: head.currentRevisionId },
         });
@@ -325,6 +391,7 @@ export function createFinalInvoiceService(options: Options) {
           throw commercialConflict('FINANCIAL_SOURCE_CONFLICT');
         const id = randomUUID();
         const adjustment = {
+          ...(input.reviewId ? { reviewId: input.reviewId } : {}),
           id,
           predecessorRevisionId: prior.id,
           reason: input.reason,

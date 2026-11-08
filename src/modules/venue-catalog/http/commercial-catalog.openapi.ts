@@ -1,4 +1,9 @@
 import { z } from 'zod';
+import {
+  createIncidentalOfferingSchema,
+  reviseIncidentalOfferingSchema,
+  incidentalOfferingViewSchema,
+} from '../domain/incidental-offering.js';
 import type { ZodOpenApiObject, ZodOpenApiOperationObject } from 'zod-openapi';
 import {
   createServiceSchema,
@@ -104,6 +109,13 @@ function paths(
   };
 }
 export const commercialCatalogOpenApiPaths = {
+  ...paths(
+    'incidental-offerings',
+    'IncidentalOfferings',
+    createIncidentalOfferingSchema,
+    reviseIncidentalOfferingSchema,
+    incidentalOfferingViewSchema,
+  ),
   ...paths(
     'services',
     'RestaurantServices',

@@ -15,6 +15,7 @@ export const catalogResources = {
   'catalog-media-asset': ['/catalog'],
   'print-offering': ['/catalog/print-offerings'],
   'restaurant-service': ['/catalog/services'],
+  'incidental-offering': ['/catalog/incidental-offerings'],
 } as const;
 
 export function resourcesForCatalogEntity(entityType: string): readonly string[] | null {

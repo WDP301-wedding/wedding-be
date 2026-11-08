@@ -41,6 +41,21 @@ export function createBillingOperationsRepository(
   return Object.freeze<BillingOperationsRepository>({
     requireBalanceAvailable(bookingId, context) {
       return enlisted(bookingId, context, async (client) => {
+        const draft = await client.incidentalExpenseDraft.findUnique({
+          where: { bookingId },
+          include: { currentReview: true },
+        });
+        if (
+          draft?.currentReview?.type === 'ADJUSTMENT' &&
+          draft.currentReview.state !== 'WITHDRAWN'
+        ) {
+          const head = await client.finalInvoiceHead.findUnique({ where: { bookingId } });
+          const document = draft.currentReview.document as {
+            adjustment?: { expectedInvoiceRevisionId?: string };
+          };
+          if (document.adjustment?.expectedInvoiceRevisionId === head?.currentRevisionId)
+            throw new BillingPersistenceConflict('EXPENSE_APPROVAL_REQUIRED');
+        }
         if (
           (await client.billingPaymentAttempt.findFirst({
             where: {

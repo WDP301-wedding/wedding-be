@@ -15,6 +15,16 @@ evidence and frontend source. New requirements are extensions to completed work.
 
 ## 1. Team Boundary
 
+Incidental-pricing/approval amendment confirmed on **2026-11-08**: new bookings
+freeze the Manager incidental catalog and include the schedule in their contracts.
+After completion, Manager submits the full expense table and owning FULL Couple
+approves the same immutable version or requests changes. Manager may explicitly
+confirm no expenses. Invoice finalization and later adjustments cannot bypass this
+gate. OTHER requires a specific description and reason, with no attachment flow.
+Existing bookings retain their previous agreements and workflow. Backend,
+Manager/Couple Web and PRM-app are authorized. See
+[accepted scope](./incidental-catalog-approval-2026-11-08.md).
+
 Completed-event dashboard/deposit amendment confirmed on **2026-11-08**: Tasks 8
 and 10 may change backend, Manager/Couple Web and PRM-app. Report revenue from
 current finalized invoices for COMPLETED events; keep provisional amounts, cash

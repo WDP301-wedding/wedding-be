@@ -1,5 +1,7 @@
 import { registerAnalyticsCommercialCases } from './analytics-commercial-cases.js';
 import { registerDepositPolicyCases } from './deposit-policy-api-cases.js';
+import { registerIncidentalApprovalCases } from './incidental-approval-api-cases.js';
+import { Prisma } from '../../src/generated/prisma/client.js';
 import { registerPrintAppendixRequestCases } from './print-appendix-requests-api-cases.js';
 import { registerGuestCompletionCases } from './guest-management-completion-cases.js';
 import { registerReleaseDemoCases } from './release-demo-cases.js';
@@ -517,8 +519,30 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
     const state = contractsResponseSchema.parse((await get(f.path, 'own')).body as unknown).data;
     return approved(f, { contract: state.revisions[0]!, bookingRevision: state.bookingRevision });
   }
-  async function paidFixture(past = false, historicalSelections?: typeof lines) {
+  async function paidFixture(
+    past = false,
+    historicalSelections?: typeof lines,
+    incidentalPolicy: 'legacy' | 'current' = 'legacy',
+  ) {
     const f = await fixture();
+    if (incidentalPolicy === 'legacy') {
+      // Baseline settlement cases exercise pre-amendment agreements. Seed that
+      // historical shape before any contract/payment exists, in this disposable
+      // database only. Current-policy acceptance explicitly selects 'current'.
+      await database.prisma.$transaction(async (tx) => {
+        await tx.$executeRawUnsafe(
+          'ALTER TABLE "Booking" DISABLE TRIGGER booking_incidental_pricing',
+        );
+        await tx.booking.update({
+          where: { id: f.id },
+          data: { incidentalPolicyVersion: null, incidentalPricing: Prisma.DbNull },
+        });
+        await tx.$executeRawUnsafe('SET CONSTRAINTS ALL IMMEDIATE');
+        await tx.$executeRawUnsafe(
+          'ALTER TABLE "Booking" ENABLE TRIGGER booking_incidental_pricing',
+        );
+      });
+    }
     if (past) {
       // Synthetic historical fixture, seeded BEFORE any commercial document or payment.
       // Production APIs never rewrite a signed event date to bypass the event-end gate.
@@ -579,6 +603,7 @@ describeDb('BE-06–10 actual HTTP and disposable PostgreSQL API verification', 
   };
   registerCommercialAcceptanceCases(harness);
   registerDepositPolicyCases(harness);
+  registerIncidentalApprovalCases(harness);
   registerPrintAppendixRequestCases(harness);
   registerAnalyticsCommercialCases(harness);
   registerStepSixApiCases(harness);

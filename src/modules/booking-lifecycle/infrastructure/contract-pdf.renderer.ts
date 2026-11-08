@@ -252,6 +252,19 @@ export async function renderContractPdf(
   ensure(90);
   pdf.y += 8;
   text('Tổng giá trị hợp đồng: ' + money(content.contractTotalVnd), true, 12);
+  if (content.incidentalPricing) {
+    section('Bảng đơn giá áp dụng khi phát sinh');
+    text(
+      'Chỉ tính khi thực tế phát sinh; không cộng vào giá trị hợp đồng hoặc tiền đặt cọc. Sau tiệc, hai bên duyệt cùng bảng chi phí trước khi tất toán. Manager có thể xác nhận không có phát sinh.',
+    );
+    for (const item of content.incidentalPricing) {
+      text(item.name + ' — ' + money(item.unitPriceVnd) + '/' + item.unit, true);
+      text(item.description + '. Cách tính: ' + item.chargingRule);
+    }
+    text(
+      'Khoản khác phải có mô tả cụ thể, lý do và số tiền, được hai bên duyệt cùng bảng phát sinh.',
+    );
+  }
   if (terms) {
     text('Đơn giá và tổng tiền đã bao gồm thuế GTGT.', true);
     renderStandardTerms(view, terms, section, text);

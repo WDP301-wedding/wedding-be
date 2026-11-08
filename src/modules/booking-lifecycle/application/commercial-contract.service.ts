@@ -247,6 +247,9 @@ export function createCommercialContractService(options: Options) {
           ? {}
           : { depositRate: booking.depositPercentage }),
         incidentalClause: INCIDENTAL_CLAUSE,
+        ...(booking.incidentalPolicyVersion === 1
+          ? { incidentalPricing: booking.incidentalPricing, incidentalApprovalRequired: true }
+          : {}),
         ...(menus === undefined
           ? {}
           : { standardTerms: { version: 'WEDDING_STANDARD_V1', ...menus } }),

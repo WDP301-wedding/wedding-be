@@ -1,5 +1,13 @@
 # Backend Ownership
 
+Owner-approved amendment, 2026-11-08: implement booking-frozen incidental catalogs
+and whole-table Manager/Couple approval as confirmed in
+docs/incidental-catalog-approval-2026-11-08.md across backend, Manager/Couple Web
+and PRM-app. Manager initiates/edits; Couple approves or requests changes. Explicit
+Manager no-expense confirmation permits zero-expense settlement. Preserve prior
+booking agreements, invoices, payments and retained PDFs. This supersedes the
+old Manager-only expense-finalization rule for new bookings.
+
 Owner-approved amendment, 2026-11-08: implement Tasks 8 and 10 as confirmed in
 docs/tasks-8-10-dashboard-deposit-2026-11-08.md across backend, Manager/Couple Web
 and PRM-app. Completed-event revenue uses finalized invoices. New bookings freeze

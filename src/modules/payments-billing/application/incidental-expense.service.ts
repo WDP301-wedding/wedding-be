@@ -1,4 +1,12 @@
 import { randomUUID } from 'node:crypto';
+import { incidentalPricingSchema } from '../../venue-catalog/domain/incidental-offering.js';
+import { requireExpenseApproval } from '../domain/incidental-approval.js';
+import {
+  expenseReviewView,
+  resolveExpenseLine,
+  requireExpenseDraftEditable,
+} from './incidental-review.persistence.js';
+import { createIncidentalReviewService } from './incidental-review.service.js';
 import type { z } from 'zod';
 import type { PrismaClient, Prisma } from '../../../generated/prisma/client.js';
 import type {
@@ -20,10 +28,9 @@ import {
   deleteExpenseSchema,
   expenseSnapshotSchema,
   expenseLineSchema,
-  calculateExpenseLine,
 } from '../domain/final-invoice.js';
 
-type Options = {
+export type IncidentalExpenseOptions = {
   scope: ReturnType<typeof createBookingBoundaryUnitOfWork>;
   boundary: BookingBoundaryUnitOfWork;
   operations: BillingOperationsRepository;
@@ -39,6 +46,10 @@ export const financialContext = (
   authority: 'AUTHENTICATED',
 });
 export async function readExpenseDraft(client: PrismaClient, bookingId: string) {
+  const booking = await client.booking.findUniqueOrThrow({
+    where: { id: bookingId },
+    select: { incidentalPolicyVersion: true, incidentalPricing: true },
+  });
   const draft = await client.incidentalExpenseDraft.findUnique({ where: { bookingId } });
   const rows = await client.incidentalExpenseLine.findMany({
     where: { bookingId },
@@ -54,17 +65,51 @@ export async function readExpenseDraft(client: PrismaClient, bookingId: string) 
       unitPriceVnd: row.unitPriceVnd.toNumber(),
       totalVnd: row.totalVnd.toNumber(),
       note: row.note,
+      ...(row.sourceType === 'CATALOG'
+        ? {
+            sourceType: 'CATALOG',
+            offeringId: row.offeringId,
+            offeringRevision: row.offeringRevision,
+          }
+        : row.sourceType === 'OTHER'
+          ? { sourceType: 'OTHER', reason: row.reason }
+          : {}),
     }),
   );
+  const reviews = await client.incidentalExpenseReview.findMany({
+    where: { bookingId },
+    orderBy: { revisionNumber: 'desc' },
+    take: 50,
+  });
+  const current = reviews.find((r) => r.id === draft?.currentReviewId) ?? null;
+  let canFinalize = true;
+  try {
+    requireExpenseApproval(
+      booking.incidentalPolicyVersion,
+      draft?.revision ?? 0,
+      checkedSum(lines.map((l) => l.totalVnd)),
+      current,
+    );
+  } catch {
+    canFinalize = false;
+  }
   return {
     bookingId,
     revision: draft?.revision ?? 0,
     finalized: invoice?.currentRevisionId != null,
     lines,
     totalVnd: checkedSum(lines.map((l) => l.totalVnd)),
+    approvalRequired: booking.incidentalPolicyVersion !== null,
+    pricing:
+      booking.incidentalPolicyVersion === null
+        ? []
+        : incidentalPricingSchema.parse(booking.incidentalPricing),
+    currentReview: current ? expenseReviewView(current) : null,
+    reviewHistory: reviews.map(expenseReviewView),
+    canFinalize,
   };
 }
-export function createIncidentalExpenseService(options: Options) {
+export function createIncidentalExpenseService(options: IncidentalExpenseOptions) {
   async function mutate(
     bookingId: string,
     expectedRevision: number,
@@ -81,6 +126,7 @@ export function createIncidentalExpenseService(options: Options) {
         options.scope.withClient(bookingId, scoped, async (client) => {
           await options.operations.requireManager(bookingId, scoped);
           await options.event(client).requireEnded(bookingId);
+          await requireExpenseDraftEditable(client, bookingId);
           const current = await readExpenseDraft(client, bookingId);
           if (current.finalized) throw commercialConflict('INVOICE_FINALIZED');
           if (current.revision !== expectedRevision)
@@ -121,6 +167,7 @@ export function createIncidentalExpenseService(options: Options) {
     return line;
   }
   return Object.freeze({
+    ...createIncidentalReviewService(options),
     async authorize(
       bookingId: string,
       actor: AuthenticatedActor,
@@ -151,7 +198,16 @@ export function createIncidentalExpenseService(options: Options) {
     ) {
       const { expectedRevision, ...input } = createExpenseSchema.parse(raw);
       return mutate(bookingId, expectedRevision, actor, requestId, 'created', async (client) => {
-        const data = { id: randomUUID(), bookingId, ...calculateExpenseLine(input) };
+        const resolved = await resolveExpenseLine(client, bookingId, input);
+        const data = {
+          id: randomUUID(),
+          bookingId,
+          ...resolved,
+          sourceType: resolved.sourceType ?? 'LEGACY',
+          offeringId: resolved.offeringId ?? null,
+          offeringRevision: resolved.offeringRevision ?? null,
+          reason: resolved.reason ?? null,
+        };
         await client.incidentalExpenseLine.create({ data });
         return { lineId: data.id, before: null, after: data };
       });
@@ -172,10 +228,28 @@ export function createIncidentalExpenseService(options: Options) {
           unit: before.unit,
           unitPriceVnd: before.unitPriceVnd.toNumber(),
           note: before.note,
+          ...(before.sourceType === 'CATALOG'
+            ? {
+                sourceType: 'CATALOG',
+                offeringId: before.offeringId,
+                offeringRevision: before.offeringRevision,
+              }
+            : before.sourceType === 'OTHER'
+              ? { sourceType: 'OTHER', reason: before.reason }
+              : {}),
           ...patch,
         });
-        const after = calculateExpenseLine(input);
-        await client.incidentalExpenseLine.update({ where: { id: lineId }, data: after });
+        const after = await resolveExpenseLine(client, bookingId, input);
+        await client.incidentalExpenseLine.update({
+          where: { id: lineId },
+          data: {
+            ...after,
+            sourceType: after.sourceType ?? 'LEGACY',
+            offeringId: after.offeringId ?? null,
+            offeringRevision: after.offeringRevision ?? null,
+            reason: after.reason ?? null,
+          },
+        });
         return { lineId, before, after };
       });
     },
