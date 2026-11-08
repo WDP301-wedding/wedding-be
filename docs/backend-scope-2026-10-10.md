@@ -15,6 +15,14 @@ evidence and frontend source. New requirements are extensions to completed work.
 
 ## 1. Team Boundary
 
+Assigned-event operations amendment confirmed by the owner on **2026-11-08**:
+retire active named-Guest lists and check-in for all roles. Manager assigns Staff
+to events; Staff retains own task updates, incident reporting and handovers.
+Couple keeps separately entered headcount, groups, seating and generic invitations.
+This work may change wedding-be, wedding-manage-web, wedding-web and PRM-app.
+Preserve historical guest/check-in data and previously issued read-only invitations.
+See [scope and verification](./staff-operations-without-guests-2026-11-08.md).
+
 Cancellation/refund amendment confirmed by the owner on **2026-11-08**: this work
 may change backend, Manager web, Couple web and PRM-app. Keep the signed contract
 unchanged. Restaurant cancellation refunds only 100% of received deposit in-system;

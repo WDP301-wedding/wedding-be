@@ -1,4 +1,5 @@
 import { OperationsWorkspaceService } from '../application/operations-workspace.service.js';
+import { eventOperationsReader } from '../../booking-lifecycle/infrastructure/event-operations.reader.js';
 import type { PrismaClient } from '../../../generated/prisma/client.js';
 import {
   PrismaBookingBoundary,
@@ -80,7 +81,7 @@ export function createStaffServices(
       journal.requireSeatingScopeAccess(bookingId, scope),
   };
   return {
-    workspace: new OperationsWorkspaceService(staff, journal, seating),
+    workspace: new OperationsWorkspaceService(staff, journal, eventOperationsReader, seating),
     staff,
     guests,
     journal,

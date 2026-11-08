@@ -1,5 +1,13 @@
 # Backend Ownership
 
+Owner-approved amendment, 2026-11-08: assigned-event operations replaces active
+named-Guest lists and all new check-in/configuration/undo operations. This revision
+may change wedding-be, wedding-manage-web, wedding-web and PRM-app. Keep explicit
+planning headcount, groups, seating and generic invitations. Staff retains task
+updates, incident reports and handovers. Preserve historical rows and prior
+read-only invitation access. See docs/staff-operations-without-guests-2026-11-08.md;
+this supersedes conflicting named-list/check-in and frontend boundaries below.
+
 Owner-approved exception, 2026-10-19: the website performance/reliability revision
 may change both `wedding-web` and `wedding-be`, in that order, followed by direct
 browser E2E verification of the deployed website. It covers all wedding-web routes,

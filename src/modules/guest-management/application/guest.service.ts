@@ -230,11 +230,7 @@ export class GuestService {
           (await tx.guestGroup.count({ where: { bookingId, status: 'ACTIVE' } })) >= 100
         )
           throw conflict('GUEST_GROUP_QUOTA_EXCEEDED');
-        if (
-          input.status === 'ARCHIVED' &&
-          (await tx.guest.count({ where: { bookingId, guestGroupId: groupId, status: 'ACTIVE' } }))
-        )
-          throw conflict('GUEST_GROUP_IN_USE');
+        // Retained named-Guest rows are historical and no longer block group planning.
         const result = await tx.guestGroup.update({
           where: { id: groupId },
           data: {

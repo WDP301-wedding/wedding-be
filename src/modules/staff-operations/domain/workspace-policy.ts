@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { settingsSchema } from '../http/staff.schemas.js';
-import { attendanceSchema } from '../application/attendance-readers.js';
+import { eventOperationsSchema } from '../../booking-lifecycle/application/event-operations.reader.js';
 import { approvedTimelineSnapshotSchema } from '../../booking-lifecycle/application/booking-readers.js';
 import { seatingRenderSchema } from '../../invitation-studio/domain/studio-policy.js';
 const text = (max: number) => z.string().trim().normalize('NFC').min(1).max(max);
@@ -33,19 +32,17 @@ export const workspaceSchema = z.strictObject({
   bookingId: z.uuid(),
   bookingCode: z.string(),
   alias: z.string().nullable(),
-  settings: settingsSchema,
-  attendance: attendanceSchema,
-  listedGuestCount: z.int().nonnegative(),
+  operations: eventOperationsSchema,
   planningHeadcount: z.int().nonnegative(),
-  windowOpen: z.boolean(),
-  windowOpensAt: z.iso.datetime(),
-  windowClosesAt: z.iso.datetime(),
   isManager: z.boolean(),
   timeline: approvedTimelineSnapshotSchema,
-  seating: z.strictObject({
-    status: z.enum(['ABSENT', 'DRAFT', 'CONFIRMED', 'REQUIRES_REVIEW']),
-    renderSnapshot: seatingRenderSchema,
-  }),
+  seating: z.discriminatedUnion('status', [
+    z.strictObject({ status: z.literal('ABSENT'), renderSnapshot: z.tuple([]) }),
+    z.strictObject({
+      status: z.enum(['DRAFT', 'CONFIRMED', 'REQUIRES_REVIEW']),
+      renderSnapshot: seatingRenderSchema,
+    }),
+  ]),
   members: z.array(z.strictObject({ accountId: z.uuid(), label: z.string() })).max(100),
 });
 export const workCreateInput = z.strictObject({

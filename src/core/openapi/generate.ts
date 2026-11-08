@@ -7,11 +7,54 @@ import { createDocument } from 'zod-openapi';
 
 import { OPENAPI_ARTIFACT_PATH, OPENAPI_DIGEST_PATH } from './artifact.js';
 import { openApiRegistry } from './registry.js';
+import { isRetiredGuestPath } from '../http/retired-guest-operations.js';
 
 export type OpenApiDocument = ReturnType<typeof createDocument>;
 
 export function createOpenApiDocument(): OpenApiDocument {
-  return createDocument(openApiRegistry);
+  const document = createDocument(openApiRegistry);
+  for (const [path, item] of Object.entries(document.paths ?? {})) {
+    if (!isRetiredGuestPath(path)) continue;
+    for (const method of ['get', 'post', 'patch', 'delete'] as const) {
+      const operation = item?.[method];
+      if (!operation) continue;
+      operation.deprecated = true;
+      delete operation.requestBody;
+      // Retirement only needs authentication; former bodies/command keys are ignored.
+      delete operation.parameters;
+      operation.description =
+        'Retired 2026-11-08. Authenticated requests return 410 FEATURE_RETIRED without reading or changing named guests/check-in. Use planning headcount, groups, generic invitations and assigned event operations.';
+      operation.responses = {
+        '401': { $ref: '#/components/responses/Unauthorized' },
+        '410': {
+          description:
+            'FEATURE_RETIRED. Update the client; no replacement named-list/check-in operation.',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                additionalProperties: false,
+                required: ['error'],
+                properties: {
+                  error: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: ['code', 'message', 'requestId'],
+                    properties: {
+                      code: { type: 'string', const: 'FEATURE_RETIRED' },
+                      message: { type: 'string' },
+                      requestId: { type: 'string', format: 'uuid' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+    }
+  }
+  return document;
 }
 
 export function serializeOpenApiDocument(document: OpenApiDocument): string {

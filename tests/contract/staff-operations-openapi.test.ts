@@ -43,6 +43,8 @@ describe('SPEC-08 exact private backend contract', () => {
       }
     }
     const search = doc.paths?.['/staff/events/{bookingId}/guests/search']?.get;
-    expect(search?.parameters?.length).toBe(3);
+    expect(search?.deprecated).toBe(true);
+    expect(search?.parameters).toBeUndefined();
+    expect(search?.responses).toHaveProperty('410');
   });
 });

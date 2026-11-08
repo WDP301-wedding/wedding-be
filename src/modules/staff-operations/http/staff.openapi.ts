@@ -109,7 +109,7 @@ export const staffOpenApiPaths: NonNullable<ZodOpenApiObject['paths']> = {
     get: op(
       'readStaffWorkspace',
       workspaceSchema,
-      'Assigned Staff or Manager. Read-only operational context independent of check-in mode/window: approved timeline, seating, safe attendance, settings and assigned team. No financial data or contract mutation.',
+      'Assigned Staff or Manager. Approved timeline, seating, assigned team, explicit planningHeadcount, separate bride/groom names, table count and approved menu/service names, descriptions and quantities. Effective mutually approved appendices override contract offerings. Legacy events use retained proposal facts. No named guests, attendance, check-in windows, prices or financial documents. Assignment revocation denies subsequent access.',
     ),
   },
   '/staff/events/{bookingId}/work-items': {

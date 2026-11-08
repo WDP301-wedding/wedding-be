@@ -11,6 +11,7 @@ import {
   workHistorySchema,
 } from '../domain/workspace-policy.js';
 import { Router, type Request, type Response } from 'express';
+import { retiredGuestOperation } from '../../../core/http/retired-guest-operations.js';
 import { z } from 'zod';
 import {
   createAuthenticatedActorMiddleware,
@@ -76,6 +77,12 @@ export function createStaffRouter(s: ReturnType<typeof createStaffServices>) {
       res.set({ 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' });
     next();
   });
+  router.use(
+    ['/bookings/:bookingId/check-in-settings', '/staff/events/:bookingId/guests'],
+    authenticate,
+    retiredGuestOperation,
+  );
+
   const get = <P extends z.ZodType, Q extends z.ZodType>(
     path: string,
     params: P,

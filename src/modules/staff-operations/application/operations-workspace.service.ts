@@ -1,9 +1,8 @@
-import { checkInWindow, isWindowOpen } from '../domain/staff-policy.js';
+import type { EventOperationsReader } from '../../booking-lifecycle/application/event-operations.reader.js';
 import { Prisma, type StaffWorkItem } from '../../../generated/prisma/client.js';
 import { NotFoundError, ValidationError } from '../../../core/errors/app-error.js';
 import { conflict, id, parse } from '../../guest-management/domain/guest-policy.js';
-import { attendance } from './attendance-readers.js';
-import { configurationDto, denied } from './staff.service.js';
+import { denied } from './staff.service.js';
 import type { StaffService } from './staff.service.js';
 import type { CheckInService } from './check-in.service.js';
 import type { StaffRequestContext, StaffSeatingGuidance } from './staff.contracts.js';
@@ -27,6 +26,7 @@ export class OperationsWorkspaceService {
   constructor(
     readonly staff: StaffService,
     readonly journal: CheckInService,
+    readonly operations: EventOperationsReader,
     readonly seating?: StaffSeatingGuidance,
   ) {}
   async list(value: unknown, context: StaffRequestContext) {
@@ -82,10 +82,6 @@ export class OperationsWorkspaceService {
           where: { id: bookingId },
           select: { bookingCode: true, alias: true },
         });
-        const head = await tx.staffConfiguration.findUnique({ where: { bookingId } });
-        const settings = head
-          ? configurationDto(head)
-          : { bookingId, checkInMode: 'NONE' as const, revision: 1, locked: false };
         const assignments = await tx.staffAssignment.findMany({
           where: { bookingId, status: 'ACTIVE' },
           take: 100,
@@ -104,26 +100,8 @@ export class OperationsWorkspaceService {
         return workspaceSchema.parse({
           bookingId,
           ...booking,
-          settings,
-          attendance: await attendance(tx, bookingId),
-          listedGuestCount: await this.staff.guests.readers.getActiveGuestCount(bookingId),
+          operations: await this.operations.read(tx, bookingId),
           planningHeadcount: event.planningHeadcount,
-          windowOpen: isWindowOpen(
-            this.staff.guests.guests.now(),
-            timeline.eventDate,
-            timeline.shiftStartTime,
-            timeline.shiftEndTime,
-          ),
-          windowOpensAt: checkInWindow(
-            timeline.eventDate,
-            timeline.shiftStartTime,
-            timeline.shiftEndTime,
-          ).opensAt,
-          windowClosesAt: checkInWindow(
-            timeline.eventDate,
-            timeline.shiftStartTime,
-            timeline.shiftEndTime,
-          ).closesAt,
           isManager: actor.roles.includes('MANAGER'),
           timeline,
           seating: (await this.seating?.getOperationalPlan?.(bookingId, scope)) ?? {
@@ -254,7 +232,13 @@ export class OperationsWorkspaceService {
           throw denied('STAFF_WORK_ACTION_FORBIDDEN');
         if (
           row.kind === 'HANDOVER' &&
-          (input.status !== 'DONE' || row.createdByAccountId === context.actorId)
+          (input.status !== 'DONE' ||
+            row.status === 'DONE' ||
+            row.createdByAccountId === context.actorId ||
+            (input.assignedAccountId !== undefined &&
+              input.assignedAccountId !== row.assignedAccountId) ||
+            (row.assignedAccountId !== context.actorId &&
+              !(manager && row.assignedAccountId === null)))
         )
           throw denied('STAFF_HANDOVER_ACK_REQUIRED');
         await this.requireAssignee(tx, bookingId, input.assignedAccountId ?? null);

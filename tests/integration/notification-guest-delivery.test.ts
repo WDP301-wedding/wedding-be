@@ -158,7 +158,7 @@ import {
         }),
       ).rejects.toThrow();
     }, 30000);
-    it('queues the real Guest HTTP command, delivers only the explicit destination and purges private content while preserving dedup', async () => {
+    it('retires new HTTP delivery while retaining delivery evidence and recovery for historical queued requests', async () => {
       const f = await studioFixture(db.prisma);
       let clock = f.now;
       const guests = createGuestServices(db.prisma, () => clock),
@@ -213,28 +213,30 @@ import {
         randomUUID(),
         f.couple,
       );
-      const key = randomUUID(),
-        issue = () =>
-          request(app)
-            .post(`/api/v1/bookings/${f.bookingId}/guests/${guest.guestId}/delivery`)
-            .set('Authorization', `Bearer ${f.couple.accessToken}`)
-            .set('Idempotency-Key', key)
-            .send({ expectedRevision: 0, intendedEmail: 'explicit@example.invalid' });
-      for (const invalidKey of [undefined, 'k'.repeat(129)]) {
-        const invalid = request(app)
-          .post('/api/v1/bookings/' + f.bookingId + '/guests/' + guest.guestId + '/delivery')
-          .set('Authorization', 'Bearer ' + f.couple.accessToken);
-        if (invalidKey !== undefined) invalid.set('Idempotency-Key', invalidKey);
-        expect(
-          (await invalid.send({ expectedRevision: 0, intendedEmail: 'explicit@example.invalid' }))
-            .status,
-        ).toBe(invalidKey === undefined ? 400 : 422);
-      }
-      const issued = await issue();
-      expect(issued.status).toBe(201);
-      const issuedData = result(guestDeliveryDto).parse(issued.body).data;
-      expect((await issue()).body).toEqual(issued.body);
-      expect(JSON.stringify(issued.body)).not.toMatch(
+      const key = randomUUID();
+      await request(app)
+        .post(`/api/v1/bookings/${f.bookingId}/guests/${guest.guestId}/delivery`)
+        .auth(f.couple.accessToken, { type: 'bearer' })
+        .send({ expectedRevision: 0, intendedEmail: 'explicit@example.invalid' })
+        .expect(410);
+      expect(
+        await db.prisma.notificationCredential.count({
+          where: { intent: { bookingId: f.bookingId } },
+        }),
+      ).toBe(0);
+      // Retained internal adapter sets up a historical queued request for recovery/retention tests.
+      const issue = () =>
+        guests.links.issueDelivery(
+          f.bookingId,
+          guest.guestId,
+          { expectedRevision: 0, intendedEmail: 'explicit@example.invalid' },
+          key,
+          f.couple,
+          adapter,
+        );
+      const issuedData = guestDeliveryDto.parse(await issue());
+      expect(await issue()).toEqual(issuedData);
+      expect(JSON.stringify(issuedData)).not.toMatch(
         /wgc_|explicit@example|84900000000|private-note/u,
       );
       let content = '',
@@ -358,7 +360,7 @@ import {
       expect(metadata.ciphertext).toBeNull();
       expect(metadata.credentialId).toBe(issuedData.credentialId);
       const replay = await issue();
-      expect(replay.body).toEqual(issued.body);
+      expect(replay).toEqual(issuedData);
       expect(await db.prisma.notificationIntent.count({ where: { id: claim.id } })).toBe(1);
       const inboxIntent = await foundation.enqueue({
         eventId: randomUUID(),

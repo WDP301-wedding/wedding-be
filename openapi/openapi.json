@@ -10733,64 +10733,14 @@
     },
     "/bookings/{bookingId}/check-in-settings": {
       "get": {
-        "description": "Owning FULL Couple or Manager; NONE default. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
+        "deprecated": true,
+        "description": "Retired 2026-11-08. Authenticated requests return 410 FEATURE_RETIRED without reading or changing named guests/check-in. Use planning headcount, groups, generic invitations and assigned event operations.",
         "operationId": "readCheckInSettings",
         "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "data": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "bookingId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "checkInMode": {
-                          "enum": [
-                            "NONE",
-                            "BY_GUEST_NAME"
-                          ],
-                          "type": "string"
-                        },
-                        "locked": {
-                          "type": "boolean"
-                        },
-                        "revision": {
-                          "exclusiveMinimum": 0,
-                          "maximum": 9007199254740991,
-                          "type": "integer"
-                        }
-                      },
-                      "required": [
-                        "bookingId",
-                        "checkInMode",
-                        "revision",
-                        "locked"
-                      ],
-                      "type": "object"
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Authorized result."
-          },
-          "400": {
-            "$ref": "#/components/responses/IdempotencyKeyRequired"
-          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
-          "403": {
+          "410": {
             "content": {
               "application/json": {
                 "schema": {
@@ -10800,6 +10750,7 @@
                       "additionalProperties": false,
                       "properties": {
                         "code": {
+                          "const": "FEATURE_RETIRED",
                           "type": "string"
                         },
                         "message": {
@@ -10807,7 +10758,6 @@
                         },
                         "requestId": {
                           "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                           "type": "string"
                         }
                       },
@@ -10826,16 +10776,7 @@
                 }
               }
             },
-            "description": "EVENT_ASSIGNMENT_REQUIRED, CHECK_IN_DISABLED, CHECK_IN_WINDOW_CLOSED, MANAGER_OVERRIDE_REQUIRED or CHECK_IN_CORRECTION_FORBIDDEN."
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
+            "description": "FEATURE_RETIRED. Update the client; no replacement named-list/check-in operation."
           }
         },
         "security": [
@@ -10859,102 +10800,14 @@
         }
       ],
       "patch": {
-        "description": "Owning FULL Couple or Manager on a confirmed event. Enabling requires active names. Guest imports never enable. After first record, including later UNDO, mode is locked. Conflicts: NAMED_GUEST_LIST_REQUIRED, CHECK_IN_MODE_LOCKED, CHECK_IN_CONFIGURATION_STALE. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
+        "deprecated": true,
+        "description": "Retired 2026-11-08. Authenticated requests return 410 FEATURE_RETIRED without reading or changing named guests/check-in. Use planning headcount, groups, generic invitations and assigned event operations.",
         "operationId": "configureCheckIn",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/IdempotencyKey"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": {
-                "checkInMode": "BY_GUEST_NAME",
-                "expectedRevision": 1
-              },
-              "schema": {
-                "additionalProperties": false,
-                "properties": {
-                  "checkInMode": {
-                    "enum": [
-                      "NONE",
-                      "BY_GUEST_NAME"
-                    ],
-                    "type": "string"
-                  },
-                  "expectedRevision": {
-                    "exclusiveMinimum": 0,
-                    "maximum": 9007199254740991,
-                    "type": "integer"
-                  }
-                },
-                "required": [
-                  "checkInMode",
-                  "expectedRevision"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "data": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "bookingId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "checkInMode": {
-                          "enum": [
-                            "NONE",
-                            "BY_GUEST_NAME"
-                          ],
-                          "type": "string"
-                        },
-                        "locked": {
-                          "type": "boolean"
-                        },
-                        "revision": {
-                          "exclusiveMinimum": 0,
-                          "maximum": 9007199254740991,
-                          "type": "integer"
-                        }
-                      },
-                      "required": [
-                        "bookingId",
-                        "checkInMode",
-                        "revision",
-                        "locked"
-                      ],
-                      "type": "object"
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Authorized result."
-          },
-          "400": {
-            "$ref": "#/components/responses/IdempotencyKeyRequired"
-          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
-          "403": {
+          "410": {
             "content": {
               "application/json": {
                 "schema": {
@@ -10964,6 +10817,7 @@
                       "additionalProperties": false,
                       "properties": {
                         "code": {
+                          "const": "FEATURE_RETIRED",
                           "type": "string"
                         },
                         "message": {
@@ -10971,7 +10825,6 @@
                         },
                         "requestId": {
                           "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                           "type": "string"
                         }
                       },
@@ -10990,16 +10843,7 @@
                 }
               }
             },
-            "description": "EVENT_ASSIGNMENT_REQUIRED, CHECK_IN_DISABLED, CHECK_IN_WINDOW_CLOSED, MANAGER_OVERRIDE_REQUIRED or CHECK_IN_CORRECTION_FORBIDDEN."
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
+            "description": "FEATURE_RETIRED. Update the client; no replacement named-list/check-in operation."
           }
         },
         "security": [
@@ -21215,177 +21059,50 @@
     },
     "/bookings/{bookingId}/guests": {
       "get": {
-        "description": "Manager or owning FULL Couple. Confirmed and completed bookings remain readable. Preparation writes return PREPARATION_READ_ONLY after completion or verified final settlement. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
+        "deprecated": true,
+        "description": "Retired 2026-11-08. Authenticated requests return 410 FEATURE_RETIRED without reading or changing named guests/check-in. Use planning headcount, groups, generic invitations and assigned event operations.",
         "operationId": "listNamedGuests",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "limit",
-            "schema": {
-              "default": 25,
-              "maximum": 50,
-              "minimum": 1,
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
-            "name": "cursor",
-            "schema": {
-              "maxLength": 1024,
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "guestGroupId",
-            "schema": {
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "status",
-            "schema": {
-              "default": "ACTIVE",
-              "enum": [
-                "ACTIVE",
-                "ARCHIVED"
-              ],
-              "type": "string"
-            }
-          }
-        ],
         "responses": {
-          "200": {
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "410": {
             "content": {
               "application/json": {
                 "schema": {
                   "additionalProperties": false,
                   "properties": {
-                    "data": {
+                    "error": {
                       "additionalProperties": false,
                       "properties": {
-                        "items": {
-                          "items": {
-                            "additionalProperties": false,
-                            "properties": {
-                              "bookingId": {
-                                "format": "uuid",
-                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                                "type": "string"
-                              },
-                              "guestGroupId": {
-                                "format": "uuid",
-                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                                "type": "string"
-                              },
-                              "guestId": {
-                                "format": "uuid",
-                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                                "type": "string"
-                              },
-                              "name": {
-                                "maxLength": 120,
-                                "minLength": 1,
-                                "type": "string"
-                              },
-                              "operationalNote": {
-                                "anyOf": [
-                                  {
-                                    "maxLength": 500,
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "null"
-                                  }
-                                ]
-                              },
-                              "phone": {
-                                "type": [
-                                  "string",
-                                  "null"
-                                ]
-                              },
-                              "revision": {
-                                "exclusiveMinimum": 0,
-                                "maximum": 9007199254740991,
-                                "type": "integer"
-                              },
-                              "status": {
-                                "enum": [
-                                  "ACTIVE",
-                                  "ARCHIVED"
-                                ],
-                                "type": "string"
-                              }
-                            },
-                            "required": [
-                              "guestId",
-                              "bookingId",
-                              "guestGroupId",
-                              "name",
-                              "phone",
-                              "operationalNote",
-                              "status",
-                              "revision"
-                            ],
-                            "type": "object"
-                          },
-                          "maxItems": 50,
-                          "type": "array"
+                        "code": {
+                          "const": "FEATURE_RETIRED",
+                          "type": "string"
                         },
-                        "nextCursor": {
-                          "type": [
-                            "string",
-                            "null"
-                          ]
+                        "message": {
+                          "type": "string"
                         },
-                        "sourceSequence": {
-                          "exclusiveMinimum": 0,
-                          "maximum": 9007199254740991,
-                          "type": "integer"
+                        "requestId": {
+                          "format": "uuid",
+                          "type": "string"
                         }
                       },
                       "required": [
-                        "items",
-                        "sourceSequence",
-                        "nextCursor"
+                        "code",
+                        "message",
+                        "requestId"
                       ],
                       "type": "object"
                     }
                   },
                   "required": [
-                    "data"
+                    "error"
                   ],
                   "type": "object"
                 }
               }
             },
-            "description": "Private result; Cache-Control: no-store."
-          },
-          "400": {
-            "$ref": "#/components/responses/IdempotencyKeyRequired"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "413": {
-            "description": "Request exceeds configured body/import limits."
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
+            "description": "FEATURE_RETIRED. Update the client; no replacement named-list/check-in operation."
           }
         },
         "security": [
@@ -21409,168 +21126,50 @@
         }
       ],
       "post": {
-        "description": "Manager or owning FULL Couple. Confirmed and completed bookings remain readable. Preparation writes return PREPARATION_READ_ONLY after completion or verified final settlement. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
+        "deprecated": true,
+        "description": "Retired 2026-11-08. Authenticated requests return 410 FEATURE_RETIRED without reading or changing named guests/check-in. Use planning headcount, groups, generic invitations and assigned event operations.",
         "operationId": "createNamedGuest",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/IdempotencyKey"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": {
-                "guestGroupId": "10000000-0000-4000-8000-000000000001",
-                "name": "Nguyễn An"
-              },
-              "schema": {
-                "additionalProperties": false,
-                "properties": {
-                  "guestGroupId": {
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                    "type": "string"
-                  },
-                  "name": {
-                    "maxLength": 120,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "operationalNote": {
-                    "anyOf": [
-                      {
-                        "maxLength": 500,
-                        "type": "string"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  "phone": {
-                    "anyOf": [
-                      {
-                        "pattern": "^\\+[1-9]\\d{7,14}$",
-                        "type": "string"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  }
-                },
-                "required": [
-                  "name",
-                  "guestGroupId"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
-          "201": {
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "410": {
             "content": {
               "application/json": {
                 "schema": {
                   "additionalProperties": false,
                   "properties": {
-                    "data": {
+                    "error": {
                       "additionalProperties": false,
                       "properties": {
-                        "bookingId": {
+                        "code": {
+                          "const": "FEATURE_RETIRED",
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "requestId": {
                           "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "guestGroupId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "guestId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "name": {
-                          "maxLength": 120,
-                          "minLength": 1,
-                          "type": "string"
-                        },
-                        "operationalNote": {
-                          "anyOf": [
-                            {
-                              "maxLength": 500,
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "phone": {
-                          "type": [
-                            "string",
-                            "null"
-                          ]
-                        },
-                        "revision": {
-                          "exclusiveMinimum": 0,
-                          "maximum": 9007199254740991,
-                          "type": "integer"
-                        },
-                        "status": {
-                          "enum": [
-                            "ACTIVE",
-                            "ARCHIVED"
-                          ],
                           "type": "string"
                         }
                       },
                       "required": [
-                        "guestId",
-                        "bookingId",
-                        "guestGroupId",
-                        "name",
-                        "phone",
-                        "operationalNote",
-                        "status",
-                        "revision"
+                        "code",
+                        "message",
+                        "requestId"
                       ],
                       "type": "object"
                     }
                   },
                   "required": [
-                    "data"
+                    "error"
                   ],
                   "type": "object"
                 }
               }
             },
-            "description": "Private result; Cache-Control: no-store."
-          },
-          "400": {
-            "$ref": "#/components/responses/IdempotencyKeyRequired"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "413": {
-            "description": "Request exceeds configured body/import limits."
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
+            "description": "FEATURE_RETIRED. Update the client; no replacement named-list/check-in operation."
           }
         },
         "security": [
@@ -21596,183 +21195,50 @@
         }
       ],
       "post": {
-        "description": "Manager or owning FULL Couple. Confirmed and completed bookings remain readable. Preparation writes return PREPARATION_READ_ONLY after completion or verified final settlement. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
+        "deprecated": true,
+        "description": "Retired 2026-11-08. Authenticated requests return 410 FEATURE_RETIRED without reading or changing named guests/check-in. Use planning headcount, groups, generic invitations and assigned event operations.",
         "operationId": "previewNamedGuestImport",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/IdempotencyKey"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": {
-                "allowUpdates": false,
-                "rows": [
-                  {
-                    "externalRowKey": "row-1",
-                    "guestGroupId": "10000000-0000-4000-8000-000000000001",
-                    "name": "Nguyễn An"
-                  }
-                ]
-              },
-              "schema": {
-                "additionalProperties": false,
-                "properties": {
-                  "allowUpdates": {
-                    "default": false,
-                    "type": "boolean"
-                  },
-                  "rows": {
-                    "items": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "externalRowKey": {
-                          "maxLength": 120,
-                          "minLength": 1,
-                          "type": "string"
-                        },
-                        "guestGroupId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "name": {
-                          "maxLength": 120,
-                          "minLength": 1,
-                          "type": "string"
-                        },
-                        "operationalNote": {
-                          "anyOf": [
-                            {
-                              "maxLength": 500,
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "phone": {
-                          "anyOf": [
-                            {
-                              "pattern": "^\\+[1-9]\\d{7,14}$",
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        }
-                      },
-                      "required": [
-                        "name",
-                        "guestGroupId",
-                        "externalRowKey"
-                      ],
-                      "type": "object"
-                    },
-                    "maxItems": 1000,
-                    "minItems": 1,
-                    "type": "array"
-                  }
-                },
-                "required": [
-                  "rows"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
-          "200": {
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "410": {
             "content": {
               "application/json": {
                 "schema": {
                   "additionalProperties": false,
                   "properties": {
-                    "data": {
+                    "error": {
                       "additionalProperties": false,
                       "properties": {
-                        "createdCount": {
-                          "maximum": 9007199254740991,
-                          "minimum": 0,
-                          "type": "integer"
-                        },
-                        "digest": {
-                          "maxLength": 64,
-                          "minLength": 64,
+                        "code": {
+                          "const": "FEATURE_RETIRED",
                           "type": "string"
                         },
-                        "expiresAt": {
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                        "message": {
                           "type": "string"
                         },
-                        "listSequence": {
-                          "exclusiveMinimum": 0,
-                          "maximum": 9007199254740991,
-                          "type": "integer"
-                        },
-                        "previewId": {
+                        "requestId": {
                           "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                           "type": "string"
-                        },
-                        "unchangedCount": {
-                          "maximum": 9007199254740991,
-                          "minimum": 0,
-                          "type": "integer"
-                        },
-                        "updatedCount": {
-                          "maximum": 9007199254740991,
-                          "minimum": 0,
-                          "type": "integer"
                         }
                       },
                       "required": [
-                        "previewId",
-                        "digest",
-                        "listSequence",
-                        "createdCount",
-                        "updatedCount",
-                        "unchangedCount",
-                        "expiresAt"
+                        "code",
+                        "message",
+                        "requestId"
                       ],
                       "type": "object"
                     }
                   },
                   "required": [
-                    "data"
+                    "error"
                   ],
                   "type": "object"
                 }
               }
             },
-            "description": "Private result; Cache-Control: no-store."
-          },
-          "400": {
-            "$ref": "#/components/responses/IdempotencyKeyRequired"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "413": {
-            "description": "Request exceeds configured body/import limits."
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
+            "description": "FEATURE_RETIRED. Update the client; no replacement named-list/check-in operation."
           }
         },
         "security": [
@@ -21798,102 +21264,50 @@
         }
       ],
       "post": {
-        "description": "Manager or owning FULL Couple. Confirmed and completed bookings remain readable. Preparation writes return PREPARATION_READ_ONLY after completion or verified final settlement. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
+        "deprecated": true,
+        "description": "Retired 2026-11-08. Authenticated requests return 410 FEATURE_RETIRED without reading or changing named guests/check-in. Use planning headcount, groups, generic invitations and assigned event operations.",
         "operationId": "commitNamedGuestImport",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/IdempotencyKey"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "additionalProperties": false,
-                "properties": {
-                  "digest": {
-                    "pattern": "^[a-f0-9]{64}$",
-                    "type": "string"
-                  },
-                  "previewId": {
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "previewId",
-                  "digest"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
-          "200": {
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "410": {
             "content": {
               "application/json": {
                 "schema": {
                   "additionalProperties": false,
                   "properties": {
-                    "data": {
+                    "error": {
                       "additionalProperties": false,
                       "properties": {
-                        "createdCount": {
-                          "maximum": 9007199254740991,
-                          "minimum": 0,
-                          "type": "integer"
+                        "code": {
+                          "const": "FEATURE_RETIRED",
+                          "type": "string"
                         },
-                        "unchangedCount": {
-                          "maximum": 9007199254740991,
-                          "minimum": 0,
-                          "type": "integer"
+                        "message": {
+                          "type": "string"
                         },
-                        "updatedCount": {
-                          "maximum": 9007199254740991,
-                          "minimum": 0,
-                          "type": "integer"
+                        "requestId": {
+                          "format": "uuid",
+                          "type": "string"
                         }
                       },
                       "required": [
-                        "createdCount",
-                        "updatedCount",
-                        "unchangedCount"
+                        "code",
+                        "message",
+                        "requestId"
                       ],
                       "type": "object"
                     }
                   },
                   "required": [
-                    "data"
+                    "error"
                   ],
                   "type": "object"
                 }
               }
             },
-            "description": "Private result; Cache-Control: no-store."
-          },
-          "400": {
-            "$ref": "#/components/responses/IdempotencyKeyRequired"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "413": {
-            "description": "Request exceeds configured body/import limits."
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
+            "description": "FEATURE_RETIRED. Update the client; no replacement named-list/check-in operation."
           }
         },
         "security": [
@@ -21928,179 +21342,50 @@
         }
       ],
       "patch": {
-        "description": "Manager or owning FULL Couple. Confirmed and completed bookings remain readable. Preparation writes return PREPARATION_READ_ONLY after completion or verified final settlement. Guest lists are optional. Writes require Idempotency-Key; list changes never derive planning, enable check-in or affect money. Cross-booking identities are concealed. Import takes parsed CSV/JSON rows; no formula/unknown columns. Companion quantities remain outside this contract.",
+        "deprecated": true,
+        "description": "Retired 2026-11-08. Authenticated requests return 410 FEATURE_RETIRED without reading or changing named guests/check-in. Use planning headcount, groups, generic invitations and assigned event operations.",
         "operationId": "updateNamedGuest",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/IdempotencyKey"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": {
-                "expectedRevision": 1,
-                "status": "ARCHIVED"
-              },
-              "schema": {
-                "additionalProperties": false,
-                "properties": {
-                  "expectedRevision": {
-                    "exclusiveMinimum": 0,
-                    "maximum": 9007199254740991,
-                    "type": "integer"
-                  },
-                  "guestGroupId": {
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                    "type": "string"
-                  },
-                  "name": {
-                    "maxLength": 120,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "operationalNote": {
-                    "anyOf": [
-                      {
-                        "maxLength": 500,
-                        "type": "string"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  "phone": {
-                    "anyOf": [
-                      {
-                        "pattern": "^\\+[1-9]\\d{7,14}$",
-                        "type": "string"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  "status": {
-                    "enum": [
-                      "ACTIVE",
-                      "ARCHIVED"
-                    ],
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "expectedRevision"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
-          "200": {
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "410": {
             "content": {
               "application/json": {
                 "schema": {
                   "additionalProperties": false,
                   "properties": {
-                    "data": {
+                    "error": {
                       "additionalProperties": false,
                       "properties": {
-                        "bookingId": {
+                        "code": {
+                          "const": "FEATURE_RETIRED",
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "requestId": {
                           "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "guestGroupId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "guestId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "name": {
-                          "maxLength": 120,
-                          "minLength": 1,
-                          "type": "string"
-                        },
-                        "operationalNote": {
-                          "anyOf": [
-                            {
-                              "maxLength": 500,
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "phone": {
-                          "type": [
-                            "string",
-                            "null"
-                          ]
-                        },
-                        "revision": {
-                          "exclusiveMinimum": 0,
-                          "maximum": 9007199254740991,
-                          "type": "integer"
-                        },
-                        "status": {
-                          "enum": [
-                            "ACTIVE",
-                            "ARCHIVED"
-                          ],
                           "type": "string"
                         }
                       },
                       "required": [
-                        "guestId",
-                        "bookingId",
-                        "guestGroupId",
-                        "name",
-                        "phone",
-                        "operationalNote",
-                        "status",
-                        "revision"
+                        "code",
+                        "message",
+                        "requestId"
                       ],
                       "type": "object"
                     }
                   },
                   "required": [
-                    "data"
+                    "error"
                   ],
                   "type": "object"
                 }
               }
             },
-            "description": "Private result; Cache-Control: no-store."
-          },
-          "400": {
-            "$ref": "#/components/responses/IdempotencyKeyRequired"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "413": {
-            "description": "Request exceeds configured body/import limits."
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
+            "description": "FEATURE_RETIRED. Update the client; no replacement named-list/check-in operation."
           }
         },
         "security": [
@@ -22135,110 +21420,50 @@
         }
       ],
       "post": {
-        "description": "Manager or owning FULL Couple under Guest authority. Explicit intendedEmail is required, never inferred from Guest names/phones. Receipt has identifiers only; transient credential is retained encrypted in the shared transaction and purged by expiry/terminal policy. Generic workflows need no Guest or recipient. Private no-store result. Delivery/read state is never booking approval, settlement or attendance evidence.",
+        "deprecated": true,
+        "description": "Retired 2026-11-08. Authenticated requests return 410 FEATURE_RETIRED without reading or changing named guests/check-in. Use planning headcount, groups, generic invitations and assigned event operations.",
         "operationId": "queuePersonalizedGuestInvitation",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/IdempotencyKey"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "additionalProperties": false,
-                "properties": {
-                  "expectedRevision": {
-                    "maximum": 9007199254740991,
-                    "minimum": 0,
-                    "type": "integer"
-                  },
-                  "intendedEmail": {
-                    "format": "email",
-                    "maxLength": 254,
-                    "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "expectedRevision",
-                  "intendedEmail"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
-          "201": {
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "410": {
             "content": {
               "application/json": {
                 "schema": {
                   "additionalProperties": false,
                   "properties": {
-                    "data": {
+                    "error": {
                       "additionalProperties": false,
                       "properties": {
-                        "credentialId": {
+                        "code": {
+                          "const": "FEATURE_RETIRED",
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "requestId": {
                           "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                           "type": "string"
-                        },
-                        "expiresAt": {
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-                          "type": "string"
-                        },
-                        "notificationIntentId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "revision": {
-                          "exclusiveMinimum": 0,
-                          "maximum": 9007199254740991,
-                          "type": "integer"
                         }
                       },
                       "required": [
-                        "credentialId",
-                        "revision",
-                        "expiresAt",
-                        "notificationIntentId"
+                        "code",
+                        "message",
+                        "requestId"
                       ],
                       "type": "object"
                     }
                   },
                   "required": [
-                    "data"
+                    "error"
                   ],
                   "type": "object"
                 }
               }
             },
-            "description": "Redacted private result."
-          },
-          "400": {
-            "$ref": "#/components/responses/IdempotencyKeyRequired"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          },
-          "503": {
-            "description": "Required database, credential encryption or worker configuration is unavailable."
+            "description": "FEATURE_RETIRED. Update the client; no replacement named-list/check-in operation."
           }
         },
         "security": [
@@ -22253,105 +21478,50 @@
     },
     "/bookings/{bookingId}/guests/{guestId}/personalized-invitations": {
       "get": {
-        "description": "Manager or owning FULL Couple on a confirmed Booking. Latest credential metadata only, including expired/revoked credentials and archived Guests; revision is zero with nullable metadata before first issuance. Use revision as expectedRevision when issuing/delivering. Does not issue, revoke or recover raw credentials. Unknown query keys are rejected; foreign Guests are concealed as 404.",
+        "deprecated": true,
+        "description": "Retired 2026-11-08. Authenticated requests return 410 FEATURE_RETIRED without reading or changing named guests/check-in. Use planning headcount, groups, generic invitations and assigned event operations.",
         "operationId": "readGuestInvitationMetadata",
-        "parameters": [],
         "responses": {
-          "200": {
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "410": {
             "content": {
               "application/json": {
                 "schema": {
                   "additionalProperties": false,
                   "properties": {
-                    "data": {
+                    "error": {
                       "additionalProperties": false,
                       "properties": {
-                        "credentialId": {
-                          "anyOf": [
-                            {
-                              "format": "uuid",
-                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "expiresAt": {
-                          "anyOf": [
-                            {
-                              "format": "date-time",
-                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "guestId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "code": {
+                          "const": "FEATURE_RETIRED",
                           "type": "string"
                         },
-                        "revision": {
-                          "maximum": 9007199254740991,
-                          "minimum": 0,
-                          "type": "integer"
+                        "message": {
+                          "type": "string"
                         },
-                        "revokedAt": {
-                          "anyOf": [
-                            {
-                              "format": "date-time",
-                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
+                        "requestId": {
+                          "format": "uuid",
+                          "type": "string"
                         }
                       },
                       "required": [
-                        "guestId",
-                        "revision",
-                        "credentialId",
-                        "expiresAt",
-                        "revokedAt"
+                        "code",
+                        "message",
+                        "requestId"
                       ],
                       "type": "object"
                     }
                   },
                   "required": [
-                    "data"
+                    "error"
                   ],
                   "type": "object"
                 }
               }
             },
-            "description": "Private result; Cache-Control: no-store."
-          },
-          "400": {
-            "$ref": "#/components/responses/IdempotencyKeyRequired"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "413": {
-            "description": "Request exceeds configured body/import limits."
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
+            "description": "FEATURE_RETIRED. Update the client; no replacement named-list/check-in operation."
           }
         },
         "security": [
@@ -22384,109 +21554,50 @@
         }
       ],
       "post": {
-        "description": "Requires active Guest and published Invitation. Raw credential returned once only, in URL fragment. Retried issuance cannot replay a raw token; use a new key/current revision to reissue. No automatic delivery or attendance write.",
+        "deprecated": true,
+        "description": "Retired 2026-11-08. Authenticated requests return 410 FEATURE_RETIRED without reading or changing named guests/check-in. Use planning headcount, groups, generic invitations and assigned event operations.",
         "operationId": "issueReadOnlyGuestInvitation",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/IdempotencyKey"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": {
-                "expectedRevision": 0
-              },
-              "schema": {
-                "additionalProperties": false,
-                "properties": {
-                  "expectedRevision": {
-                    "maximum": 9007199254740991,
-                    "minimum": 0,
-                    "type": "integer"
-                  }
-                },
-                "required": [
-                  "expectedRevision"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
-          "201": {
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "410": {
             "content": {
               "application/json": {
                 "schema": {
                   "additionalProperties": false,
                   "properties": {
-                    "data": {
+                    "error": {
                       "additionalProperties": false,
                       "properties": {
-                        "credential": {
-                          "pattern": "^wgc_[A-Za-z0-9_-]{43}$",
+                        "code": {
+                          "const": "FEATURE_RETIRED",
                           "type": "string"
                         },
-                        "credentialId": {
+                        "message": {
+                          "type": "string"
+                        },
+                        "requestId": {
                           "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                           "type": "string"
-                        },
-                        "expiresAt": {
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-                          "type": "string"
-                        },
-                        "fragment": {
-                          "type": "string"
-                        },
-                        "revision": {
-                          "exclusiveMinimum": 0,
-                          "maximum": 9007199254740991,
-                          "type": "integer"
                         }
                       },
                       "required": [
-                        "credentialId",
-                        "revision",
-                        "credential",
-                        "fragment",
-                        "expiresAt"
+                        "code",
+                        "message",
+                        "requestId"
                       ],
                       "type": "object"
                     }
                   },
                   "required": [
-                    "data"
+                    "error"
                   ],
                   "type": "object"
                 }
               }
             },
-            "description": "Private result; Cache-Control: no-store."
-          },
-          "400": {
-            "$ref": "#/components/responses/IdempotencyKeyRequired"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "413": {
-            "description": "Request exceeds configured body/import limits."
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
+            "description": "FEATURE_RETIRED. Update the client; no replacement named-list/check-in operation."
           }
         },
         "security": [
@@ -58255,201 +57366,14 @@
     },
     "/staff/events/{bookingId}/guests/search": {
       "get": {
-        "description": "Current Staff role, active event assignment and BY_GUEST_NAME required. Staff writes within event start - 2h through end + 12h; Manager writes require explicit overrideReason and may override the window only. One listed identity, never all-person attendance; companions are not counted by this API. No invitation/QR authority. Normalized name/phone matching; only phoneLast4, no private notes. Duplicate names remain separate IDs. Opaque cursor becomes stale on Guest changes. Seating ABSENT succeeds. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
+        "deprecated": true,
+        "description": "Retired 2026-11-08. Authenticated requests return 410 FEATURE_RETIRED without reading or changing named guests/check-in. Use planning headcount, groups, generic invitations and assigned event operations.",
         "operationId": "searchStaffEventGuests",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "query",
-            "required": true,
-            "schema": {
-              "maxLength": 120,
-              "minLength": 2,
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "cursor",
-            "schema": {
-              "maxLength": 1024,
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "schema": {
-              "default": 25,
-              "maximum": 50,
-              "minimum": 1,
-              "type": "integer"
-            }
-          }
-        ],
         "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "data": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "guidanceStatus": {
-                          "enum": [
-                            "ABSENT",
-                            "DRAFT",
-                            "CONFIRMED",
-                            "REQUIRES_REVIEW"
-                          ],
-                          "type": "string"
-                        },
-                        "items": {
-                          "items": {
-                            "additionalProperties": false,
-                            "properties": {
-                              "checkInRecordId": {
-                                "anyOf": [
-                                  {
-                                    "format": "uuid",
-                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "null"
-                                  }
-                                ]
-                              },
-                              "checkedIn": {
-                                "type": "boolean"
-                              },
-                              "groupColor": {
-                                "pattern": "^#[A-F0-9]{6}$",
-                                "type": "string"
-                              },
-                              "groupName": {
-                                "maxLength": 80,
-                                "minLength": 1,
-                                "type": "string"
-                              },
-                              "guestGroupId": {
-                                "format": "uuid",
-                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                                "type": "string"
-                              },
-                              "guestId": {
-                                "format": "uuid",
-                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                                "type": "string"
-                              },
-                              "ledgerRevision": {
-                                "maximum": 9007199254740991,
-                                "minimum": 0,
-                                "type": "integer"
-                              },
-                              "name": {
-                                "maxLength": 120,
-                                "minLength": 1,
-                                "type": "string"
-                              },
-                              "phoneLast4": {
-                                "anyOf": [
-                                  {
-                                    "maxLength": 4,
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "null"
-                                  }
-                                ]
-                              },
-                              "tableLabels": {
-                                "items": {
-                                  "type": "string"
-                                },
-                                "type": "array"
-                              },
-                              "warning": {
-                                "anyOf": [
-                                  {
-                                    "const": "GUEST_GROUP_CHANGED",
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "null"
-                                  }
-                                ]
-                              }
-                            },
-                            "required": [
-                              "guestId",
-                              "guestGroupId",
-                              "name",
-                              "phoneLast4",
-                              "groupName",
-                              "groupColor",
-                              "checkedIn",
-                              "ledgerRevision",
-                              "warning",
-                              "tableLabels"
-                            ],
-                            "type": "object"
-                          },
-                          "maxItems": 50,
-                          "type": "array"
-                        },
-                        "nextCursor": {
-                          "type": [
-                            "string",
-                            "null"
-                          ]
-                        },
-                        "seatingPlanRevisionId": {
-                          "anyOf": [
-                            {
-                              "format": "uuid",
-                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "sourceSequence": {
-                          "maximum": 9007199254740991,
-                          "minimum": 0,
-                          "type": "integer"
-                        }
-                      },
-                      "required": [
-                        "sourceSequence",
-                        "nextCursor",
-                        "guidanceStatus",
-                        "seatingPlanRevisionId",
-                        "items"
-                      ],
-                      "type": "object"
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Authorized result."
-          },
-          "400": {
-            "$ref": "#/components/responses/IdempotencyKeyRequired"
-          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
-          "403": {
+          "410": {
             "content": {
               "application/json": {
                 "schema": {
@@ -58459,6 +57383,7 @@
                       "additionalProperties": false,
                       "properties": {
                         "code": {
+                          "const": "FEATURE_RETIRED",
                           "type": "string"
                         },
                         "message": {
@@ -58466,7 +57391,6 @@
                         },
                         "requestId": {
                           "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                           "type": "string"
                         }
                       },
@@ -58485,16 +57409,7 @@
                 }
               }
             },
-            "description": "EVENT_ASSIGNMENT_REQUIRED, CHECK_IN_DISABLED, CHECK_IN_WINDOW_CLOSED, MANAGER_OVERRIDE_REQUIRED or CHECK_IN_CORRECTION_FORBIDDEN."
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
+            "description": "FEATURE_RETIRED. Update the client; no replacement named-list/check-in operation."
           }
         },
         "security": [
@@ -58540,194 +57455,14 @@
         }
       ],
       "post": {
-        "description": "Current Staff role, active event assignment and BY_GUEST_NAME required. Staff writes within event start - 2h through end + 12h; Manager writes require explicit overrideReason and may override the window only. One listed identity, never all-person attendance; companions are not counted by this API. No invitation/QR authority. Staff may undo only their own effective record. Manager may undo any. expectedLedgerRevision is the effective CHECK_IN record revision for that Guest. Stale/already-undone -> CHECK_IN_CORRECTION_CONFLICT. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
+        "deprecated": true,
+        "description": "Retired 2026-11-08. Authenticated requests return 410 FEATURE_RETIRED without reading or changing named guests/check-in. Use planning headcount, groups, generic invitations and assigned event operations.",
         "operationId": "undoNamedGuestCheckIn",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/IdempotencyKey"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": {
-                "checkInRecordId": "10000000-0000-4000-8000-000000000001",
-                "expectedLedgerRevision": 1,
-                "reason": "Sửa thao tác check-in nhầm"
-              },
-              "schema": {
-                "additionalProperties": false,
-                "properties": {
-                  "checkInRecordId": {
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                    "type": "string"
-                  },
-                  "expectedLedgerRevision": {
-                    "exclusiveMinimum": 0,
-                    "maximum": 9007199254740991,
-                    "type": "integer"
-                  },
-                  "overrideReason": {
-                    "maxLength": 500,
-                    "minLength": 10,
-                    "type": "string"
-                  },
-                  "reason": {
-                    "maxLength": 500,
-                    "minLength": 10,
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "checkInRecordId",
-                  "expectedLedgerRevision",
-                  "reason"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "data": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "action": {
-                          "enum": [
-                            "CHECK_IN",
-                            "UNDO"
-                          ],
-                          "type": "string"
-                        },
-                        "actorAccountId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "bookingId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "checkInRecordId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "eventTime": {
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-                          "type": "string"
-                        },
-                        "groupColorSnapshot": {
-                          "pattern": "^#[A-F0-9]{6}$",
-                          "type": "string"
-                        },
-                        "groupNameSnapshot": {
-                          "maxLength": 80,
-                          "minLength": 1,
-                          "type": "string"
-                        },
-                        "guestGroupId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "guestId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "ledgerRevision": {
-                          "exclusiveMinimum": 0,
-                          "maximum": 9007199254740991,
-                          "type": "integer"
-                        },
-                        "originalCheckInRecordId": {
-                          "anyOf": [
-                            {
-                              "format": "uuid",
-                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "overrideReason": {
-                          "anyOf": [
-                            {
-                              "maxLength": 500,
-                              "minLength": 10,
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "reason": {
-                          "anyOf": [
-                            {
-                              "maxLength": 500,
-                              "minLength": 10,
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "recordedAt": {
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "checkInRecordId",
-                        "bookingId",
-                        "guestId",
-                        "action",
-                        "ledgerRevision",
-                        "originalCheckInRecordId",
-                        "guestGroupId",
-                        "groupNameSnapshot",
-                        "groupColorSnapshot",
-                        "actorAccountId",
-                        "eventTime",
-                        "recordedAt",
-                        "reason",
-                        "overrideReason"
-                      ],
-                      "type": "object"
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Authorized result."
-          },
-          "400": {
-            "$ref": "#/components/responses/IdempotencyKeyRequired"
-          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
-          "403": {
+          "410": {
             "content": {
               "application/json": {
                 "schema": {
@@ -58737,6 +57472,7 @@
                       "additionalProperties": false,
                       "properties": {
                         "code": {
+                          "const": "FEATURE_RETIRED",
                           "type": "string"
                         },
                         "message": {
@@ -58744,7 +57480,6 @@
                         },
                         "requestId": {
                           "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                           "type": "string"
                         }
                       },
@@ -58763,16 +57498,7 @@
                 }
               }
             },
-            "description": "EVENT_ASSIGNMENT_REQUIRED, CHECK_IN_DISABLED, CHECK_IN_WINDOW_CLOSED, MANAGER_OVERRIDE_REQUIRED or CHECK_IN_CORRECTION_FORBIDDEN."
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
+            "description": "FEATURE_RETIRED. Update the client; no replacement named-list/check-in operation."
           }
         },
         "security": [
@@ -58787,194 +57513,14 @@
     },
     "/staff/events/{bookingId}/guests/{guestId}/check-ins": {
       "get": {
-        "description": "Current Staff role, active event assignment and BY_GUEST_NAME required. Staff writes within event start - 2h through end + 12h; Manager writes require explicit overrideReason and may override the window only. One listed identity, never all-person attendance; companions are not counted by this API. No invitation/QR authority. Includes archived Guest history; Staff within window and Manager may read retained history after event. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
+        "deprecated": true,
+        "description": "Retired 2026-11-08. Authenticated requests return 410 FEATURE_RETIRED without reading or changing named guests/check-in. Use planning headcount, groups, generic invitations and assigned event operations.",
         "operationId": "readNamedGuestCheckInHistory",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "afterRevision",
-            "schema": {
-              "default": 0,
-              "maximum": 9007199254740991,
-              "minimum": 0,
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "schema": {
-              "default": 25,
-              "maximum": 50,
-              "minimum": 1,
-              "type": "integer"
-            }
-          }
-        ],
         "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "data": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "items": {
-                          "items": {
-                            "additionalProperties": false,
-                            "properties": {
-                              "action": {
-                                "enum": [
-                                  "CHECK_IN",
-                                  "UNDO"
-                                ],
-                                "type": "string"
-                              },
-                              "actorAccountId": {
-                                "format": "uuid",
-                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                                "type": "string"
-                              },
-                              "bookingId": {
-                                "format": "uuid",
-                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                                "type": "string"
-                              },
-                              "checkInRecordId": {
-                                "format": "uuid",
-                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                                "type": "string"
-                              },
-                              "eventTime": {
-                                "format": "date-time",
-                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-                                "type": "string"
-                              },
-                              "groupColorSnapshot": {
-                                "pattern": "^#[A-F0-9]{6}$",
-                                "type": "string"
-                              },
-                              "groupNameSnapshot": {
-                                "maxLength": 80,
-                                "minLength": 1,
-                                "type": "string"
-                              },
-                              "guestGroupId": {
-                                "format": "uuid",
-                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                                "type": "string"
-                              },
-                              "guestId": {
-                                "format": "uuid",
-                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                                "type": "string"
-                              },
-                              "ledgerRevision": {
-                                "exclusiveMinimum": 0,
-                                "maximum": 9007199254740991,
-                                "type": "integer"
-                              },
-                              "originalCheckInRecordId": {
-                                "anyOf": [
-                                  {
-                                    "format": "uuid",
-                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "null"
-                                  }
-                                ]
-                              },
-                              "overrideReason": {
-                                "anyOf": [
-                                  {
-                                    "maxLength": 500,
-                                    "minLength": 10,
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "null"
-                                  }
-                                ]
-                              },
-                              "reason": {
-                                "anyOf": [
-                                  {
-                                    "maxLength": 500,
-                                    "minLength": 10,
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "null"
-                                  }
-                                ]
-                              },
-                              "recordedAt": {
-                                "format": "date-time",
-                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-                                "type": "string"
-                              }
-                            },
-                            "required": [
-                              "checkInRecordId",
-                              "bookingId",
-                              "guestId",
-                              "action",
-                              "ledgerRevision",
-                              "originalCheckInRecordId",
-                              "guestGroupId",
-                              "groupNameSnapshot",
-                              "groupColorSnapshot",
-                              "actorAccountId",
-                              "eventTime",
-                              "recordedAt",
-                              "reason",
-                              "overrideReason"
-                            ],
-                            "type": "object"
-                          },
-                          "maxItems": 50,
-                          "type": "array"
-                        },
-                        "nextAfterRevision": {
-                          "anyOf": [
-                            {
-                              "exclusiveMinimum": 0,
-                              "maximum": 9007199254740991,
-                              "type": "integer"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        }
-                      },
-                      "required": [
-                        "items",
-                        "nextAfterRevision"
-                      ],
-                      "type": "object"
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Authorized result."
-          },
-          "400": {
-            "$ref": "#/components/responses/IdempotencyKeyRequired"
-          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
-          "403": {
+          "410": {
             "content": {
               "application/json": {
                 "schema": {
@@ -58984,6 +57530,7 @@
                       "additionalProperties": false,
                       "properties": {
                         "code": {
+                          "const": "FEATURE_RETIRED",
                           "type": "string"
                         },
                         "message": {
@@ -58991,7 +57538,6 @@
                         },
                         "requestId": {
                           "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                           "type": "string"
                         }
                       },
@@ -59010,16 +57556,7 @@
                 }
               }
             },
-            "description": "EVENT_ASSIGNMENT_REQUIRED, CHECK_IN_DISABLED, CHECK_IN_WINDOW_CLOSED, MANAGER_OVERRIDE_REQUIRED or CHECK_IN_CORRECTION_FORBIDDEN."
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
+            "description": "FEATURE_RETIRED. Update the client; no replacement named-list/check-in operation."
           }
         },
         "security": [
@@ -59052,175 +57589,14 @@
         }
       ],
       "post": {
-        "description": "Current Staff role, active event assignment and BY_GUEST_NAME required. Staff writes within event start - 2h through end + 12h; Manager writes require explicit overrideReason and may override the window only. One listed identity, never all-person attendance; companions are not counted by this API. No invitation/QR authority. Active Guest required. Duplicate new key -> GUEST_ALREADY_CHECKED_IN. Future eventTime rejected. First Group snapshot retained across archival/moves/UNDO/recheck-in. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
+        "deprecated": true,
+        "description": "Retired 2026-11-08. Authenticated requests return 410 FEATURE_RETIRED without reading or changing named guests/check-in. Use planning headcount, groups, generic invitations and assigned event operations.",
         "operationId": "checkInNamedGuest",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/IdempotencyKey"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": {},
-              "schema": {
-                "additionalProperties": false,
-                "properties": {
-                  "eventTime": {
-                    "format": "date-time",
-                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-                    "type": "string"
-                  },
-                  "overrideReason": {
-                    "maxLength": 500,
-                    "minLength": 10,
-                    "type": "string"
-                  }
-                },
-                "type": "object"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "data": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "action": {
-                          "enum": [
-                            "CHECK_IN",
-                            "UNDO"
-                          ],
-                          "type": "string"
-                        },
-                        "actorAccountId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "bookingId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "checkInRecordId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "eventTime": {
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-                          "type": "string"
-                        },
-                        "groupColorSnapshot": {
-                          "pattern": "^#[A-F0-9]{6}$",
-                          "type": "string"
-                        },
-                        "groupNameSnapshot": {
-                          "maxLength": 80,
-                          "minLength": 1,
-                          "type": "string"
-                        },
-                        "guestGroupId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "guestId": {
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                          "type": "string"
-                        },
-                        "ledgerRevision": {
-                          "exclusiveMinimum": 0,
-                          "maximum": 9007199254740991,
-                          "type": "integer"
-                        },
-                        "originalCheckInRecordId": {
-                          "anyOf": [
-                            {
-                              "format": "uuid",
-                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "overrideReason": {
-                          "anyOf": [
-                            {
-                              "maxLength": 500,
-                              "minLength": 10,
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "reason": {
-                          "anyOf": [
-                            {
-                              "maxLength": 500,
-                              "minLength": 10,
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "recordedAt": {
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "checkInRecordId",
-                        "bookingId",
-                        "guestId",
-                        "action",
-                        "ledgerRevision",
-                        "originalCheckInRecordId",
-                        "guestGroupId",
-                        "groupNameSnapshot",
-                        "groupColorSnapshot",
-                        "actorAccountId",
-                        "eventTime",
-                        "recordedAt",
-                        "reason",
-                        "overrideReason"
-                      ],
-                      "type": "object"
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Authorized result."
-          },
-          "400": {
-            "$ref": "#/components/responses/IdempotencyKeyRequired"
-          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
-          "403": {
+          "410": {
             "content": {
               "application/json": {
                 "schema": {
@@ -59230,6 +57606,7 @@
                       "additionalProperties": false,
                       "properties": {
                         "code": {
+                          "const": "FEATURE_RETIRED",
                           "type": "string"
                         },
                         "message": {
@@ -59237,7 +57614,6 @@
                         },
                         "requestId": {
                           "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
                           "type": "string"
                         }
                       },
@@ -59256,16 +57632,7 @@
                 }
               }
             },
-            "description": "EVENT_ASSIGNMENT_REQUIRED, CHECK_IN_DISABLED, CHECK_IN_WINDOW_CLOSED, MANAGER_OVERRIDE_REQUIRED or CHECK_IN_CORRECTION_FORBIDDEN."
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
+            "description": "FEATURE_RETIRED. Update the client; no replacement named-list/check-in operation."
           }
         },
         "security": [
@@ -60188,7 +58555,7 @@
     },
     "/staff/events/{bookingId}/workspace": {
       "get": {
-        "description": "Assigned Staff or Manager. Read-only operational context independent of check-in mode/window: approved timeline, seating, safe attendance, settings and assigned team. No financial data or contract mutation. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
+        "description": "Assigned Staff or Manager. Approved timeline, seating, assigned team, explicit planningHeadcount, separate bride/groom names, table count and approved menu/service names, descriptions and quantities. Effective mutually approved appendices override contract offerings. Legacy events use retained proposal facts. No named guests, attendance, check-in windows, prices or financial documents. Assignment revocation denies subsequent access. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
         "operationId": "readStaffWorkspace",
         "responses": {
           "200": {
@@ -60206,90 +58573,6 @@
                             "null"
                           ]
                         },
-                        "attendance": {
-                          "additionalProperties": false,
-                          "properties": {
-                            "bookingId": {
-                              "format": "uuid",
-                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                              "type": "string"
-                            },
-                            "byGuestGroup": {
-                              "items": {
-                                "additionalProperties": false,
-                                "properties": {
-                                  "checkedInGuestCount": {
-                                    "maximum": 9007199254740991,
-                                    "minimum": 0,
-                                    "type": "integer"
-                                  },
-                                  "groupColorSnapshot": {
-                                    "pattern": "^#[A-F0-9]{6}$",
-                                    "type": "string"
-                                  },
-                                  "groupNameSnapshot": {
-                                    "maxLength": 80,
-                                    "minLength": 1,
-                                    "type": "string"
-                                  },
-                                  "guestGroupId": {
-                                    "format": "uuid",
-                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                                    "type": "string"
-                                  }
-                                },
-                                "required": [
-                                  "guestGroupId",
-                                  "groupNameSnapshot",
-                                  "groupColorSnapshot",
-                                  "checkedInGuestCount"
-                                ],
-                                "type": "object"
-                              },
-                              "type": "array"
-                            },
-                            "checkInMode": {
-                              "enum": [
-                                "NONE",
-                                "BY_GUEST_NAME"
-                              ],
-                              "type": "string"
-                            },
-                            "checkedInGuestCount": {
-                              "anyOf": [
-                                {
-                                  "maximum": 9007199254740991,
-                                  "minimum": 0,
-                                  "type": "integer"
-                                },
-                                {
-                                  "type": "null"
-                                }
-                              ]
-                            },
-                            "ledgerRevision": {
-                              "maximum": 9007199254740991,
-                              "minimum": 0,
-                              "type": "integer"
-                            },
-                            "measurementStatus": {
-                              "enum": [
-                                "NOT_RECORDED",
-                                "LISTED_GUESTS_ONLY"
-                              ],
-                              "type": "string"
-                            }
-                          },
-                          "required": [
-                            "bookingId",
-                            "checkInMode",
-                            "measurementStatus",
-                            "checkedInGuestCount",
-                            "ledgerRevision",
-                            "byGuestGroup"
-                          ],
-                          "type": "object"
-                        },
                         "bookingCode": {
                           "type": "string"
                         },
@@ -60300,11 +58583,6 @@
                         },
                         "isManager": {
                           "type": "boolean"
-                        },
-                        "listedGuestCount": {
-                          "maximum": 9007199254740991,
-                          "minimum": 0,
-                          "type": "integer"
                         },
                         "members": {
                           "items": {
@@ -60328,160 +58606,227 @@
                           "maxItems": 100,
                           "type": "array"
                         },
-                        "planningHeadcount": {
-                          "maximum": 9007199254740991,
-                          "minimum": 0,
-                          "type": "integer"
-                        },
-                        "seating": {
+                        "operations": {
                           "additionalProperties": false,
                           "properties": {
-                            "renderSnapshot": {
+                            "brideName": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "groomName": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "offerings": {
                               "items": {
                                 "additionalProperties": false,
                                 "properties": {
-                                  "color": {
-                                    "anyOf": [
-                                      {
-                                        "pattern": "^#[A-F0-9]{6}$",
-                                        "type": "string"
-                                      },
-                                      {
-                                        "type": "null"
-                                      }
-                                    ]
-                                  },
-                                  "guestGroupId": {
-                                    "anyOf": [
-                                      {
-                                        "format": "uuid",
-                                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                                        "type": "string"
-                                      },
-                                      {
-                                        "type": "null"
-                                      }
-                                    ]
-                                  },
-                                  "guestGroupName": {
-                                    "anyOf": [
-                                      {
-                                        "maxLength": 80,
-                                        "minLength": 1,
-                                        "type": "string"
-                                      },
-                                      {
-                                        "type": "null"
-                                      }
-                                    ]
-                                  },
-                                  "height": {
-                                    "maximum": 10000,
-                                    "minimum": 1,
-                                    "type": "integer"
-                                  },
-                                  "layoutTableId": {
-                                    "format": "uuid",
-                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                                    "type": "string"
-                                  },
-                                  "rotationDegrees": {
-                                    "maximum": 359,
-                                    "minimum": 0,
-                                    "type": "integer"
-                                  },
-                                  "shape": {
+                                  "category": {
                                     "enum": [
-                                      "ROUND",
-                                      "RECTANGLE"
+                                      "MENU",
+                                      "SERVICE"
                                     ],
                                     "type": "string"
                                   },
-                                  "tableLabel": {
-                                    "maxLength": 50,
-                                    "minLength": 1,
+                                  "description": {
                                     "type": "string"
                                   },
-                                  "width": {
-                                    "maximum": 10000,
-                                    "minimum": 1,
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "quantity": {
+                                    "exclusiveMinimum": 0,
+                                    "maximum": 9007199254740991,
                                     "type": "integer"
                                   },
-                                  "x": {
-                                    "maximum": 10000,
-                                    "minimum": 0,
-                                    "type": "integer"
-                                  },
-                                  "y": {
-                                    "maximum": 10000,
-                                    "minimum": 0,
-                                    "type": "integer"
+                                  "unit": {
+                                    "type": "string"
                                   }
                                 },
                                 "required": [
-                                  "layoutTableId",
-                                  "tableLabel",
-                                  "shape",
-                                  "x",
-                                  "y",
-                                  "width",
-                                  "height",
-                                  "rotationDegrees",
-                                  "guestGroupId",
-                                  "guestGroupName",
-                                  "color"
+                                  "category",
+                                  "name",
+                                  "description",
+                                  "unit",
+                                  "quantity"
                                 ],
                                 "type": "object"
                               },
-                              "maxItems": 500,
-                              "minItems": 1,
+                              "maxItems": 50,
                               "type": "array"
                             },
-                            "status": {
+                            "phase": {
                               "enum": [
-                                "ABSENT",
-                                "DRAFT",
                                 "CONFIRMED",
-                                "REQUIRES_REVIEW"
-                              ],
-                              "type": "string"
-                            }
-                          },
-                          "required": [
-                            "status",
-                            "renderSnapshot"
-                          ],
-                          "type": "object"
-                        },
-                        "settings": {
-                          "additionalProperties": false,
-                          "properties": {
-                            "bookingId": {
-                              "format": "uuid",
-                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                              "type": "string"
-                            },
-                            "checkInMode": {
-                              "enum": [
-                                "NONE",
-                                "BY_GUEST_NAME"
+                                "COMPLETED"
                               ],
                               "type": "string"
                             },
-                            "locked": {
-                              "type": "boolean"
-                            },
-                            "revision": {
+                            "tableCount": {
                               "exclusiveMinimum": 0,
                               "maximum": 9007199254740991,
                               "type": "integer"
                             }
                           },
                           "required": [
-                            "bookingId",
-                            "checkInMode",
-                            "revision",
-                            "locked"
+                            "phase",
+                            "brideName",
+                            "groomName",
+                            "tableCount",
+                            "offerings"
+                          ],
+                          "type": "object"
+                        },
+                        "planningHeadcount": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "seating": {
+                          "oneOf": [
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "renderSnapshot": {
+                                  "items": false,
+                                  "maxItems": 0,
+                                  "prefixItems": [],
+                                  "type": "array"
+                                },
+                                "status": {
+                                  "const": "ABSENT",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "status",
+                                "renderSnapshot"
+                              ],
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "renderSnapshot": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "color": {
+                                        "anyOf": [
+                                          {
+                                            "pattern": "^#[A-F0-9]{6}$",
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ]
+                                      },
+                                      "guestGroupId": {
+                                        "anyOf": [
+                                          {
+                                            "format": "uuid",
+                                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ]
+                                      },
+                                      "guestGroupName": {
+                                        "anyOf": [
+                                          {
+                                            "maxLength": 80,
+                                            "minLength": 1,
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ]
+                                      },
+                                      "height": {
+                                        "maximum": 10000,
+                                        "minimum": 1,
+                                        "type": "integer"
+                                      },
+                                      "layoutTableId": {
+                                        "format": "uuid",
+                                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                        "type": "string"
+                                      },
+                                      "rotationDegrees": {
+                                        "maximum": 359,
+                                        "minimum": 0,
+                                        "type": "integer"
+                                      },
+                                      "shape": {
+                                        "enum": [
+                                          "ROUND",
+                                          "RECTANGLE"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "tableLabel": {
+                                        "maxLength": 50,
+                                        "minLength": 1,
+                                        "type": "string"
+                                      },
+                                      "width": {
+                                        "maximum": 10000,
+                                        "minimum": 1,
+                                        "type": "integer"
+                                      },
+                                      "x": {
+                                        "maximum": 10000,
+                                        "minimum": 0,
+                                        "type": "integer"
+                                      },
+                                      "y": {
+                                        "maximum": 10000,
+                                        "minimum": 0,
+                                        "type": "integer"
+                                      }
+                                    },
+                                    "required": [
+                                      "layoutTableId",
+                                      "tableLabel",
+                                      "shape",
+                                      "x",
+                                      "y",
+                                      "width",
+                                      "height",
+                                      "rotationDegrees",
+                                      "guestGroupId",
+                                      "guestGroupName",
+                                      "color"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "maxItems": 500,
+                                  "minItems": 1,
+                                  "type": "array"
+                                },
+                                "status": {
+                                  "enum": [
+                                    "DRAFT",
+                                    "CONFIRMED",
+                                    "REQUIRES_REVIEW"
+                                  ],
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "status",
+                                "renderSnapshot"
+                              ],
+                              "type": "object"
+                            }
                           ],
                           "type": "object"
                         },
@@ -60605,32 +58950,14 @@
                             "isEffective"
                           ],
                           "type": "object"
-                        },
-                        "windowClosesAt": {
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-                          "type": "string"
-                        },
-                        "windowOpen": {
-                          "type": "boolean"
-                        },
-                        "windowOpensAt": {
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-                          "type": "string"
                         }
                       },
                       "required": [
                         "bookingId",
                         "bookingCode",
                         "alias",
-                        "settings",
-                        "attendance",
-                        "listedGuestCount",
+                        "operations",
                         "planningHeadcount",
-                        "windowOpen",
-                        "windowOpensAt",
-                        "windowClosesAt",
                         "isManager",
                         "timeline",
                         "seating",
