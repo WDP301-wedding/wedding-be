@@ -11,6 +11,7 @@ import { analyticsOpenApiPaths } from '../../modules/analytics-dashboard/http/an
 import { notificationOpenApiPaths } from '../../modules/notifications-automation/http/notification.openapi.js';
 import { seatingOpenApiPaths } from '../../modules/seating-plan/http/seating.openapi.js';
 import { staffOpenApiPaths } from '../../modules/staff-operations/http/staff.openapi.js';
+import { staffInvitationOpenApiPaths } from '../../modules/identity-access/staff-invitation/staff-invitation.openapi.js';
 import {
   experienceOpenApiPaths,
   experienceOpenApiSchemas,
@@ -619,6 +620,7 @@ export const openApiRegistry: ZodOpenApiObject = {
       },
     },
     ...staffOpenApiPaths,
+    ...staffInvitationOpenApiPaths,
     ...bookingNavigationPaths,
   },
   components: {

@@ -3,6 +3,7 @@ import {
   NotFoundError,
   IdempotencyKeyReusedError,
   InvalidIdempotencyKeyError,
+  AppError,
 } from '../../../core/errors/app-error.js';
 import { idempotencyKeySchema } from '../../../core/idempotency/idempotency.schemas.js';
 import type { AuthenticatedActorResolver } from '../authorization/authenticated-actor.middleware.js';
@@ -15,6 +16,7 @@ import {
   canonicalizeRequest,
   hashCanonicalRequest as digest,
 } from '../../../core/idempotency/request-hash.js';
+import type { StaffInvitationIssuer } from '../staff-invitation/staff-invitation.service.js';
 
 /** Identity owns the account/role/session writes. Assignment reconciliation is
  * enlisted by Staff infrastructure so disable is one atomic command. */
@@ -28,6 +30,7 @@ export function createStaffAccountProvisioner(
     reason: string,
   ) => Promise<void>,
   now: () => Date,
+  invitations?: StaffInvitationIssuer,
 ): StaffAccountProvisioner {
   async function run<T>(
     action: string,
@@ -108,9 +111,14 @@ export function createStaffAccountProvisioner(
     });
   }
   return {
-    provision(emailValue, key, context) {
+    async provision(emailValue, key, context) {
       const email = normalizeEmail(emailValue);
-      return run('staff.provision', { email: email.normalized }, key, context, async (tx) => {
+      let delivery: Awaited<ReturnType<StaffInvitationIssuer['prepare']>> | undefined;
+      const result = await run<{
+        accountId: string;
+        credentialSetupRequired: boolean;
+        invitationId?: string;
+      }>('staff.provision', { email: email.normalized }, key, context, async (tx) => {
         await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`staff-email:${email.normalized}`}))`;
         const account = await tx.account.upsert({
           where: { emailNormalized: email.normalized },
@@ -118,18 +126,39 @@ export function createStaffAccountProvisioner(
           create: { emailNormalized: email.normalized, displayEmail: email.display },
         });
         const row = await target(tx, account.id);
-        await tx.accountRole.upsert({
-          where: { accountId_role: { accountId: row.id, role: 'STAFF' } },
-          create: { accountId: row.id, role: 'STAFF' },
-          update: {},
-        });
+        if (!invitations)
+          await tx.accountRole.upsert({
+            where: { accountId_role: { accountId: row.id, role: 'STAFF' } },
+            create: { accountId: row.id, role: 'STAFF' },
+            update: {},
+          });
+        if (invitations)
+          delivery = await invitations.prepare(tx, row, context.actorId, context.requestId);
         await audit(tx, row.id, 'identity.staff-provisioned', context);
-        return { accountId: row.id, credentialSetupRequired: row.passwordCredential === null };
+        return {
+          accountId: row.id,
+          credentialSetupRequired: row.passwordCredential === null,
+          ...(delivery ? { invitationId: delivery.invitationId } : {}),
+        };
       });
+      if (invitations && delivery) await invitations.dispatch(delivery);
+      return {
+        accountId: result.accountId,
+        credentialSetupRequired: result.credentialSetupRequired,
+        ...(invitations && result.invitationId
+          ? { invitation: await invitations.summary(result.invitationId) }
+          : {}),
+      };
     },
     setOperationalAccess(accountId, input, key, context) {
       return run(`staff.operational-access:${accountId}`, input, key, context, async (tx) => {
         await target(tx, accountId);
+        if (input.enabled && invitations)
+          throw new AppError({
+            status: 422,
+            code: 'STAFF_INVITATION_REQUIRED',
+            message: 'Mời nhân viên qua email để khôi phục quyền.',
+          });
         if (input.enabled)
           await tx.accountRole.upsert({
             where: { accountId_role: { accountId, role: 'STAFF' } },
@@ -137,6 +166,10 @@ export function createStaffAccountProvisioner(
             update: {},
           });
         else {
+          await tx.staffInvitation.updateMany({
+            where: { accountId, status: 'ACTIVE' },
+            data: { status: 'REVOKED' },
+          });
           await tx.accountRole.deleteMany({ where: { accountId, role: 'STAFF' } });
           const at = now();
           await tx.session.updateMany({

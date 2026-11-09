@@ -1,6 +1,7 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 
-export type OpaqueTokenPurpose = 'access' | 'refresh' | 'invitation' | 'password-reset';
+export type OpaqueTokenPurpose =
+  'access' | 'refresh' | 'invitation' | 'password-reset' | 'staff-invitation';
 
 export type IssuedOpaqueToken = Readonly<{
   token: string;
@@ -12,6 +13,7 @@ const tokenPrefixes: Readonly<Record<OpaqueTokenPurpose, string>> = Object.freez
   refresh: 'wir',
   invitation: 'wii',
   'password-reset': 'wip',
+  'staff-invitation': 'wis',
 });
 
 const hashDomain = 'wedding.identity-token.v1';

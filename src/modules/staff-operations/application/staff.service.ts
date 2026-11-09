@@ -21,6 +21,7 @@ import {
   type staffDirectoryQuery,
 } from '../domain/staff-policy.js';
 import type { StaffRequestContext } from './staff.contracts.js';
+import { invitationSummary } from '../../identity-access/staff-invitation/staff-invitation.service.js';
 
 export const configurationDto = (r: StaffConfiguration) => ({
   bookingId: r.bookingId,
@@ -60,11 +61,20 @@ export class StaffService {
     const rows = await this.repository.prisma.account.findMany({
       where: {
         status: 'ACTIVE',
-        roles: { some: { role: 'STAFF' }, none: { role: 'MANAGER' } },
+        roles: { none: { role: 'MANAGER' } },
+        OR: [
+          { roles: { some: { role: 'STAFF' } } },
+          { staffInvitations: { some: { status: 'ACTIVE' } } },
+        ],
         emailNormalized: { contains: query.q, mode: 'insensitive' },
         ...(query.afterId ? { id: { gt: query.afterId } } : {}),
       },
-      select: { id: true, displayEmail: true, passwordCredential: { select: { accountId: true } } },
+      select: {
+        id: true,
+        displayEmail: true,
+        passwordCredential: { select: { accountId: true } },
+        staffInvitations: { orderBy: { createdAt: 'desc' }, take: 1 },
+      },
       orderBy: { id: 'asc' },
       take: query.limit + 1,
     });
@@ -74,6 +84,9 @@ export class StaffService {
         accountId: row.id,
         email: row.displayEmail,
         credentialSetupRequired: row.passwordCredential === null,
+        invitation: row.staffInvitations[0]
+          ? invitationSummary(row.staffInvitations[0], this.guests.guests.now())
+          : null,
       })),
       nextAfterId: rows.length > query.limit ? page.at(-1)!.id : null,
     };
@@ -279,9 +292,19 @@ export class StaffService {
         await tx.$queryRaw`SELECT id FROM "AccountRole" WHERE "accountId"=${input.staffAccountId}::uuid ORDER BY id FOR SHARE`;
         const account = await tx.account.findUnique({
           where: { id: input.staffAccountId },
-          include: { roles: true },
+          include: {
+            roles: true,
+            staffInvitations: {
+              where: { status: 'ACTIVE', expiresAt: { gt: this.guests.guests.now() } },
+              take: 1,
+            },
+          },
         });
-        if (account?.status !== 'ACTIVE' || !account.roles.some((r) => r.role === 'STAFF'))
+        if (
+          account?.status !== 'ACTIVE' ||
+          account.roles.some((r) => r.role === 'MANAGER') ||
+          (!account.roles.some((r) => r.role === 'STAFF') && account.staffInvitations.length === 0)
+        )
           throw new NotFoundError();
         const where = {
           bookingId_staffAccountId: { bookingId, staffAccountId: input.staffAccountId },

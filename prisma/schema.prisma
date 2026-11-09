@@ -513,12 +513,30 @@ model Account {
   sessions               Session[]
   passwordResets         PasswordResetCredential[]
   passwordOtpChallenges  PasswordOtpChallenge[]
+  staffInvitations       StaffInvitation[] @relation("StaffInvitationAccount")
+  issuedStaffInvitations StaffInvitation[] @relation("StaffInvitationIssuer")
   staffCreatedWorkItems StaffWorkItem[] @relation("StaffWorkCreator")
   staffAssignedWorkItems StaffWorkItem[] @relation("StaffWorkAssignee")
   retentionFacts         AccountRetentionEligibilityFact[]
 
   @@index([status])
   @@index([piiRetentionEligibleAt])
+}
+
+model StaffInvitation {
+  id String @id @default(uuid()) @db.Uuid
+  accountId String @db.Uuid
+  issuedByAccountId String @db.Uuid
+  tokenHash String @unique
+  status WorkspaceInvitationStatus @default(ACTIVE)
+  deliveryStatus String @default("UNKNOWN")
+  expiresAt DateTime @db.Timestamptz(6)
+  acceptedAt DateTime? @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  account Account @relation("StaffInvitationAccount", fields: [accountId], references: [id], onDelete: Restrict)
+  issuer Account @relation("StaffInvitationIssuer", fields: [issuedByAccountId], references: [id], onDelete: Restrict)
+  @@index([accountId, createdAt(sort: Desc)])
+  @@unique([accountId], map: "StaffInvitation_active_account_key", where: raw("\"status\" = 'ACTIVE'"))
 }
 
 model PasswordCredential {

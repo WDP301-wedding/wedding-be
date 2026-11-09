@@ -15,6 +15,12 @@ evidence and frontend source. New requirements are extensions to completed work.
 
 ## 1. Team Boundary
 
+Staff email-invitation amendment approved on **2026-11-09**: backend and Manager
+Web may add single-use invitation links, initial password setup on Manager Web,
+existing-password acceptance, explicit reissue and revocation. Preserve existing
+accounts' other roles/passwords and retained business history. See
+[flow and API](./staff-email-invitations-2026-11-09.md).
+
 Table-capacity amendment confirmed on **2026-11-09**: fixed maximum 10 people per
 table, no per-table capacity setting in this rule. Menu quantities remain tables;
 Couple may edit planning headcount within effective table and hall-layout limits.

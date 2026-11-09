@@ -14,6 +14,9 @@ import { createStudioRouter } from './http/studio.router.js';
 import { createGeminiAiImageProvider } from '../../integrations/ai-image/gemini-ai-image-provider.js';
 import { createStaffSeatingServices } from '../staff-operations/infrastructure/staff-seating.composition.js';
 import { createStaffRouter } from '../staff-operations/http/staff.router.js';
+import { createStaffInvitationIssuer } from '../identity-access/staff-invitation/staff-invitation.service.js';
+import { createEmailProvider } from '../../integrations/email/email-provider.factory.js';
+import { AppError } from '../../core/errors/app-error.js';
 import { createSeatingRouter } from '../seating-plan/http/seating.router.js';
 import { startSeatingReconciler } from '../seating-plan/infrastructure/seating-reconciler.js';
 import { createLogger } from '../../core/logging/logger.js';
@@ -75,7 +78,29 @@ export async function createInvitationStudioRuntime(
         config.invitationStudio.webOrigin,
       ),
     );
-    const { staff, seating } = createStaffSeatingServices(prisma, composition, now);
+    const invitations =
+      config.email.enabled && config.identityAccess.manageWebOrigin
+        ? createStaffInvitationIssuer(
+            prisma,
+            {
+              emailProvider: createEmailProvider(config.email),
+              manageWebOrigin: config.identityAccess.manageWebOrigin,
+            },
+            now,
+          )
+        : {
+            prepare: () =>
+              Promise.reject(
+                new AppError({
+                  status: 503,
+                  code: 'STAFF_INVITATION_NOT_CONFIGURED',
+                  message: 'Staff invitations require email and MANAGE_WEB_ORIGIN configuration.',
+                }),
+              ),
+            dispatch: () => Promise.resolve(),
+            summary: () => Promise.reject(new Error('Staff invitation is not configured.')),
+          };
+    const { staff, seating } = createStaffSeatingServices(prisma, composition, now, invitations);
     router.use(createSeatingRouter(seating.seating, seating.resolver));
     router.use(createStaffRouter(staff));
     const logger = createLogger({

@@ -1,6 +1,7 @@
 import { tmpdir } from 'node:os';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Config } from '../../config/config.js';
+import { parseEnvironment } from '../../config/env.js';
 import { createPrismaClient } from '../../core/database/prisma.js';
 import { createInvitationStudioServices } from './infrastructure/studio.composition.js';
 import { createInvitationStudioRuntime } from './invitation-studio.runtime.js';
@@ -26,11 +27,9 @@ vi.mock('./infrastructure/image-jobs.worker.js', () => ({
 
 function config(storage: Config['storage'] = { enabled: false }): Config {
   return {
-    database: { url: 'postgresql://local/test' },
-    invitationStudio: { publicOrigin: null, reconcilerEnabled: true },
+    ...parseEnvironment({ NODE_ENV: 'test', DATABASE_URL: 'postgresql://local/test' }),
     storage,
-    runtime: { environment: 'test', logLevel: 'warn' },
-  } as Config;
+  };
 }
 function storage(): StorageProvider {
   return vi.mocked(createInvitationStudioServices).mock.calls.at(-1)![1];
@@ -58,7 +57,7 @@ describe('InvitationStudioRuntime', () => {
   it.each([true, false])('forwards the explicit Seating scheduler mode %s', async (enabled) => {
     const runtime = await createInvitationStudioRuntime({
       ...config(),
-      invitationStudio: { publicOrigin: null, reconcilerEnabled: enabled },
+      invitationStudio: { ...config().invitationStudio, reconcilerEnabled: enabled },
     });
     expect(startSeatingReconciler).toHaveBeenCalledWith(
       expect.any(Object),
@@ -77,8 +76,8 @@ describe('InvitationStudioRuntime', () => {
       null,
       expect.any(Function),
       false,
-      undefined,
-      undefined,
+      config().aiDesign,
+      config().invitationStudio.webOrigin,
     );
     for (const operation of [
       storage().put({
@@ -132,7 +131,7 @@ describe('InvitationStudioRuntime', () => {
         signingKey: 'controlled-storage-fixture-key-at-least-32-bytes',
       }),
       aiImage: { provider: 'gemini', apiKey: 'test-key', model: 'gemini-2.5-flash-image' },
-      invitationStudio: { publicOrigin: null, reconcilerEnabled: true, imageJobsEnabled: true },
+      invitationStudio: { ...config().invitationStudio, imageJobsEnabled: true },
     });
     expect(vi.mocked(createInvitationStudioServices).mock.calls.at(-1)?.[5]).toBe(true);
     expect(startImageJobsWorker).toHaveBeenCalledWith(

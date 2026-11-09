@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { mode } from '../domain/staff-policy.js';
+import { staffInvitationSummarySchema } from '../../identity-access/staff-invitation/staff-invitation.schemas.js';
 export const settingsSchema = z.strictObject({
   bookingId: z.uuid(),
   checkInMode: mode,
@@ -17,6 +18,7 @@ export const assignmentSchema = z.strictObject({
 export const provisionSchema = z.strictObject({
   accountId: z.uuid(),
   credentialSetupRequired: z.boolean(),
+  invitation: staffInvitationSummarySchema.optional(),
 });
 export const operationalSchema = z.strictObject({ accountId: z.uuid(), enabled: z.boolean() });
 export const recordSchema = z.strictObject({

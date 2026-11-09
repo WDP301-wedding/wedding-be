@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { staffInvitationSummarySchema } from '../../identity-access/staff-invitation/staff-invitation.schemas.js';
 export const mode = z.enum(['NONE', 'BY_GUEST_NAME']);
 export const reason = z.string().trim().normalize('NFC').min(10).max(500);
 export const configurationInput = z.strictObject({
@@ -56,6 +57,7 @@ export const staffDirectorySchema = z.strictObject({
         accountId: z.uuid(),
         email: z.string(),
         credentialSetupRequired: z.boolean(),
+        invitation: staffInvitationSummarySchema.nullable().optional(),
       }),
     )
     .max(50),
