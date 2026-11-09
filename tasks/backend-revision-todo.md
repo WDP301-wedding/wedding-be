@@ -892,5 +892,6 @@ SPEC-01–05 or replace the separate provider/runtime readiness gates.
 - [x] Complete isolated PostgreSQL, Manager Web and desktop/mobile browser checks;
       remove the owner-named unused Staff test identity on the confirmed Render
       workspace, retaining audit. [Evidence](evidence/staff-email-invitations-2026-11-09.md).
-- [ ] Release backend/Manager Web and verify deployed behavior; real inbox
-      delivery remains separate from provider acceptance and controlled tests.
+- [x] Release backend/Manager Web and verify deployed behavior, migration, Manager
+      link origin and test-account absence. Real inbox delivery is left for the
+      owner's requested retry and remains separate from provider acceptance.
