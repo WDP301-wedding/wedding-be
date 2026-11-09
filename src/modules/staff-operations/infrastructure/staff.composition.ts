@@ -14,12 +14,14 @@ import { AttendanceReaders } from '../application/attendance-readers.js';
 import type { StaffSeatingGuidance } from '../application/staff.contracts.js';
 import { createPrismaBookingReaders } from '../../booking-lifecycle/infrastructure/prisma-booking.readers.js';
 import { createPrismaDepositSettlementReader } from '../../payments-billing/infrastructure/prisma-deposit-settlement.reader.js';
+import type { StaffInvitationIssuer } from '../../identity-access/staff-invitation/staff-invitation.service.js';
 
 export function createStaffServices(
   prisma: PrismaClient,
   now: () => Date = () => new Date(),
   sharedBoundary?: PrismaBookingBoundary,
   seating?: StaffSeatingGuidance,
+  invitations?: StaffInvitationIssuer,
 ) {
   const boundary = sharedBoundary ?? new PrismaBookingBoundary(prisma);
   const guests = createGuestServices(
@@ -74,6 +76,7 @@ export function createStaffServices(
       }
     },
     now,
+    invitations,
   );
   const readers = new AttendanceReaders(prisma, boundary, guests.readers, events);
   const seatingAccess = {

@@ -1,5 +1,10 @@
 # Backend Ownership
 
+Owner-approved amendment, 2026-11-09: implement Staff email invitations with
+single-use 72-hour links to Manager Web password setup/acceptance. This revision
+may change wedding-be and wedding-manage-web. Preserve existing passwords/roles,
+event and financial history. See docs/staff-email-invitations-2026-11-09.md.
+
 Owner-approved amendment, 2026-11-09: enforce fixed maximum 10 guests per table;
 menu quantities remain table quantities. Couple retains explicit headcount edits.
 Validate minimum tables and maximum published active hall-layout table count at

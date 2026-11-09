@@ -4,6 +4,22 @@ import { config } from './config.js';
 import { EnvironmentConfigurationError, parseEnvironment } from './env.js';
 
 describe('Public invitation origin configuration', () => {
+  it('routes Staff invitations only to an explicitly configured trusted Manager origin', () => {
+    expect(parseEnvironment({ NODE_ENV: 'test' }).identityAccess.manageWebOrigin).toBeUndefined();
+    for (const origin of ['https://manage.example.test', 'http://localhost:3002'])
+      expect(parseEnvironment({ MANAGE_WEB_ORIGIN: origin }).identityAccess.manageWebOrigin).toBe(
+        origin,
+      );
+    for (const origin of [
+      'http://public.example.test',
+      'https://manage.example.test/path',
+      'https://user:pass@manage.example.test',
+      'https://manage.example.test?next=other',
+    ])
+      expect(() => parseEnvironment({ MANAGE_WEB_ORIGIN: origin })).toThrow(
+        EnvironmentConfigurationError,
+      );
+  });
   it('controls Seating reconciliation independently of notification delivery', () => {
     expect(parseEnvironment({ NODE_ENV: 'test' }).invitationStudio.reconcilerEnabled).toBe(true);
     expect(

@@ -29,6 +29,8 @@ import { createWorkspaceInvitationAcceptanceService } from './workspace-invitati
 import { createPrismaWorkspaceInvitationRepository } from './workspace-invitation/workspace-invitation.repository.js';
 
 import type { Redis } from 'ioredis';
+import { createStaffInvitationAcceptance } from './staff-invitation/staff-invitation.service.js';
+import { createStaffInvitationRouter } from './staff-invitation/staff-invitation.router.js';
 
 export type IdentityRuntime = Readonly<{
   router: Router;
@@ -145,6 +147,12 @@ export async function createIdentityRuntime(
       allowedWebOrigins: config.cors.allowedOrigins,
       refreshCookieName: config.identityAccess.refreshCookie.name,
     });
+    router.use(
+      createStaffInvitationRouter(
+        createStaffInvitationAcceptance(prisma, passwordCrypto),
+        dependencies?.redisClient,
+      ),
+    );
     router.use(
       createPasswordOtpRouter(passwordOtpService, actorResolver, dependencies?.redisClient),
     );

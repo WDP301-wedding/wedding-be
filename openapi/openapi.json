@@ -9243,6 +9243,166 @@
         ]
       }
     },
+    "/auth/staff-invitation-acceptances": {
+      "post": {
+        "description": "Public single-use Staff invitation. Token in JSON body, never URL/query. Private no-store. Details do not consume the link. Acceptance initializes a missing password or verifies the existing password unchanged, grants STAFF only, then requires login. Revoked, superseded, consumed and expired links are rejected. 10 requests / 15 minutes per IP, shared Redis when configured.",
+        "operationId": "acceptStaffInvitation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "invitationToken": {
+                    "pattern": "^wis_[A-Za-z0-9_-]{43}$",
+                    "type": "string"
+                  },
+                  "password": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "invitationToken",
+                  "password"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "accepted": {
+                          "const": true,
+                          "type": "boolean"
+                        },
+                        "email": {
+                          "format": "email",
+                          "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+                          "type": "string"
+                        },
+                        "requiresLogin": {
+                          "const": true,
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "accepted",
+                        "email",
+                        "requiresLogin"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invitation result; no session or token returned."
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        },
+        "security": [],
+        "tags": [
+          "Identity"
+        ]
+      }
+    },
+    "/auth/staff-invitation-details": {
+      "post": {
+        "description": "Public single-use Staff invitation. Token in JSON body, never URL/query. Private no-store. Details do not consume the link. Acceptance initializes a missing password or verifies the existing password unchanged, grants STAFF only, then requires login. Revoked, superseded, consumed and expired links are rejected. 10 requests / 15 minutes per IP, shared Redis when configured.",
+        "operationId": "getStaffInvitationDetails",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "invitationToken": {
+                    "pattern": "^wis_[A-Za-z0-9_-]{43}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "invitationToken"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "expiresAt": {
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                          "type": "string"
+                        },
+                        "hasExistingPassword": {
+                          "type": "boolean"
+                        },
+                        "maskedEmail": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "maskedEmail",
+                        "hasExistingPassword",
+                        "expiresAt"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invitation result; no session or token returned."
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        },
+        "security": [],
+        "tags": [
+          "Identity"
+        ]
+      }
+    },
     "/auth/web-session-refreshes": {
       "post": {
         "description": "Unsafe to replay after an unknown outcome; clients must fall back to login.",
@@ -60539,7 +60699,7 @@
         }
       ],
       "post": {
-        "description": "Manager. expectedRevision 0 for first assignment; exact current revision for reactivation. Current ACTIVE Identity with STAFF role required. NONE mode permits other duties. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
+        "description": "Manager. expectedRevision 0 for first assignment; exact current revision for reactivation. ACTIVE account with STAFF role or a currently valid pending Staff invitation required. Pending invitees can be assigned but cannot act as Staff before accepting. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
         "operationId": "assignEventStaff",
         "parameters": [
           {
@@ -65999,6 +66159,52 @@
                               },
                               "email": {
                                 "type": "string"
+                              },
+                              "invitation": {
+                                "anyOf": [
+                                  {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "deliveryStatus": {
+                                        "enum": [
+                                          "UNKNOWN",
+                                          "ACCEPTED",
+                                          "FAILED"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "expiresAt": {
+                                        "format": "date-time",
+                                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                                        "type": "string"
+                                      },
+                                      "invitationId": {
+                                        "format": "uuid",
+                                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                        "type": "string"
+                                      },
+                                      "status": {
+                                        "enum": [
+                                          "PENDING",
+                                          "ACCEPTED",
+                                          "EXPIRED",
+                                          "REVOKED"
+                                        ],
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "invitationId",
+                                      "status",
+                                      "deliveryStatus",
+                                      "expiresAt"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
                               }
                             },
                             "required": [
@@ -66104,7 +66310,7 @@
         ]
       },
       "post": {
-        "description": "Manager. Identity reuses normalized email; no password/role input. credentialSetupRequired uses the existing Identity password-OTP flow; this operation does not deliver email. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
+        "description": "Manager invites or explicitly reissues a Staff invitation by normalized email. New Staff authority is granted only on acceptance; existing roles/passwords remain. Single-use 72-hour token opens configured MANAGE_WEB_ORIGIN/staff-invitation. Reissue supersedes the old link; 60-second cooldown and at most 3 invitations/account/day. Same-key replay never sends again. invitation.deliveryStatus ACCEPTED means provider acceptance, not mailbox delivery; FAILED is explicit provider rejection, UNKNOWN is ambiguous. Missing email/origin fails 503 STAFF_INVITATION_NOT_CONFIGURED before account creation. No token returned. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
         "operationId": "provisionStaffAccount",
         "parameters": [
           {
@@ -66153,6 +66359,45 @@
                         },
                         "credentialSetupRequired": {
                           "type": "boolean"
+                        },
+                        "invitation": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "deliveryStatus": {
+                              "enum": [
+                                "UNKNOWN",
+                                "ACCEPTED",
+                                "FAILED"
+                              ],
+                              "type": "string"
+                            },
+                            "expiresAt": {
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                              "type": "string"
+                            },
+                            "invitationId": {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "PENDING",
+                                "ACCEPTED",
+                                "EXPIRED",
+                                "REVOKED"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "invitationId",
+                            "status",
+                            "deliveryStatus",
+                            "expiresAt"
+                          ],
+                          "type": "object"
                         }
                       },
                       "required": [
@@ -66248,7 +66493,7 @@
         }
       ],
       "post": {
-        "description": "Manager. Disabling removes only STAFF role, revokes current sessions and atomically revokes all active assignments; independent Couple role/access remains. Enabling does not reactivate assignments. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
+        "description": "Manager. Disabling removes only STAFF role, revokes current sessions, pending invitations and active assignments atomically; independent Couple role/access remains. Restore by issuing a new email invitation; enabled:true returns 422 STAFF_INVITATION_REQUIRED. Private no-store. Strict schemas reject unknown body/query fields. Cross-event identities are concealed. Writes require a durable Idempotency-Key; identical replay returns the original result only after current authorization is rechecked. Changed same-key payload returns 409 IDEMPOTENCY_KEY_REUSED.",
         "operationId": "setStaffOperationalAccess",
         "parameters": [
           {

@@ -9,7 +9,16 @@ export interface StaffAccountProvisioner {
     email: string,
     key: string,
     context: StaffProvisioningContext,
-  ): Promise<{ accountId: string; credentialSetupRequired: boolean }>;
+  ): Promise<{
+    accountId: string;
+    credentialSetupRequired: boolean;
+    invitation?: {
+      invitationId: string;
+      status: string;
+      deliveryStatus: string;
+      expiresAt: string;
+    };
+  }>;
   setOperationalAccess(
     accountId: string,
     input: { enabled: boolean; reason: string },

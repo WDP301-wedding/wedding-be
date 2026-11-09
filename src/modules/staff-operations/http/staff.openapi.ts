@@ -165,7 +165,7 @@ export const staffOpenApiPaths: NonNullable<ZodOpenApiObject['paths']> = {
     post: op(
       'provisionStaffAccount',
       provisionSchema,
-      'Manager. Identity reuses normalized email; no password/role input. credentialSetupRequired uses the existing Identity password-OTP flow; this operation does not deliver email.',
+      'Manager invites or explicitly reissues a Staff invitation by normalized email. New Staff authority is granted only on acceptance; existing roles/passwords remain. Single-use 72-hour token opens configured MANAGE_WEB_ORIGIN/staff-invitation. Reissue supersedes the old link; 60-second cooldown and at most 3 invitations/account/day. Same-key replay never sends again. invitation.deliveryStatus ACCEPTED means provider acceptance, not mailbox delivery; FAILED is explicit provider rejection, UNKNOWN is ambiguous. Missing email/origin fails 503 STAFF_INVITATION_NOT_CONFIGURED before account creation. No token returned.',
       provisionInput,
       '201',
       { email: 'staff@example.test' },
@@ -176,7 +176,7 @@ export const staffOpenApiPaths: NonNullable<ZodOpenApiObject['paths']> = {
     post: op(
       'setStaffOperationalAccess',
       operationalSchema,
-      'Manager. Disabling removes only STAFF role, revokes current sessions and atomically revokes all active assignments; independent Couple role/access remains. Enabling does not reactivate assignments.',
+      'Manager. Disabling removes only STAFF role, revokes current sessions, pending invitations and active assignments atomically; independent Couple role/access remains. Restore by issuing a new email invitation; enabled:true returns 422 STAFF_INVITATION_REQUIRED.',
       operationalInput,
       '201',
       { enabled: false, reason: 'Kết thúc nhiệm vụ vận hành' },
@@ -192,7 +192,7 @@ export const staffOpenApiPaths: NonNullable<ZodOpenApiObject['paths']> = {
     post: op(
       'assignEventStaff',
       assignmentSchema,
-      'Manager. expectedRevision 0 for first assignment; exact current revision for reactivation. Current ACTIVE Identity with STAFF role required. NONE mode permits other duties.',
+      'Manager. expectedRevision 0 for first assignment; exact current revision for reactivation. ACTIVE account with STAFF role or a currently valid pending Staff invitation required. Pending invitees can be assigned but cannot act as Staff before accepting.',
       assignmentInput,
       '201',
       { staffAccountId: '10000000-0000-4000-8000-000000000001', expectedRevision: 0 },

@@ -882,3 +882,15 @@ SPEC-01–05 or replace the separate provider/runtime readiness gates.
   runner before merge; local Windows native exits are not a green full-suite result.
 - [ ] T810-REL Coordinated deployment/migrations and released OpenAPI client pins;
   verify actual deployed behavior separately from local test evidence.
+
+## Staff email invitations — 2026-11-09
+
+- Owner-approved implementation across backend and Manager Web; see
+  [scope, contracts and rollout](../docs/staff-email-invitations-2026-11-09.md).
+- [x] Implement Staff email invitation issuance/acceptance, expiry, reissue,
+      revocation, deferred new Staff authority, Manager Web setup/status/actions.
+- [x] Complete isolated PostgreSQL, Manager Web and desktop/mobile browser checks;
+      remove the owner-named unused Staff test identity on the confirmed Render
+      workspace, retaining audit. [Evidence](evidence/staff-email-invitations-2026-11-09.md).
+- [ ] Release backend/Manager Web and verify deployed behavior; real inbox
+      delivery remains separate from provider acceptance and controlled tests.

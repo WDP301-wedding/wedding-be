@@ -293,6 +293,16 @@ const rawEnvironmentSchema = z
       .default('false')
       .transform((value) => value === 'true'),
     PUBLIC_INVITATION_ORIGIN: optionalString.pipe(corsOrigin.optional()),
+    MANAGE_WEB_ORIGIN: optionalString.pipe(
+      corsOrigin
+        .refine((value) => {
+          const url = new URL(value);
+          return (
+            url.protocol === 'https:' || ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)
+          );
+        }, 'Manager Web must use HTTPS outside loopback.')
+        .optional(),
+    ),
     PUBLIC_INVITATION_WEB_ORIGIN: optionalString.pipe(corsOrigin.optional()),
     SEATING_RECONCILER_ENABLED: z
       .enum(['true', 'false'])
@@ -512,6 +522,7 @@ export type BackendConfig = Readonly<{
   }>;
   identityAccess: Readonly<{
     passwordOtpHashKey: string | undefined;
+    manageWebOrigin: string | undefined;
     trustedProxyHops: 0 | 1;
     refreshCookie: Readonly<{
       name: '__Host-wedding-refresh';
@@ -671,6 +682,7 @@ function pickEnvironment(source: EnvironmentSource): EnvironmentSource {
     STORAGE_SIGNING_KEY: source.STORAGE_SIGNING_KEY,
     PUBLIC_INVITATION_ORIGIN: source.PUBLIC_INVITATION_ORIGIN,
     PUBLIC_INVITATION_WEB_ORIGIN: source.PUBLIC_INVITATION_WEB_ORIGIN,
+    MANAGE_WEB_ORIGIN: source.MANAGE_WEB_ORIGIN,
     SEATING_RECONCILER_ENABLED: source.SEATING_RECONCILER_ENABLED,
     AI_IMAGE_JOBS_ENABLED: source.AI_IMAGE_JOBS_ENABLED,
     RESEND_API_KEY: source.RESEND_API_KEY,
@@ -808,6 +820,7 @@ function createConfig(environment: RawEnvironment): Omit<BackendConfig, 'notific
     }),
     identityAccess: Object.freeze({
       passwordOtpHashKey: environment.AUTH_OTP_HASH_KEY,
+      manageWebOrigin: environment.MANAGE_WEB_ORIGIN,
       trustedProxyHops: environment.AUTH_TRUST_PROXY_HOPS ?? 0,
       refreshCookie: Object.freeze({
         name: '__Host-wedding-refresh' as const,
