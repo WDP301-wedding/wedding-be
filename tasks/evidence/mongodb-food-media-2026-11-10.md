@@ -38,8 +38,12 @@ separate evidence and is not claimed by this local run.
 
 ## Existing broader verification limitations
 
-The full Vitest suite was run with real local PostgreSQL and MongoDB; it is not
-green. It reports failures in existing payment/print/notification/upgrade/realtime
+The full Vitest suite completed with real local PostgreSQL and MongoDB (exit 1,
+1,418.49 seconds): **289 files passed, 51 failed; 2,323 tests passed, 162 failed,
+16 skipped; two worker errors**, as reported by Vitest. Workers running
+`booking-lifecycle/runtime.test.ts` and `commercial-contracts-api.test.ts` exited
+unexpectedly with Windows exit code `3221226505`; their remaining tests are not
+verified by this sweep. This run is not green. It reports failures in existing payment/print/notification/upgrade/realtime
 fixtures outside the new scoped acceptance. Do not describe all backend tests as
 passing or use the focused result as full release acceptance.
 
