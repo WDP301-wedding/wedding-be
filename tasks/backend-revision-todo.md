@@ -1,5 +1,15 @@
 # Backend Revision Tasks: 2026-10-10
 
+## MongoDB dish/menu-package image storage — 2026-11-10
+
+- [x] Add selective MongoDB GridFS file/metadata storage with existing signed URLs, validation and historical version ownership.
+- [x] Add non-destructive copy, checksum verification and disk export for rollback.
+- [x] Prepare a separate authenticated Render Private Service Blueprint and operator runbook.
+- [x] Complete scoped verification (214 tests), contract/type/build/OpenAPI checks and local real-MongoDB evidence; retain documented broader-suite limitations.
+- [ ] Review/apply the Render infrastructure plan, migrate files and verify deployed image operations. Local checks do not imply live acceptance.
+      [Scope/runbook](../docs/mongodb-food-media-2026-11-10.md).
+      [Evidence and release limits](./evidence/mongodb-food-media-2026-11-10.md).
+
 ## Fixed table capacity and effective commercial summaries — 2026-11-09
 
 - [x] Guard commercial writes and Couple planning changes with ten people per table and published active hall-layout table maximum; preserve reserved payment reconciliation.

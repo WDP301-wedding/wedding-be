@@ -15,6 +15,13 @@ evidence and frontend source. New requirements are extensions to completed work.
 
 ## 1. Team Boundary
 
+MongoDB food-media amendment approved on **2026-11-10**: move dish/menu-package
+image bytes and technical metadata to MongoDB GridFS, hosted as a separate Render
+Private Service. Retain PostgreSQL catalog content, prices, version/association
+history, contracts, invoices and payments. Migration copies/verifies sources and
+supports verified export before rollback. No frontend API shape changes or new
+frontend ownership are introduced. See [scope and runbook](./mongodb-food-media-2026-11-10.md).
+
 Staff email-invitation amendment approved on **2026-11-09**: backend and Manager
 Web may add single-use invitation links, initial password setup on Manager Web,
 existing-password acceptance, explicit reissue and revocation. Preserve existing

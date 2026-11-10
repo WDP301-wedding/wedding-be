@@ -1,5 +1,12 @@
 # Backend Ownership
 
+Owner-approved amendment, 2026-11-10: store dish/menu-package image bytes and
+technical file metadata in MongoDB GridFS on a separate Render Private Service.
+Keep catalog content/prices/versions, association/audit rows and all commercial
+history in PostgreSQL. Preserve source images during verified migration/rollback.
+See docs/mongodb-food-media-2026-11-10.md; do not claim deployed MongoDB acceptance
+from local checks or health alone.
+
 Owner-approved amendment, 2026-11-09: implement Staff email invitations with
 single-use 72-hour links to Manager Web password setup/acceptance. This revision
 may change wedding-be and wedding-manage-web. Preserve existing passwords/roles,
