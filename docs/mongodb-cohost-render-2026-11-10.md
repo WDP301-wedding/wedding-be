@@ -123,3 +123,11 @@ supervisor ordering/failures and Mongo-only reconciliation tests supplement the
 earlier GridFS acceptance tests. The previous broad backend suite has documented
 baseline failures; do not claim all backend tests pass. Record actual release
 verification separately in tasks/evidence/mongodb-food-media-2026-11-10.md.
+
+The MongoDB CI job uses `ubuntu-22.04` (currently kernel 6.8) because the first
+promotion run failed before tests: MongoDB refused the newer hosted-runner
+kernel. Keep every MongoDB test and the aggregate release gate enabled. Review
+this runner pin before its announced retirement; move to a newer runner only
+with a compatible MongoDB/kernel combination verified by the same integration
+suite. References: [MongoDB kernel compatibility](https://jira.mongodb.org/browse/SERVER-125742)
+and the [hosted runner inventory](https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2204-Readme.md).

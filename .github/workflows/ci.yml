@@ -101,7 +101,9 @@ jobs:
 
   mongodb-integration:
     name: MongoDB GridFS media gates
-    runs-on: ubuntu-latest
+    # MongoDB 8 refuses the newer runner kernels (SERVER-121912/SERVER-125742).
+    # This runner uses kernel 6.8; revisit before Ubuntu 22.04 runner retirement.
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     services:
       postgres:
