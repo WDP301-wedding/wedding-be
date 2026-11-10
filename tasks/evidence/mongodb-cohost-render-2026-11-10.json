@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 1,
+  "verifiedAtUtc": "2026-11-10T13:13:42.613Z",
+  "service": {
+    "id": "srv-dbct9ao473hc73a5qud0",
+    "name": "wedding-be-render-trial",
+    "url": "https://wedding-be-render-trial.onrender.com",
+    "workspaceId": "tea-dbcss8ks728c73851hl0",
+    "region": "singapore",
+    "plan": "1c-2g",
+    "instances": 1,
+    "diskId": "dsk-dbctva0m7kps73cubbb0",
+    "diskSizeGB": 1,
+    "publicPorts": [
+      10000
+    ],
+    "branch": "codex/mongodb-food-media",
+    "autoDeploy": false,
+    "newServicesCreated": 0
+  },
+  "release": {
+    "commit": "feae2d796d5420418eb39d83331a9b264b587b38",
+    "phaseOneDeploy": "dep-dbph93ec6qcc73allc00",
+    "activeDeploy": "dep-dbphbbff3r2c7385jr2g",
+    "embeddedLiveAtUtc": "2026-11-10T13:02:31.563334Z",
+    "restartReconciledAtUtc": "2026-11-10T13:04:51.029781579Z"
+  },
+  "migration": {
+    "sourceAssociations": 36,
+    "sourceBytes": 95272223,
+    "first": {
+      "examined": 36,
+      "verified": 36,
+      "written": 36,
+      "missingDetached": 0
+    },
+    "restart": {
+      "examined": 36,
+      "verified": 36,
+      "written": 0,
+      "missingDetached": 0
+    },
+    "rollbackExport": {
+      "mode": "export-to-disk",
+      "examined": 36,
+      "verified": 36,
+      "written": 36,
+      "missingDetached": 0,
+      "dryRun": false
+    }
+  },
+  "beforeRestart": {
+    "action": "capture",
+    "mongoVersion": "8.0.34",
+    "mongoDatabase": "wedding_catalog",
+    "foodAssociations": 36,
+    "verifiedFoodAssociations": 36,
+    "missingDetached": 0,
+    "retainedSourcesDigest": "cf4f514bf34e729edca465d9be29c68a7b8cee3c3740ee2a5f10eca5b6234db8",
+    "mongoObjects": 36,
+    "mongoMetadataDigest": "f5f511e3681d511674a737e17ca30bd31b99c1eaf9332749be8e8da1cbe36198",
+    "mongoOnlySignedHttp": true,
+    "privateDiskSignedHttp": true,
+    "tamperedUrlRejected": true,
+    "hallSignedRead": true,
+    "anonymousReadDenied": true,
+    "appAdminCommandDenied": true,
+    "mongoResidentMiB": 298,
+    "wiredTigerCacheBytes": 268435456,
+    "diskAvailableBytes": 519733248,
+    "probeKey": "venue-catalog-media/08ed15bb-7eae-49c5-bf5f-389e15412fd2/6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec.png",
+    "metadataSample": [
+      {
+        "_id": "6af315dcf35536110d63545e",
+        "length": 2655498,
+        "uploadDate": "2026-11-10T13:02:20.058Z",
+        "filename": "venue-catalog-media/082764a2-6141-4c93-809a-6699f4f2c2b7/18c415d9798a5b3c8e87f026a3845de0c18c41b94705a3c09516cc9ff0b36b89.png",
+        "metadata": {
+          "objectKey": "venue-catalog-media/082764a2-6141-4c93-809a-6699f4f2c2b7/18c415d9798a5b3c8e87f026a3845de0c18c41b94705a3c09516cc9ff0b36b89.png",
+          "purpose": "VENUE_CATALOG_MEDIA",
+          "resourceId": "082764a2-6141-4c93-809a-6699f4f2c2b7",
+          "checksumSha256": "18c415d9798a5b3c8e87f026a3845de0c18c41b94705a3c09516cc9ff0b36b89",
+          "contentType": "image/png",
+          "sizeBytes": 2655498,
+          "resourceType": "DISH_VERSION",
+          "schemaVersion": 1
+        }
+      }
+    ]
+  },
+  "afterRestart": {
+    "action": "check",
+    "mongoVersion": "8.0.34",
+    "mongoDatabase": "wedding_catalog",
+    "foodAssociations": 36,
+    "verifiedFoodAssociations": 36,
+    "missingDetached": 0,
+    "retainedSourcesDigest": "cf4f514bf34e729edca465d9be29c68a7b8cee3c3740ee2a5f10eca5b6234db8",
+    "mongoObjects": 36,
+    "mongoMetadataDigest": "f5f511e3681d511674a737e17ca30bd31b99c1eaf9332749be8e8da1cbe36198",
+    "mongoOnlySignedHttp": true,
+    "privateDiskSignedHttp": true,
+    "tamperedUrlRejected": true,
+    "hallSignedRead": true,
+    "anonymousReadDenied": true,
+    "appAdminCommandDenied": true,
+    "mongoResidentMiB": 292,
+    "wiredTigerCacheBytes": 268435456,
+    "diskAvailableBytes": 516505600,
+    "probeKey": "venue-catalog-media/08ed15bb-7eae-49c5-bf5f-389e15412fd2/6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec.png",
+    "metadataSample": [
+      {
+        "_id": "6af315dcf35536110d63545e",
+        "length": 2655498,
+        "uploadDate": "2026-11-10T13:02:20.058Z",
+        "filename": "venue-catalog-media/082764a2-6141-4c93-809a-6699f4f2c2b7/18c415d9798a5b3c8e87f026a3845de0c18c41b94705a3c09516cc9ff0b36b89.png",
+        "metadata": {
+          "objectKey": "venue-catalog-media/082764a2-6141-4c93-809a-6699f4f2c2b7/18c415d9798a5b3c8e87f026a3845de0c18c41b94705a3c09516cc9ff0b36b89.png",
+          "purpose": "VENUE_CATALOG_MEDIA",
+          "resourceId": "082764a2-6141-4c93-809a-6699f4f2c2b7",
+          "checksumSha256": "18c415d9798a5b3c8e87f026a3845de0c18c41b94705a3c09516cc9ff0b36b89",
+          "contentType": "image/png",
+          "sizeBytes": 2655498,
+          "resourceType": "DISH_VERSION",
+          "schemaVersion": 1
+        }
+      }
+    ]
+  },
+  "financialHistory": {
+    "unchanged": true,
+    "before": {
+      "CommercialContractRevision": {
+        "count": 2,
+        "sha256": "e29b1ba256b8c387edb67394716d6ad2f65dc54ede8f61688b64d846ab5619ac"
+      },
+      "CommercialContractLine": {
+        "count": 4,
+        "sha256": "beddcb87b8d5e6537c1260e76be4079045ffbddf1fdb668d19bc4ccd30256726"
+      },
+      "CommercialContractApproval": {
+        "count": 4,
+        "sha256": "ad8c96e05ced48f4af23df6809aef761cf9e46e083df0f16711b448cdb6014a0"
+      },
+      "CommercialAppendixRevision": {
+        "count": 2,
+        "sha256": "61eb81b3f0306f512d80319ce0dc12dc166c6c0bb1be514b55e48b043fd6a642"
+      },
+      "CommercialAppendixApproval": {
+        "count": 4,
+        "sha256": "2b06f1ae0aa7f4d9378d12bc84436790fe9eac9e0727ed8494872d2f48c71fea"
+      },
+      "FinalInvoiceRevision": {
+        "count": 1,
+        "sha256": "63c9a1171687463efb25e57929bbf26db477a4762c080f250ccfe57544312440"
+      },
+      "BillingLedgerEntry": {
+        "count": 8,
+        "sha256": "45039300390a7879e36759ecd90d372a5d9a60c607c04b2c0e6fd31a5c40485e"
+      },
+      "BillingPaymentAttempt": {
+        "count": 3,
+        "sha256": "8f3f6d5c417ae3029ea49f9dd65674fc020ac9cb022d4d879ad31fa3a4b26bbe"
+      }
+    },
+    "after": {
+      "CommercialContractRevision": {
+        "count": 2,
+        "sha256": "e29b1ba256b8c387edb67394716d6ad2f65dc54ede8f61688b64d846ab5619ac"
+      },
+      "CommercialContractLine": {
+        "count": 4,
+        "sha256": "beddcb87b8d5e6537c1260e76be4079045ffbddf1fdb668d19bc4ccd30256726"
+      },
+      "CommercialContractApproval": {
+        "count": 4,
+        "sha256": "ad8c96e05ced48f4af23df6809aef761cf9e46e083df0f16711b448cdb6014a0"
+      },
+      "CommercialAppendixRevision": {
+        "count": 2,
+        "sha256": "61eb81b3f0306f512d80319ce0dc12dc166c6c0bb1be514b55e48b043fd6a642"
+      },
+      "CommercialAppendixApproval": {
+        "count": 4,
+        "sha256": "2b06f1ae0aa7f4d9378d12bc84436790fe9eac9e0727ed8494872d2f48c71fea"
+      },
+      "FinalInvoiceRevision": {
+        "count": 1,
+        "sha256": "63c9a1171687463efb25e57929bbf26db477a4762c080f250ccfe57544312440"
+      },
+      "BillingLedgerEntry": {
+        "count": 8,
+        "sha256": "45039300390a7879e36759ecd90d372a5d9a60c607c04b2c0e6fd31a5c40485e"
+      },
+      "BillingPaymentAttempt": {
+        "count": 3,
+        "sha256": "8f3f6d5c417ae3029ea49f9dd65674fc020ac9cb022d4d879ad31fa3a4b26bbe"
+      }
+    }
+  },
+  "pdfSmoke": {
+    "headlessPdfSmoke": true,
+    "syntheticFixture": true,
+    "externalBrowserRequestsBlocked": true,
+    "apiReadyDuringPdf": true,
+    "pdfBytes": 23868,
+    "pdfSha256": "e325bafb20f2c4b32b1a571c4addf8166bbd9486a4d290846bcd26ec5ce54f46",
+    "memoryBeforeBytes": 875839488,
+    "memoryDuringBytes": 947744768,
+    "memoryAfterPdfBytes": 974831616
+  },
+  "publicCatalogHttp": {
+    "publicCatalogAndImages": true,
+    "results": [
+      {
+        "path": "/api/v1/catalog/dishes?limit=10",
+        "status": 200,
+        "items": 10,
+        "imageUrls": 10,
+        "firstImageStatus": 200,
+        "firstImageBytes": 2231269
+      },
+      {
+        "path": "/api/v1/catalog/menu-packages?limit=10",
+        "status": 200,
+        "items": 6,
+        "imageUrls": 6,
+        "firstImageStatus": 200,
+        "firstImageBytes": 3120286
+      }
+    ]
+  },
+  "ownedProbesRemoved": true,
+  "memoryObservation": {
+    "startUtc": "2026-11-10T13:04:50Z",
+    "endUtc": "2026-11-10T13:07:50Z",
+    "postRestartPeakBytes": 552484860,
+    "lastBytes": 483041280,
+    "limitGiB": 2,
+    "source": "Render memory_usage metrics; cgroup PDF measurements are recorded separately."
+  },
+  "verification": {
+    "scopedTestsPassed": 221,
+    "authBootstrapTestsPassed": 2,
+    "contractTestsPassed": 101,
+    "typecheck": true,
+    "build": true,
+    "changedFileLint": true,
+    "openapiCheck": true,
+    "dependencyAuditNoHighCritical": true,
+    "fullSuiteGreen": false,
+    "fullSuiteLimitation": "Previously reproduced unrelated fixture failures; see Markdown evidence."
+  },
+  "limits": "Bounded verification, not a sustained-load or unlimited-capacity guarantee. No financial/provider command was executed."
+}

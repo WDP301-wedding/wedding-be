@@ -67,6 +67,57 @@ commercial history. Use `mongodump`/`mongorestore` and backups outside this disk
 
 ## Evidence and limits
 
+Deployment completed on 2026-11-10: commit `feae2d7`, active deploy
+`dep-dbphbbff3r2c7385jr2g`. The existing service still uses `1c-2g`, its original
+1 GiB disk and only HTTP port 10000. Its source branch is
+`codex/mongodb-food-media` with auto-deploy off; merge this branch before switching
+the service back to `main`. Do not point the service at an older disk-only branch
+without completing the export/rollback sequence above.
+
+All 36 retained food images were copied and checksum-verified, with original
+disk files retained. A real service restart verified unchanged metadata and
+Mongo-only signed HTTP reads; reconciliation then verified 36 and copied zero.
+All eight captured commercial/financial table hashes matched before and after.
+See the evidence document and JSON record for target-specific checks and limits.
+
+## Show MongoDB usage during a demonstration
+
+In the running service's Render Shell, from `/app`, run this read-only command.
+It prints database/version, actual GridFS collections, one metadata document and
+the number of binary chunks for that document. It does not print credentials.
+
+```sh
+node --input-type=module <<'NODE'
+import { MongoClient } from 'mongodb';
+import { embeddedMongoSettings } from './dist/integrations/storage/embedded-mongo.js';
+const settings = embeddedMongoSettings(process.env);
+if (!settings) throw new Error('Embedded MongoDB is not enabled.');
+const client = new MongoClient(settings.appUri);
+try {
+  const database = client.db(settings.database);
+  const sample = await database.collection('food_images.files').findOne();
+  console.log({
+    database: settings.database,
+    version: (await client.db('admin').command({ buildInfo: 1 })).version,
+    files: await database.collection('food_images.files').countDocuments(),
+    chunks: await database.collection('food_images.chunks').countDocuments(),
+    sample,
+    sampleChunks: sample
+      ? await database.collection('food_images.chunks').countDocuments({ files_id: sample._id })
+      : 0,
+  });
+} finally {
+  await client.close();
+}
+NODE
+```
+
+Upload an image through the existing Manager interface, rerun the query sorted
+by uploadDate if needed, and correlate its resourceId/content key with the API.
+MongoDB stores actual bytes plus technical metadata; PostgreSQL retains catalog
+content/prices/version associations and commercial history. No separate paid
+MongoDB service or public MongoDB port is needed for this proof.
+
 Local bootstrap/authentication, privilege-denial, restart credential reuse,
 supervisor ordering/failures and Mongo-only reconciliation tests supplement the
 earlier GridFS acceptance tests. The previous broad backend suite has documented

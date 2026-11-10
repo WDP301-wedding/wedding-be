@@ -21,8 +21,54 @@ bytes total. Applied PostgreSQL migrations match the release (no new migrations)
 Hashes/counts were captured for contract revisions/lines/approvals, appendices,
 invoice revisions, ledger entries and payment attempts to compare after release.
 The pre-release live deploy is `dep-dbotpo95efls73f02m0g`, commit `1149479`.
-Actual deployment, migration and restart verification are recorded below when
-observed; these local results alone are not deployed acceptance.
+Actual deployment, migration and restart verification follow; local results alone
+are not deployed acceptance.
+
+### Observed co-hosted release
+
+- Existing service only: `srv-dbct9ao473hc73a5qud0`, plan `1c-2g`, original disk
+  `dsk-dbctva0m7kps73cubbb0`, size 1 GiB, one instance, Singapore, only public HTTP
+  port 10000. No new service/disk or plan increase; separate Blueprint unapplied.
+- Commit `feae2d796d5420418eb39d83331a9b264b587b38`; phase-one disk-only deploy
+  `dep-dbph93ec6qcc73allc00` became live at 2026-11-10 13:00:08 UTC. Embedded-mode
+  deploy `dep-dbphbbff3r2c7385jr2g` became live at 13:02:31 UTC (20:02:31 Saigon).
+- MongoDB **8.0.34**, `wedding_catalog`, `food_images.files`/`food_images.chunks`.
+  First reconciliation: examined 36, verified 36, written 36, missingDetached 0.
+  Original disk files remained present and checksum-matched for every association.
+- Actual service restart changed instance `q8b5s` to `lqq6q`; next reconciliation
+  at 13:04:51 UTC verified the same 36 and wrote **zero**. GridFS metadata digest
+  before/after: `f5f511e3681d511674a737e17ca30bd31b99c1eaf9332749be8e8da1cbe36198`.
+  Retained association/key/checksum digest:
+  `cf4f514bf34e729edca465d9be29c68a7b8cee3c3740ee2a5f10eca5b6234db8`.
+- An owned synthetic image existing **only in MongoDB**, with no source disk file
+  or PostgreSQL association, was fetched through the deployed signed HTTPS route
+  with an exact checksum match before and after restart. A separately owned
+  private disk image and an existing Hall image passed signed HTTPS checks too.
+  Tampered signatures returned 404. Anonymous MongoDB reads and the app account's
+  admin serverStatus command were denied. Both owned probe objects were removed
+  after verification; no customer/catalog association was created/deleted.
+- The actual public `/api/v1/catalog/dishes` and `/api/v1/catalog/menu-packages`
+  endpoints returned 200 with current catalog items and image URLs; an image
+  returned by each endpoint was fetched successfully with non-empty bytes. Thus
+  verification covers the catalog API-to-image flow, beyond direct storage probes.
+- Counts and SHA-256 hashes matched across all rows in eight pre-existing tables:
+  contract revisions, contract lines, contract approvals, appendix revisions,
+  appendix approvals, final invoice revisions, ledger entries and payment attempts.
+  Native rollback export verified all 36 images with no missing detached sources.
+- MongoDB WiredTiger cache limit: 268,435,456 bytes. After-restart Render memory
+  samples peaked at 552,484,860 bytes and ended at 483,041,280 bytes against 2 GiB;
+  free disk observed at 516,505,600 bytes after restart. These are bounded samples,
+  not a sustained-load or future-capacity guarantee.
+- A synthetic three-page Chromium PDF smoke ran in the same active container,
+  with external browser requests blocked and API readiness HTTP 200 during rendering.
+  PDF: 23,868 bytes; cgroup memory after PDF 974,831,616 bytes, below 2 GiB. This
+  tests headless browser availability/resource sharing, not every production PDF.
+- Source branch is `codex/mongodb-food-media`, auto-deploy remains off. Merge the
+  release branch before changing back to main; rollback requires the verified
+  export sequence when new Mongo-only catalog images exist.
+- [Machine-readable release evidence](./mongodb-cohost-render-2026-11-10.json).
+  No real-money payment, paid generation, credential logging or shared-data deletion
+  was performed. Existing broader backend-suite limitations remain below.
 
 Scope: actual dish/menu-package image bytes and technical metadata in MongoDB
 GridFS; content/prices/versions, associations/audit and commercial history stay in
