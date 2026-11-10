@@ -1,0 +1,29 @@
+# Separate Blueprint: creates only the new private food-image datastore.
+# API cutover remains explicit after copy/verify. Never apply this as render.yaml.
+services:
+  - type: pserv
+    name: wedding-food-mongodb
+    runtime: docker
+    repo: https://github.com/WDP301-wedding/wedding-be
+    branch: codex/mongodb-food-media
+    region: singapore
+    plan: 0.5c-512mb
+    dockerfilePath: ./ops/mongodb/Dockerfile
+    dockerContext: .
+    autoDeployTrigger: 'off'
+    numInstances: 1
+    disk:
+      name: wedding-food-mongodb-data
+      mountPath: /data/db
+      sizeGB: 1
+    envVars:
+      - key: MONGO_INITDB_ROOT_USERNAME
+        value: wedding_admin
+      - key: MONGO_INITDB_ROOT_PASSWORD
+        generateValue: true
+      - key: MONGO_INITDB_DATABASE
+        value: wedding_catalog
+      - key: CATALOG_MONGO_USERNAME
+        value: wedding_catalog_app
+      - key: CATALOG_MONGO_PASSWORD
+        generateValue: true
