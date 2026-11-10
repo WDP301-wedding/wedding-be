@@ -8360,7 +8360,7 @@
   "paths": {
     "/api/v1/storage/objects/{mediaPath}": {
       "get": {
-        "description": "Available with render-disk storage. Use the complete URL returned by an authorized media/catalog operation, without modifying its path or query. The signature authorizes this object only, for at most one hour (default 15 minutes). Missing, altered or expired signatures return 404. Bytes are verified against the content-addressed key. Responses use private, no-store. No upload or directory-listing route is exposed.",
+        "description": "Available with render-disk storage, including optional MongoDB GridFS dish/menu images. Use the complete URL returned by an authorized media/catalog operation, without modifying its path or query. The signature authorizes this object only, for at most one hour (default 15 minutes). Missing, altered or expired signatures return 404. Bytes are verified against the content-addressed key. Responses use private, no-store. No upload or directory-listing route is exposed.",
         "operationId": "readSignedStorageObject",
         "parameters": [
           {

@@ -99,6 +99,37 @@ const validProductionEnvironment = {
 } as const;
 
 describe('parseEnvironment', () => {
+  it('enables MongoDB food images only with a complete explicit configuration', () => {
+    const disk = {
+      NODE_ENV: 'test',
+      STORAGE_DISK_PATH: '/var/data/media',
+      STORAGE_PUBLIC_ORIGIN: 'https://api.example.test',
+      STORAGE_SIGNING_KEY: 'x'.repeat(32),
+    };
+    expect(parseEnvironment(disk).storage).not.toHaveProperty('catalogMongo');
+    expect(
+      parseEnvironment({
+        ...disk,
+        CATALOG_MONGO_URI: 'mongodb://user:secret@mongo:27017/?authSource=wedding_catalog',
+        CATALOG_MONGO_DATABASE: 'wedding_catalog',
+      }).storage,
+    ).toMatchObject({ catalogMongo: { database: 'wedding_catalog' } });
+    for (const settings of [
+      { CATALOG_MONGO_URI: 'mongodb://mongo:27017' },
+      { CATALOG_MONGO_DATABASE: 'wedding_catalog' },
+      { CATALOG_MONGO_URI: 'https://mongo:27017', CATALOG_MONGO_DATABASE: 'wedding_catalog' },
+      { CATALOG_MONGO_URI: 'mongodb://mongo:27017', CATALOG_MONGO_DATABASE: '../bad' },
+    ])
+      expect(() => parseEnvironment({ ...disk, ...settings })).toThrow(
+        EnvironmentConfigurationError,
+      );
+    expect(() =>
+      parseEnvironment({
+        CATALOG_MONGO_URI: 'mongodb://mongo:27017',
+        CATALOG_MONGO_DATABASE: 'wedding_catalog',
+      }),
+    ).toThrow(EnvironmentConfigurationError);
+  });
   it('selects persistent Render storage without a retired provider fallback and fails closed on incomplete disk configuration', () => {
     const disk = {
       ...validProductionEnvironment,

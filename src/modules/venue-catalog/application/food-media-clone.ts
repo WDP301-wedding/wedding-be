@@ -46,6 +46,7 @@ export async function withClonedFoodMedia(
             contentType: storageContentTypeSchema.parse(source.contentType),
             purpose: 'VENUE_CATALOG_MEDIA' as const,
             resourceId: input.versionId,
+            catalogResourceType: resourceType,
           };
           const expected = createStoredObject(command);
           if (

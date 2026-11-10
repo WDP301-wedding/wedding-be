@@ -205,7 +205,7 @@ export const openApiRegistry: ZodOpenApiObject = {
         operationId: 'readSignedStorageObject',
         summary: 'Read private media using a scoped expiring URL',
         description:
-          'Available with render-disk storage. Use the complete URL returned by an authorized media/catalog operation, without modifying its path or query. The signature authorizes this object only, for at most one hour (default 15 minutes). Missing, altered or expired signatures return 404. Bytes are verified against the content-addressed key. Responses use private, no-store. No upload or directory-listing route is exposed.',
+          'Available with render-disk storage, including optional MongoDB GridFS dish/menu images. Use the complete URL returned by an authorized media/catalog operation, without modifying its path or query. The signature authorizes this object only, for at most one hour (default 15 minutes). Missing, altered or expired signatures return 404. Bytes are verified against the content-addressed key. Responses use private, no-store. No upload or directory-listing route is exposed.',
         tags: ['Invitation Media'],
         security: [],
         parameters: [

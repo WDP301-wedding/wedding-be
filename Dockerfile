@@ -29,6 +29,18 @@ RUN npm run db:generate && npm run build
 # ------------------------------------------------------------------------------
 FROM base AS runtime
 
+# Co-hosted MongoDB uses the existing service/disk. Pin the server version; the
+# official Debian repository resolves its shared-library dependencies correctly.
+RUN apt-get update && apt-get install -y --no-install-recommends curl gnupg \
+    && curl --fail --silent --show-error https://pgp.mongodb.com/server-8.0.asc \
+       | gpg --dearmor -o /usr/share/keyrings/mongodb-server-8.0.gpg \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg] https://repo.mongodb.org/apt/debian bookworm/mongodb-org/8.0 main" \
+       > /etc/apt/sources.list.d/mongodb-org-8.0.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends mongodb-org-server=8.0.34 mongodb-database-tools \
+    && apt-get purge -y --auto-remove curl gnupg \
+    && rm -rf /var/lib/apt/lists/*
+
 ENV NODE_ENV=production
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
@@ -48,4 +60,4 @@ COPY --chown=node:node scripts/performance-db-probe.mjs ./scripts/performance-db
 COPY --chown=node:node scripts/render-start.sh ./scripts/render-start.sh
 
 USER node
-CMD ["node", "--enable-source-maps", "--import", "./dist/instrumentation.js", "dist/server.js"]
+CMD ["/bin/sh", "./scripts/render-start.sh"]

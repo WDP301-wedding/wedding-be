@@ -17,7 +17,7 @@ describe('backend CI contract', () => {
     expect(workflow).toContain('pull_request:');
     expect(workflow).toContain('push:');
     expect(workflow).toMatch(/branches:\s*\[main\]/u);
-    expect(workflow.match(/uses: \.\/\.github\/actions\/backend-setup/gu)).toHaveLength(3);
+    expect(workflow.match(/uses: \.\/\.github\/actions\/backend-setup/gu)).toHaveLength(4);
     expect(setup).toContain("node-version-file: '.node-version'");
     expect(setup).toContain('run: npm ci');
     expect(setup).toContain('run: npm run db:generate');
@@ -28,7 +28,11 @@ describe('backend CI contract', () => {
     expect(workflow).toMatch(
       /postgresql-integration:[\s\S]*npm run db:migrate:deploy[\s\S]*npm run db:generate[\s\S]*npx vitest run tests\/integration\//u,
     );
-    expect(workflow).toContain('needs: [lint, production, postgresql-integration]');
+    expect(workflow).toContain(
+      'needs: [lint, production, postgresql-integration, mongodb-integration]',
+    );
+    expect(workflow).toContain('run: npm run test:mongo');
+    expect(workflow).toContain('MONGODB_RESULT: ${{ needs.mongodb-integration.result }}');
     expect(workflow).toContain('run: npm run api:check');
     expect(workflow).toContain('run: npm run build');
     expect(workflow).toContain('run: npm run audit:ci');

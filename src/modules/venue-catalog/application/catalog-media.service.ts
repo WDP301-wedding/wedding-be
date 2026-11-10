@@ -571,6 +571,9 @@ function storageCommand(input: UploadCatalogMediaInput) {
     contentType: input.contentType,
     purpose: CATALOG_PLATFORM_POLICY.storagePurpose,
     resourceId: input.resourceId,
+    ...(input.resourceType === 'DISH_VERSION' || input.resourceType === 'MENU_PACKAGE_VERSION'
+      ? { catalogResourceType: input.resourceType }
+      : {}),
   } as const;
 }
 

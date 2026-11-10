@@ -47,5 +47,34 @@ no IP allowlist, database credential, network policy or infrastructure was chang
 
 Controlled email tests and local browser success do not prove real mailbox
 delivery. No invitation was sent to the owner's email during these checks.
-Record the actual backend/client release and deployed checks before claiming the
-new flow available on Render/Manager Web. Keep tokens and provider receipts private.
+The owner will exercise real mailbox delivery by recreating the unused account.
+Keep tokens and provider receipts private.
+
+## Verified deployed release
+
+- Backend [PR 117](https://github.com/WDP301-wedding/wedding-be/pull/117), merged
+  commit `1149479a25b883c85ee0c50505e5de6648e66297`; final PR CI and exact main
+  [CI run](https://github.com/WDP301-wedding/wedding-be/actions/runs/42637092399)
+  passed all lint, production/unit/contract/audit and native PostgreSQL gates.
+  The runtime fixture follow-up replaced an incomplete Config cast with the real
+  environment parser; 131 focused config/composition tests passed locally.
+- Render deploy `dep-dbotpo95efls73f02m0g` became LIVE on 2026-11-09 at
+  21:49 Asia/Saigon, on that exact backend commit. MANAGE_WEB_ORIGIN was patched
+  by key, preserving other service variables; the same public value is in
+  render.yaml. The current published Render JSON Schema validated the YAML.
+- Manager [PR 57](https://github.com/WDP301-wedding/wedding-manage-web/pull/57),
+  merged commit `aba4bd4ff90c880313c02ce3220ecacc2a6c529d`; final PR and exact main
+  [CI/deploy run](https://github.com/WDP301-wedding/wedding-manage-web/actions/runs/42636489275)
+  passed. The live page is
+  [Manager Web Staff invitation](https://wedding-manage-web.vercel.app/staff-invitation).
+  A separate dependency commit patched the existing audit blockers; final audit
+  reported zero high/critical findings without weakening its policy. The full
+  desktop/320px mobile setup-to-Staff-login journey passed again on Next 16.4.5.
+- Live checks: readiness 200; a nonexistent, syntactically valid Staff token
+  returns 422 STAFF_INVITATION_INVALID_OR_EXPIRED and Cache-Control no-store.
+  Actual Manager Web reaches the new API, removes the URL fragment, displays the
+  invalid-link state at 320px without horizontal overflow, and has zero page errors.
+- Internal post-deploy read-only evidence confirmed the migration completed,
+  Manager origin is correct, email configuration exists, and the owner-named test
+  email still has zero Account rows. This is configuration/runtime evidence,
+  not a claim that an email reached an inbox.

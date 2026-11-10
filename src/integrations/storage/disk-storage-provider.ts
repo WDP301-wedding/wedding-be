@@ -69,7 +69,7 @@ export class DiskStorageProvider implements StorageProvider {
       } catch (error) {
         if (!hasCode(error, 'EEXIST')) throw error;
       }
-      await this.read(object);
+      await this.#readDisk(object);
       return object;
     } finally {
       await unlink(temporary).catch((error: unknown) => {
@@ -79,6 +79,10 @@ export class DiskStorageProvider implements StorageProvider {
   }
 
   async read(reference: StorageObjectReference): Promise<Uint8Array> {
+    return this.#readDisk(reference);
+  }
+
+  async #readDisk(reference: StorageObjectReference): Promise<Uint8Array> {
     const validated = createStorageObjectReference(reference);
     let file;
     try {

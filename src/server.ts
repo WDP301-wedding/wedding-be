@@ -7,10 +7,12 @@ import type { Logger } from 'pino';
 import type { Redis } from 'ioredis';
 
 import { createApp, type CreateAppOptions } from './app.js';
+import { createDiskStorageRouter } from './integrations/storage/disk-storage-provider.js';
 import {
-  DiskStorageProvider,
-  createDiskStorageRouter,
-} from './integrations/storage/disk-storage-provider.js';
+  checkStorageProvider,
+  closeStorageProvider,
+  createSignedStorageProvider,
+} from './integrations/storage/storage.factory.js';
 import type { Config } from './config/config.js';
 import { createRuntimeFeatureManifest } from './config/runtime-manifest.js';
 import { EnvironmentConfigurationError } from './config/env.js';
@@ -532,9 +534,10 @@ async function startApplication(
   };
 
   const combinedReadinessProbe: ReadinessProbe = async (signal) => {
-    const [database, redis] = await Promise.allSettled([
+    const [database, redis, media] = await Promise.allSettled([
       databaseReadiness.probe(signal),
       redisManager.isConfigured ? redisManager.healthCheck() : Promise.resolve(true),
+      config.storage.enabled ? checkStorageProvider(config.storage) : Promise.resolve(),
     ]);
     if (database.status === 'rejected') {
       logger.warn({
@@ -555,6 +558,14 @@ async function startApplication(
       throw new Error('Redis readiness check failed.');
     }
     if (database.status === 'rejected') throw database.reason;
+    if (media.status === 'rejected') {
+      logger.warn({
+        event: 'readiness_dependency_failed',
+        dependency: 'mongodb-food-media',
+        reason: 'probe_failed',
+      });
+      throw new Error('Food media storage readiness check failed.');
+    }
   };
 
   const running = await startServer({
@@ -595,7 +606,15 @@ async function startApplication(
     },
     resources: [
       createApplicationDatabaseResource(
-        { $disconnect: closeDatabase },
+        {
+          $disconnect: async () => {
+            try {
+              await closeDatabase();
+            } finally {
+              if (config.storage.enabled) await closeStorageProvider(config.storage);
+            }
+          },
+        },
         tracingResource === undefined
           ? [
               realtimeResource,
@@ -631,7 +650,7 @@ async function startApplication(
       if (config.storage.enabled)
         app.use(
           '/api/v1/storage',
-          createDiskStorageRouter(new DiskStorageProvider(config.storage)),
+          createDiskStorageRouter(createSignedStorageProvider(config.storage)),
         );
       app.use('/api/v1', identityRuntime.router);
       app.use('/api/v1', venueCatalogRuntime.router);

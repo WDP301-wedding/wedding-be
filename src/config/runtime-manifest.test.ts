@@ -3,6 +3,26 @@ import { parseEnvironment } from './env.js';
 import { createRuntimeFeatureManifest } from './runtime-manifest.js';
 
 describe('runtime feature manifest', () => {
+  it('reports optional MongoDB image storage without publishing connection credentials', () => {
+    const manifest = createRuntimeFeatureManifest(
+      parseEnvironment({
+        STORAGE_DISK_PATH: '/var/data/media',
+        STORAGE_PUBLIC_ORIGIN: 'https://api.example.test',
+        STORAGE_SIGNING_KEY: 'x'.repeat(32),
+        CATALOG_MONGO_URI: 'mongodb://private-user:sentinel-password@private-mongo:27017',
+        CATALOG_MONGO_DATABASE: 'wedding_catalog',
+      }),
+    );
+    expect(manifest.features.catalogStorage).toMatchObject({
+      mode: 'mongodb-gridfs-food+render-disk',
+      configuration: 'configured',
+      liveVerification: 'pending',
+    });
+    expect(manifest.features.invitationStorage.mode).toBe('render-disk');
+    expect(JSON.stringify(manifest)).not.toMatch(
+      /sentinel|mongodb:\/\/|private-user|private-mongo/u,
+    );
+  });
   it('declares the Seating scheduler separately from notification workers', () => {
     for (const enabled of [false, true]) {
       const manifest = createRuntimeFeatureManifest(

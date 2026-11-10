@@ -13,8 +13,16 @@ export const putObjectCommandSchema = z
     contentType: storageContentTypeSchema,
     purpose: storagePurposeSchema,
     resourceId: resourceIdSchema,
+    catalogResourceType: z.enum(['DISH_VERSION', 'MENU_PACKAGE_VERSION']).optional(),
   })
   .superRefine((command, context) => {
+    if (command.catalogResourceType && command.purpose !== 'VENUE_CATALOG_MEDIA') {
+      context.addIssue({
+        code: 'custom',
+        path: ['catalogResourceType'],
+        message: 'Food media must belong to the venue catalog.',
+      });
+    }
     if (command.bytes.byteLength > MAX_STORAGE_OBJECT_BYTES) {
       context.addIssue({
         code: 'custom',

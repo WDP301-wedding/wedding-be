@@ -1,4 +1,7 @@
 # Paid backend + 1 GB disk approved by the owner; PostgreSQL remains Free.
+# Owner revision: MongoDB runs inside this existing 25 USD service, on localhost,
+# with /var/data/mongodb alongside retained /var/data/wedding-media source files.
+# The standalone ops/render/mongodb.yaml Blueprint is a superseded alternative.
 databases:
   - name: wedding-db-render-trial
     plan: free
@@ -14,7 +17,7 @@ services:
     runtime: docker
     repo: https://github.com/WDP301-wedding/wedding-be
     branch: main
-    plan: starter
+    plan: 1c-2g
     region: singapore
     dockerfilePath: ./Dockerfile
     dockerContext: .
@@ -30,6 +33,13 @@ services:
     # The initial data import is complete. Apply pending migrations before API startup.
     dockerCommand: /bin/sh ./scripts/render-start.sh
     envVars:
+      # Set true only after validating the exact release and disk headroom.
+      - key: CATALOG_MONGO_EMBEDDED_ENABLED
+        value: 'true'
+      - key: CATALOG_MONGO_ROOT_PASSWORD
+        generateValue: true
+      - key: CATALOG_MONGO_APP_PASSWORD
+        generateValue: true
       - key: STORAGE_DRIVER
         value: render-disk
       - key: STORAGE_DISK_PATH

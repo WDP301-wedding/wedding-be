@@ -1,5 +1,15 @@
 # Backend Revision Tasks: 2026-10-10
 
+## MongoDB dish/menu-package image storage — 2026-11-10
+
+- [x] Add selective MongoDB GridFS file/metadata storage with existing signed URLs, validation and historical version ownership.
+- [x] Add non-destructive copy, checksum verification and disk export for rollback.
+- [x] Prepare a separate authenticated Render Private Service Blueprint and operator runbook.
+- [x] Complete scoped verification (214 tests), contract/type/build/OpenAPI checks and local real-MongoDB evidence; retain documented broader-suite limitations.
+- [x] Deploy the owner-revised co-hosted MongoDB runtime in the existing 25 USD backend service, migrate/verify all 36 retained images and prove restart persistence, signed HTTP reads, privilege boundaries and unchanged financial snapshots. The separate Private Service plan remains unapplied. [Co-hosted runbook](../docs/mongodb-cohost-render-2026-11-10.md).
+      [Scope/runbook](../docs/mongodb-food-media-2026-11-10.md).
+      [Evidence and release limits](./evidence/mongodb-food-media-2026-11-10.md).
+
 ## Fixed table capacity and effective commercial summaries — 2026-11-09
 
 - [x] Guard commercial writes and Couple planning changes with ten people per table and published active hall-layout table maximum; preserve reserved payment reconciliation.
@@ -892,5 +902,6 @@ SPEC-01–05 or replace the separate provider/runtime readiness gates.
 - [x] Complete isolated PostgreSQL, Manager Web and desktop/mobile browser checks;
       remove the owner-named unused Staff test identity on the confirmed Render
       workspace, retaining audit. [Evidence](evidence/staff-email-invitations-2026-11-09.md).
-- [ ] Release backend/Manager Web and verify deployed behavior; real inbox
-      delivery remains separate from provider acceptance and controlled tests.
+- [x] Release backend/Manager Web and verify deployed behavior, migration, Manager
+      link origin and test-account absence. Real inbox delivery is left for the
+      owner's requested retry and remains separate from provider acceptance.
