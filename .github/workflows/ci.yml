@@ -84,7 +84,7 @@ jobs:
   quality:
     # Preserve the existing check name for branch protection and release consumers.
     name: Static, test, build, and audit gates
-    needs: [lint, production, postgresql-integration]
+    needs: [lint, production, postgresql-integration, mongodb-integration]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     timeout-minutes: 1
@@ -94,9 +94,50 @@ jobs:
           LINT_RESULT: ${{ needs.lint.result }}
           PRODUCTION_RESULT: ${{ needs.production.result }}
           MIGRATIONS_RESULT: ${{ needs.postgresql-integration.result }}
+          MONGODB_RESULT: ${{ needs.mongodb-integration.result }}
         run: |
           printf 'Lint: %s; production: %s; migrations: %s\n' "$LINT_RESULT" "$PRODUCTION_RESULT" "$MIGRATIONS_RESULT"
-          [[ "$LINT_RESULT" == success && "$PRODUCTION_RESULT" == success && "$MIGRATIONS_RESULT" == success ]]
+          [[ "$LINT_RESULT" == success && "$PRODUCTION_RESULT" == success && "$MIGRATIONS_RESULT" == success && "$MONGODB_RESULT" == success ]]
+
+  mongodb-integration:
+    name: MongoDB GridFS media gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: mirror.gcr.io/library/postgres:17@sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3
+        env:
+          POSTGRES_DB: wedding_mongo_ci
+          POSTGRES_USER: wedding_ci
+          POSTGRES_PASSWORD: wedding_ci_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U wedding_ci -d wedding_mongo_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      mongo:
+        image: mongo:8.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ping:1})'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_MONGO_URI: mongodb://127.0.0.1:27017
+      TEST_MIGRATION_DATABASE_URL: postgresql://wedding_ci:wedding_ci_only@127.0.0.1:5432/wedding_mongo_ci
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Prepare backend dependencies
+        uses: ./.github/actions/backend-setup
+      - name: Verify real MongoDB images and non-destructive migration
+        run: npm run test:mongo
 
   postgresql-integration:
     name: PostgreSQL migration and integration gates

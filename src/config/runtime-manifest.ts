@@ -41,7 +41,11 @@ export function createRuntimeFeatureManifest(config: BackendConfig, revision?: s
       ),
       catalogStorage: feature(
         config.storage.enabled,
-        config.storage.enabled ? config.storage.provider : 'development-fake',
+        config.storage.enabled
+          ? config.storage.catalogMongo
+            ? 'mongodb-gridfs-food+render-disk'
+            : config.storage.provider
+          : 'development-fake',
       ),
       invitationStorage: feature(
         config.storage.enabled,

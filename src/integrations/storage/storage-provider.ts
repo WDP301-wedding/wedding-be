@@ -19,6 +19,8 @@ export interface PutObjectCommand {
   readonly contentType: StorageContentType;
   readonly purpose: StoragePurpose;
   readonly resourceId: string;
+  /** Server-selected food catalog owner, never accepted from a public upload body. */
+  readonly catalogResourceType?: 'DISH_VERSION' | 'MENU_PACKAGE_VERSION';
 }
 
 export interface StorageObjectReference {
@@ -67,7 +69,8 @@ export function createStorageObjectReference(value: unknown): StorageObjectRefer
 }
 
 export function validatePutObjectCommand(command: PutObjectCommand): PutObjectCommand {
-  return parseStorageInput(putObjectCommandSchema, command);
+  const { catalogResourceType, ...validated } = parseStorageInput(putObjectCommandSchema, command);
+  return { ...validated, ...(catalogResourceType ? { catalogResourceType } : {}) };
 }
 
 export function validateSignedReadTtl(expiresInSeconds?: number): number {

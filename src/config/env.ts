@@ -255,6 +255,29 @@ const rawEnvironmentSchema = z
       httpsUrl.refine((value) => new URL(value).origin === value).optional(),
     ),
     STORAGE_SIGNING_KEY: optionalString.pipe(z.string().min(32).max(1024).optional()),
+    CATALOG_MONGO_URI: optionalString.pipe(
+      z
+        .string()
+        .refine((value) => {
+          try {
+            const url = new URL(value);
+            return (
+              ['mongodb:', 'mongodb+srv:'].includes(url.protocol) &&
+              Boolean(url.hostname) &&
+              !url.hash
+            );
+          } catch {
+            return false;
+          }
+        }, 'Must be a MongoDB connection URI.')
+        .optional(),
+    ),
+    CATALOG_MONGO_DATABASE: optionalString.pipe(
+      z
+        .string()
+        .regex(/^[A-Za-z][A-Za-z0-9_-]{0,62}$/u)
+        .optional(),
+    ),
     RESEND_API_KEY: optionalString,
     VNPAY_TMN_CODE: optionalString.pipe(
       z
@@ -395,6 +418,14 @@ const rawEnvironmentSchema = z
         context,
       );
     const uniqueOrigins = new Set(environment.CORS_ALLOWED_ORIGINS);
+    requireAllOrNone(environment, ['CATALOG_MONGO_URI', 'CATALOG_MONGO_DATABASE'], context);
+    if (environment.CATALOG_MONGO_URI && !environment.STORAGE_DISK_PATH) {
+      context.addIssue({
+        code: 'custom',
+        path: ['CATALOG_MONGO_URI'],
+        message: 'Food image storage requires configured disk storage and signed URLs.',
+      });
+    }
     if (uniqueOrigins.size !== environment.CORS_ALLOWED_ORIGINS.length) {
       context.addIssue({
         code: 'custom',
@@ -497,6 +528,7 @@ type StorageConfig =
       root: string;
       publicOrigin: string;
       signingKey: string;
+      catalogMongo?: Readonly<{ uri: string; database: string }>;
     }>;
 type EmailConfig =
   | DisabledProvider
@@ -680,6 +712,8 @@ function pickEnvironment(source: EnvironmentSource): EnvironmentSource {
     STORAGE_DISK_PATH: source.STORAGE_DISK_PATH,
     STORAGE_PUBLIC_ORIGIN: source.STORAGE_PUBLIC_ORIGIN,
     STORAGE_SIGNING_KEY: source.STORAGE_SIGNING_KEY,
+    CATALOG_MONGO_URI: source.CATALOG_MONGO_URI,
+    CATALOG_MONGO_DATABASE: source.CATALOG_MONGO_DATABASE,
     PUBLIC_INVITATION_ORIGIN: source.PUBLIC_INVITATION_ORIGIN,
     PUBLIC_INVITATION_WEB_ORIGIN: source.PUBLIC_INVITATION_WEB_ORIGIN,
     MANAGE_WEB_ORIGIN: source.MANAGE_WEB_ORIGIN,
@@ -766,6 +800,14 @@ function createConfig(environment: RawEnvironment): Omit<BackendConfig, 'notific
           root: environment.STORAGE_DISK_PATH,
           publicOrigin: environment.STORAGE_PUBLIC_ORIGIN,
           signingKey: environment.STORAGE_SIGNING_KEY,
+          ...(environment.CATALOG_MONGO_URI && environment.CATALOG_MONGO_DATABASE
+            ? {
+                catalogMongo: Object.freeze({
+                  uri: environment.CATALOG_MONGO_URI,
+                  database: environment.CATALOG_MONGO_DATABASE,
+                }),
+              }
+            : {}),
         })
       : Object.freeze({ enabled: false });
   const email: EmailConfig =

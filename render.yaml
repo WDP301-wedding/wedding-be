@@ -1,4 +1,7 @@
 # Paid backend + 1 GB disk approved by the owner; PostgreSQL remains Free.
+# MongoDB food images: separate private-service Blueprint ops/render/mongodb.yaml.
+# Set CATALOG_MONGO_URI and CATALOG_MONGO_DATABASE on this API only after migration
+# verification. Keep this disk for private/non-food media and rollback originals.
 databases:
   - name: wedding-db-render-trial
     plan: free
