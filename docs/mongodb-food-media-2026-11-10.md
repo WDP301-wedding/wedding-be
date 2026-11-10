@@ -1,5 +1,10 @@
 # MongoDB food catalog media — 2026-11-10
 
+**Current owner revision:** deploy MongoDB on localhost inside the existing
+25 USD Render backend service using its existing disk. The separate Private
+Service plan below is retained as historical context and must remain unapplied.
+Follow [the co-hosted runtime/deployment runbook](./mongodb-cohost-render-2026-11-10.md).
+
 Owner authorization: store actual dish/menu-package image files and file metadata
 in MongoDB, hosted as a separate private Render service. Dish/menu content,
 prices, versions, bookings, contracts, invoices and payments remain in PostgreSQL.

@@ -16,7 +16,8 @@ export interface FoodMediaMigrationAsset {
   readonly sizeBytes: number;
   readonly detachedAt: Date | null;
 }
-export type FoodMediaMigrationMode = 'copy-to-mongo' | 'verify' | 'export-to-disk';
+export type FoodMediaMigrationMode =
+  'copy-to-mongo' | 'reconcile-to-mongo' | 'verify' | 'export-to-disk';
 
 /** No relational writes, source deletes or automatic backend switches. */
 export async function migrateFoodMedia(input: {
@@ -36,10 +37,13 @@ export async function migrateFoodMedia(input: {
   for await (const asset of input.assets) {
     summary.examined++;
     const reference = createStorageObjectReference({ ...asset, purpose: 'VENUE_CATALOG_MEDIA' });
+    let existingMongo: boolean;
     let bytes: Uint8Array | null;
     try {
-      bytes =
-        input.mode === 'copy-to-mongo'
+      bytes = input.mode === 'reconcile-to-mongo' ? await input.mongo.read(reference) : null;
+      existingMongo = bytes !== null;
+      bytes ??=
+        input.mode === 'copy-to-mongo' || input.mode === 'reconcile-to-mongo'
           ? await input.disk.read!(reference)
           : await input.mongo.read(reference);
       if (bytes === null) throw new NotFoundError();
@@ -64,8 +68,8 @@ export async function migrateFoodMedia(input: {
       expected.sizeBytes !== asset.sizeBytes
     )
       throw new ProviderError('failure');
-    if (input.apply && input.mode !== 'verify') {
-      const destination = input.mode === 'copy-to-mongo' ? input.mongo : input.disk;
+    if (input.apply && input.mode !== 'verify' && !existingMongo) {
+      const destination = input.mode === 'export-to-disk' ? input.disk : input.mongo;
       await destination.put(command);
       const restored = await destination.read!(reference);
       if (restored === null || !Buffer.from(restored).equals(Buffer.from(bytes)))

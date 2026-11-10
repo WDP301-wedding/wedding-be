@@ -31,6 +31,20 @@ function fixture() {
   return { disk, mongo };
 }
 describe('non-destructive food image migration', () => {
+  it('reconciles Mongo-only new images after restart without requiring a legacy disk copy', async () => {
+    const f = fixture();
+    f.disk.read.mockRejectedValue(new NotFoundError());
+    expect(
+      await migrateFoodMedia({ ...f, assets: rows(), mode: 'reconcile-to-mongo', apply: true }),
+    ).toMatchObject({ verified: 1, written: 0 });
+    expect(f.disk.read).not.toHaveBeenCalled();
+    expect(f.mongo.put).not.toHaveBeenCalled();
+    f.mongo.read.mockResolvedValueOnce(null);
+    f.disk.read.mockResolvedValue(bytes);
+    expect(
+      await migrateFoodMedia({ ...f, assets: rows(), mode: 'reconcile-to-mongo', apply: true }),
+    ).toMatchObject({ verified: 1, written: 1 });
+  });
   it('defaults to a checksum-verified dry run without destination writes or source deletes', async () => {
     const f = fixture();
     expect(

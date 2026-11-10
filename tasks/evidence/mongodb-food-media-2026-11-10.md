@@ -1,5 +1,29 @@
 # MongoDB food-image storage evidence — 2026-11-10
 
+## Owner-authorized co-hosted continuation
+
+The owner subsequently requested actual deployment inside the existing 25 USD
+backend service, replacing the separate-service plan. No additional Render
+service or disk-size/compute-plan increase is authorized. Follow the
+[co-hosted runbook](../../docs/mongodb-cohost-render-2026-11-10.md).
+
+Pre-release verification: **221/221 scoped tests** on disposable PostgreSQL 18.6
+and MongoDB 8.3; **2/2 additional auth-enabled MongoDB bootstrap/privilege tests**;
+**101/101 contract tests**; final typecheck/build, changed-file ESLint, OpenAPI
+check, shell syntax check and dependency audit pass. Audit reports no high/critical
+advisories. A fail-fast broad sweep still reproduces the previously observed
+`media-native-providers.test.ts` COMPLETED-phase fixture failure (expected 404,
+received 409); no existing test/quality guard was disabled.
+
+Read-only live preflight: existing service `1c-2g`, same 1 GiB disk, 825,323,520
+bytes available; 30 dish-image and 6 menu-image associations, 95,272,223 source
+bytes total. Applied PostgreSQL migrations match the release (no new migrations).
+Hashes/counts were captured for contract revisions/lines/approvals, appendices,
+invoice revisions, ledger entries and payment attempts to compare after release.
+The pre-release live deploy is `dep-dbotpo95efls73f02m0g`, commit `1149479`.
+Actual deployment, migration and restart verification are recorded below when
+observed; these local results alone are not deployed acceptance.
+
 Scope: actual dish/menu-package image bytes and technical metadata in MongoDB
 GridFS; content/prices/versions, associations/audit and commercial history stay in
 PostgreSQL. Owner selected this scope and Render hosting in this chat and confirmed

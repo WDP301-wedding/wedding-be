@@ -24,7 +24,6 @@ export function createSignedStorageProvider(config: StorageConfig): DiskStorageP
       serverSelectionTimeoutMS: 3000,
       connectTimeoutMS: 3000,
       socketTimeoutMS: 10000,
-      timeoutMS: 15000,
     });
     const provider = new MongoFoodStorageProvider(
       config,
@@ -47,6 +46,5 @@ export async function closeStorageProvider(config: StorageConfig): Promise<void>
 export async function checkStorageProvider(config: StorageConfig): Promise<void> {
   createSignedStorageProvider(config);
   const client = providers.get(config)?.client;
-  if (client)
-    await client.db(config.catalogMongo!.database).command({ ping: 1 }, { timeoutMS: 2000 });
+  if (client) await client.db(config.catalogMongo!.database).command({ ping: 1, maxTimeMS: 2000 });
 }

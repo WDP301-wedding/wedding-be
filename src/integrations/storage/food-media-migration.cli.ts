@@ -9,7 +9,7 @@ import {
   type FoodMediaMigrationMode,
 } from './food-media-migration.js';
 
-const modes = ['copy-to-mongo', 'verify', 'export-to-disk'] as const;
+const modes = ['copy-to-mongo', 'reconcile-to-mongo', 'verify', 'export-to-disk'] as const;
 const args = process.argv.slice(2);
 const mode = args[0];
 if (
@@ -17,7 +17,9 @@ if (
   args.slice(1).some((arg) => arg !== '--apply') ||
   args.length > 2
 )
-  throw new Error('Usage: npm run media:migrate -- copy-to-mongo|verify|export-to-disk [--apply]');
+  throw new Error(
+    'Usage: npm run media:migrate -- copy-to-mongo|reconcile-to-mongo|verify|export-to-disk [--apply]',
+  );
 if (!config.storage.enabled || !config.storage.catalogMongo || !config.database.url)
   throw new Error(
     'Configured PostgreSQL, disk storage and CATALOG_MONGO_URI/DATABASE are required.',
@@ -25,7 +27,8 @@ if (!config.storage.enabled || !config.storage.catalogMongo || !config.database.
 const settings = config.storage;
 const mongo = new MongoClient(settings.catalogMongo!.uri, {
   serverSelectionTimeoutMS: 3000,
-  timeoutMS: 15000,
+  connectTimeoutMS: 3000,
+  socketTimeoutMS: 10000,
   maxPoolSize: 2,
 });
 const prisma = createPrismaClient(config.database.url);

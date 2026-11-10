@@ -21,4 +21,9 @@ esac
 # Apply additive releases against this service's configured database. Prisma's
 # migration lock serializes retries; set -e prevents starting an incompatible API.
 npm run db:migrate:deploy
+case "${CATALOG_MONGO_EMBEDDED_ENABLED:-false}" in
+  true) exec node --enable-source-maps dist/integrations/storage/embedded-mongo.cli.js ;;
+  false|'') ;;
+  *) echo 'Invalid embedded MongoDB feature flag.' >&2; exit 1 ;;
+esac
 exec node --enable-source-maps --import ./dist/instrumentation.js dist/server.js

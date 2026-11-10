@@ -1,7 +1,9 @@
 # Backend Ownership
 
 Owner-approved amendment, 2026-11-10: store dish/menu-package image bytes and
-technical file metadata in MongoDB GridFS on a separate Render Private Service.
+technical file metadata in MongoDB GridFS. Owner revision in this chat, 2026-11-10:
+run MongoDB on localhost inside the existing 25 USD Render backend service using
+its current disk; do not create or apply the separate Private Service Blueprint.
 Keep catalog content/prices/versions, association/audit rows and all commercial
 history in PostgreSQL. Preserve source images during verified migration/rollback.
 See docs/mongodb-food-media-2026-11-10.md; do not claim deployed MongoDB acceptance
