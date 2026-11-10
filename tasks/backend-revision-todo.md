@@ -6,7 +6,7 @@
 - [x] Add non-destructive copy, checksum verification and disk export for rollback.
 - [x] Prepare a separate authenticated Render Private Service Blueprint and operator runbook.
 - [x] Complete scoped verification (214 tests), contract/type/build/OpenAPI checks and local real-MongoDB evidence; retain documented broader-suite limitations.
-- [ ] Review/apply the Render infrastructure plan, migrate files and verify deployed image operations. Local checks do not imply live acceptance.
+- [ ] Apply the reviewed Render infrastructure plan, migrate files and verify deployed image operations. Owner chose **keep plan, do not deploy** on 2026-11-10; resume only when requested. Local checks do not imply live acceptance.
       [Scope/runbook](../docs/mongodb-food-media-2026-11-10.md).
       [Evidence and release limits](./evidence/mongodb-food-media-2026-11-10.md).
 

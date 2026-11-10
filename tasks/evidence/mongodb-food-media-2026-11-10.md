@@ -69,12 +69,14 @@ acceptance guard was disabled. Changed TypeScript/JavaScript files pass ESLint.
   Service (`wedding-food-mongodb-u3p5`), 0.5 CPU / 512 MB, 1 GiB disk at `/data/db`,
   generated root/application credentials and no public web endpoint. No existing
   resources are adopted, replaced or removed.
-- Plan URL: <https://dashboard.render.com/blueprint/exs-dbpaln3rjlhs73fclk0g/sync/exe-dbpalnbrjlhs73fcll2g>.
-  Planning is not deployment; approval has not been applied.
+- Latest plan URL: <https://dashboard.render.com/blueprint/exs-dbpaln3rjlhs73fclk0g/sync/exe-dbpamrbrjlhs73fcpdeg>,
+  generated from reviewed commit `96d35b3`. Planning is not deployment. After
+  reviewing the concrete plan/cost, the owner chose **keep the plan, do not deploy**
+  in this chat on 2026-11-10. Approval was not applied and no paid service was created.
 - A read-only Render PostgreSQL inventory could not run through hosted MCP because
   the database correctly blocks external connections. No allowlist was widened.
   Actual source counts must be collected by migration inside the running API Shell.
-- Pending: user approval of the concrete Render infrastructure plan, actual MongoDB
+- Deferred by the owner: approval of the concrete Render infrastructure plan, actual MongoDB
   deployment and authenticated persistence/restart checks, controlled API release,
   source copy/verification/cutover, and deployed Manager image operations with
   historical reads. Follow the [runbook](../../docs/mongodb-food-media-2026-11-10.md).
