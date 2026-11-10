@@ -69,10 +69,10 @@ commercial history. Use `mongodump`/`mongorestore` and backups outside this disk
 
 Deployment completed on 2026-11-10: commit `feae2d7`, active deploy
 `dep-dbphbbff3r2c7385jr2g`. The existing service still uses `1c-2g`, its original
-1 GiB disk and only HTTP port 10000. Its source branch is
-`codex/mongodb-food-media` with auto-deploy off; merge this branch before switching
-the service back to `main`. Do not point the service at an older disk-only branch
-without completing the export/rollback sequence above.
+1 GiB disk and only HTTP port 10000. The owner subsequently requested merging the
+release into `main` and deploying from `main`; keep auto-deploy off during that
+promotion and deploy the checked merge commit explicitly. Do not point the service
+at an older disk-only commit without completing the export/rollback sequence above.
 
 All 36 retained food images were copied and checksum-verified, with original
 disk files retained. A real service restart verified unchanged metadata and

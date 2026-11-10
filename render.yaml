@@ -16,8 +16,7 @@ services:
     name: wedding-be-render-trial
     runtime: docker
     repo: https://github.com/WDP301-wedding/wedding-be
-    # Keep the co-hosted release branch until it is merged into main.
-    branch: codex/mongodb-food-media
+    branch: main
     plan: 1c-2g
     region: singapore
     dockerfilePath: ./Dockerfile
