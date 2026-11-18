@@ -1,3 +1,14 @@
 {
-  "exceptions": []
+  "exceptions": [
+    {
+      "advisoryId": "1247710",
+      "package": "picomatch",
+      "severity": "high",
+      "advisoryUrl": "https://github.com/advisories/GHSA-fc5q-39xc-vjpf",
+      "reachability": "The lockfile resolves picomatch 4.0.7 through the Vitest toolchain. The production image retains development dependencies, but the backend startup and API paths do not load Vitest or pass request data to its glob matcher.",
+      "mitigation": "Vitest uses repository-controlled test globs in CI. Upgrade to a patched release and remove this exception once the locked dependency tree no longer reports this advisory.",
+      "owner": "backend maintainers",
+      "reviewBy": "2026-12-02"
+    }
+  ]
 }
