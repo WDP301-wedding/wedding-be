@@ -63,5 +63,5 @@ after creating a new provider instance. They also prove same/distinct-command ra
 timeline supersession, concealed denial, late money and immutable completion.
 
 Authority: [ADR-004](0004-enlist-booking-owner-providers-and-retention-evidence.md),
-[SPEC-04](../../SPEC-payments-billing.md), and
+[SPEC-04](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-payments-billing.md), and
 [the approved plan](../archive/plan-2026-10-10.md#21-spec-04-payments-billing-bounded-implementation-plan).

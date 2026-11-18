@@ -2,7 +2,7 @@
 
 Date: 2026-10-12 (Asia/Saigon). Provider version: `staff-operations@1.0.0`.
 Authority: [confirmed scope](backend-scope-2026-10-10.md),
-[SPEC-08](../SPEC-staff-operations.md). Acceptance results and exact OpenAPI digest
+[SPEC-08](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-staff-operations.md). Acceptance results and exact OpenAPI digest
 are recorded in [evidence](../tasks/evidence/staff-operations-w1-w5-2026-10-12.md).
 
 This release implements the named Guest contract. A Guest may bring other people.

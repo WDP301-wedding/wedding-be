@@ -3,7 +3,7 @@
 Implementation date: 2026-10-11. Branch: `codex/commercial-contracts-step-4`.
 Scope: wedding-be only. Authoritative scope remains
 [2026-10-10 backend scope](./backend-scope-2026-10-10.md) and
-[SPEC-commercial-contracts](../SPEC-commercial-contracts.md).
+[SPEC-commercial-contracts](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-commercial-contracts.md).
 [ADR-010](./decisions/0010-freeze-full-commercial-contracts-before-deposit.md)
 records transaction, receivable and PDF decisions.
 

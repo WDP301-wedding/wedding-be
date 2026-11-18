@@ -6,7 +6,7 @@ Status: **Approved contract and team allocation** by the project owner, 2026-10-
 Active baseline: `WEDDING-CONTRACT-1@1.1.0`.
 Inherited baseline: `WEDDING-CONTRACT-1@1.0.0`.
 Accepted additions: [amendment 1.1.0, Section 21](../CONTRACT-BASELINE.md).
-Module register: [CAPABILITY-MAP.md](../CAPABILITY-MAP.md).
+Module register: [CAPABILITY-MAP.md](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/CAPABILITY-MAP.md).
 
 ## 1. What independent implementation means
 

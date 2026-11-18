@@ -80,7 +80,7 @@ Proof: `vnpay.protocol.test.ts`, `vnpay.gateway.test.ts`, `vnpay.service.test.ts
 timeout-after-IPN, expiry, changed payload/currency, transaction reuse, proof-commit
 faults, money-write recovery, same-account promotion and retained late money.
 
-Authority: [SPEC-04](../../SPEC-payments-billing.md),
+Authority: [SPEC-04](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-payments-billing.md),
 [ADR-005](0005-recover-deposit-application-after-durable-settlement.md),
 [Billing evidence](../../tasks/evidence/payments-billing.md),
 [official PAY documentation](https://sandbox.vnpayment.vn/apis/docs/thanh-toan-pay/pay.html),

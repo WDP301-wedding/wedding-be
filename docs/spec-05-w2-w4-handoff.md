@@ -1,7 +1,7 @@
 # Invitation Backend Provider Hand-off
 
 Current contract index after documentation consolidation on 2026-10-10.
-[Invitation specification](../SPEC-invitation-studio.md),
+[Invitation specification](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-invitation-studio.md),
 [contract baseline](../CONTRACT-BASELINE.md) and the
 [committed OpenAPI](../openapi/openapi.json) define the owned contracts.
 [Backend scope](./backend-scope-2026-10-10.md) governs commercial/profile amendments;

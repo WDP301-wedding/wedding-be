@@ -307,7 +307,7 @@ Concurrency tests are required for timeline approvals versus edits, payment elig
 
 This product revision is specified when:
 
-- CPL/SVC/CTR/FIN requirements trace to the [commercial extension](./SPEC-commercial-contracts.md), and backend task/evidence gates are separate from frontend delivery;
+- CPL/SVC/CTR/FIN requirements trace to the [commercial extension](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-commercial-contracts.md), and backend task/evidence gates are separate from frontend delivery;
 - the complete [confirmed scope](./docs/backend-scope-2026-10-10.md) overrides earlier incompatible access, print charging and deposit rules;
 
 - every functional requirement is allocated to exactly one provider module and any consumers depend in the direction recorded by `CAPABILITY-MAP.md`;
