@@ -26,6 +26,10 @@ const empty = z.strictObject({});
 const bookParams = z.strictObject({ bookingId: id });
 const designParams = bookParams.extend({ designId: id });
 const context = (res: Response) => res.locals.studioContext as MediaRequestContext;
+const publicContext = (req: Request): MediaRequestContext => ({
+  actorId: 'public',
+  requestId: req.requestId,
+});
 const key = (req: Request) => {
   const value = req.get('idempotency-key');
   if (value === undefined) throw new IdempotencyKeyRequiredError();
@@ -66,7 +70,6 @@ export function createStudioRouter(
   };
   router.use(
     [
-      '/invitation-templates',
       '/management/invitation-templates',
       '/bookings/:bookingId/invitations',
       '/bookings/:bookingId/invitation-image-generations',
@@ -138,8 +141,8 @@ export function createStudioRouter(
       })().catch(next);
     },
   );
-  route('get', '/invitation-templates', schemas.templateListResponse, (req, res) =>
-    services.designs.listTemplates(parseStudio(schemas.templateQuery, req.query), context(res)),
+  route('get', '/invitation-templates', schemas.templateListResponse, (req) =>
+    services.designs.listTemplates(parseStudio(schemas.templateQuery, req.query), publicContext(req)),
   );
   route(
     'get',
