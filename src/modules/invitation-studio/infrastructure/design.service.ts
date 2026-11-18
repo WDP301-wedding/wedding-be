@@ -121,7 +121,14 @@ export class DesignService {
   }
   async listTemplates(page: unknown, context: MediaRequestContext) {
     const query = parseStudio(pageSchema, page);
-    await this.access.templates(query.bookingId, query.includeArchived, context);
+    // Public access: no token, no bookingId, no archived → only active templates, skip auth
+    const isPublicRequest =
+      context.accessToken === undefined &&
+      query.bookingId === undefined &&
+      !query.includeArchived;
+    if (!isPublicRequest) {
+      await this.access.templates(query.bookingId, query.includeArchived, context);
+    }
     const rows = await this.repository.templatePage(query);
     const heads = rows.slice(0, query.limit);
     const items = heads.map((row) => {
@@ -135,7 +142,9 @@ export class DesignService {
         ...parseStudio(designContentSchema, row.content),
       };
     });
-    await this.access.templates(query.bookingId, query.includeArchived, context);
+    if (!isPublicRequest) {
+      await this.access.templates(query.bookingId, query.includeArchived, context);
+    }
     return { items, nextCursor: rows.length > query.limit ? rows[query.limit - 1]!.id : null };
   }
   async getTemplate(templateValue: string, context: MediaRequestContext, versionValue?: string) {
