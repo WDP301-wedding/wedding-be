@@ -40,6 +40,7 @@ export function createRedisManager(options: RedisManagerOptions): RedisManager {
     throw new Error('INVALID_REDIS_URL: Redis URL must start with redis:// or rediss://');
   }
 
+  let closing = false;
   const baseOptions: RedisOptions = {
     lazyConnect: true,
     connectTimeout: 5_000,
@@ -47,11 +48,10 @@ export function createRedisManager(options: RedisManagerOptions): RedisManager {
     maxRetriesPerRequest: 3,
     enableOfflineQueue: false,
     retryStrategy(times) {
-      if (times > 5) {
-        logger?.warn({ attempts: times }, 'Redis reconnection limit reached.');
-        return null; // Stop retrying
-      }
-      return Math.min(times * 200, 2_000); // Exponential backoff with 2s cap
+      if (closing) return null;
+      // Keep all three connections recoverable after a prolonged outage. Commands
+      // still fail promptly: no offline queue and a bounded command timeout.
+      return Math.min(times * 200, 5_000) + Math.floor(Math.random() * 200);
     },
   };
 
@@ -75,13 +75,20 @@ export function createRedisManager(options: RedisManagerOptions): RedisManager {
           if (c.status !== 'ready' && c.status !== 'connecting') {
             await c.connect();
           }
-          const pong = await Promise.race([
-            c.ping(),
-            new Promise<string>((_, reject) =>
-              setTimeout(() => reject(new Error(`Redis ${name} connection timeout`)), 3000),
-            ),
-          ]);
-          return pong;
+          let timeout: ReturnType<typeof setTimeout> | undefined;
+          try {
+            return await Promise.race([
+              c.ping(),
+              new Promise<string>((_, reject) => {
+                timeout = setTimeout(
+                  () => reject(new Error(`Redis ${name} connection timeout`)),
+                  3000,
+                );
+              }),
+            ]);
+          } finally {
+            clearTimeout(timeout);
+          }
         };
 
         const [generalPong, pubPong, subPong] = await Promise.all([
@@ -110,12 +117,12 @@ export function createRedisManager(options: RedisManagerOptions): RedisManager {
       return { pub: pubClient, sub: subClient };
     },
     async healthCheck() {
-      // Let ioredis own reconnects already in progress. Restart a connection
-      // whose automatic retry budget was exhausted without blocking the probe.
-      if (client.status === 'end') {
-        void client.connect().catch(() => undefined);
+      if (closing) return false;
+      // A healthy command client alone does not prove cross-node fanout works.
+      for (const connection of allClients) {
+        if (connection.status === 'end') void connection.connect().catch(() => undefined);
       }
-      if (client.status !== 'ready') return false;
+      if (allClients.some((connection) => connection.status !== 'ready')) return false;
       try {
         const pong = await client.ping();
         return pong === 'PONG';
@@ -124,6 +131,7 @@ export function createRedisManager(options: RedisManagerOptions): RedisManager {
       }
     },
     async close() {
+      closing = true;
       await Promise.all(
         allClients.map(async (c) => {
           try {

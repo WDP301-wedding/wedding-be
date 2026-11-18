@@ -39,6 +39,7 @@ export type RealtimeActor = Readonly<{
 }>;
 
 export interface ServerToClientEvents {
+  'realtime:resync': () => void;
   'realtime:event': (event: RealtimeEvent) => void;
   'subscription:denied': (data: { reason: string; bookingId?: string }) => void;
   'subscription:confirmed': (data: { room: string }) => void;

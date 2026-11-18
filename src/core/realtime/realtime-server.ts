@@ -6,7 +6,6 @@ import type { PrismaClient } from '../../generated/prisma/client.js';
 import type { Logger } from 'pino';
 import type { BackendConfig } from '../../config/env.js';
 import type { SessionRepository } from '../../modules/identity-access/session/session.repository.js';
-import { createAuthenticatedActorResolver } from '../../modules/identity-access/authorization/authenticated-actor.middleware.js';
 import { hashOpaqueToken } from '../../modules/identity-access/crypto/token.js';
 import type { RedisManager } from '../redis/redis-client.js';
 import {
@@ -17,6 +16,8 @@ import {
 import { createRealtimeBroker, type RealtimeBroker } from './realtime-broker.js';
 import { createRealtimeAudience } from './realtime-audience.js';
 import { createRealtimeLimits } from './realtime-limits.js';
+import type { RealtimeMetrics } from './realtime-metrics.js';
+import { watchFanoutRecovery } from './redis-fanout-recovery.js';
 
 export interface RealtimeServerOptions {
   readonly httpServer: HttpServer;
@@ -25,6 +26,7 @@ export interface RealtimeServerOptions {
   readonly prisma: PrismaClient;
   readonly redisManager: RedisManager;
   readonly logger?: Logger;
+  readonly metrics?: RealtimeMetrics;
 }
 
 export interface RealtimeServerInstance {
@@ -72,6 +74,7 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
     },
   });
 
+  const recoveryCleanups: Array<() => void> = [];
   // Attach Redis adapter for multi-instance fanout if Redis is configured
   if (redisManager.isConfigured) {
     const pubSub = redisManager.createPubSubPair();
@@ -81,11 +84,20 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
           key: `wedding:${config.runtime.environment}:socket.io`,
         }),
       );
+      recoveryCleanups.push(
+        watchFanoutRecovery(pubSub, () => {
+          io.local.emit('realtime:resync');
+          options.metrics?.fanoutRecovered();
+          logger?.info(
+            { event: 'realtime_redis_recovered' },
+            'Realtime clients requested to resynchronize.',
+          );
+        }),
+      );
       logger?.info('Socket.IO Redis multi-instance fanout adapter enabled.');
     }
   }
 
-  const actorResolver = createAuthenticatedActorResolver(sessionRepository);
   // A namespace socket is not connected until async middleware completes. A
   // transport can send more CONNECT packets in that gap, bypassing the limits
   // installed after authentication. Admit before the first database lookup.
@@ -199,14 +211,12 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
         // 2. Extract token from auth payload
         const auth = socket.handshake.auth as Record<string, unknown> | undefined;
         const token = auth?.token;
-        if (typeof token !== 'string' || !token) {
+        if (typeof token !== 'string' || !/^wia_[A-Za-z0-9_-]{43}$/u.test(token)) {
           return next(new Error('AUTHENTICATION_REQUIRED'));
         }
 
         // 3. IP connection limit check with trusted proxy policy
         const clientIp = extractClientIp(socket);
-        const actor = await actorResolver.resolve(token);
-        if (!transportIsOpen()) return next(new Error('TRANSPORT_CLOSED'));
         const tokenHash = hashOpaqueToken(token, 'access');
         const state = await sessionRepository.findActorByAccessTokenHash(tokenHash);
         if (!transportIsOpen()) return next(new Error('TRANSPORT_CLOSED'));
@@ -219,13 +229,14 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
           state.credentialStatus !== 'ACTIVE' ||
           state.sessionStatus !== 'ACTIVE' ||
           state.accountStatus !== 'ACTIVE' ||
-          state.credentialExpiresAt.getTime() <= now ||
-          state.idleExpiresAt.getTime() <= now ||
-          state.absoluteExpiresAt.getTime() <= now
+          ![state.credentialExpiresAt, state.idleExpiresAt, state.absoluteExpiresAt].every(
+            (date) => Number.isFinite(date.getTime()) && date.getTime() > now,
+          )
         ) {
           return next(new Error('TOKEN_EXPIRED'));
         }
 
+        const actor = state;
         const actualTokenExpiry = Math.min(
           state.credentialExpiresAt.getTime(),
           state.idleExpiresAt.getTime(),
@@ -303,6 +314,11 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
   // fetchSockets reaches every Redis adapter node. Check authority in batches,
   // then dispatch only to authorized socket IDs, never to unchecked room members.
   const broker = createRealtimeBroker(io, logger, undefined, async (rooms, event) => {
+    // Do not acknowledge outbox delivery while the fanout transport is unavailable.
+    const pair = redisManager.createPubSubPair();
+    if (pair && (pair.pub.status !== 'ready' || pair.sub.status !== 'ready')) {
+      throw new Error('REALTIME_FANOUT_UNAVAILABLE');
+    }
     const sockets = await io.in([...rooms]).fetchSockets();
     const ids = await authorizeAudience(sockets, rooms, event);
     for (let offset = 0; offset < ids.length; offset += 200) {
@@ -317,13 +333,23 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
     const sockets = [...io.sockets.sockets.values()];
     void (async () => {
       await authorizeAudience(sockets, []);
-      for (const socket of sockets) {
-        if (
-          socket.connected &&
-          !(await limits.reserve(extractClientIp(socket), socket.data.actor.accountId, socket.id))
-        ) {
-          socket.disconnect(true);
-        }
+      // Bounded concurrency keeps Redis round trips from serializing every
+      // socket's lease renewal while avoiding an unbounded command burst.
+      for (let offset = 0; offset < sockets.length; offset += 20) {
+        await Promise.all(
+          sockets.slice(offset, offset + 20).map(async (socket) => {
+            if (
+              socket.connected &&
+              !(await limits.reserve(
+                extractClientIp(socket),
+                socket.data.actor.accountId,
+                socket.id,
+              ))
+            ) {
+              socket.disconnect(true);
+            }
+          }),
+        );
       }
     })()
       .catch((err) => {
@@ -402,8 +428,12 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
         });
     });
 
+    const pendingSubscriptions = new Map<string, symbol>();
+
     // 4. Booking subscription handler with shape validation and authorization
     socket.on('subscribe:booking', async (data) => {
+      let reservation: symbol | undefined;
+      const requestedId = data?.bookingId;
       try {
         const bookingId = data?.bookingId;
         if (typeof bookingId !== 'string' || !UUID_REGEX.test(bookingId)) {
@@ -411,9 +441,11 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
           return;
         }
 
+        if (pendingSubscriptions.has(bookingId)) return;
         if (
           !socket.data.subscriptions.has(bookingId) &&
-          socket.data.subscriptions.size >= MAX_SUBSCRIPTIONS_PER_SOCKET
+          new Set([...socket.data.subscriptions, ...pendingSubscriptions.keys()]).size >=
+            MAX_SUBSCRIPTIONS_PER_SOCKET
         ) {
           socket.emit('subscription:denied', {
             reason: 'SUBSCRIPTION_LIMIT_EXCEEDED',
@@ -421,6 +453,22 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
           });
           return;
         }
+
+        reservation = Symbol(bookingId);
+        pendingSubscriptions.set(bookingId, reservation);
+        const joinBooking = async () => {
+          if (!socket.connected || pendingSubscriptions.get(bookingId) !== reservation)
+            return false;
+          await socket.join(`booking:${bookingId}`);
+          if (!socket.connected || pendingSubscriptions.get(bookingId) !== reservation) {
+            if (!socket.data.subscriptions.has(bookingId))
+              await socket.leave(`booking:${bookingId}`);
+            return false;
+          }
+          socket.data.subscriptions.add(bookingId);
+          socket.emit('subscription:confirmed', { room: `booking:${bookingId}` });
+          return true;
+        };
 
         // Validate session is still active before granting new room subscriptions
         const active = await validateSocketSession(socket);
@@ -431,9 +479,7 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
 
         // Authorization check
         if (currentActor.roles.includes('MANAGER')) {
-          await socket.join(`booking:${bookingId}`);
-          socket.data.subscriptions.add(bookingId);
-          socket.emit('subscription:confirmed', { room: `booking:${bookingId}` });
+          if (!(await joinBooking())) return;
           await emitPublicationSnapshot(socket, bookingId);
           return;
         }
@@ -463,9 +509,7 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
             return;
           }
 
-          await socket.join(`booking:${bookingId}`);
-          socket.data.subscriptions.add(bookingId);
-          socket.emit('subscription:confirmed', { room: `booking:${bookingId}` });
+          if (!(await joinBooking())) return;
           if (grant.level === 'FULL') await emitPublicationSnapshot(socket, bookingId);
           return;
         }
@@ -484,15 +528,22 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
             return;
           }
 
-          await socket.join(`booking:${bookingId}`);
-          socket.data.subscriptions.add(bookingId);
-          socket.emit('subscription:confirmed', { room: `booking:${bookingId}` });
+          if (!(await joinBooking())) return;
           return;
         }
 
         socket.emit('subscription:denied', { reason: 'FORBIDDEN', bookingId });
       } catch (err) {
         logger?.error({ err }, 'Error handling subscribe:booking.');
+        socket.emit('subscription:denied', { reason: 'SUBSCRIPTION_UNAVAILABLE' });
+      } finally {
+        if (
+          typeof requestedId === 'string' &&
+          reservation &&
+          pendingSubscriptions.get(requestedId) === reservation
+        ) {
+          pendingSubscriptions.delete(requestedId);
+        }
       }
     });
 
@@ -500,6 +551,7 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
       try {
         const bookingId = data?.bookingId;
         if (typeof bookingId === 'string' && UUID_REGEX.test(bookingId)) {
+          pendingSubscriptions.delete(bookingId);
           void socket.leave(`booking:${bookingId}`);
           socket.data.subscriptions.delete(bookingId);
         }
@@ -509,6 +561,7 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
     });
 
     socket.on('disconnect', (reason) => {
+      pendingSubscriptions.clear();
       logger?.debug(
         { accountId: socket.data.actor.accountId, socketId: socket.id, reason },
         'Realtime socket disconnected.',
@@ -521,6 +574,7 @@ export function createRealtimeServer(options: RealtimeServerOptions): RealtimeSe
     broker,
     async close() {
       clearInterval(sweepTimer);
+      for (const cleanup of recoveryCleanups) cleanup();
       await io.close();
     },
   };

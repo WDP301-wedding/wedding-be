@@ -93,7 +93,7 @@ it('still connects a valid client after checking its current session', async () 
     socket.send(connectPacket);
     fixture.finish(activeCredential());
     await connected;
-    expect(fixture.lookup).toHaveBeenCalledTimes(2);
+    expect(fixture.lookup).toHaveBeenCalledTimes(1);
     expect(fixture.realtime.io.sockets.sockets.size).toBe(1);
   } finally {
     await fixture.close();
@@ -117,6 +117,100 @@ it('does not continue authentication after the pending transport closes', async 
 });
 
 const connectPacket = `40${JSON.stringify({ token: `wia_${'a'.repeat(43)}` })}`;
+
+it('reserves subscription slots before asynchronous authority checks', async () => {
+  const fixture = await admissionFixture();
+  let resume!: (value: AccessCredentialState) => void;
+  try {
+    const socket = await fixture.connect();
+    socket.send(connectPacket);
+    fixture.finish(activeCredential());
+    await vi.waitFor(() => expect(fixture.realtime.io.sockets.sockets.size).toBe(1));
+    await delay(20);
+    // Share one held lookup result for all pending requests.
+    const held = new Promise<AccessCredentialState>((resolve) => {
+      resume = resolve;
+    });
+    fixture.lookup.mockImplementation(() => held);
+    const ids = Array.from(
+      { length: 21 },
+      (_, i) => `00000000-0000-4000-8000-${String(i).padStart(12, '0')}`,
+    );
+    const denied: string[] = [];
+    socket.addEventListener('message', (packet) => {
+      if (String(packet.data).includes('SUBSCRIPTION_LIMIT_EXCEEDED'))
+        denied.push(String(packet.data));
+    });
+    for (const bookingId of ids)
+      socket.send(`42${JSON.stringify(['subscribe:booking', { bookingId }])}`);
+    await vi.waitFor(() => expect(denied).toHaveLength(1));
+    expect(fixture.lookup).toHaveBeenCalledTimes(21); // one handshake + twenty reservations
+    resume(activeCredential());
+    await vi.waitFor(() =>
+      expect([...fixture.realtime.io.sockets.sockets.values()][0]?.data.subscriptions.size).toBe(
+        20,
+      ),
+    );
+  } finally {
+    resume?.(activeCredential());
+    await fixture.close();
+  }
+});
+
+it('does not resurrect a subscription cancelled during authorization', async () => {
+  const fixture = await admissionFixture();
+  let resume!: (value: AccessCredentialState) => void;
+  try {
+    const socket = await fixture.connect();
+    socket.send(connectPacket);
+    fixture.finish(activeCredential());
+    await vi.waitFor(() => expect(fixture.realtime.io.sockets.sockets.size).toBe(1));
+    await delay(20);
+    const held = new Promise<AccessCredentialState>((resolve) => {
+      resume = resolve;
+    });
+    fixture.lookup.mockImplementation(() => held);
+    const bookingId = '00000000-0000-4000-8000-000000000099';
+    socket.send(`42${JSON.stringify(['subscribe:booking', { bookingId }])}`);
+    await vi.waitFor(() => expect(fixture.lookup).toHaveBeenCalledTimes(2));
+    socket.send(`42${JSON.stringify(['unsubscribe:booking', { bookingId }])}`);
+    await delay(30);
+    resume(activeCredential());
+    await delay(30);
+    const serverSocket = [...fixture.realtime.io.sockets.sockets.values()][0];
+    expect(serverSocket?.data.subscriptions.size).toBe(0);
+    expect(serverSocket?.rooms.has(`booking:${bookingId}`)).toBe(false);
+  } finally {
+    resume?.(activeCredential());
+    await fixture.close();
+  }
+});
+
+it.each(['revoked', 'expired'] as const)(
+  'disconnects a %s session before subscribing',
+  async (mode) => {
+    const fixture = await admissionFixture();
+    try {
+      const socket = await fixture.connect();
+      socket.send(connectPacket);
+      fixture.finish(activeCredential());
+      await vi.waitFor(() => expect(fixture.realtime.io.sockets.sockets.size).toBe(1));
+      await delay(20);
+      const state = activeCredential();
+      fixture.lookup.mockResolvedValue(
+        mode === 'revoked'
+          ? { ...state, sessionStatus: 'REVOKED' }
+          : { ...state, credentialExpiresAt: new Date(0) },
+      );
+      socket.send(
+        `42${JSON.stringify(['subscribe:booking', { bookingId: '00000000-0000-4000-8000-000000000099' }])}`,
+      );
+      await vi.waitFor(() => expect(fixture.realtime.io.sockets.sockets.size).toBe(0));
+    } finally {
+      await fixture.close();
+    }
+  },
+);
 
 function activeCredential(): AccessCredentialState {
   return {

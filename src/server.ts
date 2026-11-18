@@ -1,3 +1,4 @@
+import { createRealtimeMetrics } from './core/realtime/realtime-metrics.js';
 import { createServer, type RequestListener, type Server } from 'node:http';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -583,7 +584,9 @@ async function startApplication(
       if (config.realtime.enabled) {
         // Reuse bookingLifecycleRuntime.prisma to avoid exceeding database connection pool budget
         const sharedPrisma = bookingLifecycleRuntime.prisma;
+        const realtimeMetrics = createRealtimeMetrics(metrics.registry);
         realtimeInstance = createRealtimeServer({
+          metrics: realtimeMetrics,
           httpServer: server,
           config,
           sessionRepository: identityRuntime.sessionRepository,
@@ -592,6 +595,7 @@ async function startApplication(
           logger,
         });
         outboxRelay = createRealtimeOutboxRelay({
+          metrics: realtimeMetrics,
           prisma: sharedPrisma,
           broker: realtimeInstance.broker,
           redisManager,

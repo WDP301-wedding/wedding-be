@@ -5,6 +5,7 @@ import type { Logger } from 'pino';
 import type { RedisManager } from '../redis/redis-client.js';
 import type { RealtimeBroker } from './realtime-broker.js';
 import type { RealtimeEvent, RealtimeEventType } from './realtime-types.js';
+import type { RealtimeMetrics } from './realtime-metrics.js';
 import { createDeliveryQueue } from './delivery-queue.js';
 import { catalogResources, resourcesForCatalogEntity } from './catalog-events.js';
 
@@ -13,6 +14,7 @@ export interface OutboxRelayOptions {
   readonly broker: RealtimeBroker;
   readonly redisManager: RedisManager;
   readonly logger?: Logger;
+  readonly metrics?: RealtimeMetrics;
   readonly pollIntervalMs?: number;
 }
 
@@ -60,10 +62,13 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
                 // A notification row can change revision between claim and read. Its
                 // queued revision remains a distinct invalidation, never a cursor fence.
                 await broker.publish({ ...event, eventId: event.eventId + ':' + claim.revision });
+                options.metrics?.dispatchLag(stream, event.occurredAt);
                 dispatched++;
               }
               await queue.finish(stream, claim, true);
+              options.metrics?.delivery(stream, 'dispatched');
             } catch (err) {
+              options.metrics?.delivery(stream, 'retry');
               await queue.finish(stream, claim, false);
               logger?.error(
                 { err, stream, eventId: claim.eventId },
@@ -71,6 +76,9 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
               );
             }
           }
+        } catch (err) {
+          options.metrics?.delivery(stream, 'batch_error');
+          throw err;
         } finally {
           // Token check makes release harmless for delivered/reclaimed claims.
           await Promise.all(claims.map((claim) => queue.finish(stream, claim, false)));
@@ -474,7 +482,9 @@ export function createRealtimeOutboxRelay(options: OutboxRelayOptions): OutboxRe
                       ? [`/bookings/${bookingId}/invitations`]
                       : [
                           `/bookings/${bookingId}/staff-assignments`,
-                          `/bookings/${bookingId}/check-in-configuration`,
+                          `/staff/events`,
+                          `/staff/events/${bookingId}`,
+                          `/staff/events/${bookingId}/work-items`,
                         ],
                 occurredAt: row.occurredAt.toISOString(),
               };

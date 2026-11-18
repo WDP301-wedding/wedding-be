@@ -25,6 +25,7 @@ export function createRealtimeBroker(
 ): RealtimeBroker {
   // Deduplication cache to prevent echo or replay storms
   const seenEventIds = new Set<string>();
+  const inFlight = new Map<string, Promise<void>>();
   const MAX_SEEN_EVENTS = 10_000;
 
   function markAndCheckDuplicate(eventId: string): boolean {
@@ -66,6 +67,22 @@ export function createRealtimeBroker(
     broadcaster.emit('realtime:event', event);
   }
 
+  function dispatchOnce(rooms: readonly string[], event: RealtimeEvent): Promise<void> {
+    if (seenEventIds.has(event.eventId)) return Promise.resolve();
+    const pending = inFlight.get(event.eventId);
+    if (pending) return pending;
+    const delivery = Promise.resolve().then(async () => {
+      try {
+        await dispatchToRooms(rooms, event);
+        markAndCheckDuplicate(event.eventId);
+      } finally {
+        inFlight.delete(event.eventId);
+      }
+    });
+    inFlight.set(event.eventId, delivery);
+    return delivery;
+  }
+
   return {
     async publish(event: RealtimeEvent): Promise<void> {
       if (seenEventIds.has(event.eventId)) {
@@ -92,48 +109,49 @@ export function createRealtimeBroker(
         targetRooms.push('role:manager');
       }
 
-      await dispatchToRooms(targetRooms, event);
-      markAndCheckDuplicate(event.eventId);
+      await dispatchOnce(targetRooms, event);
     },
 
     async publishToBooking(bookingId: string, event: RealtimeEvent): Promise<void> {
       if (seenEventIds.has(event.eventId)) return;
-      await dispatchToRooms([`booking:${bookingId}`, 'role:manager'], event);
-      markAndCheckDuplicate(event.eventId);
+      await dispatchOnce([`booking:${bookingId}`, 'role:manager'], event);
     },
 
     async publishToAccount(accountId: string, event: RealtimeEvent): Promise<void> {
       if (seenEventIds.has(event.eventId)) return;
-      await dispatchToRooms([`account:${accountId}`], event);
-      markAndCheckDuplicate(event.eventId);
+      await dispatchOnce([`account:${accountId}`], event);
     },
 
     async publishToRole(role: string, event: RealtimeEvent): Promise<void> {
       if (seenEventIds.has(event.eventId)) return;
-      await dispatchToRooms([`role:${role}`], event);
-      markAndCheckDuplicate(event.eventId);
+      await dispatchOnce([`role:${role}`], event);
     },
 
     async publishToCatalog(event: RealtimeEvent): Promise<void> {
       if (seenEventIds.has(event.eventId)) return;
-      await dispatchToRooms(['public:catalog', 'role:manager'], event);
-      markAndCheckDuplicate(event.eventId);
+      await dispatchOnce(['public:catalog', 'role:manager'], event);
     },
 
     revokeSession(sessionId: string) {
       io.to(`session:${sessionId}`).emit('realtime:event', {
-        eventId: crypto.randomUUID(), schemaVersion: 1, type: 'session.revoked',
+        eventId: crypto.randomUUID(),
+        schemaVersion: 1,
+        type: 'session.revoked',
         scope: { entityType: 'session', entityId: sessionId },
-        resources: [], occurredAt: new Date().toISOString(),
+        resources: [],
+        occurredAt: new Date().toISOString(),
       });
       io.in(`session:${sessionId}`).disconnectSockets(true);
     },
 
     revokeAccount(accountId: string) {
       io.to(`account:${accountId}`).emit('realtime:event', {
-        eventId: crypto.randomUUID(), schemaVersion: 1, type: 'session.revoked',
+        eventId: crypto.randomUUID(),
+        schemaVersion: 1,
+        type: 'session.revoked',
         scope: { entityType: 'account', entityId: accountId },
-        resources: [], occurredAt: new Date().toISOString(),
+        resources: [],
+        occurredAt: new Date().toISOString(),
       });
       io.in(`account:${accountId}`).disconnectSockets(true);
     },
