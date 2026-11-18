@@ -12,9 +12,9 @@
 - Previous 2.0.0 business scope confirmed: 2026-10-10 (Section 22)
 - Previous amendment approval: project owner approved SPEC-03 through SPEC-11 and Section 21
   on 2026-10-06; module implementation plans and acceptance remain separate gates.
-- Capability index: [`CAPABILITY-MAP.md`](./CAPABILITY-MAP.md)
+- Capability index: [`CAPABILITY-MAP.md`](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/CAPABILITY-MAP.md)
 - Product requirements: [`PRODUCT-REQUIREMENTS.md`](./PRODUCT-REQUIREMENTS.md)
-- Platform contract: [`SPEC-core-platform.md`](./SPEC-core-platform.md)
+- Platform contract: [`SPEC-core-platform.md`](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-core-platform.md)
 - Governance rationale:
   [`ADR-002`](./docs/decisions/0002-freeze-program-contracts-before-parallel-specification.md)
 
@@ -1797,8 +1797,8 @@ consumer pins and actual Seating confirm/invalidate/UoW rollback/race evidence.
 The owner confirmed the seven interview decisions and full scope with “đúng với ý tôi r”.
 Authoritative requirements are in [the confirmed amendment](./docs/backend-scope-2026-10-10.md),
 [PRODUCT-REQUIREMENTS.md](./PRODUCT-REQUIREMENTS.md),
-[SPEC-commercial-contracts.md](./SPEC-commercial-contracts.md) and
-[SPEC-guest-management.md](./SPEC-guest-management.md).
+[SPEC-commercial-contracts.md](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-commercial-contracts.md) and
+[SPEC-guest-management.md](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-guest-management.md).
 
 - `guest-management` explicitly replaces the former guest-response module ID;
   guests only read invitations. Planned headcount derives from active household
@@ -1834,7 +1834,7 @@ Household/party identity model, automatic list-derived headcount and
 mandatory/multi-arrival check-in in Sections 6, 8, 21 and 22. Those sections remain
 historical compatibility/approval records, not new Guest/Staff integration contracts.
 Commercial/deposit/print money rules remain unchanged. Current sources are
-[Guest](./SPEC-guest-management.md), [Staff](./SPEC-staff-operations.md),
+[Guest](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-guest-management.md), [Staff](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-staff-operations.md),
 [scope](./docs/backend-scope-2026-10-10.md) and [tasks](./tasks/backend-revision-todo.md).
 
 ### 23.1 Identities and Ownership

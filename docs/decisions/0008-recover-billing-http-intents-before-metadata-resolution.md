@@ -79,8 +79,8 @@ and changed-body keys. Injected failures after committed deposit/refund prove re
 return the original IDs despite changed booking/ledger/approval state. New tables,
 dependencies and schema migrations are not needed for this HTTP publication.
 
-Authority: [SPEC-04](../../SPEC-payments-billing.md),
-[core specification](../../SPEC-core-platform.md),
+Authority: [SPEC-04](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-payments-billing.md),
+[core specification](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-core-platform.md),
 [contract baseline](../../CONTRACT-BASELINE.md),
 [ADR-007](0007-manual-billing-approval-and-ledger-views.md), and
 [Billing evidence](../../tasks/evidence/payments-billing.md).

@@ -8,7 +8,7 @@ Status: ACCEPTED for confirmed backend scope; source `623001b` passed the comple
 Linux/PostgreSQL backend workflow. Production/live business providers remain separate.
 
 Authority: [confirmed backend scope](../../docs/backend-scope-2026-10-10.md),
-[SPEC-08](../../SPEC-staff-operations.md), [active backlog](../backend-revision-todo.md).
+[SPEC-08](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-staff-operations.md), [active backlog](../backend-revision-todo.md).
 Hand-off: [strict API/provider documentation](../../docs/staff-operations-w1-w5.md).
 Machine-readable [manifest](staff-operations-provider-manifest-2026-10-12.json).
 

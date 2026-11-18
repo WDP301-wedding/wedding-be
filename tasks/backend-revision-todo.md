@@ -54,8 +54,8 @@ Business scope confirmed by the owner. Implementation below is pending unless
 checked with evidence. This is the active backlog for the commercial/profile
 extensions and SPEC-06 onward; supersedes older mixed backend/frontend outlines.
 Sources: [confirmed scope](../docs/backend-scope-2026-10-10.md),
-[commercial specification](../SPEC-commercial-contracts.md),
-[Guest specification](../SPEC-guest-management.md), and
+[commercial specification](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-commercial-contracts.md),
+[Guest specification](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-guest-management.md), and
 [SPEC-01–05 runtime/provider audit](./evidence/spec01-05-runtime-audit-2026-10-10.md).
 
 Owner-confirmed Group + optional Guest amendment: no Household/party model;

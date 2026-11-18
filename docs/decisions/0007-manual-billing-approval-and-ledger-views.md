@@ -95,7 +95,7 @@ See `operations.test.ts`, `operations-safety.test.ts`, `operations-storage.test.
 `balance-vnpay.test.ts`, `views.test.ts`, `readers-conformance.test.ts` and
 `operations-upgrade.test.ts` in `tests/integration/payments-billing/`.
 
-Authority: [SPEC-04](../../SPEC-payments-billing.md),
+Authority: [SPEC-04](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-payments-billing.md),
 [contract baseline](../../CONTRACT-BASELINE.md),
 [ADR-005](0005-recover-deposit-application-after-durable-settlement.md),
 [ADR-006](0006-durable-vnpay-evidence-and-reconciliation.md), and

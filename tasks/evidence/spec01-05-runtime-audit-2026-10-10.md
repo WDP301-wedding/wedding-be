@@ -161,7 +161,7 @@ This snapshot is not the current Railway/Vercel environment or running-server st
 
 ### SPEC-05: Invitation Studio
 
-- [Invitation checkpoint](../../SPEC-invitation-studio.md#14-w2w4-backend-implementation-checkpoint--2026-10-09)
+- [Invitation checkpoint](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-invitation-studio.md#14-w2w4-backend-implementation-checkpoint--2026-10-09)
   and [controlled Storage](../../tests/integration/invitation-studio/controlled-storage.ts)
   explicitly verify Gemini/Supabase adapters without live network. [Review fixes](./spec05-review-fixes.md)
   prove canonical Booking/Billing persistence and atomic print charges; neither is
@@ -174,7 +174,7 @@ This snapshot is not the current Railway/Vercel environment or running-server st
   invitation design. Real model/key/quota/output/storage/design integration needs
   `RV-10`. Durable unknown-effect reconciliation needs fault/operational proof
   (`RV-11`) without repeatedly purchasing generation; do not send private photos.
-- [Approved print-file follow-up](../../SPEC-invitation-studio.md#11-approved-print-file-output-follow-up-2026-10-08)
+- [Approved print-file follow-up](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-invitation-studio.md#11-approved-print-file-output-follow-up-2026-10-08)
   remains explicitly pending. Current printable snapshot/order routes and public
   HTML are not authorized printable-file rendering/download. Add output contract
   (`RV-17`), renderer without seating (`RV-18`) and real Seating output (`RV-19`).

@@ -59,5 +59,5 @@ Proof: `src/core/database/booking-unit-of-work.test.ts`,
 [the BK-W8 checkpoint](../../tasks/evidence/booking-lifecycle.md).
 
 Authority: [ADR-003](0003-publish-provider-hand-offs-for-overlapping-implementation.md),
-[SPEC-03](../../SPEC-booking-lifecycle.md), and
+[SPEC-03](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-booking-lifecycle.md), and
 [the approved bounded plan](../archive/plan-2026-10-10.md#20-spec-03-booking-lifecycle-bounded-implementation-plan).

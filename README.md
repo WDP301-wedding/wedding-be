@@ -19,16 +19,8 @@ is retained and future client delivery belongs to the frontend team.
 - [Frontend screen brief and copyable Stitch prompt (Vietnamese)](docs/frontend-stitch-design-brief-vi.md):
   role/channel screen map, business rules, UI states and the verified Swagger contract.
 
-- [Product requirements](PRODUCT-REQUIREMENTS.md), [capability map](CAPABILITY-MAP.md)
+- [Product requirements](PRODUCT-REQUIREMENTS.md)
   and [contract baseline](CONTRACT-BASELINE.md#23-group-and-optional-guest-list--2026-10-10).
-- Foundation and completed modules: [Core](SPEC-core-platform.md),
-  [Identity](SPEC-identity-access.md), [Venue](SPEC-venue-catalog.md),
-  [Booking](SPEC-booking-lifecycle.md), [Payments](SPEC-payments-billing.md),
-  [Invitation](SPEC-invitation-studio.md).
-- Extensions and pending modules: [Commercial contracts](SPEC-commercial-contracts.md),
-  [Guest](SPEC-guest-management.md), [Seating](SPEC-seating-plan.md),
-  [Staff](SPEC-staff-operations.md), [Notifications](SPEC-notifications-automation.md),
-  [Analytics](SPEC-analytics-dashboard.md), [Release](SPEC-release-demo.md).
 - [Provider/ownership hand-off rules](docs/team-implementation.md) and
   [current Invitation hand-off](docs/spec-05-w2-w4-handoff.md).
 
@@ -51,10 +43,9 @@ active task lists, current API contracts or fresh release/provider acceptance:
 - [Original post-Booking mixed-client scope](docs/archive/post-booking-experience-2026-10-08.md).
 - [SPEC-05 W2–W4 checkpoint](tasks/evidence/spec05-w2-w4-handoff-2026-10-09.md).
 
-Current intake/overview requirements now live in [Booking](SPEC-booking-lifecycle.md#11-intake-and-couple-overview);
-account settings and current password OTP in [Identity](SPEC-identity-access.md#23-account-settings-and-current-password-otp).
-The redundant SPEC-05/06 implementation guide has been removed; this index links
-directly to its authoritative sources. Archival does not close any pending task.
+See the historical specifications for
+[intake and the Couple overview](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-booking-lifecycle.md#11-intake-and-couple-overview)
+and [account settings and password OTP](https://github.com/WDP301-wedding/wedding-be/blob/37ee17a1fd9fb88db17bfecdd763d3ae78d35101/SPEC-identity-access.md#23-account-settings-and-current-password-otp).
 
 ## Prerequisites
 
