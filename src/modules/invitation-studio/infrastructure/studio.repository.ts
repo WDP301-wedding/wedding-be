@@ -47,15 +47,16 @@ export class StudioRepository {
         id: string;
         revision: number;
         currentVersionId: string;
+        active: boolean;
         versionId: string | null;
         versionTemplateId: string | null;
         content: Prisma.JsonValue;
       }[]
     >(Prisma.sql`
-      SELECT h.id, h.revision, h."currentVersionId", v.id AS "versionId",
+      SELECT h.id, h.revision, h."currentVersionId", h.active, v.id AS "versionId",
         v."templateId" AS "versionTemplateId", v.content
       FROM (
-        SELECT id, revision, "currentVersionId"
+        SELECT id, revision, "currentVersionId", active
         FROM ${Prisma.raw(`${schema}."InvitationTemplate"`)}
         WHERE ${query.includeArchived ? Prisma.sql`TRUE` : Prisma.sql`active = TRUE`}
           ${query.cursor === undefined ? Prisma.empty : Prisma.sql`AND id > ${query.cursor}::uuid`}

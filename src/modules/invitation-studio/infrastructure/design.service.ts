@@ -131,6 +131,7 @@ export class DesignService {
         templateId: row.id,
         versionId: row.versionId,
         revisionNumber: row.revision,
+        active: row.active,
         ...parseStudio(designContentSchema, row.content),
       };
     });
